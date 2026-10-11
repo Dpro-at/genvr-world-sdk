@@ -1,7 +1,7 @@
 import { CommandPayload, WorldDocument, WorldPackage, type ItemPackage } from './vendor/contracts/index.js';
 import { type ChatModel, type AssistantEvent } from './vendor/assistant/index.js';
 import { type WorldState } from './vendor/world/index.js';
-export declare const SDK_VERSION = "0.1.0";
+export declare const SDK_VERSION = "0.1.1";
 export declare const PACKAGE_WORK_BUDGET = 5000000;
 export type WorldEvent = {
     type: 'changed' | 'saved' | 'opened';

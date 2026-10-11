@@ -47973,7 +47973,7 @@ async function runAssistant({ model: model2, host, history, prompt, onEvent, max
 var CORRECTION_WINDOW_MS = 10 * 60 * 1e3;
 
 // src/session.ts
-var SDK_VERSION = "0.1.0";
+var SDK_VERSION = "0.1.1";
 var PACKAGE_WORK_BUDGET = 5e6;
 function readWorldPackage(input2) {
   const text = typeof input2 === "string" ? input2 : JSON.stringify(input2);
@@ -48203,7 +48203,7 @@ var root = resolve(process2.env.GENVR_WORLD_DIR ?? ".genvr-worlds");
 await mkdir(root, { recursive: true });
 var realRoot = await realpath(root);
 var session;
-var server = new Server({ name: "genvr-world-sdk", version: "0.1.0" }, { capabilities: { tools: {} } });
+var server = new Server({ name: "3d-world-sdk", version: SDK_VERSION }, { capabilities: { tools: {} } });
 var localTools = [
   { name: "create_world", description: "Create a new local private world. No Genvr account required.", inputSchema: { type: "object", properties: { title: { type: "string", maxLength: 60 }, style: { type: "string", enum: ["blocky", "realistic", "anime", "voxel"] } }, additionalProperties: false } },
   { name: "save_world_local", description: "Save the current world in the configured local folder.", inputSchema: { type: "object", properties: {}, additionalProperties: false } },

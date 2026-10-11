@@ -1,9 +1,9 @@
-# 3D World SDK 0.1.0 (preview)
+# 3D World SDK 0.1.1 (preview)
 
 Standalone authoring with the same Genvr world contracts, command engine, Core Library and assistant tools.
 No Agent Player dependency or integration. JavaScript is bundled; declaration dependencies are ordinary npm
 packages, not private workspace packages. Download the standalone `.tgz` from the Dpro GitHub SDK prerelease,
-then `npm install /path/to/3d-world-sdk-0.1.0.tgz` (Node 24+). Run `npx genvr-world-demo` to open the
+then `npm install /path/to/3d-world-sdk-0.1.1.tgz` (Node 24+). Run `npx genvr-world-demo` to open the
 included local example at http://127.0.0.1:3028. Registry preview installation: `npm install 3d-world-sdk@preview`. Bundled Genvr source retains AGPL-3.0-only;
 the included asset credits describe their separate licenses. This preview uses the shared engine and
 authoring tools; its demo is a simplified host, not the complete Genvr Studio interface.
@@ -20,6 +20,27 @@ const draft = await client.createDraft(world); // retain ID before upload, so re
 const uploaded = await client.uploadWorld(world, { id: draft.id, baseVersion: 0 });
 // Publication is a separate explicit action requiring content answers and access settings.
 ```
+
+## Build worlds for games, films and social spaces
+
+Use the SDK to create and edit environments for games, film sets, meeting rooms, exhibitions,
+classrooms and other interactive experiences. The same validated Genvr authoring tools can place
+items, build rooms, shape supported terrain, change the environment and store game rules/scripts.
+Agents can generate and revise these worlds, save them locally, preview them and explicitly submit
+them to Genvr. Local asset packages can carry creator-owned models.
+
+| Use | Available in this package | Additional host or Genvr integration |
+| --- | --- | --- |
+| World and room design | Authoring tools, local save/open, undo/redo, optional 3D preview | Full Studio editor UI if needed |
+| Games | Environments and validated game/rule/script authoring data | Game execution, player controls and authoritative server hosting |
+| Films | Create the locations, props and environment for a film | Genvr Filming workspace or a host camera/recording/timeline/export implementation |
+| Avatars | Worlds can use host-supplied, licensed character assets through runtime/asset adapters | Avatar creation UI, rig/assets, animation and account persistence |
+| Meetings and social rooms | Build the room and save/publish its world | Multiplayer, participants, voice/video, permissions and a server |
+
+The preview does not include the complete Genvr filming editor, avatar designer, multiplayer service
+or meeting application. A downloaded local world is not automatically a playable game, recorded film
+or live meeting. Platform publication requires an authenticated account and existing content/access
+checks; store item submission enters review. Agent Player integration is deferred.
 
 Use `world.generate(prompt, model)` with your own `ChatModel` adapter or call `world.tool(name, args)` from
 any agent. Exported `TOOL_DEFINITIONS` describe the same validated authoring tools as Genvr. Models cannot

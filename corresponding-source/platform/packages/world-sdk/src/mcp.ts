@@ -6,13 +6,13 @@ import { resolve, dirname } from 'node:path';
 import process from 'node:process';
 import { Id } from '@genvr/contracts';
 import { TOOL_DEFINITIONS } from '@genvr/assistant';
-import { WorldSession } from './session.js';
+import { WorldSession, SDK_VERSION } from './session.js';
 
 const root = resolve(process.env.GENVR_WORLD_DIR ?? '.genvr-worlds');
 await mkdir(root, { recursive: true });
 const realRoot = await realpath(root);
 let session: WorldSession | undefined;
-const server = new Server({ name: 'genvr-world-sdk', version: '0.1.0' }, { capabilities: { tools: {} } });
+const server = new Server({ name: '3d-world-sdk', version: SDK_VERSION }, { capabilities: { tools: {} } });
 const localTools = [
   { name: 'create_world', description: 'Create a new local private world. No Genvr account required.', inputSchema: { type: 'object' as const, properties: { title: { type: 'string', maxLength: 60 }, style: { type: 'string', enum: ['blocky', 'realistic', 'anime', 'voxel'] } }, additionalProperties: false } },
   { name: 'save_world_local', description: 'Save the current world in the configured local folder.', inputSchema: { type: 'object' as const, properties: {}, additionalProperties: false } },

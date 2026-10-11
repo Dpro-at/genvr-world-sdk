@@ -118,7 +118,7 @@ import {
   worldBox,
   zoneFromParams,
   zoneShapeOfItem
-} from "./chunk-POHMG6VF.js";
+} from "./chunk-HMRUHG7W.js";
 
 // ../../../node_modules/.pnpm/three@0.186.1/node_modules/three/build/three.core.js
 var REVISION = "186";
