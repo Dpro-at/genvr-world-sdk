@@ -1,0 +1,6 @@
+/** Port of Tidewater (github.com/dgreenheck/tidewater, commit 4811ba48), Copyright 2026 DRG Software Solutions LLC, MIT; LICENSE-tidewater.md. */
+export { mulberry32, Noise2D, smoothstep, clamp, type Rng } from './grass-noise.js';
+export { CELL, R_NEAR, R_MID, R_FAR, FADE_T2, FADE_T1, FADE_T0, MAX_NEAR, MAX_MID, MAX_FAR, CLUMPS, BLADES, BLADE_TIER, TIER_N, OATS, VINES, KIND, blueNoise, PatchBuilder, clumpParams, buildPatch, type P2, type GrassBlade, type GrassClump, type GrassLevel, } from './grass-patch.js';
+export { f, C, MEADOW, VEG_MODULE_REF, grassModule, grassMaterialOptions, standInGrassMaterial, grassTierFade, grassWidthCompensation, grassTierZeroCut, type GrassWgslModule, type GrassMaterialSource, type GrassMaterialOptions, type GrassMaterialFactory, } from './grass-material.js';
+export { GrassField, RecordedGrassTexture, recordGrassTexture, type GrassTerrain, type GrassMask, type GrassTextureOptions, type GrassTexture, type GrassTextureFactory, type GrassCamera, type GrassLevelMesh, type GrassFieldOptions, } from './grass-field.js';
+export { GRASS_MASK_TEXEL, GRASS_MASK_RULES, buildGrassMask, soilGrassSite, type GrassCover, type GrassNoise, type GrassMaskSite, type GrassMaskOptions, type GrassMaskResult, type SoilGrassInputs, } from './grass-mask.js';

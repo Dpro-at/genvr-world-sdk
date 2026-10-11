@@ -1,0 +1,60 @@
+/** Port of Tidewater (github.com/dgreenheck/tidewater, commit 4811ba48), Copyright 2026 DRG Software Solutions LLC, MIT; LICENSE-tidewater.md. */
+import type { Vector2 } from 'three';
+import { type BirdSpecies } from './bird-shapes.js';
+import { type BirdPoseRecord, type WingGlide } from './bird-pose.js';
+import { type Rng } from './kit.js';
+export interface FlightConfig {
+    speed: number;
+    minSpeed: number;
+    maxBank: number;
+    roll: number;
+    climb: number;
+    sink: number;
+    freq: number;
+    amp: number;
+    glide: WingGlide;
+    duty: number;
+}
+export declare const FLIGHT: Record<number, FlightConfig>;
+export declare class Flyer {
+    species: number;
+    sp: BirdSpecies;
+    cfg: FlightConfig;
+    rng: Rng;
+    P: BirdPoseRecord;
+    x: number;
+    y: number;
+    z: number;
+    vx: number;
+    vy: number;
+    vz: number;
+    yaw: number;
+    gamma: number;
+    bank: number;
+    pitch: number;
+    speed: number;
+    phase: number;
+    flap: number;
+    flapWant: number;
+    burst: number;
+    bursting: boolean;
+    freqMul: number;
+    wander: number;
+    headYaw: number;
+    headPitch: number;
+    tailSpread: number;
+    tailPitch: number;
+    legs: number;
+    flare: number;
+    dive: number;
+    hover: number;
+    windK: number;
+    fold: number;
+    extraPitch: number;
+    twirl: number;
+    scale0?: number;
+    constructor(species: number, seed: number, rng: Rng);
+    place(x: number, y: number, z: number, yaw: number): void;
+    steer(dt: number, tx: number, ty: number, tz: number, speed: number, power?: number, turnGain?: number, wind?: Vector2 | null): void;
+    animate(dt: number): void;
+}

@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Genvr World SDK</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#111827;color:#e5e7eb;font:16px system-ui}main{max-width:1200px;margin:auto;padding:20px}h1{margin:0 0 8px}p{color:#b7c4d5}button,input,textarea{font:inherit;border:1px solid #475569;border-radius:8px;padding:10px;background:#1e293b;color:inherit}button{cursor:pointer}button:disabled{opacity:.5}button:hover{background:#334155}.row{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}input{min-width:0;flex:1}textarea{width:100%;min-height:90px}#view{height:430px;border-radius:12px;background:#334155;position:relative;overflow:hidden}#status{white-space:pre-wrap;padding:12px;background:#1e293b;border-radius:8px}details{margin-top:16px;border:1px solid #475569;border-radius:8px;padding:12px}label{display:block;margin:8px 0}label input[type=checkbox]{margin-right:8px}@media(max-width:600px){main{padding:12px}#view{height:300px}.row input{flex-basis:100%}}
+</style>
+<main><h1>Build a world, keep it yours</h1><p>Standalone SDK preview. Create, edit and save locally. Upload to your Genvr private draft only when you choose.</p>
+<div class="row"><button id="new">New world</button><button id="garden">Generate garden</button><button id="bench">Add bench</button><button id="sky">Sunset</button><button id="undo">Undo</button><button id="redo">Redo</button></div>
+<div id="view" aria-label="3D world preview"></div>
+<div class="row"><button id="save">Save locally</button><button id="open">Reopen local save</button><button id="download">Download world file</button><label>Import file <input id="file" type="file" accept=".json,.genvr-world"></label></div>
+<details><summary>Your agent / AI</summary><p>Connect a local or host-provided Ollama-compatible chat endpoint. It must accept messages and return streamed tool calls using the SDK tool definitions. No provider key is stored in world files.</p>
+<div class="row"><input id="model" placeholder="http://localhost:11434/api/chat"><input id="model-name" value="qwen3:8b" aria-label="Model name"></div><textarea id="prompt" placeholder="Build a garden, add benches and set sunset"></textarea><button id="generate">Ask model</button></details>
+<details><summary>Upload to Genvr</summary><p>Use an endpoint and existing authenticated session allowed by that host's CORS settings. Production sign-in is required. Import replaces the selected private draft at the shown version.</p>
+<div class="row"><input id="api" value="http://localhost:4028" aria-label="API endpoint"><input id="target" placeholder="Private draft ID"><input id="version" type="number" min="0" value="0" aria-label="Target version"></div>
+<div class="row"><button id="draft">Create private draft</button><button id="upload">Upload world to draft</button></div>
+<p>Publish from your world's About page after completing the content questionnaire and choosing access. Imported worlds stay private until then.</p></details>
+<details><summary>Submit your own item to the store</summary><p>Upload a self-contained GLB you own or are licensed to distribute. This sends it for review; it does not instantly publish it.</p>
+<div class="row"><input id="item-name" placeholder="Item name"><input id="item-file" type="file" accept=".glb"><button id="item-submit">Submit item for review</button></div></details>
+<pre id="status" role="status">Ready.</pre><script type="module" src="/dist/demo-app.js"></script></main></html>

@@ -1,0 +1,1 @@
+This reviewed distribution comes from Dpro-at/genvr commit 1e6dc286. Bundled sourcemaps include corresponding original modules; canonical build sources: https://github.com/Dpro-at/genvr/tree/1e6dc286/platform/packages/world-sdk . License AGPL-3.0-only, with separate asset credits. npm publication pending registry authentication. No Agent Player integration.

@@ -1,0 +1,38 @@
+{
+  "name": "@genvr/world-sdk",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Standalone Genvr world authoring, local persistence and explicit platform publication adapters.",
+  "license": "AGPL-3.0-only",
+  "engines": {
+    "node": ">=24"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./runtime": {
+      "types": "./dist/types/runtime.d.ts",
+      "default": "./dist/runtime.js"
+    }
+  },
+  "dependencies": {
+    "zod": "4.6.5",
+    "three": "0.186.1",
+    "@types/three": "0.186.0",
+    "@dimforge/rapier3d-compat": "0.20.0"
+  },
+  "bin": {
+    "genvr-world-mcp": "./dist/mcp.js",
+    "genvr-world-demo": "./serve.mjs"
+  },
+  "files": [
+    "dist",
+    "demo",
+    "assets",
+    "serve.mjs",
+    "README.md",
+    "LICENSE"
+  ]
+}
