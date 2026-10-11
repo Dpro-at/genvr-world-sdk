@@ -2,7 +2,7 @@ import { build } from 'esbuild';
 import { mkdir, readFile, writeFile, readdir, cp } from 'node:fs/promises';
 import { dirname, relative, resolve } from 'node:path';
 await mkdir('dist', { recursive: true });
-await build({ entryPoints: ['src/index.ts', 'src/runtime.ts'], outdir: 'dist', bundle: true,
+await build({ entryPoints: ['src/index.ts', 'src/runtime.ts', 'src/studio-project.ts'], outdir: 'dist', bundle: true,
   splitting: true, format: 'esm', platform: 'browser', target: 'es2022', sourcemap: true,
 });
 await build({ entryPoints: ['demo/app.ts'], outfile: 'dist/demo-app.js', bundle: true,
@@ -46,8 +46,10 @@ await writeFile('dist/package-manifest.json', JSON.stringify({ name: '3d-world-s
   repository: { type: 'git', url: 'git+https://github.com/Dpro-at/genvr-world-sdk.git' },
   publishConfig: { access: 'public', tag: 'preview' },
   engines: { node: '>=24' },
-  exports: { '.': { types: './dist/types/index.d.ts', default: './dist/index.js' }, './runtime': { types: './dist/types/runtime.d.ts', default: './dist/runtime.js' } },
+  exports: { '.': { types: './dist/types/index.d.ts', default: './dist/index.js' }, './runtime': { types: './dist/types/runtime.d.ts', default: './dist/runtime.js' },
+    './studio': { types: './dist/studio.d.ts', default: './dist/studio.js' }, './studio.css': './dist/studio.css',
+    './studio-project': { types: './dist/types/studio-project.d.ts', default: './dist/studio-project.js' } },
   dependencies: { zod: '4.6.5', three: '0.186.1', '@types/three': '0.186.0', '@dimforge/rapier3d-compat': '0.20.0' },
-  bin: { 'genvr-world-mcp': './dist/mcp.js', 'genvr-world-demo': './serve.mjs' },
-  files: ['dist', 'demo', 'assets', 'serve.mjs', 'README.md', 'LICENSE'],
+  bin: { 'genvr-world-mcp': './dist/mcp.js', 'genvr-world-demo': './serve.mjs', 'genvr-studio': './serve-studio.mjs' },
+  files: ['dist', 'demo', 'assets', 'serve.mjs', 'serve-studio.mjs', 'README.md', 'LICENSE'],
 }, null, 2));

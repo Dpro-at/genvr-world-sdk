@@ -1,0 +1,52 @@
+<!doctype html><meta charset="utf-8"><title>Tidewater post integration</title>
+<script type="importmap">{"imports":{"three/webgpu":"/node_modules/three/build/three.webgpu.js","three/tsl":"/node_modules/three/build/three.tsl.js","three":"/node_modules/three/build/three.webgpu.js","three/addons/":"/node_modules/three/examples/jsm/"}}</script>
+<script type="module">
+import * as T from 'three/webgpu';
+import {TidewaterPost} from '/dist/post/index.js';
+import {hazeShadowProvider} from '/dist/post/shadow-provider.js';
+import {PostPass} from '/dist/post/pass.js';
+import {GroundBounce} from '/dist/tidewater-sky/ground-bounce.js';
+import {PostEffects} from '/dist/post-effects.js';
+async function run(){
+const r=new T.WebGPURenderer({antialias:false,trackTimestamp:true});await r.init();r.setSize(128,96);r.setAnimationLoop(()=>{});document.body.append(r.domElement);
+const scene=new T.Scene();scene.background=new T.Color(.2,.35,.5);
+const c=new T.PerspectiveCamera(62,128/96,.1,60000);c.coordinateSystem=T.WebGPUCoordinateSystem;c.position.set(0,2,5);c.lookAt(0,0,0);c.updateProjectionMatrix();c.updateMatrixWorld(true);
+const ground=new T.Mesh(new T.PlaneGeometry(40,40),new T.MeshBasicNodeMaterial({color:0x947650}));ground.rotation.x=-Math.PI/2;scene.add(ground);
+const cube=new T.Mesh(new T.BoxGeometry(1,1,1),new T.MeshBasicNodeMaterial({color:0xcc6633}));cube.position.y=.5;scene.add(cube);
+const water=new T.Mesh(new T.PlaneGeometry(4,4),new T.MeshBasicNodeMaterial({color:0x225566,transparent:true,opacity:.6,depthWrite:true,side:T.DoubleSide}));water.material.name='tidewater-sea';const wave=T.TSL.uniform(0);water.material.positionNode=T.TSL.positionLocal.add(T.TSL.vec3(0,0,T.TSL.sin(T.TSL.positionLocal.x.mul(4)).mul(wave)));water.rotation.x=-Math.PI/2;water.position.set(1,.1,1);scene.add(water);
+const sky={light:{direction:new T.Vector3(0,1,0),color:new T.Color(4,3,2),night:0},atmosphere:{skyIrradiance:[.2,.3,.4],skyLuminance:()=>T.TSL.vec3(.2,.3,.4)},shading:{moonSky:()=>T.TSL.vec3(0)},clouds:{cloudShadow:()=>T.TSL.float(1),sampleView:()=>T.TSL.vec4(0,0,0,1)}};
+const lighting={sea:T.TSL.uniform(0),sun:new T.DirectionalLight(),bounce:{heightfieldVisibilityNode:()=>T.TSL.float(1)}};
+const post=new TidewaterPost(r,scene,c,sky,lighting);
+for(let i=0;i<4;i++){await new Promise(requestAnimationFrame);cube.position.x=i*.03;wave.value=i*.1;post.render(1/60,0);}
+const pixels=await r.readRenderTargetPixelsAsync(post.sceneTarget,0,0,128,96);let nonzero=0;for(const x of pixels)if(x)nonzero++;
+const maskPixels=await r.readRenderTargetPixelsAsync(post.sceneTarget,0,0,128,96,2),velocityPixels=await r.readRenderTargetPixelsAsync(post.sceneTarget,0,0,128,96,1);let waterPixels=0,waterVelocity=0;
+for(let i=0;i<maskPixels.length;i+=4)if(T.DataUtils.fromHalfFloat(maskPixels[i+1])>.5){waterPixels++;waterVelocity=Math.max(waterVelocity,Math.abs(T.DataUtils.fromHalfFloat(velocityPixels[i])),Math.abs(T.DataUtils.fromHalfFloat(velocityPixels[i+1])));}
+const restored=!c.view?.enabled&&r.getRenderTarget()===null&&r.getMRT()===null&&scene.background!==null;
+r.setSize(96,64);post.render(1/60,0);await r.backend.device.queue.onSubmittedWorkDone();const timings=[];r.setSize(2560,1440);post.render(1/60,0);await r.backend.device.queue.onSubmittedWorkDone();await r.resolveTimestampsAsync('compute');await r.resolveTimestampsAsync('render');
+for(let i=0;i<4;i++){await new Promise(requestAnimationFrame);post.render(1/60,0);await r.backend.device.queue.onSubmittedWorkDone();timings.push({compute:await r.resolveTimestampsAsync('compute'),render:await r.resolveTimestampsAsync('render')});}
+const stageTimings={};const p=post.passes;
+for(const [name,draw] of Object.entries({scene:()=>p.scene(),beauty:()=>p.beauty.update(),ao:()=>p.ao.update(r,1/60,c),haze:()=>p.haze.update(r,1/60,c),temporal:()=>{p.temporal.beginFrame();p.temporal.update(r,1/60);},motion:()=>p.motion.update(r,1/60),bloom:()=>p.bloom.update(r),final:()=>p.final.render()})){
+ await r.resolveTimestampsAsync('compute');await r.resolveTimestampsAsync('render');draw();await r.backend.device.queue.onSubmittedWorkDone();const compute=await r.resolveTimestampsAsync('compute'),render=await r.resolveTimestampsAsync('render');stageTimings[name]={compute:['scene','beauty','final'].includes(name)?0:compute,render:['scene','beauty','final','ao'].includes(name)?render:0};}
+const savedProjection=post.projection;post.dispose();post.dispose();r.setSize(96,64);
+const rebuilt=new TidewaterPost(r,scene,c,sky,lighting);c.fov=55;c.updateProjectionMatrix();await new Promise(requestAnimationFrame);rebuilt.render(1/60,0);
+const projectionStable=rebuilt.projection===savedProjection&&Math.abs(savedProjection.elements[5]-c.projectionMatrix.elements[5])<1e-10;rebuilt.dispose();
+const shadowTarget=new T.RenderTarget(16,16);shadowTarget.depthTexture=new T.DepthTexture(16,16,T.UnsignedIntType);
+const material=new T.NodeMaterial();material.fragmentNode=T.TSL.vec4(0,0,0,1);material.depthNode=T.TSL.uv().y;
+const quad=new T.QuadMesh(material);r.setRenderTarget(shadowTarget);r.clear();quad.render(r);r.setRenderTarget(null);
+const shadowSun=new T.DirectionalLight();shadowSun.shadow.shadowNode={lights:[0,1,2].map(()=>{const light=new T.DirectionalLight();light.shadow.map=shadowTarget;return light;})};
+const probeCamera=new T.PerspectiveCamera();probeCamera.updateMatrixWorld(true);
+const hard=hazeShadowProvider(shadowSun,probeCamera);const probe=new PostPass(r,T.TSL.vec4(hard(T.TSL.vec3(.5,.25,.5)),hard(T.TSL.vec3(.5,.75,.5)),0,1),'shadow-probe',2,2);probe.update();
+const shadowPixels=await r.readRenderTargetPixelsAsync(probe.target,0,0,2,2);const shadowCheck=[T.DataUtils.fromHalfFloat(shadowPixels[0]),T.DataUtils.fromHalfFloat(shadowPixels[1])];
+probe.dispose();quad.material.dispose();shadowTarget.dispose();
+const n=T.TSL;const bounce=new GroundBounce({resolution:32,origin:new T.Vector2(-16,-16),size:32,
+ heightNode:xz=>xz.x.greaterThan(16).and(xz.x.lessThan(50)).select(n.float(100),n.float(0)),normalNode:()=>n.vec3(0,1,0),albedoNode:()=>n.vec3(.3),sunDirection:n.uniform(new T.Vector3(1,1,0).normalize()),sunColor:n.uniform(new T.Vector3(1,1,1)),seaLevel:n.uniform(-100)});
+bounce.update(r,true);const hillProbe=new PostPass(r,n.vec4(bounce.heightfieldVisibilityNode(n.vec3(0,10,0)),bounce.heightfieldVisibilityNode(n.vec3(0,150,0)),0,1),'hill-probe',2,2);hillProbe.update();
+const hillPixels=await r.readRenderTargetPixelsAsync(hillProbe.target,0,0,2,2);const hillCheck=[T.DataUtils.fromHalfFloat(hillPixels[0]),T.DataUtils.fromHalfFloat(hillPixels[1])];hillProbe.dispose();bounce.dispose();
+scene.userData.tidewaterSky=sky;scene.userData.tidewaterLighting=lighting;
+const effects=new PostEffects(r,scene,c);
+for(const mode of ['tidewater','genvr','tidewater','genvr']){effects.set(true,{on:true,rays:true},mode);for(let k=0;k<3;k++){await new Promise(requestAnimationFrame);effects.setSubmerged(k===1?1:0);effects.render(1/60);}}
+effects.dispose();await r.backend.device.queue.onSubmittedWorkDone();
+const pass=nonzero>100&&waterPixels>100&&waterVelocity<.0001&&restored&&projectionStable&&shadowCheck[0]===1&&shadowCheck[1]===0&&hillCheck[0]===0&&hillCheck[1]===1;window.__result={pass,nonzero,waterPixels,waterVelocity,restored,projectionStable,qualityAndUnderwater:true,shadowCheck,hillCheck,timings,stageTimings};r.setAnimationLoop(null);
+}
+run().catch(e=>{console.error(e);window.__result={error:String(e.stack??e),pass:false};});
+</script>

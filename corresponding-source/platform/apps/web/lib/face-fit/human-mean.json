@@ -1,0 +1,19 @@
+{
+  "eyeWidth": 0.4111,
+  "eyeOpen": 0.2586,
+  "eyeSpacing": 0.5891,
+  "eyeHeight": 0.6809,
+  "eyeTilt": 0.0304,
+  "browHeight": 0.3943,
+  "noseWidth": 0.5053,
+  "noseLength": 0.6978,
+  "mouthWidth": 0.7795,
+  "mouthHeight": 0.2907,
+  "upperLip": 0.0933,
+  "lowerLip": 0.1305,
+  "mouthCorners": -0.0118,
+  "jawWidth": 1.8852,
+  "chinWidth": 0.7327,
+  "chinHeight": 0.6408,
+  "faceWidth": 0.8677
+}

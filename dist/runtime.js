@@ -49,6 +49,7 @@ import {
   decodeTerrainFieldTile,
   defaultFromY,
   doorSpots,
+  encodeTerrain,
   findAnimation,
   findBody,
   findSkinMaterial,
@@ -118,7 +119,7 @@ import {
   worldBox,
   zoneFromParams,
   zoneShapeOfItem
-} from "./chunk-TR5JHFWL.js";
+} from "./chunk-Y2ORNEXY.js";
 
 // ../../../node_modules/.pnpm/three@0.186.1/node_modules/three/build/three.core.js
 var REVISION = "186";
@@ -111195,6 +111196,7 @@ var CHARACTER = {
 var DEFAULT_SETTINGS = { maxStep: 0.4, maxSlopeDeg: 45, snapToGround: 0.3 };
 var PhysicsWorld = class {
   world;
+  #started = false;
   constructor() {
     this.world = new zg.World({ x: 0, y: -9.81, z: 0 });
   }
@@ -111318,6 +111320,12 @@ var PhysicsWorld = class {
   step(dt2) {
     this.world.timestep = dt2;
     this.world.step();
+    this.#started = true;
+  }
+  /** Rapier 0.20 fills its broad phase on the first positive step, not when colliders are added. */
+  prepareCharacterQueries() {
+    if (!this.#started)
+      this.step(1 / 60);
   }
   dispose() {
     this.world.free();
@@ -111384,6 +111392,7 @@ var Character = class {
   }
   /** Moves the collider with the one-way filter and records a side wall it ran into. */
   #compute(delta) {
+    this.physics.prepareCharacterQueries();
     this.#feetY = this.#body.translation().y - CHARACTER.centerOffset;
     this.#controller.computeColliderMovement(this.#collider, delta, void 0, void 0, this.#filter);
     this.#wall = 0;
@@ -116361,6 +116370,7 @@ async function createRuntime({ onFilmFrame, onRendered, container, world, terrai
     get world() {
       return state.doc;
     },
+    snapshot: () => ({ world: structuredClone(state.doc), terrainChunks: encodeTerrain(state).map((row) => row.data).filter(Boolean) }),
     get playerPosition() {
       const pose = rideNow ? items.livePose(rideNow.instanceId) : null;
       return pose ? { x: pose.x, y: pose.y, z: pose.z } : character.feet;

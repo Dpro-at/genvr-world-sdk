@@ -1,2 +1,7 @@
 packages:
+  - admin
+  - platform/apps/*
   - platform/packages/*
+
+patchedDependencies:
+  '@mediapipe/tasks-vision@1.1.0': patches/@mediapipe__tasks-vision@1.1.0.patch

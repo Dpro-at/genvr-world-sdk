@@ -1,0 +1,35 @@
+<!doctype html><meta charset="utf-8"><title>Tidewater post integration</title>
+<script type="importmap">{"imports":{"three/webgpu":"/node_modules/three/build/three.webgpu.js","three/tsl":"/node_modules/three/build/three.tsl.js","three":"/node_modules/three/build/three.webgpu.js","three/addons/":"/node_modules/three/examples/jsm/"}}</script>
+<script type="module">
+import * as T from 'three/webgpu';
+import {TidewaterPost} from '/dist/post/index.js';
+import {hazeShadowProvider} from '/dist/post/shadow-provider.js';
+import {PostPass} from '/dist/post/pass.js';
+import {GroundBounce} from '/dist/tidewater-sky/ground-bounce.js';
+import {PostEffects} from '/dist/post-effects.js';
+async function run(){
+const r=new T.WebGPURenderer({antialias:false});await r.init();r.setSize(128,96);r.setAnimationLoop(()=>{});document.body.append(r.domElement);
+const scene=new T.Scene();scene.background=new T.Color(.2,.35,.5);
+const c=new T.PerspectiveCamera(62,128/96,.1,60000);c.coordinateSystem=T.WebGPUCoordinateSystem;c.position.set(0,24,15);c.lookAt(0,20,0);c.updateProjectionMatrix();c.updateMatrixWorld(true);
+// Reproduce native CDLOD's canonical grid -> absolute world displacement. A conventional
+// object transform would conceal the positionGeometry/positionLocal mismatch under test.
+const material=new T.MeshBasicNodeMaterial({color:0x947650,side:T.DoubleSide});
+const n=T.TSL;material.positionNode=n.vec3(n.positionLocal.x.mul(16),n.float(20),n.positionLocal.y.mul(16));
+const terrain=new T.Mesh(new T.PlaneGeometry(1,1,40,40),material);terrain.name='native-terrain';terrain.frustumCulled=false;scene.add(terrain);
+const sky={light:{direction:new T.Vector3(0,1,0),color:new T.Color(4,3,2),night:0},atmosphere:{skyIrradiance:[.2,.3,.4],skyLuminance:()=>T.TSL.vec3(.2,.3,.4)},shading:{moonSky:()=>T.TSL.vec3(0)},clouds:{cloudShadow:()=>T.TSL.float(1),sampleView:()=>T.TSL.vec4(0,0,0,1)}};
+const lighting={sea:T.TSL.uniform(0),sun:new T.DirectionalLight(),bounce:{heightfieldVisibilityNode:()=>T.TSL.float(1)}};
+
+const post=new TidewaterPost(r,scene,c,sky,lighting);
+async function frame(){await new Promise(requestAnimationFrame);post.render(1/60,0);const velocity=await r.readRenderTargetPixelsAsync(post.sceneTarget,0,0,128,96,1);const mask=await r.readRenderTargetPixelsAsync(post.sceneTarget,0,0,128,96,2);let max=0,count=0,water=0;for(let i=0;i<velocity.length;i+=4){const x=T.DataUtils.fromHalfFloat(velocity[i]),y=T.DataUtils.fromHalfFloat(velocity[i+1]);if(!Number.isFinite(x)||!Number.isFinite(y))throw Error('nonfinite velocity');max=Math.max(max,Math.abs(x),Math.abs(y));if(Math.abs(x)+Math.abs(y)>1e-5)count++;water=Math.max(water,T.DataUtils.fromHalfFloat(mask[i+1]));}return{max,count,water};}
+await frame();const stationary=await frame();
+c.position.x+=1;c.updateMatrixWorld(true);const moving=await frame();const stopped=await frame();
+const cloned=material.clone();cloned.mrtNode=null;terrain.material=cloned;const clone=await frame();const removedOriginalRestored=material.mrtNode==null;
+// Negative control: ordinary Three velocity still sees the undeformed canonical grid.
+terrain.name='negative-control';await frame();const uncorrected=await frame();const cloneRestored=cloned.mrtNode==null;
+terrain.name='native-terrain';const restored=await frame();
+post.dispose();post.dispose();const disposedRestored=cloned.mrtNode==null;
+const pass=stationary.max<1e-5&&moving.max>.001&&moving.count>100&&stopped.max<1e-5&&clone.max<1e-5&&removedOriginalRestored&&uncorrected.max>.1&&cloneRestored&&restored.max<1e-5&&disposedRestored&&stationary.water===0&&moving.water===0;
+window.__result={pass,stationary,moving,stopped,clone,uncorrected,restored,removedOriginalRestored,cloneRestored,disposedRestored};r.setAnimationLoop(null);r.dispose();
+}
+run().catch(e=>{console.error(e);window.__result={error:String(e.stack??e),pass:false};});
+</script>

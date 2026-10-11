@@ -1,0 +1,51 @@
+{
+  "name": "@genvr/web",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Genvr web app: public site, experience pages, editor shell, admin (client of the API).",
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/copy-decoders.mjs && next dev --port 3000",
+    "build": "node scripts/copy-decoders.mjs && next build --webpack",
+    "start": "next start --port 3000",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests"
+  },
+  "dependencies": {
+    "@colyseus/sdk": "^0.18.4",
+    "@genvr/api-client": "workspace:*",
+    "@genvr/assistant": "workspace:*",
+    "@genvr/contracts": "workspace:*",
+    "@genvr/core-library": "workspace:*",
+    "@genvr/film": "workspace:*",
+    "@genvr/runtime": "workspace:*",
+    "@genvr/script": "workspace:*",
+    "@genvr/validator": "workspace:*",
+    "@genvr/world-sdk": "workspace:*",
+    "@huggingface/transformers": "4.2.0",
+    "@mediapipe/tasks-vision": "1.1.0",
+    "@mintplex-labs/piper-tts-web": "1.0.5",
+    "@sentry/nextjs": "^11.0.0",
+    "better-auth": "^1.7.6",
+    "lucide-react": "^1.48.0",
+    "maplibre-gl": "^5.24.0",
+    "next": "^16.3.6",
+    "onnxruntime-web": "1.26.0-dev.20260416-b7804b056c",
+    "posthog-js": "^1.434.12",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "three": "^0.186.1",
+    "uqr": "0.1.2",
+    "web-respect-dpro": "0.1.2"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.3",
+    "@types/node": "^26.6.2",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@types/three": "^0.186.0",
+    "postcss": "^8.5.28",
+    "tailwindcss": "^4.3.3",
+    "vitest": "^5.0.1"
+  }
+}

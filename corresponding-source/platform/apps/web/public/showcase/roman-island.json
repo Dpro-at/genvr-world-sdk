@@ -1,0 +1,161 @@
+{
+  "place": "exp-b1212f768f572034",
+  "title": "Roman Island",
+  "stops": [
+    {
+      "side": "left",
+      "kicker": "A Genvr world",
+      "title": "An island out of time",
+      "text": "Scroll to sail in. Everything you see is a live world, built piece by piece in Genvr.",
+      "camera": {
+        "position": [
+          0,
+          8,
+          360
+        ],
+        "target": [
+          0,
+          10,
+          230
+        ],
+        "fov": 55
+      }
+    },
+    {
+      "side": "right",
+      "kicker": "The shore",
+      "title": "Where the whale sleeps",
+      "text": "A bronze whale rises over the beach, among palms, shells and starfish.",
+      "camera": {
+        "position": [
+          -6,
+          7,
+          268
+        ],
+        "target": [
+          18,
+          3,
+          238
+        ],
+        "fov": 50,
+        "ease": "in_out"
+      }
+    },
+    {
+      "side": "left",
+      "kicker": "The gate",
+      "title": "Enter the old empire",
+      "text": "Two stone guardians keep the great door on the hill.",
+      "camera": {
+        "position": [
+          0,
+          26,
+          192
+        ],
+        "target": [
+          0,
+          27,
+          150
+        ],
+        "fov": 50
+      }
+    },
+    {
+      "side": "right",
+      "kicker": "The fortress",
+      "title": "Walls that held a thousand years",
+      "text": "Fly around the fortress on the high plateau.",
+      "camera": {
+        "position": [
+          62,
+          52,
+          92
+        ],
+        "target": [
+          0,
+          30,
+          30
+        ],
+        "fov": 55,
+        "ease": "in_out"
+      }
+    },
+    {
+      "side": "left",
+      "kicker": "The fortress",
+      "title": "Every side tells a story",
+      "camera": {
+        "position": [
+          -64,
+          46,
+          -8
+        ],
+        "target": [
+          0,
+          30,
+          30
+        ],
+        "fov": 55
+      }
+    },
+    {
+      "side": "right",
+      "kicker": "The emperor",
+      "title": "A face carved in marble",
+      "text": "A giant head watches over the island.",
+      "camera": {
+        "position": [
+          0,
+          36,
+          -36
+        ],
+        "target": [
+          0,
+          34,
+          -70
+        ],
+        "fov": 50,
+        "ease": "out"
+      }
+    },
+    {
+      "side": "left",
+      "kicker": "The forest",
+      "title": "Into the green",
+      "text": "Oaks, ashes and aspens cover the northern slopes.",
+      "camera": {
+        "position": [
+          0,
+          44,
+          -108
+        ],
+        "target": [
+          0,
+          28,
+          -175
+        ],
+        "fov": 60
+      }
+    },
+    {
+      "side": "left",
+      "kicker": "The portal",
+      "title": "The old stone ring",
+      "text": "Overgrown and forgotten. Step through and build your own world.",
+      "camera": {
+        "position": [
+          12,
+          19,
+          -176
+        ],
+        "target": [
+          0,
+          13,
+          -212
+        ],
+        "fov": 50,
+        "ease": "in_out"
+      }
+    }
+  ]
+}

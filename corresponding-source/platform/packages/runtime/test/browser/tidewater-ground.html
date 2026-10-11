@@ -1,0 +1,48 @@
+<!doctype html><html><body><script type="importmap">{"imports":{"three/webgpu":"/node_modules/three/build/three.webgpu.js","three/tsl":"/node_modules/three/build/three.tsl.js"}}</script><script type="module">
+import {WebGPURenderer,Scene,PerspectiveCamera,Mesh,PlaneGeometry,MeshBasicNodeMaterial,RenderTarget,HalfFloatType,TSL,DataUtils,Color,SRGBColorSpace} from 'three/webgpu';
+import {createTidewaterGroundGraph} from '/dist/tidewater-ground/ground-shading.js';
+import {createDetailTexture} from '/dist/tidewater-ground/detail-texture.js';
+try {
+ const renderer=new WebGPURenderer();await renderer.init();renderer.setSize(64,64);document.body.append(renderer.domElement);
+ const errors=[];renderer.backend.device.addEventListener('uncapturederror',e=>errors.push(e.error.message));
+ const scene=new Scene(),camera=new PerspectiveCamera(60,1,.1,100);camera.position.z=3;
+ const detail=createDetailTexture();
+ const inputs={detailTexture:detail,position:TSL.vec3(TSL.uv().x.mul(10),TSL.uv().y.mul(15).sub(5),TSL.uv().y.mul(10)),normalRock:TSL.vec4(TSL.uv().x.mul(.7),TSL.uv().y.mul(.4),TSL.uv().x,1),splat:TSL.vec4(TSL.uv().x,TSL.uv().y,TSL.uv().y,.5),cameraPosition:TSL.vec3(0,2,3)};
+ const g=createTidewaterGroundGraph(inputs);
+ const material=new MeshBasicNodeMaterial();material.colorNode=TSL.vec4(g.colorNode,1);scene.add(new Mesh(new PlaneGeometry(5,5),material));
+ const rt=new RenderTarget(64,64,{type:HalfFloatType});renderer.setRenderTarget(rt);renderer.render(scene,camera);renderer.setRenderTarget(null);await renderer.backend.device.queue.onSubmittedWorkDone();
+ const pixels=Array.from(await renderer.readRenderTargetPixelsAsync(rt,0,0,64,64),DataUtils.fromHalfFloat);
+ // Independent oracle: load and evaluate the actual pinned source JS template generators.
+ const shadingText=await (await fetch('/source/world/terrain/TerrainShading.js')).text();
+ const terrainText=await (await fetch('/source/world/Terrain.js')).text();
+ const shading=new Function('Color','SRGBColorSpace',shadingText.replace(/^import .*;\r?\n/gm,'').replace(/export /g,'')+';return {srgb,rot2,code:SHADING_WGSL};')(Color,SRGBColorSpace);
+ const bt=String.fromCharCode(96);
+ const surfaceTemplate=terrainText.slice(terrainText.indexOf('const TERRAIN_SURFACE'));
+ let surface=new Function('S','rot2','WORLD','GRASS_FADE',surfaceTemplate+';return TERRAIN_SURFACE;')(shading.srgb,shading.rot2,{swellDir:{x:-.11914522,y:-.99287684},reef:{center:{x:1e8,z:1e8},radius:58}},[62,87]);
+ surface=surface.replace(/#if REFRACTION_CLIP[\s\S]*?#else\r?\n([\s\S]*?)#endif/,'$1').replace('in.P','position').replace('terrainNormalRock( xz )','normalRock').replace('terrainSplat( xz )','splat').replaceAll('frame.cameraPos','cameraPosition').replaceAll('frame.windDir','windDirection').replaceAll('frame.windSpeed','windSpeed').replaceAll('mat.gustOffset','gustOffset').replaceAll('mat.wetDarken','wetDarken').replaceAll('terMeadowW','meadowOut').replace('terWetFoam( xz, h )','wetFoam').replace('var hdOut = 0.0;','var hdOut = 0.0; var meadowOut=0.0;').replace('s.albedo = albedoOut;','return mat3x3f(albedoOut,outN,vec3f(outRough,sat(outAO),meadowOut));').replace(/s\.(roughness|normal|ao) = .*?;/g,'');
+ let helpers=shading.code+terrainText.match(/fn terGustAt[\s\S]*?\n\}/)[0].replaceAll('smpLinearRepeat','smpAniso4Repeat')+'\nfn terDetail(uv:vec2f)->vec4f{return textureSample(terrainDetailTex,smpAniso4Repeat,uv);}\nfn sat(x:f32)->f32{return clamp(x,0.0,1.0);}\nfn luminance(c:vec3f)->f32{return dot(c,vec3f(.2126,.7152,.0722));}';
+ const names=Array.from(helpers.matchAll(/fn (\w+)\(/g),m=>m[1]);
+ function bind(code){for(const name of names){const matches=Array.from(code.matchAll(new RegExp('\\b'+name+'\\s*\\(','g')));for(const m of matches.reverse()){let j=m.index+m[0].length,depth=1;const start=j;while(depth){if(code[j]==='(')depth++;if(code[j]===')')depth--;j++;}const decl=code.slice(m.index-3,m.index)==='fn ';code=code.slice(0,j-1)+(code.slice(start,j-1).trim()?',':'')+(decl?'terrainDetailTex:texture_2d<f32>,smpAniso4Repeat:sampler':'terrainDetailTex,smpAniso4Repeat')+code.slice(j-1);}}return code;}
+ const args='position:vec3f,normalRock:vec4f,splat:vec4f,cameraPosition:vec3f,wetFoam:vec2f,windDirection:vec2f,windSpeed:f32,gustOffset:vec2f,swellDirection:vec2f,reefWeight:f32,wetDarken:f32,terrainDetailTex:texture_2d<f32>,smpAniso4Repeat:sampler';
+ const oracle=TSL.wgslFn('fn sourceGround('+args+')->mat3x3f{'+bind(surface)+'}\n'+bind(helpers));
+ const textureNode=TSL.texture(detail);
+ const sourceResult=oracle({position:inputs.position,normalRock:inputs.normalRock,splat:inputs.splat,cameraPosition:inputs.cameraPosition,wetFoam:TSL.vec2(TSL.smoothstep(.5,0,inputs.position.y),0),windDirection:TSL.vec2(0,-1),windSpeed:TSL.float(0),gustOffset:TSL.vec2(0),swellDirection:TSL.vec2(-.11914522,-.99287684),reefWeight:TSL.float(0),wetDarken:TSL.float(.58),terrainDetailTex:textureNode,smpAniso4Repeat:TSL.sampler(textureNode)});
+ material.dispose();material.colorNode=TSL.vec4(sourceResult.element(0),1);material.needsUpdate=true;
+ renderer.setRenderTarget(rt);renderer.render(scene,camera);renderer.setRenderTarget(null);await renderer.backend.device.queue.onSubmittedWorkDone();
+ const reference=Array.from(await renderer.readRenderTargetPixelsAsync(rt,0,0,64,64),DataUtils.fromHalfFloat);
+ let maxError=Math.max(...pixels.map((x,i)=>Math.abs(x-reference[i]))),finite=pixels.every(Number.isFinite);
+ for(const [actual,expected] of [[g.normalWorldNode,sourceResult.element(1)],[TSL.vec3(g.roughnessNode,g.aoNode,g.meadowWeightNode),sourceResult.element(2)]]){
+  const images=[];for(const output of [actual,expected]){material.dispose();material.colorNode=TSL.vec4(output,1);material.needsUpdate=true;renderer.setRenderTarget(rt);renderer.render(scene,camera);renderer.setRenderTarget(null);await renderer.backend.device.queue.onSubmittedWorkDone();images.push(Array.from(await renderer.readRenderTargetPixelsAsync(rt,0,0,64,64),DataUtils.fromHalfFloat));}
+  finite=finite&&images.flat().every(Number.isFinite);maxError=Math.max(maxError,...images[0].map((x,i)=>Math.abs(x-images[1][i])));
+ }
+ const variants=[];for(const key of ['beachSand','seabedSand','rock','grass','dirt','rubble']){
+  const painted=createTidewaterGroundGraph({...inputs,layerWeights:{[key]:TSL.float(1)}});
+  material.dispose();material.colorNode=TSL.vec4(painted.colorNode,1);material.needsUpdate=true;renderer.setRenderTarget(rt);renderer.render(scene,camera);renderer.setRenderTarget(null);await renderer.backend.device.queue.onSubmittedWorkDone();
+  const image=Array.from(await renderer.readRenderTargetPixelsAsync(rt,0,0,64,64),DataUtils.fromHalfFloat);finite=finite&&image.every(Number.isFinite);variants.push({key,mean:image.reduce((a,x,i)=>a+(i%4<3?x:0),0)/(64*64*3)});
+ }
+ material.dispose();material.colorNode=TSL.vec4(TSL.texture(detail).sample(TSL.uv()).rgb.sub(TSL.texture(detail).sample(TSL.uv().add(1)).rgb).abs(),1);material.needsUpdate=true;renderer.setRenderTarget(rt);renderer.render(scene,camera);renderer.setRenderTarget(null);await renderer.backend.device.queue.onSubmittedWorkDone();
+ const wrapPixels=Array.from(await renderer.readRenderTargetPixelsAsync(rt,0,0,64,64),DataUtils.fromHalfFloat);const wrapError=Math.max(...wrapPixels.filter((_,i)=>i%4<3));
+ window.__result={finite,maxError,wrapError,variants,sample:pixels.slice(0,16),errors};
+ detail.dispose();rt.dispose();material.dispose();renderer.dispose();
+}catch(e){window.__result={error:String(e),stack:e.stack};}
+</script></body></html>

@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../studio/browser.tsx"],
+  "sourcesContent": ["import { mountStudio } from './app';\nmountStudio(document.getElementById('studio')!);\n"],
+  "mappings": ";;;;;;;;;AACA,YAAY,SAAS,eAAe,QAAQ,CAAE;",
+  "names": []
+}

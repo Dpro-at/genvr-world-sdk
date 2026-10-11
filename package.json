@@ -1,6 +1,6 @@
 {
   "name": "3d-world-sdk",
-  "version": "0.2.0",
+  "version": "0.3.0-preview.1",
   "type": "module",
   "description": "Standalone Genvr world authoring, local persistence and explicit platform publication adapters.",
   "license": "AGPL-3.0-only",
@@ -23,6 +23,15 @@
     "./runtime": {
       "types": "./dist/types/runtime.d.ts",
       "default": "./dist/runtime.js"
+    },
+    "./studio": {
+      "types": "./dist/studio.d.ts",
+      "default": "./dist/studio.js"
+    },
+    "./studio.css": "./dist/studio.css",
+    "./studio-project": {
+      "types": "./dist/types/studio-project.d.ts",
+      "default": "./dist/studio-project.js"
     }
   },
   "dependencies": {
@@ -33,13 +42,15 @@
   },
   "bin": {
     "genvr-world-mcp": "./dist/mcp.js",
-    "genvr-world-demo": "./serve.mjs"
+    "genvr-world-demo": "./serve.mjs",
+    "genvr-studio": "./serve-studio.mjs"
   },
   "files": [
     "dist",
     "demo",
     "assets",
     "serve.mjs",
+    "serve-studio.mjs",
     "README.md",
     "LICENSE"
   ]

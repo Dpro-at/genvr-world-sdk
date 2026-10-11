@@ -1,0 +1,200 @@
+<!doctype html>
+<html>
+  <head>
+    <link rel="icon" href="data:," />
+    <meta charset="utf-8" />
+    <style>
+      body {
+        margin: 0;
+        background: #182d34;
+        color: #e4efec;
+        font: 14px sans-serif;
+      }
+      p {
+        margin: 12px;
+      }
+      canvas {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <p>Source CDLOD: 0.2 m near lattice / continuous morph / reusable height provider</p>
+    <script type="importmap">
+      {
+        "imports": {
+          "three/webgpu": "/node_modules/three/build/three.webgpu.js",
+          "three/tsl": "/node_modules/three/build/three.tsl.js"
+        }
+      }
+    </script>
+    <script type="module">
+      import {
+        TSL,
+        WebGPURenderer,
+        StorageBufferAttribute,
+        Vector3,
+        Scene,
+        PerspectiveCamera,
+        Mesh,
+        MeshBasicNodeMaterial,
+      } from 'three/webgpu';
+      import { TerrainLod } from '/dist/terrain-lod/index.js';
+      try {
+        const renderer = new WebGPURenderer({ trackTimestamp: true });
+        await renderer.init();
+        renderer.setSize(960, 540);
+        document.body.appendChild(renderer.domElement);
+        const errors = [];
+        renderer.backend.device.addEventListener('uncapturederror', (e) => errors.push(e.error.message));
+        const lod = new TerrainLod({
+          gridSize: 40,
+          leafSize: 8,
+          levels: 9,
+          rangeFactor: 2,
+          center: { x: -1024, z: -1024, size: 2048 },
+          minY: -20,
+          maxY: 40,
+        });
+        const source = await (await fetch('/source/core/CDLOD.js')).text();
+        const start = source.indexOf('code: /* wgsl */`') + 'code: /* wgsl */`'.length,
+          end = source.indexOf('`,', start);
+        let wgsl = new Function('P', 'Cap', 'return `' + source.slice(start, end) + '`;')('cdlod', 'Cdlod');
+        wgsl = wgsl.slice(wgsl.indexOf('fn cdlodMorph'));
+        wgsl = wgsl
+          .replace('y0: f32 ) -> CdlodVertex', 'y0: f32, m: vec4f ) -> vec4f')
+          .replace('let m = cdlod.morph[ lod ];', '')
+          .replace(
+            'var o: CdlodVertex;',
+            'var worldXZ:vec2f;var spacing:f32;var morphKOut:f32;var lodOut:f32;var sizeOut:f32;',
+          )
+          .replaceAll('o.worldXZ', 'worldXZ')
+          .replaceAll('o.spacing', 'spacing')
+          .replaceAll('o.morphK', 'morphKOut')
+          .replaceAll('o.lod', 'lodOut')
+          .replaceAll('o.size', 'sizeOut')
+          .replace('return o;', 'return vec4f(worldXZ,spacing,morphKOut);');
+        const oracle = TSL.wgslFn(wgsl),
+          count = 512;
+        const a = new StorageBufferAttribute(new Float32Array(count * 4), 4),
+          b = new StorageBufferAttribute(new Float32Array(count * 4), 4);
+        const outA = TSL.storage(a, 'vec4', count),
+          outB = TSL.storage(b, 'vec4', count),
+          params = TSL.uniformArray(lod.morph, 'vec4').setGroup(TSL.renderGroup);
+        const view = TSL.uniform(new Vector3(-7.43, 2.1, 5.67)).setGroup(TSL.renderGroup);
+        const kernel = TSL.Fn(() => {
+          const i = TSL.int(TSL.instanceIndex),
+            l = i.mod(9),
+            spacing = TSL.float(0.2).mul(TSL.float(2).pow(TSL.float(l))),
+            size = spacing.mul(40);
+          const node = TSL.vec4(
+            TSL.float(i.mod(11)).sub(6).mul(size),
+            TSL.float(i.mod(7)).sub(4).mul(size),
+            size.mul(TSL.select(i.mod(3).equal(0), 0.5, 1)),
+            TSL.float(l),
+          );
+          const grid = TSL.vec2(TSL.float(i.mod(41)).div(40), TSL.float(i.mul(13).mod(41)).div(40)),
+            height = TSL.float(i.mod(19)).sub(9).mul(0.3);
+          const actual = lod.morphNode(node, grid, height, view),
+            expected = oracle({ node, grid, viewPos: view, y0: height, m: params.element(l) });
+          outA.element(i).assign(TSL.vec4(actual.worldXZ, actual.spacing, actual.morphK));
+          outB.element(i).assign(expected);
+        })().compute(count);
+        let maxError = 0,
+          finite = true,
+          morphing = 0;
+        const errorsByPose = [];
+        for (const v of [
+          new Vector3(-7.43, 2.1, 5.67),
+          new Vector3(0, 0, 0),
+          new Vector3(167, 15, -81),
+          new Vector3(-2048, 700, 1799),
+        ]) {
+          view.value.copy(v);
+          renderer.compute(kernel);
+          const av = new Float32Array(await renderer.getArrayBufferAsync(a)),
+            bv = new Float32Array(await renderer.getArrayBufferAsync(b));
+          let err = 0;
+          for (let i = 0; i < av.length; i++) {
+            err = Math.max(err, Math.abs(av[i] - bv[i]));
+            finite &&= Number.isFinite(av[i]) && Number.isFinite(bv[i]);
+            if (i % 4 === 3 && av[i] > 0 && av[i] < 1) morphing++;
+          }
+          errorsByPose.push(err);
+          maxError = Math.max(maxError, err);
+        }
+        const scene = new Scene(),
+          camera = new PerspectiveCamera(60, 960 / 540, 0.1, 6000);
+        camera.position.set(30, 24, 56);
+        camera.lookAt(0, 0, -20);
+        const node = TSL.attribute('nodeData', 'vec4'),
+          grid = TSL.positionLocal.xz,
+          snapped = lod.snappedNode(node, grid);
+        const height = (xz) => xz.x.mul(0.03).sin().mul(xz.y.mul(0.022).cos()).mul(15);
+        const vertex = lod.morphNode(node, grid, height(snapped));
+        const material = new MeshBasicNodeMaterial();
+        material.positionNode = TSL.vec3(vertex.worldXZ.x, height(vertex.worldXZ), vertex.worldXZ.y);
+        material.colorNode = TSL.vec3(0.1, 0.32, 0.26).add(
+          TSL.vec3(vertex.lod.mul(0.035), vertex.morphK.mul(0.15), 0),
+        );
+        material.wireframe = true;
+        const mesh = new Mesh(lod.geometry, material);
+        mesh.frustumCulled = false;
+        scene.add(mesh);
+        lod.update(camera);
+        const samples = [];
+        for (let i = 0; i < 40; i++) {
+          const start = performance.now();
+          lod.update(camera);
+          samples.push(performance.now() - start);
+          renderer.render(scene, camera);
+        }
+        await renderer.backend.device.queue.onSubmittedWorkDone();
+        const nodes = lod.count,
+          triangles = nodes * 40 * 40 * 2,
+          overflow = lod.overflowCount;
+        const batchStart = performance.now();
+        for (let i = 0; i < 300; i++) lod.update(camera);
+        const selectionBatchMeanMs = (performance.now() - batchStart) / 300;
+        renderer.setSize(2560, 1440);
+        renderer.render(scene, camera);
+        await renderer.backend.device.queue.onSubmittedWorkDone();
+        await renderer.resolveTimestampsAsync('render');
+        const renderGpuMs = [];
+        for (let i = 0; i < 6; i++) {
+          renderer.render(scene, camera);
+          await renderer.backend.device.queue.onSubmittedWorkDone();
+          renderGpuMs.push(await renderer.resolveTimestampsAsync('render'));
+        }
+        renderer.setSize(960, 540);
+        renderer.render(scene, camera);
+        await renderer.backend.device.queue.onSubmittedWorkDone();
+        const sorted = samples.slice(5).sort((a, b) => a - b);
+        const selectionMedianMs = sorted[Math.floor(sorted.length / 2)],
+          selectionMaxMs = Math.max(...samples.slice(5));
+        kernel.dispose();
+        material.dispose();
+        lod.dispose();
+        lod.dispose();
+        lod.update(camera);
+        window.__result = {
+          maxError,
+          errorsByPose,
+          finite,
+          morphing,
+          nodes,
+          triangles,
+          overflow,
+          selectionMedianMs,
+          selectionMaxMs,
+          selectionBatchMeanMs,
+          renderGpuMs,
+          disposed: lod.count === 0,
+          errors,
+        };
+      } catch (e) {
+        window.__result = { error: String(e), stack: e.stack };
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,79 @@
+<!doctype html><meta charset="utf-8"><link rel="icon" href="data:,"><title>Reusable Tidewater ground</title>
+<script type="importmap">{"imports":{"three/webgpu":"/node_modules/three/build/three.webgpu.js","three/tsl":"/node_modules/three/build/three.tsl.js","@genvr/core-library":"/node_modules/@genvr/core-library/dist/index.js","@genvr/contracts":"/node_modules/@genvr/contracts/dist/index.js","zod":"/node_modules/@genvr/contracts/node_modules/zod/index.js"}}</script>
+<script type="module">
+import * as T from 'three/webgpu';
+import {TidewaterGround} from '/dist/tidewater-ground/index.js';
+import {realisticGroundMaterial} from '/dist/terrain-realistic.js';
+import {createTidewaterGroundGraph} from '/dist/tidewater-ground/ground-shading.js';
+try {
+ const r=new T.WebGPURenderer({antialias:true});await r.init();r.setSize(256,256);document.body.append(r.domElement);
+ const errors=[];r.backend.device.addEventListener('uncapturederror',e=>errors.push(e.error.message));
+ const scene=new T.Scene();scene.background=new T.Color(.15,.2,.25);
+ scene.add(new T.HemisphereLight(0xffffff,0x667788,2));const sun=new T.DirectionalLight(0xfff3db,3);sun.position.set(4,9,2);scene.add(sun);
+ const camera=new T.PerspectiveCamera(45,1,.1,100);camera.position.set(0,8,9);camera.lookAt(0,0,0);
+ const adapter=new TidewaterGround({half:16,heightAt:()=>0});adapter.update(0);
+ const params=new URLSearchParams(location.search), variant=params.get('variant')??'beach-sand';
+ const names=['ground-080',`tidewater-${variant}`];
+ const geo=new T.PlaneGeometry(12,12,1,1).rotateX(-Math.PI/2).toNonIndexed();
+ const count=geo.attributes.position.count,layers=[],bary=[];
+ for(let i=0;i<count;i++){layers.push(0,1,1);bary.push(...(i%3===0?[1,0,0]:i%3===1?[0,1,0]:[0,0,1]));}
+ geo.setAttribute('groundLayers',new T.Float32BufferAttribute(layers,3));geo.setAttribute('groundBary',new T.Float32BufferAttribute(bary,3));
+ const m=new T.MeshStandardNodeMaterial();m.colorNode=T.TSL.vec3(.8,.1,.2);m.roughnessNode=T.TSL.float(.8);
+ adapter.bind(m,names,params.has('variant')?1:undefined);scene.add(new T.Mesh(geo,m));
+ if(variant.startsWith('seabed')||variant==='rubble'||variant==='seagrass') adapter.update(4);
+ if(variant==='grass')adapter.update(-3);
+ const target=new T.RenderTarget(256,256,{type:T.HalfFloatType});
+ r.setRenderTarget(target);r.render(scene,camera);r.setRenderTarget(null);r.render(scene,camera);
+ await r.backend.device.queue.onSubmittedWorkDone();
+ const values=Array.from(await r.readRenderTargetPixelsAsync(target,0,0,256,256),T.DataUtils.fromHalfFloat);
+ const finite=values.every(Number.isFinite);const colors=new Set(values.filter((_,i)=>i%4===0).map(x=>x.toFixed(3)));
+ // Regression: the procedural fallback image must not tint mixed paint boundaries.
+ let fallbackLeak=0;
+ if(!params.has('variant')) {
+  const samples=[];
+  for(const fallback of [[255,0,0,255],[0,0,255,255]]) {
+   const color=new T.DataArrayTexture(new Uint8Array([100,100,100,255,...fallback]),1,1,2);color.needsUpdate=true;
+   const surface=new T.DataArrayTexture(new Uint8Array([128,128,220,255,128,128,220,255]),1,1,2);surface.needsUpdate=true;
+   const built=realisticGroundMaterial(color,surface,[3,3],0,0,[false,true]);
+   built.rules.rockOn.value=0;built.rules.snowOn.value=0;adapter.bind(built.material,names);
+   scene.children.find(o=>o.isMesh).material=built.material;
+   r.setRenderTarget(target);r.render(scene,camera);r.setRenderTarget(null);
+   await r.backend.device.queue.onSubmittedWorkDone();
+   samples.push(Array.from(await r.readRenderTargetPixelsAsync(target,0,0,256,256),T.DataUtils.fromHalfFloat));
+   built.material.dispose();color.dispose();surface.dispose();
+  }
+  for(let i=0;i<samples[0].length;i++)fallbackLeak=Math.max(fallbackLeak,Math.abs(samples[0][i]-samples[1][i]));
+ }
+ // Painted seagrass must drive the exact source seabed mask, including normals and roughness/AO.
+ const t=T.TSL, inputs={detailTexture:adapter.detail,position:t.positionWorld.sub(t.vec3(0,4,0)),
+  cameraPosition:t.cameraPosition.sub(t.vec3(0,4,0)),normalRock:t.vec4(0,0,0,1),splat:t.vec4(0,0,1,0)};
+ const reference=createTidewaterGroundGraph(inputs);
+ const painted=createTidewaterGroundGraph({...inputs,splat:t.vec4(0),layerWeights:{seagrass:t.float(1)}});
+ let seagrassMaskError=0;
+ for(const outputs of [[painted.colorNode,reference.colorNode],[painted.normalWorldNode,reference.normalWorldNode],
+   [t.vec3(painted.roughnessNode,painted.aoNode,painted.meadowWeightNode),t.vec3(reference.roughnessNode,reference.aoNode,reference.meadowWeightNode)]]) {
+  const samples=[];
+  for(const output of outputs){const test=new T.MeshBasicNodeMaterial();test.colorNode=output;
+   scene.children.find(o=>o.isMesh).material=test;r.setRenderTarget(target);r.render(scene,camera);r.setRenderTarget(null);
+   await r.backend.device.queue.onSubmittedWorkDone();
+   samples.push(Array.from(await r.readRenderTargetPixelsAsync(target,0,0,256,256),T.DataUtils.fromHalfFloat));test.dispose();}
+  for(let i=0;i<samples[0].length;i++)seagrassMaskError=Math.max(seagrassMaskError,Math.abs(samples[0][i]-samples[1][i]));
+ }
+ // Static terrain receivers must read the persistent live bridge without rebuilding materials.
+ const wet=t.uniform(0).setGroup(t.renderGroup), swell=t.uniform(new T.Vector2(1,0)).setGroup(t.renderGroup);
+ const live=new TidewaterGround({half:16,heightAt:()=>0},{wetFoamNode:()=>t.vec2(wet,0),swellDirectionNode:swell});
+ live.update(-1);
+ const liveMaterial=new T.MeshStandardNodeMaterial();liveMaterial.colorNode=t.vec3(.5);
+ live.bind(liveMaterial,['tidewater-beach-sand'],0);scene.children.find(o=>o.isMesh).material=liveMaterial;
+ const wetPixels=[];
+ for(const value of [0,1]){wet.value=value;r.setRenderTarget(target);r.render(scene,camera);r.setRenderTarget(null);
+  await r.backend.device.queue.onSubmittedWorkDone();
+  wetPixels.push(Array.from(await r.readRenderTargetPixelsAsync(target,0,0,256,256),T.DataUtils.fromHalfFloat));}
+ let liveWetnessChange=0;
+ for(let i=0;i<wetPixels[0].length;i++)liveWetnessChange=Math.max(liveWetnessChange,Math.abs(wetPixels[0][i]-wetPixels[1][i]));
+ liveMaterial.dispose();live.dispose();
+ window.__result={finite,mixed:colors.size>8,colors:colors.size,fallbackLeak,seagrassMaskError,liveWetnessChange,errors};
+ window.__dispose=()=>{adapter.dispose();m.dispose();geo.dispose();target.dispose();r.dispose();};
+}catch(e){window.__result={error:String(e),stack:e.stack};}
+</script>
+

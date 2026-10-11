@@ -92,6 +92,8 @@ export declare class PhysicsWorld {
      */
     addKinematicBox(origin: Vec3Like, yaw: number, center: Vec3Like, halfExtents: Vec3Like): RAPIER.RigidBody;
     step(dt: number): void;
+    /** Rapier 0.20 fills its broad phase on the first positive step, not when colliders are added. */
+    prepareCharacterQueries(): void;
     dispose(): void;
 }
 export declare class Character {

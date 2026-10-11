@@ -1,0 +1,44 @@
+<!doctype html><html><body><script type="importmap">{"imports":{"three/webgpu":"/node_modules/three/build/three.webgpu.js","three/tsl":"/node_modules/three/build/three.tsl.js"}}</script><script type="module">
+import {WebGPURenderer,Scene,PerspectiveCamera,Mesh,PlaneGeometry,MeshBasicNodeMaterial,RenderTarget,DepthTexture,FloatType,HalfFloatType,TSL,StorageBufferAttribute,Vector3,DataUtils} from 'three/webgpu';
+import {TemporalUpscale} from '/dist/post/temporal-upscale.js';
+import {MotionBlur} from '/dist/post/motion-blur.js';
+import {LensFlare} from '/dist/post/lens-flare.js';
+import {LensDrops} from '/dist/post/lens-drops.js';
+try {
+ const renderer=new WebGPURenderer();await renderer.init();renderer.setSize(64,64);document.body.append(renderer.domElement);
+ const errors=[];renderer.backend.device.addEventListener('uncapturederror',e=>errors.push(e.error.message));
+ const scene=new Scene(),camera=new PerspectiveCamera(60,1,.1,100);camera.position.z=3;
+ const material=new MeshBasicNodeMaterial();material.colorNode=TSL.vec4(.4,.2,.1,1);scene.add(new Mesh(new PlaneGeometry(5,5),material));
+ const rt=new RenderTarget(64,64,{type:HalfFloatType,depthTexture:new DepthTexture(64,64,FloatType)});
+ const taa=new TemporalUpscale(rt.texture,rt.depthTexture,camera);taa.resize(64,64);
+ for(let i=0;i<6;i++){taa.beginFrame();renderer.setRenderTarget(rt);renderer.render(scene,camera);renderer.setRenderTarget(null);taa.update(renderer,1/60,1);}
+ camera.position.x=.25;taa.beginFrame();renderer.setRenderTarget(rt);renderer.render(scene,camera);renderer.setRenderTarget(null);taa.update(renderer,1/60,1);
+ const buffer=new StorageBufferAttribute(new Float32Array(8),4),out=TSL.storage(buffer,'vec4',2);
+ renderer.compute(TSL.Fn(()=>{out.element(0).assign(TSL.textureLoad(taa.texture,TSL.ivec2(32,32)));out.element(1).assign(TSL.textureLoad(taa.velocityTexture,TSL.ivec2(32,32)));})().compute(1));
+ const sample=Array.from(new Float32Array(await renderer.getArrayBufferAsync(buffer)));
+ const exposureBuffer=new StorageBufferAttribute(new Float32Array([1]),1),exposureNode=TSL.storage(exposureBuffer,'float',1);
+ const exposed=new TemporalUpscale(rt.texture,rt.depthTexture,camera);exposed.resize(64,64);exposed.setExposureNode(exposureNode.element(0));
+ const lumaBuffer=new StorageBufferAttribute(new Float32Array(8),4),lumaOut=TSL.storage(lumaBuffer,'vec4',2);
+ const readLuma=TSL.Fn(()=>{lumaOut.element(0).assign(TSL.textureLoad(exposed.history[0][2],TSL.ivec2(32,32)));lumaOut.element(1).assign(TSL.textureLoad(exposed.history[1][2],TSL.ivec2(32,32)));})().compute(1);
+ async function exposureFrame(){exposed.beginFrame();renderer.setRenderTarget(rt);renderer.render(scene,camera);renderer.setRenderTarget(null);exposed.update(renderer,1/60,99);}
+ await exposureFrame();await exposureFrame();renderer.compute(readLuma);const low=Array.from(new Float32Array(await renderer.getArrayBufferAsync(lumaBuffer)));
+ renderer.compute(TSL.Fn(()=>{exposureNode.element(0).assign(4);})().compute(1));await exposureFrame();await exposureFrame();renderer.compute(readLuma);const high=Array.from(new Float32Array(await renderer.getArrayBufferAsync(lumaBuffer)));
+ const gpuExposureChanged=Math.max(high[0],high[4])>Math.max(low[0],low[4])+.01;readLuma.dispose();exposed.dispose();
+ const motion=new MotionBlur(taa.texture,rt.depthTexture,taa.velocityTexture,camera);motion.resize(64,64);motion.beginFrame();motion.update(renderer,1/60);
+ const flare=new LensFlare(rt.depthTexture,camera);flare.resize(64,64);flare.update(renderer,1/60,new Vector3(0,0,-1));
+ const drops=new LensDrops();drops.resize(64,64);drops.update(1/60,true);drops.update(1/60,false);drops.seed.value=3;
+ const tex=TSL.texture(taa.texture),uv=TSL.uv();
+ const outputMaterial=new MeshBasicNodeMaterial();outputMaterial.colorNode=TSL.vec4(drops.node(uv,q=>motion.node(tex.sample(q).rgb,q).add(flare.node(q)),q=>tex.sample(q).rgb),1);
+ const outScene=new Scene(),outCamera=new PerspectiveCamera(60,1,.1,100);outCamera.position.z=3;outScene.add(new Mesh(new PlaneGeometry(5,5),outputMaterial));
+ const finalTarget=new RenderTarget(64,64,{type:HalfFloatType});renderer.setRenderTarget(finalTarget);renderer.render(outScene,outCamera);renderer.setRenderTarget(null);await renderer.backend.device.queue.onSubmittedWorkDone();
+ const pixels=await renderer.readRenderTargetPixelsAsync(finalTarget,0,0,64,64);const decoded=Array.from(pixels,DataUtils.fromHalfFloat);const finalFinite=decoded.every(Number.isFinite);const wetChanged=decoded.some((x,i)=>i%4===0&&Math.abs(x-.4)>.005);
+ rt.setSize(32,32);taa.resize(32,32);taa.reset();taa.beginFrame();renderer.setRenderTarget(rt);renderer.render(scene,camera);renderer.setRenderTarget(null);taa.update(renderer,1/60,1);await renderer.backend.device.queue.onSubmittedWorkDone();
+ const resized=taa.texture.image.width===32;
+ motion.dispose();flare.dispose();drops.dispose();
+ taa.dispose();
+ motion.dispose();flare.dispose();taa.dispose();
+ motion.resize(16,16);motion.beginFrame();motion.update(renderer,1/60);flare.resize(16,16);flare.update(renderer,1/60,new Vector3(0,0,-1));taa.resize(16,16);taa.beginFrame();taa.update(renderer,1/60,1);
+ await renderer.backend.device.queue.onSubmittedWorkDone();
+ window.__result={sample,gpuExposureChanged,low,high,finalFinite,wetChanged,resized,disposed:true,finite:sample.every(Number.isFinite),moving:Math.abs(sample[4])>.001,restored:camera.view===null,errors};
+}catch(e){window.__result={error:String(e),stack:e.stack};}
+</script></body></html>

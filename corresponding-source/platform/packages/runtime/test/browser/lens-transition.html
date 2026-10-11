@@ -1,0 +1,142 @@
+<!doctype html>
+<body style="margin: 0">
+  <script type="importmap">
+    { "imports": { "three/webgpu": "/three/three.webgpu.js", "three/tsl": "/three/three.tsl.js" } }
+  </script>
+  <script type="module">
+    import * as T from 'three/webgpu';
+    import { LensDrops, TidewaterBloom, PostPass, createFinalNode, createFinalParams } from '/bundle.js';
+    async function run() {
+      const r = new T.WebGPURenderer();
+      await r.init();
+      r.setSize(512, 288);
+      r.setAnimationLoop(() => {});
+      const errors = [];
+      r.backend.device.addEventListener('uncapturederror', (e) => errors.push(e.error.message));
+      document.body.append(r.domElement);
+      const n = T.TSL;
+      const input = new T.DataTexture(
+        new Float32Array(64 * 64 * 4).fill(1),
+        64,
+        64,
+        T.RGBAFormat,
+        T.FloatType,
+      );
+      input.minFilter = input.magFilter = T.LinearFilter;
+      input.needsUpdate = true;
+      const bloom = new TidewaterBloom(input);
+      bloom.resize(512, 288);
+      bloom.update(r);
+      const lens = new LensDrops();
+      lens.resize(512, 288);
+      const pass = new PostPass(
+        r,
+        n.vec4(
+          lens.node(
+            n.uv(),
+            (uv) => n.texture(input, uv).rgb,
+            (uv) => n.texture(bloom.half, uv).level(0).rgb,
+          ),
+          1,
+        ),
+        'lens',
+        512,
+        288,
+      );
+      const bad = new PostPass(
+        r,
+        n.vec4(
+          lens.node(
+            n.uv(),
+            (uv) => n.texture(input, uv).rgb,
+            (uv) => n.texture(bloom.half, uv).rgb,
+          ),
+          1,
+        ),
+        'implicit-negative',
+        512,
+        288,
+      );
+      const depth = new T.DataTexture(new Float32Array(64 * 64).fill(0.5), 64, 64, T.RedFormat, T.FloatType);
+      depth.needsUpdate = true;
+      const final = new PostPass(
+        r,
+        createFinalNode({
+          resolved: input,
+          depth,
+          bloom: bloom.texture,
+          half: bloom.half,
+          exposureNode: n.float(1),
+          lens: (...args) => lens.node(...args),
+        }),
+        'actual-final',
+        512,
+        288,
+      );
+      const stages = [];
+      for (const [name, dt, under] of [
+        ['dry', 0, false],
+        ['under', 0.016, true],
+        ['exit', 0.016, false],
+        ['sliding', 3, false],
+        ['evaporated', 10, false],
+      ]) {
+        lens.update(dt, under);
+        if (name === 'exit') lens.seed.value = 17.3;
+        await new Promise(requestAnimationFrame);
+        pass.update();
+        const image = await r.readRenderTargetPixelsAsync(pass.target, 0, 0, 512, 288);
+        let min = Infinity,
+          max = 0,
+          black = 0,
+          nonfinite = 0;
+        for (let i = 0; i < image.length; i++)
+          if (i % 4 < 3) {
+            const v = T.DataUtils.fromHalfFloat(image[i]);
+            min = Math.min(min, v);
+            max = Math.max(max, v);
+            if (v < 0.2) black++;
+            if (!Number.isFinite(v)) nonfinite++;
+          }
+        stages.push({ name, min, max, black, nonfinite, wet: lens.wet.value });
+      }
+      lens.update(0.016, true);
+      lens.update(0.016, false);
+      lens.seed.value = 17.3;
+      const extra = [];
+      for (const [name, p] of [
+        ['implicit-negative', bad],
+        ['actual-final', final],
+      ]) {
+        p.update();
+        const pixels = await r.readRenderTargetPixelsAsync(p.target, 0, 0, 512, 288);
+        let black = 0,
+          min = Infinity;
+        for (let i = 0; i < pixels.length; i++)
+          if (i % 4 < 3) {
+            const v = T.DataUtils.fromHalfFloat(pixels[i]);
+            min = Math.min(min, v);
+            if (v < 0.2) black++;
+          }
+        extra.push({ name, min, black });
+      }
+      window.showStage = (name) => {
+        lens.wet.value = 1;
+        lens.age.value = 0;
+        lens.seed.value = 17.3;
+        (name === 'implicit-negative' ? bad : name === 'actual-final' ? final : pass).pipeline.render();
+      };
+      window.__result = {
+        stages,
+        extra,
+        errors,
+        pass:
+          stages.every((s) => s.black === 0 && s.nonfinite === 0) &&
+          extra[0].black > 100 &&
+          extra[1].black === 0,
+      };
+      r.setAnimationLoop(null);
+    }
+    run().catch((e) => (window.__result = { error: String(e.stack ?? e) }));
+  </script>
+</body>

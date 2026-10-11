@@ -1,0 +1,134 @@
+<!doctype html>
+<body style="margin: 0; width: 690px; height: 480px">
+  <script type="importmap">
+    {
+      "imports": {
+        "three/webgpu": "/three/three.webgpu.js",
+        "three/tsl": "/three/three.tsl.js",
+        "three": "/three/three.webgpu.js",
+        "three/addons/": "/addons/"
+      }
+    }
+  </script>
+  <script type="module">
+    import { createRuntime, TidewaterPost, PostPass } from '/bundle.js';
+    import { TSL as n, MeshBasicNodeMaterial, DoubleSide } from 'three/webgpu';
+    async function run() {
+      let post,
+        frames = 0;
+      const render = TidewaterPost.prototype.render;
+      TidewaterPost.prototype.render = function (...args) {
+        post = this;
+        frames++;
+        return render.apply(this, args);
+      };
+      const fixture = await (await fetch('/fixture.json')).json();
+      const runtime = await createRuntime({
+        container: document.body,
+        world: fixture.world,
+        loadTerrainFieldPage: async (request) => ({
+          version: fixture.world.version,
+          tiles: request.coordinates.map(({ tx, tz }) =>
+            fixture.tiles.find((t) => t.tx === tx && t.tz === tz),
+          ),
+        }),
+      });
+      runtime.setGraphics({ quality: 9, fpsCap: 60 });
+      while (!post || frames < 40) await new Promise(requestAnimationFrame);
+      runtime.setPaused(true);
+      const p = post.passes,
+        meshes = [];
+      post.scene.traverse((o) => {
+        if (o.name === 'native-terrain') meshes.push(o);
+      });
+      const originals = meshes.map((o) => o.material);
+      let mode = 'original';
+      window.showStage = async (name) => {
+        meshes.forEach((o, i) => {
+          o.material = originals[i];
+          o.castShadow = true;
+          o.receiveShadow = true;
+        });
+        if (name === 'no-cast') meshes.forEach((o) => (o.castShadow = false));
+        if (name === 'no-receive') meshes.forEach((o) => (o.receiveShadow = false));
+        if (name === 'no-both')
+          meshes.forEach((o) => {
+            o.castShadow = false;
+            o.receiveShadow = false;
+          });
+        if (name === 'base-normal') {
+          meshes.forEach((o, i) => {
+            const m = originals[i].clone();
+            const nr = originals[i].colorNode.node.parameters.normalRock;
+            const normal = n.vec3(nr.x, n.sqrt(n.max(n.float(1).sub(n.dot(nr.xy, nr.xy)), 0)), nr.y);
+            m.normalNode = n.transformNormalToView(normal);
+            o.material = m;
+          });
+        }
+        if (name === 'geometric-normal')
+          meshes.forEach((o, i) => {
+            const m = originals[i].clone();
+            m.normalNode = n.normalView;
+            o.material = m;
+          });
+        if (['albedo', 'normal', 'ao'].includes(name))
+          meshes.forEach((o, i) => {
+            const m = new MeshBasicNodeMaterial({ side: DoubleSide });
+            m.positionNode = originals[i].positionNode;
+            m.colorNode =
+              name === 'albedo'
+                ? originals[i].colorNode
+                : name === 'normal'
+                  ? originals[i].normalNode.mul(0.5).add(0.5)
+                  : n.vec3(originals[i].aoNode);
+            o.material = m;
+            o.castShadow = false;
+            o.receiveShadow = false;
+          });
+        // Receive-shadow participates in cached program construction, dispose render objects when toggled.
+        meshes.forEach((o) => {
+          o.material.dispose();
+          o.material.needsUpdate = true;
+        });
+        post.renderer.shadowMap.needsUpdate = true;
+        p.scene();
+        const t = post.sceneTarget.texture,
+          pass = new PostPass(
+            post.renderer,
+            n.vec4(
+              n
+                .texture(t)
+                .rgb.div(n.texture(t).rgb.add(1))
+                .pow(1 / 2.2),
+              1,
+            ),
+            'debug',
+            690,
+            480,
+          );
+        post.renderer.setRenderTarget(null);
+        pass.pipeline.render();
+        pass.dispose();
+      };
+      window.__result = {
+        frames,
+        stages: [
+          'original',
+          'no-cast',
+          'no-receive',
+          'no-both',
+          'geometric-normal',
+          'base-normal',
+          'albedo',
+          'normal',
+          'ao',
+        ],
+        meshes: meshes.length,
+      };
+    }
+    run().catch((e) => {
+      console.error(e);
+      window.__result = { error: String(e.stack ?? e) };
+    });
+  </script>
+</body>

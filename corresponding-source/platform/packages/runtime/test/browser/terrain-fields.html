@@ -1,0 +1,288 @@
+<!doctype html>
+<html>
+  <body style="margin: 0; background: #142330">
+    <script type="importmap">
+      { "imports": { "three/webgpu": "/three/three.webgpu.js", "three/tsl": "/three/three.tsl.js" } }
+    </script>
+    <script type="module">
+      import {
+        WebGPURenderer,
+        Scene,
+        OrthographicCamera,
+        PerspectiveCamera,
+        Mesh,
+        PlaneGeometry,
+        MeshBasicNodeMaterial,
+        MeshStandardNodeMaterial,
+        RenderTarget,
+        FloatType,
+        TSL as t,
+        Color,
+        DataTexture,
+        RGBAFormat,
+        LinearFilter,
+        DirectionalLight,
+        HemisphereLight,
+      } from 'three/webgpu';
+      import {
+        TerrainFieldTextures,
+        TerrainFieldStore,
+        encodeTerrainFieldTile,
+        terrainFieldFloat32Bytes,
+        TerrainLod,
+        generateIsland,
+        bakeTerrainMaps,
+        createDetailTexture,
+        createTidewaterGroundGraph,
+      } from '/bundle.js';
+      try {
+        if (new URLSearchParams(location.search).has('preview')) {
+          const started = performance.now(),
+            island = generateIsland(7);
+          const d = {
+              schemaVersion: 1,
+              id: 'island-preview',
+              origin: [-1024, -1024],
+              spacing: 1,
+              width: 2048,
+              height: 2048,
+              sampling: 'cell-center',
+              channels: [{ id: 'height', encoding: 'f32le' }],
+            },
+            store = new TerrainFieldStore(d);
+          for (let tz = 0; tz < 16; tz++)
+            for (let tx = 0; tx < 16; tx++) {
+              const values = new Float32Array(128 * 128);
+              for (let y = 0; y < 128; y++)
+                values.set(
+                  island.heights.subarray(
+                    (tz * 128 + y) * 2048 + tx * 128,
+                    (tz * 128 + y) * 2048 + tx * 128 + 128,
+                  ),
+                  y * 128,
+                );
+              store.replace(
+                encodeTerrainFieldTile(d, { tx, tz, channels: { height: terrainFieldFloat32Bytes(values) } }),
+                store.revision,
+              );
+            }
+          const gpuStarted = performance.now();
+          let taskStarted = gpuStarted,
+            maxTileTaskMs = 0,
+            yieldCount = 0;
+          const gpu = await TerrainFieldTextures.createAsync(store, undefined, {
+              yieldControl: async () => {
+                maxTileTaskMs = Math.max(maxTileTaskMs, performance.now() - taskStarted);
+                yieldCount++;
+                await new Promise((resolve) => setTimeout(resolve, 0));
+                taskStarted = performance.now();
+              },
+            }),
+            gpuPreparationMs = performance.now() - gpuStarted,
+            baked = bakeTerrainMaps(island),
+            detail = createDetailTexture();
+          const normal = new DataTexture(baked.normal, 2048, 2048, RGBAFormat),
+            splat = new DataTexture(baked.splat, 2048, 2048, RGBAFormat);
+          for (const texture of [normal, splat]) {
+            texture.minFilter = texture.magFilter = LinearFilter;
+            texture.generateMipmaps = false;
+            texture.needsUpdate = true;
+          }
+          const renderer = new WebGPURenderer();
+          await renderer.init();
+          renderer.setSize(1280, 720);
+          document.body.append(renderer.domElement);
+          const errors = [];
+          renderer.backend.device.addEventListener('uncapturederror', (e) => errors.push(e.error.message));
+          const scene = new Scene();
+          scene.background = new Color('#afccdc');
+          const camera = new PerspectiveCamera(55, 1280 / 720, 0.5, 5000);
+          camera.position.set(700, 420, 680);
+          camera.lookAt(-60, 60, -250);
+          if (new URLSearchParams(location.search).get('preview') === 'coast') {
+            let shore = 0;
+            for (let x = 0; x < 900; x++) if (island.heightAt(x, 0) > 0) shore = x;
+            camera.position.set(shore + 55, 15, 80);
+            camera.lookAt(shore - 35, 3, -30);
+          }
+          const lod = new TerrainLod({
+            gridSize: 40,
+            leafSize: 8,
+            levels: 9,
+            rangeFactor: 2,
+            center: { x: -1024, z: -1024, size: 2048 },
+            heightBounds: (...r) => island.boundsFor(...r),
+          });
+          const material = new MeshStandardNodeMaterial();
+          const node = t.attribute('nodeData', 'vec4'),
+            grid = t.positionLocal.xz;
+          const snapped = lod.snappedNode(node, grid),
+            morphed = lod.morphNode(node, grid, gpu.sampleNode('height', snapped));
+          material.positionNode = t.vec3(
+            morphed.worldXZ.x,
+            gpu.sampleNode('height', morphed.worldXZ),
+            morphed.worldXZ.y,
+          );
+          const uv = t.positionWorld.xz.add(1024).div(2048),
+            nr = t.texture(normal, uv);
+          const graph = createTidewaterGroundGraph({
+            detailTexture: detail,
+            position: t.positionWorld,
+            cameraPosition: t.cameraPosition,
+            normalRock: t.vec4(nr.rg.mul(2).sub(1), nr.ba),
+            splat: t.texture(splat, uv),
+          });
+          material.colorNode = graph.colorNode;
+          material.normalNode = t.transformNormalToView(graph.normalWorldNode);
+          material.roughnessNode = graph.roughnessNode;
+          material.aoNode = graph.aoNode;
+          const mesh = new Mesh(lod.geometry, material);
+          mesh.frustumCulled = false;
+          scene.add(mesh);
+          scene.add(new HemisphereLight(0xc9e9ff, 0x524736, 1.8));
+          const sun = new DirectionalLight(0xfff3d6, 3);
+          sun.position.set(500, 850, 300);
+          scene.add(sun);
+          lod.update(camera);
+          renderer.render(scene, camera);
+          await renderer.backend.device.queue.onSubmittedWorkDone();
+          window.__result = {
+            preview: true,
+            errors,
+            preparationMs: performance.now() - started,
+            heightTextureBytes: gpu.byteLength,
+            gpuPreparation: { wallMs: gpuPreparationMs, maxTileTaskMs, yieldCount },
+            sourceResolution: 2048,
+            leafSpacing: 0.2,
+            nodes: lod.count,
+            triangles: lod.count * 40 * 40 * 2,
+            overflow: lod.overflowCount,
+            bakeMs: baked.ms,
+            limits:
+              'Isolated geometry and source-material preview; preview lighting, no ocean, no live world/collision activation.',
+          };
+        } else {
+          const renderer = new WebGPURenderer();
+          await renderer.init();
+          renderer.setSize(256, 256);
+          document.body.append(renderer.domElement);
+          const errors = [];
+          renderer.backend.device.addEventListener('uncapturederror', (e) => errors.push(e.error.message));
+          const runs = [];
+          for (const [sampling, width, height] of [
+            ['cell-center', 129, 130],
+            ['vertex', 129, 130],
+            ['cell-center', 1, 1],
+            ['vertex', 1, 1],
+          ]) {
+            const d = {
+              schemaVersion: 1,
+              id: 'probe',
+              origin: [-7, 19],
+              spacing: 0.5,
+              width,
+              height,
+              sampling,
+              channels: [
+                { id: 'height', encoding: 'f32le' },
+                { id: 'mask', encoding: 'u8' },
+              ],
+            };
+            const store = new TerrainFieldStore(d);
+            const h = (x, z) => Math.fround(x * 0.25 + z * 2 + Math.sin(x * 0.2) * Math.cos(z * 0.3));
+            const m = (x, z) => (x * 3 + z * 7) % 256;
+            for (let tz = 0; tz < Math.ceil(d.height / 128); tz++)
+              for (let tx = 0; tx < Math.ceil(d.width / 128); tx++) {
+                const cols = Math.min(128, d.width - tx * 128),
+                  rows = Math.min(128, d.height - tz * 128),
+                  heights = new Float32Array(cols * rows),
+                  mask = new Uint8Array(cols * rows);
+                for (let z = 0; z < rows; z++)
+                  for (let x = 0; x < cols; x++) {
+                    heights[z * cols + x] = h(tx * 128 + x, tz * 128 + z);
+                    mask[z * cols + x] = m(tx * 128 + x, tz * 128 + z);
+                  }
+                store.replace(
+                  encodeTerrainFieldTile(d, {
+                    tx,
+                    tz,
+                    channels: { height: terrainFieldFloat32Bytes(heights), mask },
+                  }),
+                  store.revision,
+                );
+              }
+            const gpu = new TerrainFieldTextures(store),
+              scene = new Scene(),
+              camera = new OrthographicCamera(-1, 1, 1, -1, 0.1, 10);
+            camera.position.z = 1;
+            const material = new MeshBasicNodeMaterial();
+            scene.add(new Mesh(new PlaneGeometry(2, 2), material));
+            const target = new RenderTarget(64, 64, { type: FloatType });
+            // Non-integer world coordinates spanning both128-cell seams and outside each boundary.
+            const shift = sampling === 'cell-center' ? 0.5 : 0;
+            const xz = t
+              .uv()
+              .mul(t.vec2(d.width + 3, d.height + 3))
+              .sub(1.5)
+              .add(shift)
+              .mul(d.spacing)
+              .add(t.vec2(...d.origin));
+            for (const filter of ['bilinear', 'nearest'])
+              for (const outside of [undefined, -999]) {
+                material.dispose();
+                material.fragmentNode = t.vec4(
+                  gpu.sampleNode('height', xz, { filter, outside }),
+                  gpu.sampleNode('mask', xz, { filter, outside }),
+                  xz.x,
+                  xz.y,
+                );
+                material.needsUpdate = true;
+                renderer.setRenderTarget(target);
+                renderer.render(scene, camera);
+                renderer.setRenderTarget(null);
+                await renderer.backend.device.queue.onSubmittedWorkDone();
+                const values = await renderer.readRenderTargetPixelsAsync(target, 0, 0, 64, 64);
+                let maxError = 0,
+                  finite = true;
+                for (let k = 0; k < values.length; k += 4) {
+                  let x = (values[k + 2] - d.origin[0]) / d.spacing - shift,
+                    z = (values[k + 3] - d.origin[1]) / d.spacing - shift;
+                  const out = x < 0 || z < 0 || x > d.width - 1 || z > d.height - 1;
+                  x = Math.max(0, Math.min(d.width - 1, x));
+                  z = Math.max(0, Math.min(d.height - 1, z));
+                  const sample = (f) => {
+                    if (out && outside !== undefined) return outside;
+                    if (filter === 'nearest') return f(Math.floor(x + 0.5), Math.floor(z + 0.5));
+                    const ix = Math.floor(x),
+                      iz = Math.floor(z),
+                      jx = Math.min(ix + 1, d.width - 1),
+                      jz = Math.min(iz + 1, d.height - 1),
+                      a = x - ix,
+                      b = z - iz;
+                    return (
+                      (f(ix, iz) * (1 - a) + f(jx, iz) * a) * (1 - b) +
+                      (f(ix, jz) * (1 - a) + f(jx, jz) * a) * b
+                    );
+                  };
+                  maxError = Math.max(
+                    maxError,
+                    Math.abs(values[k] - sample(h)),
+                    Math.abs(values[k + 1] - sample(m)),
+                  );
+                  finite = finite && Array.from(values.slice(k, k + 4)).every(Number.isFinite);
+                }
+                runs.push({ sampling, width, height, filter, outside: outside ?? 'clamp', maxError, finite });
+              }
+            gpu.dispose();
+            material.dispose();
+            target.dispose();
+          }
+          window.__result = { runs, errors };
+          renderer.dispose();
+        }
+      } catch (error) {
+        window.__result = { error: String(error), stack: error.stack };
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,89 @@
+<!doctype html>
+<body style="margin: 0; width: 690px; height: 480px">
+  <script type="importmap">
+    {
+      "imports": {
+        "three/webgpu": "/three/three.webgpu.js",
+        "three/tsl": "/three/three.tsl.js",
+        "three": "/three/three.webgpu.js",
+        "three/addons/": "/addons/"
+      }
+    }
+  </script>
+  <script type="module">
+    import { createRuntime, TidewaterPost, PostPass } from '/bundle.js';
+    import { TSL as n } from 'three/webgpu';
+    async function run() {
+      let post,
+        frames = 0;
+      const render = TidewaterPost.prototype.render;
+      TidewaterPost.prototype.render = function (...args) {
+        post = this;
+        frames++;
+        return render.apply(this, args);
+      };
+      const fixture = await (await fetch('/fixture.json')).json();
+      const runtime = await createRuntime({
+        container: document.body,
+        world: fixture.world,
+        loadTerrainFieldPage: async (request) => ({
+          version: fixture.world.version,
+          tiles: request.coordinates.map(({ tx, tz }) =>
+            fixture.tiles.find((t) => t.tx === tx && t.tz === tz),
+          ),
+        }),
+      });
+      runtime.setGraphics({ quality: 9, fpsCap: 60 });
+      while (!post || frames < 40) await new Promise(requestAnimationFrame);
+      runtime.setPaused(true);
+      const p = post.passes,
+        stages = {
+          scene: post.sceneTarget.texture,
+          ao: p.ao.colorTexture,
+          haze: p.haze.texture,
+          beauty: p.beauty.texture,
+          temporal: p.temporal.texture,
+        };
+      const dimensions = Object.fromEntries(
+        Object.entries(stages).map(([k, t]) => [k, [t.image.width, t.image.height]]),
+      );
+      window.showStage = async (name) => {
+        const t = stages[name];
+        const pass = new PostPass(
+          post.renderer,
+          n.vec4(
+            n
+              .texture(t)
+              .rgb.div(n.texture(t).rgb.add(1))
+              .pow(1 / 2.2),
+            1,
+          ),
+          'debug',
+          690,
+          480,
+        );
+        post.renderer.setRenderTarget(null);
+        pass.pipeline.render();
+        pass.dispose();
+      };
+      stages.temporalBefore = p.temporal.history[0][0];
+      window.advance = async (count, staticKeep) => {
+        if (staticKeep !== null) p.temporal.settings.staticKeep.value = staticKeep;
+        const end = frames + count;
+        runtime.setPaused(false);
+        while (frames < end) await new Promise(requestAnimationFrame);
+        runtime.setPaused(true);
+        return frames;
+      };
+      window.resetTemporal = () => {
+        p.temporal.reset();
+        post.render(0, 0);
+      };
+      window.__result = { frames, stages: Object.keys(stages), dimensions };
+    }
+    run().catch((e) => {
+      console.error(e);
+      window.__result = { error: String(e.stack ?? e) };
+    });
+  </script>
+</body>

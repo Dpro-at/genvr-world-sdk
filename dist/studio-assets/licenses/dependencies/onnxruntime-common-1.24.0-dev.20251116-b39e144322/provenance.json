@@ -1,0 +1,10 @@
+{
+  "files": [
+    "onnxruntime-LICENSE.txt",
+    "onnxruntime-ThirdPartyNotices.txt"
+  ],
+  "sources": [
+    "https://raw.githubusercontent.com/microsoft/onnxruntime/b7804b056c/LICENSE",
+    "https://raw.githubusercontent.com/microsoft/onnxruntime/b7804b056c/ThirdPartyNotices.txt"
+  ]
+}

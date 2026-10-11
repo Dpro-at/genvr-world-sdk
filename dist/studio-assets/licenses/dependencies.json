@@ -1,0 +1,183 @@
+[
+  {
+    "name": "scheduler",
+    "version": "0.28.0",
+    "license": "MIT",
+    "files": [
+      "LICENSE"
+    ]
+  },
+  {
+    "name": "react",
+    "version": "19.3.0",
+    "license": "MIT",
+    "files": [
+      "LICENSE"
+    ]
+  },
+  {
+    "name": "react-dom",
+    "version": "19.3.0",
+    "license": "MIT",
+    "files": [
+      "LICENSE"
+    ]
+  },
+  {
+    "name": "lucide-react",
+    "version": "1.48.0",
+    "license": "ISC",
+    "files": [
+      "LICENSE"
+    ]
+  },
+  {
+    "name": "three",
+    "version": "0.186.1",
+    "license": "MIT",
+    "files": [
+      "LICENSE"
+    ]
+  },
+  {
+    "name": "zod",
+    "version": "4.6.5",
+    "license": "MIT",
+    "files": [
+      "LICENSE"
+    ]
+  },
+  {
+    "name": "@dimforge/rapier3d-compat",
+    "version": "0.20.0",
+    "license": "Apache-2.0",
+    "files": [
+      "LICENSE"
+    ]
+  },
+  {
+    "name": "openapi-fetch",
+    "version": "0.17.0",
+    "license": "MIT",
+    "files": [
+      "LICENSE"
+    ]
+  },
+  {
+    "name": "@jitl/quickjs-ng-wasmfile-release-sync",
+    "version": "0.32.0",
+    "license": "MIT",
+    "files": [
+      "LICENSE"
+    ]
+  },
+  {
+    "name": "@jitl/quickjs-ffi-types",
+    "version": "0.32.0",
+    "license": "MIT",
+    "files": [
+      "LICENSE"
+    ]
+  },
+  {
+    "name": "quickjs-emscripten-core",
+    "version": "0.32.0",
+    "license": "MIT",
+    "files": [
+      "LICENSE"
+    ]
+  },
+  {
+    "name": "maplibre-gl",
+    "version": "5.24.0",
+    "license": "BSD-3-Clause",
+    "files": [
+      "LICENSE.txt"
+    ]
+  },
+  {
+    "name": "@mediapipe/tasks-vision",
+    "version": "1.1.0",
+    "license": "Apache-2.0",
+    "files": [
+      "mediapipe-LICENSE.txt"
+    ],
+    "provenance": {
+      "files": [
+        "mediapipe-LICENSE.txt"
+      ],
+      "sources": [
+        "https://raw.githubusercontent.com/google-ai-edge/mediapipe/v0.10.32/LICENSE"
+      ]
+    }
+  },
+  {
+    "name": "onnxruntime-web",
+    "version": "1.26.0-dev.20260416-b7804b056c",
+    "license": "MIT",
+    "files": [
+      "onnxruntime-LICENSE.txt",
+      "onnxruntime-ThirdPartyNotices.txt"
+    ],
+    "provenance": {
+      "files": [
+        "onnxruntime-LICENSE.txt",
+        "onnxruntime-ThirdPartyNotices.txt"
+      ],
+      "sources": [
+        "https://raw.githubusercontent.com/microsoft/onnxruntime/b7804b056c/LICENSE",
+        "https://raw.githubusercontent.com/microsoft/onnxruntime/b7804b056c/ThirdPartyNotices.txt"
+      ]
+    }
+  },
+  {
+    "name": "onnxruntime-common",
+    "version": "1.24.0-dev.20251116-b39e144322",
+    "license": "MIT",
+    "files": [
+      "onnxruntime-LICENSE.txt",
+      "onnxruntime-ThirdPartyNotices.txt"
+    ],
+    "provenance": {
+      "files": [
+        "onnxruntime-LICENSE.txt",
+        "onnxruntime-ThirdPartyNotices.txt"
+      ],
+      "sources": [
+        "https://raw.githubusercontent.com/microsoft/onnxruntime/b7804b056c/LICENSE",
+        "https://raw.githubusercontent.com/microsoft/onnxruntime/b7804b056c/ThirdPartyNotices.txt"
+      ]
+    }
+  },
+  {
+    "name": "@huggingface/transformers",
+    "version": "4.2.0",
+    "license": "Apache-2.0",
+    "files": [
+      "LICENSE"
+    ]
+  },
+  {
+    "name": "@mintplex-labs/piper-tts-web",
+    "version": "1.0.5",
+    "license": "MIT",
+    "files": [
+      "piper-package.json",
+      "piper-README.md",
+      "piper-MIT.txt"
+    ],
+    "provenance": {
+      "files": [
+        "piper-package.json",
+        "piper-README.md",
+        "piper-MIT.txt"
+      ],
+      "sources": [
+        "https://raw.githubusercontent.com/Mintplex-Labs/piper-tts-web/5f06fa07a4284d846a43a0477a09fb15b4769157/package.json",
+        "https://raw.githubusercontent.com/Mintplex-Labs/piper-tts-web/5f06fa07a4284d846a43a0477a09fb15b4769157/README.md",
+        "https://raw.githubusercontent.com/spdx/license-list-data/v3.26.0/text/MIT.txt"
+      ],
+      "note": "Publisher declares MIT in package.json and credits diffusion-studio/vits-web and Rhasspy Piper in README. Upstream publishes no separate LICENSE file. The SPDX text is supplied as license text, not a fabricated upstream copyright notice. Optional speech models and their runtimes are downloaded only on explicit use and are not included in this archive."
+    }
+  }
+]

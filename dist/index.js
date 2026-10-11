@@ -11,7 +11,7 @@ import {
   readWorldPackage,
   replayWorldPackage,
   streamingChatModel
-} from "./chunk-TR5JHFWL.js";
+} from "./chunk-Y2ORNEXY.js";
 
 // src/storage.ts
 function browserStorage(storage, prefix = "genvr.world.") {

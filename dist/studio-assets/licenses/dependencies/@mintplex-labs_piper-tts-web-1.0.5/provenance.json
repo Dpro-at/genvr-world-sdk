@@ -1,0 +1,13 @@
+{
+  "files": [
+    "piper-package.json",
+    "piper-README.md",
+    "piper-MIT.txt"
+  ],
+  "sources": [
+    "https://raw.githubusercontent.com/Mintplex-Labs/piper-tts-web/5f06fa07a4284d846a43a0477a09fb15b4769157/package.json",
+    "https://raw.githubusercontent.com/Mintplex-Labs/piper-tts-web/5f06fa07a4284d846a43a0477a09fb15b4769157/README.md",
+    "https://raw.githubusercontent.com/spdx/license-list-data/v3.26.0/text/MIT.txt"
+  ],
+  "note": "Publisher declares MIT in package.json and credits diffusion-studio/vits-web and Rhasspy Piper in README. Upstream publishes no separate LICENSE file. The SPDX text is supplied as license text, not a fabricated upstream copyright notice. Optional speech models and their runtimes are downloaded only on explicit use and are not included in this archive."
+}

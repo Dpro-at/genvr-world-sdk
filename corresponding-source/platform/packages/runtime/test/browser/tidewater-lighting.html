@@ -1,0 +1,200 @@
+<!doctype html><meta charset="utf-8" /><title>Tidewater shadow lifecycle</title>
+<style>
+  body {
+    margin: 0;
+    background: #111;
+  }
+  canvas {
+    display: block;
+  }
+</style>
+<script type="importmap">
+  {
+    "imports": {
+      "three/webgpu": "/node_modules/three/build/three.webgpu.js",
+      "three": "/node_modules/three/build/three.webgpu.js",
+      "three/tsl": "/node_modules/three/build/three.tsl.js",
+      "three/addons/": "/node_modules/three/examples/jsm/"
+    }
+  }
+</script>
+<script type="module">
+  import {
+    Scene,
+    PerspectiveCamera,
+    WebGPURenderer,
+    DirectionalLight,
+    Mesh,
+    BoxGeometry,
+    PlaneGeometry,
+    MeshStandardNodeMaterial,
+    RenderTarget,
+    UnsignedByteType,
+  } from 'three/webgpu';
+  import { TidewaterLighting } from '/dist/tidewater-sky/lighting.js';
+  import { SunShadows } from '/dist/shadows.js';
+  import { realisticQuality } from '/dist/realistic-quality.js';
+  async function run() {
+    const renderer = new WebGPURenderer({ antialias: false });
+    await renderer.init();
+    renderer.setSize(960, 540);
+    renderer.shadowMap.enabled = true;
+    document.body.append(renderer.domElement);
+    const scene = new Scene(),
+      camera = new PerspectiveCamera(50, 960 / 540, 0.1, 1000);
+    camera.position.set(14, 10, 14);
+    camera.lookAt(0, 0, 0);
+    const sun = new DirectionalLight(0xffffff, 3);
+    sun.position.set(10, 15, 5);
+    sun.castShadow = true;
+    scene.add(sun, sun.target);
+    const floor = new Mesh(
+      new PlaneGeometry(10000, 10000),
+      new MeshStandardNodeMaterial({ color: 0xffffff, roughness: 1 }),
+    );
+    floor.rotation.x = -Math.PI / 2;
+    floor.receiveShadow = true;
+    scene.add(floor);
+    for (const x of [0, 15, 55, 180]) {
+      const box = new Mesh(new BoxGeometry(4, 8, 4), new MeshStandardNodeMaterial({ color: 0xcc8a44 }));
+      box.position.set(x, 4, 0);
+      box.castShadow = true;
+      box.receiveShadow = true;
+      scene.add(box);
+    }
+    const shadows = new SunShadows(sun, scene),
+      target = new RenderTarget(960, 540, { type: UnsignedByteType });
+    const qualities = [
+      null,
+      realisticQuality({ quality: 8, touchDevice: false, webgpu: true }),
+      null,
+      realisticQuality({ quality: 8, touchDevice: false, webgpu: true }),
+    ];
+    const samples = [],
+      cadence = [];
+    for (const quality of qualities) {
+      shadows.apply(quality);
+      for (let i = 0; i < 8; i++) {
+        await new Promise(requestAnimationFrame);
+        renderer.render(scene, camera);
+        if (quality) cadence.push([...sun.shadow.shadowNode.rendered]);
+      }
+      renderer.setRenderTarget(target);
+      renderer.render(scene, camera);
+      renderer.setRenderTarget(null);
+      await renderer.backend.device.queue.onSubmittedWorkDone();
+      const pixels = await renderer.readRenderTargetPixelsAsync(target, 0, 0, 960, 540);
+      let sum = 0,
+        dark = 0;
+      for (let i = 0; i < pixels.length; i += 4) {
+        sum += pixels[i];
+        if (pixels[i] < 30) dark++;
+      }
+      samples.push({ mean: sum / (960 * 540), dark });
+    }
+    renderer.render(scene, camera);
+    const stable =
+      Math.abs(samples[0].mean - samples[2].mean) < 0.1 && Math.abs(samples[1].mean - samples[3].mean) < 0.1;
+    const casterMeshes = scene.children.filter((x) => x.isMesh && x.castShadow);
+    for (const mesh of casterMeshes) mesh.visible = false;
+    await new Promise(requestAnimationFrame);
+    renderer.setRenderTarget(target);
+    renderer.render(scene, camera);
+    renderer.setRenderTarget(null);
+    const clearPixels = await renderer.readRenderTargetPixelsAsync(target, 0, 0, 960, 540);
+    let clearSum = 0;
+    for (let i = 0; i < clearPixels.length; i += 4) clearSum += clearPixels[i];
+    const clearMean = clearSum / (960 * 540),
+      casterEffect = clearMean - samples[3].mean;
+    for (const mesh of casterMeshes) mesh.visible = true;
+    renderer.render(scene, camera);
+    const cadenceValid =
+      cadence.some((x) => x[0] && !x[1] && !x[2]) && cadence.some((x) => x[0] && x[1] && !x[2]);
+    const movement = [];
+    for (const depth of [9.8, 10.2, 59.8, 60.2, 180, 2000]) {
+      camera.position.set(14, 10, depth);
+      camera.lookAt(depth === 2000 ? 14 : 0, 0, depth === 2000 ? 1986 : 0);
+      camera.fov = depth > 100 ? 65 : 50;
+      camera.updateProjectionMatrix();
+      await new Promise(requestAnimationFrame);
+      renderer.setRenderTarget(target);
+      renderer.render(scene, camera);
+      renderer.setRenderTarget(null);
+      const pixels = await renderer.readRenderTargetPixelsAsync(target, 0, 0, 960, 540);
+      let sum = 0;
+      for (let i = 0; i < pixels.length; i += 4) sum += pixels[i];
+      movement.push(sum / (960 * 540));
+    }
+    const lab = new Scene(),
+      labSun = new DirectionalLight(0xffffff, 4);
+    labSun.position.set(0, 10, 0);
+    lab.add(labSun, labSun.target);
+    const original = new MeshStandardNodeMaterial({ color: 0xffffff, roughness: 1 });
+    const receiver = new Mesh(new PlaneGeometry(10, 10), original);
+    receiver.rotation.x = Math.PI / 2;
+    receiver.position.y = 4;
+    lab.add(receiver);
+    const labCamera = new PerspectiveCamera(50, 960 / 540, 0.1, 100);
+    labCamera.position.set(0, 1, 0);
+    labCamera.lookAt(0, 4, 0);
+    const bridge = new TidewaterLighting(renderer, lab, labSun, {
+      half: 250,
+      heightAt: () => 0,
+      slotAt: () => 0,
+    });
+    const readLab = async (on = true) => {
+      await new Promise(requestAnimationFrame);
+      bridge.update(1 / 60, labCamera, on, -10000, 0);
+      renderer.setRenderTarget(target);
+      renderer.render(lab, labCamera);
+      renderer.setRenderTarget(null);
+      const p = await renderer.readRenderTargetPixelsAsync(target, 480, 270, 1, 1);
+      return [...p].slice(0, 3);
+    };
+    const white = await readLab();
+    original.color.setRGB(1, 0, 0);
+    const red = await readLab();
+    await readLab(false);
+    const restored = receiver.material === original;
+    await readLab(true);
+    const tintUpdated = white[1] > 5 && red[0] > 5 && red[1] < 2;
+    lab.remove(receiver);
+    await readLab(true);
+    const removalClean =
+      bridge.retainedMaterials === 0 && bridge.retainedMeshes === 0 && receiver.material === original;
+    bridge.dispose();
+    camera.position.set(14, 10, 14);
+    camera.fov = 50;
+    camera.lookAt(0, 0, 0);
+    camera.updateProjectionMatrix();
+    renderer.render(scene, camera);
+    target.dispose();
+    shadows.dispose();
+    return {
+      samples,
+      stable,
+      cadence,
+      cadenceValid,
+      clearMean,
+      casterEffect,
+      movement,
+      white,
+      red,
+      tintUpdated,
+      restored,
+      removalClean,
+      pass:
+        stable &&
+        cadenceValid &&
+        casterEffect > 0.1 &&
+        tintUpdated &&
+        restored &&
+        removalClean &&
+        movement.every((x) => Number.isFinite(x) && x > 10) &&
+        samples.every((x) => Number.isFinite(x.mean)),
+    };
+  }
+  run()
+    .then((x) => (window.__result = x))
+    .catch((e) => (window.__result = { error: String(e.stack || e) }));
+</script>

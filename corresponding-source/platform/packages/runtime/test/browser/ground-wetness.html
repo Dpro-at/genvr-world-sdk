@@ -1,0 +1,106 @@
+<!doctype html><meta charset="utf-8"><title>Source shore wetness history</title>
+<script type="importmap">{"imports":{"three/webgpu":"/node_modules/three/build/three.webgpu.js","three/tsl":"/node_modules/three/build/three.tsl.js"}}</script>
+<script type="module">
+import * as T from 'three/webgpu';
+import {GroundWetness} from '/dist/ocean/ground-wetness.js';
+import {SHORE_EVALUATOR_WGSL} from '/dist/ocean/shore-evaluator.js';
+import {createLaceTexture} from '/dist/ocean/surf-lace.js';
+const errors=[];
+try {
+ const renderer=new T.WebGPURenderer({trackTimestamp:true});await renderer.init();renderer.setSize(64,64);renderer.setAnimationLoop(()=>{});
+ renderer.backend.device.addEventListener('uncapturederror',e=>errors.push(e.error.message));document.body.append(renderer.domElement);
+ const n=32,depths=new Float32Array(n*n),fields=new Float32Array(n*n*4);
+ for(let j=0;j<n;j++)for(let i=0;i<n;i++){depths[j*n+i]=-(-16+(j+.5));fields.set([0,0,1,0],(j*n+i)*4);}
+ const depth=new T.DataTexture(depths,n,n,T.RedFormat,T.FloatType),field=new T.DataTexture(fields,n,n,T.RGBAFormat,T.FloatType);depth.needsUpdate=field.needsUpdate=true;
+ const bridge=new GroundWetness(n);bridge.region.value.set(-16,-16,32,n);
+ const initStart=performance.now();
+ const node=bridge.wetFoamNode(T.TSL.positionWorld.xz,T.TSL.positionWorld.y.sub(20));
+ const initializationMs=performance.now()-initStart;
+ const material=new T.MeshBasicNodeMaterial();material.colorNode=T.TSL.vec3(node.x,node.y,0);
+ const scene=new T.Scene(),geo=new T.PlaneGeometry(32,32).rotateX(-Math.PI/2);const mesh=new T.Mesh(geo,material);mesh.position.y=20;scene.add(mesh);
+ const camera=new T.PerspectiveCamera(60,1,.1,1000);camera.position.set(0,45,1);camera.lookAt(0,20,0);
+ const rt=new T.RenderTarget(64,64,{type:T.FloatType});
+ const input={depthTexture:depth,fieldTexture:field,extent:16,level:20,time:0,period:9,amplitude:.34,enabled:1,swellDirection:[.6,.8]};
+ const probe=async texture=>{const attribute=new T.StorageBufferAttribute(new Float32Array(n*n*4),4),buffer=T.TSL.storage(attribute,'vec4',n*n);
+ const k=T.TSL.Fn(()=>{const i=T.TSL.globalId.x;buffer.element(i).assign(T.TSL.textureLoad(texture,T.TSL.ivec2(i.mod(n),i.div(n))));})().compute(n*n);renderer.compute(k);
+ const result=new Float32Array(await renderer.getArrayBufferAsync(attribute));k.dispose();return [...result];};
+ // Execute the ORIGINAL ShoreSim constructor to capture its native compute shader unchanged.
+ const source=await (await fetch('/source/ocean/ShoreSim.js')).text();
+ class TextureStub{constructor(options){this.options=options;}}
+ class BlockStub{constructor(_name,fields){this.fields=Object.fromEntries(Object.entries(fields).map(([k,v])=>[k,{value:v[1]}]));}}
+ class CodeStub{constructor(options){this.code=options.code;}}
+ const Original=new Function('Vector2','Texture','UniformBlock','ShaderModule','StorageBuffer','ComputeKernel','commonModule','makeLaceTexture','LACE_TILE','GPU',
+ source.replace(/^import .*;\r?\n/gm,'').replace('export class','class')+';return ShoreSim;')(T.Vector2,TextureStub,BlockStub,CodeStub,CodeStub,CodeStub,null,()=>({userData:{size:512,nearest:null}}),3.5,null);
+ const original=new Original(null,{terrainGPU:{module:null},shore:{module:null,buildDirTexture(){}},center:new T.Vector2(),size:32,res:n});
+ const moduleCode=original.module.code.slice(0,original.module.code.indexOf('// bilinear lace lookup'));
+ const device=renderer.backend.device,refA=device.createTexture({size:[n,n],format:'rgba16float',usage:GPUTextureUsage.TEXTURE_BINDING|GPUTextureUsage.COPY_DST}),refB=device.createTexture({size:[n,n],format:'rgba16float',usage:GPUTextureUsage.STORAGE_BINDING|GPUTextureUsage.COPY_SRC});
+ const deposits=device.createBuffer({size:n*n*4,usage:GPUBufferUsage.STORAGE}),waves=new T.StorageBufferAttribute(new Float32Array(n*n*16),16);
+ const waveNode=T.TSL.storage(waves,'mat4',n*n),clock=T.TSL.uniform(new T.Vector4(0,20,9,.34)).setGroup(T.TSL.renderGroup);
+ const waveFn=T.TSL.wgslFn(SHORE_EVALUATOR_WGSL);
+ const waveKernel=T.TSL.Fn(()=>{const i=T.TSL.globalId.x,p=T.TSL.vec2(i.mod(n),i.div(n)).add(.5).sub(16);
+ waveNode.element(i).assign(waveFn(p,p.y.add(20),T.TSL.texture(depth),T.TSL.texture(field),T.TSL.vec2(-16),T.TSL.float(32),clock,T.TSL.float(1)));})().compute(n*n);
+ const lace=createLaceTexture();await renderer.initTexture(lace);
+ const shader=device.createShaderModule({code:`
+ struct Params{min:vec2f,size:f32,dryTime:f32,foamLife:f32,surfFoamLife:f32,residueLife:f32,foamGen:f32,depositGain:f32};
+ const shoreSimP=Params(vec2f(-16.0),32.0,28.0,4.5,2.6,5.0,1.0,0.02);
+ struct FrameInfo{dt:f32,seaLevel:f32};const frame=FrameInfo(.05,0.0);
+ const WG_X=8;const WG_Y=8;const WG_Z=1;
+ @group(0)@binding(0)var shoreSimStateTex:texture_2d<f32>;
+ @group(0)@binding(1)var shoreSimOut:texture_storage_2d<rgba16float,write>;
+ @group(0)@binding(2)var<storage,read_write>shoreSimDeposit:array<u32>;
+ @group(0)@binding(3)var shoreSimLace:texture_2d<f32>;
+ @group(0)@binding(4)var smpLinearRepeat:sampler;
+ @group(0)@binding(5)var<storage,read>oracleWaves:array<mat4x4f>;
+ fn sat(x:f32)->f32{return clamp(x,0.0,1.0);}
+ fn terrainHeightAt(p:vec2f)->f32{return p.y;}
+ struct Sw{runup:f32,inland:f32,flow:vec2f,foam:f32,swashFoam:f32,dir:vec2f};
+ fn shoreEvaluateWorld(p:vec2f,depth:f32,ground:f32)->Sw{
+ let i=vec2u((p+16.0)/32.0*${n}.0);let s=oracleWaves[i.y*${n}u+i.x];return Sw(s[0].z,s[0].w,s[1].xy,s[0].x,s[0].y,s[1].zw);}
+ ${moduleCode}
+${original.kernel.code}`});
+ const pipeline=await device.createComputePipelineAsync({layout:'auto',compute:{module:shader,entryPoint:'main'}});
+ let referenceError=0;
+ const referenceStep=async()=>{
+ clock.value.x=input.time;renderer.compute(waveKernel);await device.queue.onSubmittedWorkDone();
+ const bg=device.createBindGroup({layout:pipeline.getBindGroupLayout(0),entries:[
+ {binding:0,resource:refA.createView()},{binding:1,resource:refB.createView()},{binding:2,resource:{buffer:deposits}},
+ {binding:3,resource:renderer.backend.get(lace).texture.createView()},{binding:4,resource:device.createSampler({minFilter:'linear',magFilter:'linear',mipmapFilter:'linear',addressModeU:'repeat',addressModeV:'repeat'})},
+ {binding:5,resource:{buffer:renderer.backend.get(waves).buffer}}]});
+ const encoder=device.createCommandEncoder(),pass=encoder.beginComputePass();pass.setPipeline(pipeline);pass.setBindGroup(0,bg);pass.dispatchWorkgroups(n/8,n/8);pass.end();encoder.copyTextureToTexture({texture:refB},{texture:refA},[n,n]);
+ const row=256,read=device.createBuffer({size:row*n,usage:GPUBufferUsage.COPY_DST|GPUBufferUsage.MAP_READ});encoder.copyTextureToBuffer({texture:refB},{buffer:read,bytesPerRow:row},[n,n]);device.queue.submit([encoder.finish()]);await read.mapAsync(GPUMapMode.READ);
+ const data=new Uint16Array(read.getMappedRange()),actual=await probe(bridge.state);
+ for(let y=0;y<n;y++)for(let x=0;x<n*4;x++)referenceError=Math.max(referenceError,Math.abs(actual[y*n*4+x]-T.DataUtils.fromHalfFloat(data[y*row/2+x])));
+ read.unmap();read.destroy();
+ };
+ const step=async()=>{await new Promise(requestAnimationFrame);bridge.update(renderer,.05,input);await renderer.backend.device.queue.onSubmittedWorkDone();};
+ await step(); // Allocate/clear stable native state before seeding the oracle history.
+ const seed=new Uint16Array(n*n*4);
+ for(let y=0;y<n;y++)for(let x=0;x<n;x++){
+ const k=(y*n+x)*4;seed[k]=T.DataUtils.toHalfFloat(.1+.6*x/n);seed[k+1]=T.DataUtils.toHalfFloat(.7);seed[k+2]=T.DataUtils.toHalfFloat(.2+.5*y/n);seed[k+3]=T.DataUtils.toHalfFloat((y-n/2)*.1);}
+ device.queue.writeTexture({texture:renderer.backend.get(bridge.state).texture},seed,{bytesPerRow:n*8},[n,n]);
+ device.queue.writeTexture({texture:refA},seed,{bytesPerRow:n*8},[n,n]);
+ let maxFoam=0,maxResidue=0,maxFlow=0;
+ for(const phaseTime of [0,.05,2.7,4.8,7.2,9.8,14.4,18.2]){input.time=phaseTime;await step();await referenceStep();
+ const state=await probe(bridge.state);maxFoam=Math.max(maxFoam,...state.filter((_,i)=>i%4===0));maxResidue=Math.max(maxResidue,...state.filter((_,i)=>i%4===2));maxFlow=Math.max(maxFlow,...state.filter((_,i)=>i%4===3).map(Math.abs));}
+
+ const active=await probe(bridge.state),finite=active.every(Number.isFinite),wetMax=Math.max(...active.filter((_,i)=>i%4===1));
+ const autoDirection=bridge.swellDirectionNode.value.x===.6&&bridge.swellDirectionNode.value.y===.8;
+ renderer.setRenderTarget(rt);renderer.render(scene,camera);renderer.setRenderTarget(null);await renderer.backend.device.queue.onSubmittedWorkDone();
+ const first=Array.from(await renderer.readRenderTargetPixelsAsync(rt,0,0,64,64));
+ const stableTexture=bridge.state;bridge.deactivate();await new Promise(requestAnimationFrame);renderer.setRenderTarget(rt);renderer.render(scene,camera);renderer.setRenderTarget(null);
+ const fallback=Array.from(await renderer.readRenderTargetPixelsAsync(rt,0,0,64,64));const liveChange=Math.max(...first.map((v,i)=>Math.abs(v-fallback[i])));
+ const resetDirection=Math.abs(bridge.swellDirectionNode.value.x+.11914522)<1e-8;
+ await step();const retained=bridge.state===stableTexture&&bridge.availableNode.value===1;
+ bridge.invalidate();await step();const invalidatedFinite=(await probe(bridge.state)).every(Number.isFinite);
+ bridge.dispose();bridge.dispose();bridge.update(renderer,.05,input);const disposed=bridge.availableNode.value===0;
+ // Worst case768²: every texel is shallow and evaluates the full source wave/simulation kernel.
+ const flatDepth=new T.DataTexture(new Float32Array(4),2,2,T.RedFormat,T.FloatType);flatDepth.needsUpdate=true;
+ const full=new GroundWetness(),fullInput={...input,depthTexture:flatDepth,extent:1000};const gpuMs=[];
+ await renderer.resolveTimestampsAsync('compute');
+ for(let i=0;i<5;i++){await new Promise(requestAnimationFrame);full.update(renderer,.016,fullInput);await device.queue.onSubmittedWorkDone();const ms=await renderer.resolveTimestampsAsync('compute');if(i)gpuMs.push(ms);}
+ full.dispose();flatDepth.dispose();
+ window.__result={initializationMs,gpuMs,maxFoam,maxResidue,maxFlow,referenceError,finite,wetMax,autoDirection,liveChange,resetDirection,retained,invalidatedFinite,disposed,errors,pass:maxFoam>.1&&maxResidue>.1&&maxFlow>.1&&referenceError<.005&&finite&&wetMax>.1&&autoDirection&&liveChange>.05&&resetDirection&&retained&&invalidatedFinite&&disposed};
+ waveKernel.dispose();refA.destroy();refB.destroy();deposits.destroy();lace.dispose();
+ material.dispose();geo.dispose();depth.dispose();field.dispose();rt.dispose();renderer.dispose();
+}catch(error){console.error(error);window.__result={error:String(error),stack:error.stack,errors};}
+</script>

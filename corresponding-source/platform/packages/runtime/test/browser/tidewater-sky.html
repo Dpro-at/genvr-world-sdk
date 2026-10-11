@@ -1,0 +1,109 @@
+<!doctype html>
+<meta charset="utf-8" />
+<title>Tidewater sky check</title>
+<style>html,body{margin:0;background:#000}canvas{display:block}</style>
+<script type="importmap">
+  { "imports": { "three/webgpu": "/node_modules/three/build/three.webgpu.js", "three": "/node_modules/three/build/three.webgpu.js" } }
+</script>
+<script type="module">
+  // World plan task 3: the TSL atmosphere LUTs against the CPU reference (transmittance, error < 1e-3), a look at
+  // the sky (zenith blue, horizon brighter, sun disc), and the cost of each kernel. ?view=1 keeps drawing the sky.
+  import { PerspectiveCamera, Scene, WebGPURenderer, TSL, StorageBufferAttribute } from 'three/webgpu';
+  import { TidewaterSky, sunDirection } from '/dist/tidewater-sky/index.js';
+  import { transmittance, transmittanceTexel, TRANSMITTANCE_SIZE } from '/dist/tidewater-sky/atmosphere-math.js';
+
+  const q = new URLSearchParams(location.search);
+  async function run() {
+    const renderer = new WebGPURenderer({ antialias: false });
+    await renderer.init();
+    if (!renderer.backend.isWebGPUBackend) return { error: 'not WebGPU' };
+    renderer.setSize(innerWidth, innerHeight);
+    document.body.appendChild(renderer.domElement);
+    const scene = new Scene();
+    const sky = new TidewaterSky(renderer, scene);
+    const originalTone = renderer.toneMapping;
+    const originalExposure = renderer.toneMappingExposure;
+    scene.add(sky.group);
+    sky.enable(true);
+    sky.setEnvironmentQuality(128, 1);
+    const hours = Number(q.get('time') ?? 16.2);
+    sky.show({ sun: sunDirection(hours, Number(q.get('az') ?? 0)), exposure: 0.55, dim: 1 });
+    const camera = new PerspectiveCamera(Number(q.get('fov') ?? 60), innerWidth / innerHeight, 0.1, 5000);
+    const [cx, cy, cz] = (q.get('cam') ?? '0,1.7,0').split(',').map(Number);
+    const [lx, ly, lz] = (q.get('look') ?? '-100,20,10').split(',').map(Number);
+    camera.position.set(cx, cy, cz);
+    camera.lookAt(lx, ly, lz);
+    const device = renderer.backend.device;
+    let t0 = performance.now();
+    sky.update(0.016, camera.position);
+    await device.queue.onSubmittedWorkDone();
+    const firstMs = performance.now() - t0;
+
+    // transmittance LUT against the CPU integral, every texel
+    const gpu = await sky.atmosphere.readTransmittance(renderer);
+    const [W, H] = TRANSMITTANCE_SIZE;
+    let maxErr = 0;
+    let at = null;
+    for (let y = 0; y < H; y += 1)
+      for (let x = 0; x < W; x += 1) {
+        const { r, mu } = transmittanceTexel(x, y);
+        const ref = transmittance(r, mu);
+        for (let c = 0; c < 3; c += 1) {
+          const e = Math.abs(gpu[(y * W + x) * 4 + c] - ref[c]);
+          if (e > maxErr) { maxErr = e; at = { x, y, c, gpu: gpu[(y * W + x) * 4 + c], cpu: ref[c] }; }
+        }
+      }
+    const zenith = [0, 1, 2].map((c) => gpu[c]);
+    const horizon = [0, 1, 2].map((c) => gpu[(W - 1) * 4 + c]);
+
+    // the sky view kernel alone, many times
+    const runs = 60;
+    t0 = performance.now();
+    for (let i = 0; i < runs; i += 1) {
+      sky.atmosphere.params.sunDir.value.x += 1e-4;
+      sky.atmosphere.update(renderer, 0, camera.position.y);
+    }
+    await device.queue.onSubmittedWorkDone();
+    const skyViewMs = (performance.now() - t0) / runs;
+    sky.show({ sun: sunDirection(hours, Number(q.get('az') ?? 0)), exposure: 0.55, dim: 1 });
+    sky.update(0.3, camera.position);
+    // draw cost of the dome at this size
+    renderer.render(scene, camera);
+    await device.queue.onSubmittedWorkDone();
+    t0 = performance.now();
+    for (let i = 0; i < runs; i += 1) renderer.render(scene, camera);
+    await device.queue.onSubmittedWorkDone();
+    const drawMs = (performance.now() - t0) / runs;
+    const samples = new StorageBufferAttribute(new Float32Array(24), 4);
+    const output = TSL.storage(samples, 'vec4', 6);
+    const directions = [[1,0,0],[-1,0,0],[0,1,0],[0,-1,0],[0,0,1],[0,0,-1]];
+    renderer.compute(TSL.Fn(() => {
+      directions.forEach((direction, i) => output.element(i).assign(TSL.vec4(sky.shading.viewRadiance(TSL.vec3(...direction)), 1)));
+    })().compute(1));
+    const cardinalFinite = Array.from(new Float32Array(await renderer.getArrayBufferAsync(samples))).every(Number.isFinite);
+    const previousEnvironment = scene.environment;
+    sky.setEnvironmentQuality(64, 1);
+    sky.update(0, camera.position);
+    const environmentResized = scene.environment !== previousEnvironment;
+    sky.enable(false);
+    const toneRestored = renderer.toneMapping === originalTone && renderer.toneMappingExposure === originalExposure;
+    sky.enable(true);
+    sky.setEnvironmentQuality(128, 1);
+    sky.show({ sun: sunDirection(hours), exposure: 0.55, dim: 1 });
+    await new Promise((r) => setTimeout(r, 400));
+    sky.update(0.3, camera.position);
+    renderer.render(scene, camera);
+    const result = {
+      maxErr, at, zenith, horizon, firstMs, skyViewMs, drawMs, cardinalFinite, environmentResized, toneRestored,
+      sunLight: sky.light.color.toArray().map((v) => +v.toFixed(3)),
+      horizonColor: sky.horizon?.toArray().map((v) => +v.toFixed(3)) ?? null,
+      irradiance: sky.atmosphere.skyIrradiance?.map((v) => +v.toFixed(3)) ?? null,
+    };
+    if (q.has('view')) {
+      const loop = () => { sky.update(0.016, camera.position); renderer.render(scene, camera); requestAnimationFrame(loop); };
+      loop();
+    }
+    return result;
+  }
+  run().then((r) => (window.__result = r)).catch((e) => (window.__result = { error: String(e && e.stack || e) }));
+</script>

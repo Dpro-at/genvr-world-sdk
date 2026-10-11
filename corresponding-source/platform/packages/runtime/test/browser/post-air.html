@@ -1,0 +1,77 @@
+<!doctype html><meta charset="utf-8"><title>Tidewater GTAO and air haze GPU check</title>
+<style>body{margin:0;background:#111;color:white;font:14px monospace}canvas{width:512px;height:512px}</style>
+<script type="importmap">{"imports":{"three/webgpu":"/node_modules/three/build/three.webgpu.js","three/tsl":"/node_modules/three/build/three.tsl.js","three":"/node_modules/three/build/three.webgpu.js","three/addons/":"/node_modules/three/examples/jsm/"}}</script>
+<script type="module">
+import {WebGPURenderer,PerspectiveCamera,Vector3,Vector4,TSL,DataTexture,FloatType,RGBAFormat,NearestFilter,
+ StorageBufferAttribute,WebGPUCoordinateSystem,Scene,Mesh,BoxGeometry,PlaneGeometry,MeshBasicNodeMaterial,RenderTarget,DepthTexture,NoToneMapping} from 'three/webgpu';
+import {AirHaze} from '/dist/post/air-haze.js';import {GTAO} from '/dist/post/gtao.js';
+import {hazeInScatter,marchHaze} from '/dist/post/air-math.js';
+
+async function run(){
+ const W=64,H=64,renderer=new WebGPURenderer({antialias:false,trackTimestamp:true});await renderer.init();renderer.setSize(W,H);
+ renderer.setAnimationLoop(()=>{});renderer.toneMapping=NoToneMapping;document.body.append(renderer.domElement);
+ const camera=new PerspectiveCamera(60,1,.1,100000);camera.coordinateSystem=WebGPUCoordinateSystem;camera.position.set(0,10,0);
+ camera.lookAt(0,10,-1);camera.updateProjectionMatrix();camera.updateMatrixWorld(true);
+ const rgba=new Float32Array(W*H*4),depths=new Float32Array(W*H*4);
+ for(let y=0;y<H;y++)for(let x=0;x<W;x++){let p=(y*W+x)*4;rgba.set([.2,.3,.4,1],p);
+   const z=x<21?200:x<43?1200:100000;const clip=new Vector4(0,0,-z,1).applyMatrix4(camera.projectionMatrix);depths[p]=x>=43?1:clip.z/clip.w;depths[p+3]=1;}
+ const make=data=>{const t=new DataTexture(data,W,H,RGBAFormat,FloatType);t.minFilter=t.magFilter=NearestFilter;t.needsUpdate=true;return t;};
+ const mediumData=new Float32Array(W*H*4),medium=make(mediumData),underwater=TSL.uniform(0).setGroup(TSL.renderGroup);
+ const color=make(rgba),depth=make(depths),sun=TSL.uniform(new Vector3(0,.2,-Math.sqrt(.96))).setGroup(TSL.renderGroup),sunColor=TSL.uniform(new Vector3(4,3,2)).setGroup(TSL.renderGroup),visibility=TSL.uniform(1).setGroup(TSL.renderGroup);
+ const haze=new AirHaze({inputTexture:color,depthTexture:depth,camera,sunDirectionNode:sun,sunColorNode:sunColor,seaLevelNode:TSL.uniform(0),
+  skyLuminanceNode:()=>TSL.vec3(.6,.7,.8),skyIrradianceNode:TSL.vec3(.5),shadowNode:()=>visibility,mediumTexture:medium,underwaterNode:underwater,unjitteredProjectionMatrix:camera.projectionMatrix.clone()});
+ haze.resize(W,H);haze.shafts.value=0;
+ const probe=async texture=>{const w=texture.image.width,h=texture.image.height;const attribute=new StorageBufferAttribute(new Float32Array(w*h*4),4),buffer=TSL.storage(attribute,'vec4',w*h);
+  const kernel=TSL.Fn(()=>{const i=TSL.globalId.x;buffer.element(i).assign(TSL.textureLoad(texture,TSL.ivec2(i.mod(w),i.div(w))));})().compute(w*h);
+  renderer.compute(kernel);const result=new Float32Array(await renderer.getArrayBufferAsync(attribute));kernel.dispose();return result;};
+ const step=async()=>{await new Promise(requestAnimationFrame);haze.update(renderer,.016,camera);await renderer.backend.device.queue.onSubmittedWorkDone();};
+ await step();const analytic=await probe(haze.texture);let analyticError=0;
+ for(const x of [10,32,55]){const y=32,p=(y*W+x)*4,uv=[(x+.5)/W,(y+.5)/H];
+  const v=new Vector4(uv[0]*2-1,1-uv[1]*2,Math.min(depths[p],.999999),1).applyMatrix4(camera.projectionMatrixInverse);v.multiplyScalar(1/v.w);
+  const scatter=x>=43?0:hazeInScatter(10,v.y/Math.hypot(v.x,v.y,v.z),Math.hypot(v.x,v.y,v.z));
+  for(let c=0;c<3;c++)analyticError=Math.max(analyticError,Math.abs(analytic[p+c]-(rgba[p+c]*(1-scatter)+[.6,.7,.8][c]*scatter)));}
+ camera.setViewOffset(W,H,2,1,W,H);await step();const jittered=await probe(haze.texture);let unjitteredError=0;for(let i=0;i<analytic.length;i++)unjitteredError=Math.max(unjitteredError,Math.abs(analytic[i]-jittered[i]));camera.clearViewOffset();
+ haze.enabled.value=0;await step();const disabled=await probe(haze.texture);let disabledError=0;for(let i=0;i<disabled.length;i++)disabledError=Math.max(disabledError,Math.abs(disabled[i]-rgba[i]));
+ haze.enabled.value=1;underwater.value=1;await step();const submerged=await probe(haze.texture);let underwaterError=0;for(let i=0;i<submerged.length;i++)underwaterError=Math.max(underwaterError,Math.abs(submerged[i]-rgba[i]));underwater.value=0;
+ for(let y=0;y<H;y++)for(let x=0;x<21;x++)mediumData[(y*W+x)*4]=1;medium.needsUpdate=true;await step();const masked=await probe(haze.texture);const mediumError=Math.max(...[0,1,2].map(c=>Math.abs(masked[(32*W+10)*4+c]-rgba[(32*W+10)*4+c])));
+ mediumData.fill(0);medium.needsUpdate=true;
+ haze.enabled.value=1;haze.shafts.value=1;haze.godRays=false;await step();const lit=await probe(haze.texture);visibility.value=0;haze.invalidate();await step();const shadow=await probe(haze.texture);
+ let shaftDifference=0;for(let i=0;i<lit.length;i+=4)shaftDifference+=Math.abs(lit[i]-shadow[i]);shaftDifference/=W*H;
+ const low=await probe(haze.low);const lowFinite=low.every(Number.isFinite);const historyActive=haze.historyValid.value===0;
+ const lx=5,ly=16,uv=[(lx+.5)/32,(ly+.5)/32],d=depths[((ly*2+1)*W+lx*2+1)*4];
+ const v=new Vector4(uv[0]*2-1,1-uv[1]*2,d,1).applyMatrix4(camera.projectionMatrixInverse);v.multiplyScalar(1/v.w);const distance=Math.hypot(v.x,v.y,v.z);
+ const fract=x=>x-Math.floor(x);const jit=fract(fract(52.9829189*fract((lx+.5)*.06711056+(ly+.5)*.00583715))+haze.frame.value*.61803398875);
+ const cpuMarch=marchHaze(10,v.y/distance,distance,jit,()=>0),marchError=Math.abs(low[(ly*32+lx)*4+1]-cpuMarch[1]);
+ await step();const temporalActive=haze.historyValid.value===1;
+ haze.godRays=true;visibility.value=1;haze.invalidate();await step();const rays=await probe(haze.godRayTextures[3]);const raysFinite=rays.every(Number.isFinite);
+ const rayPeak=Math.max(...rays.filter((_,i)=>i%4===0));
+ // Actual scene depth texture checks (not only float depth inputs): corner + near box.
+ const scene=new Scene();scene.background=null;const material=new MeshBasicNodeMaterial({color:0x808080});
+ const plane=new Mesh(new PlaneGeometry(20,20),material);plane.position.set(0,10,-5);scene.add(plane);
+ const floor=new Mesh(new PlaneGeometry(20,20),material);floor.rotation.x=-Math.PI/2;floor.position.set(0,9,-5);scene.add(floor);
+ const box=new Mesh(new BoxGeometry(2,2,2),material);box.position.set(0,10,-4);scene.add(box);
+ const target=new RenderTarget(W,H);target.depthTexture=new DepthTexture(W,H);renderer.setRenderTarget(target);renderer.render(scene,camera);renderer.setRenderTarget(null);
+ const gtao=new GTAO(target.depthTexture,camera,{inputTexture:target.texture});gtao.resize(W,H);await new Promise(requestAnimationFrame);gtao.update(renderer);await renderer.backend.device.queue.onSubmittedWorkDone();
+ const aoValues=await probe(gtao.texture),aoFinite=aoValues.every(Number.isFinite),aoMinimum=Math.min(...aoValues.filter((_,i)=>i%4===0));
+ // Haze also compiles and samples an actual texture_depth_2d (not only RGBA synthetic depth).
+ const actualHaze=new AirHaze({inputTexture:target.texture,depthTexture:target.depthTexture,camera,sunDirectionNode:sun,sunColorNode:sunColor,seaLevelNode:TSL.uniform(0),skyLuminanceNode:()=>TSL.vec3(.6,.7,.8),skyIrradianceNode:TSL.vec3(.5)});
+ actualHaze.resize(W,H);await new Promise(requestAnimationFrame);actualHaze.update(renderer);const actualDepthFinite=(await probe(actualHaze.texture)).every(Number.isFinite);actualHaze.dispose();
+ // Padded workgroups must leave odd-sized output finite and cover its last pixel.
+ target.setSize(65,67);renderer.setRenderTarget(target);renderer.render(scene,camera);renderer.setRenderTarget(null);
+ gtao.resize(65,67);await new Promise(requestAnimationFrame);gtao.update(renderer);
+ const oddAO=await probe(gtao.colorTexture),oddSizeFinite=oddAO.every(Number.isFinite)&&oddAO.at(-1)===1;
+ const timedHaze=new AirHaze({inputTexture:target.texture,depthTexture:target.depthTexture,camera,sunDirectionNode:sun,sunColorNode:sunColor,seaLevelNode:TSL.uniform(0),skyLuminanceNode:()=>TSL.vec3(.6,.7,.8),skyIrradianceNode:TSL.vec3(.5),shadowNode:()=>TSL.float(.5)});
+ timedHaze.resize(65,67);timedHaze.update(renderer);const oddHaze=await probe(timedHaze.texture),oddHazeFinite=oddHaze.every(Number.isFinite)&&oddHaze.at(-1)===1;
+ target.setSize(2560,1440);camera.aspect=2560/1440;camera.updateProjectionMatrix();renderer.setRenderTarget(target);renderer.render(scene,camera);renderer.setRenderTarget(null);
+ gtao.resize(2560,1440);timedHaze.resize(2560,1440);const aoGpuMs=[],hazeGpuMs=[];
+ for(let i=0;i<4;i++){await new Promise(requestAnimationFrame);gtao.update(renderer);await renderer.backend.device.queue.onSubmittedWorkDone();const a=await renderer.resolveTimestampsAsync('compute');
+ timedHaze.update(renderer);await renderer.backend.device.queue.onSubmittedWorkDone();const b=await renderer.resolveTimestampsAsync('compute');if(i){aoGpuMs.push(a);hazeGpuMs.push(b);}}
+ timedHaze.dispose();
+ haze.resize(32,48);await step();const resized=haze.texture.image.width===32&&haze.low.image.height===24&&haze.historyValid.value===0;
+ haze.dispose();haze.dispose();gtao.dispose();gtao.dispose();const frame=haze.frame.value;haze.update(renderer);const disposed=haze.frame.value===frame;
+ const pass=analyticError<.004&&unjitteredError===0&&disabledError<.001&&underwaterError<.001&&mediumError<.001&&marchError<.005&&shaftDifference>.001&&lowFinite&&historyActive&&temporalActive&&raysFinite&&rayPeak>0&&aoFinite&&aoMinimum<.95&&actualDepthFinite&&resized&&disposed&&oddSizeFinite&&oddHazeFinite;
+ window.__result={analyticError,unjitteredError,disabledError,underwaterError,mediumError,marchError,shaftDifference,lowFinite,historyActive,temporalActive,raysFinite,rayPeak,aoFinite,aoMinimum,actualDepthFinite,resized,disposed,oddSizeFinite,oddHazeFinite,aoGpuMs,hazeGpuMs,pass};
+ renderer.dispose();target.dispose();color.dispose();depth.dispose();medium.dispose();material.dispose();plane.geometry.dispose();box.geometry.dispose();floor.geometry.dispose();
+}
+run().catch(error=>{console.error(error);window.__result={error:String(error),stack:error.stack};});
+</script>

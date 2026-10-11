@@ -1,0 +1,4 @@
+@font-face { font-family: 'Genvr Film Nunito'; src: url('./font-assets/nunito-latin.woff2') format('woff2'); font-weight: 400 900; font-display: swap; }
+@font-face { font-family: 'Genvr Film Merriweather'; src: url('./font-assets/merriweather-latin.woff2') format('woff2'); font-weight: 400 900; font-display: swap; }
+@font-face { font-family: 'Genvr Film JetBrains Mono'; src: url('./font-assets/jetbrainsmono-latin.woff2') format('woff2'); font-weight: 400 700; font-display: swap; }
+@font-face { font-family: 'Genvr Film Bebas Neue'; src: url('./font-assets/bebasneue-latin.woff2') format('woff2'); font-weight: 400; font-display: swap; }

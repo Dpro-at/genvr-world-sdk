@@ -35737,6 +35737,24 @@ function roofBends(a2, b2, planes) {
   return [...bends].sort((x2, y3) => x2 - y3);
 }
 
+// ../world/dist/small-starter.js
+var LAYOUT = [
+  ["genvr.core.tree.pine", -9, -7, 5, 0],
+  ["genvr.core.tree.pine", 9, -8, 5.5, 0.4],
+  ["genvr.core.tree.pine", -10, 7, 4.5, -0.3],
+  ["genvr.core.rock", -5, -5, 0.8, 0.2],
+  ["genvr.core.rock", 6, -3, 1, -0.5],
+  ["genvr.core.rock", -8, 7, 0.6, 0.7],
+  ["genvr.core.bench", -5, 1, 0.9, Math.PI / 2],
+  ["genvr.core.bench", 5, 1, 0.9, -Math.PI / 2],
+  ["genvr.core.flower", -6, 3, 0.4, 0],
+  ["genvr.core.flower", -5, 3.5, 0.35, 0.2],
+  ["genvr.core.flower", -4, 3, 0.4, -0.1],
+  ["genvr.core.flower", 4, 3, 0.35, 0.1],
+  ["genvr.core.flower", 5, 3.5, 0.4, -0.2],
+  ["genvr.core.flower", 6, 3, 0.35, 0]
+];
+
 // ../world/dist/rest-layers.js
 function restLayers(state) {
   const { doc, terrain, voxels } = state;
@@ -40659,7 +40677,7 @@ async function readChatStream(body, onText, onQueue) {
 var CORRECTION_WINDOW_MS = 10 * 60 * 1e3;
 
 // src/session.ts
-var SDK_VERSION = "0.2.0";
+var SDK_VERSION = "0.3.0-preview.1";
 var PACKAGE_WORK_BUDGET = 5e6;
 function readWorldPackage(input2) {
   const text2 = typeof input2 === "string" ? input2 : JSON.stringify(input2);
@@ -152051,6 +152069,7 @@ var CHARACTER = {
 var DEFAULT_SETTINGS = { maxStep: 0.4, maxSlopeDeg: 45, snapToGround: 0.3 };
 var PhysicsWorld = class {
   world;
+  #started = false;
   constructor() {
     this.world = new zg.World({ x: 0, y: -9.81, z: 0 });
   }
@@ -152174,6 +152193,12 @@ var PhysicsWorld = class {
   step(dt2) {
     this.world.timestep = dt2;
     this.world.step();
+    this.#started = true;
+  }
+  /** Rapier 0.20 fills its broad phase on the first positive step, not when colliders are added. */
+  prepareCharacterQueries() {
+    if (!this.#started)
+      this.step(1 / 60);
   }
   dispose() {
     this.world.free();
@@ -152240,6 +152265,7 @@ var Character = class {
   }
   /** Moves the collider with the one-way filter and records a side wall it ran into. */
   #compute(delta) {
+    this.physics.prepareCharacterQueries();
     this.#feetY = this.#body.translation().y - CHARACTER.centerOffset;
     this.#controller.computeColliderMovement(this.#collider, delta, void 0, void 0, this.#filter);
     this.#wall = 0;
@@ -157217,6 +157243,7 @@ async function createRuntime({ onFilmFrame, onRendered, container, world, terrai
     get world() {
       return state.doc;
     },
+    snapshot: () => ({ world: structuredClone(state.doc), terrainChunks: encodeTerrain(state).map((row) => row.data).filter(Boolean) }),
     get playerPosition() {
       const pose = rideNow ? items.livePose(rideNow.instanceId) : null;
       return pose ? { x: pose.x, y: pose.y, z: pose.z } : character.feet;

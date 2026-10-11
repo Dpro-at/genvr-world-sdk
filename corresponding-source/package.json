@@ -1,20 +1,40 @@
 {
-  "name": "3d-world-sdk-source",
+  "name": "genvr",
   "private": true,
   "type": "module",
+  "description": "Genvr platform monorepo",
   "packageManager": "pnpm@10.24.0",
   "engines": {
     "node": ">=24"
   },
+  "scripts": {
+    "prepare": "git config core.hooksPath tooling/owner-notes || true",
+    "agents": "node tooling/scripts/agents.mjs",
+    "agents:test": "node --test tooling/scripts/agents.test.mjs",
+    "skills:sync": "node tooling/scripts/sync-skills.mjs",
+    "skills:check": "node tooling/scripts/sync-skills.mjs --check",
+    "dev": "turbo run dev",
+    "phone": "node tooling/scripts/phone.mjs",
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "typecheck": "turbo run typecheck",
+    "lint": "eslint --config tooling/eslint.config.js .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "api:generate": "pnpm --filter @genvr/api openapi && pnpm --filter @genvr/api-client generate"
+  },
   "devDependencies": {
     "@dgreenheck/ez-tree": "1.1.0",
+    "@eslint/js": "^10.0.1",
     "@types/node": "^26.6.2",
+    "eslint": "^10.11.0",
+    "prettier": "^3.9.9",
+    "sharp": "0.35.4",
     "tsx": "^4.23.15",
+    "turbo": "^2.11.3",
     "typescript": "^6.0.3",
+    "typescript-eslint": "^8.70.1",
     "vitest": "^5.0.1"
   },
-  "scripts": {
-    "build": "pnpm --filter @genvr/world-sdk... build",
-    "pack": "pnpm --filter @genvr/world-sdk pack:standalone"
-  }
+  "prettier": "./tooling/prettier.config.json"
 }

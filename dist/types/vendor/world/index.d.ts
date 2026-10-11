@@ -11,6 +11,7 @@ export * from './rivers.js';
 export * from './world-generator.js';
 export * from './scatter.js';
 export * from './starter.js';
+export * from './small-starter.js';
 export * from './voxel-data.js';
 export * from './player-blocks.js';
 export * from './rest-layers.js';

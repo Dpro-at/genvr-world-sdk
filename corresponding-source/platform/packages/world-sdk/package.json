@@ -1,28 +1,39 @@
 {
   "name": "@genvr/world-sdk",
-  "version": "0.2.0",
+  "version": "0.3.0-preview.1",
   "license": "AGPL-3.0-only",
   "description": "Standalone Genvr world authoring, local persistence and explicit platform publication adapters.",
   "type": "module",
   "exports": {
     ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" },
-    "./runtime": { "types": "./dist/runtime.d.ts", "default": "./dist/runtime.js" }
+    "./runtime": { "types": "./dist/runtime.d.ts", "default": "./dist/runtime.js" },
+    "./studio": { "types": "./dist/studio.d.ts", "default": "./dist/studio.js" },
+    "./studio.css": "./dist/studio.css",
+    "./studio-project": { "types": "./dist/studio-project.d.ts", "default": "./dist/studio-project.js" }
   },
-  "files": ["dist", "demo", "assets", "serve.mjs", "README.md"],
-  "bin": { "genvr-world-mcp": "./dist/mcp.js", "genvr-world-demo": "./serve.mjs" },
+  "files": ["dist", "demo", "assets", "serve.mjs", "serve-studio.mjs", "README.md"],
+  "bin": { "genvr-world-mcp": "./dist/mcp.js", "genvr-world-demo": "./serve.mjs", "genvr-studio": "./serve-studio.mjs" },
   "scripts": {
-    "build": "tsc -p tsconfig.build.json && node build.mjs",
+    "build": "node clean.mjs && tsc -p tsconfig.build.json && node build.mjs && node build-studio.mjs",
+    "typecheck:studio": "tsc -p studio/tsconfig.json --noEmit",
+    "studio": "node serve-studio.mjs",
     "pack:standalone": "node pack.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
     "demo": "node serve.mjs"
   },
   "dependencies": {
+    "@genvr/api-client": "workspace:*",
     "@genvr/assistant": "workspace:*",
     "@genvr/contracts": "workspace:*",
     "@genvr/core-library": "workspace:*",
     "@genvr/runtime": "workspace:*",
-    "@genvr/world": "workspace:*"
+    "@genvr/world": "workspace:*",
+    "@genvr/film": "workspace:*",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "lucide-react": "^1.48.0",
+    "zod": "4.6.5"
   },
-  "devDependencies": { "esbuild": "0.28.2", "vitest": "^5.0.1", "@modelcontextprotocol/sdk": "1.31.0" }
+  "devDependencies": { "esbuild": "0.28.2", "vitest": "^5.0.1", "@modelcontextprotocol/sdk": "1.31.0", "@types/react": "^19.3.0", "@types/react-dom": "^19.3.0", "@types/node": "^26.6.2" }
 }

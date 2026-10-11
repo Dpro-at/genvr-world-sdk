@@ -1,0 +1,66 @@
+[
+  {
+    "id": "hair.short01",
+    "kind": "hair",
+    "textures": {
+      "diffuse": "hair.short01.diffuse.webp"
+    }
+  },
+  {
+    "id": "hair.short02",
+    "kind": "hair",
+    "textures": {
+      "diffuse": "hair.short02.diffuse.webp",
+      "normal": "hair.short02.normal.webp"
+    }
+  },
+  {
+    "id": "hair.short03",
+    "kind": "hair",
+    "textures": {
+      "diffuse": "hair.short03.diffuse.webp"
+    }
+  },
+  {
+    "id": "hair.short04",
+    "kind": "hair",
+    "textures": {
+      "diffuse": "hair.short04.diffuse.webp"
+    }
+  },
+  {
+    "id": "brows.eyebrow001",
+    "kind": "brows",
+    "textures": {
+      "diffuse": "brows.eyebrow001.diffuse.webp"
+    }
+  },
+  {
+    "id": "brows.eyebrow006",
+    "kind": "brows",
+    "textures": {
+      "diffuse": "brows.eyebrow006.diffuse.webp"
+    }
+  },
+  {
+    "id": "brows.eyebrow010",
+    "kind": "brows",
+    "textures": {
+      "diffuse": "brows.eyebrow010.diffuse.webp"
+    }
+  },
+  {
+    "id": "beard.viking",
+    "kind": "beard",
+    "textures": {
+      "diffuse": "beard.viking.diffuse.webp"
+    }
+  },
+  {
+    "id": "beard.moustache",
+    "kind": "beard",
+    "textures": {
+      "diffuse": "beard.moustache.diffuse.webp"
+    }
+  }
+]

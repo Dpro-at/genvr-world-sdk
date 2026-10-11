@@ -1,0 +1,73 @@
+<!doctype html><meta charset="utf-8"><title>Tidewater final GPU source parity</title>
+<script type="importmap">{"imports":{"three/webgpu":"/node_modules/three/build/three.webgpu.js","three":"/node_modules/three/build/three.webgpu.js"}}</script>
+<script type="module">
+import { WebGPURenderer,TSL,DataTexture,RGBAFormat,FloatType,StorageTexture,StorageBufferAttribute,Vector3,
+ QuadMesh,NodeMaterial,RenderTarget,DepthTexture,NoToneMapping,LinearSRGBColorSpace,HalfFloatType,DataUtils,LinearFilter } from 'three/webgpu';
+import { TidewaterBloom } from '/dist/post/bloom.js';
+import { TidewaterExposure } from '/dist/post/exposure.js';
+import { createFinalNode,createFinalParams,gradeNode,rcasNode } from '/dist/post/final.js';
+import { gradeDisplay,adaptExposure,bloomDown13,rcasHDR } from '/dist/post/final-math.js';
+async function run(){
+ const renderer=new WebGPURenderer({antialias:false,trackTimestamp:true});await renderer.init();renderer.setSize(512,256);renderer.toneMapping=NoToneMapping;document.body.append(renderer.domElement);
+ const device=renderer.backend.device;
+ const c=[.3,.4,.6],size=64,data=new Float32Array(size*size*4);for(let i=0;i<size*size;i++)data.set([...c,1],i*4);
+ const input=new DataTexture(Uint16Array.from(data,DataUtils.toHalfFloat),size,size,RGBAFormat,HalfFloatType);input.minFilter=input.magFilter=LinearFilter;input.needsUpdate=true;
+ const depthData=new Float32Array(size*size*4);depthData.fill(.5);const depth=new DataTexture(depthData,size,size,RGBAFormat,FloatType);depth.needsUpdate=true;
+ const bloom=new TidewaterBloom(input);bloom.resize(size,size);bloom.update(renderer);
+ const exposure=new TidewaterExposure(bloom.meterTexture);exposure.update(renderer,1,0);
+ let actualExposure=new Float32Array(await renderer.getArrayBufferAsync(exposure.buffer))[0];
+ const refExposure=adaptExposure(1,.2126*c[0]+.7152*c[1]+.0722*c[2],1),exposureError=Math.abs(actualExposure-refExposure);
+ const output=new StorageBufferAttribute(new Float32Array(64*4),4),out=TSL.storage(output,'vec4',64),params=createFinalParams();params.frameIndex.value=7;
+ const read=TSL.Fn(()=>{
+  const i=TSL.globalId.x,p=TSL.vec2(i.mod(8),i.div(8)),uv=p.add(.5).div(8);
+  const color=TSL.vec3(.3,.4,.6);
+  out.element(i).assign(TSL.vec4(gradeNode(color,uv,TSL.uvec2(p),TSL.float(1),params),1));
+ })().compute(64,[64,1,1]);renderer.compute(read);
+ const values=new Float32Array(await renderer.getArrayBufferAsync(output));let gradeError=0;
+ for(let i=0;i<64;i++){const x=i%8,y=Math.floor(i/8),ref=gradeDisplay(c,[(x+.5)/8,(y+.5)/8],[x,y],7);for(let k=0;k<3;k++)gradeError=Math.max(gradeError,Math.abs(values[i*4+k]-ref[k]));}
+ const samples=TSL.Fn(()=>{
+  out.element(0).assign(TSL.texture(bloom.texture,TSL.vec2(.5)));
+  out.element(1).assign(TSL.texture(bloom.half,TSL.vec2(.5)));
+  out.element(2).assign(TSL.vec4(rcasNode(input,depth,TSL.vec2(.5),params.sharpen),1));
+ })().compute(1,[1,1,1]);renderer.compute(samples);
+ const result=new Float32Array(await renderer.getArrayBufferAsync(output));let bloomError=0,rcasError=0;
+ for(let k=0;k<3;k++){bloomError=Math.max(bloomError,Math.abs(result[k]-c[k]*5),Math.abs(result[4+k]-c[k]));rcasError=Math.max(rcasError,Math.abs(result[8+k]-c[k]));}
+ // Actual fullscreen final verifies sampling/RCAS + caller output-transform contract.
+ const material=new NodeMaterial();material.fragmentNode=createFinalNode({resolved:input,depth,bloom:bloom.texture,half:bloom.half,exposureNode:exposure.node,params});material.toneMapped=false;
+ const quad=new QuadMesh(material),rt=new RenderTarget(64,64,{type:FloatType});rt.texture.colorSpace=LinearSRGBColorSpace;
+ renderer.setRenderTarget(rt);quad.render(renderer);renderer.setRenderTarget(null);
+ const pixel=await renderer.readRenderTargetPixelsAsync(rt,32,32,1,1);const fullscreenFinite=[...pixel].every(Number.isFinite);
+ params.exposure.value=.275;renderer.setRenderTarget(rt);quad.render(renderer);renderer.setRenderTarget(null);
+ const changed=await renderer.readRenderTargetPixelsAsync(rt,32,32,1,1);const dynamicParams=Math.abs(changed[0]-pixel[0])>.1;params.exposure.value=.55;
+ const depthRT=new RenderTarget(64,64,{type:HalfFloatType,depthTexture:new DepthTexture(64,64)});renderer.setRenderTarget(depthRT);quad.render(renderer);renderer.setRenderTarget(null);
+ const nativeDepthRead=TSL.Fn(()=>{out.element(0).assign(TSL.vec4(rcasNode(input,depthRT.depthTexture,TSL.vec2(.5),params.sharpen),1));})().compute(1,[1,1,1]);renderer.compute(nativeDepthRead);
+ const depthR=new Float32Array(await renderer.getArrayBufferAsync(output)),nativeDepthFinite=[...depthR.slice(0,4)].every(Number.isFinite);
+ // Asymmetric red impulse + green ramp exercise all13tap geometry and the RCAS HDR lobe.
+ const n=8,edgeData=new Float32Array(n*n*4);for(let y=0;y<n;y++)for(let x=0;x<n;x++)edgeData.set([x===2&&y===3?8:.1,.05+x*.07,.2+y*.04,1],(y*n+x)*4);
+ const qData=Uint16Array.from(edgeData,DataUtils.toHalfFloat),quant=Float32Array.from(qData,DataUtils.fromHalfFloat);
+ const edgeTexture=new DataTexture(qData,n,n,RGBAFormat,HalfFloatType);edgeTexture.minFilter=edgeTexture.magFilter=LinearFilter;edgeTexture.needsUpdate=true;
+ const edgeBloom=new TidewaterBloom(edgeTexture);edgeBloom.resize(n,n);edgeBloom.update(renderer);
+ const edgeRead=TSL.Fn(()=>{const i=TSL.globalId.x,p=TSL.vec2(i.mod(4),i.div(4));out.element(i).assign(TSL.texture(edgeBloom.half,p.add(.5).div(4)));})().compute(16,[16,1,1]);renderer.compute(edgeRead);
+ const edgeValues=new Float32Array(await renderer.getArrayBufferAsync(output));
+ const at=(x,y)=>{x=Math.max(0,Math.min(n-1,x));y=Math.max(0,Math.min(n-1,y));return [...quant.slice((y*n+x)*4,(y*n+x)*4+3)];};
+ const bilinear=(u,v)=>{const x=u*n-.5,y=v*n-.5,x0=Math.floor(x),y0=Math.floor(y),fx=x-x0,fy=y-y0;return [0,1,2].map(c=>at(x0,y0)[c]*(1-fx)*(1-fy)+at(x0+1,y0)[c]*fx*(1-fy)+at(x0,y0+1)[c]*(1-fx)*fy+at(x0+1,y0+1)[c]*fx*fy);};
+ const offsets=[[-2,-2],[0,-2],[2,-2],[-2,0],[0,0],[2,0],[-2,2],[0,2],[2,2],[-1,-1],[1,-1],[-1,1],[1,1]];
+ let impulseError=0;for(let i=0;i<16;i++){const u=(i%4+.5)/4,v=(Math.floor(i/4)+.5)/4,reference=bloomDown13(offsets.map(([x,y])=>bilinear(u+x/n,v+y/n)),true);for(let c=0;c<3;c++)impulseError=Math.max(impulseError,Math.abs(edgeValues[i*4+c]-reference[c]));}
+ const edgeRCAS=TSL.Fn(()=>{out.element(0).assign(TSL.vec4(rcasNode(edgeTexture,depth,TSL.vec2(2.5/8,3.5/8),params.sharpen),1));})().compute(1,[1,1,1]);renderer.compute(edgeRCAS);
+ const edgeR=new Float32Array(await renderer.getArrayBufferAsync(output)),edgeRef=rcasHDR(at(2,3),[at(2,2),at(1,3),at(3,3),at(2,4)]);
+ const edgeRcasError=Math.max(...edgeRef.map((v,c)=>Math.abs(v-edgeR[c])));
+ const before=actualExposure;exposure.reset();exposure.params.enabled.value=0;exposure.update(renderer,1,1);
+ actualExposure=new Float32Array(await renderer.getArrayBufferAsync(exposure.buffer))[0];const disabled=actualExposure===1;
+ // Resize odd dimensions and a full1440p timing sample after compile.
+ bloom.resize(513,257);bloom.update(renderer);await device.queue.onSubmittedWorkDone();const oddResize=bloom.texture.image.width===257&&bloom.texture.image.height===129;
+ const large=new StorageTexture(2560,1440);large.type=HalfFloatType;large.mipmapsAutoUpdate=false;
+ const fill=TSL.Fn(()=>{TSL.storageTexture(large,TSL.globalId.xy,TSL.vec4(.3,.4,.6,1)).toStack();})().computeKernel([8,8,1]);renderer.compute(fill,[320,180,1]);
+ const fullBloom=new TidewaterBloom(large);fullBloom.resize(2560,1440);fullBloom.update(renderer);await device.queue.onSubmittedWorkDone();await renderer.resolveTimestampsAsync('compute');
+ const gpuMs=[];for(let i=0;i<4;i++){fullBloom.update(renderer);await device.queue.onSubmittedWorkDone();gpuMs.push(await renderer.resolveTimestampsAsync('compute'));}
+ material.fragmentNode=createFinalNode({resolved:large,depth,bloom:fullBloom.texture,half:fullBloom.half,exposureNode:TSL.float(1),params});material.needsUpdate=true;rt.setSize(2560,1440);renderer.setRenderTarget(rt);quad.render(renderer);renderer.setRenderTarget(null);await device.queue.onSubmittedWorkDone();await renderer.resolveTimestampsAsync('render');
+ renderer.setRenderTarget(rt);quad.render(renderer);renderer.setRenderTarget(null);await device.queue.onSubmittedWorkDone();const finalGpuMs=await renderer.resolveTimestampsAsync('render');
+ fullBloom.dispose();fullBloom.dispose();bloom.dispose();edgeBloom.dispose();edgeRead.dispose();edgeRCAS.dispose();edgeTexture.dispose();exposure.dispose();read.dispose();samples.dispose();nativeDepthRead.dispose();depthRT.dispose();fill.dispose();large.dispose();rt.dispose();material.dispose();input.dispose();depth.dispose();renderer.dispose();
+ return {gradeError,bloomError,impulseError,rcasError,edgeRcasError,exposureError,exposure:before,disabled,oddResize,fullscreenFinite,nativeDepthFinite,dynamicParams,bloomGpuMs:gpuMs,finalGpuMs,pass:gradeError<.00001&&bloomError<.01&&impulseError<.002&&rcasError<.001&&edgeRcasError<.0001&&exposureError<.001&&disabled&&oddResize&&fullscreenFinite&&nativeDepthFinite&&dynamicParams};
+}
+run().then(r=>window.__result=r).catch(e=>window.__result={error:String(e.stack||e)});
+</script>

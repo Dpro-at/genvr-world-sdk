@@ -1,0 +1,26 @@
+/* ../../apps/web/lib/video-studio/fonts.css */
+@font-face {
+  font-family: "Genvr Film Nunito";
+  src: url("./nunito-latin-LTD77BFG.woff2") format("woff2");
+  font-weight: 400 900;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Genvr Film Merriweather";
+  src: url("./merriweather-latin-UQBWMYSV.woff2") format("woff2");
+  font-weight: 400 900;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Genvr Film JetBrains Mono";
+  src: url("./jetbrainsmono-latin-2TKUHYWA.woff2") format("woff2");
+  font-weight: 400 700;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Genvr Film Bebas Neue";
+  src: url("./bebasneue-latin-6RSG64MI.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+/*# sourceMappingURL=fonts-Q7LTYBGA.css.map */

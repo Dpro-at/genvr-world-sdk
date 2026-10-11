@@ -1,0 +1,99 @@
+@import 'tailwindcss';
+
+/* Short screens (phones turned sideways): side panels lay their tabs out as a rail. */
+@custom-variant short (@media (max-height: 500px));
+
+/*
+ * Platform colors (decision 67): calm black and white, light and dark mode. Brand orange and
+ * purple (docs/BRAND.md) are for the logo and marketing only. Components use these semantic
+ * tokens, so both modes work without extra classes:
+ *   paper    page background        surface  cards and panels
+ *   ink      text and icons         brand    primary action (black in light, white in dark)
+ *   on-brand text on brand/ink      coral    danger and errors (muted red)
+ *   sun      neutral highlight       mint     success (muted green)
+ */
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-brand: var(--brand);
+  --color-brand-dark: var(--brand-dark);
+  --color-on-brand: var(--on-brand);
+  --color-coral: var(--danger);
+  --color-sun: var(--neutral);
+  --color-mint: var(--success);
+  --font-sans: 'Nunito', ui-rounded, system-ui, sans-serif;
+  --radius-card: 1.25rem;
+}
+
+:root {
+  color-scheme: light;
+  --paper: #f4f4f5;
+  --surface: #ffffff;
+  --ink: #0a0a0a;
+  --brand: #0a0a0a;
+  --brand-dark: #3f3f46;
+  --on-brand: #ffffff;
+  --danger: #b91c1c;
+  --neutral: #d4d4d8;
+  --success: #15803d;
+}
+
+/* Dark mode: the system choice, unless the player picked a mode (data-theme on <html>). */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+    --paper: #09090b;
+    --surface: #18181b;
+    --ink: #fafafa;
+    --brand: #fafafa;
+    --brand-dark: #a1a1aa;
+    --on-brand: #09090b;
+    --danger: #f87171;
+    --neutral: #3f3f46;
+    --success: #4ade80;
+  }
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --paper: #09090b;
+  --surface: #18181b;
+  --ink: #fafafa;
+  --brand: #fafafa;
+  --brand-dark: #a1a1aa;
+  --on-brand: #09090b;
+  --danger: #f87171;
+  --neutral: #3f3f46;
+  --success: #4ade80;
+}
+
+html,
+body {
+  background: var(--paper);
+  color: var(--ink);
+}
+
+/* Native-feel rules (docs/APPS.md): no overscroll bounce or pull-to-refresh. */
+body {
+  overscroll-behavior: none;
+}
+
+/* Reduce motion (player setting, P3-21): no animations or transitions on the page. */
+:root[data-reduce-motion] *,
+:root[data-reduce-motion] *::before,
+:root[data-reduce-motion] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* Rows that scroll sideways by swiping (toolbars): no visible scrollbar (owner review 2026-09-25). */
+.scroll-row {
+  scrollbar-width: none;
+}
+.scroll-row::-webkit-scrollbar {
+  display: none;
+}

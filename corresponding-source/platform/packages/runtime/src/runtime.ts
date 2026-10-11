@@ -152,6 +152,7 @@ import {
   CommandHistory,
   BLOCKS,
   createWorldState,
+  encodeTerrain,
   placeWaterAt,
   doorSpots,
   freeSpawnPoint,
@@ -275,6 +276,8 @@ export interface RuntimeOptions {
 export const SIDE_CAMERA = { distance: 14, height: 2.5, minDistance: 8, maxDistance: 26 } as const;
 
 export interface GenvrRuntime {
+  /** Detached local save, including heightfield, voxel edits and loaded raster field pages. */
+  snapshot(): { world: WorldDocument; terrainChunks: string[] };
   /** Explicit on-demand inventory; never walks scene resources on the animation loop. */
   diagnostics(options?: DiagnosticOptions): RuntimeDiagnostics;
   /** "WebGPU" or "WebGL2" (automatic fallback). */
@@ -3240,6 +3243,7 @@ export async function createRuntime({
     get world() {
       return state.doc;
     },
+    snapshot: () => ({ world: structuredClone(state.doc), terrainChunks: encodeTerrain(state).map((row) => row.data).filter(Boolean) }),
     get playerPosition() {
       // While riding, where the item is.
       const pose = rideNow ? items.livePose(rideNow.instanceId) : null;

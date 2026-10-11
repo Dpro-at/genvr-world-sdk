@@ -1,0 +1,63 @@
+<!doctype html><meta charset="utf-8"><title>Tidewater environment GPU verification</title>
+<script type="importmap">{"imports":{"three/webgpu":"/node_modules/three/build/three.webgpu.js","three":"/node_modules/three/build/three.webgpu.js"}}</script>
+<script type="module">
+import { WebGPURenderer, TSL, Vector3, StorageBufferAttribute, Scene, PerspectiveCamera,
+  Mesh, SphereGeometry, MeshPhysicalNodeMaterial, NoToneMapping, RenderTarget, FloatType, LinearSRGBColorSpace } from 'three/webgpu';
+import { TidewaterEnvironment } from '/dist/tidewater-sky/environment.js';
+async function run(){
+ const renderer=new WebGPURenderer({antialias:false,trackTimestamp:true});await renderer.init();
+ renderer.setSize(512,256);renderer.toneMapping=NoToneMapping;document.body.append(renderer.domElement);
+ const device=renderer.backend.device,sun=new Vector3(0,1,0);
+ const constant=TSL.uniform(new Vector3(.3,.4,.6));
+ const env=new TidewaterEnvironment(()=>constant);
+ const start=performance.now();env.update(renderer,0,sun);await device.queue.onSubmittedWorkDone();const primeMs=performance.now()-start;
+ const primeGpuMs=await renderer.resolveTimestampsAsync('compute');
+ const output=new StorageBufferAttribute(new Float32Array(54*4),4),out=TSL.storage(output,'vec4',54);
+ const directions=[[1,0,0],[-1,0,0],[0,1,0],[0,-1,0],[0,0,1],[0,0,-1]];
+ const read=async(environment)=>{
+  const kernel=TSL.Fn(()=>{
+   for(let d=0;d<6;d++){
+    for(let level=0;level<6;level++)out.element(d*6+level).assign(TSL.vec4(environment.sampleSpecular(TSL.vec3(...directions[d]),TSL.float(level/5)),1));
+    out.element(36+d).assign(TSL.vec4(environment.sampleDiffuse(TSL.vec3(...directions[d])),1));
+   }
+  })().compute(1,[1,1,1]);renderer.compute(kernel);
+  const result=new Float32Array(await renderer.getArrayBufferAsync(output));kernel.dispose();return result;
+ };
+ const values=await read(env);let constantError=0;
+ for(let i=0;i<42;i++)for(let c=0;c<3;c++)constantError=Math.max(constantError,Math.abs(values[i*4+c]-[.3,.4,.6][c]));
+ const scene=new Scene();scene.environmentNode=env.environmentNode;
+ const sphere=new Mesh(new SphereGeometry(1,32,16),new MeshPhysicalNodeMaterial({color:0xffffff,roughness:1,metalness:0,specularIntensity:0}));scene.add(sphere);
+ const camera=new PerspectiveCamera(50,2,.1,100);camera.position.set(0,0,4);renderer.render(scene,camera);await device.queue.onSubmittedWorkDone();
+ const target=new RenderTarget(512,256,{type:FloatType});renderer.outputColorSpace=LinearSRGBColorSpace;
+ renderer.setRenderTarget(target);renderer.render(scene,camera);renderer.setRenderTarget(null);
+ const pbrPixel=await renderer.readRenderTargetPixelsAsync(target,256,128,1,1);
+ const pbrError=Math.max(...[.3,.4,.6].map((v,c)=>Math.abs(pbrPixel[c]-v)));
+ // Change radiance and swap front buffers without touching the receiver, its material or camera.
+ constant.value.set(.6,.2,.1);env.update(renderer,0,sun,true);await device.queue.onSubmittedWorkDone();
+ renderer.setRenderTarget(target);renderer.render(scene,camera);renderer.setRenderTarget(null);
+ const changedPixel=await renderer.readRenderTargetPixelsAsync(target,256,128,1,1);
+ const changedPbrError=Math.max(...[.6,.2,.1].map((v,c)=>Math.abs(changedPixel[c]-v)));
+ constant.value.set(.3,.4,.6);env.update(renderer,0,sun,true);await device.queue.onSubmittedWorkDone();target.dispose();
+ const encoded=new TidewaterEnvironment(d=>d.mul(.3).add(.5));encoded.update(renderer,0,sun);await device.queue.onSubmittedWorkDone();
+ const directional=await read(encoded);let orientationError=0,diffuseError=0;
+ for(let d=0;d<6;d++)for(let c=0;c<3;c++){
+  orientationError=Math.max(orientationError,Math.abs(directional[(d*6)*4+c]-(.5+.3*directions[d][c])));
+  diffuseError=Math.max(diffuseError,Math.abs(directional[(36+d)*4+c]-(.5+.2*directions[d][c])));
+ }
+ await renderer.resolveTimestampsAsync('compute');await renderer.resolveTimestampsAsync('render');
+ env.timer=0;const stepGpuMs=[];
+ for(let i=0;i<env.totalSteps;i++){env.update(renderer,0,sun);await device.queue.onSubmittedWorkDone();
+  const ms=await renderer.resolveTimestampsAsync('compute');stepGpuMs.push(i!==env.totalSteps-1&&Number.isFinite(ms)?ms:null);}
+ const before=env.refreshCount;env.update(renderer,2.9,sun);const idle=env.step===-1&&env.refreshCount===before;
+ env.update(renderer,.11,sun);const refreshStarted=env.step===1&&env.refreshCount===before;
+ for(let i=0;i<env.totalSteps-1;i++)env.update(renderer,0,sun);const timerSwap=env.refreshCount===before+1&&env.step===-1;
+ const moved=new Vector3(Math.sin(.005),Math.cos(.005),0);env.update(renderer,0,moved);
+ const angleStarted=env.step===1;for(let i=0;i<env.totalSteps-1;i++)env.update(renderer,0,moved);
+ const angleSwap=env.refreshCount===before+2&&env.step===-1;
+ await device.queue.onSubmittedWorkDone();encoded.dispose();env.dispose();env.dispose();
+ return {constantError,orientationError,diffuseError,finite:Array.from(values).every(Number.isFinite),
+  primeMs,primeGpuMs,stepGpuMs,pbrError,changedPbrError,pbrPixel:Array.from(pbrPixel),changedPixel:Array.from(changedPixel),
+  idle,refreshStarted,timerSwap,angleStarted,angleSwap,adapterRendered:pbrError<.003&&changedPbrError<.003,disposed:env.intensity.value===0};
+}
+run().then(result=>window.__result=result).catch(error=>window.__result={error:String(error.stack||error)});
+</script>

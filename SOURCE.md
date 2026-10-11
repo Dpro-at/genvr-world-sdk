@@ -1,9 +1,13 @@
-# Corresponding source — 3d-world-sdk0.2.0
+# Corresponding Source: 3d-world-sdk 0.3.0-preview.1
 
-AGPL-3.0-only SDK/shared engine/contracts/tool/runtime source and build configs are in corresponding-source/. They contain no platform account/payment/API/admin implementation or credentials. Public material textures are retained with asset licenses in assets/CREDITS.md. Local authoring needs no login; optional account linking uses configurable endpoints. No Agent Player integration.
+The `corresponding-source/` workspace contains the canonical Genvr runtime, SDK, shared Studio UI,
+workers, fonts and licensed assets. It does not include an API server, admin app, account database,
+production credentials or Agent Player integration. Follow its README for Node24+/pnpm10.24 locked
+installation, dependency-first build, tests and Studio startup. Shared components are used by the website
+and this package; changes belong in the canonical sources and package build, not a second UI.
 
-Node24+: from corresponding-source run corepack pnpm install --frozen-lockfile, corepack pnpm build, corepack pnpm run pack. Workspace name @genvr/world-sdk is internal; distribution is3d-world-sdk. SDK account-link source independently reviewed in platform commit5adcffc9; shared source baseline9220bf3a.
-
-This GitHub preview includes the archive rebuilt from this independent source workspace: SHA256dd9f546567c1ba20db90154fc0bc400df858ece9eb3860f0b66c099009a65695. The earlier prepared85e490 archive is not this release asset. Source build and all9 SDK tests pass; timestamps/build paths may change archive bytes and bundle chunk names. Verify release checksums rather than assuming byte-identical rebuilds.
-
-Production account-link activation and npm0.2.0 publication are deferred by the owner. npm0.1.1 remains the verified published version. Genvr account-link support requires host routes and migration0041; no live production account-link claim. Local authoring remains usable independently.
+Both the installable archive and corresponding-source archive are prerelease assets with SHA256SUMS.txt.
+Source is independently reviewed and rebuildable; build paths/timestamps may change archive bytes and
+chunk names, so no byte-identical-rebuild claim is made. Genvr code is AGPL-3.0-only; bundled dependencies
+and assets retain their included notices. npm publication, production deployment/account activation
+and Agent Player remain deferred. Local projects and films need no Genvr account.

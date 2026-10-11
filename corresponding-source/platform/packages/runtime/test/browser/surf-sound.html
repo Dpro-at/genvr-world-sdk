@@ -1,0 +1,71 @@
+<!doctype html>
+<meta charset="utf-8" />
+<title>Surf sound check</title>
+<style>html,body{margin:0;background:#000}canvas{display:block}</style>
+<script type="importmap">
+  {
+    "imports": {
+      "three/webgpu": "/node_modules/three/build/three.webgpu.js",
+      "three/tsl": "/node_modules/three/build/three.tsl.js",
+      "three": "/node_modules/three/build/three.webgpu.js",
+      "three/addons/": "/node_modules/three/examples/jsm/"
+    }
+  }
+</script>
+<script type="module">
+  // The surf sound on a test island (plan task 6), run muted: the log says what was scheduled and played.
+  // URL: ?island=R,slope&cam=x,y,z&phone=1 (phone: no Tidewater sea, a shore field solved for the sound alone)
+  import * as THREE from 'three/webgpu';
+  import { TidewaterSea } from '/dist/ocean/tidewater-sea.js';
+  import { WorldAudio } from '/dist/audio.js';
+  import { SurfAudio } from '/dist/ocean/surf-audio.js';
+  import { shoreFieldFromHeights } from '/dist/ocean/shore-field-worker.js';
+  import { swellFromSetting } from '/dist/ocean/sea-clock.js';
+
+  const p = new URLSearchParams(location.search);
+  const num = (k, d) => (p.get(k) ?? d).split(',').map(Number);
+  const [isleR, slope] = num('island', '150,0.066');
+  const [cx, cy, cz] = num('cam', '0,1.7,-140');
+  const extent = Number(p.get('extent') ?? 600);
+  const phone = p.get('phone') === '1';
+  const heightAt = (x, z) => Math.max(-30, (isleR - Math.hypot(x, z)) * slope);
+  const renderer = new THREE.WebGPURenderer({ antialias: false });
+  await renderer.init();
+  renderer.setSize(innerWidth, innerHeight);
+  document.body.appendChild(renderer.domElement);
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 0.1, 20000);
+  camera.position.set(cx, cy, cz);
+  camera.lookAt(cx * 3, 0, cz * 3);
+  const sun = new THREE.DirectionalLight(0xffffff, 3);
+  sun.position.set(30, 60, -40);
+  scene.add(sun, sun.target);
+  const audio = new WorldAudio(window);
+  const surf = new SurfAudio(audio, '/audio/sea/');
+  let sea = null;
+  let soundShore = null;
+  if (phone) {
+    const swell = swellFromSetting(undefined);
+    shoreFieldFromHeights({ heightAt, level: 0, extent, res: 256 }).then((field) => {
+      soundShore = { field, heightAt, level: 0, swellDir: field.swellDir, period: swell.period, amplitude: swell.amplitude };
+    });
+  } else {
+    sea = new TidewaterSea(renderer, heightAt, { cascades: 3, gridCells: 256, ripples: false });
+    sea.sync(0, extent, scene);
+    scene.add(sea.mesh);
+  }
+  const ground = { heightAt, level: 0 };
+  let last = performance.now();
+  const forward = new THREE.Vector3();
+  window.__surf = { surf, audio, startedAt: Date.now() };
+  renderer.setAnimationLoop(() => {
+    const now = performance.now();
+    const dt = Math.min(0.05, (now - last) / 1000);
+    last = now;
+    const roomMs = Date.now();
+    sea?.update(dt, camera, scene, sun, undefined, roomMs);
+    audio.setListener(camera.position, camera.getWorldDirection(forward));
+    surf.update(dt, camera.position, roomMs, sea ? sea.surfShore : soundShore, ground);
+    renderer.render(scene, camera);
+  });
+</script>

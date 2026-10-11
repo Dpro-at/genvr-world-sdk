@@ -1,0 +1,54 @@
+[
+  {
+    "family": "nunito",
+    "subset": "latin",
+    "file": "nunito-latin.woff2",
+    "source": "https://fonts.gstatic.com/s/nunito/v32/XRXV3I6Li01BKofINeaB.woff2",
+    "cssSource": "https://fonts.googleapis.com/css2?family=Nunito:wght@400..900&display=swap",
+    "retrieved": "2026-10-10",
+    "sha256": "ba344451eab25b217a165363b1982048a5e5830a0daf36577973955a04cac793",
+    "bytes": 39128,
+    "licenseRepository": "google/fonts",
+    "licenseCommit": "bd8f81ddb5c74d5c8897b36ad88b440266245103",
+    "licensePath": "ofl/nunito/OFL.txt"
+  },
+  {
+    "family": "merriweather",
+    "subset": "latin",
+    "file": "merriweather-latin.woff2",
+    "source": "https://fonts.gstatic.com/s/merriweather/v33/u-4e0qyriQwlOrhSvowK_l5UcA6zuSYEqOzpPe3HOZJ5eX1WtLaQwmYiSeqqJ-k.woff2",
+    "cssSource": "https://fonts.googleapis.com/css2?family=Merriweather:wght@400..900&display=swap",
+    "retrieved": "2026-10-10",
+    "sha256": "4fbe8dd9c23b1fd62a988bb8a69b8e692d810f773d9ef6ebca2ba2760c7b11ee",
+    "bytes": 97548,
+    "licenseRepository": "google/fonts",
+    "licenseCommit": "bd8f81ddb5c74d5c8897b36ad88b440266245103",
+    "licensePath": "ofl/merriweather/OFL.txt"
+  },
+  {
+    "family": "jetbrainsmono",
+    "subset": "latin",
+    "file": "jetbrainsmono-latin.woff2",
+    "source": "https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxDcwg.woff2",
+    "cssSource": "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400..700&display=swap",
+    "retrieved": "2026-10-10",
+    "sha256": "83c005d49d8a6a50474c73a5a36ac0468076e9c4a29da7bdb14995d80560a5be",
+    "bytes": 31432,
+    "licenseRepository": "google/fonts",
+    "licenseCommit": "bd8f81ddb5c74d5c8897b36ad88b440266245103",
+    "licensePath": "ofl/jetbrainsmono/OFL.txt"
+  },
+  {
+    "family": "bebasneue",
+    "subset": "latin",
+    "file": "bebasneue-latin.woff2",
+    "source": "https://fonts.gstatic.com/s/bebasneue/v16/JTUSjIg69CK48gW7PXoo9Wlhyw.woff2",
+    "cssSource": "https://fonts.googleapis.com/css2?family=Bebas+Neue:wght@400&display=swap",
+    "retrieved": "2026-10-10",
+    "sha256": "a7c90c89240c134f7fdd33d40c000ec90b79d675ea53e8cc5a6d423c073de412",
+    "bytes": 13768,
+    "licenseRepository": "google/fonts",
+    "licenseCommit": "bd8f81ddb5c74d5c8897b36ad88b440266245103",
+    "licensePath": "ofl/bebasneue/OFL.txt"
+  }
+]

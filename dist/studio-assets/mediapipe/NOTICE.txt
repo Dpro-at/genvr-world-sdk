@@ -1,0 +1,10 @@
+face_landmarker.task (float16, version 1) - MediaPipe Face Landmarker model bundle by Google
+(face detector BlazeFace short range, Face Mesh V2, Blendshape V2).
+Source: https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task
+Licence: Apache License, Version 2.0 (Face Mesh V2 model card: "LICENSED UNDER Apache License, Version 2.0").
+Used only in the browser for "Face from photo" in the character editor (FACE-02): the photo never leaves the device,
+and the landmarks give no recognition or identification (model card, out-of-scope uses).
+The WASM runtime in wasm/ is copied from @mediapipe/tasks-vision (Apache-2.0) by scripts/copy-decoders.mjs.
+@mediapipe/tasks-vision 1.1.0 (pinned) posts usage logs (OS, version, task, timings) to odml.pa.googleapis.com every
+60 s with a built-in key and no switch to turn it off; patches/@mediapipe__tasks-vision@1.1.0.patch (pnpm
+patchedDependencies) makes that logger a no-op, so the browser never calls Google. Re-check the patch on any upgrade.

@@ -1,0 +1,28 @@
+{
+  "name": "@genvr/film",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Studio Filming edit model (FILM-02): integer tick time, tracks and clips, edits checked by invariants, one command registry for UI, keys, MCP and the assistant, labelled undo, saved versions and the project file. No DOM.",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@genvr/contracts": "workspace:*",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "vitest": "^5.0.1"
+  }
+}

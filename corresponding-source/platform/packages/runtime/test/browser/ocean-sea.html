@@ -1,0 +1,119 @@
+<!doctype html>
+<meta charset="utf-8" />
+<title>Tidewater sea check</title>
+<style>html,body{margin:0;background:#000}canvas{display:block}</style>
+<script type="importmap">
+  {
+    "imports": {
+      "three/webgpu": "/node_modules/three/build/three.webgpu.js",
+      "three/tsl": "/node_modules/three/build/three.tsl.js",
+      "three": "/node_modules/three/build/three.webgpu.js",
+      "three/addons/": "/node_modules/three/examples/jsm/"
+    }
+  }
+</script>
+<script type="module">
+  // Open sea (no island) with the Tidewater sea, for screenshots against the live demo (plan task 2).
+  // URL: ?cam=x,y,z&look=x,y,z&sun=elevationDeg,azimuthDeg&q=10&t=seconds&grid=768
+  import * as THREE from 'three/webgpu';
+  import { SkyMesh } from 'three/addons/objects/SkyMesh.js';
+  import { TidewaterSea } from '/dist/ocean/tidewater-sea.js';
+
+  const p = new URLSearchParams(location.search);
+  const num = (k, d) => (p.get(k) ?? d).split(',').map(Number);
+  const [cx, cy, cz] = num('cam', '0,1.7,0');
+  const [lx, ly, lz] = num('look', '0,0,-100');
+  const [elev, azim] = num('sun', '25,200');
+  const ultra = (p.get('q') ?? '10') !== '7';
+  const timing = p.get('timing') === '1';
+  const renderer = new THREE.WebGPURenderer({ antialias: true, trackTimestamp: timing });
+  await renderer.init();
+  renderer.setSize(innerWidth, innerHeight);
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = Number(p.get('exposure') ?? 0.5);
+  document.body.appendChild(renderer.domElement);
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(Number(p.get('fov') ?? 60), innerWidth / innerHeight, 0.1, 20000);
+  camera.position.set(cx, cy, cz);
+  camera.lookAt(lx, ly, lz);
+
+  const sunDir = new THREE.Vector3().setFromSphericalCoords(1, THREE.MathUtils.degToRad(90 - elev), THREE.MathUtils.degToRad(azim));
+  const sky = new SkyMesh();
+  sky.scale.setScalar(10000);
+  sky.sunPosition.value.copy(sunDir);
+  sky.turbidity.value = 2.5;
+  sky.rayleigh.value = 1.2;
+  scene.add(sky);
+  const envScene = new THREE.Scene();
+  const envSky = new SkyMesh();
+  envSky.scale.setScalar(50);
+  envSky.sunPosition.value.copy(sunDir);
+  envSky.turbidity.value = 2.5;
+  envSky.rayleigh.value = 1.2;
+  envSky.showSunDisc.value = 0;
+  envScene.add(envSky);
+  const pmrem = new THREE.PMREMGenerator(renderer);
+  scene.environment = pmrem.fromScene(envScene, 0, 0.1, 100, { size: 256 }).texture;
+  scene.environmentIntensity = 1;
+
+  const sun = new THREE.DirectionalLight(0xfff4e8, Number(p.get('sunI') ?? 3));
+  sun.position.copy(sunDir).multiplyScalar(100);
+  scene.add(sun, sun.target);
+
+  const [slope, shore] = num('beach', '0,0');
+  // island=R,slope: a round island of radius R at the waterline with a beach of that slope (plan tasks 4-5)
+  const [isleR, isleSlope] = num('island', '0,0');
+  const heightAt = isleR
+    ? (x, z) => Math.max(-30, (isleR - Math.hypot(x, z)) * isleSlope)
+    : slope ? (x, z) => (-z - shore) * slope : () => -500;
+  if (slope || isleR) {
+    // the beach itself: a plain sand plane matching heightAt
+    const g = new THREE.PlaneGeometry(4000, 4000, 400, 400);
+    g.rotateX(-Math.PI / 2);
+    const pa = g.getAttribute('position');
+    for (let i = 0; i < pa.count; i += 1) pa.setY(i, heightAt(pa.getX(i), pa.getZ(i)));
+    g.computeVertexNormals();
+    scene.add(new THREE.Mesh(g, new THREE.MeshStandardMaterial({ color: 0xd8c8a0, roughness: 1 })));
+  }
+  const sea = new TidewaterSea(renderer, heightAt, { cascades: ultra ? 4 : 3, gridCells: Number(p.get('grid') ?? (ultra ? 768 : 512)), ripples: ultra, detail: ultra && p.get('detail') !== '0', ...(p.get('debug') ? { debugView: p.get('debug') } : {}) });
+  sea.sync(0, Number(p.get('extent') ?? 3000), scene);
+  scene.add(sea.mesh);
+
+  // jump the waves to a fixed time so screenshots are repeatable
+  const t0 = Number(p.get('t') ?? 20);
+  for (let t = 0; t < t0; t += 0.1) sea.fft.update(renderer, 0.1);
+  let last = performance.now();
+  let frames = 0;
+  const times = [];
+  renderer.setAnimationLoop(() => {
+    const now = performance.now();
+    const dt = p.get('freeze') ? 0 : Math.min(0.05, (now - last) / 1000);
+    last = now;
+    sea.update(dt, camera, scene, sun);
+    renderer.render(scene, camera);
+    frames += 1;
+    times.push(now);
+    if (frames >= 120 && !timing && !window.__ready && (!isleR || sea.shoreReady))
+      window.__ready = { frameMs: (times[119] - times[20]) / 99, swell: sea.swellDirection };
+    if (frames === 120 && timing) measure();
+  });
+  async function measure() {
+    // GPU time per frame (timestamp queries): the whole frame, then the FFT alone, then without the sea
+    const avg = async (n, step) => {
+      let r = 0, c = 0;
+      for (let k = 0; k < n; k += 1) {
+        step();
+        await renderer.resolveTimestampsAsync('render');
+        await renderer.resolveTimestampsAsync('compute');
+        r += renderer.info.render.timestamp;
+        c += renderer.info.compute.timestamp;
+      }
+      return { render: r / n, compute: c / n };
+    };
+    renderer.setAnimationLoop(null);
+    const withSea = await avg(60, () => { sea.update(1 / 60, camera, scene, sun); renderer.render(scene, camera); });
+    sea.mesh.visible = false;
+    const without = await avg(60, () => renderer.render(scene, camera));
+    window.__ready = { gpuMs: { frameWithSea: withSea.render, fft: withSea.compute, frameWithoutSea: without.render } };
+  }
+</script>

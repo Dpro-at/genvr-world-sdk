@@ -1,0 +1,230 @@
+<!doctype html>
+<meta charset="utf-8" />
+<title>Tidewater cloud GPU check</title>
+<style>
+  html,
+  body {
+    margin: 0;
+    background: #000;
+  }
+  canvas {
+    display: block;
+  }
+</style>
+<script type="importmap">
+  {
+    "imports": {
+      "three/webgpu": "/node_modules/three/build/three.webgpu.js",
+      "three": "/node_modules/three/build/three.webgpu.js"
+    }
+  }
+</script>
+<script type="module">
+  import { PerspectiveCamera, Scene, WebGPURenderer, TSL, StorageBufferAttribute } from 'three/webgpu';
+  import { TidewaterSky, sunDirection } from '/dist/tidewater-sky/index.js';
+  import { cloudShape } from '/dist/tidewater-sky/cloud-noise-math.js';
+  const q = new URLSearchParams(location.search);
+  async function run() {
+    const renderer = new WebGPURenderer({ antialias: false, trackTimestamp: true });
+    await renderer.init();
+    if (!renderer.backend.isWebGPUBackend) throw new Error('WebGPU required');
+    renderer.setSize(innerWidth, innerHeight);
+    document.body.append(renderer.domElement);
+    const scene = new Scene();
+    const sky = new TidewaterSky(renderer, scene);
+    scene.add(sky.group);
+    sky.enable(true);
+    sky.setEnvironmentQuality(64, 1);
+    sky.show({ sun: sunDirection(Number(q.get('time') ?? 16.2)), exposure: 0.55, dim: 1 });
+    const camera = new PerspectiveCamera(60, innerWidth / innerHeight, 0.1, 5000);
+    camera.position.set(10, 1.7, -40);
+    camera.lookAt(10, 500, 2000);
+    const device = renderer.backend.device;
+    const noiseStart = performance.now();
+    await sky.clouds.noise.update(renderer);
+    await device.queue.onSubmittedWorkDone();
+    const noiseLoadMs = performance.now() - noiseStart;
+    const frame = () => {
+      sky.update(1 / 60, camera.position, camera);
+      renderer.render(scene, camera);
+    };
+    const firstStart = performance.now();
+    for (let i = 0; i < 64; i++) {
+      frame();
+      await device.queue.onSubmittedWorkDone();
+    }
+    const firstMs = performance.now() - firstStart;
+    await renderer.resolveTimestampsAsync('compute');
+    await renderer.resolveTimestampsAsync('render');
+    const timings = [],
+      gpuTimings = [];
+    for (let i = 0; i < 32; i++) {
+      const start = performance.now();
+      frame();
+      await device.queue.onSubmittedWorkDone();
+      timings.push(performance.now() - start);
+      const gpuMs = await renderer.resolveTimestampsAsync('compute');
+      if (Number.isFinite(gpuMs)) gpuTimings.push(gpuMs);
+      await renderer.resolveTimestampsAsync('render');
+    }
+    // Read radiance and shadow values over a hemisphere and a 12 km ground grid.
+    const buffer = new StorageBufferAttribute(new Float32Array(64 * 24), 4);
+    const out = TSL.storage(buffer, 'vec4', 384);
+    const kernel = TSL.Fn(() => {
+      const i = TSL.globalId.x;
+      const x = TSL.float(i.mod(8)).add(0.5).div(8);
+      const y = TSL.float(i.div(8)).add(0.5).div(8);
+      const phi = x.mul(Math.PI * 2);
+      const elevation = y.mul(Math.PI / 2);
+      const dir = TSL.vec3(
+        TSL.cos(phi).mul(TSL.cos(elevation)),
+        TSL.sin(elevation),
+        TSL.sin(phi).mul(TSL.cos(elevation)),
+      );
+      out.element(i).assign(sky.clouds.sampleEnvironment(dir));
+      out
+        .element(i.add(64))
+        .assign(TSL.vec4(sky.clouds.cloudShadow(TSL.vec2(x, y).sub(0.5).mul(12000)), 0, 0, 1));
+      out.element(i.add(128)).assign(sky.clouds.sampleView(dir));
+      out.element(i.add(192)).assign(TSL.texture(sky.clouds.noise.weatherTexture, TSL.vec2(x, y)).level(0));
+      const noiseCoord = TSL.vec3(
+        TSL.float(i.mod(8)).mul(8).add(0.5).div(64),
+        TSL.float(i.div(8)).mul(8).add(0.5).div(64),
+        21.5 / 64,
+      );
+      out.element(i.add(256)).assign(TSL.texture3D(sky.clouds.noise.noiseTexture, noiseCoord).level(0));
+      out.element(i.add(320)).assign(TSL.texture3D(sky.clouds.noise.noiseTexture, noiseCoord).level(6));
+    })().compute(64);
+    const sample = async () => {
+      renderer.compute(kernel);
+      return new Float32Array(await renderer.getArrayBufferAsync(buffer));
+    };
+    const values = await sample();
+    const weatherSamples = Array.from({ length: 64 }, (_, i) => values[(192 + i) * 4]);
+    const weatherMean = weatherSamples.reduce((a, b) => a + b, 0) / 64;
+    const weatherVariance = weatherSamples.reduce((a, b) => a + (b - weatherMean) ** 2, 0) / 64;
+    let noiseCpuError = 0;
+    for (let i = 0; i < 64; i++) {
+      const expected = cloudShape([((i % 8) * 8 + 0.5) / 64, (Math.floor(i / 8) * 8 + 0.5) / 64, 21.5 / 64]);
+      for (let c = 0; c < 3; c++)
+        noiseCpuError = Math.max(noiseCpuError, Math.abs(values[(256 + i) * 4 + c] - expected[c]));
+    }
+    const mip6 = Array.from(values.slice(320 * 4, 320 * 4 + 3));
+    const noiseValidated =
+      noiseCpuError < 0.004 && mip6.every((v) => v > 0.45 && v < 0.51) && weatherVariance > 0.001;
+    let minTrans = 1,
+      minShadow = 1,
+      maxShadow = 0;
+    for (let i = 0; i < 64; i++) {
+      minTrans = Math.min(minTrans, values[i * 4 + 3]);
+      minShadow = Math.min(minShadow, values[(64 + i) * 4]);
+      maxShadow = Math.max(maxShadow, values[(64 + i) * 4]);
+    }
+    sky.clouds.coverage.value = 0;
+    sky.clouds.invalidate();
+    for (let i = 0; i < 32; i++) {
+      frame();
+      await device.queue.onSubmittedWorkDone();
+    }
+    const clear = await sample();
+    const clearIsTransparent = Array.from(
+      { length: 64 },
+      (_, i) => Math.abs(clear[i * 4 + 3] - 1) < 0.01 && Math.abs(clear[(64 + i) * 4] - 1) < 0.01,
+    ).every(Boolean);
+    sky.clouds.coverage.value = 0.49;
+    sky.clouds.invalidate();
+    for (let i = 0; i < 32; i++) {
+      frame();
+      await device.queue.onSubmittedWorkDone();
+    }
+    if (q.has('turn')) {
+      camera.lookAt(2000, 1000, -40);
+      for (let i = 0; i < 32; i++) {
+        frame();
+        await device.queue.onSubmittedWorkDone();
+      }
+    }
+    let historyLifecycle = true;
+    const lifecycle = [];
+    for (const change of [
+      () => camera.lookAt(2000, 1000, -40),
+      () => {
+        camera.fov = 90;
+        camera.updateProjectionMatrix();
+      },
+      () => {
+        renderer.setSize(1280, 720);
+        camera.aspect = 1280 / 720;
+        camera.updateProjectionMatrix();
+      },
+      () => (camera.position.x += 2000),
+    ]) {
+      const beforeResets = sky.clouds.historyResetCount;
+      change();
+      frame();
+      await device.queue.onSubmittedWorkDone();
+      const resetOccurred = sky.clouds.historyResetCount > beforeResets;
+      for (let i = 0; i < 32; i++) {
+        frame();
+        await device.queue.onSubmittedWorkDone();
+      }
+      const moved = await sample();
+      const good = Array.from(moved).every(Number.isFinite);
+      historyLifecycle &&= good && resetOccurred;
+      lifecycle.push({ resetOccurred, finite: good });
+    }
+    let viewPanoramaAlphaError = 0,
+      viewSamples = 0;
+    for (let i = 0; i < 64; i++) {
+      const alpha = values[(128 + i) * 4 + 3];
+      if (alpha < 0.99) {
+        viewPanoramaAlphaError += Math.abs(alpha - values[i * 4 + 3]);
+        viewSamples++;
+      }
+    }
+    viewPanoramaAlphaError /= Math.max(1, viewSamples);
+    const finite = Array.from(values).every(Number.isFinite) && Array.from(clear).every(Number.isFinite);
+    const meanFrameMs = timings.reduce((a, b) => a + b, 0) / timings.length;
+    const meanComputeGpuMs = gpuTimings.length
+      ? gpuTimings.reduce((a, b) => a + b, 0) / gpuTimings.length
+      : null;
+    renderer.setSize(innerWidth, innerHeight);
+    camera.aspect = innerWidth / innerHeight;
+    camera.fov = 60;
+    camera.position.set(10, 1.7, -40);
+    camera.lookAt(10, 500, 2000);
+    camera.updateProjectionMatrix();
+    for (let i = 0; i < 32; i++) {
+      frame();
+      await device.queue.onSubmittedWorkDone();
+    }
+    return {
+      finite,
+      historyLifecycle,
+      lifecycle,
+      viewPanoramaAlphaError,
+      viewSamples,
+      weatherMean,
+      weatherVariance,
+      noiseCpuError,
+      mip6,
+      noiseValidated,
+      cloudsPresent: minTrans < 0.98,
+      shadowsPresent: minShadow < 0.98 && maxShadow <= 1.01,
+      clearIsTransparent,
+      minTrans,
+      minShadow,
+      maxShadow,
+      noiseLoadMs,
+      firstMs,
+      meanFrameMs,
+      meanComputeGpuMs,
+      maxComputeGpuMs: Math.max(...gpuTimings),
+      width: innerWidth,
+      height: innerHeight,
+    };
+  }
+  run()
+    .then((result) => (window.__result = result))
+    .catch((error) => (window.__result = { error: String(error.stack || error) }));
+</script>

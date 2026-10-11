@@ -37208,6 +37208,24 @@ function defaultRoofHeight(points, shape2) {
   return Math.round(Math.min(8, Math.max(1, height)) * 10) / 10;
 }
 
+// ../world/dist/small-starter.js
+var LAYOUT = [
+  ["genvr.core.tree.pine", -9, -7, 5, 0],
+  ["genvr.core.tree.pine", 9, -8, 5.5, 0.4],
+  ["genvr.core.tree.pine", -10, 7, 4.5, -0.3],
+  ["genvr.core.rock", -5, -5, 0.8, 0.2],
+  ["genvr.core.rock", 6, -3, 1, -0.5],
+  ["genvr.core.rock", -8, 7, 0.6, 0.7],
+  ["genvr.core.bench", -5, 1, 0.9, Math.PI / 2],
+  ["genvr.core.bench", 5, 1, 0.9, -Math.PI / 2],
+  ["genvr.core.flower", -6, 3, 0.4, 0],
+  ["genvr.core.flower", -5, 3.5, 0.35, 0.2],
+  ["genvr.core.flower", -4, 3, 0.4, -0.1],
+  ["genvr.core.flower", 4, 3, 0.35, 0.1],
+  ["genvr.core.flower", 5, 3.5, 0.4, -0.2],
+  ["genvr.core.flower", 6, 3, 0.35, 0]
+];
+
 // ../world/dist/ride-motion.js
 var DEG = Math.PI / 180;
 
@@ -47973,7 +47991,7 @@ async function runAssistant({ model: model2, host, history, prompt, onEvent, max
 var CORRECTION_WINDOW_MS = 10 * 60 * 1e3;
 
 // src/session.ts
-var SDK_VERSION = "0.2.0";
+var SDK_VERSION = "0.3.0-preview.1";
 var PACKAGE_WORK_BUDGET = 5e6;
 function readWorldPackage(input2) {
   const text = typeof input2 === "string" ? input2 : JSON.stringify(input2);

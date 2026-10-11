@@ -43,6 +43,7 @@ const DEFAULT_SETTINGS: CharacterSettings = { maxStep: 0.4, maxSlopeDeg: 45, sna
  */
 export class PhysicsWorld {
   readonly world: RAPIER.World;
+  #started = false;
 
   constructor() {
     this.world = new RAPIER.World({ x: 0, y: -9.81, z: 0 });
@@ -257,6 +258,12 @@ export class PhysicsWorld {
   step(dt: number): void {
     this.world.timestep = dt;
     this.world.step();
+    this.#started = true;
+  }
+
+  /** Rapier 0.20 fills its broad phase on the first positive step, not when colliders are added. */
+  prepareCharacterQueries(): void {
+    if (!this.#started) this.step(1 / 60);
   }
 
   dispose(): void {
@@ -342,6 +349,8 @@ export class Character {
 
   /** Moves the collider with the one-way filter and records a side wall it ran into. */
   #compute(delta: Vec3Like): void {
+    // A cold 50 ms frame otherwise sweeps through unindexed ground and traps the capsule in it.
+    this.physics.prepareCharacterQueries();
     // Rapier calls the filter while it moves the character; reading the body then fails.
     this.#feetY = this.#body.translation().y - CHARACTER.centerOffset;
     this.#controller.computeColliderMovement(this.#collider, delta, undefined, undefined, this.#filter);

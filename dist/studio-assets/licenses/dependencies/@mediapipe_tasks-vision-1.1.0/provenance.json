@@ -1,0 +1,8 @@
+{
+  "files": [
+    "mediapipe-LICENSE.txt"
+  ],
+  "sources": [
+    "https://raw.githubusercontent.com/google-ai-edge/mediapipe/v0.10.32/LICENSE"
+  ]
+}

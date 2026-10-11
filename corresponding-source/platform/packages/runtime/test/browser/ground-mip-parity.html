@@ -1,0 +1,115 @@
+<!doctype html>
+<body style="margin: 0; width: 690px; height: 480px">
+  <script type="importmap">
+    {
+      "imports": {
+        "three/webgpu": "/three/three.webgpu.js",
+        "three/tsl": "/three/three.tsl.js",
+        "three": "/three/three.webgpu.js",
+        "three/addons/": "/addons/"
+      }
+    }
+  </script>
+  <script type="module">
+    import { createRuntime, TidewaterPost, PostPass } from '/bundle.js';
+    import {
+      TSL as n,
+      MeshBasicNodeMaterial,
+      DoubleSide,
+      LinearFilter,
+      LinearMipmapLinearFilter,
+    } from 'three/webgpu';
+    async function run() {
+      let post,
+        frames = 0;
+      const render = TidewaterPost.prototype.render;
+      TidewaterPost.prototype.render = function (...args) {
+        post = this;
+        frames++;
+        return render.apply(this, args);
+      };
+      const fixture = await (await fetch('/fixture.json')).json();
+      const runtime = await createRuntime({
+        container: document.body,
+        world: fixture.world,
+        loadTerrainFieldPage: async (request) => ({
+          version: fixture.world.version,
+          tiles: request.coordinates.map(({ tx, tz }) =>
+            fixture.tiles.find((t) => t.tx === tx && t.tz === tz),
+          ),
+        }),
+      });
+      runtime.setGraphics({ quality: 9, fpsCap: 60 });
+      while (!post || frames < 40) await new Promise(requestAnimationFrame);
+      runtime.setPaused(true);
+      const p = post.passes,
+        meshes = [];
+      post.scene.traverse((o) => {
+        if (o.name === 'native-terrain') meshes.push(o);
+      });
+      const originals = meshes.map((o) => o.material),
+        textures = new Set(),
+        visited = new Set();
+      function walk(node) {
+        if (!node?.isNode || visited.has(node)) return;
+        visited.add(node);
+        if (node.isTextureNode && node.value.image.width === 2048) textures.add(node.value);
+        for (const child of node.getChildren()) walk(child);
+      }
+      originals.forEach((m) => {
+        walk(m.colorNode.node.parameters.normalRock);
+        walk(m.colorNode.node.parameters.splat);
+      });
+      if (textures.size !== 2) throw Error('Expected two source data maps');
+      const initialLevels = [...textures].map((t) => post.renderer.backend.get(t).texture.mipLevelCount);
+      if (initialLevels.some((n) => n !== 12)) throw Error('Native source mip chains missing');
+      const textureStats = [];
+      window.showStage = async (name) => {
+        const mips = name === 'source-mips';
+        for (const texture of textures) {
+          texture.dispose();
+          texture.generateMipmaps = mips;
+          texture.minFilter = mips ? LinearMipmapLinearFilter : LinearFilter;
+          texture.needsUpdate = true;
+        }
+        meshes.forEach((o) => {
+          o.material.dispose();
+          o.material.needsUpdate = true;
+        });
+        p.scene();
+        textureStats.push({
+          name,
+          levels: [...textures].map((t) => post.renderer.backend.get(t).texture.mipLevelCount),
+        });
+        const t = post.sceneTarget.texture,
+          pass = new PostPass(
+            post.renderer,
+            n.vec4(
+              n
+                .texture(t)
+                .rgb.div(n.texture(t).rgb.add(1))
+                .pow(1 / 2.2),
+              1,
+            ),
+            'debug',
+            690,
+            480,
+          );
+        post.renderer.setRenderTarget(null);
+        pass.pipeline.render();
+        pass.dispose();
+      };
+      window.__result = {
+        frames,
+        stages: ['no-mips', 'source-mips', 'restored-no-mips'],
+        meshes: meshes.length,
+        textureStats,
+        initialLevels,
+      };
+    }
+    run().catch((e) => {
+      console.error(e);
+      window.__result = { error: String(e.stack ?? e) };
+    });
+  </script>
+</body>

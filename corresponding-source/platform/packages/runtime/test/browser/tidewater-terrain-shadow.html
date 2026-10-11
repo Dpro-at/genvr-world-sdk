@@ -1,0 +1,33 @@
+<!doctype html><html><body><script type="importmap">{"imports":{"three/webgpu":"/node_modules/three/build/three.webgpu.js","three/tsl":"/node_modules/three/build/three.tsl.js"}}</script><script type="module">
+import {WebGPURenderer,TSL,Vector2,Vector3,StorageTexture,HalfFloatType,StorageBufferAttribute,Scene,PerspectiveCamera,Mesh,PlaneGeometry,MeshStandardNodeMaterial,RenderTarget,DirectionalLight,PointLight,AmbientLight,DataUtils,NoToneMapping} from 'three/webgpu';
+import {TerrainSunShadow} from '/dist/tidewater-ground/terrain-shadow.js';
+import {copyGroundSunModulation} from '/dist/tidewater-ground/sun-modulation.js';
+try{
+ const renderer=new WebGPURenderer();await renderer.init();const errors=[];renderer.backend.device.addEventListener('uncapturederror',e=>errors.push(e.error.message));
+ const size=256,res=64,origin=-128;const shadow=new TerrainSunShadow({origin:new Vector2(origin,origin),size,res,heightAt:(x,z)=>18*Math.exp(-((x-40)**2+z*z)/500)+4*Math.sin(x*.13)*Math.cos(z*.11)});
+ const source=await (await fetch('/source/world/TerrainGPU.js')).text();const start=source.indexOf('code: /* wgsl */`',source.indexOf('_initSunShadow() {'))+'code: /* wgsl */`'.length;const end=source.indexOf('`,',start);const literal=source.slice(start,end);
+ let code=new Function('SUN_N','SUN_T0','SUN_DT0','SUN_STEPS','SUN_GROWTH','invTexel','return `'+literal+'`;')(512,24,6,24,1.22,1/(size/res*4));
+ code=code.slice(code.indexOf('let ij'),code.lastIndexOf('}')).replace('let ij = vec2f( gid.xy );','let ij = pixel;').replace('let L = terrainParams.sunBake;','').replaceAll('terrainParams.size','size').replaceAll('terrainParams.origin','origin').replace(/textureStore\( terrainSunShadowOut.*?;/,'return vec4f(top,occ,0.0,1.0);');
+ const sourceMarch=TSL.wgslFn('fn sourceTerrainShadow(pixel:vec2f,L:vec3f,size:f32,origin:f32,terrainShadowHeights:texture_2d<f32>,smpLinearClamp:sampler)->vec4f{'+code+'}');
+ const reference=new StorageTexture(512,512);reference.type=HalfFloatType;
+ const sun=TSL.uniform(new Vector3(.97,.12,0)).setGroup(TSL.renderGroup);sun.value.normalize();
+ const primeStart=performance.now();while(!shadow.ready.value){shadow.update(renderer,sun.value);await new Promise(r=>setTimeout(r,0));}const primeMs=performance.now()-primeStart;
+ const tex=TSL.texture(shadow.heights);const oracleKernel=TSL.Fn(()=>{TSL.textureStore(reference,TSL.ivec2(TSL.globalId.xy),sourceMarch({pixel:TSL.vec2(TSL.globalId.xy),L:sun,size:TSL.float(size),origin:TSL.float(origin),terrainShadowHeights:tex,smpLinearClamp:TSL.sampler(tex)}));})().compute([64,64],[8,8,1]);
+ const count=256,buffer=new StorageBufferAttribute(new Float32Array(count*4),4),out=TSL.storage(buffer,'vec4',count);
+ const compare=TSL.Fn(()=>{const i=TSL.int(TSL.instanceIndex),px=TSL.ivec2(i.mod(16).mul(31),i.div(16).mul(31));const a=TSL.textureLoad(shadow.texture,px),b=TSL.textureLoad(reference,px);out.element(i).assign(a.sub(b).abs());})().compute(count);
+ renderer.compute(oracleKernel);renderer.compute(compare);const values=new Float32Array(await renderer.getArrayBufferAsync(buffer));const maxError=Math.max(...values);const finite=Array.from(values).every(Number.isFinite);
+ // Native source bilinear oracle over cached shadow field, with fractional/border receiver UVs.
+ const text=source.slice(source.indexOf('fn terrainSunShadowAt'));const body=text.slice(text.indexOf('{')+1,text.indexOf('\n}')).replace('terrainUvOf( P.xz )','((P.xz-origin)/size)').replaceAll('terrainParams.sunBaked','ready');
+ const sourceVis=TSL.wgslFn('fn sourceVisibility(P:vec3f,origin:vec2f,size:f32,ready:f32,terrainSunShadowTex:texture_2d<f32>)->f32{'+body+'}');
+ const visibilityCompare=TSL.Fn(()=>{const i=TSL.float(TSL.instanceIndex),p=TSL.vec3(i.mul(1.83).sub(180),i.mul(.067),i.mul(.76).sub(80));const a=shadow.visibilityNode(p),b=sourceVis({P:p,origin:TSL.vec2(origin),size:TSL.float(size),ready:shadow.ready,terrainSunShadowTex:TSL.texture(shadow.texture)});out.element(TSL.instanceIndex).assign(TSL.vec4(a,b,a.sub(b).abs(),1));})().compute(count);
+ renderer.compute(visibilityCompare);const visibility=new Float32Array(await renderer.getArrayBufferAsync(buffer));const visibilityError=Math.max(...Array.from(visibility).filter((_,i)=>i%4===2));const dark=Array.from(visibility).some((x,i)=>i%4===0&&x<.3);
+ const unchanged=!shadow.update(renderer,sun.value);sun.value.set(.8,.3,.2).normalize();const gpuStart=performance.now();const changed=shadow.update(renderer,sun.value);await renderer.backend.device.queue.onSubmittedWorkDone();const dispatchAndQueueMs=performance.now()-gpuStart;shadow.invalidate();const coalesced=!shadow.update(renderer,sun.value);const invalidated=shadow.update(renderer,sun.value,true);await renderer.backend.device.queue.onSubmittedWorkDone();
+ shadow.dispose();shadow.dispose();const disposed=!shadow.update(renderer,sun.value);oracleKernel.dispose();compare.dispose();visibilityCompare.dispose();reference.dispose();
+ const scene=new Scene(),camera=new PerspectiveCamera(60,1,.1,100);camera.position.z=3;
+ const original=new MeshStandardNodeMaterial({color:0xffffff,roughness:1}),clone=original.clone(),key=new DirectionalLight(0xffffff,1),local=new PointLight(0xffffff,3),ambient=new AmbientLight(0xffffff,1);key.position.z=local.position.z=3;scene.add(key,local,ambient);const mesh=new Mesh(new PlaneGeometry(4,4),original);scene.add(mesh);const rt=new RenderTarget(32,32,{type:HalfFloatType});renderer.toneMapping=NoToneMapping;
+ copyGroundSunModulation(original,clone,key,TSL.vec3(0,1,0),TSL.float(.25));
+ async function brightness(material){mesh.material=material;renderer.setRenderTarget(rt);renderer.render(scene,camera);renderer.setRenderTarget(null);await renderer.backend.device.queue.onSubmittedWorkDone();const pixels=Array.from(await renderer.readRenderTargetPixelsAsync(rt,0,0,32,32),DataUtils.fromHalfFloat);return pixels.reduce((s,x,i)=>s+(i%4<3?x:0),0);}
+ const lightingRatios={};for(const [name,light] of [['key',key],['local',local],['ambient',ambient]]){for(const l of [key,local,ambient])l.visible=l===light;lightingRatios[name]=(await brightness(clone))/(await brightness(original));}rt.dispose();clone.dispose();original.dispose();
+ window.__result={maxError,visibilityError,primeMs,dispatchAndQueueMs,coalesced,lightingRatios,finite,dark,unchanged,changed,invalidated,disposed,errors};
+}catch(e){window.__result={error:String(e),stack:e.stack};}
+</script></body></html>

@@ -96,6 +96,11 @@ export declare const SIDE_CAMERA: {
     readonly maxDistance: 26;
 };
 export interface GenvrRuntime {
+    /** Detached local save, including heightfield, voxel edits and loaded raster field pages. */
+    snapshot(): {
+        world: WorldDocument;
+        terrainChunks: string[];
+    };
     /** Explicit on-demand inventory; never walks scene resources on the animation loop. */
     diagnostics(options?: DiagnosticOptions): RuntimeDiagnostics;
     /** "WebGPU" or "WebGL2" (automatic fallback). */

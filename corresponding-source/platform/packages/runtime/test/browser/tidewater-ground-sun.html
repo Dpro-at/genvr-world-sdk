@@ -1,0 +1,20 @@
+<!doctype html><html><body><script type="importmap">{"imports":{"three/webgpu":"/node_modules/three/build/three.webgpu.js","three/tsl":"/node_modules/three/build/three.tsl.js"}}</script><script type="module">
+import {WebGPURenderer,Scene,PerspectiveCamera,Mesh,PlaneGeometry,MeshStandardNodeMaterial,RenderTarget,HalfFloatType,TSL,DataUtils,DirectionalLight,PointLight,AmbientLight,Vector3,NoToneMapping} from 'three/webgpu';
+import {attachGroundSunModulation,copyGroundSunModulation} from '/dist/tidewater-ground/sun-modulation.js';
+try{
+ const renderer=new WebGPURenderer();await renderer.init();renderer.setSize(32,32);renderer.toneMapping=NoToneMapping;
+ const errors=[];renderer.backend.device.addEventListener('uncapturederror',e=>errors.push(e.error.message));
+ const scene=new Scene(),camera=new PerspectiveCamera(60,1,.1,100);camera.position.z=3;
+ const original=new MeshStandardNodeMaterial({color:0xffffff,roughness:1,metalness:0});const clone=original.clone();
+ const sun=new DirectionalLight(0xffffff,1);sun.position.set(0,0,3);const other=new DirectionalLight(0xffffff,1);other.position.copy(sun.position);
+ const point=new PointLight(0xffffff,3);point.position.set(0,0,3);const ambient=new AmbientLight(0xffffff,1);
+ scene.add(sun,other,point,ambient);const mesh=new Mesh(new PlaneGeometry(4,4),original);scene.add(mesh);
+ const dir=TSL.uniform(new Vector3(0,-1,0)).setGroup(TSL.renderGroup);attachGroundSunModulation(original,TSL.float(1));const restore=copyGroundSunModulation(original,clone,sun,dir);
+ const rt=new RenderTarget(32,32,{type:HalfFloatType});
+ async function mean(material){mesh.material=material;renderer.setRenderTarget(rt);renderer.render(scene,camera);renderer.setRenderTarget(null);await renderer.backend.device.queue.onSubmittedWorkDone();const p=Array.from(await renderer.readRenderTargetPixelsAsync(rt,0,0,32,32),DataUtils.fromHalfFloat);return p.reduce((a,x,i)=>a+(i%4<3?x:0),0);}
+ const ratios={};for(const [key,light] of [['sun',sun],['other',other],['point',point],['ambient',ambient]]){for(const l of [sun,other,point,ambient])l.visible=l===light;ratios[key]=(await mean(clone))/(await mean(original));}
+ for(const l of [sun,other,point,ambient])l.visible=l===sun;dir.value.y=1;ratios.high=(await mean(clone))/(await mean(original));
+ restore();clone.dispose();clone.needsUpdate=true;ratios.restored=(await mean(clone))/(await mean(original));
+ window.__result={ratios,errors};clone.dispose();original.dispose();rt.dispose();renderer.dispose();
+}catch(e){window.__result={error:String(e),stack:e.stack};}
+</script></body></html>
