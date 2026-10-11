@@ -1319,10 +1319,10 @@ export async function createRuntime({
   // Players never arrive inside a house or an item (owner, 2026-10-07): the start point as it is now (a Real place
   // build moves it), moved to the nearest free street or open ground. Items count once they are loaded.
   let spawnItems: ItemsView | null = null;
-  const standsInItem = (x: number, z: number): boolean => {
+  const standsInItem = (x: number, z: number, feetY = groundHeight(x, z)): boolean => {
     const view = spawnItems;
     if (!view) return false;
-    const feet = groundHeight(x, z);
+    const feet = feetY;
     const boxes = view.scatteredBoxesNear(x, z, 3);
     for (const instance of state.doc.instances) {
       const [ix, , iz] = instance.transform.position;
@@ -3425,10 +3425,27 @@ export async function createRuntime({
       controlsEnabled = on;
     },
     setSimulating: (on) => {
+      const enteringTest = on && !simulating && editable;
       simulating = on || !editable;
       items.setSimulating(on, state.doc);
       items.setMarkersVisible(!simulating, state.doc);
       viewCubeWanted = !on;
+      // Building can place a solid item over the player while Studio is open.
+      // Resolve that overlap when Test starts, just as we do when joining/respawning.
+      if (enteringTest && !rideNow) {
+        const feet = character.feet;
+        const spot = standsInItem(feet.x, feet.z, feet.y)
+          ? freeSpawnPoint(state.doc, feet.x, feet.z, standsInItem)
+          : { x: feet.x, z: feet.z, moved: false };
+        if (spot.moved) {
+          character.teleport({ x: spot.x, y: groundHeight(spot.x, spot.z) + 0.05, z: spot.z });
+          terrainColliders.update(spot.x, spot.z);
+          sitting = null;
+          emote = null;
+          swimMotion = createSwimMotion();
+          groundSpeed.reset();
+        }
+      }
     },
     setMarkersVisible: (on) => items.setMarkersVisible(on, state.doc),
     setHeldTool: (itemId) => heldTool.set(itemId),

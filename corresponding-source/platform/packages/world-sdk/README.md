@@ -1,9 +1,13 @@
-# 3D World SDK 0.1.1 (preview)
+# 3D World SDK 0.2.0 (preview)
+
+Account-link support in this version requires the matching Genvr host routes and database migration0041.
+The host implementation is prepared for review; production account linking is not active until that rollout is verified.
+The currently verified npm release remains0.1.1 until a0.2.0 registry publication is confirmed. Local authoring works independently.
 
 Standalone authoring with the same Genvr world contracts, command engine, Core Library and assistant tools.
 No Agent Player dependency or integration. JavaScript is bundled; declaration dependencies are ordinary npm
 packages, not private workspace packages. Download the standalone `.tgz` from the Dpro GitHub SDK prerelease,
-then `npm install /path/to/3d-world-sdk-0.1.1.tgz` (Node 24+). Run `npx genvr-world-demo` to open the
+then `npm install /path/to/3d-world-sdk-0.2.0.tgz` (Node 24+). Run `npx genvr-world-demo` to open the
 included local example at http://127.0.0.1:3028. Registry preview installation: `npm install 3d-world-sdk@preview`. Bundled Genvr source retains AGPL-3.0-only;
 the included asset credits describe their separate licenses. This preview uses the shared engine and
 authoring tools; its demo is a simplified host, not the complete Genvr Studio interface.
@@ -93,3 +97,29 @@ an allowed origin and compatible browser cookie policy; the SDK does not change 
 Server hosts can inject an authenticated fetch implementation. If an import commits but its response is lost,
 read the target world's latest version with `client.readWorld(id)` before retrying: a stale retry returns409
 and never overwrites it.
+
+## Connect a host to a Genvr account (0.2.0)
+
+Agent Player integration is not included. Any CLI, agent or local host can use the account-link adapter:
+
+```ts
+import { GenvrAccountLink, GenvrClient } from '3d-world-sdk';
+const link = new GenvrAccountLink('https://api.genvr.net');
+const request = await link.start('My world tool', ['worlds:read', 'worlds:write']);
+// Show request.userCode and open request.verificationUri in the user's browser.
+// User signs in to Genvr, compares the code and explicitly approves the displayed scopes.
+// Poll at request.interval seconds, stopping at expiresIn, denial or cancellation.
+const result = await link.poll(request);
+if (result.status === 'linked') {
+  // Store result.account.accessToken in the host's secure credential store.
+  const client = GenvrClient.linked('https://api.genvr.net', result.account.accessToken);
+  const owner = await client.linkedIdentity();
+  // Existing createDraft/readWorld/uploadWorld calls now use the scoped account grant.
+}
+```
+
+This is a Genvr JSON device-link API informed by RFC8628, not a general OAuth/OIDC authorization server. App names are self-declared, not verified identities. Display the code in the initiating host and compare it in Genvr; never approve unsolicited links. No custom browser callback is needed: the host polls and returns to its linked state automatically. Tokens expire after 30 days, have no refresh token, and must be relinked if expired. A consumed token response cannot be retrieved again; restart the link if the response is lost.
+
+Scopes: `worlds:read`, `worlds:write` (private draft/import), `worlds:publish` (separate explicit publication), `items:submit` (existing store review). Request only what the user needs. Tokens cannot edit profiles, access payments/staff tools or call arbitrary API routes. Existing world ownership, tier limits, rights/content checks and item moderation still apply. The user can revoke a grant at Settings → Linked accounts → World apps; a host can call `client.disconnect()` to revoke itself. Revocation takes effect on the next API call.
+
+Local/private save requires no account link. Linking never publishes a world or approves an item automatically. Portable world files never include credentials. Avoid printing tokens, storing them in world files, browser URLs or source control. Untrusted JavaScript with access to the host's credentials can use its grants, so keep secrets in the host's protected storage.

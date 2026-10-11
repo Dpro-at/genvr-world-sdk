@@ -47973,7 +47973,7 @@ async function runAssistant({ model: model2, host, history, prompt, onEvent, max
 var CORRECTION_WINDOW_MS = 10 * 60 * 1e3;
 
 // src/session.ts
-var SDK_VERSION = "0.1.1";
+var SDK_VERSION = "0.2.0";
 var PACKAGE_WORK_BUDGET = 5e6;
 function readWorldPackage(input2) {
   const text = typeof input2 === "string" ? input2 : JSON.stringify(input2);

@@ -30,11 +30,18 @@ export declare class GenvrClient {
     #private;
     readonly baseUrl: string;
     readonly fetcher: typeof fetch;
+    /** Keep the token in the host's secure credential store, never in portable world files. */
+    static linked(baseUrl: string, accessToken: string, fetcher?: typeof fetch): GenvrClient;
     constructor(baseUrl: string, fetcher?: typeof fetch);
     readWorld(id: string): Promise<{
         world: WorldDocument;
         terrain: string[];
     }>;
+    linkedIdentity(): Promise<{
+        id: string;
+        name: string;
+    }>;
+    disconnect(): Promise<void>;
     /** Create a private draft once, then retain its ID for repeat uploads/recovery. */
     createDraft(session: WorldSession): Promise<{
         id: string;

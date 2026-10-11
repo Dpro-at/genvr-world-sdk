@@ -40659,7 +40659,7 @@ async function readChatStream(body, onText, onQueue) {
 var CORRECTION_WINDOW_MS = 10 * 60 * 1e3;
 
 // src/session.ts
-var SDK_VERSION = "0.1.1";
+var SDK_VERSION = "0.2.0";
 var PACKAGE_WORK_BUDGET = 5e6;
 function readWorldPackage(input2) {
   const text2 = typeof input2 === "string" ? input2 : JSON.stringify(input2);
@@ -40909,7 +40909,7 @@ var GenvrError = class extends Error {
   status;
   details;
 };
-var GenvrClient = class {
+var GenvrClient = class _GenvrClient {
   constructor(baseUrl, fetcher = (input2, init) => globalThis.fetch(input2, init)) {
     this.baseUrl = baseUrl;
     this.fetcher = fetcher;
@@ -40919,6 +40919,15 @@ var GenvrClient = class {
   }
   baseUrl;
   fetcher;
+  /** Keep the token in the host's secure credential store, never in portable world files. */
+  static linked(baseUrl, accessToken, fetcher = globalThis.fetch) {
+    if (!/^gvr_link_[A-Za-z0-9_-]{43}$/.test(accessToken)) throw new Error("Invalid linked account token.");
+    return new _GenvrClient(baseUrl, (input2, init) => {
+      const headers = new Headers(init?.headers);
+      headers.set("authorization", `Bearer ${accessToken}`);
+      return fetcher(input2, { ...init, credentials: "omit", headers });
+    });
+  }
   async #request(path, body, method = "POST") {
     const response = await this.fetcher(`${this.baseUrl.replace(/\/$/, "")}${path}`, {
       method,
@@ -40933,6 +40942,13 @@ var GenvrClient = class {
     const response = await this.#request(`/v1/experiences/${encodeURIComponent(id)}/world`, void 0, "GET");
     if (!Array.isArray(response.terrain) || !response.terrain.every((row) => typeof row === "string")) throw new Error("Invalid world terrain response.");
     return { world: WorldDocument.parse(response.world), terrain: response.terrain };
+  }
+  async linkedIdentity() {
+    const user = await this.#request("/v1/account-links/session", void 0, "GET");
+    return { id: String(user.id), name: String(user.name) };
+  }
+  async disconnect() {
+    await this.#request("/v1/account-links/disconnect");
   }
   /** Create a private draft once, then retain its ID for repeat uploads/recovery. */
   async createDraft(session2) {
@@ -155586,11 +155602,11 @@ async function createRuntime({ onFilmFrame, onRendered, container, world, terrai
   if (!activeSurface)
     groundView.update(sx, sz);
   let spawnItems = null;
-  const standsInItem = (x2, z3) => {
+  const standsInItem = (x2, z3, feetY = groundHeight(x2, z3)) => {
     const view2 = spawnItems;
     if (!view2)
       return false;
-    const feet = groundHeight(x2, z3);
+    const feet = feetY;
     const boxes = view2.scatteredBoxesNear(x2, z3, 3);
     for (const instance3 of state.doc.instances) {
       const [ix, , iz] = instance3.transform.position;
@@ -157341,10 +157357,23 @@ async function createRuntime({ onFilmFrame, onRendered, container, world, terrai
       controlsEnabled = on2;
     },
     setSimulating: (on2) => {
+      const enteringTest = on2 && !simulating && editable;
       simulating = on2 || !editable;
       items.setSimulating(on2, state.doc);
       items.setMarkersVisible(!simulating, state.doc);
       viewCubeWanted = !on2;
+      if (enteringTest && !rideNow) {
+        const feet = character.feet;
+        const spot = standsInItem(feet.x, feet.z, feet.y) ? freeSpawnPoint(state.doc, feet.x, feet.z, standsInItem) : { x: feet.x, z: feet.z, moved: false };
+        if (spot.moved) {
+          character.teleport({ x: spot.x, y: groundHeight(spot.x, spot.z) + 0.05, z: spot.z });
+          terrainColliders.update(spot.x, spot.z);
+          sitting = null;
+          emote = null;
+          swimMotion = createSwimMotion();
+          groundSpeed.reset();
+        }
+      }
     },
     setMarkersVisible: (on2) => items.setMarkersVisible(on2, state.doc),
     setHeldTool: (itemId) => heldTool.set(itemId),

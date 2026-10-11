@@ -13,6 +13,16 @@ export class GenvrError extends Error {
 export class GenvrClient {
     baseUrl;
     fetcher;
+    /** Keep the token in the host's secure credential store, never in portable world files. */
+    static linked(baseUrl, accessToken, fetcher = globalThis.fetch) {
+        if (!/^gvr_link_[A-Za-z0-9_-]{43}$/.test(accessToken))
+            throw new Error('Invalid linked account token.');
+        return new GenvrClient(baseUrl, (input, init) => {
+            const headers = new Headers(init?.headers);
+            headers.set('authorization', `Bearer ${accessToken}`);
+            return fetcher(input, { ...init, credentials: 'omit', headers });
+        });
+    }
     constructor(baseUrl, fetcher = (input, init) => globalThis.fetch(input, init)) {
         this.baseUrl = baseUrl;
         this.fetcher = fetcher;
@@ -37,6 +47,11 @@ export class GenvrClient {
             throw new Error('Invalid world terrain response.');
         return { world: WorldDocument.parse(response.world), terrain: response.terrain };
     }
+    async linkedIdentity() {
+        const user = await this.#request('/v1/account-links/session', undefined, 'GET');
+        return { id: String(user.id), name: String(user.name) };
+    }
+    async disconnect() { await this.#request('/v1/account-links/disconnect'); }
     /** Create a private draft once, then retain its ID for repeat uploads/recovery. */
     async createDraft(session) {
         if (session.export().base.sizeTier !== 'small')

@@ -11,7 +11,7 @@ import {
   readWorldPackage,
   replayWorldPackage,
   streamingChatModel
-} from "./chunk-HMRUHG7W.js";
+} from "./chunk-TR5JHFWL.js";
 
 // src/storage.ts
 function browserStorage(storage, prefix = "genvr.world.") {
@@ -38,7 +38,7 @@ var GenvrError = class extends Error {
   status;
   details;
 };
-var GenvrClient = class {
+var GenvrClient = class _GenvrClient {
   constructor(baseUrl, fetcher = (input, init) => globalThis.fetch(input, init)) {
     this.baseUrl = baseUrl;
     this.fetcher = fetcher;
@@ -48,6 +48,15 @@ var GenvrClient = class {
   }
   baseUrl;
   fetcher;
+  /** Keep the token in the host's secure credential store, never in portable world files. */
+  static linked(baseUrl, accessToken, fetcher = globalThis.fetch) {
+    if (!/^gvr_link_[A-Za-z0-9_-]{43}$/.test(accessToken)) throw new Error("Invalid linked account token.");
+    return new _GenvrClient(baseUrl, (input, init) => {
+      const headers = new Headers(init?.headers);
+      headers.set("authorization", `Bearer ${accessToken}`);
+      return fetcher(input, { ...init, credentials: "omit", headers });
+    });
+  }
   async #request(path, body, method = "POST") {
     const response = await this.fetcher(`${this.baseUrl.replace(/\/$/, "")}${path}`, {
       method,
@@ -62,6 +71,13 @@ var GenvrClient = class {
     const response = await this.#request(`/v1/experiences/${encodeURIComponent(id)}/world`, void 0, "GET");
     if (!Array.isArray(response.terrain) || !response.terrain.every((row) => typeof row === "string")) throw new Error("Invalid world terrain response.");
     return { world: WorldDocument.parse(response.world), terrain: response.terrain };
+  }
+  async linkedIdentity() {
+    const user = await this.#request("/v1/account-links/session", void 0, "GET");
+    return { id: String(user.id), name: String(user.name) };
+  }
+  async disconnect() {
+    await this.#request("/v1/account-links/disconnect");
   }
   /** Create a private draft once, then retain its ID for repeat uploads/recovery. */
   async createDraft(session) {
@@ -88,7 +104,49 @@ var GenvrClient = class {
     return { id: String(item.id) };
   }
 };
+
+// src/account-link.ts
+var ACCOUNT_LINK_SCOPES = ["worlds:read", "worlds:write", "worlds:publish", "items:submit"];
+var GenvrAccountLink = class {
+  constructor(apiUrl, fetcher = (input, init) => globalThis.fetch(input, init)) {
+    this.apiUrl = apiUrl;
+    this.fetcher = fetcher;
+    const url = new URL(apiUrl);
+    if (url.protocol !== "https:" && !(url.protocol === "http:" && ["localhost", "127.0.0.1"].includes(url.hostname)) || url.username || url.password || url.search || url.hash)
+      throw new Error("Account link endpoint requires HTTPS or local HTTP, without credentials.");
+  }
+  apiUrl;
+  fetcher;
+  async #request(path, body) {
+    const response = await this.fetcher(`${this.apiUrl.replace(/\/$/, "")}/v1/account-links/${path}`, {
+      method: "POST",
+      credentials: "omit",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(body)
+    });
+    const data = await response.json();
+    return { response, data };
+  }
+  async start(clientName, scopes = ["worlds:read", "worlds:write"]) {
+    const { response, data } = await this.#request("start", { clientName, scopes });
+    if (!response.ok) throw new Error(data.message ?? "Unable to start account link.");
+    if (typeof data.deviceCode !== "string" || !/^[A-Za-z0-9_-]{43}$/.test(data.deviceCode) || typeof data.userCode !== "string" || !/^[A-F0-9]{6}-[A-F0-9]{6}$/.test(data.userCode) || typeof data.verificationUri !== "string" || !Number.isFinite(data.expiresIn) || !(data.expiresIn > 0 && data.expiresIn <= 600) || !Number.isFinite(data.interval) || !(data.interval >= 5)) throw new Error("Invalid account link response.");
+    const verification = new URL(data.verificationUri);
+    if (verification.username || verification.password || verification.protocol !== "https:" && !(verification.protocol === "http:" && ["localhost", "127.0.0.1"].includes(verification.hostname))) throw new Error("Unsafe account link page.");
+    return data;
+  }
+  /** Poll no faster than request.interval seconds; pending is not an error or permission to publish. */
+  async poll(request) {
+    const { response, data } = await this.#request("token", { deviceCode: request.deviceCode });
+    if (response.status === 400 && data.error === "authorization_pending") return { status: "pending" };
+    if (!response.ok) throw new Error(data.error ?? data.message ?? "Account link failed.");
+    if (typeof data.accessToken !== "string" || !data.accessToken.startsWith("gvr_link_") || data.tokenType !== "Bearer" || !Array.isArray(data.scopes) || !data.scopes.every((s) => ACCOUNT_LINK_SCOPES.includes(s)) || typeof data.grantId !== "string" || !Number.isFinite(Date.parse(data.expiresAt))) throw new Error("Invalid linked account response.");
+    return { status: "linked", account: data };
+  }
+};
 export {
+  ACCOUNT_LINK_SCOPES,
+  GenvrAccountLink,
   GenvrClient,
   GenvrError,
   PACKAGE_WORK_BUDGET,

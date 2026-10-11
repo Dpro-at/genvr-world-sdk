@@ -1,6 +1,6 @@
 {
   "name": "3d-world-sdk",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "type": "module",
   "description": "Standalone Genvr world authoring, local persistence and explicit platform publication adapters.",
   "license": "AGPL-3.0-only",

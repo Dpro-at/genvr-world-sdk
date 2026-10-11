@@ -118,7 +118,7 @@ import {
   worldBox,
   zoneFromParams,
   zoneShapeOfItem
-} from "./chunk-HMRUHG7W.js";
+} from "./chunk-TR5JHFWL.js";
 
 // ../../../node_modules/.pnpm/three@0.186.1/node_modules/three/build/three.core.js
 var REVISION = "186";
@@ -114746,11 +114746,11 @@ async function createRuntime({ onFilmFrame, onRendered, container, world, terrai
   if (!activeSurface)
     groundView.update(sx, sz);
   let spawnItems = null;
-  const standsInItem = (x2, z2) => {
+  const standsInItem = (x2, z2, feetY = groundHeight(x2, z2)) => {
     const view2 = spawnItems;
     if (!view2)
       return false;
-    const feet = groundHeight(x2, z2);
+    const feet = feetY;
     const boxes = view2.scatteredBoxesNear(x2, z2, 3);
     for (const instance3 of state.doc.instances) {
       const [ix, , iz] = instance3.transform.position;
@@ -116501,10 +116501,23 @@ async function createRuntime({ onFilmFrame, onRendered, container, world, terrai
       controlsEnabled = on2;
     },
     setSimulating: (on2) => {
+      const enteringTest = on2 && !simulating && editable;
       simulating = on2 || !editable;
       items.setSimulating(on2, state.doc);
       items.setMarkersVisible(!simulating, state.doc);
       viewCubeWanted = !on2;
+      if (enteringTest && !rideNow) {
+        const feet = character.feet;
+        const spot = standsInItem(feet.x, feet.z, feet.y) ? freeSpawnPoint(state.doc, feet.x, feet.z, standsInItem) : { x: feet.x, z: feet.z, moved: false };
+        if (spot.moved) {
+          character.teleport({ x: spot.x, y: groundHeight(spot.x, spot.z) + 0.05, z: spot.z });
+          terrainColliders.update(spot.x, spot.z);
+          sitting = null;
+          emote = null;
+          swimMotion = createSwimMotion();
+          groundSpeed.reset();
+        }
+      }
     },
     setMarkersVisible: (on2) => items.setMarkersVisible(on2, state.doc),
     setHeldTool: (itemId) => heldTool.set(itemId),

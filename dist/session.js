@@ -2,7 +2,7 @@ import { CommandPayload, WorldDocument, WorldPackage, WORLD_PACKAGE_BYTES, WORLD
 import { getCoreItem } from '@genvr/core-library';
 import { runAssistant, runTool } from '@genvr/assistant';
 import { applyCommand, createWorldState, encodeTerrain, planWaterFill } from '@genvr/world';
-export const SDK_VERSION = '0.1.1';
+export const SDK_VERSION = '0.2.0';
 export const PACKAGE_WORK_BUDGET = 5_000_000;
 export function readWorldPackage(input) {
     const text = typeof input === 'string' ? input : JSON.stringify(input);
