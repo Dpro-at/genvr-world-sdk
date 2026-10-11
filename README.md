@@ -1,16 +1,15 @@
-# Genvr World SDK 0.1.0 (preview)
+# 3D World SDK 0.1.0 (preview)
 
 Standalone authoring with the same Genvr world contracts, command engine, Core Library and assistant tools.
 No Agent Player dependency or integration. JavaScript is bundled; declaration dependencies are ordinary npm
 packages, not private workspace packages. Download the standalone `.tgz` from the Dpro GitHub SDK prerelease,
-then `npm install /path/to/genvr-world-sdk-0.1.0.tgz` (Node 24+). Run `npx genvr-world-demo` to open the
-included local example at http://127.0.0.1:3028. The archive is a preview release in the private Dpro repository,
-with npm publication pending authenticated registry access. Bundled Genvr source retains AGPL-3.0-only;
+then `npm install /path/to/3d-world-sdk-0.1.0.tgz` (Node 24+). Run `npx genvr-world-demo` to open the
+included local example at http://127.0.0.1:3028. Registry preview installation: `npm install 3d-world-sdk@preview`. Bundled Genvr source retains AGPL-3.0-only;
 the included asset credits describe their separate licenses. This preview uses the shared engine and
 authoring tools; its demo is a simplified host, not the complete Genvr Studio interface.
 
 ```ts
-import { WorldSession, saveWorld, browserStorage, GenvrClient } from '@genvr/world-sdk';
+import { WorldSession, saveWorld, browserStorage, GenvrClient } from '3d-world-sdk';
 const world = WorldSession.create({ title: 'My garden' });
 await world.tool('place_item', { itemId: 'genvr.core.bench', x: 5, z: 8 });
 await world.tool('set_sky', { preset: 'sunset' });
@@ -35,7 +34,7 @@ Genvr credentials or publication tools. JavaScript hosts use the explicit authen
 Browser preview is an optional subpath:
 
 ```ts
-import { previewWorld } from '@genvr/world-sdk/runtime';
+import { previewWorld } from '3d-world-sdk/runtime';
 const preview = await previewWorld(world, document.getElementById('preview')!);
 // Refresh preview after editing; dispose it before replacing it or unmounting.
 preview.dispose();

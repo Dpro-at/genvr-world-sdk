@@ -1,0 +1,28 @@
+{
+  "name": "@genvr/world-sdk",
+  "version": "0.1.0",
+  "license": "AGPL-3.0-only",
+  "description": "Standalone Genvr world authoring, local persistence and explicit platform publication adapters.",
+  "type": "module",
+  "exports": {
+    ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" },
+    "./runtime": { "types": "./dist/runtime.d.ts", "default": "./dist/runtime.js" }
+  },
+  "files": ["dist", "demo", "assets", "serve.mjs", "README.md"],
+  "bin": { "genvr-world-mcp": "./dist/mcp.js", "genvr-world-demo": "./serve.mjs" },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json && node build.mjs",
+    "pack:standalone": "node pack.mjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "demo": "node serve.mjs"
+  },
+  "dependencies": {
+    "@genvr/assistant": "workspace:*",
+    "@genvr/contracts": "workspace:*",
+    "@genvr/core-library": "workspace:*",
+    "@genvr/runtime": "workspace:*",
+    "@genvr/world": "workspace:*"
+  },
+  "devDependencies": { "esbuild": "0.28.2", "vitest": "^5.0.1", "@modelcontextprotocol/sdk": "1.31.0" }
+}

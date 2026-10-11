@@ -1,0 +1,27 @@
+{
+  "name": "@genvr/game",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Rules engine: match phases, health, melee, respawn, score and teams as pure state driven by an injected clock. No rendering, no networking.",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@genvr/contracts": "workspace:*"
+  },
+  "devDependencies": {
+    "vitest": "^5.0.1"
+  }
+}

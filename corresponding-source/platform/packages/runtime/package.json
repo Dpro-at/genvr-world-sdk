@@ -1,0 +1,38 @@
+{
+  "name": "@genvr/runtime",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Genvr three.js runtime (player and editor core). Must not import React or Next.js.",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./character": {
+      "types": "./dist/character/index.d.ts",
+      "default": "./dist/character/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run --passWithNoTests"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.2",
+    "@types/three": "^0.186.0",
+    "vitest": "^5.0.1"
+  },
+  "dependencies": {
+    "@dimforge/rapier3d-compat": "^0.20.0",
+    "@genvr/contracts": "workspace:*",
+    "@genvr/core-library": "workspace:*",
+    "@genvr/validator": "workspace:*",
+    "@genvr/world": "workspace:*",
+    "three": "^0.186.1"
+  }
+}

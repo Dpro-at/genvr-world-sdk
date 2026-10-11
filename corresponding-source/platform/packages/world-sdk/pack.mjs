@@ -1,0 +1,16 @@
+import { cp, mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { resolve } from 'node:path';
+import { execFileSync } from 'node:child_process';
+const temp = await mkdtemp(resolve(tmpdir(), 'genvr-sdk-pack-'));
+const root = resolve(temp, 'package'); await mkdir(root);
+await cp('dist', resolve(root, 'dist'), { recursive: true, filter: source => !source.endsWith('.tgz') });
+await cp('demo', resolve(root, 'demo'), { recursive: true });
+await cp('assets', resolve(root, 'assets'), { recursive: true });
+await cp('README.md', resolve(root, 'README.md'));
+await cp('LICENSE', resolve(root, 'LICENSE'));
+await cp('serve.mjs', resolve(root, 'serve.mjs'));
+await writeFile(resolve(root, 'package.json'), await readFile('dist/package-manifest.json'));
+const archive = resolve('dist', '3d-world-sdk-0.1.0.tgz');
+execFileSync('tar', ['-czf', archive, '-C', temp, 'package']);
+console.log(archive);

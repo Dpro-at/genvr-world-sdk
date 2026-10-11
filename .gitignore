@@ -1,0 +1,5 @@
+node_modules/
+corresponding-source/**/dist/
+corresponding-source/**/node_modules/
+*.tgz
+

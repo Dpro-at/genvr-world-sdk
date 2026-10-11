@@ -1,0 +1,34 @@
+// Shared world model: terrain data, command application with undo, history.
+export * from './terrain-data.js';
+export {
+  applyCommand,
+  CommandError,
+  createWorldState,
+  encodeTerrain,
+  isDefaultChunk,
+  type ApplyResult,
+  type WorldState,
+} from './apply.js';
+export { CommandHistory } from './history.js';
+export { decodeTerrainEdit, diffTerrain, revertTerrain, snapshotTerrain } from './terrain-edits.js';
+export * from './roads.js';
+export * from './bridges.js';
+export * from './walls.js';
+export * from './building-roof.js';
+export * from './water.js';
+export * from './rivers.js';
+export * from './world-generator.js';
+export * from './scatter.js';
+export * from './starter.js';
+export * from './voxel-data.js';
+export * from './player-blocks.js';
+export * from './rest-layers.js';
+export { type AppliedStep } from './history.js';
+export { Replica, type PendingCommand, type RebaseResult } from './replica.js';
+export * from './ride-motion.js';
+export * from './height-tiles.js';
+export * from './terrain-fields.js';
+export * from './terrain-field-sampler.js';
+
+export * from './terrain-fields-state.js';
+export * from './spawn-place.js';

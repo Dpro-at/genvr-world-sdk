@@ -1,0 +1,34 @@
+{
+  "name": "@genvr/validator",
+  "version": "0.0.0",
+  "private": true,
+  "description": "World validation rules shared by browser and worker.",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./lod": {
+      "types": "./dist/lod.d.ts",
+      "default": "./dist/lod.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run --passWithNoTests"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.2",
+    "vitest": "^5.0.1"
+  },
+  "dependencies": {
+    "@genvr/contracts": "workspace:*",
+    "@genvr/core-library": "workspace:*",
+    "three": "^0.186.1"
+  }
+}

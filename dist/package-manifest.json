@@ -1,9 +1,17 @@
 {
-  "name": "@genvr/world-sdk",
+  "name": "3d-world-sdk",
   "version": "0.1.0",
   "type": "module",
   "description": "Standalone Genvr world authoring, local persistence and explicit platform publication adapters.",
   "license": "AGPL-3.0-only",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Dpro-at/genvr-world-sdk.git"
+  },
+  "publishConfig": {
+    "access": "public",
+    "tag": "preview"
+  },
   "engines": {
     "node": ">=24"
   },

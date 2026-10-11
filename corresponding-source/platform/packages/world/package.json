@@ -1,0 +1,27 @@
+{
+  "name": "@genvr/world",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Shared world model: terrain data, command application with undo, history. No rendering; runs in browser, server, and tests.",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@genvr/contracts": "workspace:*"
+  },
+  "devDependencies": {
+    "vitest": "^5.0.1"
+  }
+}

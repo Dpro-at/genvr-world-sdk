@@ -1,0 +1,1188 @@
+import {
+  AnimationClip,
+  Bone,
+  BoxGeometry,
+  BufferAttribute,
+  BufferGeometry,
+  Color,
+  Euler,
+  Group,
+  Matrix3,
+  Matrix4,
+  MeshStandardMaterial,
+  MeshStandardNodeMaterial,
+  Quaternion,
+  QuaternionKeyframeTrack,
+  Skeleton,
+  SkinnedMesh,
+  TSL,
+  Vector3,
+  VectorKeyframeTrack,
+  type Material,
+  type Texture,
+} from 'three/webgpu';
+import type { AvatarBodyType, AvatarScale, BodyId, MouthShape } from '@genvr/contracts';
+import {
+  CORE_ANIMATIONS,
+  findBody,
+  findSkinMaterial,
+  lookParts,
+  sizedBody,
+  type AnimationItem,
+  type AvatarBody,
+  RELAXED_GRIP,
+  type Key,
+  type Pose,
+  type RigBone,
+  type V3,
+  planarAngle,
+  isItemBodyId,
+} from '@genvr/core-library';
+import { createGltfLoader } from './gltf.js';
+import { SpringBones } from './spring-bones.js';
+import { createMouth, MOUTH_GAP, type MouthMesh } from './mouth.js';
+import { applyMouthMorphs, mouthMorphs, type MouthMorphs } from './visemes.js';
+import { useDualQuaternionSkinning } from './character/dual-quaternion-skinning.js';
+import {
+  fitHumanProxy,
+  humanHairMaterial,
+  loadHumanProxy,
+  setHumanHairColor,
+  type HumanProxy,
+} from './character/human/proxy.js';
+import type { HumanData } from './character/human/format.js';
+import {
+  humanDetail,
+  humanGeometry,
+  humanMaterial,
+  humanOutlineMaterial,
+  loadHumanData,
+  OUTLINE,
+  setHumanColors,
+  setHumanMouth,
+} from './character/human/body.js';
+import type { FaceUniforms } from './character/human/face.js';
+
+/**
+ * The Genvr avatar (tasks P2-05, P2-20, P2-22): blocky characters built from the Core Library
+ * body types, each with its own skeleton: Classic (Roblox-like, 15 joints, the main avatar) and
+ * Starter (the first test body on the standard 52-bone Mixamo rig). The rest pose is a T-pose
+ * facing +z with every bone's axes aligned to the world, feet at y = 0. Changing the body type
+ * rebuilds the skeleton inside the same scene objects.
+ */
+
+/** The standard 52-bone rig (Mixamo names, same as agent_player): the Starter body's joints. */
+export const STANDARD_BONES: readonly string[] = findBody('starter').joints.map((joint) => joint.name);
+export type StandardBone = string;
+export const bonePrefix = 'mixamorig';
+
+/** Colors of the avatar's parts (hex strings), the body type, and the worn Core items. */
+export interface AvatarLook {
+  skin: string;
+  hair: string;
+  shirt: string;
+  pants: string;
+  shoes: string;
+  /** Classic when missing (decision 73). */
+  body?: BodyId;
+  /** Height, width, and head size (normal when missing). */
+  scale?: AvatarScale;
+  wear?: readonly string[];
+  /** A fantasy skin material (Core Library `SKIN_MATERIALS` id) on a generated body. */
+  skinMaterial?: string | undefined;
+  /** Anime Shape of a generated body's face, 0..1. */
+  animeShape?: number | undefined;
+  /** Muscle and fat of a generated body (contracts `BUILD_KEYS`; absent keys 0). */
+  build?: Readonly<Record<string, number>> | undefined;
+  /** Hair, eyebrows and beard of a generated body (contracts `HumanHair`, asset ids such as `hair.short02`). */
+  humanHair?: Readonly<{ head?: string | undefined; brows?: string | undefined; beard?: string | undefined }> | undefined;
+}
+
+export const DEFAULT_LOOK: AvatarLook = {
+  skin: '#f2c49b',
+  hair: '#3b2a20',
+  shirt: '#6d4aff',
+  pants: '#2b2d42',
+  shoes: '#f2f2ee',
+};
+
+const nodeName = (body: AvatarBody, joint: string) => `${body.bonePrefix}${joint}`;
+
+/**
+ * Where a right hand holds things (P9-12): the bone that carries the hand, the palm in that bone's
+ * own space, and the direction from the wrist to the fingers (bone space; bones rest unrotated, so
+ * this is the T-pose arm, or the hanging arm of a flat body).
+ */
+export interface HandGrip {
+  bone: Bone;
+  palm: Vector3;
+  along: Vector3;
+}
+
+/** How far past the wrist of a rigged hand (toward the knuckles) the palm is. */
+const PALM_PAST_WRIST = 0.7;
+
+/**
+ * The right hand of a body and its skeleton: the joint that carries the hand (the body's fit for
+ * the standard `RightHand` bone, else the joint that bone moves), found by its node name so rigs
+ * with a bone prefix (Mixamo, mesh bodies) work too. The palm is the middle of the hand's block
+ * (the fit box, or the hand joint's parts); rigged hands without blocks hold a little past the
+ * wrist toward the knuckles. Null when the body has no right hand.
+ */
+export function rightHandGrip(body: AvatarBody, skeleton: Skeleton): HandGrip | null {
+  const fit = body.fit.RightHand;
+  const joint =
+    body.joints.find((j) => j.name === fit?.joint) ??
+    body.joints.find((j) => body.animation[j.name]?.includes('RightHand'));
+  if (!joint) return null;
+  const bone = skeleton.getBoneByName(nodeName(body, joint.name));
+  if (!bone) return null;
+  const at = new Vector3(...joint.at);
+  const parent = body.joints.find((j) => j.name === joint.parent);
+  const children = body.joints.filter((j) => j.parent === joint.name);
+  // From the wrist toward the fingers: the knuckles, or the way the arm runs into this joint.
+  const along = new Vector3();
+  for (const child of children) along.add(new Vector3(...child.at).sub(at).divideScalar(children.length));
+  const knuckles = along.length();
+  if (knuckles === 0 && parent) along.subVectors(at, new Vector3(...parent.at));
+  if (along.lengthSq() === 0) along.set(-1, 0, 0);
+  along.normalize();
+  const parts = body.parts.filter((part) => part.joint === joint.name);
+  let palm: Vector3;
+  if (fit) palm = new Vector3(...fit.box.center).sub(at);
+  else if (parts.length > 0) {
+    palm = new Vector3();
+    for (const part of parts) palm.add(new Vector3(...part.center).sub(at).divideScalar(parts.length));
+  } else palm = along.clone().multiplyScalar(knuckles * PALM_PAST_WRIST);
+  return { bone, palm, along };
+}
+
+/** How far the top of a rigged head is above its `Head` joint (the joint sits at the skull's base). */
+const RIGGED_HEAD = 0.22;
+
+/** The top of a body's head above its feet at rest: its highest block, or above a rigged head joint. */
+export function headTopOf(body: AvatarBody): number {
+  if (body.parts.length > 0) return Math.max(...body.parts.map((part) => part.center[1] + part.size[1] / 2));
+  const head = body.joints.find((joint) => joint.name === 'Head');
+  return (head?.at[1] ?? 1.6) + RIGGED_HEAD;
+}
+
+/** Red the whole avatar turns for a moment when hit (P9-12), mixed into its own glow. */
+const FLASH_RED = new Color(0xff2020);
+
+type Glowing = Material & { emissive?: Color; emissiveIntensity?: number; emissiveMap?: Texture | null };
+
+/**
+ * The red of a hit (P9-12) on an avatar's own material: its glow turns red and fully on (a model's
+ * glow may be off, `emissiveIntensity` 0, or come from a dark glow picture, which is set aside
+ * while red). Amount 0 puts back exactly what the material had; a material swapped out mid-flash
+ * gets its own glow back too. Nothing new is made per hit (a material set aside its glow picture
+ * once is ready for the next hit).
+ */
+export class HitTint {
+  readonly #own = new WeakMap<Material, { emissive: Color; intensity: number; map: Texture | null }>();
+  #tinted: Glowing | null = null;
+
+  apply(material: Material, amount: number): void {
+    const next = material as Glowing;
+    if (this.#tinted && this.#tinted !== next) this.#restore(this.#tinted);
+    this.#tinted = null;
+    if (!next.emissive) return;
+    let own = this.#own.get(next);
+    if (!own) {
+      own = {
+        emissive: next.emissive.clone(),
+        intensity: next.emissiveIntensity ?? 1,
+        map: next.emissiveMap ?? null,
+      };
+      this.#own.set(next, own);
+    }
+    if (amount <= 0) {
+      this.#restore(next);
+      return;
+    }
+    next.emissive.copy(own.emissive).lerp(FLASH_RED, amount);
+    if (next.emissiveIntensity !== undefined) next.emissiveIntensity = Math.max(own.intensity, 1);
+    if (next.emissiveMap) {
+      next.emissiveMap = null;
+      next.needsUpdate = true;
+    }
+    this.#tinted = next;
+  }
+
+  #restore(material: Glowing): void {
+    const own = this.#own.get(material);
+    if (!own || !material.emissive) return;
+    material.emissive.copy(own.emissive);
+    if (material.emissiveIntensity !== undefined) material.emissiveIntensity = own.intensity;
+    if (own.map && material.emissiveMap !== own.map) {
+      material.emissiveMap = own.map;
+      material.needsUpdate = true;
+    }
+  }
+}
+
+/** Seconds a knocked-out avatar takes to fall and fade away (P9-12). */
+export const DOWN_SECONDS = 1.2;
+/** Height of the chest pivot of a body lying on the ground (m). */
+const LYING_CHEST = 0.2;
+
+/**
+ * The knocked-out look at `amount` (0 = standing, 1 = gone; P9-12): the body falls backwards
+ * around the chest in the first part, lying on the ground, then fades out.
+ */
+export function downLook(amount: number): { tilt: number; drop: number; opacity: number } {
+  const a = Math.min(1, Math.max(0, amount));
+  const fall = Math.min(1, a / 0.45) ** 2;
+  // Fully there until 0.55, gone at 1.
+  const opacity = Math.min(1, (1 - a) / 0.45);
+  return { tilt: (-fall * Math.PI) / 2, drop: fall * (CHEST_HEIGHT - LYING_CHEST), opacity };
+}
+
+/**
+ * The fade of a knocked-out avatar on its own material: see-through while fading, and exactly its
+ * own `transparent` and `opacity` back at 1 (a model's material may be see-through by design).
+ */
+export class FadeLook {
+  readonly #own = new WeakMap<Material, { transparent: boolean; opacity: number }>();
+  #faded: Material | null = null;
+
+  apply(material: Material, opacity: number): void {
+    if (this.#faded && this.#faded !== material) this.#restore(this.#faded);
+    this.#faded = null;
+    let own = this.#own.get(material);
+    if (!own) {
+      own = { transparent: material.transparent, opacity: material.opacity };
+      this.#own.set(material, own);
+    }
+    if (opacity >= 1) {
+      this.#restore(material);
+      return;
+    }
+    if (!material.transparent) {
+      material.transparent = true;
+      material.needsUpdate = true;
+    }
+    material.opacity = own.opacity * opacity;
+    this.#faded = material;
+  }
+
+  #restore(material: Material): void {
+    const own = this.#own.get(material);
+    if (!own) return;
+    if (material.transparent !== own.transparent) {
+      material.transparent = own.transparent;
+      material.needsUpdate = true;
+    }
+    material.opacity = own.opacity;
+  }
+}
+
+/** Edge of the small cubes an avatar is drawn with in cube looks (P2-26), before fitting a part. */
+export const AVATAR_CUBE = 0.1;
+
+const {
+  abs,
+  attribute,
+  dot,
+  float,
+  floor,
+  fract,
+  min,
+  mix,
+  normalGeometry,
+  positionGeometry,
+  sin,
+  step,
+  vec3,
+  vertexColor,
+} = TSL;
+
+/**
+ * The avatar drawn as small cubes (Voxel places, decision 104): every body part is split into
+ * cells of about AVATAR_CUBE, fitted to the part's own edges, each a little lighter or darker than
+ * its neighbors, with a faint line between them. Only the material changes, so the skeleton and
+ * animations are the same as everywhere.
+ */
+function cubeMaterial(): Material {
+  const material = new MeshStandardNodeMaterial({ roughness: 0.85, metalness: 0, flatShading: true });
+  const cell = positionGeometry.sub(attribute('cellOrigin', 'vec3')).div(attribute('cellSize', 'vec3'));
+  const index = floor(cell);
+  // Cells along a face: the axis the face looks along does not split it.
+  const across = vec3(1).sub(abs(normalGeometry));
+  const random = fract(sin(dot(index, vec3(12.9898, 78.233, 37.719))).mul(43758.5453));
+  const tint = float(1).add(random.sub(0.5).mul(0.16));
+  const edge = min(fract(cell), vec3(1).sub(fract(cell)));
+  // Distance to the nearest line between cells on this face (faces ignore the axis they look along).
+  const near = min(min(mix(1, edge.x, across.x), mix(1, edge.y, across.y)), mix(1, edge.z, across.z));
+  const line = mix(0.85, 1, step(0.07, near));
+  material.colorNode = vertexColor().mul(tint).mul(line);
+  return material;
+}
+
+/** One skinned geometry for the whole body (one draw call); every vertex has a single bone. */
+function bodyGeometry(look: AvatarLook, body: AvatarBody): BufferGeometry {
+  const index = new Map(body.joints.map((joint, i) => [joint.name, i]));
+  const positions: number[] = [];
+  const normals: number[] = [];
+  const vertexColors: number[] = [];
+  const skinIndex: number[] = [];
+  const skinWeight: number[] = [];
+  const indices: number[] = [];
+  // Where each part's cells start and how big they are (cube looks fit whole cells to a part).
+  const cellOrigin: number[] = [];
+  const cellSize: number[] = [];
+  // Block parts exist only on Genvr's own bodies (an uploaded body is a mesh, with none). The body shown can be a
+  // stand-in for the look's body (Classic while a mesh body loads), so its own id is used.
+  if (isItemBodyId(body.id)) return new BufferGeometry();
+  for (const part of lookParts({ ...look, body: body.id, ...(body.scale ? { scale: body.scale } : {}) })) {
+    // The mouth is drawn as its own surface with the nine shapes (lip sync, P2-44); 2D bodies keep their block.
+    if (part.face === 'mouth' && !body.flat) continue;
+    const bone = index.get(part.joint);
+    if (bone === undefined) continue;
+    const box = new BoxGeometry(...part.size);
+    box.translate(...part.center);
+    const base = positions.length / 3;
+    const p = box.getAttribute('position');
+    const n = box.getAttribute('normal');
+    const color = new Color(part.color);
+    const size = part.size.map((s) => s / Math.max(1, Math.round(s / AVATAR_CUBE)));
+    const origin = part.size.map((s, axis) => part.center[axis]! - s / 2);
+    for (let i = 0; i < p.count; i += 1) {
+      cellOrigin.push(...origin);
+      cellSize.push(...size);
+      positions.push(p.getX(i), p.getY(i), p.getZ(i));
+      normals.push(n.getX(i), n.getY(i), n.getZ(i));
+      vertexColors.push(color.r, color.g, color.b);
+      skinIndex.push(bone, 0, 0, 0);
+      skinWeight.push(1, 0, 0, 0);
+    }
+    const boxIndex = box.getIndex()!;
+    for (let i = 0; i < boxIndex.count; i += 1) indices.push(base + boxIndex.getX(i));
+    box.dispose();
+  }
+  const geometry = new BufferGeometry();
+  geometry.setAttribute('position', new BufferAttribute(new Float32Array(positions), 3));
+  geometry.setAttribute('normal', new BufferAttribute(new Float32Array(normals), 3));
+  geometry.setAttribute('color', new BufferAttribute(new Float32Array(vertexColors), 3));
+  geometry.setAttribute('skinIndex', new BufferAttribute(new Uint16Array(skinIndex), 4));
+  geometry.setAttribute('skinWeight', new BufferAttribute(new Float32Array(skinWeight), 4));
+  geometry.setAttribute('cellOrigin', new BufferAttribute(new Float32Array(cellOrigin), 3));
+  geometry.setAttribute('cellSize', new BufferAttribute(new Float32Array(cellSize), 3));
+  geometry.setIndex(indices);
+  geometry.computeBoundingSphere();
+  return geometry;
+}
+
+/** The body's bones in joint order, parented and placed at their rest positions. */
+function buildSkeleton(body: AvatarBody): { root: Bone; skeleton: Skeleton } {
+  const byName = new Map<string, { bone: Bone; at: readonly number[] }>();
+  const bones = body.joints.map((joint) => {
+    const bone = new Bone();
+    bone.name = nodeName(body, joint.name);
+    const parent = joint.parent ? byName.get(joint.parent) : undefined;
+    if (parent) {
+      bone.position.set(
+        joint.at[0] - parent.at[0]!,
+        joint.at[1] - parent.at[1]!,
+        joint.at[2] - parent.at[2]!,
+      );
+      parent.bone.add(bone);
+    } else {
+      bone.position.set(...joint.at);
+    }
+    byName.set(joint.name, { bone, at: joint.at });
+    return bone;
+  });
+  return { root: bones[0]!, skeleton: new Skeleton(bones) };
+}
+
+export interface GenvrAvatar {
+  /** Add this to the scene; its position is the feet, rotation.y the facing. */
+  readonly root: Group;
+  /** Tilts the whole body (swimming) around the chest without changing the facing. */
+  readonly pose: Group;
+  readonly mesh: SkinnedMesh;
+  /** The current body type's skeleton and clips (they change with the body type). */
+  readonly skeleton: Skeleton;
+  readonly clips: AnimationClip[];
+  /** The worn body: a Genvr body, or a creator's uploaded body (its item id). */
+  readonly body: AvatarBody['id'];
+  /**
+   * Changes colors, worn items, body type, and size at once. Returns true when the skeleton was
+   * replaced (another body type or size): animators must bind to the new clips then.
+   */
+  setLook(look: AvatarLook): boolean;
+  /** Draws the avatar as small cubes (Voxel places) or with smooth blocks. */
+  setCubes(cubes: boolean): void;
+  /** Swings hair, coat panels, and tassels (bodies with springs); call after the clips each frame. */
+  updateSprings(delta: number): void;
+  /**
+   * Shows a mouth shape while the avatar speaks (lip sync, P2-44); `X` is at rest. Block bodies draw it, mesh bodies
+   * show it through their mouth blend shapes; bodies without either (2D bodies for now) ignore it.
+   */
+  setMouth(shape: MouthShape): void;
+  /** The mouth shape shown now (`X` at rest, and for bodies that cannot show one). */
+  readonly mouth: MouthShape;
+  /** Height of the top of the head above the feet at rest (m); follows the body type. */
+  readonly headTop: number;
+  /** Where the right hand holds things (null for bodies without a right arm); follows the body type. */
+  readonly rightHand: HandGrip | null;
+  /**
+   * Tints the whole avatar red by `amount` (0 = its own colors, 1 = full red; P9-12 hits). Changes
+   * the avatar's own material only, so nothing new is made per hit and nothing is drawn twice.
+   */
+  setFlash(amount: number): void;
+  /**
+   * Level of detail of a generated body: `full` near the camera, `lite` far away and on phones (the same body and
+   * skeleton with fewer triangles). Other bodies ignore it.
+   */
+  setDetail(detail: 'full' | 'lite'): void;
+  /**
+   * The knocked-out look (P9-12): 0 stands, up to 1 fallen and faded out (see `downLook`). While
+   * above 0 it owns the body's tilt, so callers leave `pose.rotation` alone.
+   */
+  setDown(amount: number): void;
+  readonly down: number;
+  dispose(): void;
+}
+
+// ---------------------------------------------------------------------------------------------
+// Mesh bodies (decision 111, P2-35): a skinned 3D model bound to the body's own skeleton.
+// ---------------------------------------------------------------------------------------------
+
+interface BodyModel {
+  geometry: BufferGeometry;
+  material: Material;
+  /** The model's morph target names (its blend shapes), by index. */
+  morphs?: Record<string, number>;
+  /** How the model's mouth blend shapes show the nine mouth shapes (lip sync P2-44); null without them. */
+  mouth: MouthMorphs | null;
+  /** Our generated body's baked data, for its shape variants (geometry by rounded Anime Shape and build). */
+  human?: { data: HumanData; variants: Map<string, BufferGeometry> };
+}
+
+/** Most generated shape variants kept per body (the oldest unused goes first; editor sliders make many). */
+const MAX_HUMAN_VARIANTS = 24;
+const step20 = (value: number) => Math.round(value * 20) / 20;
+
+/**
+ * The geometry of a generated body for its Anime Shape and build (values in steps of 0.05, each variant made once
+ * and kept while avatars use it).
+ */
+function humanVariant(model: BodyModel, look: Pick<AvatarLook, 'animeShape' | 'build'>): BufferGeometry {
+  const anime = step20(Math.min(1, Math.max(0, look.animeShape ?? 0)));
+  const build = Object.fromEntries(
+    Object.entries(look.build ?? {})
+      .map(([key, value]) => [key, step20(value)] as const)
+      .filter(([, value]) => value !== 0)
+      .sort(([a], [b]) => a.localeCompare(b)),
+  );
+  const key = JSON.stringify([anime, build]);
+  if (!model.human || key === '[0,{}]') return model.geometry;
+  let geometry = model.human.variants.get(key);
+  if (geometry) {
+    model.human.variants.delete(key);
+  } else {
+    geometry = humanGeometry(model.human.data, 'anime', 'boy', anime, build);
+    if (model.human.variants.size >= MAX_HUMAN_VARIANTS) {
+      // Drop the oldest variant no avatar draws any more (the stage and players keep theirs).
+      for (const [old, kept] of model.human.variants)
+        if (!kept.userData.users) {
+          model.human.variants.delete(old);
+          kept.dispose();
+          break;
+        }
+    }
+  }
+  model.human.variants.set(key, geometry);
+  return geometry;
+}
+
+/** The full-detail geometry behind a generated body's geometry (its lighter level of detail points back to it). */
+const fullOf = (geometry: BufferGeometry): BufferGeometry =>
+  (geometry.userData.full as BufferGeometry | undefined) ?? geometry;
+
+/** Hair, eyebrows and beards (HAIR-01): loaded proxies by url, and their fit per shaped body geometry. */
+const humanProxies = new Map<string, HumanProxy>();
+const fittedProxies = new WeakMap<BufferGeometry, Map<string, BufferGeometry>>();
+const fittedProxy = (body: BufferGeometry, proxy: HumanProxy): BufferGeometry => {
+  let fits = fittedProxies.get(body);
+  if (!fits) fittedProxies.set(body, (fits = new Map()));
+  let fit = fits.get(proxy.id);
+  if (!fit) fits.set(proxy.id, (fit = fitHumanProxy(proxy, body)));
+  return fit;
+};
+
+/** Loaded models by body id, shared by every avatar that wears the body. */
+const bodyModels = new Map<string, BodyModel>();
+const bodyLoads = new Map<string, Promise<BodyModel | null>>();
+
+/**
+ * A model's skinned geometry bound to the body's own skeleton: vertices moved to their bind
+ * position (the model's T-pose rest) and each skin index pointed at the body joint with the same
+ * bone name (glTF drops the `:` of `mixamorig:Hips`, like our node names). Unknown bones fall to
+ * the root.
+ */
+export function bindModelGeometry(
+  body: AvatarBody,
+  source: BufferGeometry,
+  boneNames: readonly string[],
+  bindMatrix?: Matrix4,
+): BufferGeometry {
+  const clean = (name: string) => name.replace(/[^A-Za-z0-9_]/g, '');
+  const index = new Map(body.joints.map((joint, i) => [clean(nodeName(body, joint.name)), i]));
+  const remap = boneNames.map((name) => index.get(clean(name)) ?? 0);
+  const geometry = source.clone();
+  if (bindMatrix) {
+    geometry.applyMatrix4(bindMatrix);
+    // Blend shapes are offsets: they turn and scale with the model, they do not move with it.
+    const linear = new Matrix3().setFromMatrix4(bindMatrix);
+    const normals = new Matrix3().getNormalMatrix(bindMatrix);
+    const offset = new Vector3();
+    const turn = (attributes: BufferAttribute[] | undefined, matrix: Matrix3) => {
+      for (const attribute of attributes ?? [])
+        for (let i = 0; i < attribute.count; i += 1) {
+          offset.fromBufferAttribute(attribute, i).applyMatrix3(matrix);
+          attribute.setXYZ(i, offset.x, offset.y, offset.z);
+        }
+    };
+    if (geometry.morphTargetsRelative) {
+      turn(geometry.morphAttributes.position as BufferAttribute[] | undefined, linear);
+      turn(geometry.morphAttributes.normal as BufferAttribute[] | undefined, normals);
+    }
+  }
+  const skin = geometry.getAttribute('skinIndex');
+  const indices = new Uint16Array(skin.count * 4);
+  for (let i = 0; i < skin.count; i += 1)
+    for (let k = 0; k < 4; k += 1) indices[i * 4 + k] = remap[skin.getComponent(i, k)] ?? 0;
+  geometry.setAttribute('skinIndex', new BufferAttribute(indices, 4));
+  return geometry;
+}
+
+/** Loads a mesh body's model once (null for block bodies or when it cannot be loaded). */
+export function loadBodyModel(body: AvatarBody): Promise<BodyModel | null> {
+  if (!body.model) return Promise.resolve(null);
+  const ready = bodyModels.get(body.id);
+  if (ready) return Promise.resolve(ready);
+  let load = bodyLoads.get(body.id);
+  if (!load && body.generated === 'human') {
+    // Our own generated body (CHAR-02): the baked data is read by our generator; joints are already in body order.
+    load = loadHumanData(body.model)
+      .then((data) => {
+        const model: BodyModel = {
+          geometry: humanGeometry(data),
+          material: humanMaterial(),
+          mouth: null,
+          human: { data, variants: new Map() },
+        };
+        bodyModels.set(body.id, model);
+        return model;
+      })
+      .catch(() => null);
+    bodyLoads.set(body.id, load);
+  }
+  if (!load) {
+    load = createGltfLoader()
+      .loadAsync(body.model)
+      .then((gltf) => {
+        let skinned: SkinnedMesh | undefined;
+        gltf.scene.updateMatrixWorld(true);
+        gltf.scene.traverse((object) => {
+          if (!skinned && (object as SkinnedMesh).isSkinnedMesh) skinned = object as SkinnedMesh;
+        });
+        if (!skinned) return null;
+        const model: BodyModel = {
+          geometry: bindModelGeometry(
+            body,
+            skinned.geometry,
+            skinned.skeleton.bones.map((bone) => bone.name),
+            skinned.bindMatrix,
+          ),
+          material: skinned.material as Material,
+          ...(skinned.morphTargetDictionary ? { morphs: { ...skinned.morphTargetDictionary } } : {}),
+          mouth: mouthMorphs(skinned.morphTargetDictionary),
+        };
+        bodyModels.set(body.id, model);
+        return model;
+      })
+      .catch(() => null);
+    bodyLoads.set(body.id, load);
+  }
+  return load;
+}
+
+// Uploaded bodies (2026-10-03): a creator's body item, resolved through the app (its data and model link), then
+// worn like any mesh body. Classic stands in until it is known and its model has loaded.
+
+const itemBodies = new Map<string, AvatarBody>();
+const itemBodyLoads = new Map<string, Promise<AvatarBody | null>>();
+let itemBodyResolver: ((id: string) => Promise<AvatarBody | null>) | null = null;
+
+/** How the app turns a body item id into a body (the place's body route and `bodyFromItem`); null: unknown. */
+export function setItemBodyResolver(resolver: ((id: string) => Promise<AvatarBody | null>) | null): void {
+  itemBodyResolver = resolver;
+}
+
+/** A body item, asked for once (null when the app cannot resolve it: it stays Classic). */
+function loadItemBody(id: string): Promise<AvatarBody | null> {
+  const known = itemBodies.get(id);
+  if (known) return Promise.resolve(known);
+  let load = itemBodyLoads.get(id);
+  if (!load) {
+    load = (itemBodyResolver ? itemBodyResolver(id) : Promise.resolve(null))
+      .then((body) => {
+        if (body) itemBodies.set(id, body);
+        else itemBodyLoads.delete(id);
+        return body;
+      })
+      .catch(() => {
+        itemBodyLoads.delete(id);
+        return null;
+      });
+    itemBodyLoads.set(id, load);
+  }
+  return load;
+}
+
+/** The body a look asks for: one of Genvr's at its size, or a known uploaded body (null while it is not known). */
+function lookBody(look: AvatarLook): AvatarBody | null {
+  return look.body && isItemBodyId(look.body)
+    ? (itemBodies.get(look.body) ?? null)
+    : sizedBody(look.body, look.scale);
+}
+
+/** Loads the model of a look's body (if it has one) before an avatar wears it. */
+export async function preloadAvatarLook(look: AvatarLook): Promise<void> {
+  const body = look.body && isItemBodyId(look.body) ? await loadItemBody(look.body) : findBody(look.body);
+  if (body) await loadBodyModel(body);
+}
+
+/** Height of the pivot the body tilts around when swimming. */
+const CHEST_HEIGHT = 1.2;
+/** Forward tilt of the body while swimming (radians). */
+export const SWIM_TILT = 1.5;
+/**
+ * Clips played lying in the water and their tilt: the crawl almost flat on the surface (reference sheet: 2-3
+ * degrees off flat), the breaststroke a little more upright for the breath.
+ */
+export const SWIM_CLIPS: ReadonlyMap<string, number> = new Map([
+  ['Swim', 1.518], // 3 degrees off flat
+  ['SwimBreast', 1.484], // 5 degrees off flat
+]);
+/** The body's forward tilt a clip is played with. */
+export const clipTilt = (clip: string | null | undefined): number => (clip ? (SWIM_CLIPS.get(clip) ?? 0) : 0);
+
+/** Builds the Genvr avatar with its animation clips. */
+export function createGenvrAvatar(
+  look: AvatarLook = DEFAULT_LOOK,
+  options: {
+    cubes?: boolean;
+    /** Called when a mesh body's model arrives and replaces the stand-in: rebind the animator. */
+    onBodyReady?: () => void;
+  } = {},
+): GenvrAvatar {
+  const smooth = new MeshStandardMaterial({ vertexColors: true, roughness: 0.75, flatShading: true });
+  let cubes: Material | null = options.cubes ? cubeMaterial() : null;
+  let material: Material = cubes ?? smooth;
+  /** Level of detail of a generated body (`setDetail`). */
+  let detail: 'full' | 'lite' = 'full';
+  /** A skinned mesh with its own skeleton; a new body type gets a new mesh (GPU buffers fit it). */
+  const makeMesh = (current: AvatarBody, next: AvatarLook) => {
+    const { root: rootBone, skeleton } = buildSkeleton(current);
+    // A mesh body draws its shared model with its own texture (never cubes: it is not blocks).
+    const model = bodyModels.get(current.id);
+    // A mesh body's shared material is copied once per avatar, so a hit tints only this avatar.
+    // Our generated body gets a fresh material per avatar (its colours are uniforms a clone would share).
+    const made = model
+      ? new SkinnedMesh(
+          current.generated === 'human' ? humanDetail(humanVariant(model, next), detail) : model.geometry,
+          current.generated === 'human'
+            ? humanMaterial(
+                next.skin,
+                next.pants,
+                findSkinMaterial(next.skinMaterial),
+                humanVariant(model, next).userData.face as Record<string, [number, number, number]> | undefined,
+              )
+            : model.material.clone(),
+        )
+      : new SkinnedMesh(bodyGeometry(next, current), material);
+    // The model's blend shapes by name (the mouth's shapes, lip sync P2-44), all at rest.
+    if (model?.morphs) {
+      made.morphTargetDictionary = { ...model.morphs };
+      made.morphTargetInfluences = new Array<number>(model.geometry.morphAttributes.position?.length ?? 0).fill(0);
+    }
+    mouthMorphTable = model?.mouth ?? null;
+    if (mouthMorphTable && made.morphTargetInfluences)
+      applyMouthMorphs(made.morphTargetInfluences, mouthMorphTable, mouthShape);
+    made.userData.sharedGeometry = Boolean(model);
+    // Generated shape variants count their meshes, so the cache only drops unused ones.
+    if (current.generated === 'human') {
+      const full = fullOf(made.geometry);
+      full.userData.users = (full.userData.users ?? 0) + 1;
+    }
+    made.userData.ownMaterial = Boolean(model);
+    // Kept apart from `material`: the editor swaps in view materials (clay, wireframe) and back.
+    if (current.generated === 'human') made.userData.humanMaterial = made.material;
+    made.name = 'avatar-body';
+    made.castShadow = true;
+    made.frustumCulled = false;
+    made.add(rootBone);
+    // A model kept in its own pose (the warrior's A-pose) binds with its joints turned into that
+    // pose, then the joints go back to the T-pose the clips start from (P2-35).
+    const bent = model ? current.joints.filter((joint) => joint.bind) : [];
+    for (const joint of bent)
+      skeleton.getBoneByName(nodeName(current, joint.name))?.quaternion.set(...joint.bind!);
+    made.bind(skeleton);
+    for (const joint of bent) skeleton.getBoneByName(nodeName(current, joint.name))?.quaternion.identity();
+    // Our generated body keeps its volume at the shoulders and hips (CHAR-02), and wears the anime outline: the
+    // same skin drawn again from its back faces, pushed out, on the same skeleton.
+    if (current.generated === 'human') {
+      // The drawn mouth's opening also opens the jaw (the face.mouth-open shape), on the body and the outline.
+      const mouthOpen = ((made.material as Material).userData.face as FaceUniforms).mouthOpen;
+      useDualQuaternionSkinning(made, undefined, mouthOpen);
+      const outline = new SkinnedMesh(made.geometry, humanOutlineMaterial(made.material as Material));
+      outline.name = 'avatar-outline';
+      outline.frustumCulled = false;
+      outline.castShadow = false;
+      outline.bind(skeleton, made.bindMatrix);
+      useDualQuaternionSkinning(outline, OUTLINE, mouthOpen);
+      made.add(outline);
+      made.userData.outline = outline;
+    }
+    // The mouth of a block body: a small surface on the head with the nine shapes (lip sync, P2-44).
+    mouthMesh?.dispose();
+    mouthMesh = null;
+    const mouthPart =
+      model || current.flat || isItemBodyId(current.id)
+        ? undefined
+        : lookParts({ ...next, body: current.id, ...(current.scale ? { scale: current.scale } : {}) }).find(
+            (part) => part.face === 'mouth',
+          );
+    const head = mouthPart ? skeleton.getBoneByName(nodeName(current, mouthPart.joint)) : undefined;
+    const headAt = mouthPart ? current.joints.find((joint) => joint.name === mouthPart.joint)?.at : undefined;
+    if (mouthPart && head && headAt) {
+      mouthMesh = createMouth(mouthPart.size);
+      mouthMesh.mesh.position.set(
+        mouthPart.center[0] - headAt[0],
+        mouthPart.center[1] - headAt[1],
+        mouthPart.center[2] - headAt[2] + mouthPart.size[2] / 2 + MOUTH_GAP,
+      );
+      mouthMesh.setShape(mouthShape);
+      head.add(mouthMesh.mesh);
+    }
+    made.position.y = -CHEST_HEIGHT;
+    springs =
+      model && current.springs
+        ? new SpringBones(skeleton, current.springs.chains, current.springs.colliders, (joint) =>
+            nodeName(current, joint),
+          )
+        : null;
+    return made;
+  };
+  let springs: SpringBones | null = null;
+  let mouthMesh: MouthMesh | null = null;
+  let mouthMorphTable: MouthMorphs | null = null;
+  let mouthShape: MouthShape = 'X';
+  /**
+   * The body for a look: Genvr's at once; an uploaded one once the app resolved it. Until then Classic stands in, and
+   * the avatar swaps when it is known (and its model loaded, see `shown`).
+   */
+  const resolve = (next: AvatarLook): AvatarBody => {
+    const known = lookBody(next);
+    if (known) return known;
+    const id = next.body!;
+    void loadItemBody(id).then((itemBody) => {
+      if (!itemBody || wantedLook.body !== id) return;
+      wanted = itemBody;
+      const ready = shown(itemBody);
+      if (ready === body) return;
+      swap(ready, wantedLook);
+      options.onBodyReady?.();
+    });
+    return sizedBody('classic', next.scale);
+  };
+  let wanted = resolve(look);
+  let wantedLook = look;
+  /** The body shown for a wanted one: a mesh body stands in as Classic until its model loads. */
+  const shown = (next: AvatarBody): AvatarBody => {
+    if (!next.model || bodyModels.has(next.id)) return next;
+    void loadBodyModel(next).then((model) => {
+      if (!model || wanted !== next || body === next) return;
+      swap(next, wantedLook);
+      options.onBodyReady?.();
+    });
+    return sizedBody('classic', wantedLook.scale);
+  };
+  const swap = (next: AvatarBody, nextLook: AvatarLook) => {
+    body = next;
+    const old = mesh;
+    mesh = makeMesh(body, nextLook);
+    mesh.visible = old.visible;
+    pose.remove(old);
+    pose.add(mesh);
+    if (!old.userData.sharedGeometry) old.geometry.dispose();
+    else if (fullOf(old.geometry).userData.users) fullOf(old.geometry).userData.users -= 1;
+    if (old.userData.ownMaterial) (old.material as Material).dispose();
+    ((old.userData.outline as SkinnedMesh | undefined)?.material as Material | undefined)?.dispose();
+    grip = null;
+    applyFlash();
+    syncHair();
+  };
+  /** The right hand of the current skeleton, worked out once per body (null: not yet; undefined: none). */
+  let grip: HandGrip | null | undefined = null;
+  let flash = 0;
+  const tint = new HitTint();
+  let down = 0;
+  const fade = new FadeLook();
+  const applyFlash = () => {
+    tint.apply(mesh.material as Material, flash);
+    fade.apply(mesh.material as Material, downLook(down).opacity);
+  };
+  let body = shown(wanted);
+  let mesh = makeMesh(body, look);
+  /**
+   * Hair, eyebrows and beard of a generated body (HAIR-01): one skinned mesh each on the body's skeleton, fitted to
+   * the body as shaped now (a new shape refits them), coloured with the look's hair colour. Loaded on first use.
+   */
+  const hairParts = new Map<string, SkinnedMesh>();
+  let disposed = false;
+  const syncHair = () => {
+    const ids =
+      body.generated === 'human' && body.model
+        ? (Object.values(wantedLook.humanHair ?? {}).filter(Boolean) as string[])
+        : [];
+    const full = fullOf(mesh.geometry);
+    for (const [id, part] of hairParts)
+      if (!ids.includes(id) || part.userData.fitFor !== full || part.parent !== mesh) {
+        part.removeFromParent();
+        (part.material as Material).dispose();
+        hairParts.delete(id);
+      }
+    if (!ids.length) return;
+    const base = body.model!.replace(/[^/]*$/, '');
+    for (const id of ids) {
+      const shown = hairParts.get(id);
+      if (shown) {
+        setHumanHairColor(shown.material as MeshStandardNodeMaterial, wantedLook.hair);
+        continue;
+      }
+      const proxy = humanProxies.get(base + id);
+      if (!proxy) {
+        void loadHumanProxy(base, id)
+          .then((loaded) => {
+            humanProxies.set(base + id, loaded);
+            if (!disposed) syncHair();
+          })
+          .catch(() => {});
+        continue;
+      }
+      const part = new SkinnedMesh(fittedProxy(full, proxy), humanHairMaterial(base, proxy, wantedLook.hair));
+      part.name = `avatar-${proxy.kind}`;
+      part.frustumCulled = false;
+      part.castShadow = true;
+      part.bind(mesh.skeleton, mesh.bindMatrix);
+      useDualQuaternionSkinning(part);
+      part.userData.fitFor = full;
+      mesh.add(part);
+      hairParts.set(id, part);
+    }
+  };
+  syncHair();
+  const root = new Group();
+  root.name = 'avatar';
+  // A second group lets swimming tilt the body around the chest without turning the facing.
+  const pose = new Group();
+  pose.name = 'avatar-pose';
+  pose.position.y = CHEST_HEIGHT;
+  pose.add(mesh);
+  root.add(pose);
+  return {
+    root,
+    pose,
+    get mesh() {
+      return mesh;
+    },
+    get skeleton() {
+      return mesh.skeleton;
+    },
+    get headTop() {
+      return headTopOf(body);
+    },
+    get rightHand() {
+      if (grip === null) grip = rightHandGrip(body, mesh.skeleton) ?? undefined;
+      return grip ?? null;
+    },
+    setDetail(next) {
+      if (next === detail) return;
+      detail = next;
+      if (body.generated !== 'human') return;
+      const geometry = humanDetail(fullOf(mesh.geometry), detail);
+      mesh.geometry = geometry;
+      const outline = mesh.userData.outline as SkinnedMesh | undefined;
+      if (outline) outline.geometry = geometry;
+    },
+    setFlash(amount) {
+      if (amount === flash) return;
+      flash = amount;
+      applyFlash();
+    },
+    get down() {
+      return down;
+    },
+    setDown(amount) {
+      if (amount === down) return;
+      down = amount;
+      const look = downLook(amount);
+      pose.rotation.x = look.tilt;
+      pose.position.y = CHEST_HEIGHT - look.drop;
+      mesh.visible = look.opacity > 0;
+      applyFlash();
+    },
+    get clips() {
+      return avatarClips(body);
+    },
+    get body() {
+      return body.id;
+    },
+    setLook(next) {
+      wantedLook = next;
+      wanted = resolve(next);
+      const nextBody = shown(wanted);
+      if (nextBody !== body) {
+        // Another body type or size: another skeleton, so a new mesh in the same place.
+        swap(nextBody, next);
+        return true;
+      }
+      // Our generated body takes the skin and bottom colours (CHAR-02); other mesh bodies keep their texture.
+      if (body.generated === 'human') {
+        // A fantasy skin is its own material (a pattern compiled into it): a new one means a new mesh.
+        const own = mesh.userData.humanMaterial as Material;
+        const model = bodyModels.get(body.id);
+        if (
+          (own.userData.skinMaterial ?? '') !== (findSkinMaterial(next.skinMaterial)?.id ?? '') ||
+          (model && humanVariant(model, next) !== fullOf(mesh.geometry))
+        ) {
+          swap(body, next);
+          return true;
+        }
+        setHumanColors(own, next.skin, next.pants);
+        syncHair();
+        return false;
+      }
+      // A mesh body keeps its model; colors and block clothing do not apply to it yet.
+      if (body.model) return false;
+      const old = mesh.geometry;
+      mesh.geometry = bodyGeometry(next, body);
+      old.dispose();
+      return false;
+    },
+    setMouth(shape) {
+      mouthShape = shape;
+      // Our generated body draws its mouth in the material.
+      if (mesh.userData.humanMaterial) setHumanMouth(mesh.userData.humanMaterial as Material, shape);
+      mouthMesh?.setShape(shape);
+      if (mouthMorphTable && mesh.morphTargetInfluences)
+        applyMouthMorphs(mesh.morphTargetInfluences, mouthMorphTable, shape);
+    },
+    get mouth() {
+      return mouthMesh || mouthMorphTable || mesh.userData.humanMaterial ? mouthShape : 'X';
+    },
+    updateSprings(delta) {
+      springs?.update(delta);
+    },
+    setCubes(on) {
+      if (on) cubes ??= cubeMaterial();
+      material = on ? cubes! : smooth;
+      if (!body.model) mesh.material = material;
+      applyFlash();
+    },
+    dispose() {
+      disposed = true;
+      for (const part of hairParts.values()) (part.material as Material).dispose();
+      mouthMesh?.dispose();
+      if (!mesh.userData.sharedGeometry) mesh.geometry.dispose();
+      else if (fullOf(mesh.geometry).userData.users) fullOf(mesh.geometry).userData.users -= 1;
+      if (mesh.userData.ownMaterial) (mesh.material as Material).dispose();
+      ((mesh.userData.outline as SkinnedMesh | undefined)?.material as Material | undefined)?.dispose();
+      smooth.dispose();
+      cubes?.dispose();
+    },
+  };
+}
+
+// ---------------------------------------------------------------------------------------------
+// Animation clips: keyframe data from the Core Library (avatar-appearance), turned into clips.
+// ---------------------------------------------------------------------------------------------
+
+const toRadians = (degrees: number) => (degrees * Math.PI) / 180;
+const X_AXIS = new Vector3(1, 0, 0);
+const Z_AXIS = new Vector3(0, 0, 1);
+
+/** Arm raise (degrees above hanging) where the collarbone starts to lift, its share, and its limit. */
+export const SHOULDER_LIFT = { from: 45, share: 0.35, max: 40 };
+
+/** Curl of each finger segment (1, 2, 3) at a full grip, degrees; the thumb curls less. */
+export const FINGER_CURL = { finger: [70, 95, 65], thumb: [20, 35, 40] };
+const FINGER = /^(Left|Right)Hand(Thumb|Index|Middle|Ring|Pinky)([123])$/;
+const PALM = new Vector3(0, -1, 0);
+
+/**
+ * Finger tracks of a body with finger bones (owner, CHAR-02: the hands should move their fingers): every segment
+ * turns toward the palm by the key's grip (palms face down in the T-pose rest, rest frames are world-aligned, so
+ * the axis is the segment direction crossed with the palm normal).
+ */
+function fingerTracks(animation: AnimationItem, keys: readonly Key[], body: AvatarBody): QuaternionKeyframeTrack[] {
+  if (body.flat) return [];
+  const at = new Map(body.joints.map((joint) => [joint.name, new Vector3(...joint.at)]));
+  const tracks: QuaternionKeyframeTrack[] = [];
+  for (const joint of body.joints) {
+    const match = FINGER.exec(joint.name);
+    if (!match) continue;
+    const [, side, finger, segment] = match;
+    const child = body.joints.find((one) => one.parent === joint.name);
+    const from = child ? at.get(joint.name)! : at.get(joint.parent!)!;
+    const to = child ? at.get(child.name)! : at.get(joint.name)!;
+    const direction = to.clone().sub(from).normalize();
+    // The thumb lies along the front of the hand: it folds in across the palm (toward the back, -z) as well as down.
+    const palm = finger === 'Thumb' ? new Vector3(0, -0.6, -1).normalize() : PALM;
+    void side;
+    const axis = direction.clone().cross(palm).normalize();
+    if (axis.lengthSq() < 0.5) continue;
+    const full = (finger === 'Thumb' ? FINGER_CURL.thumb : FINGER_CURL.finger)[Number(segment) - 1]!;
+    const values: number[] = [];
+    const q = new Quaternion();
+    for (const [, pose] of keys) {
+      const grip = pose.grip ?? animation.grip ?? RELAXED_GRIP;
+      q.setFromAxisAngle(axis, toRadians(full * grip));
+      values.push(q.x, q.y, q.z, q.w);
+    }
+    tracks.push(new QuaternionKeyframeTrack(`${nodeName(body, joint.name)}.quaternion`, keys.map(([t]) => t), values));
+  }
+  return tracks;
+}
+
+/** True when a body has a collarbone joint of its own, apart from the upper arm (mesh bodies). */
+function hasOwnShoulders(body: AvatarBody): boolean {
+  if (body.flat) return false;
+  const joints = Object.entries(body.animation);
+  const of = (bone: RigBone) => joints.find(([, sources]) => sources.includes(bone))?.[0];
+  const shoulder = of('LeftShoulder');
+  return shoulder !== undefined && shoulder !== of('LeftArm');
+}
+
+/**
+ * A key with the collarbones lifted as the arms go up (owner, CHAR-02: shoulders pinched and thinned in Wave and
+ * Cheer because no clip turned the Shoulder bone). The upper arm is turned back by the same amount, so the arm
+ * still points where the clip says; only the shoulder joint rises with it, as a real shoulder blade does.
+ */
+function withShoulders([time, pose]: Key): Key {
+  const next: Pose = { ...pose };
+  const arm = new Quaternion();
+  const lift = new Quaternion();
+  const e = new Euler();
+  const direction = new Vector3();
+  for (const [side, sign] of [
+    ['Left', 1],
+    ['Right', -1],
+  ] as const) {
+    const angles = pose[`${side}Arm`];
+    if (!angles) continue;
+    arm.setFromEuler(e.set(toRadians(angles[0]), toRadians(angles[1]), toRadians(angles[2]), 'XYZ'));
+    direction.set(sign, 0, 0).applyQuaternion(arm);
+    const raised = (Math.acos(Math.min(1, Math.max(-1, -direction.y))) * 180) / Math.PI;
+    const degrees = Math.min(SHOULDER_LIFT.max, Math.max(0, (raised - SHOULDER_LIFT.from) * SHOULDER_LIFT.share));
+    if (degrees <= 0) continue;
+    lift.setFromAxisAngle(Z_AXIS, toRadians(degrees * sign));
+    const own = pose[`${side}Shoulder`] ?? [0, 0, 0];
+    const shoulder = new Quaternion()
+      .setFromEuler(e.set(toRadians(own[0]), toRadians(own[1]), toRadians(own[2]), 'XYZ'))
+      .multiply(lift);
+    arm.premultiply(lift.invert());
+    const toDegrees = (q: Quaternion): V3 => {
+      e.setFromQuaternion(q, 'XYZ');
+      return [(e.x * 180) / Math.PI, (e.y * 180) / Math.PI, (e.z * 180) / Math.PI];
+    };
+    next[`${side}Shoulder`] = toDegrees(shoulder);
+    next[`${side}Arm`] = toDegrees(arm);
+  }
+  return [time, next];
+}
+
+/**
+ * A library animation as a clip of a body type. Each joint takes the rotations of the standard
+ * bones mapped to it, combined parent first (all rest frames are aligned, so this is exact);
+ * joints without animated bones stay at rest.
+ */
+export function clipFromAnimation(
+  animation: AnimationItem,
+  body: AvatarBody = findBody('starter'),
+): AnimationClip {
+  const keys = hasOwnShoulders(body) ? animation.keys.map(withShoulders) : animation.keys;
+  const used = new Set<string>();
+  for (const [, pose] of keys) for (const bone of Object.keys(pose)) used.add(bone);
+  const tracks: Array<QuaternionKeyframeTrack | VectorKeyframeTrack> = [];
+  const q = new Quaternion();
+  const part = new Quaternion();
+  const e = new Euler();
+  for (const [joint, sources] of Object.entries(body.animation)) {
+    if (!sources.some((bone) => used.has(bone))) continue;
+    const values: number[] = [];
+    for (const [, pose] of keys) {
+      q.identity();
+      if (body.flat) {
+        // A flat 2D body turns each joint in its own plane only (decision 93).
+        const degrees = sources.reduce((sum, bone) => sum + planarAngle(bone, pose[bone] ?? [0, 0, 0]), 0);
+        q.setFromAxisAngle(X_AXIS, toRadians(degrees));
+      } else
+        for (const bone of sources) {
+          // Bones missing from a key keep the rest rotation at that time.
+          const [x, y, z] = pose[bone] ?? [0, 0, 0];
+          e.set(toRadians(x), toRadians(y), toRadians(z), 'XYZ');
+          q.multiply(part.setFromEuler(e));
+        }
+      values.push(q.x, q.y, q.z, q.w);
+    }
+    tracks.push(
+      new QuaternionKeyframeTrack(
+        `${nodeName(body, joint)}.quaternion`,
+        keys.map(([t]) => t),
+        values,
+      ),
+    );
+  }
+  tracks.push(...fingerTracks(animation, keys, body));
+  if (keys.some(([, pose]) => pose.hipsY !== undefined)) {
+    const rootJoint = body.joints[0]!;
+    const [x, y, z] = rootJoint.at;
+    tracks.push(
+      new VectorKeyframeTrack(
+        `${nodeName(body, rootJoint.name)}.position`,
+        keys.map(([t]) => t),
+        keys.flatMap(([, pose]) => [x, y + (pose.hipsY ?? 0) * (body.scale?.height ?? 1), z]),
+      ),
+    );
+  }
+  return new AnimationClip(animation.clip, animation.duration, tracks);
+}
+
+const clipCache = new WeakMap<AvatarBody, AnimationClip[]>();
+
+/** Every Core animation (movement clips and player moves) as clips of a body type (shared). */
+function avatarClips(body: AvatarBody): AnimationClip[] {
+  let clips = clipCache.get(body);
+  if (!clips) {
+    clips = CORE_ANIMATIONS.map((animation) => clipFromAnimation(animation, body));
+    clipCache.set(body, clips);
+  }
+  return clips;
+}
+
+/** Every Core animation as clips of a body type (Classic when not given). */
+export const createAvatarClips = (body?: AvatarBodyType): AnimationClip[] => avatarClips(findBody(body));
+
+/** Rest position of a joint (world, T-pose), e.g. for tests and attachment points. */
+export function restPosition(joint: string, body?: AvatarBodyType): Vector3 {
+  const found = findBody(body ?? 'starter').joints.find((entry) => entry.name === joint);
+  return found ? new Vector3(...found.at) : new Vector3();
+}

@@ -1,0 +1,32 @@
+{
+  "name": "@genvr/assistant",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Build assistant: tool definitions made from world commands and the tool loop (model injected). Runs in the browser, workers, and tests.",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@genvr/contracts": "workspace:*",
+    "@genvr/core-library": "workspace:*",
+    "@genvr/script": "workspace:*",
+    "@genvr/validator": "workspace:*",
+    "@genvr/world": "workspace:*",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "vitest": "^5.0.1"
+  }
+}

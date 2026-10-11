@@ -1,0 +1,20 @@
+{
+  "name": "3d-world-sdk-source",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.24.0",
+  "engines": {
+    "node": ">=24"
+  },
+  "devDependencies": {
+    "@dgreenheck/ez-tree": "1.1.0",
+    "@types/node": "^26.6.2",
+    "tsx": "^4.23.15",
+    "typescript": "^6.0.3",
+    "vitest": "^5.0.1"
+  },
+  "scripts": {
+    "build": "pnpm --filter @genvr/world-sdk... build",
+    "pack": "pnpm --filter @genvr/world-sdk pack:standalone"
+  }
+}

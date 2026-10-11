@@ -1,0 +1,39 @@
+{
+  "name": "@genvr/script",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Creator script sandbox: QuickJS-ng (WASM) runtimes with memory, stack and time limits, the runner and the dry-run harness.",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./node": {
+      "types": "./dist/node.d.ts",
+      "default": "./dist/node.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run --no-file-parallelism",
+    "bench": "tsx test/measure.bench.ts",
+    "bench:worker": "tsx test/worker.bench.ts"
+  },
+  "dependencies": {
+    "@genvr/contracts": "workspace:*",
+    "@genvr/core-library": "workspace:*",
+    "@genvr/game": "workspace:*",
+    "@jitl/quickjs-ffi-types": "0.32.0",
+    "@jitl/quickjs-ng-wasmfile-release-sync": "0.32.0",
+    "quickjs-emscripten-core": "0.32.0"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.2",
+    "vitest": "^5.0.1"
+  }
+}

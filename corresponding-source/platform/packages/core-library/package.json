@@ -1,0 +1,28 @@
+{
+  "name": "@genvr/core-library",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Genvr Core Library: free built-in materials, environment, kits.",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.2",
+    "vitest": "^5.0.1"
+  },
+  "dependencies": {
+    "@genvr/contracts": "workspace:*"
+  }
+}
