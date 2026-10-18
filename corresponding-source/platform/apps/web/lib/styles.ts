@@ -1,3 +1,4 @@
+import { AVAILABLE_WORLD_STYLES } from '@genvr/contracts';
 import { CREATE_CARD_IMAGES } from './create-card-images';
 
 export type StyleId = 'blocky' | 'realistic' | 'anime' | 'voxel';
@@ -17,7 +18,7 @@ export const STYLE_CARDS: Array<{
     image: CREATE_CARD_IMAGES.style.blocky,
     description: 'Simple shapes and bright colors. Fast on every phone.',
     gradient: 'from-ink/10 to-ink/25',
-    ready: true,
+    ready: AVAILABLE_WORLD_STYLES.includes('blocky'),
   },
   {
     id: 'realistic',
@@ -25,7 +26,7 @@ export const STYLE_CARDS: Array<{
     image: CREATE_CARD_IMAGES.style.realistic,
     description: 'Real materials, soft light, and water that shines.',
     gradient: 'from-ink/5 to-ink/20',
-    ready: true,
+    ready: AVAILABLE_WORLD_STYLES.includes('realistic'),
   },
   {
     id: 'anime',
@@ -33,7 +34,7 @@ export const STYLE_CARDS: Array<{
     image: CREATE_CARD_IMAGES.style.anime,
     description: 'Painted colors, soft light, and dreamy skies.',
     gradient: 'from-ink/10 to-ink/20',
-    ready: false,
+    ready: AVAILABLE_WORLD_STYLES.includes('anime'),
   },
   {
     id: 'voxel',
@@ -41,7 +42,7 @@ export const STYLE_CARDS: Array<{
     image: CREATE_CARD_IMAGES.style.voxel,
     description: 'Bright cube worlds with hills, a lake, and mountains.',
     gradient: 'from-ink/15 to-ink/30',
-    ready: true,
+    ready: AVAILABLE_WORLD_STYLES.includes('voxel'),
   },
 ];
 

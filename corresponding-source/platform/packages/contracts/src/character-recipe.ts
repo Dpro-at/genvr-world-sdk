@@ -1,3 +1,4 @@
+import { normalizeCharacterRig } from './character-rig-compatibility.js';
 import { z } from 'zod';
 import {
   BodyId,
@@ -15,12 +16,12 @@ import {
 /**
  * Character recipe (CHAR-01, plan docs/superpowers/plans/2026-10-05-character-editor-phase1.md): a character as
  * settings only, never meshes. The editor shapes and colours one of the bodies on its own skeleton; clothes,
- * animations and effects are slots for library items made for the same 52-bone Mixamo-name rig (phase 2).
+ * animations and effects are slots for library items made for the same standard 52-bone humanoid rig (phase 2).
  */
 
 export const CHARACTER_RECIPE_VERSION = 1;
 /** The one rig every recipe, garment and animation item is made for. */
-export const CHARACTER_RIG = 'mixamo-52';
+export const CHARACTER_RIG = 'genvr-humanoid-52';
 /** Largest recipe as JSON (bytes of UTF-16 text length; recipes are small ASCII settings). */
 export const MAX_RECIPE_JSON = 8192;
 
@@ -188,7 +189,7 @@ export const RecipeEffect = z
 export const CharacterRecipe = z
   .object({
     version: z.literal(CHARACTER_RECIPE_VERSION).default(CHARACTER_RECIPE_VERSION),
-    rig: z.literal(CHARACTER_RIG).default(CHARACTER_RIG),
+    rig: z.preprocess(normalizeCharacterRig, z.literal(CHARACTER_RIG).default(CHARACTER_RIG)),
     name: z.string().trim().min(1).max(60).default('My character'),
     /** The body shaped and coloured: one of Genvr's, or a creator's uploaded body item. */
     body: BodyId.default('starter'),

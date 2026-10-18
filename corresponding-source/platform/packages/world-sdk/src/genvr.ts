@@ -40,6 +40,21 @@ export class GenvrClient {
     if (!Array.isArray(response.terrain) || !response.terrain.every(row => typeof row === 'string')) throw new Error('Invalid world terrain response.');
     return { world: WorldDocument.parse(response.world), terrain: response.terrain as string[] };
   }
+  /** Browse approved public catalog items. Availability is separate from purchase rights. */
+  async catalogItems(options: { after?: string; limit?: number; q?: string } = {}): Promise<{ items: unknown[]; next: string | null }> {
+    if (options.limit !== undefined && (!Number.isInteger(options.limit) || options.limit < 1 || options.limit > 200)) throw new Error('Invalid catalog limit.');
+    if (options.q !== undefined && options.q.length > 100) throw new Error('Catalog query is too long.');
+    if (options.after !== undefined && !/^[A-Za-z0-9._-]{1,128}$/.test(options.after)) throw new Error('Invalid catalog cursor.');
+    const query = new URLSearchParams({ source: 'user', limit: String(options.limit ?? 200), ...(options.after ? { after: options.after } : {}), ...(options.q ? { q: options.q } : {}) });
+    const data = await this.#request('/v1/catalog/items?' + query, undefined, 'GET');
+    if (!Array.isArray(data.items) || data.items.length > 200 || !(data.next === null || typeof data.next === 'string')) throw new Error('Invalid catalog response.');
+    return { items: data.items, next: data.next };
+  }
+  /** The server enforces approved/free or authenticated entitlement before issuing asset links. */
+  async readItemPackage(id: string): Promise<Record<string, unknown>> {
+    if (!/^[A-Za-z0-9._-]{1,128}$/.test(id) || id.includes('..')) throw new Error('Invalid item ID.');
+    return this.#request(`/v1/items/${encodeURIComponent(id)}/package`, undefined, 'GET');
+  }
   async linkedIdentity(): Promise<{ id: string; name: string }> {
     const user = await this.#request('/v1/account-links/session', undefined, 'GET');
     return { id: String(user.id), name: String(user.name) };

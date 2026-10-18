@@ -145,7 +145,7 @@ export const DEFAULT_GROUND = {
  */
 export const STARTER_GROUND: Record<WorldSeed['kind'], Partial<Record<SoilName, string>>> = {
   valley: { grass: 'grass-001' },
-  island: { grass: 'grass-005' },
+  island: { grass: 'grass-005', sand: 'ground-054' },
   plain: {},
   mountains: { grass: 'grass-008', rock: 'rock-063', dirt: 'ground-110' },
 };

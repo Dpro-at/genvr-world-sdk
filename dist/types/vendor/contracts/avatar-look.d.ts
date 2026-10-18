@@ -43,6 +43,7 @@ export declare const AvatarBodyType: z.ZodEnum<{
     "anime-boy": "anime-boy";
     warrior: "warrior";
     human: "human";
+    robot: "robot";
 }>;
 export type AvatarBodyType = z.infer<typeof AvatarBodyType>;
 /** A creator's uploaded body item, by its store id (uploaded bodies, 2026-10-03). */
@@ -60,6 +61,7 @@ export declare const BodyId: z.ZodUnion<readonly [z.ZodEnum<{
     "anime-boy": "anime-boy";
     warrior: "warrior";
     human: "human";
+    robot: "robot";
 }>, z.ZodType<`user.${string}`, unknown, z.core.$ZodTypeInternals<`user.${string}`, unknown>>]>;
 export type BodyId = z.infer<typeof BodyId>;
 /** Whether a body id is one of Genvr's own bodies (kept looks are kept for those only). */
@@ -209,6 +211,7 @@ export declare const AvatarLook: z.ZodObject<{
         "anime-boy": "anime-boy";
         warrior: "warrior";
         human: "human";
+        robot: "robot";
     }>, z.ZodType<`user.${string}`, unknown, z.core.$ZodTypeInternals<`user.${string}`, unknown>>]>>;
     scale: z.ZodDefault<z.ZodObject<{
         height: z.ZodDefault<z.ZodNumber>;
@@ -420,6 +423,7 @@ export declare const AvatarProfile: z.ZodObject<{
         "anime-boy": "anime-boy";
         warrior: "warrior";
         human: "human";
+        robot: "robot";
     }>, z.ZodType<`user.${string}`, unknown, z.core.$ZodTypeInternals<`user.${string}`, unknown>>]>>;
     scale: z.ZodDefault<z.ZodObject<{
         height: z.ZodDefault<z.ZodNumber>;
@@ -523,6 +527,7 @@ export declare const AvatarProfile: z.ZodObject<{
         "anime-boy": "anime-boy";
         warrior: "warrior";
         human: "human";
+        robot: "robot";
     }> & z.core.$partial, z.ZodObject<{
         scale: z.ZodDefault<z.ZodObject<{
             height: z.ZodDefault<z.ZodNumber>;
@@ -658,6 +663,7 @@ export declare const PlaceAvatar: z.ZodObject<{
         "anime-boy": "anime-boy";
         warrior: "warrior";
         human: "human";
+        robot: "robot";
     }>, z.ZodType<`user.${string}`, unknown, z.core.$ZodTypeInternals<`user.${string}`, unknown>>]>]>>;
     outfit: z.ZodDefault<z.ZodObject<{
         body: z.ZodDefault<z.ZodUnion<readonly [z.ZodEnum<{
@@ -668,6 +674,7 @@ export declare const PlaceAvatar: z.ZodObject<{
             "anime-boy": "anime-boy";
             warrior: "warrior";
             human: "human";
+            robot: "robot";
         }>, z.ZodType<`user.${string}`, unknown, z.core.$ZodTypeInternals<`user.${string}`, unknown>>]>>;
         scale: z.ZodDefault<z.ZodObject<{
             height: z.ZodDefault<z.ZodNumber>;

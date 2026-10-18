@@ -184,7 +184,7 @@ export function AssistantPanel({
         model: services.model ?? streamingChatModel(`${API_URL}/v1/experiences/${encodeURIComponent(placeId)}/assistant`, {
           credentials: 'include',
         }),
-        host: hostFor(rt, placeId),
+        host: { ...hostFor(rt, placeId), ...(services.avatarVoice ? {avatarVoice:services.avatarVoice} : {}), ...(services.userAvatarLibrary ? { userAvatarLibrary: services.userAvatarLibrary } : {}), ...(services.presentAvatar ? { presentAvatar: services.presentAvatar, presentationInfo: services.presentationInfo } : {}) },
         // The last messages are enough context and keep requests small.
         history: history.current.slice(-30),
         prompt: text,

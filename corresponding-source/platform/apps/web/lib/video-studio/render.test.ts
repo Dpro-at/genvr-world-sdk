@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { FilmSession, emptyFilm, fromSeconds, type Media } from '@genvr/film';
-import { captionsAt, layersAt, pictureSegments, playerSlots, soundEvents } from './render';
+import { hasPictureSound, captionsAt, layersAt, pictureSegments, playerSlots, soundEvents } from './render';
 import { checkTakeLength } from './model';
 
 const media = (id: string, seconds: number): Media => ({ id, kind: 'video', asset: `asset-${id}`, name: id, duration: fromSeconds(seconds), camera: null,
@@ -95,4 +95,43 @@ describe('timeline playback plan', () => {
     expect(film.run('clip.place', { media: 'a', track: top, start: 2, in: 0, duration: 1 })).toMatchObject({ ok: true });
     expect(new Set(playerSlots(film.project).values()).size).toBe(2);
   });
+});
+
+ it('does not open an empty audio mix for unused or muted sound media', () => {
+  const film = new FilmSession(emptyFilm());
+  film.run('media.add', { media: { ...media('unused-audio', 3), hasSound: true }, place: 'none' });
+  film.run('media.add', { media: media('silent-take', 3) });
+  expect(hasPictureSound(film.project)).toBe(false);
+  film.run('media.add', { media: { ...media('audible-take', 3), hasSound: true } });
+  expect(hasPictureSound(film.project)).toBe(true);
+  film.run('track.set', { track: film.project.tracks.find(t => t.kind === 'picture')!.id, muted: true });
+  expect(hasPictureSound(film.project)).toBe(false);
+ });
+
+it('switches alternate dialogue and captions without duplicating the picture', () => {
+ let n = 0;
+ const film = new FilmSession(emptyFilm(), () => `lang${++n}`);
+ expect(film.run('media.add', { media: { ...media('scene', 7), cues: [] } }).ok).toBe(true);
+ for (const lang of ['ar', 'en', 'de']) {
+  expect(film.run('media.add', { media: { ...media(lang, 4), kind: 'audio', cues: [] }, place: 'none' }).ok).toBe(true);
+  expect(film.run('voice.set', { lang, name: lang, media: lang }).ok).toBe(true);
+  expect(film.run('subtitles.set', { lang, name: lang, show: true, lines: [{ start: .5, end: 4.5, text: lang }] }).ok).toBe(true);
+ }
+ for (const lang of ['ar', 'en', 'de']) {
+  expect(film.run('subtitles.show', { lang }).ok).toBe(true);
+  expect(soundEvents(film.project, pictureSegments(film.project)).map(e => e.asset)).toEqual([`asset-${lang}`]);
+  expect(captionsAt(film.project, undefined, 1)).toEqual([lang]);
+  expect(film.project.tracks.filter(t => t.kind === 'picture').flatMap(t => t.clips)).toHaveLength(1);
+ }
+});
+
+it('appends a later scene voice without replacing the opening and rejects overlaps', () => {
+ let n=0; const s=new FilmSession(emptyFilm(),()=>`append${++n}`);
+ for(const id of ['intro','later']) expect(s.run('media.add',{media:{...media(id,3),kind:'audio',cues:[]},place:'none'}).ok).toBe(true);
+ expect(s.run('voice.set',{lang:'en',name:'Luna',media:'intro',start:.5}).ok).toBe(true);
+ expect(s.run('voice.set',{lang:'en',name:'Luna',media:'later',start:11.5,append:true}).ok).toBe(true);
+ const track=()=>s.project.tracks.find(t=>t.kind==='sound'&&t.lang==='en')!;
+ expect(track().clips.map(c=>[c.type==='media'?c.media:'',c.start])).toEqual([['intro',fromSeconds(.5)],['later',fromSeconds(11.5)]]);
+ expect(s.run('voice.set',{lang:'en',name:'Luna',media:'later',start:1,append:true}).ok).toBe(false);
+ expect(track().clips).toHaveLength(2);
 });

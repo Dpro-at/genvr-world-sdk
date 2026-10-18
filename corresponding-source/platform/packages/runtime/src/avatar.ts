@@ -1,3 +1,7 @@
+import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
+import { LEGACY_BONE_PREFIX } from './avatar-rig-compatibility.js';
+import { createRobotFace } from './robot-face.js';
+import { applyAvatarExpression, EXPRESSION_KEYS, type AvatarExpression } from './avatar-expression.js';
 import {
   AnimationClip,
   Bone,
@@ -66,15 +70,15 @@ import type { FaceUniforms } from './character/human/face.js';
 /**
  * The Genvr avatar (tasks P2-05, P2-20, P2-22): blocky characters built from the Core Library
  * body types, each with its own skeleton: Classic (Roblox-like, 15 joints, the main avatar) and
- * Starter (the first test body on the standard 52-bone Mixamo rig). The rest pose is a T-pose
+ * Starter (the first test body on the standard 52-bone humanoid rig). The rest pose is a T-pose
  * facing +z with every bone's axes aligned to the world, feet at y = 0. Changing the body type
  * rebuilds the skeleton inside the same scene objects.
  */
 
-/** The standard 52-bone rig (Mixamo names, same as agent_player): the Starter body's joints. */
+/** The standard 52-bone humanoid rig: the Starter body's joints. */
 export const STANDARD_BONES: readonly string[] = findBody('starter').joints.map((joint) => joint.name);
 export type StandardBone = string;
-export const bonePrefix = 'mixamorig';
+export const bonePrefix = LEGACY_BONE_PREFIX;
 
 /** Colors of the avatar's parts (hex strings), the body type, and the worn Core items. */
 export interface AvatarLook {
@@ -125,7 +129,7 @@ const PALM_PAST_WRIST = 0.7;
 /**
  * The right hand of a body and its skeleton: the joint that carries the hand (the body's fit for
  * the standard `RightHand` bone, else the joint that bone moves), found by its node name so rigs
- * with a bone prefix (Mixamo, mesh bodies) work too. The palm is the middle of the hand's block
+ * with a bone prefix (imported mesh bodies) work too. The palm is the middle of the hand's block
  * (the fit box, or the hand joint's parts); rigged hands without blocks hold a little past the
  * wrist toward the knuckles. Null when the body has no right hand.
  */
@@ -422,6 +426,9 @@ export interface GenvrAvatar {
    * show it through their mouth blend shapes; bodies without either (2D bodies for now) ignore it.
    */
   setMouth(shape: MouthShape): void;
+  readonly expressionSupported: boolean;
+  setExpression(expression: AvatarExpression): void;
+  updateExpression(delta: number): void;
   /** The mouth shape shown now (`X` at rest, and for bodies that cannot show one). */
   readonly mouth: MouthShape;
   /** Height of the top of the head above the feet at rest (m); follows the body type. */
@@ -453,7 +460,7 @@ export interface GenvrAvatar {
 
 interface BodyModel {
   geometry: BufferGeometry;
-  material: Material;
+  material: Material | Material[];
   /** The model's morph target names (its blend shapes), by index. */
   morphs?: Record<string, number>;
   /** How the model's mouth blend shapes show the nine mouth shapes (lip sync P2-44); null without them. */
@@ -521,7 +528,7 @@ const bodyLoads = new Map<string, Promise<BodyModel | null>>();
 /**
  * A model's skinned geometry bound to the body's own skeleton: vertices moved to their bind
  * position (the model's T-pose rest) and each skin index pointed at the body joint with the same
- * bone name (glTF drops the `:` of `mixamorig:Hips`, like our node names). Unknown bones fall to
+ * canonical bone name (including supported external namespaces). Unknown bones fall to
  * the root.
  */
 export function bindModelGeometry(
@@ -560,6 +567,31 @@ export function bindModelGeometry(
   return geometry;
 }
 
+/** Retains every material primitive in a locally imported character. */
+export function mergeLocalBodyPrimitives(body: AvatarBody, scene: Group): BodyModel {
+          const parts: BufferGeometry[] = [], materials: Material[] = [];
+          const groups: Array<{ start: number; count: number; material: number }> = [];
+          let start = 0;
+          scene.traverse(object => {
+            const part = object as SkinnedMesh;
+            if (!part.isSkinnedMesh) return;
+            let geometry = bindModelGeometry(body, part.geometry, part.skeleton.bones.map(bone => bone.name), part.bindMatrix);
+            // Exported primitives may share the complete vertex buffer; keep only their referenced vertices.
+            if (geometry.index) { const indexed = geometry; geometry = indexed.toNonIndexed(); indexed.dispose(); }
+            const own = Array.isArray(part.material) ? part.material : [part.material];
+            for (const group of geometry.groups.length ? geometry.groups : [{ start: 0, count: geometry.index?.count ?? geometry.getAttribute('position').count, materialIndex: 0 }])
+              groups.push({ start: start + group.start, count: group.count, material: materials.length + (group.materialIndex ?? 0) });
+            start += geometry.index?.count ?? geometry.getAttribute('position').count;
+            materials.push(...own); geometry.clearGroups(); parts.push(geometry);
+          });
+          const geometry = mergeGeometries(parts, false);
+          for (const part of parts) part.dispose();
+          if (!geometry) throw new Error('Imported character primitives could not be combined.');
+          for (const group of groups) geometry.addGroup(group.start, group.count, group.material);
+          return { geometry, material: materials, mouth: null };
+
+}
+
 /** Loads a mesh body's model once (null for block bodies or when it cannot be loaded). */
 export function loadBodyModel(body: AvatarBody): Promise<BodyModel | null> {
   if (!body.model) return Promise.resolve(null);
@@ -592,6 +624,12 @@ export function loadBodyModel(body: AvatarBody): Promise<BodyModel | null> {
           if (!skinned && (object as SkinnedMesh).isSkinnedMesh) skinned = object as SkinnedMesh;
         });
         if (!skinned) return null;
+        // GLTF splits a multi-material character into separate skinned primitives.
+        // Local imports must retain every primitive, including clothes, eyes and hair.
+        if (body.id.startsWith('user.')) {
+          const model = mergeLocalBodyPrimitives(body, gltf.scene);
+          bodyModels.set(body.id, model); return model;
+        }
         const model: BodyModel = {
           geometry: bindModelGeometry(
             body,
@@ -599,7 +637,7 @@ export function loadBodyModel(body: AvatarBody): Promise<BodyModel | null> {
             skinned.skeleton.bones.map((bone) => bone.name),
             skinned.bindMatrix,
           ),
-          material: skinned.material as Material,
+          material: skinned.material,
           ...(skinned.morphTargetDictionary ? { morphs: { ...skinned.morphTargetDictionary } } : {}),
           mouth: mouthMorphs(skinned.morphTargetDictionary),
         };
@@ -617,7 +655,30 @@ export function loadBodyModel(body: AvatarBody): Promise<BodyModel | null> {
 
 const itemBodies = new Map<string, AvatarBody>();
 const itemBodyLoads = new Map<string, Promise<AvatarBody | null>>();
+const localItemBodies = new Map<string, { body: AvatarBody; users: number }>();
 let itemBodyResolver: ((id: string) => Promise<AvatarBody | null>) | null = null;
+
+/** Register a user-selected local body without replacing the host's item resolver. */
+export function registerLocalAvatarBody(body: AvatarBody): () => void {
+  if (!isItemBodyId(body.id) || !body.model) throw new Error('A local avatar needs a user body ID and model.');
+  const row = localItemBodies.get(body.id) ?? { body, users: 0 };
+  row.users++; localItemBodies.set(body.id, row);
+  let released = false;
+  return () => {
+    if (released) return; released = true;
+    if (--row.users > 0) return;
+    localItemBodies.delete(body.id);
+    itemBodyLoads.delete(body.id);
+    // Runtime instances using this registration must be disposed before its owner releases it.
+    const model = bodyModels.get(body.id);
+    if (model) {
+      model.geometry.dispose();
+      for (const material of Array.isArray(model.material) ? model.material : [model.material]) material.dispose();
+      bodyModels.delete(body.id);
+    }
+    bodyLoads.delete(body.id);
+  };
+}
 
 /** How the app turns a body item id into a body (the place's body route and `bodyFromItem`); null: unknown. */
 export function setItemBodyResolver(resolver: ((id: string) => Promise<AvatarBody | null>) | null): void {
@@ -626,6 +687,7 @@ export function setItemBodyResolver(resolver: ((id: string) => Promise<AvatarBod
 
 /** A body item, asked for once (null when the app cannot resolve it: it stays Classic). */
 function loadItemBody(id: string): Promise<AvatarBody | null> {
+  const local = localItemBodies.get(id); if (local) return Promise.resolve(local.body);
   const known = itemBodies.get(id);
   if (known) return Promise.resolve(known);
   let load = itemBodyLoads.get(id);
@@ -648,7 +710,7 @@ function loadItemBody(id: string): Promise<AvatarBody | null> {
 /** The body a look asks for: one of Genvr's at its size, or a known uploaded body (null while it is not known). */
 function lookBody(look: AvatarLook): AvatarBody | null {
   return look.body && isItemBodyId(look.body)
-    ? (itemBodies.get(look.body) ?? null)
+    ? (localItemBodies.get(look.body)?.body ?? itemBodies.get(look.body) ?? null)
     : sizedBody(look.body, look.scale);
 }
 
@@ -689,22 +751,27 @@ export function createGenvrAvatar(
   let detail: 'full' | 'lite' = 'full';
   /** A skinned mesh with its own skeleton; a new body type gets a new mesh (GPU buffers fit it). */
   const makeMesh = (current: AvatarBody, next: AvatarLook) => {
-    const { root: rootBone, skeleton } = buildSkeleton(current);
     // A mesh body draws its shared model with its own texture (never cubes: it is not blocks).
     const model = bodyModels.get(current.id);
+    const generated = model && current.generated === 'human' ? humanVariant(model, next) : null;
+    const fitted: AvatarBody = generated?.userData.joints
+      ? { ...current, joints: generated.userData.joints as AvatarBody['joints'] }
+      : current;
+    const { root: rootBone, skeleton } = buildSkeleton(fitted);
     // A mesh body's shared material is copied once per avatar, so a hit tints only this avatar.
     // Our generated body gets a fresh material per avatar (its colours are uniforms a clone would share).
     const made = model
       ? new SkinnedMesh(
-          current.generated === 'human' ? humanDetail(humanVariant(model, next), detail) : model.geometry,
+          generated ? humanDetail(generated, detail) : model.geometry,
           current.generated === 'human'
             ? humanMaterial(
                 next.skin,
                 next.pants,
                 findSkinMaterial(next.skinMaterial),
-                humanVariant(model, next).userData.face as Record<string, [number, number, number]> | undefined,
+                generated!.userData.face as Record<string, [number, number, number]> | undefined,
+                next.hair,
               )
-            : model.material.clone(),
+            : Array.isArray(model.material) ? model.material.map(one => one.clone()) : model.material.clone(),
         )
       : new SkinnedMesh(bodyGeometry(next, current), material);
     // The model's blend shapes by name (the mouth's shapes, lip sync P2-44), all at rest.
@@ -715,6 +782,8 @@ export function createGenvrAvatar(
     mouthMorphTable = model?.mouth ?? null;
     if (mouthMorphTable && made.morphTargetInfluences)
       applyMouthMorphs(made.morphTargetInfluences, mouthMorphTable, mouthShape);
+    made.userData.fittedBody = fitted;
+    made.userData.bodyHeight = generated?.userData.height;
     made.userData.sharedGeometry = Boolean(model);
     // Generated shape variants count their meshes, so the cache only drops unused ones.
     if (current.generated === 'human') {
@@ -730,7 +799,7 @@ export function createGenvrAvatar(
     made.add(rootBone);
     // A model kept in its own pose (the warrior's A-pose) binds with its joints turned into that
     // pose, then the joints go back to the T-pose the clips start from (P2-35).
-    const bent = model ? current.joints.filter((joint) => joint.bind) : [];
+    const bent = model ? fitted.joints.filter((joint) => joint.bind) : [];
     for (const joint of bent)
       skeleton.getBoneByName(nodeName(current, joint.name))?.quaternion.set(...joint.bind!);
     made.bind(skeleton);
@@ -753,6 +822,16 @@ export function createGenvrAvatar(
     // The mouth of a block body: a small surface on the head with the nine shapes (lip sync, P2-44).
     mouthMesh?.dispose();
     mouthMesh = null;
+    robotFace?.dispose();
+    robotFace = null;
+    if (current.id === 'robot') {
+      const shell = current.parts.find(part => part.joint === 'Head')!;
+      const joint = current.joints.find(joint => joint.name === 'Head')!;
+      robotFace = createRobotFace(shell.size[0], shell.size[1]);
+      robotFace.root.position.set(shell.center[0] - joint.at[0], shell.center[1] - joint.at[1], shell.center[2] - joint.at[2] + shell.size[2] / 2 + .003);
+      robotFace.setExpression(expression); robotFace.setMouth(mouthShape);
+      skeleton.getBoneByName(nodeName(current, 'Head'))!.add(robotFace.root);
+    }
     const mouthPart =
       model || current.flat || isItemBodyId(current.id)
         ? undefined
@@ -781,9 +860,11 @@ export function createGenvrAvatar(
     return made;
   };
   let springs: SpringBones | null = null;
+  let robotFace: ReturnType<typeof createRobotFace> | null = null;
   let mouthMesh: MouthMesh | null = null;
   let mouthMorphTable: MouthMorphs | null = null;
   let mouthShape: MouthShape = 'X';
+  let expression: AvatarExpression = 'neutral';
   /**
    * The body for a look: Genvr's at once; an uploaded one once the app resolved it. Until then Classic stands in, and
    * the avatar swaps when it is known (and its model loaded, see `shown`).
@@ -823,7 +904,7 @@ export function createGenvrAvatar(
     pose.add(mesh);
     if (!old.userData.sharedGeometry) old.geometry.dispose();
     else if (fullOf(old.geometry).userData.users) fullOf(old.geometry).userData.users -= 1;
-    if (old.userData.ownMaterial) (old.material as Material).dispose();
+    if (old.userData.ownMaterial) for (const one of Array.isArray(old.material) ? old.material : [old.material]) one.dispose();
     ((old.userData.outline as SkinnedMesh | undefined)?.material as Material | undefined)?.dispose();
     grip = null;
     applyFlash();
@@ -832,12 +913,15 @@ export function createGenvrAvatar(
   /** The right hand of the current skeleton, worked out once per body (null: not yet; undefined: none). */
   let grip: HandGrip | null | undefined = null;
   let flash = 0;
-  const tint = new HitTint();
+  const tints = new WeakMap<Material, HitTint>();
   let down = 0;
-  const fade = new FadeLook();
+  const fades = new WeakMap<Material, FadeLook>();
   const applyFlash = () => {
-    tint.apply(mesh.material as Material, flash);
-    fade.apply(mesh.material as Material, downLook(down).opacity);
+    for (const material of Array.isArray(mesh.material) ? mesh.material : [mesh.material]) {
+      let tint = tints.get(material); if (!tint) tints.set(material, (tint = new HitTint()));
+      let fade = fades.get(material); if (!fade) fades.set(material, (fade = new FadeLook()));
+      tint.apply(material, flash); fade.apply(material, downLook(down).opacity);
+    }
   };
   let body = shown(wanted);
   let mesh = makeMesh(body, look);
@@ -890,6 +974,7 @@ export function createGenvrAvatar(
   };
   syncHair();
   const root = new Group();
+  const expressionWeights: Record<string, number> = {};
   root.name = 'avatar';
   // A second group lets swimming tilt the body around the chest without turning the facing.
   const pose = new Group();
@@ -907,10 +992,10 @@ export function createGenvrAvatar(
       return mesh.skeleton;
     },
     get headTop() {
-      return headTopOf(body);
+      return (mesh.userData.bodyHeight as number | undefined) ?? headTopOf(body);
     },
     get rightHand() {
-      if (grip === null) grip = rightHandGrip(body, mesh.skeleton) ?? undefined;
+      if (grip === null) grip = rightHandGrip(mesh.userData.fittedBody as AvatarBody, mesh.skeleton) ?? undefined;
       return grip ?? null;
     },
     setDetail(next) {
@@ -940,7 +1025,7 @@ export function createGenvrAvatar(
       applyFlash();
     },
     get clips() {
-      return avatarClips(body);
+      return avatarClips(mesh.userData.fittedBody as AvatarBody);
     },
     get body() {
       return body.id;
@@ -966,7 +1051,7 @@ export function createGenvrAvatar(
           swap(body, next);
           return true;
         }
-        setHumanColors(own, next.skin, next.pants);
+        setHumanColors(own, next.skin, next.pants, next.hair);
         syncHair();
         return false;
       }
@@ -977,16 +1062,26 @@ export function createGenvrAvatar(
       old.dispose();
       return false;
     },
+    get expressionSupported() { return Boolean(robotFace || mouthMesh || mesh.userData.humanMaterial || EXPRESSION_KEYS.some(key => mesh.morphTargetDictionary?.[key] !== undefined)); },
+    setExpression(value) { expression = value; mouthMesh?.setExpression(value); robotFace?.setExpression(value); },
+    updateExpression(delta) {
+      robotFace?.update(delta);
+      if (mouthShape === 'X') mouthMesh?.setExpression(expression);
+      for (const key of EXPRESSION_KEYS) { const i = mesh.morphTargetDictionary?.[key]; if (i !== undefined && mesh.morphTargetInfluences) mesh.morphTargetInfluences[i] = 0; }
+      if (mouthMorphTable && mesh.morphTargetInfluences) applyMouthMorphs(mesh.morphTargetInfluences, mouthMorphTable, mouthShape);
+      applyAvatarExpression(mesh, expression, expressionWeights, delta);
+    },
     setMouth(shape) {
       mouthShape = shape;
       // Our generated body draws its mouth in the material.
       if (mesh.userData.humanMaterial) setHumanMouth(mesh.userData.humanMaterial as Material, shape);
       mouthMesh?.setShape(shape);
+      robotFace?.setMouth(shape);
       if (mouthMorphTable && mesh.morphTargetInfluences)
         applyMouthMorphs(mesh.morphTargetInfluences, mouthMorphTable, shape);
     },
     get mouth() {
-      return mouthMesh || mouthMorphTable || mesh.userData.humanMaterial ? mouthShape : 'X';
+      return robotFace || mouthMesh || mouthMorphTable || mesh.userData.humanMaterial ? mouthShape : 'X';
     },
     updateSprings(delta) {
       springs?.update(delta);
@@ -999,11 +1094,12 @@ export function createGenvrAvatar(
     },
     dispose() {
       disposed = true;
+      robotFace?.dispose();
       for (const part of hairParts.values()) (part.material as Material).dispose();
       mouthMesh?.dispose();
       if (!mesh.userData.sharedGeometry) mesh.geometry.dispose();
       else if (fullOf(mesh.geometry).userData.users) fullOf(mesh.geometry).userData.users -= 1;
-      if (mesh.userData.ownMaterial) (mesh.material as Material).dispose();
+      if (mesh.userData.ownMaterial) for (const one of Array.isArray(mesh.material) ? mesh.material : [mesh.material]) one.dispose();
       ((mesh.userData.outline as SkinnedMesh | undefined)?.material as Material | undefined)?.dispose();
       smooth.dispose();
       cubes?.dispose();

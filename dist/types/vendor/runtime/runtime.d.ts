@@ -1,3 +1,4 @@
+import type { AvatarExpression } from './avatar-expression.js';
 import { type PlaceBlockLook, type RideModel, type CommandPayload, type SideMove, type VoiceLine, type WorldDocument } from '../contracts/index.js';
 import { PerspectiveCamera } from 'three/webgpu';
 import { type AvatarLook } from './avatar.js';
@@ -17,12 +18,16 @@ import { type TerrainFieldPageLoader } from './terrain-field-loader.js';
 import { type DiagnosticOptions, type RuntimeDiagnostics } from './diagnostics.js';
 export interface RuntimeOptions {
     /** Optional filming rig, after gameplay camera and before environment/LOD/water update.
-     * Return true on a camera cut to discard temporal rendering history. */
+     * Return true on a camera cut to discard temporal rendering history. A structured result also declares
+     * actor visibility while the filming camera replaces the gameplay camera. */
     onFilmFrame?: (camera: PerspectiveCamera, dt: number, player: {
         x: number;
         y: number;
         z: number;
-    }) => boolean | void;
+    }) => boolean | {
+        cut: boolean;
+        actorVisible: boolean;
+    } | void;
     /** Called immediately after drawing, while the canvas framebuffer is readable. */
     onRendered?: () => void;
     container: HTMLElement;
@@ -219,7 +224,23 @@ export interface GenvrRuntime {
      * toggles sitting. Returns false for unknown animations.
      */
     playAnimation(id: string): boolean;
+    presentAnimation(target: string, animationId: string): boolean;
+    importAvatarMotion(target: string, id: string, data: ArrayBuffer): Promise<boolean>;
+    presentExpression(target: string, expression: AvatarExpression): boolean;
+    supportsAvatarExpression(target: string): boolean;
+    readonly avatarState: {
+        body: string;
+        visible: boolean;
+        mouth: import('../contracts/index.js').MouthShape;
+        position: {
+            x: number;
+            y: number;
+            z: number;
+        };
+        headTop: number;
+    };
     /** Temporary filming pose; native sitting, emotes and player controls remain independent. */
+    prepareSceneAnimation(id: string): Promise<boolean>;
     playSceneAnimation(id: string): boolean;
     /** Local production preview only: transient object choreography, never saved commands. */
     sceneMotion(instanceId: string, motion: SceneMotion, seconds: number): boolean;
@@ -294,7 +315,7 @@ export interface GenvrRuntime {
     say(id: string | 'self', line: {
         url: string;
         voice: Pick<VoiceLine, 'duration' | 'cues'>;
-    }): void;
+    }, onMouth?: (shape: import('../contracts/index.js').MouthShape) => void): Promise<boolean>;
     /**
      * The local player is knocked out in a game (P9-12): the avatar falls and fades; false stands
      * it up again (respawn).
@@ -326,6 +347,8 @@ export interface GenvrRuntime {
      */
     capture(maxWidth?: number): string;
     /** Loudness (0-1) of footsteps and other effects, and of the weather and nature ambience (P2-08). */
+    setSpeechMouth(id: string, shape: import('../contracts/index.js').MouthShape): boolean;
+    setVoiceRecordingStream(stream: MediaStream | null): void;
     setAudioVolumes(volumes: {
         effects: number;
         ambience: number;

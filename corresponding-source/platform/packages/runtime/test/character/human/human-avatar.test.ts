@@ -3,6 +3,9 @@ import { fileURLToPath } from 'node:url';
 import { AnimationMixer, Vector3, type SkinnedMesh } from 'three/webgpu';
 import { beforeAll, describe, expect, it, vi } from 'vitest';
 import { CORE_ANIMATIONS, findBody } from '@genvr/core-library';
+import { decodeHuman } from '../../../src/character/human/format.js';
+import { animeShapeWeights, buildWeights, generateHuman } from '../../../src/character/human/generate.js';
+import { HUMAN_FACE_LANDMARKS } from '@genvr/core-library';
 import { clipFromAnimation, createGenvrAvatar, DEFAULT_LOOK, loadBodyModel } from '../../../src/avatar.js';
 
 const file = fileURLToPath(new URL('../../../../../apps/web/public/human/human-base.bin', import.meta.url));
@@ -50,6 +53,72 @@ describe('generated body on the game avatar (CHAR-02)', () => {
   it('wears the generated mesh with 52 bones', () => {
     expect(avatar.body).toBe('human');
     expect(mesh.skeleton.bones).toHaveLength(52);
+  });
+
+  it('fits the skeleton and animation rest positions to a changed generated body', () => {
+    const build = { muscle: .5, 'face.headLength': -.5, 'face.jawWidth': .4 };
+    const changed = createGenvrAvatar({ ...DEFAULT_LOOK, body: 'human', animeShape: 1, build });
+    const data = decodeHuman(bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength));
+    const expected = generateHuman(data, 'anime', 'boy', HUMAN_FACE_LANDMARKS, {
+      ...animeShapeWeights(1), ...buildWeights(build),
+    })!;
+    changed.root.updateMatrixWorld(true);
+    const rootPosition = changed.mesh.getWorldPosition(new Vector3());
+    for (const joint of expected.joints) {
+      // Compare rest pivots against helper positions fitted from the changed mesh.
+      const actual = changed.mesh.skeleton.bones.find(one => one.name === body.bonePrefix + joint.name)!;
+      expect(actual).toBeDefined();
+      expect(actual.getWorldPosition(new Vector3()).sub(rootPosition).distanceTo(new Vector3(...joint.at))).toBeLessThan(.00001);
+    }
+    const expectedHips = expected.joints.find(one => one.name === 'Hips')!;
+    const hips = changed.mesh.skeleton.bones.find(one => one.name.endsWith('Hips'))!;
+    expect(hips.position.y).toBeCloseTo(expectedHips.at[1], 5);
+    expect(changed.headTop).toBeCloseTo(expected.height, 5);
+    changed.dispose();
+  });
+
+  it('updates brow and lash color with the existing hair color without replacing the mesh', () => {
+    const look = { ...DEFAULT_LOOK, body: 'human' as const, hair: '#2b1d18' };
+    const colored = createGenvrAvatar(look), original = colored.mesh;
+    const uniforms = (original.material as import('three/webgpu').Material).userData.face;
+    expect(uniforms.browColor.value.getHexString()).toBe('2b1d18');
+    colored.setLook({ ...look, hair: '#794d31' });
+    expect(colored.mesh).toBe(original);
+    expect(uniforms.browColor.value.getHexString()).toBe('794d31');
+    colored.dispose();
+  });
+
+  it('has nonempty finite expression geometry confined to the face', () => {
+    const position = mesh.geometry.getAttribute('position');
+    const shared = mesh.geometry.getAttribute('blink') as import('three/webgpu').InterleavedBufferAttribute;
+    for (const name of ['faceSmile', 'faceAngry', 'faceSad', 'faceSurprised', 'faceThinking']) {
+      const delta = mesh.geometry.getAttribute(name);
+      expect(delta.count).toBe(position.count);
+      expect((delta as import('three/webgpu').InterleavedBufferAttribute).data).toBe(shared.data);
+      let changed = 0;
+      for (let i = 0; i < delta.count; i++) {
+        const length = Math.hypot(delta.getX(i), delta.getY(i), delta.getZ(i));
+        expect(Number.isFinite(length)).toBe(true);
+        if (length > 1e-8) {
+          changed++;
+          expect(position.getY(i)).toBeGreaterThan(1);
+          expect(length).toBeLessThan(.15);
+        }
+      }
+      expect(changed).toBeGreaterThan(10);
+    }
+  });
+
+  it('keeps facial paint coordinates unchanged when editor positions are resized', () => {
+    const geometry = mesh.geometry.clone();
+    const position = geometry.getAttribute('position');
+    const face = geometry.getAttribute('facePosition');
+    const eyeVertex = Array.from({length: position.count}, (_, i) => i).find(i => position.getY(i) > 1.5)!;
+    const before = face.getY(eyeVertex);
+    position.setY(eyeVertex, position.getY(eyeVertex) * 1.2);
+    expect(face.getY(eyeVertex)).toBe(before);
+    expect(position.getY(eyeVertex)).not.toBe(before);
+    geometry.dispose();
   });
 
   it('left-side vertices follow only left bones, right-side only right bones', () => {

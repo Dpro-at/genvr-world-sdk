@@ -70,13 +70,15 @@ describe('core items', () => {
     expect(CORE_ITEMS.length).toBeGreaterThanOrEqual(12);
   });
 
-  it('stand on the ground (bounds start at y = 0)', () => {
+  it('stand at ground zero or declare their shallow root depth', () => {
     for (const item of CORE_ITEMS) {
       const { min } = item.parts.length
         ? itemBounds(item.parts)
         : (itemModelLook(item, 'realistic')?.model.bounds ??
           itemGeneratedLook(item, 'realistic')!.generated.bounds);
-      expect(Math.abs(min[1]), item.manifest.id).toBeLessThan(0.01);
+      const sink = item.manifest.placement?.rest?.sink ?? 0;
+      if (min[1] < 0 && sink > 0) expect(min[1], item.manifest.id).toBeGreaterThanOrEqual(-sink - .05);
+      else expect(Math.abs(min[1]), item.manifest.id).toBeLessThan(0.01);
     }
   });
 

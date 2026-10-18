@@ -59,6 +59,8 @@ export interface HumanBody {
   face: Record<string, [number, number, number]>;
   /** Per drawn vertex, where the closed-eye (blink) shape moves it; played on the GPU, never mixed in. */
   blink: Float32Array;
+  /** Distances from the shaped upper/lower lid edges, filled during contour fitting. */
+  lidDistance?: Float32Array;
   /** Per drawn vertex, where the open-mouth shape moves it (speech), played on the GPU like the blink. */
   mouthOpen: Float32Array;
   /** Per drawn vertex, how far along its lash strip it sits: 0 at the lid rim, 1 at the tip (0 off the lashes). */

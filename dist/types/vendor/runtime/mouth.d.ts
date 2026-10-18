@@ -1,3 +1,4 @@
+import type { AvatarExpression } from './avatar-expression.js';
 import { type MouthShape } from '../contracts/index.js';
 import { DataTexture, Mesh } from 'three/webgpu';
 /** The nine pictures side by side (shared by every mouth). */
@@ -7,6 +8,7 @@ export interface MouthMesh {
     mesh: Mesh;
     shape: MouthShape;
     setShape(shape: MouthShape): void;
+    setExpression(expression: AvatarExpression): void;
     dispose(): void;
 }
 /** How far in front of the face block the mouth surface floats, so it never flickers against it. */

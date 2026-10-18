@@ -98,6 +98,7 @@ export declare class WorldAudio {
     gameSound(kind: 'strike' | 'hit', position: Point): void;
     /** Thunder a moment after a lightning flash: a low rumble that rolls away. */
     thunder(): void;
+    setVoiceRecordingStream(stream: MediaStream | null): void;
     /**
      * A live copy of the whole world mix (FILM-08: recorded with a filmed shot), after the underwater
      * muffle and the volume sliders; null until the world's sound has started.

@@ -320,6 +320,7 @@ export declare const GenvrManifest: z.ZodObject<{
             "anime-boy": "anime-boy";
             warrior: "warrior";
             human: "human";
+            robot: "robot";
         }>, z.ZodType<`user.${string}`, unknown, z.core.$ZodTypeInternals<`user.${string}`, unknown>>]>>;
         scale: z.ZodDefault<z.ZodObject<{
             height: z.ZodDefault<z.ZodNumber>;
@@ -687,6 +688,7 @@ export declare const ItemPackage: z.ZodObject<{
                 "anime-boy": "anime-boy";
                 warrior: "warrior";
                 human: "human";
+                robot: "robot";
             }>, z.ZodType<`user.${string}`, unknown, z.core.$ZodTypeInternals<`user.${string}`, unknown>>]>>;
             scale: z.ZodDefault<z.ZodObject<{
                 height: z.ZodDefault<z.ZodNumber>;

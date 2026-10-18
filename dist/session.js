@@ -1,8 +1,8 @@
-import { CommandPayload, WorldDocument, WorldPackage, WORLD_PACKAGE_BYTES, WORLD_PACKAGE_COMMANDS, SIZE_TIERS } from '@genvr/contracts';
+import { CommandPayload, WorldDocument, WorldPackage, WORLD_PACKAGE_BYTES, WORLD_PACKAGE_COMMANDS, SIZE_TIERS, AVAILABLE_WORLD_STYLES, supportsWorldStarter } from '@genvr/contracts';
 import { getCoreItem } from '@genvr/core-library';
 import { runAssistant, runTool } from '@genvr/assistant';
 import { applyCommand, createWorldState, encodeTerrain, planWaterFill } from '@genvr/world';
-export const SDK_VERSION = '0.3.0-preview.1';
+export const SDK_VERSION = '0.3.0-preview.3';
 export const PACKAGE_WORK_BUDGET = 5_000_000;
 export function readWorldPackage(input) {
     const text = typeof input === 'string' ? input : JSON.stringify(input);
@@ -94,6 +94,17 @@ export class WorldSession {
     #undo = [];
     #redo = [];
     #history = [];
+    #presentationInfo;
+    #presentation;
+    /** Attach a live viewport controller; presentation is never written into world packages. */
+    attachPresentation(execute, describe) {
+        this.#presentation = execute;
+        this.#presentationInfo = describe;
+        return () => { if (this.#presentation === execute) {
+            this.#presentation = undefined;
+            this.#presentationInfo = undefined;
+        } };
+    }
     #onEvent;
     constructor(input, onEvent) {
         const parsed = replayWorldPackage(input);
@@ -102,6 +113,10 @@ export class WorldSession {
         this.#onEvent = onEvent;
     }
     static create(options = {}) {
+        if (options.base && !AVAILABLE_WORLD_STYLES.includes(options.base.style.base))
+            throw new Error('This world style is not available yet.');
+        if (options.base?.world && !supportsWorldStarter(options.base.style.base, options.base.world.kind))
+            throw new Error('This world kind is not available in the selected style.');
         return new WorldSession({ format: 'genvr-world', formatVersion: 1, sdkVersion: SDK_VERSION,
             id: options.id ?? `local.${crypto.randomUUID()}`, title: options.title ?? 'My world',
             base: options.base ?? { style: { base: 'blocky' }, sizeTier: 'small' }, commands: [], assets: [],
@@ -153,6 +168,7 @@ export class WorldSession {
     }
     #host() {
         return {
+            ...(this.#presentation ? { presentAvatar: this.#presentation, ...(this.#presentationInfo ? { presentationInfo: this.#presentationInfo } : {}) } : {}),
             world: () => this.world, heightAt: (x, z) => this.heightAt(x, z), focus: () => ({ x: 0, z: 0 }),
             blockGround: () => !!this.#state.voxels,
             isPlaceable: id => !!getCoreItem(id) || this.#record.assets.some(asset => asset.id === id),

@@ -51,5 +51,5 @@ await writeFile('dist/package-manifest.json', JSON.stringify({ name: '3d-world-s
     './studio-project': { types: './dist/types/studio-project.d.ts', default: './dist/studio-project.js' } },
   dependencies: { zod: '4.6.5', three: '0.186.1', '@types/three': '0.186.0', '@dimforge/rapier3d-compat': '0.20.0' },
   bin: { 'genvr-world-mcp': './dist/mcp.js', 'genvr-world-demo': './serve.mjs', 'genvr-studio': './serve-studio.mjs' },
-  files: ['dist', 'demo', 'assets', 'serve.mjs', 'serve-studio.mjs', 'README.md', 'LICENSE'],
+  files: ['dist', 'demo', 'assets', 'skills', 'serve.mjs', 'serve-studio.mjs', 'live-studio-bridge.mjs', 'local-voice.mjs', 'voice-worker.py', 'voice-requirements.txt', 'voice-demos.json', 'README.md', 'LICENSE'],
 }, null, 2));

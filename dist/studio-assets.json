@@ -115,6 +115,11 @@
     "sha256": "4069cd065ab4cbd08943875fe0cd35bab4fd8e99d338bde4f83afdd43acafbc1"
   },
   {
+    "path": "decoders/basis/README.md",
+    "bytes": 1388,
+    "sha256": "a578df416c1e0852e9c36a1cf91b4d28d91a251294f87ce610a3bc7ca4df15e0"
+  },
+  {
     "path": "decoders/basis/basis_transcoder.js",
     "bytes": 57529,
     "sha256": "8478b5b6d6b74e7d3082b89f6417321d8d1dc0307f2b30d4484bb11b441696a1"
@@ -125,9 +130,9 @@
     "sha256": "6cf17dc889352c42e9acf8897107978d127005fe3386c36a0e3845e27967630a"
   },
   {
-    "path": "decoders/basis/README.md",
-    "bytes": 1388,
-    "sha256": "a578df416c1e0852e9c36a1cf91b4d28d91a251294f87ce610a3bc7ca4df15e0"
+    "path": "decoders/draco/README.md",
+    "bytes": 1395,
+    "sha256": "839850a67c93f6b26d3cc038a45bd8289e3cfdf15531e69339e8eb1282b4eb76"
   },
   {
     "path": "decoders/draco/draco_decoder.js",
@@ -160,9 +165,9 @@
     "sha256": "8bb2952d2ba7d67e1414f8df819410cb0434a666be53f671fff75f68843d76f6"
   },
   {
-    "path": "decoders/draco/README.md",
-    "bytes": 1395,
-    "sha256": "839850a67c93f6b26d3cc038a45bd8289e3cfdf15531e69339e8eb1282b4eb76"
+    "path": "film-examples/island-languages.genvrfilm",
+    "bytes": 20812548,
+    "sha256": "499231f2ad136d8f2653564338cdce7c45f123f78fc38ee7bbcd02eea113e90e"
   },
   {
     "path": "human/human-base.bin",
@@ -271,8 +276,18 @@
   },
   {
     "path": "licenses/CREDITS.md",
-    "bytes": 2151,
-    "sha256": "a1240d9c049508212af1473a18bfb8a3b94cdaabc6b778b473c79749cf129103"
+    "bytes": 3036,
+    "sha256": "d4b752967568040b70652db8210f6c56bc967d84c3bb058c895786e6e925623c"
+  },
+  {
+    "path": "licenses/Genvr.txt",
+    "bytes": 34523,
+    "sha256": "0d96a4ff68ad6d4b6f1f30f713b18d5184912ba8dd389f86aa7710db079abcb0"
+  },
+  {
+    "path": "licenses/LICENSE-tidewater.md",
+    "bytes": 1293,
+    "sha256": "95cfe78afb01e2013c062f361cf7b45e6c812161bdc45ca5d80993c5d30e2f3f"
   },
   {
     "path": "licenses/dependencies/@dimforge_rapier3d-compat-0.20.0/LICENSE",
@@ -310,14 +325,14 @@
     "sha256": "6d7c9e9d7d12c8d3753bdb24417b84819ba4d6c2f025c37948113d86dc81eef9"
   },
   {
-    "path": "licenses/dependencies/@mintplex-labs_piper-tts-web-1.0.5/piper-package.json",
-    "bytes": 1430,
-    "sha256": "02b77984ca489c5e07b9786b4b4199bebb66fcb219cbf9b9f8aa82871b2a340e"
-  },
-  {
     "path": "licenses/dependencies/@mintplex-labs_piper-tts-web-1.0.5/piper-README.md",
     "bytes": 2716,
     "sha256": "d552eb6146b4886812590f5560b862b1bfc262eec0acd378d9c749b610da132c"
+  },
+  {
+    "path": "licenses/dependencies/@mintplex-labs_piper-tts-web-1.0.5/piper-package.json",
+    "bytes": 1430,
+    "sha256": "02b77984ca489c5e07b9786b4b4199bebb66fcb219cbf9b9f8aa82871b2a340e"
   },
   {
     "path": "licenses/dependencies/@mintplex-labs_piper-tts-web-1.0.5/provenance.json",
@@ -402,12 +417,7 @@
   {
     "path": "licenses/dependencies.json",
     "bytes": 4167,
-    "sha256": "a055567124c6003125f6cf047ad0f6043b3d1a54014ed1e1efb2c167dc7abc72"
-  },
-  {
-    "path": "licenses/film-fonts/bebasneue-latin.woff2",
-    "bytes": 13768,
-    "sha256": "a7c90c89240c134f7fdd33d40c000ec90b79d675ea53e8cc5a6d423c073de412"
+    "sha256": "947b2f67657f05a8d089840717b43621f4b4bca30f15da8a8e0a849ceb88d9af"
   },
   {
     "path": "licenses/film-fonts/bebasneue-OFL.txt",
@@ -415,14 +425,14 @@
     "sha256": "72082f6cb4d04be2ecf7cc7d9e1e7d73787f0af8a5a278a47cade70c16b78341"
   },
   {
+    "path": "licenses/film-fonts/bebasneue-latin.woff2",
+    "bytes": 13768,
+    "sha256": "a7c90c89240c134f7fdd33d40c000ec90b79d675ea53e8cc5a6d423c073de412"
+  },
+  {
     "path": "licenses/film-fonts/bebasneue-source.css",
     "bytes": 856,
     "sha256": "269f9c8d65e1120dfdf066b62b540a1fbfaa131085ceab8f006f5877d54056d8"
-  },
-  {
-    "path": "licenses/film-fonts/jetbrainsmono-latin.woff2",
-    "bytes": 31432,
-    "sha256": "83c005d49d8a6a50474c73a5a36ac0468076e9c4a29da7bdb14995d80560a5be"
   },
   {
     "path": "licenses/film-fonts/jetbrainsmono-OFL.txt",
@@ -430,14 +440,14 @@
     "sha256": "b2fe5e8987594e9ffd1d2ca52a2f5d73eb8335243893c5d6254b5ad69269591d"
   },
   {
+    "path": "licenses/film-fonts/jetbrainsmono-latin.woff2",
+    "bytes": 31432,
+    "sha256": "83c005d49d8a6a50474c73a5a36ac0468076e9c4a29da7bdb14995d80560a5be"
+  },
+  {
     "path": "licenses/film-fonts/jetbrainsmono-source.css",
     "bytes": 2510,
     "sha256": "f0115aeb31972848f24b354fcad3a06f0c203eafead6853fe0433ebab8bf5116"
-  },
-  {
-    "path": "licenses/film-fonts/merriweather-latin.woff2",
-    "bytes": 97548,
-    "sha256": "4fbe8dd9c23b1fd62a988bb8a69b8e692d810f773d9ef6ebca2ba2760c7b11ee"
   },
   {
     "path": "licenses/film-fonts/merriweather-OFL.txt",
@@ -445,19 +455,24 @@
     "sha256": "715bd349bfa6116f99e351e1548321dcfa25b91df65502d22ca8d624557697d2"
   },
   {
+    "path": "licenses/film-fonts/merriweather-latin.woff2",
+    "bytes": 97548,
+    "sha256": "4fbe8dd9c23b1fd62a988bb8a69b8e692d810f773d9ef6ebca2ba2760c7b11ee"
+  },
+  {
     "path": "licenses/film-fonts/merriweather-source.css",
     "bytes": 2226,
     "sha256": "211fe52201ebe838b8a6840427eaa61862a33853fc2304973a96e604cdd335f3"
   },
   {
-    "path": "licenses/film-fonts/nunito-latin.woff2",
-    "bytes": 39128,
-    "sha256": "ba344451eab25b217a165363b1982048a5e5830a0daf36577973955a04cac793"
-  },
-  {
     "path": "licenses/film-fonts/nunito-OFL.txt",
     "bytes": 4385,
     "sha256": "580df76c95a1ec5ab878ceb25bb3d85c6a076804e9c970c8c6972aea775fdf65"
+  },
+  {
+    "path": "licenses/film-fonts/nunito-latin.woff2",
+    "bytes": 39128,
+    "sha256": "ba344451eab25b217a165363b1982048a5e5830a0daf36577973955a04cac793"
   },
   {
     "path": "licenses/film-fonts/nunito-source.css",
@@ -470,24 +485,14 @@
     "sha256": "b076342d7f4ce326c216e78c6e21cd13d590a39ca3557205fd5851639e7646cc"
   },
   {
-    "path": "licenses/Genvr.txt",
-    "bytes": 34523,
-    "sha256": "0d96a4ff68ad6d4b6f1f30f713b18d5184912ba8dd389f86aa7710db079abcb0"
-  },
-  {
     "path": "licenses/human-CREDITS.md",
     "bytes": 1891,
     "sha256": "e7bbea7c11d1dad97b2e730e95a87eac7b65c69e5479a49e862303a294d08257"
   },
   {
     "path": "licenses/library-sources.json",
-    "bytes": 12474,
-    "sha256": "6d9419804ef09ec83e0778eccfd8979c6d695e8d7c57f41009032cda9d067d88"
-  },
-  {
-    "path": "licenses/LICENSE-tidewater.md",
-    "bytes": 1293,
-    "sha256": "95cfe78afb01e2013c062f361cf7b45e6c812161bdc45ca5d80993c5d30e2f3f"
+    "bytes": 12621,
+    "sha256": "2ac360f472865241847a25c25db2c1acbd5edcdd09a6440489be1b15606afadd"
   },
   {
     "path": "market/genvr.core.accessory.backpack.png",
@@ -2100,14 +2105,14 @@
     "sha256": "63bccf675943c491ae08fce72a4575566e8021f1646af17244d3625d08d23e55"
   },
   {
-    "path": "mediapipe/face_landmarker.task",
-    "bytes": 3758596,
-    "sha256": "64184e229b263107bc2b804c6625db1341ff2bb731874b0bcc2fe6544e0bc9ff"
-  },
-  {
     "path": "mediapipe/NOTICE.txt",
     "bytes": 1045,
     "sha256": "d255c043b469857f5c5dc9f89bf08871559c4bf9c9cda101d1f22c020549b1d3"
+  },
+  {
+    "path": "mediapipe/face_landmarker.task",
+    "bytes": 3758596,
+    "sha256": "64184e229b263107bc2b804c6625db1341ff2bb731874b0bcc2fe6544e0bc9ff"
   },
   {
     "path": "mediapipe/wasm/vision_wasm_internal.js",
@@ -2833,6 +2838,16 @@
     "path": "models/realistic/rock-moss-set-02/picture.png",
     "bytes": 107313,
     "sha256": "d3e308c089e94d01206cf7d20f68d148e7a2b8f06716cdc1fdb734a44c19b602"
+  },
+  {
+    "path": "models/realistic/rowboat/lod0.glb",
+    "bytes": 56892,
+    "sha256": "9929e6dc414f7599fb996c53b97d62647281956604ae11b6fda8d226882848e4"
+  },
+  {
+    "path": "models/realistic/rowboat/picture.svg",
+    "bytes": 499,
+    "sha256": "9237ea8ebec9fc39c723e2654993faf83b8657c3cbb2c51f114415a0dfad9cae"
   },
   {
     "path": "models/realistic/shrub-01/lod0.glb",

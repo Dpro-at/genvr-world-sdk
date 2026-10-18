@@ -96,6 +96,19 @@ export declare const StudioProject: z.ZodObject<{
             classId: z.ZodString;
         }, z.core.$strip>], "mode">;
         environment: z.ZodObject<{
+            lighting: z.ZodOptional<z.ZodArray<z.ZodObject<{
+                id: z.ZodString;
+                name: z.ZodString;
+                enabled: z.ZodDefault<z.ZodBoolean>;
+                color: z.ZodDefault<z.ZodString>;
+                intensity: z.ZodDefault<z.ZodNumber>;
+                angle: z.ZodDefault<z.ZodNumber>;
+                softness: z.ZodDefault<z.ZodNumber>;
+                distance: z.ZodDefault<z.ZodNumber>;
+                actor: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+                position: z.ZodDefault<z.ZodTuple<[z.ZodNumber, z.ZodNumber, z.ZodNumber], null>>;
+                target: z.ZodDefault<z.ZodTuple<[z.ZodNumber, z.ZodNumber, z.ZodNumber], null>>;
+            }, z.core.$strict>>>;
             sky: z.ZodObject<{
                 preset: z.ZodEnum<{
                     day: "day";
@@ -851,6 +864,13 @@ export declare const StudioProject: z.ZodObject<{
             scale: z.ZodDefault<z.ZodTuple<[z.ZodNumber, z.ZodNumber, z.ZodNumber], null>>;
         }, z.core.$strip>;
     }, z.core.$strip>;
+    avatarBodies: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodEnum<{
+        classic: "classic";
+        simple: "simple";
+        starter: "starter";
+        human: "human";
+        robot: "robot";
+    }>>>;
     terrainChunks: z.ZodArray<z.ZodString>;
     assets: z.ZodDefault<z.ZodArray<z.ZodObject<{
         id: z.ZodString;
@@ -980,6 +1000,7 @@ export declare const StudioProject: z.ZodObject<{
                     "anime-boy": "anime-boy";
                     warrior: "warrior";
                     human: "human";
+                    robot: "robot";
                 }>, z.ZodType<`user.${string}`, unknown, z.core.$ZodTypeInternals<`user.${string}`, unknown>>]>>;
                 scale: z.ZodDefault<z.ZodObject<{
                     height: z.ZodDefault<z.ZodNumber>;
@@ -1222,7 +1243,7 @@ export declare function readStudioProject(input: unknown): StudioProject;
 export declare function createStudioProject(style: Style, kind: WorldSeed['kind'] | 'empty' | 'small', play?: {
     orientation: "any" | "landscape" | "portrait";
     view: "side" | "free";
-    moves: ("double-jump" | "wall-jump" | "dash")[];
+    moves: ("dash" | "double-jump" | "wall-jump")[];
     devices: ("phone" | "tablet" | "computer" | "tv" | "vr")[];
 }): StudioProject;
 export declare function importStudioProject(text: string): StudioProject;

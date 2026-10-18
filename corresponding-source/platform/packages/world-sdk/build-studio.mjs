@@ -30,7 +30,7 @@ const styled = await postcss([tailwind({ base: web, optimize: true })]).process(
 const componentCss = await readFile('dist/studio.css', 'utf8');
 await writeFile('dist/studio.css', styled.css + '\n' + componentCss);
 // The same tracked application assets, with their existing credits, served from the local package.
-for (const directory of ['brand', 'create', 'materials', 'models', 'human', 'bodies', 'audio', 'market', 'mediapipe']) {
+for (const directory of ['film-examples', 'brand', 'create', 'materials', 'models', 'human', 'bodies', 'audio', 'market', 'mediapipe']) {
   await cp(resolve(web, 'public', directory), resolve('dist/studio-assets', directory), { recursive: true });
 }
 for (const family of ['draco', 'basis']) {

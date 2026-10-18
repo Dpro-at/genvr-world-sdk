@@ -1,9 +1,9 @@
-import { CommandPayload, WorldDocument, WorldPackage, WORLD_PACKAGE_BYTES, WORLD_PACKAGE_COMMANDS, SIZE_TIERS, type ItemPackage } from '@genvr/contracts';
+import { CommandPayload, WorldDocument, WorldPackage, WORLD_PACKAGE_BYTES, WORLD_PACKAGE_COMMANDS, SIZE_TIERS, AVAILABLE_WORLD_STYLES, supportsWorldStarter, type ItemPackage } from '@genvr/contracts';
 import { getCoreItem } from '@genvr/core-library';
-import { runAssistant, runTool, type AssistantHost, type ChatModel, type ChatMessage, type AssistantEvent } from '@genvr/assistant';
+import { runAssistant, runTool, type AssistantHost, type ChatModel, type ChatMessage, type AssistantEvent, type AvatarPresentationEvent } from '@genvr/assistant';
 import { applyCommand, createWorldState, encodeTerrain, planWaterFill, type WorldState } from '@genvr/world';
 
-export const SDK_VERSION = '0.3.0-preview.1';
+export const SDK_VERSION = '0.3.0-preview.3';
 export const PACKAGE_WORK_BUDGET = 5_000_000;
 export type WorldEvent = { type: 'changed' | 'saved' | 'opened'; id: string } | { type: 'assistant'; event: AssistantEvent };
 export interface NewWorldOptions {
@@ -87,12 +87,21 @@ export class WorldSession {
   #undo: WorldPackage[] = [];
   #redo: WorldPackage[] = [];
   #history: ChatMessage[] = [];
+  #presentationInfo: (() => string) | undefined;
+  #presentation: ((event: AvatarPresentationEvent) => string | null) | undefined;
+  /** Attach a live viewport controller; presentation is never written into world packages. */
+  attachPresentation(execute: (event: AvatarPresentationEvent) => string | null, describe?: () => string): () => void {
+    this.#presentation = execute; this.#presentationInfo = describe;
+    return () => { if (this.#presentation === execute) { this.#presentation = undefined; this.#presentationInfo = undefined; } };
+  }
   readonly #onEvent: ((event: WorldEvent) => void) | undefined;
   constructor(input: unknown, onEvent?: (event: WorldEvent) => void) {
     const parsed = replayWorldPackage(input);
     this.#record = parsed.package; this.#state = parsed.state; this.#onEvent = onEvent;
   }
   static create(options: NewWorldOptions = {}): WorldSession {
+    if (options.base && !AVAILABLE_WORLD_STYLES.includes(options.base.style.base)) throw new Error('This world style is not available yet.');
+    if (options.base?.world && !supportsWorldStarter(options.base.style.base, options.base.world.kind)) throw new Error('This world kind is not available in the selected style.');
     return new WorldSession({ format: 'genvr-world', formatVersion: 1, sdkVersion: SDK_VERSION,
       id: options.id ?? `local.${crypto.randomUUID()}`, title: options.title ?? 'My world',
       base: options.base ?? { style: { base: 'blocky' }, sizeTier: 'small' }, commands: [], assets: [],
@@ -128,6 +137,7 @@ export class WorldSession {
   }
   #host(): AssistantHost {
     return {
+      ...(this.#presentation ? { presentAvatar: this.#presentation, ...(this.#presentationInfo ? { presentationInfo: this.#presentationInfo } : {}) } : {}),
       world: () => this.world, heightAt: (x, z) => this.heightAt(x, z), focus: () => ({ x: 0, z: 0 }),
       blockGround: () => !!this.#state.voxels,
       isPlaceable: id => !!getCoreItem(id) || this.#record.assets.some(asset => asset.id === id),

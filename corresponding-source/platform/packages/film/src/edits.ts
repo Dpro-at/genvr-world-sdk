@@ -439,7 +439,7 @@ export function showSubtitles(project: FilmProject, lang: string | null) {
  * The spoken voice of one language (FILM-12b): its sound track (made when missing, tagged with `lang`) holds the one
  * recording of the whole film's lines in that language, from the film's start, as dialogue.
  */
-export function setVoice(project: FilmProject, args: { lang: string; name: string; media: string }, ctx: EditContext): string {
+export function setVoice(project: FilmProject, args: { lang: string; name: string; media: string; append?: boolean; start?: Tick }, ctx: EditContext): string {
   const media = project.media.find((m) => m.id === args.media) ?? refuse('Recording not found.');
   if (media.kind !== 'audio') refuse('A voice must be a sound file.');
   let t = project.tracks.find((x) => x.kind === 'sound' && x.lang === args.lang);
@@ -451,7 +451,10 @@ export function setVoice(project: FilmProject, args: { lang: string; name: strin
   // The clip ends on the last whole frame of the voice.
   const step = frame(project.rate), duration = Math.floor(media.duration / step) * step;
   if (duration < step) refuse('The voice is shorter than one frame.');
-  t.clips = [{ id: ctx.id(), type: 'media', media: media.id, start: 0, in: 0, duration, volume: 1, soundType: 'dialogue' }];
+  const start = args.start ?? 0;
+  if (args.append && t.clips.some(c => start < c.start + c.duration && start + duration > c.start)) refuse('The new dialogue overlaps existing language audio.');
+  const clip: MediaClip = { id: ctx.id(), type: 'media', media: media.id, start, in: 0, duration, volume: 1, soundType: 'dialogue' };
+  t.clips = args.append ? [...t.clips, clip].sort((a,b) => a.start-b.start) : [clip];
   return t.id;
 }
 

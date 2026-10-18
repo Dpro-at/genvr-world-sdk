@@ -1,3 +1,4 @@
+import { SceneLights } from './lighting.js';
 import { z } from 'zod';
 import { AccessPolicy } from './access.js';
 import { readLegacyItems, StoredGame } from './game.js';
@@ -321,6 +322,7 @@ export const WorldDocument = z.object({
   sizeTier: SizeTier,
   access: AccessPolicy,
   environment: z.object({
+    lighting: SceneLights.optional(),
     sky: z.object({ preset: SkyPreset, params: Params.default({}) }),
     weather: z.object({ preset: WeatherPreset, params: Params.default({}) }),
     water: z.array(WaterBody).default([]),

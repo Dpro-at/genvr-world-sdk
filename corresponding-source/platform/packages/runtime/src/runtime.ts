@@ -1,3 +1,7 @@
+import { SceneLighting } from './scene-lighting.js';
+import { avatarMotionEntry } from './avatar-motion-library.js';
+import { retargetAvatarMotion } from './avatar-motion.js';
+import type { AvatarExpression } from './avatar-expression.js';
 import { TidewaterLighting } from './tidewater-sky/lighting.js';
 import { builderAssembly, exportBuilderSelection } from './builder-export.js';
 import { TidewaterGround } from './tidewater-ground/index.js';
@@ -200,12 +204,13 @@ import {
 
 export interface RuntimeOptions {
   /** Optional filming rig, after gameplay camera and before environment/LOD/water update.
-   * Return true on a camera cut to discard temporal rendering history. */
+   * Return true on a camera cut to discard temporal rendering history. A structured result also declares
+   * actor visibility while the filming camera replaces the gameplay camera. */
   onFilmFrame?: (
     camera: PerspectiveCamera,
     dt: number,
     player: { x: number; y: number; z: number },
-  ) => boolean | void;
+  ) => boolean | { cut: boolean; actorVisible: boolean } | void;
   /** Called immediately after drawing, while the canvas framebuffer is readable. */
   onRendered?: () => void;
   container: HTMLElement;
@@ -392,7 +397,13 @@ export interface GenvrRuntime {
    * toggles sitting. Returns false for unknown animations.
    */
   playAnimation(id: string): boolean;
+  presentAnimation(target: string, animationId: string): boolean;
+  importAvatarMotion(target: string, id: string, data: ArrayBuffer): Promise<boolean>;
+  presentExpression(target: string, expression: AvatarExpression): boolean;
+  supportsAvatarExpression(target: string): boolean;
+  readonly avatarState: {body:string;visible:boolean;mouth:import('@genvr/contracts').MouthShape;position:{x:number;y:number;z:number};headTop:number};
   /** Temporary filming pose; native sitting, emotes and player controls remain independent. */
+  prepareSceneAnimation(id: string): Promise<boolean>;
   playSceneAnimation(id: string): boolean;
   /** Local production preview only: transient object choreography, never saved commands. */
   sceneMotion(instanceId: string, motion: SceneMotion, seconds: number): boolean;
@@ -457,7 +468,7 @@ export interface GenvrRuntime {
    * A player says a voice line (the room's `said`, lip sync P2-44): the sound plays from them and their mouth moves,
    * by the line's mouth cues or, without cues, by the sound's loudness. `self` is the local player.
    */
-  say(id: string | 'self', line: { url: string; voice: Pick<VoiceLine, 'duration' | 'cues'> }): void;
+  say(id: string | 'self', line: { url: string; voice: Pick<VoiceLine, 'duration' | 'cues'> }, onMouth?: (shape: import('@genvr/contracts').MouthShape) => void): Promise<boolean>;
   /**
    * The local player is knocked out in a game (P9-12): the avatar falls and fades; false stands
    * it up again (respawn).
@@ -482,6 +493,8 @@ export interface GenvrRuntime {
    */
   capture(maxWidth?: number): string;
   /** Loudness (0-1) of footsteps and other effects, and of the weather and nature ambience (P2-08). */
+  setSpeechMouth(id: string, shape: import('@genvr/contracts').MouthShape): boolean;
+  setVoiceRecordingStream(stream: MediaStream | null): void;
   setAudioVolumes(volumes: { effects: number; ambience: number }): void;
   /** The player's own avatar: colors and worn clothing and accessories (P2-20). */
   setAvatarLook(look: AvatarLook): void;
@@ -723,6 +736,7 @@ export async function createRuntime({
   const half = SIZE_TIERS[world.sizeTier].sideMeters / 2;
 
   const scene = new Scene();
+  const sceneLighting = new SceneLighting(scene);
   // Sky, light, fog, and weather from the Core Library; live when set_sky / set_weather change them.
   const touchDevice = typeof window !== 'undefined' && window.matchMedia?.('(pointer: coarse)').matches;
   const environment = new EnvironmentView(
@@ -738,7 +752,7 @@ export async function createRuntime({
   /** The surf, wave by wave, timed to the shore waves on the room clock (plan task 6). */
   const surf = new SurfAudio(audio);
   /** Who is saying a voice line now, and on which clock (lip sync, P2-44). */
-  const speeches = new Map<string, { mouth: SpeechMouth; now: () => number }>();
+  const speeches = new Map<string, { mouth: SpeechMouth; now: () => number; onMouth?: (shape: import('@genvr/contracts').MouthShape) => void }>();
   const audioState = () => ({
     weather: state.doc.environment.weather.preset,
     // The sky shown now: a day-night cycle brings crickets at night (P2-02).
@@ -2777,12 +2791,15 @@ export async function createRuntime({
       const speaker = id === 'self' ? avatar : remotePlayers.avatarOf(id);
       const now = speech.now();
       if (!speaker || !speech.mouth.speaking(now)) {
-        speaker?.setMouth('X');
+        speaker?.setMouth('X'); speech.onMouth?.('X');
         speeches.delete(id);
         continue;
       }
-      speaker.setMouth(speech.mouth.shapeAt(now));
+      const shape = speech.mouth.shapeAt(now); speaker.setMouth(shape); speech.onMouth?.(shape);
     }
+    avatar.updateExpression(dt);
+    for (const id of remotePlayers.ids()) remotePlayers.avatarOf(id)?.updateExpression(dt);
+
     audio.update(
       dt,
       moved,
@@ -2930,7 +2947,9 @@ export async function createRuntime({
       lookTarget.set(lx, (seaCamera ? seaOffset : groundHeight(lx, lz)) + lh, lz);
       camera.lookAt(lookTarget);
     }
-    if (onFilmFrame?.(camera, dt, feet)) post.resetHistory();
+    const filmFrame = onFilmFrame?.(camera, dt, feet);
+    if (typeof filmFrame === 'object') { if (filmFrame.actorVisible) avatar.root.visible = true; if (filmFrame.cut) post.resetHistory(); }
+    else if (filmFrame) post.resetHistory();
     if (viewOnly) {
       avatar.root.visible = false;
       const away = Math.hypot(camera.position.x - character.feet.x, camera.position.z - character.feet.z);
@@ -3032,6 +3051,11 @@ export async function createRuntime({
     submerged += ((under ? 1 : 0) - submerged) * Math.min(1, dt / post.fadeSeconds);
     post.setSubmerged(submerged);
     audio.setUnderwater(submerged > 0.5);
+    sceneLighting.update(state.doc.environment.lighting ?? [], id => {
+      if(id === 'self') return avatar.root.position;
+      const live = remotePlayers.numberAnchor(id); if(live) return {x:live.x,y:live.y-1.5,z:live.z};
+      const instance = state.doc.instances.find(row=>row.instanceId===id); return instance ? {x:instance.transform.position[0],y:instance.transform.position[1],z:instance.transform.position[2]} : null;
+    });
     surf.update(dt, camera.position, Date.now() + serverOffset, water.surfShore(), water.surfGround());
     if (viewCube) {
       const show =
@@ -3258,6 +3282,7 @@ export async function createRuntime({
     get sideMoves() {
       return sideMoves;
     },
+    get avatarState() {return {body:avatar.body,visible:avatar.root.visible,mouth:avatar.mouth,position:{x:avatar.root.position.x,y:avatar.root.position.y,z:avatar.root.position.z},headTop:avatar.headTop};},
     get localPlayer() {
       // Seat 1's moves carry the item's pose (spec 5.2); the room ignores passengers' moves.
       const pose = rideNow ? items.livePose(rideNow.instanceId) : null;
@@ -3305,6 +3330,27 @@ export async function createRuntime({
     },
     remotePlayerIds: () => remotePlayers.ids(),
     toggleSit,
+    async importAvatarMotion(target, id, data) {
+      if (!/^motion:[A-Za-z0-9_-]{1,100}$/.test(id)) throw new Error('Invalid motion ID.');
+      const actor = target === 'self' ? avatar : remotePlayers.avatarOf(target);
+      if (!actor) return false;
+      const clip = await retargetAvatarMotion(data, actor, id);
+      if (target === 'self') { animator.register(clip); return true; }
+      if (remotePlayers.avatarOf(target) !== actor) return false;
+      return remotePlayers.registerPresentation(target, clip);
+    },
+    presentAnimation(target, id) {
+      if (target === 'self') { if (id === 'idle') { emote = null; return true; }
+        if (id.startsWith('motion:') && (animator.clipNames.includes(id) || !!avatarMotionEntry(id))) { emote = { clip: id, left: null }; return true; }
+        return playAnimation(id); }
+      const animation = findAnimation(id);
+      return remotePlayers.playPresentation(target, id === 'idle' ? 'Idle' : id.startsWith('motion:') ? id : animation?.clip ?? '');
+    },
+    supportsAvatarExpression(target) { return Boolean((target === 'self' ? avatar : remotePlayers.avatarOf(target))?.expressionSupported); },
+    presentExpression(target, expression) {
+      const actor = target === 'self' ? avatar : remotePlayers.avatarOf(target);
+      if (!actor || (expression !== 'neutral' && !actor.expressionSupported)) return false; actor.setExpression(expression); return true;
+    },
     playAnimation,
     sceneMotion: (id, motion, seconds) => {
       if (
@@ -3396,7 +3442,9 @@ export async function createRuntime({
         )
         .map((i) => i.instanceId),
     clearSceneMotions,
+    prepareSceneAnimation: id => animator.prepare(findAnimation(id)?.clip ?? id),
     playSceneAnimation: (id) => {
+      if (id.startsWith('motion:') && (avatarMotionEntry(id) || animator.clipNames.includes(id))) { sceneAnimation.start(id, null); animator.play(id); return true; }
       const animation = findAnimation(id);
       if (!animation || !animator.clipNames.includes(animation.clip)) return false;
       sceneAnimation.start(
@@ -3471,14 +3519,14 @@ export async function createRuntime({
       const at = avatar.root.position;
       return remotePlayers.inReach({ x: at.x, z: at.z, yaw: avatar.root.rotation.y }, reach, arcDeg);
     },
-    say: (id, line) => {
+    say: async (id, line, onMouth) => {
       const speaker = id === 'self' ? avatar : remotePlayers.avatarOf(id);
-      if (!speaker) return;
+      if (!speaker) return false;
       const at = speaker.root.position;
-      void audio
+      return audio
         .playVoice(line.url, { x: at.x, y: at.y + speaker.headTop - 0.2, z: at.z })
         .then((started) => {
-          if (!started) return;
+          if (!started) return false;
           const mouth = new SpeechMouth();
           mouth.speak(
             line.voice,
@@ -3486,7 +3534,8 @@ export async function createRuntime({
             line.voice.cues.length > 0 ? undefined : started.analyser,
           );
           speeches.get(id)?.mouth.stop();
-          speeches.set(id, { mouth, now: started.now });
+          speeches.set(id, { mouth, now: started.now, ...(onMouth ? {onMouth} : {}) });
+          return true;
         });
     },
     showHit: (id, damage) => {
@@ -3556,6 +3605,8 @@ export async function createRuntime({
         post.resetHistory();
       }
     },
+    setSpeechMouth: (id, shape) => { const speaker=id==='self'?avatar:remotePlayers.avatarOf(id); if(!speaker)return false; speaker.setMouth(shape);return true; },
+    setVoiceRecordingStream: stream => audio.setVoiceRecordingStream(stream),
     setAudioVolumes: (volumes) => audio.setVolumes(volumes),
     setAvatarLook: (look) => {
       // Another body type brings another skeleton: the animator binds to its clips.
@@ -3681,6 +3732,7 @@ export async function createRuntime({
       previews.dispose();
       water.dispose();
       environment.dispose();
+      sceneLighting.dispose();
       tidewaterLighting?.dispose();
       tidewaterGround?.dispose();
       sunShadows.dispose();

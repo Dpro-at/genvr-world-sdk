@@ -21,6 +21,7 @@ import {
 } from '@genvr/contracts';
 import { WALL_SURFACES, type WallSurface } from '@genvr/world';
 import { z } from 'zod';
+import { AvatarPresentationEvent } from './presentation.js';
 
 /**
  * Assistant tools (docs/AI-TOOLS.md). Each tool is a friendly front for one or more world
@@ -62,6 +63,9 @@ const Area = {
 export const PLACE_ITEMS_MAX = 200;
 
 export const TOOL_ARGS = {
+  avatar_voice: z.object({ action: z.enum(['models','install','voices','clone','assign','speak','job','recordings','audio','replay','demo','playback','demo_all','preview','preview_demo','prepare_previews','remove','design','save_design','export_voice']), preview:z.boolean().optional(), voiceType:z.enum(['male','female','child']).optional(), description:z.string().max(400).optional(), confirm:z.boolean().optional(), command:z.enum(['play','pause','stop','seek','rate','volume']).optional(), value:z.number().finite().optional(), demoId:z.string().max(80).optional(), audioId:z.string().uuid().optional(), model:z.string().max(80).optional(), jobId:z.string().uuid().optional(), voiceId:z.string().uuid().optional(), name:z.string().max(80).optional(), audio:z.string().max(12*1024*1024).optional(), consent:z.boolean().optional(), projectId:z.string().max(120).optional(), target:z.string().regex(/^(self|[A-Za-z0-9_-]{1,100})$/).default('self'), text:z.string().max(1200).optional(), language:z.string().max(8).optional() }).strict(),
+  user_avatar_library: z.object({ action: z.enum(['list', 'assign', 'play']), target: z.string().regex(/^(self|[A-Za-z0-9_-]{1,100})$/).default('self'), id: z.string().max(150).nullable().optional(), query: z.string().max(200).default(''), offset: z.number().int().min(0).default(0), limit: z.number().int().min(1).max(100).default(30) }).strict(),
+  present_avatar: z.object({ event: AvatarPresentationEvent }).strict(),
   get_resource_controls: z.object({
     item_id: z
       .string()
@@ -711,6 +715,9 @@ export type ToolName = keyof typeof TOOL_ARGS;
 export type ToolArgs<N extends ToolName> = z.infer<(typeof TOOL_ARGS)[N]>;
 
 const DESCRIPTIONS: Record<ToolName, string> = {
+  avatar_voice: 'Manage local avatar voices: design a synthetic voice using language/voiceType/text/description, audition its draft, save_design with audioId/name, then assign separately. Models and installation, authorized reference voice profiles (clone), assign a voice, generate speech (speak), and poll job status. Call models/voices first; install and speak return job IDs. Audio stays local. Arabic support depends on the selected model.',
+  user_avatar_library: 'List private user characters and motions, assign an available character ID to self or a host agent, or play an available private motion ID. No asset publishing or redistribution. List before choosing IDs.',
+  present_avatar: 'Optionally show a gesture, facial expression, visual effect, notification or rich card when useful. Transient, never saves the world. target is self or a host agent ID. Use only available Core animation IDs. Never invent live app or stock data. No action permissions are granted by a card.',
   get_resource_controls:
     'Read supported controls, scope, source defaults and documentation for a Core model or ocean resource. Models use instance-scoped set_resource_params; oceans use world-scoped set_sea. Empty model controls means no generated settings; creator package controls are not described.',
   set_resource_params:

@@ -77,6 +77,8 @@ export {
   DEFAULT_LOOK,
   restPosition,
   setItemBodyResolver,
+  registerLocalAvatarBody,
+  preloadAvatarLook,
   STANDARD_BONES,
   type AvatarLook,
   type GenvrAvatar,
@@ -115,3 +117,9 @@ export {
   STARFISH_GENERATOR,
   registerSeaLife,
 } from './sealife/index.js';
+
+export { retargetAvatarMotion } from './avatar-motion.js';
+
+export { registerAvatarMotionLibrary, avatarMotionEntry as findAvatarMotion, avatarMotionEntries, type AvatarMotionLibrary, type AvatarMotionEntry } from './avatar-motion-library.js';
+
+export { MOTION_CATEGORIES, motionCategories, type MotionCategory } from './avatar-motion-categories.js';

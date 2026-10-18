@@ -1,3 +1,4 @@
+import type { AvatarPresentationEvent } from './presentation.js';
 import {
   Game,
   newGame,
@@ -9,6 +10,8 @@ import {
   rideToParams,
   SIZE_TIERS,
   WORLD_GENERATOR,
+  AVAILABLE_WORLD_STYLES,
+  supportsWorldStarter,
   ZONE_PARAMS,
   zoneFromParams,
   type CommandPayload,
@@ -81,6 +84,10 @@ export type ChatModel = (
 
 /** What the assistant can see and change: the editor's world (the studio runtime). */
 export interface AssistantHost {
+  presentAvatar?(event: AvatarPresentationEvent): string | null;
+  presentationInfo?(): string;
+  avatarVoice?(input: ToolArgs<'avatar_voice'>): Promise<unknown>;
+  userAvatarLibrary?(input: ToolArgs<'user_avatar_library'>): Promise<unknown>;
   world(): WorldDocument;
   heightAt(x: number, z: number): number;
   /**
@@ -351,6 +358,7 @@ export function systemPrompt(host: AssistantHost): string {
   const front = inFront(focus, line);
   return [
     'You are the Genvr build assistant. You build 3D places for kids and teens by calling tools.',
+    ...(host.presentAvatar ? ['Avatar presentation is available via present_avatar. Use it only when helpful; gestures and expressions are optional. Do not claim that a display card performs a real external action.', host.presentationInfo?.() ?? ''] : []),
     'Rules:',
     '- Always act with tools; never write code. Keep replies to one or two short, friendly sentences.',
     `- The ground is the x-z plane in meters, from -${half} to ${half}. y is up; heights are automatic.`,
@@ -362,7 +370,7 @@ export function systemPrompt(host: AssistantHost): string {
     ...placeNotes(host),
     '',
     'Items you can place:',
-    ...queryLibrary({ type: 'model' })
+    ...queryLibrary({ type: 'model', style: world.style.base })
       .slice(0, 60)
       .map((entry) => `- ${entry.manifest.id}: ${entry.manifest.name}`),
     '',
@@ -433,10 +441,11 @@ export function executeTool(
   const half = SIZE_TIERS[world.sizeTier].sideMeters / 2;
   const inside = (x: number, z: number) => Math.abs(x) <= half && Math.abs(z) <= half;
   const line = host.sideLine?.() ?? null;
-  const unknownItem = (id: string) =>
-    getCoreItem(id) || host.isPlaceable?.(id) || offered.get(host)?.has(id)
-      ? null
-      : `Unknown item "${id}". Use search_catalog to find item ids.`;
+  const unknownItem = (id: string) => {
+    const core = getCoreItem(id);
+    if (core && !core.manifest.styles.includes(world.style.base)) return `Item "${id}" does not support the ${world.style.base} world style. Use search_catalog for compatible items.`;
+    return core || host.isPlaceable?.(id) || offered.get(host)?.has(id) ? null : `Unknown item "${id}". Use search_catalog to find item ids.`;
+  };
   // Block places (P2-26): the top of the blocks in a column, and the changes as commands.
   const ground = (x: number, z: number) => Math.round(host.heightAt(x + 0.5, z + 0.5));
   const builder = host.focus();
@@ -468,6 +477,13 @@ export function executeTool(
   };
 
   switch (name) {
+    case 'avatar_voice': return { ok:false, result:'Use the asynchronous tool runner for voice operations.' };
+    case 'user_avatar_library': return { ok: false, result: 'Use the asynchronous tool runner for private library operations.' };
+    case 'present_avatar': {
+      if (!host.presentAvatar) return { ok: false, result: 'Avatar presentation is not enabled in this host.' };
+      const error = host.presentAvatar((args as ToolArgs<'present_avatar'>).event);
+      return { ok: !error, result: error ?? 'Avatar presentation updated.' };
+    }
     case 'get_resource_controls': {
       const { item_id } = args as ToolArgs<'get_resource_controls'>;
       const entry = getLibraryItem(item_id);
@@ -555,7 +571,7 @@ export function executeTool(
     }
     case 'search_catalog': {
       const { query } = args as ToolArgs<'search_catalog'>;
-      const { found, list } = wordSearch(query);
+      const { found, list } = wordSearch(query, world.style.base);
       return {
         ok: true,
         result:
@@ -1085,6 +1101,7 @@ export function executeTool(
     case 'make_world': {
       const a = args as ToolArgs<'make_world'>;
       if (host.blockGround?.()) return done(BLOCK_GROUND_REFUSAL, '');
+      if (!supportsWorldStarter(world.style.base, a.kind)) return done(`The ${a.kind} generator is available only in Realistic worlds. This ${world.style.base} world's style is preserved.`, '');
       const seed = {
         seed: a.seed ?? Math.floor(random() * 0x7fffffff),
         kind: a.kind,
@@ -1296,6 +1313,10 @@ export function executeTool(
     }
     case 'set_style': {
       const { base } = args as ToolArgs<'set_style'>;
+      if (!AVAILABLE_WORLD_STYLES.includes(base)) return done('This world style is not available yet.', '');
+      if ((base === 'voxel') !== Boolean(world.voxels)) return done('Voxel ground requires a new Voxel world. The current ground type is preserved.', '');
+      const incompatible = world.instances.filter(item => { const core = getCoreItem(item.itemId); return core && !core.manifest.styles.includes(base); });
+      if ((world.terrain.world && base !== 'realistic') || incompatible.length) return done('This style is not compatible with the current world and its items. Create a new world in that style.', '');
       return done(
         host.apply([{ type: 'set_style', params: { ...world.style, base } }]),
         `Style is now ${base}.`,
@@ -1546,9 +1567,9 @@ function gameError(error: { issues: ReadonlyArray<{ path: PropertyKey[]; message
 }
 
 /** Core models and supported world resources matching a name, id or subcategory. */
-function wordSearch(query: string): { found: boolean; list: CatalogHit[] } {
+function wordSearch(query: string, style: WorldDocument['style']['base']): { found: boolean; list: CatalogHit[] } {
   const words = query.toLowerCase().split(/\s+/).filter(Boolean);
-  const all = queryLibrary().filter(
+  const all = queryLibrary({ style }).filter(
     (entry) => entry.manifest.type === 'model' || getOceanResource(entry.manifest.id),
   );
   const found = all.filter((entry) => {
@@ -1580,7 +1601,7 @@ const MEANING_HITS = 8;
 async function searchCatalog(query: string, host: AssistantHost, signal?: AbortSignal): Promise<Outcome> {
   const hits = await Promise.resolve(host.searchCatalog?.(query, signal)).catch(() => null);
   const placeable = (hits ?? [])
-    .filter((hit) => getCoreItem(hit.id) || getOceanResource(hit.id) || hit.category === '3d-models')
+    .filter((hit) => { const entry = getLibraryItem(hit.id); return entry ? entry.manifest.styles.includes(host.world().style.base) && Boolean(getCoreItem(hit.id) || getOceanResource(hit.id)) : hit.category === '3d-models'; })
     .slice(0, MEANING_HITS);
   for (const hit of placeable) {
     if (getCoreItem(hit.id) || getOceanResource(hit.id)) continue;
@@ -1589,7 +1610,7 @@ async function searchCatalog(query: string, host: AssistantHost, signal?: AbortS
     offered.set(host, known);
   }
   if (placeable.length === 0) return executeTool('search_catalog', { query }, host);
-  const words = wordSearch(query);
+  const words = wordSearch(query, host.world().style.base);
   const listed = new Set(placeable.map((hit) => hit.id));
   const more = words.found ? words.list.filter((hit) => !listed.has(hit.id)) : [];
   const line = (hit: CatalogHit) =>
@@ -1619,6 +1640,16 @@ async function callTool(
     return { outcome: { ok: false, result: `Error: there is no tool named ${name}.` }, args: rawArgs };
   const parsed = parseArgs(name, rawArgs);
   if ('error' in parsed) return { outcome: { ok: false, result: `Error: ${parsed.error}` }, args: rawArgs };
+  if (name === 'avatar_voice') {
+    if (!host.avatarVoice) return {outcome:{ok:false,result:'Local voice service is not connected in this host.'},args:parsed.args};
+    try {return {outcome:{ok:true,result:JSON.stringify(await host.avatarVoice(parsed.args as ToolArgs<'avatar_voice'>))},args:parsed.args};}
+    catch(error) {return {outcome:{ok:false,result:error instanceof Error?error.message:String(error)},args:parsed.args};}
+  }
+  if (name === 'user_avatar_library') {
+    if (!host.userAvatarLibrary) return { outcome: { ok: false, result: 'Private user library is not connected in this host.' }, args: parsed.args };
+    try { return { outcome: { ok: true, result: JSON.stringify(await host.userAvatarLibrary(parsed.args as ToolArgs<'user_avatar_library'>)) }, args: parsed.args }; }
+    catch (error) { return { outcome: { ok: false, result: error instanceof Error ? error.message : String(error) }, args: parsed.args }; }
+  }
   const outcome =
     name === 'search_catalog'
       ? await searchCatalog((parsed.args as ToolArgs<'search_catalog'>).query, host, signal)

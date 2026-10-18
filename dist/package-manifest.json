@@ -1,6 +1,6 @@
 {
   "name": "3d-world-sdk",
-  "version": "0.3.0-preview.1",
+  "version": "0.3.0-preview.8",
   "type": "module",
   "description": "Standalone Genvr world authoring, local persistence and explicit platform publication adapters.",
   "license": "AGPL-3.0-only",
@@ -49,8 +49,14 @@
     "dist",
     "demo",
     "assets",
+    "skills",
     "serve.mjs",
     "serve-studio.mjs",
+    "live-studio-bridge.mjs",
+    "local-voice.mjs",
+    "voice-worker.py",
+    "voice-requirements.txt",
+    "voice-demos.json",
     "README.md",
     "LICENSE"
   ]

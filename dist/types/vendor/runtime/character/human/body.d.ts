@@ -36,7 +36,7 @@ export declare const LASH_KEEP: {
  * The anime body material: cel shading with warm shadows, skin and shorts by region, rim light (one draw call);
  * `skinMaterial` paints a fantasy skin over the skin region.
  */
-export declare function humanMaterial(skin?: string, shorts?: string, skinMaterial?: SkinMaterial, face?: Record<string, [number, number, number]>): Material;
+export declare function humanMaterial(skin?: string, shorts?: string, skinMaterial?: SkinMaterial, face?: Record<string, [number, number, number]>, brow?: string): Material;
 /**
  * The anime outline: the body drawn again from its back faces, pushed out along the normals (`OUTLINE.width`,
  * applied by the skinning node), in a dark shade of each surface's own colour. Shares the colour uniforms of the
@@ -51,6 +51,6 @@ export declare function humanGeometry(data: HumanData, style?: HumanStyle, gende
  */
 export declare function humanDetail(full: BufferGeometry, detail: 'full' | 'lite'): BufferGeometry;
 /** Recolours a generated body's own material (skin and shorts; owner, CHAR-02: skin colour per character). */
-export declare function setHumanColors(material: Material, skin: string, shorts: string): void;
+export declare function setHumanColors(material: Material, skin: string, shorts: string, brow?: string): void;
 /** Shapes the drawn mouth of a generated body for a lip sync viseme. */
 export declare function setHumanMouth(material: Material, shape: string): void;

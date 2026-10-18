@@ -2,7 +2,7 @@ import {
   __require
 } from "./chunk-NSBPE2FW.js";
 
-// ../../../node_modules/.pnpm/@mintplex-labs+piper-tts-we_2f4f79259d9baceb259718d786b4025f/node_modules/@mintplex-labs/piper-tts-web/dist/piper-tts-web.js
+// ../../../../../genvr/node_modules/.pnpm/@mintplex-labs+piper-tts-web@1.0.5_onnxruntime-web@1.26.0-dev.20260416-b7804b056c/node_modules/@mintplex-labs/piper-tts-web/dist/piper-tts-web.js
 var __defProp = Object.defineProperty;
 var __typeError = (msg) => {
   throw TypeError(msg);
@@ -282,9 +282,9 @@ var _TtsSession = class _TtsSession2 {
   }
   async init() {
     var _a, _b2;
-    const { createPiperPhonemize } = await import("./piper-o91UDS6e-MNXGYKWC.js");
+    const { createPiperPhonemize } = await import("./piper-o91UDS6e-SCHYS4BP.js");
     __privateSet(this, _createPiperPhonemize, createPiperPhonemize);
-    const ortModule = await import("./ort.wasm.bundle.min-PN5UOBNU.js");
+    const ortModule = await import("./ort.wasm.bundle.min-PIT3EWBI.js");
     const ort = ortModule.default || ortModule;
     __privateSet(this, _ort, ort);
     (_b2 = __privateGet(this, _logger)) == null ? void 0 : _b2.call(
@@ -457,7 +457,7 @@ async function getBlob(url, callback) {
   return blob;
 }
 
-// ../../../node_modules/.pnpm/onnxruntime-web@1.26.0-dev.20260416-b7804b056c/node_modules/onnxruntime-web/dist/ort.bundle.min.mjs
+// ../../../../../genvr/node_modules/.pnpm/onnxruntime-web@1.26.0-dev.20260416-b7804b056c/node_modules/onnxruntime-web/dist/ort.bundle.min.mjs
 var Wn = Object.defineProperty;
 var ff = Object.getOwnPropertyDescriptor;
 var hf = Object.getOwnPropertyNames;

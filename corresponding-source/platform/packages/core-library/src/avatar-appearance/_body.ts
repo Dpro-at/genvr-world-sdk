@@ -20,6 +20,7 @@ import classic from './bodies/classic.js';
 import flat from './bodies/flat.js';
 import simple from './bodies/simple.js';
 import starter from './bodies/starter.js';
+import robot from './bodies/robot.js';
 
 /**
  * The dressed avatar (tasks P2-20, P2-22): a body type's blocks with repainted areas, plus the worn
@@ -28,7 +29,7 @@ import starter from './bodies/starter.js';
  */
 
 /** Body types in library order; Classic is the main avatar (decision 73). */
-export const AVATAR_BODIES: readonly CoreBody[] = [classic, simple, starter, flat, animeBoy, warrior, human];
+export const AVATAR_BODIES: readonly CoreBody[] = [classic, simple, starter, flat, animeBoy, warrior, human, robot];
 
 /**
  * Bodies players pick for themselves (the Look tab). The flat 2D body is a place body: it is

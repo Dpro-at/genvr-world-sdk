@@ -82,6 +82,7 @@ export type PlaceScript = z.infer<typeof PlaceScript>;
 /** What `set_script` carries: a script without its id (the id is the command's `scriptId`). */
 export declare const PlaceScriptBody: z.ZodObject<{
     name: z.ZodString;
+    enabled: z.ZodBoolean;
     from: z.ZodOptional<z.ZodObject<{
         itemId: z.ZodString;
         version: z.ZodString;
@@ -89,7 +90,6 @@ export declare const PlaceScriptBody: z.ZodObject<{
     }, z.core.$strip>>;
     source: z.ZodString;
     api: z.ZodLiteral<1>;
-    enabled: z.ZodBoolean;
 }, z.core.$strip>;
 export type PlaceScriptBody = z.infer<typeof PlaceScriptBody>;
 /** The total source size of a place's scripts. */

@@ -35,6 +35,8 @@ import {
   SlidersHorizontal,
   Sparkles,
   Wand2,
+  Bell,
+  PanelsTopLeft,
   type LucideIcon,
 } from 'lucide-react';
 import { useEffect, useMemo, useState, type RefObject } from 'react';
@@ -148,6 +150,8 @@ const KINDS: Array<{
     filter: { type: 'vfx' },
     empty: 'Fire, smoke, sparkles, and light effects are coming to the library.',
   },
+  { id: 'notifications', label: 'Notifications', Icon: Bell, filter: {} },
+  { id: 'cards', label: 'UI cards', Icon: PanelsTopLeft, filter: {} },
 ];
 
 /** Icons of the drawn items (walls, openings, water). */
@@ -207,31 +211,41 @@ function Chips<T>({
 export function LibraryPanel({
   runtime,
   status,
-  style,
+  style: suppliedStyle,
 }: {
   runtime: RefObject<GenvrRuntime | null>;
   status: ToolStatus;
   style: Style;
 }) {
   const host = useStudioHost();
+  const kinds = host.presentationControls ? KINDS : KINDS.filter(row => row.id !== 'notifications' && row.id !== 'cards');
   const [text, setText] = useState('');
   const [kind, setKind] = useState(KINDS[0]!.id);
   const [group, setGroup] = useState<string | undefined>(undefined);
   const [price, setPrice] = useState<'free' | 'paid' | undefined>(undefined);
   const [source, setSource] = useState<ItemSource | undefined>(undefined);
-  const [anyStyle, setAnyStyle] = useState(false);
+  const [style, setStyle] = useState(suppliedStyle);
+  useEffect(() => {
+    const sync = () => setStyle(runtime.current?.world.style.base ?? suppliedStyle);
+    sync();
+    const timer = setInterval(sync, 300);
+    return () => clearInterval(timer);
+  }, [runtime, suppliedStyle]);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [details, setDetails] = useState<LibraryEntry | null>(null);
   const [selectionError, setSelectionError] = useState('');
+  const [catalogError, setCatalogError] = useState('');
+  const [catalogLoading, setCatalogLoading] = useState(false);
+  const [catalogRetry, setCatalogRetry] = useState(0);
   const [store, setStore] = useState<StoreEntry[]>([]);
   useEffect(() => {
-    if (!host.platform) return;
+    if (!host.platform && !host.catalog) return;
     const controller = new AbortController();
-    fetchStoreItems(controller.signal)
-      .then(setStore)
-      .catch(() => undefined);
+    setCatalogLoading(true); setCatalogError('');
+    const work = host.catalog ? host.catalog.list() : fetchStoreItems(controller.signal);
+    void work.then(items => { if (!controller.signal.aborted) setStore(items); }).catch(() => { if (!controller.signal.aborted) setCatalogError('Marketplace is unavailable. Bundled library items still work.'); }).finally(() => { if (!controller.signal.aborted) setCatalogLoading(false); });
     return () => controller.abort();
-  }, [host.platform]);
+  }, [host.platform, host.catalog, catalogRetry]);
   const [external, setExternal] = useState<StoreEntry[]>([]);
   const [freeOpen, setFreeOpen] = useState(false);
   useEffect(() => {
@@ -263,7 +277,7 @@ export function LibraryPanel({
     {
       ...section.filter,
       ...(picked && !pickedIds ? { subcategory: group } : {}),
-      ...(anyStyle ? {} : { style }),
+      style,
       ...(price ? { price } : {}),
       ...(source ? { source } : {}),
       text,
@@ -274,7 +288,7 @@ export function LibraryPanel({
       worksHere(entry.manifest.id, entry.manifest.subcategory) &&
       (!pickedIds || pickedIds.includes(entry.manifest.id)),
   );
-  const activeFilters = [price, source, anyStyle ? 'style' : undefined].filter(Boolean).length;
+  const activeFilters = [price, source].filter(Boolean).length;
 
   const use = (entry: LibraryEntry) => {
     const rt = runtime.current;
@@ -282,6 +296,8 @@ export function LibraryPanel({
     setDetails(entry);
     setSelectionError('');
     if (!rt) return;
+    if (!manifest.styles.includes(rt.world.style.base)) { setSelectionError('This item is not available for the current world style.'); return; }
+    if (host.catalog && manifest.price.type !== 'free') { setSelectionError('This item requires a Genvr account and an authorized purchase.'); return; }
     const drawn = DRAWN_ITEMS.find((item) => item.manifest.id === manifest.id);
     const ocean = getOceanResource(manifest.id);
     if (ocean) {
@@ -312,7 +328,8 @@ export function LibraryPanel({
       rt.setTool('terrain');
       rt.setBrush({ mode: 'paint', soil: material.soil, material: groundRef(material) });
     } else if (manifest.type === 'animation') {
-      rt.playAnimation(manifest.id);
+      if (host.presentAvatar) { const error = host.presentAvatar({ kind: 'animation', target: 'self', animation: manifest.id, duration: 5500 }); if (error) setSelectionError(error); }
+      else rt.playAnimation(manifest.id);
     } else if (manifest.subcategory === 'sky' || manifest.subcategory === 'weather') {
       // Sky and weather items apply to the whole place (live for everyone, undoable).
       const preset = manifest.id.split('.').pop() as never;
@@ -424,26 +441,21 @@ export function LibraryPanel({
         </button>
       </div>
 
+      <p role="status" aria-label="Library world style" className="rounded-lg border border-ink/10 bg-paper px-2 py-1.5 text-[11px] font-semibold">{style === 'blocky' ? 'Simple' : style === 'anime' ? 'Cartoon' : style === 'voxel' ? 'Voxel' : 'Realistic'} world · compatible items only</p>
+      {catalogLoading ? <p role="status" className="text-xs">Loading marketplace…</p> : null}
+      {catalogError ? <div role="alert" className="text-xs"><p>{catalogError}</p><button type="button" onClick={() => setCatalogRetry(value => value + 1)}>Retry marketplace</button></div> : null}
       {filtersOpen ? (
         <div className="flex flex-col gap-2 rounded-xl border border-ink/10 p-2">
           <p className="text-[11px] font-black text-ink/50 uppercase">Price</p>
           <Chips options={PRICES} value={price} onChange={setPrice} />
           <p className="text-[11px] font-black text-ink/50 uppercase">Made by</p>
-          <Chips options={host.platform ? SOURCES : SOURCES.filter(option => option.value === 'core' || !option.value)} value={source} onChange={setSource} />
-          <p className="text-[11px] font-black text-ink/50 uppercase">Art style</p>
-          <Chips
-            options={[
-              { label: `This place (${style})`, value: false },
-              { label: 'All styles', value: true },
-            ]}
-            value={anyStyle}
-            onChange={(value) => setAnyStyle(Boolean(value))}
-          />
+          <Chips options={host.platform || host.catalog ? SOURCES : SOURCES.filter(option => option.value === 'core' || !option.value)} value={source} onChange={setSource} />
+
         </div>
       ) : null}
 
       <div role="tablist" aria-label="Kinds" className="scroll-row flex gap-1 overflow-x-auto pb-0.5">
-        {KINDS.filter(entry => host.platform || entry.id !== 'free').map((entry) => (
+        {kinds.filter(entry => host.platform || entry.id !== 'free').map((entry) => (
           <button
             key={entry.id}
             type="button"
@@ -504,28 +516,14 @@ export function LibraryPanel({
           }}
         />
       ) : null}
+      {host.presentationControls && ['moves', 'effects', 'notifications', 'cards'].includes(kind) ? <div className="overflow-y-auto space-y-3">{kind === 'moves' ? host.userAvatarControls?.('motions', text) : null}{host.presentationControls(kind === 'moves' ? 'motions' : kind as 'effects' | 'notifications' | 'cards', text)}{kind === 'moves' ? host.presentationControls('expressions', text) : null}</div> : null}
       <div className="grid min-h-0 flex-1 auto-rows-min grid-cols-[repeat(auto-fill,minmax(88px,1fr))] gap-1.5 overflow-y-auto pr-1">
-        {entries.length === 0 ? (
+        {entries.length === 0 && !(host.presentationControls && ['effects', 'notifications', 'cards'].includes(kind)) ? (
           <div className="col-span-full flex flex-col items-start gap-2 px-1 py-4 text-sm text-ink/50">
-            {!anyStyle &&
-            !section.empty &&
-            queryLibrary({ ...section.filter, text }, everything).length > 0 ? (
-              <>
-                <p>Nothing here is made for the {style} style yet.</p>
-                <button
-                  type="button"
-                  onClick={() => setAnyStyle(true)}
-                  className="rounded-lg bg-ink px-2.5 py-1.5 text-xs font-bold text-on-brand"
-                >
-                  Show all styles
-                </button>
-              </>
-            ) : (
-              <p>{section.empty ?? 'Nothing found.'}</p>
-            )}
+            <p>{section.empty ?? `No compatible items found for this ${style === 'blocky' ? 'Simple' : style} world.`}</p>
           </div>
         ) : null}
-        {entries.map((entry) => {
+        {(host.presentationControls && ['notifications', 'cards'].includes(kind) ? [] : entries).map((entry) => {
           const { manifest } = entry;
           const selected = selectedId === manifest.id || details?.manifest.id === manifest.id;
           return (

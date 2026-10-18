@@ -1,3 +1,4 @@
+import type { FaceUniforms } from './human/face.js';
 import {
   Matrix4,
   NodeUpdateType,
@@ -102,6 +103,9 @@ export function useDualQuaternionSkinning(
   const rotate = (q: Node<'vec4'>, v: Node<'vec3'>): Node<'vec3'> =>
     v.add(cross(q.xyz, cross(q.xyz, v).add(v.mul(q.w))).mul(2));
 
+  const faceUniforms = material.userData.face as FaceUniforms | undefined;
+  const blink = faceUniforms ? faceUniforms.eyeClosure.greaterThanEqual(0).select(faceUniforms.eyeClosure, blinkAmount()) : blinkAmount();
+  const opening = faceUniforms ? mouthOpen.max(faceUniforms.surprise.mul(.35)) : mouthOpen;
   material.positionNode = Fn(() => {
     const index = attribute('skinIndex', 'uvec4');
     const weight = attribute('skinWeight', 'vec4');
@@ -128,15 +132,46 @@ export function useDualQuaternionSkinning(
     normalLocal.assign(mix(normalLocal, rotate(r, attribute('normal', 'vec3')), DQS_SHARE).normalize());
     // The blink shape (generated body): an offset of the rest position, turned with the skin (the lids follow the
     // head rigidly, so one rotation serves both blends).
+    // Interpolate the lid's angle around its eye, rather than a straight chord through the eyeball.
+    const restBlink = mesh.geometry.getAttribute('blink') ? attribute('blink', 'vec3') : vec3(0);
+    let blinkDelta = restBlink.mul(blink);
+    if (faceUniforms && mesh.geometry.getAttribute('facePosition')) {
+      const original = attribute('facePosition', 'vec3');
+      const centre = original.x.greaterThan(0).select(faceUniforms.leftEye, faceUniforms.rightEye);
+      const eyeRest = original.sub(centre);
+      const eyeClosed = eyeRest.add(restBlink);
+      const angle = TSL.atan(eyeRest.y.mul(eyeClosed.z).sub(eyeRest.z.mul(eyeClosed.y)), eyeRest.y.mul(eyeClosed.y).add(eyeRest.z.mul(eyeClosed.z))).mul(blink);
+      const closed = vec3(eyeRest.x, eyeRest.y.mul(angle.cos()).sub(eyeRest.z.mul(angle.sin())), eyeRest.y.mul(angle.sin()).add(eyeRest.z.mul(angle.cos())));
+      blinkDelta = closed.sub(eyeRest);
+      if (mesh.geometry.getAttribute('blinkNormal')) {
+        const lidNormal=attribute('normal','vec3').add(attribute('blinkNormal','vec3').mul(blink)).normalize();
+        normalLocal.assign(mix(normalLocal,rotate(r,lidNormal),blink).normalize());
+      }
+
+    }
     const face = mesh.geometry.getAttribute('blink')
       ? rotate(
           r,
-          attribute('blink', 'vec3')
-            .mul(blinkAmount())
-            .add(attribute('mouthOpen', 'vec3').mul(mouthOpen)),
+          blinkDelta
+            .add(attribute('mouthOpen', 'vec3').mul(opening)),
         )
       : vec3(0);
-    const skinned = mix(positionLocal, rotate(r, attribute('position', 'vec3')).add(moved), DQS_SHARE).add(face);
+    // Eye-opening expressions fade at the socket during closure; lips and brows stay expressive.
+    let expressionWeight: Node<'float'> = float(1);
+    if (faceUniforms && mesh.geometry.getAttribute('facePosition')) {
+      const original = attribute('facePosition', 'vec3');
+      const centre = original.x.greaterThan(0).select(faceUniforms.leftEye, faceUniforms.rightEye);
+      const nearEye = float(1).sub(TSL.smoothstep(float(.018), float(.03), original.sub(centre).length()));
+      expressionWeight = float(1).sub(nearEye.mul(blink));
+    }
+    const expression = faceUniforms && mesh.geometry.getAttribute('faceSmile')
+      ? rotate(r, attribute('faceSmile', 'vec3').mul(faceUniforms.expressions.x)
+          .add(attribute('faceAngry', 'vec3').mul(faceUniforms.expressions.y))
+          .add(attribute('faceSad', 'vec3').mul(faceUniforms.expressions.z))
+          .add(attribute('faceSurprised', 'vec3').mul(faceUniforms.expressions.w))
+          .add(attribute('faceThinking', 'vec3').mul(faceUniforms.thinking)).mul(expressionWeight))
+      : vec3(0);
+    const skinned = mix(positionLocal, rotate(r, attribute('position', 'vec3')).add(moved), DQS_SHARE).add(face).add(expression);
     if (!offset) return skinned;
     // A width that grows with the distance to the camera keeps the outline a steady line on screen.
     const distance = cameraPosition.distance(modelWorldMatrix.mul(vec4(skinned, 1)).xyz);

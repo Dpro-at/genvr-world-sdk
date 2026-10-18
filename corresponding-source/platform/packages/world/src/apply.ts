@@ -703,6 +703,11 @@ function applyToDocument(state: WorldState, input: CommandPayload): ApplyResult 
       doc.style = clone(command.params);
       return { inverse: { type: 'set_style', params: before }, changedChunks: none };
     }
+    case 'set_lighting': {
+      const before = doc.environment.lighting ? clone(doc.environment.lighting) : undefined;
+      if(command.params.lights) doc.environment.lighting = clone(command.params.lights); else delete doc.environment.lighting;
+      return { inverse: { type: 'set_lighting', params: before ? { lights: before } : {} }, changedChunks: none };
+    }
     case 'set_sky': {
       const before = clone(doc.environment.sky);
       doc.environment.sky = { preset: command.params.preset, params: command.params.params ?? {} };

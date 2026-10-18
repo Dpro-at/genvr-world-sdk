@@ -253,3 +253,23 @@ describe('the assistant sets up the game (P9-12)', () => {
       expect(toolDefinitions({ blockGround }).map((tool) => tool.function.name)).toContain('set_game');
   });
 });
+
+
+it('keeps generation, catalog search and placement inside the current world style', () => {
+  const { host: h, applied, state } = host();
+  state.doc.style.base = 'blocky';
+  const refused = executeTool('make_world', { kind: 'island', seed: 42 }, h);
+  expect(refused.ok).toBe(false);
+  expect(refused.result).toContain('only in Realistic');
+  expect(applied).toEqual([]);
+  const found = executeTool('search_catalog', { query: 'oak tree' }, h);
+  expect(found.result).not.toContain('genvr.core.oak-tree');
+  const placement = executeTool('place_item', { itemId: 'genvr.core.oak-tree', x: 5, z: 5 }, h);
+  expect(placement.ok).toBe(false);
+  expect(placement.result).toContain('does not support');
+  expect(applied).toEqual([]);
+  const unavailable = executeTool('set_style', { base: 'anime' }, h);
+  expect(unavailable.ok).toBe(false);
+  expect(executeTool('set_style', { base: 'voxel' }, h).ok).toBe(false);
+  expect(state.doc.style.base).toBe('blocky');
+});

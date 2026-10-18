@@ -1,0 +1,87 @@
+---
+name: genvr-avatar-presentation
+description: Control Genvr SDK avatar gestures, facial expressions, imported GLB motions, screen effects and right-side notification or rich cards through the existing Studio tools and present_avatar executor. Use when animating an existing character, coordinating presentation with a reply, or integrating a host event stream.
+---
+
+# Genvr avatar presentation
+
+Use the existing character, its skeleton and the current Studio workspace. Do not create another viewer or floating controls panel. Manual tools and model calls share `present_avatar`. Presentation is optional: use a gesture or expression when it improves the response, without forcing markers into every reply.
+
+## Find the actual capabilities
+
+- Call `get_studio_capabilities` first on standalone MCP. `list_avatar_motions` searches native IDs and optional host catalog metadata configured through `GENVR_MOTION_CATALOG`. File discovery does not attach the live viewport.
+- `TOOL_DEFINITIONS` contains the current `present_avatar` JSON schema and available Core animation IDs. Inspect it instead of guessing names.
+- Studio's assistant has this tool through its host adapter. The standalone file-only MCP server cannot animate an absent viewport; it reports presentation unavailable. `get_avatar_guide` retrieves this guide without creating a world.
+- A custom host attaches a live controller with `session.attachPresentation(handle.execute, handle.controller.describe)`. The description lists imported motion IDs and their targets. Use only IDs loaded in the current viewport.
+- `self` means the currently visible character editor stage while Avatar is open, or the local world character otherwise. Other targets are host agent IDs supplied by the host; internal runtime IDs are prefixed `host-agent:` by the adapter.
+
+## Use the existing tool locations
+
+| Function | Studio location |
+|---|---|
+| Core gestures | Items → Moves; Avatar → Moves |
+| Imported motion-only GLB files | Items → Moves; Avatar → Moves |
+| Facial expressions | Avatar → Moves → Facial Expressions, in the same card grid |
+| Screen effects | Items → Effects |
+| Notification previews | Items → Notifications |
+| Rich card previews | Items → UI cards |
+| Body, face shape, hair, clothing | Existing Avatar character controls and recipe |
+
+Notifications and cards enter from the right of the room/background viewport. They are screen-space displays, not objects attached to the character's head. Keep the original card styling while using the existing category docks for controls.
+
+## Tool calls
+
+Arguments are `{ "event": { ... } }`. All durations are milliseconds, from 200 to 60000, default 5500. Calls are transient and do not modify world files.
+
+```json
+{"event":{"kind":"expression","target":"self","expression":"thinking","duration":3000}}
+```
+
+Expressions: `neutral`, `smile`, `angry`, `sad`, `surprised`, `thinking`. Use restrained transitions. Missing model face morphs cannot be invented: mesh bodies need compatible morphs; generated humans use drawn face controls; the standard robot uses independent screen eyes, brows and mouth; other block bodies have a simpler mouth response.
+
+```json
+{"event":{"kind":"animation","target":"self","animation":"genvr.core.animation.wave","duration":4000}}
+```
+
+Confirm the animation ID in `TOOL_DEFINITIONS` or `PRESENTATION_ANIMATIONS`; the example ID must not substitute for capability discovery. A rejected animation is not a successful gesture. Both gestures and expressions restore idle/neutral after their deadline.
+
+```json
+{"event":{"kind":"effect","effect":"rain","enabled":true,"intensity":0.4,"duration":6000}}
+```
+
+Effects: matrix, emoji, snow, fireflies, starfield, rain, fire, lightning, aurora, glitch, scanlines, hologram, vignette, confetti. Screen effects are separate from saved world weather. Respect the viewport's reduced motion handling. Disable an effect with `enabled:false`; `{"event":{"kind":"clear"}}` clears the active presentation.
+
+```json
+{"event":{"kind":"notification","notification":{"type":"task","title":"Export ready","body":"The host confirmed that the export completed."}}}
+```
+
+A notification is a display, not proof of an external event. Use actual host data for app, payment and stock notifications. Do not invent prices or state that a terminal command, reply, approval or biometric verification succeeded because its card appeared. Host callbacks perform actions and report their outcome. `sourceId` identifies the host event for those callbacks.
+
+Rich cards use `{kind:"card", title, duration, spec:{root,elements}}`. Elements have `type`, `props`, `children`. Choose existing card types and bounded JSON data; never send executable HTML or JavaScript. A chart's input is data supplied by the host, not a market feed.
+
+## Import realistic old motions
+
+Use `Import GLB motion` to load a self-contained motion-only GLB, at most 16 MB and two minutes. The importer maps source bones to the current body's joint map, retains target proportions, removes horizontal root travel and returns a transient `motion:*` ID. Do not replace a captured motion with a loosely similar procedural gesture and claim equal realism. Load and compare the real source motion.
+
+Verify rest posture, shoulders/elbows, finger direction, hip height, foot contact and transitions on the current body. A motion can be structurally compatible yet need artistic correction. Reimport after changing to another viewport or rebuilding the target body; an ID alone does not transfer the loaded clip. Keep character geometry, clothing and motion data as distinct assets.
+
+Character construction and saved recipe editing are separate from this presentation tool. The full character creation MCP proposal in the original project is not an implemented creation API in this standalone SDK. Do not claim that `present_avatar` creates meshes, designs clothes or runs a 3D generation model.
+
+
+## Existing filming MCP
+
+The SDK forwards the existing platform filming tools when its operator configures `GENVR_HOST_MCP_URL` and `GENVR_HOST_MCP_TOKEN`. First inspect `get_studio_capabilities`, then `list_capture_sessions` for the host place. Use `set_camera`, `capture_photo`, `record_video`, and `get_capture` with the returned session ID. For editing, call `studio_action` with operation `{ "kind": "commands" }` before issuing commands or batches. These are the same editor operations as the Filming workspace. A local file-world ID is not a platform place ID. Do not claim a recording, render or edit succeeded until the host job reports success.
+
+## Private user library
+
+Use `user_avatar_library` with `action: "list"` to discover private character and motion IDs. Paginate with `offset` and `limit` (maximum100). Use `action: "assign"`, `target` and an available character `id`; `id: null` restores the default. Use `action: "play"` with an available private motion ID for playback. Requires an attached Studio host. Standalone file-only MCP reports it unavailable. Never infer permission to publish or redistribute private files. Imported facial morph support varies; skeletal playback does not imply facial expression support.
+
+
+## Local live Studio and voice
+
+Run genvr-studio and configure the MCP process with the exact GENVR_STUDIO_CONNECTION file printed by it. Never request or expose the token. Call list_studio_sessions, select_studio_session and inspect_studio before acting. Live sessions execute the existing editor and private library; file-only sessions have no viewport. Local filming uses the returned local place/session IDs, not an authenticated platform account.
+
+Call avatar_voice with action models and voices before choosing IDs. Install downloads only a supported optional model and returns a job ID; poll action job. Use demo with a discovered demoId to download a publisher-provided evaluation reference, or clone with an authorized PCM WAV base64 sample and consent:true. Never infer consent from an arbitrary public recording. Assign with projectId/target/voiceId; speak with text/language/voiceId. Both Arabic and English are supported by the current model. A cloned profile stores a reusable reference; this is zero-shot conditioning, not model training. Speech jobs generate local audio and then play it in the selected live viewport. Poll until done; report failures honestly. Use recordings/audio for private export and replay for existing clips. Use playback with command play/pause/stop/seek/rate/volume for player controls. Voices and models are not public package assets. Respect model and sample provenance; do not claim all providers, microphone conversations or untested voice quality are implemented.
+
+
+Use `avatar_voice` action `design` with language, voiceType (`male`, `female`, `child`), text and optional description to audition a synthetic draft. Poll the job; its result.id is the audioId. Call `save_design` with audioId/name only after selecting the preview; this does not assign an avatar. Call `assign` separately with voiceId/projectId/target. `export_voice` returns a reference WAV with embedded language/type/model metadata. Discover and install both Voice Designer and Multilingual Voice before design; the designer supplies an English reference and the multilingual model synthesizes the selected output language. Child-style is a synthetic cartoon trait, not an age-verified speaker. Listen before claiming a specific timbre or accent.

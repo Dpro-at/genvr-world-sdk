@@ -22,10 +22,11 @@ const look = (extra: Record<string, unknown> = {}) => ({
 describe('checkLookPreset', () => {
   it('accepts a look made of a player body, sizes, colors and Core wearables', () => {
     expect(checkLookPreset(look())).toEqual({ ok: true, look: look() });
+    expect(checkLookPreset(look({ body: 'robot' }))).toEqual({ ok: true, look: look({ body: 'robot' }) });
   });
 
   it('refuses an unknown body, a body players cannot choose, and broken values', () => {
-    expect(checkLookPreset(look({ body: 'robot' })).ok).toBe(false);
+    expect(checkLookPreset(look({ body: 'unknown-body' })).ok).toBe(false);
     expect(checkLookPreset(look({ body: 'flat' }))).toMatchObject({
       ok: false,
       problems: [expect.stringMatching(/body/)],

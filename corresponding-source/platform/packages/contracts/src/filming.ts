@@ -1,3 +1,4 @@
+import { SceneLights } from './lighting.js';
 import { z } from 'zod';
 
 const metres = z.number().finite().min(-60000).max(60000);
@@ -48,16 +49,18 @@ const studioId = z.string().min(1).max(120);
 /** A timed avatar/object action and dialogue line, in seconds of its recording (media time). */
 /** A spot on the ground of the world, in world metres (FILM-10). */
 export const FilmSceneSpot = z.object({ x: z.number().finite().min(-100000).max(100000), z: z.number().finite().min(-100000).max(100000) }).strict();
+export const FilmCueVoice = z.object({ id: z.string().uuid(), name: z.string().max(80), language: z.string().max(8), voiceType: z.enum(['male', 'female', 'child']).optional(), model: z.string().max(80) }).strict();
+export type FilmCueVoice = z.infer<typeof FilmCueVoice>;
 export const FilmSceneCue = z.object({
   id: studioId, actor: studioId, label: z.string().max(120), action: studioId,
   start: z.number().finite().min(0).max(180), end: z.number().finite().positive().max(180),
-  text: z.string().max(500), audio: studioId.optional(), volume: z.number().finite().min(0).max(2),
+  text: z.string().max(500), audio: studioId.optional(), voice: FilmCueVoice.optional(), volume: z.number().finite().min(0).max(2),
   /** FILM-10: where the avatar stands when the cue starts, and the spots it walks to in order (world metres). */
   at: FilmSceneSpot.optional(), to: z.array(FilmSceneSpot).max(8).optional(),
 }).strict().refine((cue) => cue.end > cue.start, 'Cue end must follow its start.');
 /** Panel arrangements inside Studio Filming (FILM-04). */
 /** Filming workspaces; `story` is the place's scroll story (SCROLL-03: moved here from its own Studio tab). */
-export const FilmWorkspace = z.enum(['shoot', 'edit', 'captions', 'sound', 'colour', 'story']);
+export const FilmWorkspace = z.enum(['shoot', 'edit', 'captions', 'sound', 'transitions', 'colour', 'story']);
 export type FilmWorkspace = z.infer<typeof FilmWorkspace>;
 const commandId = z.string().min(1).max(60).regex(/^[a-z]+\.[a-zA-Z]+$/);
 /** One editor command (ids and arguments come from `{ kind: 'commands' }`; times are seconds). */
@@ -68,6 +71,7 @@ export const FilmStudioStep = z.object({ id: commandId, args: z.record(z.string(
  * `split`, `remove`, `trim`, `cues`, `undo`, `redo` kinds are kept for existing agents.
  */
 export const FilmStudioOperation = z.discriminatedUnion('kind', [
+  z.object({ kind: z.literal('lighting'), lights: SceneLights.optional() }).strict(),
   z.object({ kind: z.literal('inspect') }).strict(),
   z.object({ kind: z.literal('commands') }).strict(),
   /** Sound jobs that read the decoded audio (FILM-08): match dialogue loudness, or fit a music clip to the film length on beats. */
@@ -92,6 +96,10 @@ export const FilmStudioOperation = z.discriminatedUnion('kind', [
     /** The Studio's recording options for this take and after (absent: as set in the Studio): world sound, live actors' voices (FILM-11). */
     world_sound: z.boolean().optional(), live_actors: z.boolean().optional() }).strict(),
   /** Speak one language's subtitles with its free voice onto its voice track (FILM-12b). */
+  z.object({ kind: z.literal('sound_import'), name: z.string().min(1).max(120), mime: z.enum(['audio/wav', 'audio/mpeg', 'audio/ogg', 'audio/mp4', 'audio/webm', 'audio/flac', 'audio/aac']), data: z.string().min(4).max(11184812).regex(/^[A-Za-z0-9+/]+={0,2}$/) }).strict(),
+  z.object({ kind: z.literal('dialogue_voice'), cue_id: studioId, voice_id: z.string().uuid(), language: z.string().max(8), shot_id: studioId.optional() }).strict(),
+  z.object({ kind: z.literal('dialogue_track'), cue_id: studioId, shot_id: studioId, language: z.string().regex(/^[a-z]{2,3}(-[A-Z]{2})?$/), start: z.number().min(0).max(3600).optional(), append: z.boolean().default(false) }).strict(),
+  z.object({ kind: z.literal('dialogue_preview'), cue_id: studioId, shot_id: studioId.optional() }).strict(),
   z.object({ kind: z.literal('voice'), language: z.string().regex(/^[a-z]{2,3}$/) }).strict(),
   /** One language's subtitles as .srt or .vtt text (FILM-12). */
   z.object({ kind: z.literal('subtitle_file'), language: z.string().regex(/^[a-z]{2,3}$/), format: z.enum(['srt', 'vtt']).default('srt') }).strict(),
@@ -110,7 +118,7 @@ export const FilmStudioResult = z.object({
   undo: z.string().max(80).optional(), redo: z.string().max(80).optional(),
   ui: z.object({ workspace: FilmWorkspace, playhead: z.number().min(0), selection: z.array(studioId).max(200), source: studioId.nullable() }).strict().optional(),
   actors: z.array(z.object({ id: studioId, label: z.string().max(120) }).strict()).max(1000),
-  actions: z.array(z.object({ id: studioId, label: z.string().max(120) }).strict()).max(200),
+  actions: z.array(z.object({ id: studioId, label: z.string().max(120) }).strict()).max(10100),
   assets: z.array(z.object({ id: studioId, mime: z.string().max(100), bytes: z.number().int().min(0) }).strict()).max(2000),
 }).strict();
 export const FilmCommand = z.discriminatedUnion('kind', [

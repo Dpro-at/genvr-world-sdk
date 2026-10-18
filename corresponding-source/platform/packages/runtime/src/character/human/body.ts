@@ -1,11 +1,16 @@
+import { fitEyelidBlink } from './eyelids.js';
+import { interleaveAttributes } from 'three/addons/utils/BufferGeometryUtils.js';
+import { humanExpressionTargets } from './expression-targets.js';
 import {
   BackSide,
   BufferAttribute,
   BufferGeometry,
   Color,
   LightingModel,
+  type InterleavedBufferAttribute,
   MeshBasicNodeMaterial,
   MeshToonNodeMaterial,
+  MeshStandardNodeMaterial,
   TSL,
   type Material,
   type Node,
@@ -61,18 +66,18 @@ export const HUMAN_SHORTS = '#2f3446';
  */
 export const ANIME_SHADOW = new Color(0.8, 0.66, 0.64);
 /** Light bands on dot(normal, light): the shadow edge and the highlight edge (soft, anime cel shading). */
-const BANDS = { shadow: [-0.06, 0.06], highlight: [0.55, 0.65], highlightShare: 0.25 };
+const BANDS = { shadow: [-0.3, 0.65], highlight: [0.7, 0.95], highlightShare: 0.25 };
 /** How much the light shapes the face (anime faces stay mostly in the light colour). */
-const FACE_LIGHT = 0.3;
+const FACE_LIGHT = 0.78;
 /** How much of the ambient light reaches the body (less keeps the cel shading readable under bright skies). */
-const AMBIENT_SHARE = 0.45;
+const AMBIENT_SHARE = 0.3;
 /** Rim light along the outline: falloff power and strength (a share of the base colour). */
 const RIM = { power: 3, strength: 0.22 };
 /**
  * Outline (inverted hull): width in metres at `reference` metres from the camera, growing with distance within
  * `scale` so it stays a steady line on screen; its colour as a (linear) share of the surface colour.
  */
-export const OUTLINE = { width: 0.002, shade: 0.2, reference: 2.5, scale: [0.7, 5] as const };
+export const OUTLINE = { width: 0.0012, shade: 0.2, reference: 2.5, scale: [0.7, 5] as const };
 /**
  * How much of each lash strip is drawn, from the lid rim (0) to the tip (1): a line at the root, the rest cut
  * away (owner note 53: the whole strip drawn solid read as a grey band over the lid). The lower lashes are not
@@ -248,13 +253,16 @@ export function humanMaterial(
   shorts = HUMAN_SHORTS,
   skinMaterial?: SkinMaterial,
   face?: Record<string, [number, number, number]>,
+  brow = '#2b1d18',
 ): Material {
   const skinColor = uniform(new Color(skin));
   const shortsColor = uniform(new Color(shorts));
   const region = attribute('region', 'float');
   const fantasy = skinMaterial ? skinPattern(skinMaterial) : null;
   // The drawn anime face over the skin (or the fantasy skin).
-  const faceParts = faceUniforms();
+  const faceParts = faceUniforms(undefined, brow);
+  if (face?.leftEye) faceParts.leftEye.value.set(...face.leftEye);
+  if (face?.rightEye) faceParts.rightEye.value.set(...face.rightEye);
   const skinNode = drawFace((fantasy ? fantasy.color : skinColor) as unknown as Node<'vec3'>, face, faceParts);
   // Regions: 0 skin, 1 shorts, 2 eyeballs, 3 upper lashes, 4 lower lashes (each part has its own vertices).
   const isShorts = float(1).sub(region.sub(1).abs()).clamp(0, 1);
@@ -263,7 +271,7 @@ export function humanMaterial(
   const isLowerLash = float(1).sub(region.sub(4).abs()).clamp(0, 1);
   // The lashes: fine dark-brown hair, a soft line above and a faint one below (owner: light, realistic lashes;
   // the anime look's bolder line comes with the face styles).
-  const upperLashColor = mix(skinNode, faceParts.lineColor, 0.72);
+  const upperLashColor = mix(skinNode, faceParts.browColor, 0.85);
   const lowerLashColor = mix(skinNode, faceParts.lineColor, 0.22);
   const base = mix(
     mix(mix(mix(skinNode, shortsColor, isShorts), drawEyeball(face, faceParts), isEye), upperLashColor, isUpperLash),
@@ -274,7 +282,12 @@ export function humanMaterial(
   // Past the root line the lash strip is not drawn (alpha test).
   const along = attribute('lash', 'float');
   const keep = mix(float(LASH_KEEP.upper), float(LASH_KEEP.lower), isLowerLash);
-  const cut = isLash.mul(along.greaterThan(keep).select(float(1), float(0)));
+  // Keep the dense root; split the outer strip into tapered fine lash strands.
+  const lashPosition = attribute('facePosition', 'vec3');
+  const strand = lashPosition.x.mul(6200).add(along.mul(2.5)).sin().abs();
+  const strandWidth = float(.5).add(along.mul(.65));
+  const betweenStrands = strand.lessThan(strandWidth).select(float(1), float(0)).mul(smoothstep(float(.06), float(.16), along));
+  const cut = isLash.mul(along.greaterThan(keep).select(float(1), betweenStrands));
   const animeShadow = uniform(ANIME_SHADOW) as unknown as Node<'vec3'>;
   const shadow = fantasy
     ? mix(
@@ -283,11 +296,12 @@ export function humanMaterial(
         isLash,
       )
     : mix(mix(base.mul(animeShadow), base, isEye), base, isLash);
-  const material = new AnimeToonMaterial(
+  const material = fantasy ? new AnimeToonMaterial(
     shadow as unknown as ShadeNode,
     faceMask(face),
     isEye.add(isLash).clamp(0, 1) as unknown as Node<'float'>,
-  );
+  ) : new MeshStandardNodeMaterial({ roughness: .64, metalness: 0 });
+  if (material instanceof MeshStandardNodeMaterial) material.roughnessNode = mix(float(.64), float(.24), isEye);
   material.colorNode = base;
   material.opacityNode = float(1).sub(cut);
   material.alphaTest = 0.5;
@@ -313,6 +327,8 @@ export function humanMaterial(
  */
 export function humanOutlineMaterial(body: Material): Material {
   const material = new MeshBasicNodeMaterial({ side: BackSide });
+  // Physical skin uses its actual silhouette; an inflated hull can pierce small facial folds.
+  if (body instanceof MeshStandardNodeMaterial) material.visible = false;
   const skin = body.userData.outlineSkin as Node<'color'>;
   const shorts = body.userData.shorts as Node<'color'>;
   const region = attribute('region', 'float');
@@ -321,6 +337,7 @@ export function humanOutlineMaterial(body: Material): Material {
   material.opacityNode = region.greaterThan(2.5).select(float(0), float(1));
   material.alphaTest = 0.5;
   material.userData.outline = true;
+  material.userData.face = body.userData.face;
   return material;
 }
 
@@ -339,12 +356,16 @@ export function humanGeometry(
   if (!body) throw new Error(`No ${style} ${gender} body yet`);
   const geometry = new BufferGeometry();
   geometry.setAttribute('position', new BufferAttribute(body.positions, 3));
+  // Facial paint keeps its bind-space coordinates when the editor reshapes the body.
+  geometry.setAttribute('facePosition', new BufferAttribute(body.positions.slice(), 3));
   geometry.setAttribute('skinIndex', new BufferAttribute(body.skinIndex, 4));
   geometry.setAttribute('skinWeight', new BufferAttribute(body.skinWeight, 4));
   geometry.setAttribute('region', new BufferAttribute(body.region, 1));
   // The closed-eye shape, played by the skinning node (`blinkAmount`).
-  geometry.setAttribute('blink', new BufferAttribute(body.blink, 3));
+  geometry.setAttribute('blink', new BufferAttribute(fitEyelidBlink(body), 3));
+  geometry.setAttribute('lidDistance',new BufferAttribute(body.lidDistance ?? new Float32Array(body.positions.length/3*2).fill(1),2));
   geometry.setAttribute('mouthOpen', new BufferAttribute(body.mouthOpen, 3));
+  for (const [name, values] of Object.entries(humanExpressionTargets(data, body.positions.length / 3))) geometry.setAttribute(name, new BufferAttribute(values, 3));
   geometry.setAttribute('lash', new BufferAttribute(body.lash, 1));
   geometry.setAttribute('muscleMap', new BufferAttribute(body.muscleMap, 1));
   geometry.setAttribute('fatMap', new BufferAttribute(body.fatMap, 1));
@@ -352,10 +373,64 @@ export function humanGeometry(
   geometry.setAttribute('fatRegion', new BufferAttribute(body.fatRegion, 1));
   geometry.setIndex(new BufferAttribute(body.triangles, 1));
   geometry.computeVertexNormals();
+  // Smooth local shading discontinuities on the dense head while retaining eyelid and eye boundaries.
+  const normals = geometry.getAttribute('normal');
+  const eye = body.face.leftEye;
+  const neighbors = new Map<number, Set<number>>();
+  if (eye) {
+    for (let i = 0; i < body.quads.length; i += 4) {
+      const ids = Array.from(body.quads.subarray(i, i + 4));
+      for (let k = 0; k < 4; k++) {
+        const a = ids[k]!, b = ids[(k + 1) % 4]!;
+        if (body.region[a] !== 0 || body.region[b] !== 0 || body.positions[a * 3 + 1]! < eye[1] - .16) continue;
+        if (!neighbors.has(a)) neighbors.set(a, new Set());
+        if (!neighbors.has(b)) neighbors.set(b, new Set());
+        neighbors.get(a)!.add(b); neighbors.get(b)!.add(a);
+      }
+    }
+  }
+  const smoothHead = (attribute: BufferAttribute) => {
+    for (let pass = 0; pass < 3; pass++) {
+      const previous = Float32Array.from(attribute.array);
+      for (const [v, adjacent] of neighbors) {
+        let x = previous[v * 3]!, y = previous[v * 3 + 1]!, z = previous[v * 3 + 2]!;
+        for (const n of adjacent) { x += previous[n * 3]!; y += previous[n * 3 + 1]!; z += previous[n * 3 + 2]!; }
+        const length = Math.hypot(x, y, z) || 1;
+        attribute.setXYZ(v, x / length, y / length, z / length);
+      }
+    }
+  };
+  smoothHead(normals as BufferAttribute);
+  // The closed lid has its own surface normals, not the open eye socket's shading.
+  const closure = geometry.getAttribute('blink');
+  const closedPositions = body.positions.slice();
+  for (let v=0;v<closure.count;v++) {
+    closedPositions[v*3] = closedPositions[v*3]! + closure.getX(v);
+    closedPositions[v*3+1] = closedPositions[v*3+1]! + closure.getY(v);
+    closedPositions[v*3+2] = closedPositions[v*3+2]! + closure.getZ(v);
+  }
+  const closed = new BufferGeometry();
+  closed.setAttribute('position',new BufferAttribute(closedPositions,3));
+  closed.setIndex(new BufferAttribute(body.triangles,1));closed.computeVertexNormals();
+  const closedNormals=closed.getAttribute('normal'), normalDelta=new Float32Array(body.positions.length);
+  smoothHead(closedNormals as BufferAttribute);
+  for(let v=0;v<closure.count;v++) {
+    if(Math.hypot(closure.getX(v),closure.getY(v),closure.getZ(v))<.000001)continue;
+    normalDelta[v*3]=closedNormals.getX(v)-normals.getX(v);
+    normalDelta[v*3+1]=closedNormals.getY(v)-normals.getY(v);
+    normalDelta[v*3+2]=closedNormals.getZ(v)-normals.getZ(v);
+  }
+  closed.dispose();geometry.setAttribute('blinkNormal',new BufferAttribute(normalDelta,3));
+  // Share one vertex buffer so facial deformation stays within WebGPU's eight-buffer baseline.
+  const faceAttributes = ['blink', 'mouthOpen', 'faceSmile', 'faceAngry', 'faceSad', 'faceSurprised', 'faceThinking', 'blinkNormal', 'lidDistance'];
+  const interleaved = interleaveAttributes(faceAttributes.map(name => geometry.getAttribute(name) as BufferAttribute)) as unknown as InterleavedBufferAttribute[] | null;
+  if (interleaved) faceAttributes.forEach((name, i) => geometry.setAttribute(name, interleaved[i]!));
   geometry.computeBoundingSphere();
   geometry.userData.quadEdges = body.quadEdges;
   geometry.userData.quads = body.quads.length / 4;
   geometry.userData.face = body.face;
+  geometry.userData.joints = body.joints;
+  geometry.userData.height = body.height;
   // The lighter level of detail (same vertices, the finer muscle areas merged back): swapped in by `humanDetail`.
   if (body.lodTriangles) geometry.userData.lodIndex = new BufferAttribute(body.lodTriangles, 1);
   return geometry;
@@ -381,9 +456,10 @@ export function humanDetail(full: BufferGeometry, detail: 'full' | 'lite'): Buff
 }
 
 /** Recolours a generated body's own material (skin and shorts; owner, CHAR-02: skin colour per character). */
-export function setHumanColors(material: Material, skin: string, shorts: string): void {
+export function setHumanColors(material: Material, skin: string, shorts: string, brow?: string): void {
   (material.userData.skin as { value: Color } | undefined)?.value.set(skin);
   (material.userData.shorts as { value: Color } | undefined)?.value.set(shorts);
+  if (brow) (material.userData.face as FaceUniforms | undefined)?.browColor.value.set(brow);
 }
 
 /**

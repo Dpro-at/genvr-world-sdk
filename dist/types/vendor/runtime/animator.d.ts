@@ -10,6 +10,8 @@ export declare class AvatarAnimator {
     #private;
     private readonly fade;
     private readonly baseClip;
+    /** Preload a library clip before a recording begins without changing the current pose. */
+    prepare(name: string): Promise<boolean>;
     constructor(root: Object3D, clips: readonly AnimationClip[], fade?: number, baseClip?: string);
     get mixer(): AnimationMixer;
     /**
@@ -17,6 +19,7 @@ export declare class AvatarAnimator {
      * continuing the clip that was playing.
      */
     rebind(root: Object3D, clips: readonly AnimationClip[]): void;
+    register(clip: AnimationClip, once?: boolean): void;
     get clipNames(): string[];
     get currentClip(): string | null;
     /** Length of a clip in seconds (0 when the avatar has no such clip). */

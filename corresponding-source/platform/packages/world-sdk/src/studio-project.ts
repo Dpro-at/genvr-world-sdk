@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { PlaySettings, WorldDocument, WorldPackage, SIZE_TIERS, WORLD_GENERATOR, defaultPlaySettings, type Style, type WorldSeed } from '@genvr/contracts';
-import { getCoreItem, getGround, groundRef, itemBoundsForStyle, starterGroundMaterials } from '@genvr/core-library';
+import { PlaySettings, WorldDocument, WorldPackage, SIZE_TIERS, WORLD_GENERATOR, supportsWorldStarter, defaultPlaySettings, type Style, type WorldSeed } from '@genvr/contracts';
+import { getCoreItem, getGround, groundRef, itemBoundsForStyle, itemFootprint, starterGroundMaterials } from '@genvr/core-library';
 import { applyCommand, createWorldState, decodeChunk, encodeTerrain, smallStarterCommands, starterWorldCommands, BLOCKS, VOXEL_CHUNK, VOXEL_LAYERS, type WorldState } from '@genvr/world';
 import { replayWorldPackage } from './session.js';
 
@@ -9,6 +9,7 @@ export const StudioProject = z.object({
   format: z.literal('genvr-studio'), version: z.literal(1),
   id: z.string().uuid(), title: z.string().trim().min(1).max(120),
   play: PlaySettings, world: WorldDocument,
+  avatarBodies: z.record(z.string().min(1).max(120), z.enum(['robot', 'human', 'classic', 'simple', 'starter'])).optional(),
   terrainChunks: z.array(z.string().max(16 * 1024 * 1024)).max(4096),
   assets: WorldPackage.shape.assets,
 }).strict();
@@ -72,6 +73,7 @@ function fromState(state: WorldState, title: string, play = defaultPlaySettings(
 }
 
 export function createStudioProject(style: Style, kind: WorldSeed['kind'] | 'empty' | 'small', play = defaultPlaySettings()): StudioProject {
+  if (!supportsWorldStarter(style, kind)) throw new Error(`The ${kind} starter is not available for ${style}. Choose a supported world type.`);
   const seed = crypto.getRandomValues(new Uint32Array(1))[0]! & 0x7fffffff;
   const world = style === 'realistic' && kind !== 'empty' && kind !== 'small' ? { seed, kind, generator: WORLD_GENERATOR } : undefined;
   const baseplate = style === 'realistic' && kind === 'empty', ground = getGround('baseplate');
@@ -89,8 +91,7 @@ export function createStudioProject(style: Style, kind: WorldSeed['kind'] | 'emp
     return itemBoundsForStyle(item, style);
   })) applyCommand(state, command);
   else if (world) {
-    for (const command of starterWorldCommands(doc, world, (x, z) => state.terrain.heightAt(x, z))) applyCommand(state, command);
-    state.doc.spawn.position = [0, state.terrain.heightAt(0, 0) + 1, 0];
+    for (const command of starterWorldCommands(doc, world, (x, z) => state.terrain.heightAt(x, z), id => { const item = getCoreItem(id); return item ? itemFootprint(item, style) : null; })) applyCommand(state, command);
   }
   return fromState(state, 'My place', play);
 }

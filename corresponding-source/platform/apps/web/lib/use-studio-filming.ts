@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type RefObject } from 'react';
 import { FilmCamera, FilmPhoto, FilmVideo, FilmStudioResult, type FilmPreset, type FilmStudioOperation, type FilmWaypoint } from '@genvr/contracts';
-import { FilmRig, captureFilm, sampleFilmPath, type GenvrRuntime, type RuntimeOptions } from '@genvr/runtime';
+import { findAvatarMotion, motionCategories, avatarMotionEntries, FilmRig, captureFilm, sampleFilmPath, type GenvrRuntime, type RuntimeOptions } from '@genvr/runtime';
 import { connectFilming } from './filming';
 import { useVideoStudio } from './video-studio/use-video-studio';
 import { mediaDuration, render, renderFrame } from './video-studio/render';
@@ -11,6 +11,9 @@ import { SUBTITLE_LANGUAGES, buildSubtitles } from './video-studio/subtitles';
 import { filmRoom } from './film-room';
 import type { FilmVoiceEvent } from '@genvr/contracts';
 import { VOICES, speak } from './video-studio/dubbing';
+import { EXPRESSIONS, type AssistantHost } from '@genvr/assistant';
+import { fitCaptureViewport } from './video-studio/capture-viewport';
+import { SceneSpeech } from './video-studio/scene-speech';
 import { CORE_ANIMATIONS } from '@genvr/core-library';
 import { SCENE_ACTOR, SCENE_FX_ACTIONS, describe as describeFilm, isHostOnly, sceneFxSteps, shakeOffset, subtitleLines, toSeconds, toSrt, toVtt, type FilmProject } from '@genvr/film';
 import { checkTakeLength, cueToSeconds, validateCues, type SceneCue } from './video-studio/model';
@@ -24,14 +27,22 @@ const EMPTY_TAKE = `The take came out empty, so nothing was saved. Try again; if
 
 export function useStudioFilming(place: string, runtime: RefObject<GenvrRuntime | null>,
   container: RefObject<HTMLDivElement | null>, log: (text: string) => void,
-  editing: () => boolean, storageKey: string | null, platformEnabled = true) {
+  editing: () => boolean, storageKey: string | null, platformEnabled = true, voiceService?: AssistantHost['avatarVoice'], filmExample?: string | false) {
   const rig = useRef(new FilmRig());
-  const studio = useVideoStudio(place, storageKey);
+  const studio = useVideoStudio(place, storageKey, filmExample);
   const latestStudio = useRef(studio); latestStudio.current = studio;
-  const directing = useRef<{ cues: SceneCue[]; start: number; started: Set<string>; activeSelf: string | null;
+  const voice = useRef(voiceService); voice.current = voiceService;
+  const sceneSpeech = useRef<SceneSpeech | null>(null);
+  if (!sceneSpeech.current) sceneSpeech.current = new SceneSpeech((actor, shape) => { runtime.current?.setSpeechMouth(actor, shape); });
+  const directing = useRef<{ cues: SceneCue[]; start: number; started: Set<string>; activeSelf: string | null; activeFace?: string | null;
     /** FILM-10: the avatar's walk of one cue, the spot it heads for now. */
     walking?: { cue: string; next: number; run: boolean; to: Array<{ x: number; z: number }> } | null } | null>(null);
   /** FILM-10: before a take the avatar goes to the start spot of its first cue, so the take opens there. */
+  const prepareCast = async (cues: SceneCue[]) => {
+    await sceneSpeech.current!.prepare(cues, latestStudio.current.snapshot().assets);
+    const ids = [...new Set(cues.filter(cue => cue.actor === 'self' && cue.action.startsWith('motion:')).map(cue => cue.action))];
+    for (const id of ids) if (!(await runtime.current?.prepareSceneAnimation(id))) throw new Error(`Motion is unavailable: ${id}`);
+  };
   const placeCast = (cues: SceneCue[]) => {
     const first = [...cues].sort((a, b) => a.start - b.start).find((c) => c.actor === 'self' && c.at);
     if (first?.at) runtime.current?.teleportPlayer({ x: first.at.x, z: first.at.z });
@@ -101,7 +112,7 @@ export function useStudioFilming(place: string, runtime: RefObject<GenvrRuntime 
   };
   const releaseRuntime = () => {
     epoch.current++; abort.current.abort(); cleanup.current?.(); cleanup.current = null;
-    directing.current = null; runtime.current?.clearSceneMotions(); runtime.current?.stopSceneAnimation(); runtime.current?.sceneWalk(null);
+    sceneSpeech.current?.stop(); directing.current = null; runtime.current?.clearSceneMotions(); runtime.current?.stopSceneAnimation(); runtime.current?.presentExpression('self', 'neutral'); runtime.current?.sceneWalk(null);
     abort.current = new AbortController(); rig.current.reset(); frames.current.clear(); storyPreview.current = null;
     remoteBusy.current = false; localBusy.current = false;
     setConnected(false); setBusy(false); setCamera(null);
@@ -113,34 +124,42 @@ export function useStudioFilming(place: string, runtime: RefObject<GenvrRuntime 
     const activeAbort = abort.current;
     return () => {
       epoch.current++; activeAbort.abort(); cleanup.current?.(); cleanup.current = null;
-      rig.current.reset(); frames.current.clear();
+      sceneSpeech.current?.dispose(); rig.current.reset(); frames.current.clear();
     };
   }, [place]);
   const prepare = () => { runtime.current?.selectItems([]); runtime.current?.setTool(null); runtime.current?.setMarkersVisible(false); };
   const onFilmFrame: NonNullable<RuntimeOptions['onFilmFrame']> = (view, dt, player) => {
+    sceneSpeech.current?.tick();
     const scene = directing.current;
     if (scene) {
       const time = (performance.now() - scene.start) / 1000;
       if (scene.activeSelf && scene.cues.some((c) => c.id === scene.activeSelf && time >= c.end)) {
         runtime.current?.stopSceneAnimation(); scene.activeSelf = null;
       }
+      if (scene.activeFace && scene.cues.some(cue => cue.id === scene.activeFace && time >= cue.end)) { runtime.current?.presentExpression('self', 'neutral'); scene.activeFace = null; }
       for (const cue of scene.cues) {
         if (time < cue.start || scene.started.has(cue.id)) continue;
         scene.started.add(cue.id);
         if (time >= cue.end || cue.action === 'none') continue;
         const rt = runtime.current;
+        if (cue.actor === 'self' && cue.action.startsWith('face:')) {
+          const expression = EXPRESSIONS.find(value => `face:${value}` === cue.action);
+          if (expression && rt?.presentExpression('self', expression)) scene.activeFace = cue.id;
+          continue;
+        }
         if (cue.actor === SCENE_ACTOR) continue; // scene effects: shake below, the rest added to the timeline after the take
         // FILM-10: the avatar starts on its spot and walks its path; walking and running come from the walk itself.
         if (cue.actor === 'self' && cue.at) rt?.teleportPlayer({ x: cue.at.x, z: cue.at.z });
         // Walking actions move the avatar for real (FILM-10b, owner N-054): along its spots, or straight ahead
         // when it has none, never on the spot. Walk and Run take their look from the movement itself.
-        const run = WALK_RUN.test(cue.action), moving = WALK_PLAIN.test(cue.action) || run || WALK_CLIP.test(cue.action);
+        const imported = findAvatarMotion(cue.action), categories = imported ? motionCategories(imported.name, imported.category) : [];
+        const plainRun = WALK_RUN.test(cue.action), run = plainRun || categories.includes('Running'), moving = WALK_PLAIN.test(cue.action) || run || WALK_CLIP.test(cue.action) || categories.includes('Walking');
         const feet = rt?.localPlayer;
         const path = cue.to?.length ? cue.to : moving && feet
           ? [{ x: feet.x + Math.sin(feet.yaw) * 200, z: feet.z + Math.cos(feet.yaw) * 200 }] : null;
         if (cue.actor === 'self' && path) {
           scene.walking = { cue: cue.id, next: 0, run, to: path }; rt?.sceneWalk(path[0]!, run);
-          if (WALK_PLAIN.test(cue.action) || run) continue;
+          if (WALK_PLAIN.test(cue.action) || plainRun) continue;
         }
         // Scene objects walk their spots too (FILM-10b); dance, bob, spin and sway play on top.
         if (cue.actor !== 'self' && cue.to?.length && !rt?.sceneTravel(cue.actor, cue.at ?? null, cue.to, run))
@@ -191,8 +210,8 @@ export function useStudioFilming(place: string, runtime: RefObject<GenvrRuntime 
     const canvas = container.current?.querySelector('canvas');
     if (canvas) rig.current.view = { position: view.position.toArray(), direction: direction.toArray(),
       fov: view.fov, render_width: canvas.width, render_height: canvas.height };
-    if (story?.cut) { story.cut = false; rig.current.consumeCut(); return true; }
-    return rig.current.consumeCut();
+    if (story?.cut) { story.cut = false; rig.current.consumeCut(); return { cut: true, actorVisible: true }; }
+    return { cut: rig.current.consumeCut(), actorVisible: Boolean(story || rig.current.settings) };
   };
   /** Shows the story's flight at `time` (stop index, fractions between stops), or gives the camera back. */
   const previewStory = (path: FilmWaypoint[] | null, time = 0, cut = true) => {
@@ -264,7 +283,9 @@ export function useStudioFilming(place: string, runtime: RefObject<GenvrRuntime 
   }, [place]);
   const actors = () => [{ id: 'self', label: 'My avatar' }, { id: SCENE_ACTOR, label: 'Scene effects' }, ...(runtime.current?.sceneActorIds() ?? [])
     .map((id) => ({ id, label: runtime.current?.itemName(runtime.current.world.instances.find((i) => i.instanceId === id)!.itemId) ?? id }))];
-  const actions = CORE_ANIMATIONS.map((a) => ({ id: a.manifest.id, label: a.manifest.name }));
+  const actions = [...CORE_ANIMATIONS.map(a => ({ id: a.manifest.id, label: a.manifest.name })),
+    ...avatarMotionEntries().map(entry => ({ id: entry.id, label: entry.name.slice(0, 120) })),
+    ...EXPRESSIONS.map(expression => ({ id: `face:${expression}`, label: `Face: ${expression}` }))];
   /** A timeline clip's recording and its cues in seconds (for directing and re-recording). */
   const clipShot = (project: FilmProject, clipId: string) => {
     const clip = project.tracks.flatMap((t) => t.clips).find((c) => c.id === clipId);
@@ -276,6 +297,7 @@ export function useStudioFilming(place: string, runtime: RefObject<GenvrRuntime 
   const checkCueActors = (cues: SceneCue[]) => {
     const actorIds = new Set(actors().map((a) => a.id));
     for (const cue of cues) {
+      if (cue.actor === 'self' && cue.action.startsWith('face:') && cue.action !== 'face:neutral' && !runtime.current?.supportsAvatarExpression('self')) throw new Error('This character has no facial controls. Choose Standard robot or our human for expression cues.');
       if (!actorIds.has(cue.actor) || (cue.action !== 'none' && !(cue.actor === 'self' ? actions.some((a) => a.id === cue.action)
         : cue.actor === SCENE_ACTOR ? SCENE_FX_ACTIONS.some((a) => a.id === cue.action) : ['dance', 'bob', 'spin', 'sway', 'run'].includes(cue.action))))
         throw new Error('Choose an available scene actor and compatible action.');
@@ -308,6 +330,63 @@ export function useStudioFilming(place: string, runtime: RefObject<GenvrRuntime 
     };
     fresh();
     switch (operation.kind) {
+      case 'lighting': {
+        if(operation.lights && !runtime.current?.applyCommand({type:'set_lighting',params:{lights:operation.lights}})) throw new Error('Could not update scene lights.');
+        return reply({result:{lights:runtime.current?.world.environment.lighting ?? []}});
+      }
+      case 'sound_import': {
+        const bytes = Uint8Array.from(atob(operation.data), ch => ch.charCodeAt(0));
+        if (bytes.length > 8 * 1024 * 1024) throw new Error('MCP audio import supports up to 8 MB; use Sound to import files up to 20 MB.');
+        const result = await s.addSound(new File([bytes], operation.name, { type: operation.mime })); fresh();
+        await s.flush(); return reply({ result });
+      }
+      case 'dialogue_voice': {
+        if (!voice.current) throw new Error('Connect the local voice service first.');
+        const shot = operation.shot_id ? clipShot(project, operation.shot_id) : null;
+        const cues = shot?.cues ?? s.plan, cue = cues.find(row => row.id === operation.cue_id);
+        if (!cue || !cue.text.trim() || cue.actor === SCENE_ACTOR) throw new Error('Choose a character cue with dialogue text.');
+        const library = await voice.current({ action: 'voices', target: 'self' }) as { voices: Array<{ id: string; name: string; model: string; voiceType?: 'male' | 'female' | 'child' }> };
+        const profile = library.voices.find(row => row.id === operation.voice_id);
+        if (!profile) throw new Error('Choose a saved voice from the voice library.');
+        let job = await voice.current({ action: 'speak', model: profile.model, voiceId: profile.id, language: operation.language, text: cue.text, target: cue.actor, preview: false }) as { id: string; status: string; error?: string; result?: { audioId: string; duration: number } };
+        while (job.status === 'running') { fresh(); await new Promise(resolve => setTimeout(resolve, 500)); job = await voice.current({ action: 'job', jobId: job.id, target: 'self' }) as typeof job; }
+        fresh(); if (job.status !== 'done' || !job.result) throw new Error(job.error ?? 'Dialogue generation failed.');
+        const end = cue.start + job.result.duration, limit = shot ? toSeconds(shot.media.duration) : 30;
+        if (end > limit) throw new Error(`The generated line ends at ${end.toFixed(1)} s; shorten the text or move its start inside ${limit.toFixed(1)} s.`);
+        const audio = await voice.current({ action: 'audio', audioId: job.result.audioId, target: 'self' }) as { data: string };
+        fresh();
+        const currentProject = latestStudio.current.snapshot().project;
+        const currentCues = shot ? clipShot(currentProject, operation.shot_id!).cues : latestStudio.current.plan;
+        const currentCue = currentCues.find(row => row.id === cue.id);
+        if (!currentCue || JSON.stringify(currentCue) !== JSON.stringify(cue)) throw new Error('The scene cue changed during generation. Generate it again.');
+        const bytes = Uint8Array.from(atob(audio.data), ch => ch.charCodeAt(0));
+        const asset = latestStudio.current.addAudio(new Blob([bytes], { type: 'audio/wav' }));
+        const next = currentCues.map(row => row.id === cue.id ? { ...row, audio: asset, end, voice: { id: profile.id, name: profile.name, language: operation.language, model: profile.model, ...(profile.voiceType ? { voiceType: profile.voiceType } : {}) } } : row);
+        if (shot) latestStudio.current.must('cues.set', { media: shot.media.id, cues: next }); else { latestStudio.current.setPlan(next); setOutput(old => ({ ...old, seconds: Math.max(old.seconds, Math.min(30, Math.ceil(end + .25))) })); }
+        await latestStudio.current.flush(); report(`${profile.name}: dialogue attached to the scene cue.`);
+        return reply({ result: { cue_id: cue.id, audio: asset, duration: job.result.duration, voice: profile.name, language: operation.language } });
+      }
+      case 'dialogue_track': {
+        const shot = clipShot(project, operation.shot_id);
+        const cue = shot.cues.find(row => row.id === operation.cue_id);
+        const audio = s.snapshot().assets.find(row => row.id === cue?.audio);
+        if (!cue?.text.trim() || !audio) throw new Error('Choose a recorded dialogue cue with audio.');
+        const start = operation.start ?? cue.start;
+        const end = start + cue.end - cue.start;
+        await s.addVoice(operation.language, `${operation.language.toUpperCase()} · ${cue.voice?.name ?? cue.label}`, audio.blob, { start, append: operation.append }); fresh();
+        const track = s.film.project.tracks.find(row => row.kind === 'sound' && row.lang === operation.language);
+        if (!track?.clips[0]) throw new Error('The language sound track was not created.');
+        must('subtitles.set', { lang: operation.language, name: operation.language.toUpperCase(), show: true, lines: [...(operation.append ? subtitleLines(project, operation.language) : []), { start, end, text: cue.text }] });
+        await s.flush();
+        return reply({ result: { language: operation.language, start, end } });
+      }
+      case 'dialogue_preview': {
+        const cues = operation.shot_id ? clipShot(project, operation.shot_id).cues : s.plan;
+        const cue = cues.find(row => row.id === operation.cue_id);
+        if (!cue?.audio) throw new Error('Generate or attach dialogue audio first.');
+        await sceneSpeech.current!.prepare([{ ...cue, start: 0, end: cue.end - cue.start }], s.snapshot().assets); fresh(); sceneSpeech.current!.start();
+        return reply({ result: { cue_id: cue.id, playing: true } });
+      }
       case 'inspect': return reply();
       case 'commands': return reply({ commands: s.film.list() });
       case 'sound': {
@@ -393,6 +472,8 @@ export function useStudioFilming(place: string, runtime: RefObject<GenvrRuntime 
         return reply({ result: { language: operation.language, format: operation.format, text: operation.format === 'vtt' ? toVtt(lines) : toSrt(lines) } });
       }
       case 'record': {
+        s.setWorkspace('shoot'); s.setPreviewing(false);
+        await new Promise<void>(resolve => requestAnimationFrame(() => resolve())); fresh();
         const canvas = container.current?.querySelector('canvas'); if (!canvas) throw new Error('World canvas unavailable.');
         if (operation.world_sound !== undefined || operation.live_actors !== undefined) {
           const next = { ...outputRef.current, ...(operation.world_sound !== undefined ? { worldSound: operation.world_sound } : {}),
@@ -402,11 +483,15 @@ export function useStudioFilming(place: string, runtime: RefObject<GenvrRuntime 
         const shot = operation.shot_id ? clipShot(project, operation.shot_id) : undefined;
         if (operation.gameplay) { rig.current.reset(); setCamera(null); }
         else if (shot) { if (shot.media.camera) rig.current.set(shot.media.camera); else rig.current.reset(); setCamera(shot.media.camera); }
-        prepare(); const cues = shot?.cues ?? s.plan, sound = outputRef.current.worldSound ? runtime.current?.worldSoundStream() ?? null : null; placeCast(cues);
-        const live = liveTake();
+        const releaseViewport = fitCaptureViewport(container.current, operation.settings.width, operation.settings.height);
+        let live: ReturnType<typeof liveTake> = null;
         try {
+          await new Promise<void>(resolve => requestAnimationFrame(() => resolve())); fresh();
+          prepare(); const cues = shot?.cues ?? s.plan, sound = outputRef.current.worldSound ? runtime.current?.worldSoundStream() ?? null : null; await prepareCast(cues); placeCast(cues);
+          live = liveTake();
           const blob = await captureFilm(canvas, { kind: 'video', settings: operation.settings }, signal, subscribe, () => {
-            live?.start();
+            if (rig.current.settings?.path) rig.current.set(rig.current.settings);
+            live?.start(); sceneSpeech.current?.start();
             directing.current = { cues: [...cues].sort((a, b) => a.start - b.start), start: performance.now(), started: new Set(), activeSelf: null };
           }, (seconds) => { if (current === epoch.current) report(`Recording ${seconds.toFixed(1)} / ${operation.settings.seconds} s…`); }, sound);
           const stopped = live?.stop();
@@ -417,21 +502,19 @@ export function useStudioFilming(place: string, runtime: RefObject<GenvrRuntime 
           stopped?.place(() => shotStart(operation.shot_id));
           if (!operation.shot_id) addSceneFx(cues);
         } catch (error) { live?.cancel(); throw error; }
-        finally { if (current === epoch.current) { directing.current = null; runtime.current?.clearSceneMotions(); runtime.current?.stopSceneAnimation(); runtime.current?.sceneWalk(null); } }
+        finally { releaseViewport(); if (current === epoch.current) { sceneSpeech.current?.stop(); directing.current = null; runtime.current?.clearSceneMotions(); runtime.current?.stopSceneAnimation(); runtime.current?.presentExpression('self', 'neutral'); runtime.current?.sceneWalk(null); } }
         return reply();
       }
       case 'export': {
-        let chosen = project;
-        if (operation.shot_id) {
-          const { clip } = clipShot(project, operation.shot_id);
-          chosen = { ...project, tracks: project.tracks.map((t) => ({ ...t, clips: t.clips.filter((c) => c.id === clip.id).map((c) => ({ ...c, start: 0 })) })) };
-        }
+        const chosen = project;
+        const clip = operation.shot_id ? clipShot(project, operation.shot_id).clip : null;
+        const range = clip ? {from:toSeconds(clip.start),to:toSeconds(clip.start+clip.duration)} : undefined;
         const canvas = document.createElement('canvas'); canvas.width = operation.width; canvas.height = operation.height;
         s.setRendering(true);
         const resume = pauseForPlayback();
         try {
-          const blob = await render(chosen, s.snapshot().assets, canvas, signal, (seconds) => { if (current === epoch.current) report(`Exporting ${seconds.toFixed(1)} seconds…`); }, true);
-          fresh(); if (!blob || blob.size > 40 * 1024 * 1024) throw new Error('Export exceeds the 40 MB MCP artifact limit.'); return blob;
+          const blob = await render(chosen, s.snapshot().assets, canvas, signal, (seconds) => { if (current === epoch.current) report(`Exporting ${seconds.toFixed(1)} seconds…`); }, true, range?.from ?? 0, undefined, range);
+          fresh(); if (!blob || blob.size > 40 * 1024 * 1024) throw new Error('Export exceeds the 40 MB MCP artifact limit.'); report('Film exported with its timeline audio.'); return blob;
         } finally { resume(); if (identity === latestStudio.current.identity) latestStudio.current.setRendering(false); }
       }
     }
@@ -443,16 +526,19 @@ export function useStudioFilming(place: string, runtime: RefObject<GenvrRuntime 
     localBusy.current = true; setBusy(true); prepare(); const current = epoch.current;
     let fallbackMessage: string | undefined;
     let live: ReturnType<typeof liveTake> = null;
+    const releaseViewport = fitCaptureViewport(container.current, width, height);
     try {
+      await new Promise<void>(resolve => requestAnimationFrame(() => resolve()));
       report(kind === 'video' ? `Recording ${seconds} seconds…` : 'Taking photo…');
       const command = kind === 'video'
         ? { kind: 'video' as const, settings: FilmVideo.parse({ width, height, seconds }) }
         : { kind: 'photo' as const, settings: FilmPhoto.parse({ width, height }) };
       const sound = kind === 'video' ? worldSound() : null;
-      if (timeline) placeCast(cues);
+      if (timeline) { await prepareCast(cues); placeCast(cues); }
       live = kind === 'video' && timeline ? liveTake() : null;
       const blob = await captureFilm(canvas, command, abort.current.signal, subscribe, () => {
         live?.start();
+        if (timeline) sceneSpeech.current?.start();
         if (timeline) directing.current = { cues: [...cues].sort((a, b) => a.start - b.start), start: performance.now(), started: new Set(), activeSelf: null };
       }, (done) => { if (current === epoch.current) report(`Recording ${done.toFixed(1)} / ${seconds} s…`); }, sound);
       const stopped = live?.stop(); live = null;
@@ -477,15 +563,29 @@ export function useStudioFilming(place: string, runtime: RefObject<GenvrRuntime 
       document.body.append(link); link.click(); link.remove(); setTimeout(() => URL.revokeObjectURL(url), 60000);
       report(fallbackMessage ?? `${kind === 'photo' ? 'Photo' : 'Silent video'} downloaded.`);
     } catch (error) { live?.cancel(); if (current === epoch.current) report(error instanceof Error ? error.message : 'Capture failed.'); }
-    finally { if (current === epoch.current) {
+    finally { releaseViewport(); if (current === epoch.current) {
       localBusy.current = false;
-      directing.current = null; runtime.current?.clearSceneMotions(); runtime.current?.stopSceneAnimation(); runtime.current?.sceneWalk(null);
+      sceneSpeech.current?.stop(); directing.current = null; runtime.current?.clearSceneMotions(); runtime.current?.stopSceneAnimation(); runtime.current?.presentExpression('self', 'neutral'); runtime.current?.sceneWalk(null);
       setBusy(remoteBusy.current); if (!rig.current.settings) runtime.current?.setMarkersVisible(isEditing.current());
     } }
   };
-  return { camera, studio, output, setOutput, busy, connected, message, onFilmFrame, onRendered, releaseRuntime, apply, preset, reset, connect, take,
+  const runLocalStudioOperation = async (operation: FilmStudioOperation, signal: AbortSignal) => {
+    if (localBusy.current || remoteBusy.current || latestStudio.current.isRendering()) throw new Error('Wait for the current capture or render.');
+    remoteBusy.current = true; setBusy(true);
+    try { return await handleStudio(operation, signal); }
+    finally { remoteBusy.current = false; setBusy(localBusy.current); }
+  };
+  const capturePhoto = async (raw: unknown, signal: AbortSignal) => {
+    const canvas = container.current?.querySelector('canvas'); if (!canvas) throw new Error('World canvas unavailable.');
+    prepare(); return captureFilm(canvas, { kind: 'photo', settings: FilmPhoto.parse(raw) }, signal, subscribe, () => {}, () => {});
+  };
+  return { assignSavedVoice: async (voiceId: string, target = 'self') => { if (!voice.current) throw new Error('Voice service unavailable.'); return voice.current({ action: 'assign', voiceId, target, projectId: place }); },
+    selectedVoice: async (target = 'self') => { if(!voice.current)return ''; const library = await voice.current({action:'voices',target:'self'}) as {assignments?:Record<string,string>}; return library.assignments?.[place+':'+target] ?? ''; },
+    previewSavedVoice: async (voiceId: string) => { if (!voice.current) throw new Error('Voice service unavailable.'); return voice.current({ action: 'preview', voiceId, target: 'self' }); }, voiceAvailable: Boolean(voiceService), voiceLibrary: async () => { if (!voice.current) return { voices: [], models: [] }; const [library, catalog] = await Promise.all([voice.current({ action: 'voices', target: 'self' }), voice.current({ action: 'models', target: 'self' })]); return { ...(library as { voices: Array<{ id: string; name: string; language?: string; voiceType?: string; model: string }> }), ...(catalog as { models: Array<{ id: string; languages: string[] }> }) }; }, handleStudio: runLocalStudioOperation, capturePhoto, camera, studio, output, setOutput, busy, connected, message, onFilmFrame, onRendered, releaseRuntime, apply, preset, reset, connect, take,
     previewStory, cameraView,
     actors, actions, pauseForPlayback,
+    sceneLights: () => runtime.current?.world.environment.lighting ?? [],
+    setSceneLights: (lights: import('@genvr/contracts').SceneLight[]) => { if (!runtime.current?.applyCommand({type:'set_lighting',params:{lights}})) throw new Error('Could not update scene lights.'); },
     /** FILM-10: where the avatar stands now, for a cue's start spot or walk-to spot (world metres, 2 decimals). */
     pickSpot: () => new Promise<{ x: number; z: number } | null>((resolve) => {
       const box = container.current;

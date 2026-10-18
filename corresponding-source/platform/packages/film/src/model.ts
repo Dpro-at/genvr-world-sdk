@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { FilmCamera } from '@genvr/contracts';
+import { FilmCamera, FilmCueVoice } from '@genvr/contracts';
 
 /** Limits stay as in the first Studio Filming version until the owner raises them (FILM-02 plan, question 1). */
 export const LIMITS = {
@@ -27,7 +27,7 @@ export type SceneSpot = z.infer<typeof SceneSpot>;
 export const SceneCue = z.object({
   id, actor: id, label: name, action: id,
   start: tick, end: tick,
-  text: z.string().max(500), audio: id.optional(), volume: z.number().finite().min(0).max(2),
+  text: z.string().max(500), audio: id.optional(), voice: FilmCueVoice.optional(), volume: z.number().finite().min(0).max(2),
   at: SceneSpot.optional(), to: z.array(SceneSpot).max(8).optional(),
 }).strict();
 export type SceneCue = z.infer<typeof SceneCue>;

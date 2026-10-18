@@ -10,6 +10,7 @@ import rock from './nature/rock.js';
 import crate from './props-and-decor/crate.js';
 import barrel from './props-and-decor/barrel.js';
 import bench from './props-and-decor/bench.js';
+import rowboat from './props-and-decor/rowboat.js';
 import table from './props-and-decor/table.js';
 import lamp from './props-and-decor/lamp.js';
 import cone from './props-and-decor/cone.js';
@@ -54,6 +55,7 @@ export const CORE_ITEMS: readonly CoreItem[] = [
   crate,
   barrel,
   bench,
+  rowboat,
   table,
   lamp,
   cone,

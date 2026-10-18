@@ -1,6 +1,6 @@
 'use client';
 
-import { ChevronDown, Ellipsis } from 'lucide-react';
+import { ChevronDown, Ellipsis, type LucideIcon } from 'lucide-react';
 import { useEffect, useRef, type ReactNode } from 'react';
 
 /** Native disclosure with outside-click/Escape dismissal and keyboard focus restoration. */
@@ -8,9 +8,11 @@ export function ToolbarMenu({
   label,
   children,
   compact = false,
+  icon: Icon,
   closeOnAction = false,
 }: {
   label: string;
+  icon?: LucideIcon;
   children: ReactNode;
   compact?: boolean;
   closeOnAction?: boolean;
@@ -44,7 +46,7 @@ export function ToolbarMenu({
           <Ellipsis aria-hidden className="size-4" />
         ) : (
           <>
-            {label}
+            {Icon ? <Icon aria-hidden className="size-4" /> : null}{label}
             <ChevronDown aria-hidden className="size-3" />
           </>
         )}

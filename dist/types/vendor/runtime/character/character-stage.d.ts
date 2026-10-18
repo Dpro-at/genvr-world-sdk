@@ -1,3 +1,4 @@
+import type { AvatarExpression } from '../avatar-expression.js';
 import { type CharacterRecipe } from '../../contracts/index.js';
 import { type ViewFace } from '../view-cube.js';
 import { type MusclePaintMode } from './muscle-paint-mode.js';
@@ -16,6 +17,9 @@ export interface CharacterStageInfo {
     /** Standing height at rest (m). */
     height: number;
     clip: string | null;
+    expression: AvatarExpression;
+    expressionSupported: boolean;
+    mouth: import('../../contracts/index.js').MouthShape;
     backend: 'WebGPU' | 'WebGL';
 }
 export interface CharacterStageColors {
@@ -39,7 +43,13 @@ export interface CharacterStage {
     setColors(colors: CharacterStageColors): void;
     /** Plays a clip in a loop (the editor previews every move in a loop). */
     play(clip: string): void;
+    presentAnimation(id: string): boolean;
+    setMouth(shape: import('../../contracts/index.js').MouthShape): void;
+    presentExpression(expression: AvatarExpression): boolean;
+    importAvatarMotion(id: string, data: ArrayBuffer): Promise<boolean>;
     setPaused(paused: boolean): void;
+    /** Manual eyelid inspection: null restores automatic blinking. */
+    setEyeClosure(amount: number | null): void;
     resetView(): void;
     /** Close-up on the face from the front (face work: eyes, mouth, lines). */
     focusFace(): void;

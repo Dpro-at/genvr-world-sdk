@@ -99,3 +99,50 @@ describe('Studio save ordering', () => {
     expect(await queue.write(async () => {})).toBe(true);
   });
 });
+
+
+describe('world starter availability and consistent style', () => {
+  it('refuses unavailable styles and unsupported kinds instead of silently creating another world', () => {
+    expect(() => createStudioProject('anime', 'small')).toThrow('not available');
+    expect(() => createStudioProject('blocky', 'valley')).toThrow('not available');
+    expect(() => createStudioProject('voxel', 'island')).toThrow('not available');
+  });
+  it.each(['valley', 'island', 'plain', 'mountains'] as const)('preserves the requested %s kind and uses only matching library assets', kind => {
+    const project = createStudioProject('realistic', kind);
+    expect(project.world.style.base).toBe('realistic');
+    expect(project.world.terrain.world?.kind).toBe(kind);
+    expect(project.world.instances.length).toBeGreaterThan(0);
+    for (const instance of project.world.instances) expect(getCoreItem(instance.itemId)?.manifest.styles).toContain('realistic');
+    if (kind === 'island') expect(project.world.environment.sea).toBeDefined();
+  });
+});
+
+
+it('starts an island on an uncluttered shore with sea and an editable rowboat', () => {
+  const project = createStudioProject('realistic', 'island');
+  expect(project.world.instances).toHaveLength(6);
+  expect(project.world.instances.some(item => item.itemId === 'genvr.core.rowboat')).toBe(true);
+  expect(project.world.style.woods?.on).toBe(false);
+  expect(project.world.spawn.position[2]).toBeGreaterThan(20);
+  const state = createWorldState(project.world, project.terrainChunks);
+  const [x, y, z] = project.world.spawn.position;
+  expect(y).toBeCloseTo(state.terrain.heightAt(x, z) + 1);
+  expect(project.world.environment.sea?.level).toBeLessThan(y);
+});
+it('gives the island rowboat a level shore berth instead of a steep resting surface', () => {
+  const project = createStudioProject('realistic', 'island');
+  const state = createWorldState(project.world, project.terrainChunks);
+  const boat = project.world.instances.find(row => row.itemId === 'genvr.core.rowboat')!;
+  const [x, , z] = boat.transform.position;
+  expect(state.terrain.heightAt(x - 1, z)).toBeCloseTo(state.terrain.heightAt(x + 1, z));
+  expect(state.terrain.heightAt(x, z - 1)).toBeCloseTo(state.terrain.heightAt(x, z + 1));
+  expect(state.terrain.soilAt(x, z)).toBe('sand');
+});
+
+
+it('keeps built-in avatar body assignments in the saved project alongside independent voice mappings', () => {
+  const project = createStudioProject('realistic', 'empty');
+  const saved = readStudioProject({ ...project, avatarBodies: { self: 'robot', guide: 'human' } });
+  expect(importStudioProject(JSON.stringify(saved)).avatarBodies).toEqual({ self: 'robot', guide: 'human' });
+  expect(() => readStudioProject({ ...project, avatarBodies: { self: 'unavailable-body' } })).toThrow();
+});

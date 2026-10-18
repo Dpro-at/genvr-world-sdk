@@ -1,8 +1,9 @@
+import type { AvatarPresentationEvent } from './presentation.js';
 import { type CommandPayload, type SideMove, type WorldDocument } from '../contracts/index.js';
 import type { ScriptRecording } from '../contracts/index.js';
 import type { ScriptLogLine } from '../script/index.js';
 import { type ScriptEngine } from './scripts.js';
-import { type ToolName } from './tools.js';
+import { type ToolArgs, type ToolName } from './tools.js';
 /** One chat message in the Ollama chat format. */
 export interface ChatMessage {
     role: 'system' | 'user' | 'assistant' | 'tool';
@@ -26,6 +27,10 @@ onQueue?: (ahead: number) => void) => Promise<{
 }>;
 /** What the assistant can see and change: the editor's world (the studio runtime). */
 export interface AssistantHost {
+    presentAvatar?(event: AvatarPresentationEvent): string | null;
+    presentationInfo?(): string;
+    avatarVoice?(input: ToolArgs<'avatar_voice'>): Promise<unknown>;
+    userAvatarLibrary?(input: ToolArgs<'user_avatar_library'>): Promise<unknown>;
     world(): WorldDocument;
     heightAt(x: number, z: number): number;
     /**

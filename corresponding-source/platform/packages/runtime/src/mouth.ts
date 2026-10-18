@@ -1,3 +1,4 @@
+import type { AvatarExpression } from './avatar-expression.js';
 import { MOUTH_SHAPES, type MouthShape } from '@genvr/contracts';
 import {
   BufferAttribute,
@@ -158,6 +159,7 @@ export interface MouthMesh {
   mesh: Mesh;
   shape: MouthShape;
   setShape(shape: MouthShape): void;
+  setExpression(expression: AvatarExpression): void;
   dispose(): void;
 }
 
@@ -184,6 +186,12 @@ export function createMouth(size: readonly [number, number, number]): MouthMesh 
   const mouth: MouthMesh = {
     mesh,
     shape: 'X',
+    setExpression(expression) {
+      mesh.rotation.z = expression === 'sad' ? Math.PI : 0;
+      mesh.scale.y = expression === 'surprised' ? 1.5 : expression === 'angry' ? .65 : 1;
+      const shape = expression === 'smile' || expression === 'sad' ? 'C' : expression === 'surprised' ? 'E' : expression === 'angry' ? 'G' : 'X';
+      mouth.setShape(shape);
+    },
     setShape(shape) {
       if (shape === mouth.shape && mouth.mesh.userData.drawn) return;
       const frame = MOUTH_SHAPES.indexOf(shape);

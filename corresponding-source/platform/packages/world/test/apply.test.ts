@@ -163,6 +163,7 @@ describe('applyCommand inverses restore the exact world', () => {
     roundTrip({ type: 'set_style', params: { base: 'anime', accent: 'realistic' } });
     roundTrip({ type: 'set_sky', params: { preset: 'sunset' } });
     roundTrip({ type: 'set_weather', params: { preset: 'rain' } });
+    roundTrip({type:'set_lighting',params:{lights:[{id:'key',name:'Key',enabled:true,color:'#ffffff',intensity:30,angle:35,softness:.5,distance:30,actor:'self',position:[2,3,3],target:[0,1.5,0]}]}});
     const water: CommandPayload = {
       type: 'add_water',
       params: { id: 'lake-1', kind: 'lake', area: square(10), level: 0.5, params: {} },

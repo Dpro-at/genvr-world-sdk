@@ -270,6 +270,23 @@ export declare const WorldPackage: z.ZodObject<{
             groupId: z.ZodString;
         }, z.core.$strip>;
     }, z.core.$strip>, z.ZodObject<{
+        type: z.ZodLiteral<"set_lighting">;
+        params: z.ZodObject<{
+            lights: z.ZodOptional<z.ZodArray<z.ZodObject<{
+                id: z.ZodString;
+                name: z.ZodString;
+                enabled: z.ZodDefault<z.ZodBoolean>;
+                color: z.ZodDefault<z.ZodString>;
+                intensity: z.ZodDefault<z.ZodNumber>;
+                angle: z.ZodDefault<z.ZodNumber>;
+                softness: z.ZodDefault<z.ZodNumber>;
+                distance: z.ZodDefault<z.ZodNumber>;
+                actor: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+                position: z.ZodDefault<z.ZodTuple<[z.ZodNumber, z.ZodNumber, z.ZodNumber], null>>;
+                target: z.ZodDefault<z.ZodTuple<[z.ZodNumber, z.ZodNumber, z.ZodNumber], null>>;
+            }, z.core.$strict>>>;
+        }, z.core.$strip>;
+    }, z.core.$strip>, z.ZodObject<{
         type: z.ZodLiteral<"set_style">;
         params: z.ZodObject<{
             base: z.ZodEnum<{
@@ -794,6 +811,7 @@ export declare const WorldPackage: z.ZodObject<{
             scriptId: z.ZodString;
             script: z.ZodNullable<z.ZodObject<{
                 name: z.ZodString;
+                enabled: z.ZodBoolean;
                 from: z.ZodOptional<z.ZodObject<{
                     itemId: z.ZodString;
                     version: z.ZodString;
@@ -801,7 +819,6 @@ export declare const WorldPackage: z.ZodObject<{
                 }, z.core.$strip>>;
                 source: z.ZodString;
                 api: z.ZodLiteral<1>;
-                enabled: z.ZodBoolean;
             }, z.core.$strip>>;
             index: z.ZodOptional<z.ZodNumber>;
         }, z.core.$strip>;
@@ -1044,6 +1061,7 @@ export declare const WorldPackage: z.ZodObject<{
                     "anime-boy": "anime-boy";
                     warrior: "warrior";
                     human: "human";
+                    robot: "robot";
                 }>, z.ZodType<`user.${string}`, unknown, z.core.$ZodTypeInternals<`user.${string}`, unknown>>]>>;
                 scale: z.ZodDefault<z.ZodObject<{
                     height: z.ZodDefault<z.ZodNumber>;
@@ -1549,6 +1567,23 @@ export declare const ImportWorldPackage: z.ZodObject<{
             type: z.ZodLiteral<"ungroup_items">;
             params: z.ZodObject<{
                 groupId: z.ZodString;
+            }, z.core.$strip>;
+        }, z.core.$strip>, z.ZodObject<{
+            type: z.ZodLiteral<"set_lighting">;
+            params: z.ZodObject<{
+                lights: z.ZodOptional<z.ZodArray<z.ZodObject<{
+                    id: z.ZodString;
+                    name: z.ZodString;
+                    enabled: z.ZodDefault<z.ZodBoolean>;
+                    color: z.ZodDefault<z.ZodString>;
+                    intensity: z.ZodDefault<z.ZodNumber>;
+                    angle: z.ZodDefault<z.ZodNumber>;
+                    softness: z.ZodDefault<z.ZodNumber>;
+                    distance: z.ZodDefault<z.ZodNumber>;
+                    actor: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+                    position: z.ZodDefault<z.ZodTuple<[z.ZodNumber, z.ZodNumber, z.ZodNumber], null>>;
+                    target: z.ZodDefault<z.ZodTuple<[z.ZodNumber, z.ZodNumber, z.ZodNumber], null>>;
+                }, z.core.$strict>>>;
             }, z.core.$strip>;
         }, z.core.$strip>, z.ZodObject<{
             type: z.ZodLiteral<"set_style">;
@@ -2075,6 +2110,7 @@ export declare const ImportWorldPackage: z.ZodObject<{
                 scriptId: z.ZodString;
                 script: z.ZodNullable<z.ZodObject<{
                     name: z.ZodString;
+                    enabled: z.ZodBoolean;
                     from: z.ZodOptional<z.ZodObject<{
                         itemId: z.ZodString;
                         version: z.ZodString;
@@ -2082,7 +2118,6 @@ export declare const ImportWorldPackage: z.ZodObject<{
                     }, z.core.$strip>>;
                     source: z.ZodString;
                     api: z.ZodLiteral<1>;
-                    enabled: z.ZodBoolean;
                 }, z.core.$strip>>;
                 index: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strip>;
@@ -2325,6 +2360,7 @@ export declare const ImportWorldPackage: z.ZodObject<{
                         "anime-boy": "anime-boy";
                         warrior: "warrior";
                         human: "human";
+                        robot: "robot";
                     }>, z.ZodType<`user.${string}`, unknown, z.core.$ZodTypeInternals<`user.${string}`, unknown>>]>>;
                     scale: z.ZodDefault<z.ZodObject<{
                         height: z.ZodDefault<z.ZodNumber>;

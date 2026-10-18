@@ -1,4 +1,4 @@
-import { Color, TSL, Vector2, type Node } from 'three/webgpu';
+import { Color, TSL, Vector2, Vector3, Vector4, type Node } from 'three/webgpu';
 
 /**
  * The drawn anime face (CHAR-02 face work; owner references docs/reference/character-anime/anime-style/): eyes with
@@ -18,18 +18,18 @@ type F = Node<'float'>;
 /** Shape of the anime eye and face parts (metres on the head). */
 export const FACE_SHAPE = {
   eye: { halfWidth: 0.0185, halfHeight: 0.0145, lowerFlat: 0.75, raise: 0.002 },
-  iris: { width: 0.58, height: 0.86 },
-  pupil: 0.42,
+  iris: { width: 0.55, height: 0.64 },
+  pupil: 0.48,
   lash: { upper: 0.0016, lower: 0.0007, wing: 0.004, lowerStrength: 0.35, rim: 0.0208, rimSoft: 0.0014 },
-  brow: { above: 0.021, halfLength: 0.017, thickness: 0.0014, arch: 18 },
+  brow: { above: 0.014, halfLength: 0.018, thickness: 0.001, arch: 13 },
   nose: { below: 0.052, halfLength: 0.0035, strength: 0.18 },
-  mouth: { y: -0.024, halfWidth: 0.0105, thickness: 0.0009, open: 0.007, strength: 0.55 },
+  mouth: { y: -0.024, halfWidth: 0.018, thickness: 0.0006, open: 0.007, strength: 0.55 },
   /** Seconds between blinks and how long a blink takes (as a share of the period). */
   blink: { period: 4.2, closing: 0.035 },
 };
 
 /** A uniform node with its CPU value (three's types lose the node type of `uniform`). */
-type Uniform<T extends 'float' | 'vec2' | 'vec3', V> = Node<T> & { value: V };
+type Uniform<T extends 'float' | 'vec2' | 'vec3' | 'vec4', V> = Node<T> & { value: V };
 
 export interface FaceUniforms {
   eyeColor: Uniform<'vec3', Color>;
@@ -39,18 +39,32 @@ export interface FaceUniforms {
   look: Uniform<'vec2', Vector2>;
   /** Mouth opening 0..1 and width 0..1 (lip sync). */
   mouthOpen: Uniform<'float', number>;
+  /** -1 automatic blinking; 0 open .. 1 closed for eyelid inspection. */
+  eyeClosure: Uniform<'float', number>;
+  leftEye: Uniform<'vec3', Vector3>;
+  rightEye: Uniform<'vec3', Vector3>;
+  expressions: Uniform<'vec4', Vector4>;
+  thinking: Uniform<'float', number>;
+  emotion: Uniform<'float', number>;
+  browTilt: Uniform<'float', number>;
+  surprise: Uniform<'float', number>;
   mouthWide: Uniform<'float', number>;
 }
 
-export function faceUniforms(eye = '#3979b8', brow = '#2b1d18'): FaceUniforms {
-  const make = <T extends 'float' | 'vec2' | 'vec3', V>(value: V) => uniform(value as never) as unknown as Uniform<T, V>;
+export function faceUniforms(eye = '#704a32', brow = '#2b1d18'): FaceUniforms {
+  const make = <T extends 'float' | 'vec2' | 'vec3' | 'vec4', V>(value: V) => uniform(value as never) as unknown as Uniform<T, V>;
   return {
     eyeColor: make<'vec3', Color>(new Color(eye)),
     lineColor: make<'vec3', Color>(new Color('#1a1210')),
     browColor: make<'vec3', Color>(new Color(brow)),
     look: make<'vec2', Vector2>(new Vector2(0, 0)),
     mouthOpen: make<'float', number>(0),
+    eyeClosure: make<'float', number>(-1),
+    leftEye: make<'vec3', Vector3>(new Vector3()),
+    rightEye: make<'vec3', Vector3>(new Vector3()),
     mouthWide: make<'float', number>(0.5),
+    expressions: make<'vec4', Vector4>(new Vector4()), thinking: make<'float', number>(0),
+    emotion: make<'float', number>(0), browTilt: make<'float', number>(0), surprise: make<'float', number>(0),
   };
 }
 
@@ -66,7 +80,7 @@ const band = (value: F, from: number | F, to: number | F, soft: number) =>
  */
 export function drawFace(skin: Node<'vec3'>, face: Record<string, Vec3> | undefined, u: FaceUniforms): Node<'vec3'> {
   if (!face?.leftUpperLid || !face.rightUpperLid || !face.leftLowerLid || !face.jaw) return skin;
-  const p = attribute('position', 'vec3');
+  const p = attribute('facePosition', 'vec3');
   const n = attribute('normal', 'vec3');
   const s = FACE_SHAPE;
   const lidZ = face.leftUpperLid[2];
@@ -76,18 +90,31 @@ export function drawFace(skin: Node<'vec3'>, face: Record<string, Vec3> | undefi
 
 
   let color: Node<'vec3'> = skin;
+  const contour = attribute('lidDistance','vec2');
+  const upperMargin = float(1).sub(smoothstep(float(.00025),float(.0011),contour.x));
+  const lowerMargin = float(1).sub(smoothstep(float(.0002),float(.001),contour.y));
+  const fold = band(contour.x,.0025,.0045,.0012).mul(front).mul(.12);
+  color = mix(color,skin.mul(vec3(.7,.51,.48)),fold);
+  color = mix(color,skin.mul(vec3(.8,.48,.46)),lowerMargin.mul(.22));
+  color = mix(color,u.lineColor,upperMargin.mul(.75));
   for (const side of [1, -1] as const) {
     const upper = side > 0 ? face.leftUpperLid : face.rightUpperLid;
     const cx = upper[0];
     const dx = p.x.sub(cx).mul(side); // + toward the outer corner
-    // Brow: a gentle arch above the eye, thicker toward the inner end.
-    const bx = dx.add(0.002);
-    const archY = float(eyeY + s.brow.above).sub(bx.pow(2).mul(s.brow.arch));
-    const browThick = float(s.brow.thickness).mul(float(1.4).sub(bx.div(s.brow.halfLength).mul(0.5)));
-    const brow = band(p.y.sub(archY), browThick.negate(), browThick, 0.0005)
-      .mul(band(bx, -s.brow.halfLength, s.brow.halfLength, 0.002))
-      .mul(front);
-    color = mix(color, u.browColor, brow);
+    // Tapered hair density, with a softer inner edge and individual irregular strands.
+    const bx = dx.add(.001);
+    const t = bx.div(s.brow.halfLength).clamp(-1, 1);
+    const archY = float(eyeY + s.brow.above + .001)
+      .sub(bx.pow(2).mul(9)).add(bx.mul(.035))
+      .add(bx.mul(u.browTilt).mul(.35)).add(u.surprise.mul(.005));
+    const taper = float(1).sub(t.abs().pow(2)).max(0).pow(.55);
+    const thickness = taper.mul(.002).mul(float(1).sub(t.mul(.28))).add(.00015);
+    const by = p.y.sub(archY);
+    const silhouette = band(by, thickness.negate(), thickness, .0007)
+      .mul(band(bx, -s.brow.halfLength, s.brow.halfLength, .0025)).mul(front);
+    const hairNoise = TSL.mx_noise_float(vec3(bx.add(by.mul(.6)).mul(4500), by.mul(250), float(7))).mul(.5).add(.5);
+    const density = smoothstep(float(.18), float(.72), hairNoise).mul(.65).add(.27);
+    color = mix(color, u.browColor, silhouette.mul(density));
   }
 
   // Nose: a short soft line below the eyes, slightly to one side (light from the left).
@@ -102,8 +129,8 @@ export function drawFace(skin: Node<'vec3'>, face: Record<string, Vec3> | undefi
   const mouthY = (face.jaw[1] + eyeY) / 2 + s.mouth.y;
   const halfWidth = float(s.mouth.halfWidth).mul(float(0.75).add(u.mouthWide.mul(0.5)));
   const mx = p.x.div(halfWidth);
-  const my = p.y.sub(mouthY);
-  const openHeight = u.mouthOpen.mul(s.mouth.open).max(0.0001);
+  const my = p.y.sub(mouthY).sub(mx.pow(2).mul(u.emotion).mul(.003));
+  const openHeight = u.mouthOpen.max(u.surprise.mul(.6)).mul(s.mouth.open).max(0.0001);
   const inner = float(1)
     .sub(smoothstep(float(0.85), float(1), mx.pow(2).add(my.div(openHeight).pow(2))))
     .mul(front)
@@ -112,7 +139,18 @@ export function drawFace(skin: Node<'vec3'>, face: Record<string, Vec3> | undefi
     .mul(band(mx, -1, 1, 0.12))
     .mul(front)
     .mul(s.mouth.strength);
-  color = mix(color, vec3(0.42, 0.12, 0.12), inner);
+  // Cupid's bow and a fuller lower lip, softly tapered into the existing lip geometry.
+  const lipX = p.x.div(halfWidth.mul(1.12));
+  const taper = float(1).sub(lipX.pow(2)).max(0);
+  const cupid = float(1).sub(smoothstep(float(.08), float(.3), lipX.abs())).mul(.0008);
+  const upperLip = taper.mul(.003).sub(cupid);
+  const lowerLip = taper.mul(-.0036);
+  const lip = band(my, lowerLip, upperLip, .0012)
+    .mul(band(lipX, -1, 1, .12)).mul(front);
+  const lipTone = mix(skin.mul(vec3(.8, .43, .43)), skin.mul(vec3(.9, .58, .56)),
+    float(1).sub(smoothstep(float(-.002), float(.001), my)));
+  color = mix(color, lipTone, lip.mul(.65));
+  color = mix(color, vec3(0.22, 0.055, 0.055), inner);
   color = mix(color, u.lineColor, line);
   return color;
 }
@@ -125,7 +163,7 @@ export function drawFace(skin: Node<'vec3'>, face: Record<string, Vec3> | undefi
 export function drawEyeball(face: Record<string, Vec3> | undefined, u: FaceUniforms): Node<'vec3'> {
   const white = vec3(0.96, 0.95, 0.94);
   if (!face?.leftEye || !face.rightEye) return white;
-  const p = attribute('position', 'vec3');
+  const p = attribute('facePosition', 'vec3');
   const s = FACE_SHAPE;
   const left = p.x.greaterThan(0);
   const centre = left.select(vec3(...face.leftEye), vec3(...face.rightEye));
@@ -138,11 +176,15 @@ export function drawEyeball(face: Record<string, Vec3> | undefined, u: FaceUnifo
   const irisE = ix.div(s.iris.width * 0.75).pow(2).add(iy.div(s.iris.height * 0.75).pow(2));
   const iris = float(1).sub(smoothstep(float(0.85), float(1), irisE)).mul(facing);
   const pupil = float(1).sub(smoothstep(float(0.8), float(1), irisE.div(s.pupil * s.pupil))).mul(facing);
-  const tone = mix(u.eyeColor.mul(0.45), u.eyeColor, smoothstep(float(0.35), float(-0.45), iy));
+  const radial = vec2(ix, iy).length().max(.001);
+  const fibers = ix.div(radial).mul(93).add(radial.mul(28)).sin().mul(.09).add(.91);
+  const tone = mix(u.eyeColor.mul(0.4), u.eyeColor.mul(1.25), float(1).sub(smoothstep(float(-0.45), float(0.35), iy))).mul(fibers);
+  const limbal = smoothstep(float(.62), float(.95), irisE).mul(iris).mul(.72);
   const shine = (x: number, y: number, r: number) =>
     float(1).sub(smoothstep(float(r * 0.7), float(r), vec2(ix.sub(x), iy.sub(y)).length())).mul(facing);
   let color: Node<'vec3'> = white;
   color = mix(color, tone, iris);
+  color = mix(color, u.eyeColor.mul(.22), limbal);
   color = mix(color, vec3(0.05, 0.04, 0.05), pupil);
   color = mix(color, vec3(1, 1, 1), max(shine(-0.14, 0.22, 0.09), shine(0.14, -0.2, 0.045)));
   return color;
@@ -155,7 +197,7 @@ export function drawEyeball(face: Record<string, Vec3> | undefined, u: FaceUnifo
  */
 export function faceMask(face: Record<string, Vec3> | undefined): Node<'float'> {
   if (!face?.leftEye || !face.rightEye || !face.jaw) return float(0);
-  const p = attribute('position', 'vec3');
+  const p = attribute('facePosition', 'vec3');
   const centre = vec3(0, (face.leftEye[1] + face.jaw[1]) / 2, face.leftEye[2]);
   const reach = (face.leftEye[1] - face.jaw[1]) * 1.1;
   const near = float(1).sub(smoothstep(float(reach * 0.75), float(reach), p.sub(centre).length()));

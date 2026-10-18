@@ -1,5 +1,10 @@
 'use client';
 
+import { MOTION_CATEGORIES, motionCategories, avatarMotionEntries } from '@genvr/runtime';
+import { EXPRESSIONS } from '@genvr/assistant';
+import { Smile, Angry, Frown, Brain, CircleHelp, Meh, Ruler, Palette, ScanFace, ChevronDown } from 'lucide-react';
+import { useStudioHost } from '../../../lib/studio-host';
+
 import {
   CHARACTER_SHAPE_LIMITS,
   FACE_PARTS,
@@ -65,12 +70,9 @@ import type { CharacterEditor } from './use-character-editor';
 import { MusclePaintPanel } from './muscle-paint-panel';
 
 export function EditorSection({ title, children }: { title: string; children: ReactNode }) {
-  return (
-    <section aria-label={title} className="mb-5">
-      <h3 className="mb-2 text-xs font-black tracking-wide text-ink/50 uppercase">{title}</h3>
-      {children}
-    </section>
-  );
+  const icons: Record<string, LucideIcon> = { Characters: PersonStanding, Body: PersonStanding, Shape: Ruler, Face: ScanFace, Colours: Palette, 'Character recipe': Save };
+  const Icon=icons[title]??PersonStanding;
+  return <section aria-label={title} className="mb-5"><h3 className="mb-2 flex items-center gap-2 text-xs font-bold text-ink/60"><Icon className="size-4"/>{title}</h3>{children}</section>;
 }
 
 /** Genvr's bodies and the creator's uploaded ones; every card keeps the same skeleton family and clips. */
@@ -788,7 +790,7 @@ export function FaceSection({ editor }: { editor: CharacterEditor }) {
     if (generated) editor.stage.current?.focusFace();
   }, [editor.stage, generated]);
   if (!generated)
-    return <p className="text-xs font-semibold text-ink/60">Face controls are for the generated human body.</p>;
+    return <p className="text-xs font-semibold text-ink/60">{recipe.body === 'robot' ? 'Use Facial Expressions in Moves to change the screen expression.' : 'Face controls are for the generated human body.'}</p>;
   const face = recipe.shape.face;
   const set = (feature: FaceFeature, value: number) =>
     editor.change((current) => ({
@@ -1068,32 +1070,50 @@ export function MovesSection({
   editor: CharacterEditor;
   columns?: string;
 }) {
-  const emotes = new Set(CORE_EMOTES.map((animation) => animation.clip));
-  return (
+  const host = useStudioHost();
+  const [category, setCategory] = useState('All'), [query, setQuery] = useState(''), [page, setPage] = useState(0);
+  const emotes = new Set(CORE_EMOTES.map(animation => animation.clip));
+  const native = CORE_ANIMATIONS.map(animation => ({
+    id: animation.clip, name: animation.manifest.name, title: animation.manifest.name,
+    categories: motionCategories(animation.manifest.name),
+    Icon: emotes.has(animation.clip) ? animationIcon(animation.manifest.id) : MOVE_ICONS[animation.clip] ?? PersonStanding,
+  }));
+  const imported = avatarMotionEntries().map(entry => {
+    const name = entry.name.replace(/^GENVR-[A-Z]+-\d+\s*·\s*/, '');
+    const categories = motionCategories(name, entry.category);
+    const category = categories[0]!;
+    const icons: Record<string, LucideIcon> = { Idle: PersonStanding, Walking: Footprints, Running: Footprints, Jumping: ArrowUp, Swimming: Waves, Traversal: Mountain, Combat: Swords, Dance: animationIcon('genvr.core.animation.dance'), Gestures: animationIcon('genvr.core.animation.wave') };
+    return { id: entry.id, name, title: entry.name, categories, Icon: icons[category] ?? PersonStanding };
+  });
+  const faceIcons: Record<string, LucideIcon> = { neutral: Meh, smile: Smile, angry: Angry, sad: Frown, surprised: CircleHelp, thinking: Brain };
+  const faces = EXPRESSIONS.map(expression => ({ id: `face:${expression}`, name: expression.charAt(0).toUpperCase() + expression.slice(1), title: `Facial expression: ${expression}`, categories: ['Facial expressions'], Icon: faceIcons[expression]! }));
+  const all = [...native, ...imported, ...faces];
+  const selected = (id: string) => id.startsWith('face:') ? (editor.info?.expression ?? 'neutral') === id.slice(5) : (editor.info?.clip ?? editor.clip) === id;
+  const play = (id: string) => {
+    if (!id.startsWith('face:')) { editor.play(id); return; }
+    const expression = id.slice(5) as typeof EXPRESSIONS[number];
+    if (host.presentAvatar) host.presentAvatar({ kind: 'expression', target: 'self', expression, duration: 60000 });
+    else editor.stage.current?.presentExpression(expression);
+  };
+  const matching = all.filter(row => `${row.name} ${row.title}`.toLowerCase().includes(query.toLowerCase()));
+  const categories = ['All', 'Facial expressions', ...MOTION_CATEGORIES.filter(value => all.some(row => row.categories.includes(value)))];
+  const filtered = matching.filter(row => category === 'All' || row.categories.includes(category as typeof MOTION_CATEGORIES[number]));
+  return <div className="space-y-2">
+    {all.length ? <>
+      <div role="tablist" aria-label="Motion categories" className="grid grid-cols-2 gap-1.5 border-b border-ink/10 pb-2">
+        {categories.map(value => <button key={value} type="button" role="tab" aria-selected={category === value} onClick={() => { setCategory(value); setPage(0); }} className={`flex min-w-0 items-center justify-between gap-1 rounded-lg px-2 py-2 text-[11px] font-bold ${category === value ? 'bg-ink text-on-brand' : 'bg-paper hover:bg-ink/5'}`}><span className="truncate">{value === 'Facial expressions' ? 'Facial Expressions' : value}</span><span className="text-[10px] opacity-60">{value === 'All' ? matching.length : matching.filter(row => row.categories.includes(value as typeof MOTION_CATEGORIES[number])).length}</span></button>)}
+      </div>
+      <input aria-label="Search moves" placeholder="Search moves and expressions" value={query} onChange={event => { setQuery(event.target.value); setPage(0); }} className="w-full rounded-lg bg-paper px-3 py-2 text-xs text-ink" />
+      <p className="text-[11px] text-ink/60">{filtered.length} {category === 'Facial expressions' ? 'expressions' : 'items'} · Some moves match multiple categories.</p>
+    </> : null}
     <div role="radiogroup" aria-label="Moves" className={`grid gap-1.5 ${columns}`}>
-      {CORE_ANIMATIONS.map((animation) => {
-        const Icon = emotes.has(animation.clip)
-          ? animationIcon(animation.manifest.id)
-          : (MOVE_ICONS[animation.clip] ?? PersonStanding);
-        const on = editor.clip === animation.clip;
-        return (
-          <button
-            key={animation.manifest.id}
-            type="button"
-            role="radio"
-            aria-checked={on}
-            onClick={() => editor.play(animation.clip)}
-            className={`flex flex-col items-center gap-1 rounded-xl px-1 py-2 text-[11px] font-bold transition active:scale-95 ${
-              on ? 'bg-ink text-on-brand' : 'bg-paper text-ink hover:bg-ink/5'
-            }`}
-          >
-            <Icon className="size-5" strokeWidth={1.8} aria-hidden />
-            <span className="w-full truncate text-center leading-tight">{animation.manifest.name}</span>
-          </button>
-        );
-      })}
+      {filtered.slice(page * 60, (page + 1) * 60).map(({ id, name, title, Icon }) => <button key={id} type="button" role="radio" aria-label={title} title={title} aria-checked={selected(id)} onClick={() => play(id)} className={`flex flex-col items-center gap-1 rounded-xl px-1 py-2 text-[11px] font-bold transition active:scale-95 ${selected(id) ? 'bg-ink text-on-brand' : 'bg-paper text-ink hover:bg-ink/5'}`}>
+        <Icon className="size-5" strokeWidth={1.8} aria-hidden />
+        <span className="w-full truncate text-center leading-tight">{name}</span>
+      </button>)}
     </div>
-  );
+    {filtered.length > 60 ? <div className="flex items-center justify-between text-xs font-bold"><button type="button" disabled={page === 0} onClick={() => setPage(value => value - 1)} className="rounded-lg p-2 hover:bg-ink/5 disabled:opacity-40">Previous</button><span>{page + 1} / {Math.ceil(filtered.length / 60)}</span><button type="button" disabled={(page + 1) * 60 >= filtered.length} onClick={() => setPage(value => value + 1)} className="rounded-lg p-2 hover:bg-ink/5 disabled:opacity-40">Next</button></div> : null}
+  </div>;
 }
 
 /** Name, save in this browser, export and import the recipe file, and the saved recipes. */
@@ -1127,15 +1147,15 @@ export function RecipeSection({ editor }: { editor: CharacterEditor }) {
       <div className="grid grid-cols-3 gap-1.5">
         <ActionButton
           Icon={Save}
-          label="Save"
+          label="Save character"
           primary
           onClick={() => {
             editor.save();
             setMessage(`Saved "${recipe.name}" in this browser.`);
           }}
         />
-        <ActionButton Icon={Download} label="Export" onClick={download} />
-        <ActionButton Icon={Upload} label="Import" onClick={() => file.current?.click()} />
+        <ActionButton Icon={Download} label="Export recipe" onClick={download} />
+        <ActionButton Icon={Upload} label="Import recipe" onClick={() => file.current?.click()} />
       </div>
       <input
         ref={file}
@@ -1217,11 +1237,11 @@ function ActionButton({
 
 /** The left dock of the Studio's Avatar tab: body, shape, colours and the recipe. */
 export function CharacterControls({ editor }: { editor: CharacterEditor }) {
+  const host = useStudioHost();
   return (
     <div className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto px-3 pb-3 [scrollbar-width:none]">
-      <EditorSection title="Body">
-        <BodySection editor={editor} />
-      </EditorSection>
+      {host.userAvatarControls ? <EditorSection title="Characters">{host.userAvatarControls('characters', '', body => editor.change(recipe => ({ ...recipe, body })))}</EditorSection> : null}
+      <EditorSection title="Body"><BodySection editor={editor} /></EditorSection>
       <EditorSection title="Shape">
         <ShapeSection editor={editor} />
       </EditorSection>
@@ -1240,9 +1260,12 @@ export function CharacterControls({ editor }: { editor: CharacterEditor }) {
 
 /** The right dock of the Studio's Avatar tab: moves to play. */
 export function CharacterMoves({ editor }: { editor: CharacterEditor }) {
+  const host = useStudioHost();
   return (
     <div className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto px-3 pt-1 pb-3 [scrollbar-width:none]">
       <MovesSection editor={editor} />
+      {host.userAvatarControls?.('motions')}
+      {host.presentationControls?.('motions')}
     </div>
   );
 }

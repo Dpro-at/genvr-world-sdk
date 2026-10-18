@@ -220,6 +220,23 @@ export declare const CommandPayload: z.ZodDiscriminatedUnion<[z.ZodObject<{
         groupId: z.ZodString;
     }, z.core.$strip>;
 }, z.core.$strip>, z.ZodObject<{
+    type: z.ZodLiteral<"set_lighting">;
+    params: z.ZodObject<{
+        lights: z.ZodOptional<z.ZodArray<z.ZodObject<{
+            id: z.ZodString;
+            name: z.ZodString;
+            enabled: z.ZodDefault<z.ZodBoolean>;
+            color: z.ZodDefault<z.ZodString>;
+            intensity: z.ZodDefault<z.ZodNumber>;
+            angle: z.ZodDefault<z.ZodNumber>;
+            softness: z.ZodDefault<z.ZodNumber>;
+            distance: z.ZodDefault<z.ZodNumber>;
+            actor: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+            position: z.ZodDefault<z.ZodTuple<[z.ZodNumber, z.ZodNumber, z.ZodNumber], null>>;
+            target: z.ZodDefault<z.ZodTuple<[z.ZodNumber, z.ZodNumber, z.ZodNumber], null>>;
+        }, z.core.$strict>>>;
+    }, z.core.$strip>;
+}, z.core.$strip>, z.ZodObject<{
     type: z.ZodLiteral<"set_style">;
     params: z.ZodObject<{
         base: z.ZodEnum<{
@@ -744,6 +761,7 @@ export declare const CommandPayload: z.ZodDiscriminatedUnion<[z.ZodObject<{
         scriptId: z.ZodString;
         script: z.ZodNullable<z.ZodObject<{
             name: z.ZodString;
+            enabled: z.ZodBoolean;
             from: z.ZodOptional<z.ZodObject<{
                 itemId: z.ZodString;
                 version: z.ZodString;
@@ -751,7 +769,6 @@ export declare const CommandPayload: z.ZodDiscriminatedUnion<[z.ZodObject<{
             }, z.core.$strip>>;
             source: z.ZodString;
             api: z.ZodLiteral<1>;
-            enabled: z.ZodBoolean;
         }, z.core.$strip>>;
         index: z.ZodOptional<z.ZodNumber>;
     }, z.core.$strip>;
@@ -1099,6 +1116,23 @@ export declare const Command: z.ZodIntersection<z.ZodObject<{
         groupId: z.ZodString;
     }, z.core.$strip>;
 }, z.core.$strip>, z.ZodObject<{
+    type: z.ZodLiteral<"set_lighting">;
+    params: z.ZodObject<{
+        lights: z.ZodOptional<z.ZodArray<z.ZodObject<{
+            id: z.ZodString;
+            name: z.ZodString;
+            enabled: z.ZodDefault<z.ZodBoolean>;
+            color: z.ZodDefault<z.ZodString>;
+            intensity: z.ZodDefault<z.ZodNumber>;
+            angle: z.ZodDefault<z.ZodNumber>;
+            softness: z.ZodDefault<z.ZodNumber>;
+            distance: z.ZodDefault<z.ZodNumber>;
+            actor: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+            position: z.ZodDefault<z.ZodTuple<[z.ZodNumber, z.ZodNumber, z.ZodNumber], null>>;
+            target: z.ZodDefault<z.ZodTuple<[z.ZodNumber, z.ZodNumber, z.ZodNumber], null>>;
+        }, z.core.$strict>>>;
+    }, z.core.$strip>;
+}, z.core.$strip>, z.ZodObject<{
     type: z.ZodLiteral<"set_style">;
     params: z.ZodObject<{
         base: z.ZodEnum<{
@@ -1623,6 +1657,7 @@ export declare const Command: z.ZodIntersection<z.ZodObject<{
         scriptId: z.ZodString;
         script: z.ZodNullable<z.ZodObject<{
             name: z.ZodString;
+            enabled: z.ZodBoolean;
             from: z.ZodOptional<z.ZodObject<{
                 itemId: z.ZodString;
                 version: z.ZodString;
@@ -1630,7 +1665,6 @@ export declare const Command: z.ZodIntersection<z.ZodObject<{
             }, z.core.$strip>>;
             source: z.ZodString;
             api: z.ZodLiteral<1>;
-            enabled: z.ZodBoolean;
         }, z.core.$strip>>;
         index: z.ZodOptional<z.ZodNumber>;
     }, z.core.$strip>;
@@ -1746,4 +1780,4 @@ export declare const Command: z.ZodIntersection<z.ZodObject<{
     }, z.core.$strip>;
 }, z.core.$strip>], "type">>;
 export type Command = z.infer<typeof Command>;
-export declare const COMMAND_TYPES: ("set_size_tier" | "add_paving" | "remove_paving" | "set_spawn" | "set_terrain_surface" | "create_field_set" | "set_field_tile" | "remove_field_tile" | "remove_field_set" | "restore_field_tile" | "set_blocks" | "place_item" | "remove_item" | "transform_item" | "set_item_params" | "rename" | "set_item_flags" | "group_items" | "ungroup_items" | "set_style" | "set_sky" | "set_weather" | "sculpt_terrain" | "generate_world" | "paint_cover" | "set_heights" | "paint_rule" | "paint_terrain" | "set_ground_material" | "add_water" | "draw_road" | "remove_water" | "set_water_level" | "draw_river" | "edit_river" | "remove_river" | "set_game" | "set_story" | "set_script" | "set_sea" | "remove_road" | "remove_wall" | "add_wall_opening" | "remove_wall_opening" | "revert_terrain" | "restore_terrain" | "draw_wall")[];
+export declare const COMMAND_TYPES: ("set_size_tier" | "add_paving" | "remove_paving" | "set_spawn" | "set_terrain_surface" | "create_field_set" | "set_field_tile" | "remove_field_tile" | "remove_field_set" | "restore_field_tile" | "set_blocks" | "place_item" | "remove_item" | "transform_item" | "set_item_params" | "rename" | "set_item_flags" | "group_items" | "ungroup_items" | "set_lighting" | "set_style" | "set_sky" | "set_weather" | "sculpt_terrain" | "generate_world" | "paint_cover" | "set_heights" | "paint_rule" | "paint_terrain" | "set_ground_material" | "add_water" | "draw_road" | "remove_water" | "set_water_level" | "draw_river" | "edit_river" | "remove_river" | "set_game" | "set_story" | "set_script" | "set_sea" | "remove_road" | "remove_wall" | "add_wall_opening" | "remove_wall_opening" | "revert_terrain" | "restore_terrain" | "draw_wall")[];

@@ -1,11 +1,13 @@
 import {
+  mountAvatarPresentation,
   mountStudio
-} from "./chunk-SBKHENP3.js";
+} from "./chunk-6G47KVKS.js";
+import "./chunk-5K7VLRXN.js";
 import "./chunk-7V6ZMJK5.js";
-import "./chunk-I54MGRUT.js";
-import "./chunk-3E5MJBAW.js";
+import "./chunk-K7QWXLXO.js";
 import "./chunk-PX6F3LHL.js";
 export {
+  mountAvatarPresentation,
   mountStudio
 };
 //# sourceMappingURL=studio.js.map

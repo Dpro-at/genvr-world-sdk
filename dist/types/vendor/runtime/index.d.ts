@@ -20,7 +20,7 @@ export { CATALOG_PICTURE_IDS, renderCatalogPictures } from './catalog-pictures.j
 export { BRUSH_RADIUS, DEFAULT_BRUSH, type BrushMode, type BrushSettings, type BrushSize, } from './terrain-tools.js';
 /** What the Cover brush writes (P2-40); the studio picks one and never depends on `@genvr/world`. */
 export type { Cover } from '../world/index.js';
-export { createAvatarClips, createGenvrAvatar, DEFAULT_LOOK, restPosition, setItemBodyResolver, STANDARD_BONES, type AvatarLook, type GenvrAvatar, type StandardBone, } from './avatar.js';
+export { createAvatarClips, createGenvrAvatar, DEFAULT_LOOK, restPosition, setItemBodyResolver, registerLocalAvatarBody, preloadAvatarLook, STANDARD_BONES, type AvatarLook, type GenvrAvatar, type StandardBone, } from './avatar.js';
 export { AvatarAnimator, locomotionClip, type LocomotionInput } from './animator.js';
 export { lookFor, RemotePlayers, type RemotePlayerState } from './remote-players.js';
 export { createGltfLoader, DEFAULT_DRACO_PATH, parseGltf, type GLTF, type GltfLoaderOptions, } from './gltf.js';
@@ -33,3 +33,6 @@ export { loudnessShape, SpeechMouth, type LevelSource } from './speech.js';
 /** Generated looks (decision 130): runtime generators of Core Library items. */
 export { hasGenerator, registerGenerator, registerGeneratorMaterial, type Generator } from './generators.js';
 export { CLAM_GENERATOR, SHELL_GENERATOR, STARFISH_GENERATOR, registerSeaLife, } from './sealife/index.js';
+export { retargetAvatarMotion } from './avatar-motion.js';
+export { registerAvatarMotionLibrary, avatarMotionEntry as findAvatarMotion, avatarMotionEntries, type AvatarMotionLibrary, type AvatarMotionEntry } from './avatar-motion-library.js';
+export { MOTION_CATEGORIES, motionCategories, type MotionCategory } from './avatar-motion-categories.js';

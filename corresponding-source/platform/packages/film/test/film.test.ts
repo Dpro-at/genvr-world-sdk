@@ -340,3 +340,15 @@ describe('saving', () => {
     expect(() => readFilmFile(new Uint8Array(20))).toThrow('wrong start');
   });
 });
+
+it('preserves a saved character voice and its dialogue audio through portable film export', () => {
+  const session = new FilmSession(emptyFilm(), counter());
+  const voice = { id: '12345678-1234-4234-9234-123456789abc', name: 'Atlas', language: 'ar', voiceType: 'male' as const, model: 'chatterbox-multilingual-v3' };
+  const cue = { id: 'dialogue', actor: 'self', label: 'Guide', action: 'none', start: s(.5), end: s(2.5), text: 'مرحبا', audio: 'speech', voice, volume: 1 };
+  const shot: Media = { ...media('shot', 3), cues: [cue] };
+  expect(session.run('media.add', { media: shot }).ok).toBe(true);
+  const file = writeFilmFile(session.project, [{ id: 'asset-shot', type: 'video/webm', bytes: new Uint8Array([1, 2]) }, { id: 'speech', type: 'audio/wav', bytes: new Uint8Array([3, 4]) }]);
+  const restored = readFilmFile(file);
+  expect(restored.project.media[0]!.cues[0]!.voice).toEqual(voice);
+  expect(restored.assets.some(asset => asset.id === 'speech')).toBe(true);
+});

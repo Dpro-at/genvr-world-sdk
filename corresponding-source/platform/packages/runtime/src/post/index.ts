@@ -19,6 +19,7 @@ import type { TidewaterLighting } from '../tidewater-sky/lighting.js';
 import { GTAO } from './gtao.js';
 import { AirHaze } from './air-haze.js';
 import { TemporalUpscale } from './temporal-upscale.js';
+import { skinnedObjectVelocity } from './object-motion.js';
 import { MotionBlur } from './motion-blur.js';
 import { LensFlare } from './lens-flare.js';
 import { LensDrops } from './lens-drops.js';
@@ -192,8 +193,9 @@ export class TidewaterPost {
       for (const m of o.material ? (Array.isArray(o.material) ? o.material : [o.material]) : []) {
         const water = m.name === 'tidewater-sea';
         const nativeTerrain = o.name === 'native-terrain';
-        if (water || nativeTerrain) cameraMotionMaterials.add(m);
-        if ((water || nativeTerrain) && !this.#cameraMotionMaterials.has(m)) {
+        const skinned = o.isSkinnedMesh === true;
+        if (water || nativeTerrain || skinned) cameraMotionMaterials.add(m);
+        if ((water || nativeTerrain || skinned) && !this.#cameraMotionMaterials.has(m)) {
           this.#cameraMotionMaterials.set(m, m.mrtNode);
           // Water and native CDLOD terrain use camera-only motion of the CURRENT world point.
           // Terrain instance reordering/morphing must not become object motion.
@@ -203,7 +205,7 @@ export class TidewaterPost {
             previous = this.#previousVP.mul(point);
           const velocity = current.xy.div(current.w).sub(previous.xy.div(previous.w)).mul(N.vec2(0.5, -0.5));
           m.mrtNode = N.mrt({
-            velocity,
+            velocity: skinned ? skinnedObjectVelocity(this.#currentVP, this.#previousVP) : velocity,
             waterMask: water ? N.vec4(N.frontFacing.select(0, 1), 1, 0, 1) : N.vec4(0),
           });
           m.needsUpdate = true;

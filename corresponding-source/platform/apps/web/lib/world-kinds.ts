@@ -25,7 +25,7 @@ export const WORLD_KIND_CARDS: Array<{
   {
     id: 'island',
     name: 'Island',
-    description: 'Land in the sea, with a hill in the middle.',
+    description: 'A quiet island with a beach, sea, two palms and a wooden rowboat. Expand it your way.',
     Icon: TreePalm,
   },
   {

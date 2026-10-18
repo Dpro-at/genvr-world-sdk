@@ -77,7 +77,7 @@ export function describe(project: FilmProject) {
     ...(project.looks ? { looks: Object.keys(project.looks) } : {}),
     tracks: project.tracks.map((t) => ({ id: t.id, kind: t.kind, name: t.name, ...(t.lang ? { lang: t.lang } : {}), locked: t.locked, muted: t.muted, solo: t.solo, hidden: t.hidden,
       clips: t.clips.map((c) => ({ ...c, startSeconds: s(c.start), endSeconds: s(end(c)), ...(c.type === 'media' ? { inSeconds: s(c.in) } : {}) })) })),
-    media: project.media.map((m) => ({ id: m.id, kind: m.kind, name: m.name, seconds: s(m.duration), camera: m.camera?.preset ?? null,
+    media: project.media.map((m) => ({ id: m.id, kind: m.kind, name: m.name, seconds: s(m.duration), camera: m.camera?.preset ?? null, hasSound: m.hasSound ?? false,
       cues: m.cues.map((c) => ({ ...c, start: s(c.start), end: s(c.end) })) })),
     markers: project.markers.map((m) => ({ ...m, seconds: s(m.at) })),
     draft: project.draft.map((c) => ({ ...c, start: s(c.start), end: s(c.end) })),
@@ -377,8 +377,8 @@ export const COMMANDS: CommandSpec[] = [
   },
   {
     id: 'voice.set', label: (a: { name?: string }) => `Voice: ${a.name ?? 'language'}`, group: 'Caption', journal: true,
-    args: z.object({ lang: LanguageTag, name: z.string().min(1).max(40), media: clipId }).strict(),
-    run: (d, a, x) => edit.setVoice(d, a, x),
+    args: z.object({ lang: LanguageTag, name: z.string().min(1).max(40), media: clipId, append: z.boolean().default(false), start: seconds.default(0) }).strict(),
+    run: (d, a, x) => edit.setVoice(d, { ...a, start: at(d, a.start) }, x),
   },
   {
     id: 'subtitles.style', label: 'Subtitle look', group: 'Caption', journal: true,

@@ -90,6 +90,18 @@ export declare const FilmSceneSpot: z.ZodObject<{
     x: z.ZodNumber;
     z: z.ZodNumber;
 }, z.core.$strict>;
+export declare const FilmCueVoice: z.ZodObject<{
+    id: z.ZodString;
+    name: z.ZodString;
+    language: z.ZodString;
+    voiceType: z.ZodOptional<z.ZodEnum<{
+        male: "male";
+        female: "female";
+        child: "child";
+    }>>;
+    model: z.ZodString;
+}, z.core.$strict>;
+export type FilmCueVoice = z.infer<typeof FilmCueVoice>;
 export declare const FilmSceneCue: z.ZodObject<{
     id: z.ZodString;
     actor: z.ZodString;
@@ -99,6 +111,17 @@ export declare const FilmSceneCue: z.ZodObject<{
     end: z.ZodNumber;
     text: z.ZodString;
     audio: z.ZodOptional<z.ZodString>;
+    voice: z.ZodOptional<z.ZodObject<{
+        id: z.ZodString;
+        name: z.ZodString;
+        language: z.ZodString;
+        voiceType: z.ZodOptional<z.ZodEnum<{
+            male: "male";
+            female: "female";
+            child: "child";
+        }>>;
+        model: z.ZodString;
+    }, z.core.$strict>>;
     volume: z.ZodNumber;
     at: z.ZodOptional<z.ZodObject<{
         x: z.ZodNumber;
@@ -116,6 +139,7 @@ export declare const FilmWorkspace: z.ZodEnum<{
     shoot: "shoot";
     edit: "edit";
     captions: "captions";
+    transitions: "transitions";
     colour: "colour";
     story: "story";
 }>;
@@ -131,6 +155,21 @@ export declare const FilmStudioStep: z.ZodObject<{
  * `split`, `remove`, `trim`, `cues`, `undo`, `redo` kinds are kept for existing agents.
  */
 export declare const FilmStudioOperation: z.ZodDiscriminatedUnion<[z.ZodObject<{
+    kind: z.ZodLiteral<"lighting">;
+    lights: z.ZodOptional<z.ZodArray<z.ZodObject<{
+        id: z.ZodString;
+        name: z.ZodString;
+        enabled: z.ZodDefault<z.ZodBoolean>;
+        color: z.ZodDefault<z.ZodString>;
+        intensity: z.ZodDefault<z.ZodNumber>;
+        angle: z.ZodDefault<z.ZodNumber>;
+        softness: z.ZodDefault<z.ZodNumber>;
+        distance: z.ZodDefault<z.ZodNumber>;
+        actor: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+        position: z.ZodDefault<z.ZodTuple<[z.ZodNumber, z.ZodNumber, z.ZodNumber], null>>;
+        target: z.ZodDefault<z.ZodTuple<[z.ZodNumber, z.ZodNumber, z.ZodNumber], null>>;
+    }, z.core.$strict>>>;
+}, z.core.$strict>, z.ZodObject<{
     kind: z.ZodLiteral<"inspect">;
 }, z.core.$strict>, z.ZodObject<{
     kind: z.ZodLiteral<"commands">;
@@ -153,6 +192,7 @@ export declare const FilmStudioOperation: z.ZodDiscriminatedUnion<[z.ZodObject<{
         shoot: "shoot";
         edit: "edit";
         captions: "captions";
+        transitions: "transitions";
         colour: "colour";
         story: "story";
     }>>;
@@ -201,6 +241,17 @@ export declare const FilmStudioOperation: z.ZodDiscriminatedUnion<[z.ZodObject<{
         end: z.ZodNumber;
         text: z.ZodString;
         audio: z.ZodOptional<z.ZodString>;
+        voice: z.ZodOptional<z.ZodObject<{
+            id: z.ZodString;
+            name: z.ZodString;
+            language: z.ZodString;
+            voiceType: z.ZodOptional<z.ZodEnum<{
+                male: "male";
+                female: "female";
+                child: "child";
+            }>>;
+            model: z.ZodString;
+        }, z.core.$strict>>;
         volume: z.ZodNumber;
         at: z.ZodOptional<z.ZodObject<{
             x: z.ZodNumber;
@@ -224,6 +275,36 @@ export declare const FilmStudioOperation: z.ZodDiscriminatedUnion<[z.ZodObject<{
     }, z.core.$strict>>;
     world_sound: z.ZodOptional<z.ZodBoolean>;
     live_actors: z.ZodOptional<z.ZodBoolean>;
+}, z.core.$strict>, z.ZodObject<{
+    kind: z.ZodLiteral<"sound_import">;
+    name: z.ZodString;
+    mime: z.ZodEnum<{
+        "audio/wav": "audio/wav";
+        "audio/mpeg": "audio/mpeg";
+        "audio/ogg": "audio/ogg";
+        "audio/mp4": "audio/mp4";
+        "audio/webm": "audio/webm";
+        "audio/flac": "audio/flac";
+        "audio/aac": "audio/aac";
+    }>;
+    data: z.ZodString;
+}, z.core.$strict>, z.ZodObject<{
+    kind: z.ZodLiteral<"dialogue_voice">;
+    cue_id: z.ZodString;
+    voice_id: z.ZodString;
+    language: z.ZodString;
+    shot_id: z.ZodOptional<z.ZodString>;
+}, z.core.$strict>, z.ZodObject<{
+    kind: z.ZodLiteral<"dialogue_track">;
+    cue_id: z.ZodString;
+    shot_id: z.ZodString;
+    language: z.ZodString;
+    start: z.ZodOptional<z.ZodNumber>;
+    append: z.ZodDefault<z.ZodBoolean>;
+}, z.core.$strict>, z.ZodObject<{
+    kind: z.ZodLiteral<"dialogue_preview">;
+    cue_id: z.ZodString;
+    shot_id: z.ZodOptional<z.ZodString>;
 }, z.core.$strict>, z.ZodObject<{
     kind: z.ZodLiteral<"voice">;
     language: z.ZodString;
@@ -271,6 +352,7 @@ export declare const FilmStudioResult: z.ZodObject<{
             shoot: "shoot";
             edit: "edit";
             captions: "captions";
+            transitions: "transitions";
             colour: "colour";
             story: "story";
         }>;
@@ -349,6 +431,21 @@ export declare const FilmCommand: z.ZodDiscriminatedUnion<[z.ZodObject<{
 }, z.core.$strip>, z.ZodObject<{
     kind: z.ZodLiteral<"studio">;
     operation: z.ZodDiscriminatedUnion<[z.ZodObject<{
+        kind: z.ZodLiteral<"lighting">;
+        lights: z.ZodOptional<z.ZodArray<z.ZodObject<{
+            id: z.ZodString;
+            name: z.ZodString;
+            enabled: z.ZodDefault<z.ZodBoolean>;
+            color: z.ZodDefault<z.ZodString>;
+            intensity: z.ZodDefault<z.ZodNumber>;
+            angle: z.ZodDefault<z.ZodNumber>;
+            softness: z.ZodDefault<z.ZodNumber>;
+            distance: z.ZodDefault<z.ZodNumber>;
+            actor: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+            position: z.ZodDefault<z.ZodTuple<[z.ZodNumber, z.ZodNumber, z.ZodNumber], null>>;
+            target: z.ZodDefault<z.ZodTuple<[z.ZodNumber, z.ZodNumber, z.ZodNumber], null>>;
+        }, z.core.$strict>>>;
+    }, z.core.$strict>, z.ZodObject<{
         kind: z.ZodLiteral<"inspect">;
     }, z.core.$strict>, z.ZodObject<{
         kind: z.ZodLiteral<"commands">;
@@ -371,6 +468,7 @@ export declare const FilmCommand: z.ZodDiscriminatedUnion<[z.ZodObject<{
             shoot: "shoot";
             edit: "edit";
             captions: "captions";
+            transitions: "transitions";
             colour: "colour";
             story: "story";
         }>>;
@@ -419,6 +517,17 @@ export declare const FilmCommand: z.ZodDiscriminatedUnion<[z.ZodObject<{
             end: z.ZodNumber;
             text: z.ZodString;
             audio: z.ZodOptional<z.ZodString>;
+            voice: z.ZodOptional<z.ZodObject<{
+                id: z.ZodString;
+                name: z.ZodString;
+                language: z.ZodString;
+                voiceType: z.ZodOptional<z.ZodEnum<{
+                    male: "male";
+                    female: "female";
+                    child: "child";
+                }>>;
+                model: z.ZodString;
+            }, z.core.$strict>>;
             volume: z.ZodNumber;
             at: z.ZodOptional<z.ZodObject<{
                 x: z.ZodNumber;
@@ -442,6 +551,36 @@ export declare const FilmCommand: z.ZodDiscriminatedUnion<[z.ZodObject<{
         }, z.core.$strict>>;
         world_sound: z.ZodOptional<z.ZodBoolean>;
         live_actors: z.ZodOptional<z.ZodBoolean>;
+    }, z.core.$strict>, z.ZodObject<{
+        kind: z.ZodLiteral<"sound_import">;
+        name: z.ZodString;
+        mime: z.ZodEnum<{
+            "audio/wav": "audio/wav";
+            "audio/mpeg": "audio/mpeg";
+            "audio/ogg": "audio/ogg";
+            "audio/mp4": "audio/mp4";
+            "audio/webm": "audio/webm";
+            "audio/flac": "audio/flac";
+            "audio/aac": "audio/aac";
+        }>;
+        data: z.ZodString;
+    }, z.core.$strict>, z.ZodObject<{
+        kind: z.ZodLiteral<"dialogue_voice">;
+        cue_id: z.ZodString;
+        voice_id: z.ZodString;
+        language: z.ZodString;
+        shot_id: z.ZodOptional<z.ZodString>;
+    }, z.core.$strict>, z.ZodObject<{
+        kind: z.ZodLiteral<"dialogue_track">;
+        cue_id: z.ZodString;
+        shot_id: z.ZodString;
+        language: z.ZodString;
+        start: z.ZodOptional<z.ZodNumber>;
+        append: z.ZodDefault<z.ZodBoolean>;
+    }, z.core.$strict>, z.ZodObject<{
+        kind: z.ZodLiteral<"dialogue_preview">;
+        cue_id: z.ZodString;
+        shot_id: z.ZodOptional<z.ZodString>;
     }, z.core.$strict>, z.ZodObject<{
         kind: z.ZodLiteral<"voice">;
         language: z.ZodString;

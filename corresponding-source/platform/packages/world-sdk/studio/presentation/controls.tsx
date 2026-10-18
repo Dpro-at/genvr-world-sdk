@@ -1,0 +1,22 @@
+import { useState, useSyncExternalStore } from 'react';
+import { EFFECTS, EXPRESSIONS, NOTIFICATION_TYPES } from '@genvr/assistant';
+import { AvatarPresentation } from '../../src/avatar-presentation';
+import { ALL_UI_COMPONENTS } from './catalog';
+export type PresentationSection = 'motions' | 'expressions' | 'effects' | 'notifications' | 'cards';
+/** Content slots inside the existing library and character docks; never an overlay toolbar. */
+export function PresentationControls({ controller, section, agents, search = '' }: { controller: AvatarPresentation; section: PresentationSection; agents: Array<{ id: string; name: string }>; search?: string }) {
+  const state = useSyncExternalStore(controller.subscribe, controller.snapshot);
+  const [target, setTarget] = useState('self'), [error, setError] = useState('');
+  const execute = (event: unknown) => setError(controller.execute(event) ?? '');
+  const matches = (value: string) => value.toLowerCase().includes(search.toLowerCase());
+  const control = (label: string, onClick: () => void, active = false) => <button key={label} type="button" onClick={onClick} aria-pressed={active} className={`rounded-xl px-2 py-2 text-left text-xs font-bold ${active ? 'bg-ink text-on-brand' : 'bg-paper text-ink hover:bg-ink/10'}`}>{label}</button>;
+  return <section aria-label={`Avatar ${section}`} className="space-y-2 text-ink">
+    {section === 'motions' || section === 'expressions' ? <label className="block text-xs font-bold">Avatar<select aria-label={`${section} target`} value={target} onChange={e => setTarget(e.target.value)} className="mt-1 block w-full rounded-lg bg-paper p-2"><option value="self">Current avatar</option>{agents.map(row => <option value={row.id} key={row.id}>{row.name}</option>)}</select></label> : null}
+    {section === 'motions' ? <><label className="block rounded-xl border border-ink/10 p-2 text-xs font-bold">Import GLB motion<input aria-label="Import avatar motion" type="file" accept=".glb" className="mt-2 w-full text-[11px]" onChange={async event => { const file = event.target.files?.[0]; event.target.value = ''; if (!file) return; try { if (file.size > 16 * 1024 * 1024) throw new Error('Motion exceeds 16 MB.'); await controller.importMotion(target, file.name, await file.arrayBuffer()); setError(''); } catch (e) { setError(String(e)); } }} /></label><div className="grid grid-cols-2 gap-1.5">{state.motions.filter(row => row.target === target && matches(row.label)).map(row => control(row.label, () => execute({ kind: 'animation', target, animation: row.id })))}</div></> : null}
+    {section === 'expressions' ? <><h3 className="text-xs font-black">Expressions</h3><div className="grid grid-cols-2 gap-1.5">{EXPRESSIONS.filter(matches).map(expression => control(expression, () => execute({ kind: 'expression', target, expression })))}</div></> : null}
+    {section === 'effects' ? <><h3 className="text-xs font-black">Screen effects</h3><div className="grid grid-cols-2 gap-1.5">{EFFECTS.filter(matches).map(effect => <div key={effect}>{control(effect, () => execute({ kind: 'effect', effect, enabled: state.effects[effect] === undefined, duration: 60000 }), state.effects[effect] !== undefined)}{state.effects[effect] !== undefined ? <input aria-label={`${effect} intensity`} className="w-full" type="range" min="0" max="1" step=".05" value={state.effects[effect]} onChange={e => execute({ kind: 'effect', effect, enabled: true, intensity: Number(e.target.value), duration: 60000 })} /> : null}</div>)}</div>{control('Clear screen effects', () => { for (const effect of EFFECTS) execute({ kind: 'effect', effect, enabled: false }); })}</> : null}
+    {section === 'notifications' ? <><p className="text-xs text-ink/60">Preview cards. Your application supplies live events.</p><div className="grid grid-cols-2 gap-1.5">{NOTIFICATION_TYPES.filter(matches).map(type => control(type, () => execute({ kind: 'notification', notification: { type, title: `${type} preview`, body: 'Example notification — connect your application for live events.' } })))}</div></> : null}
+    {section === 'cards' ? <><p className="text-xs text-ink/60">Card previews use example data.</p><div className="grid grid-cols-2 gap-1.5">{ALL_UI_COMPONENTS.filter(row => matches(row.name)).map(row => control(row.name, () => execute({ kind: 'card', title: row.name, spec: row.spec, duration: row.duration })))}</div></> : null}
+    {error ? <p role="alert" className="text-xs text-red-600">{error}</p> : null}
+  </section>;
+}

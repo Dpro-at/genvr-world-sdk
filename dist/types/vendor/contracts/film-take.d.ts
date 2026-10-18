@@ -25,9 +25,9 @@ export interface FilmTakeEvent extends FilmTakeMessage {
 export declare const FilmVoiceMessage: z.ZodObject<{
     take: z.ZodString;
     mime: z.ZodEnum<{
-        "audio/webm": "audio/webm";
         "audio/ogg": "audio/ogg";
         "audio/mp4": "audio/mp4";
+        "audio/webm": "audio/webm";
     }>;
     delay: z.ZodNumber;
     audio: z.ZodInstanceOf<Uint8Array<ArrayBuffer>>;

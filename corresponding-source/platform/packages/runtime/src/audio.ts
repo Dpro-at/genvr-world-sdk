@@ -67,6 +67,7 @@ const SEA_TRIM = 1.6;
 export class WorldAudio {
   #context: AudioContext | null = null;
   #effects: GainNode | null = null;
+  #voice: GainNode | null = null;
   #ambience: GainNode | null = null;
   /** Everything passes through this on its way out, so going under water muffles the lot. */
   #muffle: BiquadFilterNode | null = null;
@@ -235,7 +236,7 @@ export class WorldAudio {
     position: Point,
   ): Promise<{ startedAt: number; analyser: AnalyserNode; now: () => number } | null> {
     const context = this.#context;
-    const out = this.#effects;
+    const out = this.#voice;
     if (!context || !out || this.#paused) return Promise.resolve(null);
     const l = this.#listener;
     if (Math.hypot(position.x - l.x, position.y - l.y, position.z - l.z) > ITEM_SOUND.hearing)
@@ -567,13 +568,19 @@ export class WorldAudio {
 
   /** Creates the audio graph on the first interaction, or resumes it. */
   #tap: MediaStreamAudioDestinationNode | null = null;
+  #externalVoice: MediaStreamAudioSourceNode | null = null;
+  #externalVoiceStream: MediaStream | null = null;
+  setVoiceRecordingStream(stream: MediaStream | null): void {
+    this.#externalVoice?.disconnect(); this.#externalVoice = null; this.#externalVoiceStream = stream;
+    if(stream && this.#context && this.#tap) {this.#externalVoice=this.#context.createMediaStreamSource(stream);this.#externalVoice.connect(this.#tap);}
+  }
   /**
    * A live copy of the whole world mix (FILM-08: recorded with a filmed shot), after the underwater
    * muffle and the volume sliders; null until the world's sound has started.
    */
   recordingStream(): MediaStream | null {
     if (!this.#context || !this.#muffle) return null;
-    if (!this.#tap) { this.#tap = this.#context.createMediaStreamDestination(); this.#muffle.connect(this.#tap); }
+    if (!this.#tap) { this.#tap = this.#context.createMediaStreamDestination(); this.#muffle.connect(this.#tap); this.setVoiceRecordingStream(this.#externalVoiceStream); }
     return this.#tap.stream;
   }
 
@@ -586,6 +593,7 @@ export class WorldAudio {
     const context = new AudioContext();
     this.#context = context;
     this.#effects = context.createGain();
+    this.#voice = context.createGain();
     this.#ambience = context.createGain();
     this.#effects.gain.value = this.#volumes.effects;
     this.#ambience.gain.value = this.#volumes.ambience;
@@ -598,6 +606,7 @@ export class WorldAudio {
     muffle.connect(context.destination);
     this.#muffle = muffle;
     this.#effects.connect(muffle);
+    this.#voice.connect(muffle);
     this.#ambience.connect(muffle);
     // Two seconds of white noise, reused by every step, the weather, and thunder.
     const noise = context.createBuffer(1, context.sampleRate * 2, context.sampleRate);

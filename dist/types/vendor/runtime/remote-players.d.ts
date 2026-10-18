@@ -1,3 +1,4 @@
+import type { AnimationClip } from 'three/webgpu';
 import { Group } from 'three/webgpu';
 import { type BlockStyle } from '../core-library/index.js';
 import { type AvatarLook, type GenvrAvatar } from './avatar.js';
@@ -83,6 +84,8 @@ export declare class RemotePlayers {
      * start on them, even right after another, and the strike is heard there. False when not shown.
      */
     strike(id: string): boolean;
+    registerPresentation(id: string, clip: AnimationClip): boolean;
+    playPresentation(id: string, clip: string): boolean;
     /** The clip currently shown on a player, or null when not shown (tests and tools). */
     shownClip(id: string): string | null;
     /**

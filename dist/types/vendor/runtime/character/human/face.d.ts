@@ -1,4 +1,4 @@
-import { Color, Vector2, type Node } from 'three/webgpu';
+import { Color, Vector2, Vector3, Vector4, type Node } from 'three/webgpu';
 type Vec3 = [number, number, number];
 /** Shape of the anime eye and face parts (metres on the head). */
 export declare const FACE_SHAPE: {
@@ -46,7 +46,7 @@ export declare const FACE_SHAPE: {
     };
 };
 /** A uniform node with its CPU value (three's types lose the node type of `uniform`). */
-type Uniform<T extends 'float' | 'vec2' | 'vec3', V> = Node<T> & {
+type Uniform<T extends 'float' | 'vec2' | 'vec3' | 'vec4', V> = Node<T> & {
     value: V;
 };
 export interface FaceUniforms {
@@ -57,6 +57,15 @@ export interface FaceUniforms {
     look: Uniform<'vec2', Vector2>;
     /** Mouth opening 0..1 and width 0..1 (lip sync). */
     mouthOpen: Uniform<'float', number>;
+    /** -1 automatic blinking; 0 open .. 1 closed for eyelid inspection. */
+    eyeClosure: Uniform<'float', number>;
+    leftEye: Uniform<'vec3', Vector3>;
+    rightEye: Uniform<'vec3', Vector3>;
+    expressions: Uniform<'vec4', Vector4>;
+    thinking: Uniform<'float', number>;
+    emotion: Uniform<'float', number>;
+    browTilt: Uniform<'float', number>;
+    surprise: Uniform<'float', number>;
     mouthWide: Uniform<'float', number>;
 }
 export declare function faceUniforms(eye?: string, brow?: string): FaceUniforms;

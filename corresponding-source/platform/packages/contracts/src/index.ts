@@ -29,3 +29,7 @@ export * from './terrain-fields.js';
 export * from './game-products.js';
 export * from './connect-test.js';
 export * from './world-package.js';
+
+export * from './world-presets.js';
+
+export * from './lighting.js';

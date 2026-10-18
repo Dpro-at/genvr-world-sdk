@@ -1,11 +1,10 @@
 'use client';
 
-import { defaultPlaySettings, type PlaySettings } from '@genvr/contracts';
+import { supportsWorldStarter, defaultPlaySettings, type PlaySettings } from '@genvr/contracts';
 import { ArrowLeft, Sprout } from 'lucide-react';
 import { useState } from 'react';
 import { PlaySettingsPicker } from './play-settings';
 import { Badge, ErrorNote, Page } from './ui-content';
-import { UPCOMING_STYLE_CARDS } from '../lib/create-card-images';
 import { STYLE_CARDS, styleName, type StyleId } from '../lib/styles';
 import { WORLD_KIND_CARDS, type WorldKind } from '../lib/world-kinds';
 
@@ -57,7 +56,7 @@ export function CreateFlow({ onCreate, onImport }: {
                 'A small open garden with trees, rocks, benches, and flowers. Room for your own ideas.',
               Icon: Sprout,
             },
-            ...WORLD_KIND_CARDS.filter((card) => choosingStyle === 'realistic' || card.id === 'empty').map(
+            ...WORLD_KIND_CARDS.filter((card) => supportsWorldStarter(choosingStyle, card.id)).map(
               (card) =>
                 card.id === 'empty'
                   ? {
@@ -122,15 +121,13 @@ export function CreateFlow({ onCreate, onImport }: {
       </section>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {[
-          ...STYLE_CARDS.map((card) => ({
+          ...STYLE_CARDS.filter(card => card.ready).map((card) => ({
             ...card,
             pick: () => {
               setError(null);
               setChoosingStyle(card.id);
             },
           })),
-          // Styles on their way (Flat cartoon): shown so creators see what is coming.
-          ...UPCOMING_STYLE_CARDS.map((card) => ({ ...card, ready: false, pick: () => undefined })),
         ].map((card) => (
           <button
             key={card.id}

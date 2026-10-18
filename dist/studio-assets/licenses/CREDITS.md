@@ -24,3 +24,11 @@ No purchased marketplace packages, user uploads or optional speech model weights
 MediaPipe face-landmarker model is explicitly listed in its NOTICE. Optional speech,
 translation, dubbing and map services retain the website's explicit network/model requirements; their external
 data is not licensed or bundled by this archive. Account and publication services remain disabled locally.
+
+## Wooden rowboat
+
+`/models/realistic/rowboat/lod0.glb` is original Genvr procedural geometry (568 triangles, no external textures), rebuilt with `tooling/build-rowboat.mjs` in the SDK source package. It is covered by this project's AGPL-3.0-only license. The accompanying SVG is an original library icon. It is a decorative shore prop; no drivable boat or buoyancy capability is implied.
+
+## Film language example
+
+`/film-examples/island-languages.genvrfilm` contains a Genvr Standard robot recording in the procedural island and six generated demonstration dialogue outputs across three languages. It is a teaching sample, not an editable 3D scene file. Private voice profiles, reference recordings, optional model weights and imported character/motion libraries are excluded. Recorded face animation belongs to the original picture; alternate dubbing does not alter recorded lips.

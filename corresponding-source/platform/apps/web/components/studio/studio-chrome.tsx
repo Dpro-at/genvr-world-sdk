@@ -1,8 +1,14 @@
 'use client';
+import { QuickVoice } from './film/quick-voice';
+import { BodySection } from './character-editor/character-controls';
+import { LightingPanel } from './lighting-panel';
+
+
+import { recipeLook } from '@genvr/contracts';
 
 import type { PlayDevice } from '@genvr/contracts';
 import type { GenvrRuntime, ToolStatus } from '@genvr/runtime';
-import { Globe, Play, Redo2, Square, Undo2, type LucideIcon, Settings2, Volume2, VolumeX } from 'lucide-react';
+import { Mic, Camera, Users, Focus, Lightbulb, Circle, Globe, Play, Redo2, Square, Undo2, type LucideIcon, Settings2, Volume2, VolumeX } from 'lucide-react';
 import { useEffect, type ReactNode, type RefObject } from 'react';
 import { toolsFor } from '../build-panel';
 import { EnvironmentPicker } from '../environment-picker';
@@ -166,6 +172,8 @@ export function StudioChrome({
   const filmWorkspace = tab === 'filming';
   // The Avatar tab is the character editor (CHAR-01): its own stage over the viewport, the world rests meanwhile.
   const character = useCharacterEditor();
+  useEffect(() => host.characterBody?.(body => character.change(recipe => ({ ...recipe, body }))), [host.characterBody]);
+  useEffect(() => { host.characterLook?.(recipeLook(character.recipe)); }, [character.recipe, host.characterLook]);
   const characterWorkspace = tab === 'avatar' && !testing;
   useEffect(() => {
     if (!characterWorkspace) return;
@@ -230,7 +238,7 @@ export function StudioChrome({
     if (tab === 'world')
       return (
         <div className="px-2 pb-2">
-          <EnvironmentPicker runtime={runtime} variant="panel" onStyle={onStyle} />
+          <LightingPanel filming={filming} /><EnvironmentPicker runtime={runtime} variant="panel" onStyle={onStyle} />
         </div>
       );
     if (tab === 'avatar') return <CharacterControls editor={character} />;
@@ -286,7 +294,7 @@ export function StudioChrome({
                 type="button"
                 role="tab"
                 aria-selected={tab === entry.id}
-                onClick={() => onTab(entry.id)}
+                onClick={() => { if(entry.id === 'filming'){ filming.studio.setWorkspace('shoot'); filming.studio.setPreviewing(false); runtime.current?.setTool(null); } onTab(entry.id); }}
                 className={`rounded-lg px-3 py-1.5 text-xs font-bold ${tab === entry.id ? 'bg-surface text-ink shadow' : 'text-ink/60 hover:text-ink'}`}
               >
                 {entry.label}
@@ -471,6 +479,15 @@ export function StudioChrome({
           className={`relative min-h-0 min-w-0 ${filming.studio.previewing ? 'z-20 bg-black' : 'pointer-events-none opacity-0'}`}
         />
       ) : null}
+
+      {filmWorkspace && !testing ? <div style={{gridArea:'viewport'}} className="pointer-events-none relative z-40 min-h-0 min-w-0"><div role="toolbar" aria-label="Filming quick tools" className="pointer-events-auto absolute inset-x-2 top-2 flex flex-wrap items-center justify-center gap-1 rounded-lg border border-ink/15 bg-surface/95 p-1 shadow-md">
+        <ToolbarMenu label="Characters" icon={Users}><p className="text-xs font-semibold">Choose the live character</p><BodySection editor={character}/>{host.userAvatarControls?.('characters','',body=>character.change(recipe=>({...recipe,body})))}</ToolbarMenu>
+        {filming.voiceAvailable ? <ToolbarMenu label="Voice" icon={Mic}><QuickVoice filming={filming}/></ToolbarMenu> : null}
+        <ToolbarMenu label="Camera" icon={Camera} closeOnAction>{([{id:'static',label:'Static'},{id:'handheld',label:'Handheld'},{id:'running',label:'Running camera'},{id:'drone',label:'Drone'},{id:'follow',label:'Follow character'},{id:'side',label:'Side tracking'},{id:'orbit',label:'Orbit'}] as const).map(preset=><button key={preset.id} className="rounded px-2 py-2 text-left text-xs hover:bg-ink/10" disabled={filming.busy||filming.studio.rendering} onClick={()=>{filming.studio.setPreviewing(false);filming.preset(preset.id);}}>{preset.label}</button>)}</ToolbarMenu>
+        <button type="button" aria-label="Follow character" aria-pressed={filming.camera?.follow_player??false} disabled={filming.busy||filming.studio.rendering} className="flex items-center gap-1 rounded px-2 py-1.5 text-xs font-bold hover:bg-ink/10 aria-pressed:bg-brand/20" onClick={()=>{filming.studio.setPreviewing(false);if(filming.camera)filming.apply({...filming.camera,follow_player:!filming.camera.follow_player});else filming.preset('follow');}}><Focus className="size-4"/>Follow</button>
+        <ToolbarMenu label="Lighting" icon={Lightbulb}><LightingPanel filming={filming}/></ToolbarMenu>
+        <button type="button" aria-label="Record take" disabled={!filming.studio.ready||filming.busy||filming.studio.rendering} className="flex items-center gap-1 rounded border border-red-500/40 px-2 py-1.5 text-xs font-bold disabled:opacity-40" onClick={()=>{filming.studio.setWorkspace('shoot');filming.studio.setPreviewing(false);if(filming.studio.mode==='gameplay')filming.reset();const[w,h]=filming.output.size.split('x').map(Number);void filming.take('video',filming.output.seconds,w!,h!,true,undefined,filming.studio.plan);}}><Circle className="size-3 fill-red-500 text-red-500"/>Record · {filming.output.seconds}s</button>
+      </div></div> : null}
 
       {characterWorkspace ? (
         <div style={{ gridArea: 'viewport' }} className="relative z-20 min-h-0 min-w-0">

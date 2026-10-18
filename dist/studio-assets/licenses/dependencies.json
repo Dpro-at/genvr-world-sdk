@@ -1,13 +1,5 @@
 [
   {
-    "name": "scheduler",
-    "version": "0.28.0",
-    "license": "MIT",
-    "files": [
-      "LICENSE"
-    ]
-  },
-  {
     "name": "react",
     "version": "19.3.0",
     "license": "MIT",
@@ -51,6 +43,14 @@
     "name": "@dimforge/rapier3d-compat",
     "version": "0.20.0",
     "license": "Apache-2.0",
+    "files": [
+      "LICENSE"
+    ]
+  },
+  {
+    "name": "scheduler",
+    "version": "0.28.0",
+    "license": "MIT",
     "files": [
       "LICENSE"
     ]

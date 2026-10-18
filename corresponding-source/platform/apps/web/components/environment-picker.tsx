@@ -1,6 +1,6 @@
 'use client';
 
-import { CORE_SKIES, CORE_WEATHER, STYLE_PACKS } from '@genvr/core-library';
+import { CORE_SKIES, CORE_WEATHER, STYLE_PACKS, getCoreItem } from '@genvr/core-library';
 import type { GenvrRuntime } from '@genvr/runtime';
 import {
   Box,
@@ -120,7 +120,13 @@ export function EnvironmentPicker({
   const groups = [
     {
       title: 'Style',
-      buttons: READY_STYLES.map((pack) =>
+      buttons: READY_STYLES.filter(pack => {
+        const world = runtime.current?.world;
+        if (!world || pack.style === world.style.base) return true;
+        if ((pack.style === 'voxel') !== Boolean(world.voxels)) return false;
+        if (world.terrain.world && pack.style !== 'realistic') return false;
+        return world.instances.every(item => { const core = getCoreItem(item.itemId); return !core || core.manifest.styles.includes(pack.style); });
+      }).map((pack) =>
         button(pack.manifest.id, pack.manifest.name, style?.base === pack.style, () => {
           choose({ type: 'set_style', params: { ...(style ?? {}), base: pack.style } });
           onStyle?.(pack.style);

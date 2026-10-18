@@ -4,3 +4,9 @@ export * from './genvr.js';
 export * from './account-link.js';
 export { WorldPackage, WORLD_PACKAGE_BYTES, WORLD_PACKAGE_COMMANDS } from '@genvr/contracts';
 export { TOOL_DEFINITIONS, streamingChatModel, type ChatModel, type ChatMessage, type AssistantEvent } from '@genvr/assistant';
+
+export { studioAgentLook, syncStudioAgents, StudioAgent, StudioAgents } from './studio-agents.js';
+
+export * from './avatar-presentation.js';
+
+export * from './user-avatar-library.js';

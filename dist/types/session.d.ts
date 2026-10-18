@@ -1,7 +1,7 @@
 import { CommandPayload, WorldDocument, WorldPackage, type ItemPackage } from './vendor/contracts/index.js';
-import { type ChatModel, type AssistantEvent } from './vendor/assistant/index.js';
+import { type ChatModel, type AssistantEvent, type AvatarPresentationEvent } from './vendor/assistant/index.js';
 import { type WorldState } from './vendor/world/index.js';
-export declare const SDK_VERSION = "0.3.0-preview.1";
+export declare const SDK_VERSION = "0.3.0-preview.3";
 export declare const PACKAGE_WORK_BUDGET = 5000000;
 export type WorldEvent = {
     type: 'changed' | 'saved' | 'opened';
@@ -24,6 +24,8 @@ export declare function replayWorldPackage(input: unknown): {
 };
 export declare class WorldSession {
     #private;
+    /** Attach a live viewport controller; presentation is never written into world packages. */
+    attachPresentation(execute: (event: AvatarPresentationEvent) => string | null, describe?: () => string): () => void;
     constructor(input: unknown, onEvent?: (event: WorldEvent) => void);
     static create(options?: NewWorldOptions): WorldSession;
     get world(): WorldDocument;

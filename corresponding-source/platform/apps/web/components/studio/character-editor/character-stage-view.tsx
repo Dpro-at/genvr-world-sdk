@@ -1,5 +1,7 @@
 'use client';
 
+import { useStudioHost } from '../../../lib/studio-host';
+
 import type { CharacterStage } from '@genvr/runtime/character';
 import {
   Bone,
@@ -80,6 +82,7 @@ export function CharacterStageView({
   editor: CharacterEditor;
   compact?: boolean;
 }) {
+  const host = useStudioHost();
   const container = useRef<HTMLDivElement>(null);
   const [failed, setFailed] = useState(false);
   const [settings, setSettings] = useState(false);
@@ -119,6 +122,7 @@ export function CharacterStageView({
         stage.current = made;
         stop = made.onChange(setInfo);
         setInfo(made.info);
+        host.presentationStage?.(made);
       } catch {
         if (!cancelled) setFailed(true);
       }
@@ -138,6 +142,7 @@ export function CharacterStageView({
       media.removeEventListener('change', recolor);
       stop();
       made?.dispose();
+      host.presentationStage?.(null);
       stage.current = null;
       setInfo(null);
     };
@@ -160,6 +165,7 @@ export function CharacterStageView({
       style={{ background: BACKDROPS.find((one) => one.id === backdrop)!.css }}
     >
       <div ref={container} data-character-stage className="absolute inset-0" />
+      {host.presentationOverlay?.()}
       {failed ? (
         <p className="absolute inset-0 flex items-center justify-center p-6 text-center text-sm font-semibold text-ink/60">
           This browser cannot show the 3D character.

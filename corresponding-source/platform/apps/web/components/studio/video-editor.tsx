@@ -1,8 +1,8 @@
 'use client';
-import { useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
+import { useEffect, useId, useLayoutEffect, useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { Scissors, Undo2, Redo2, Download, Circle, Type, Camera, Plus, Trash2, Magnet, SlidersHorizontal,
-  Bookmark, FolderOpen, Save, MousePointer2, ChevronsRight, Columns2, ArrowLeftRight, MoveHorizontal } from 'lucide-react';
+  Users, Mic, Film, Languages, Bookmark, FolderOpen, Save, MousePointer2, ChevronsRight, Columns2, ArrowLeftRight, MoveHorizontal } from 'lucide-react';
 import { filmLength, fromSeconds, timecode, toSeconds, type Clip, type Track } from '@genvr/film';
 import type { StudioFilming } from '../../lib/use-studio-filming';
 import { drawAt, mediaDuration, render } from '../../lib/video-studio/render';
@@ -11,7 +11,10 @@ import { ProgramMonitor, SourceMonitor } from './film/monitors';
 import { AdjustmentMenu, LayerControls } from './film/effects-panel';
 import { KeyLane } from './film/keyframes';
 import { TitleMenu, TitlePanel, TransitionPanel } from './film/titles-panel';
+import { TransitionsWorkspace } from './film/transitions-panel';
 import { ColourPanel } from './film/colour-panel';
+import { useStudioHost } from '../../lib/studio-host';
+import { SceneVoice } from './film/scene-voice';
 import { ClipFace, KIND, Meters, Ruler, SoundCrossfade, TL, Toggle, TrackHeader, ZoomBar, clipBox } from './film/timeline-parts';
 import { ROWS_DEFAULT, rowHeight, trackOrder, type RowSizes } from '../../lib/video-studio/timeline-view';
 import { FONT_CLASSES } from '../../lib/video-studio/fonts';
@@ -68,6 +71,7 @@ export function VideoEditor({ filming }: { filming: StudioFilming }) {
   const lanes = useRef<HTMLDivElement>(null), scroller = useRef<HTMLDivElement>(null);
   const [stage, setStage] = useState<HTMLElement | null>(null), [time, setTime] = useState(0), [zoom, setZoom] = useState(48);
   const [drag, setDrag] = useState<Drag | null>(null), [tool, setTool] = useState<Tool>('select');
+  const [exportScope,setExportScope] = useState<'film'|'clip'|'range'>('film');
   const [scroll, setScroll] = useState({ left: 0, view: 800 });
   const anchor = useRef<{ time: number; offset: number } | null>(null);
   const [view, setViewState] = useState<TimelineView>(loadView);
@@ -108,11 +112,13 @@ export function VideoEditor({ filming }: { filming: StudioFilming }) {
     if (!live) draw(studio.playhead);
   }, [workspace]);
   useEffect(() => { if (!running && studio.previewing) draw(studio.playhead); }, [project, studio.playhead, studio.ungraded, stage, studio.previewing]);
-  const play = async (exporting: boolean) => {
+  const play = async (exporting: boolean, scope: 'film'|'clip'|'range' = 'range') => {
     if (!canvas.current || studio.isRendering() || filming.isBusy()) return;
     const controller = new AbortController(); cancel.current = controller; studio.setRendering(true); studio.setPreviewing(true);
     // With In / Out marked, playback and export use only that part (FILM-09).
-    const range = project.range ? { from: toSeconds(project.range.in), to: Math.min(studio.length, toSeconds(project.range.out)) } : undefined;
+    const selectedPicture = project.tracks.filter(t=>t.kind==='picture').flatMap(t=>t.clips).find(c=>c.id===selected);
+    if(exporting && scope==='clip' && !selectedPicture){studio.setRendering(false);studio.setMessage('Select a picture clip to export its shot.');return;}
+    const range = exporting && scope==='film' ? undefined : exporting && scope==='clip' && selectedPicture ? {from:toSeconds(selectedPicture.start),to:toSeconds(selectedPicture.start+selectedPicture.duration)} : project.range ? { from: toSeconds(project.range.in), to: Math.min(studio.length, toSeconds(project.range.out)) } : undefined;
     const first = range?.from ?? 0, last = range?.to ?? studio.length;
     const from = exporting || studio.playhead >= last - .05 || studio.playhead < first ? first : studio.playhead; setTime(from);
     const resume = filming.pauseForPlayback();
@@ -121,7 +127,7 @@ export function VideoEditor({ filming }: { filming: StudioFilming }) {
       const blob = await render(project, studio.assets, canvas.current, controller.signal, (seconds) => { reached = seconds; setTime(seconds); }, exporting, from,
         exporting ? undefined : studio.setLevels, range);
       if (blob) {
-        const url = URL.createObjectURL(blob), link = document.createElement('a'); link.href = url; link.download = 'genvr-episode.webm';
+        const url = URL.createObjectURL(blob), link = document.createElement('a'); link.href = url; link.download = `genvr-episode-${project.tracks.find(t => t.kind === 'caption' && t.lang && !t.hidden)?.lang ?? 'original'}.webm`;
         link.click(); setTimeout(() => URL.revokeObjectURL(url), 60000); studio.setMessage('Sequence exported with its captions and attached dialogue audio.');
       }
     } catch (error) { if (!controller.signal.aborted) studio.setMessage(error instanceof Error ? error.message : 'Preview failed.'); }
@@ -357,8 +363,9 @@ export function VideoEditor({ filming }: { filming: StudioFilming }) {
           {studio.previous ? <button className={button} title="Bring back the film that was open before the last Open" data-film-id="film.file.restore" disabled={running || filming.busy || !studio.ready}
             onClick={() => { if (window.confirm('Bring back the previous film in place of this one?')) void studio.restorePrevious().catch((e) => studio.setMessage(e instanceof Error ? e.message : 'Restore failed.')); }}>Restore</button> : null}
         </div>
+        <select aria-label="Export scope" className="rounded border border-ink/15 bg-paper px-2 py-1 text-xs" value={exportScope} onChange={e=>setExportScope(e.target.value as typeof exportScope)} disabled={running||filming.busy}><option value="film">Full film</option><option value="clip">Selected shot</option><option value="range" disabled={!project.range}>Marked range</option></select>
         <button className="inline-flex items-center justify-center gap-1.5 rounded-md bg-brand px-3 py-1.5 text-xs font-bold text-on-brand hover:opacity-90 disabled:opacity-35" data-film-id="film.export" disabled={!studio.length || running || filming.busy}
-          onClick={() => { if (!flashes.length || window.confirm(`${flashes.join('\n')}\n\nFlashing can hurt people with photosensitive epilepsy. Export anyway?`)) void play(true); }}>
+          onClick={() => { if (!flashes.length || window.confirm(`${flashes.join('\n')}\n\nFlashing can hurt people with photosensitive epilepsy. Export anyway?`)) void play(true,exportScope); }}>
           <Download className="size-3.5" />Export</button>
       </div>
     </div>
@@ -434,6 +441,7 @@ export function VideoEditor({ filming }: { filming: StudioFilming }) {
 export function VideoSceneInspector({ filming }: { filming: StudioFilming }) {
   const workspace = filming.studio.workspace;
   if (workspace === 'captions') return <CaptionsPanel filming={filming} />;
+  if (workspace === 'transitions') return <TransitionsWorkspace filming={filming} />;
   if (workspace === 'sound') return <SoundPanel filming={filming} />;
   if (workspace === 'colour') return <ColourPanel filming={filming} />;
   return <InspectorBody filming={filming} mode={workspace === 'edit' ? 'clip' : 'scene'} />;
@@ -442,6 +450,9 @@ export function VideoSceneInspector({ filming }: { filming: StudioFilming }) {
 /** Shoot shows the Scene panel (cues for the next take, shot workflow); Edit shows the Clip panel. */
 function InspectorBody({ filming, mode }: { filming: StudioFilming; mode: 'scene' | 'clip' }) {
   const studio = filming.studio, { project, selected, rendering: running } = studio;
+  const host = useStudioHost();
+  const [choosingAvatar, setChoosingAvatar] = useState(false), avatarDialog = useRef<HTMLDialogElement>(null);
+  useEffect(() => { if (choosingAvatar) avatarDialog.current?.showModal(); else avatarDialog.current?.close(); }, [choosingAvatar]);
   const located = selected ? project.tracks.map((t) => ({ track: t, clip: t.clips.find((c) => c.id === selected) })).find((x) => x.clip) : undefined;
   const clip = located?.clip, media = clip?.type === 'media' ? project.media.find((m) => m.id === clip.media) : undefined;
   const [start, setStart] = useState(0), [sourceIn, setSourceIn] = useState(0), [sourceOut, setSourceOut] = useState(0), [ripple, setRipple] = useState(true);
@@ -452,6 +463,9 @@ function InspectorBody({ filming, mode }: { filming: StudioFilming; mode: 'scene
   const avatarSpot = () => { const p = filming.avatarSpot(); if (!p) throw new Error('The avatar is not in the world yet.'); return p; };
   const [cueStart, setCueStart] = useState(0), [cueEnd, setCueEnd] = useState(3);
   const actors = filming.actors();
+  const [inspectorTab, setInspectorTab] = useState<'scene' | 'voices' | 'shot'>(filming.voiceAvailable ? 'voices' : 'scene');
+  const inspectorId = useId();
+  const inspectorTabs = [{ id: 'scene' as const, label: 'Scene', icon: Users }, { id: 'voices' as const, label: 'Voices', icon: Mic }, { id: 'shot' as const, label: 'Shot', icon: Film }];
   const importing = useRef(new Set<AbortController>());
   useEffect(() => () => { for (const controller of importing.current) controller.abort(); importing.current.clear(); }, [studio.identity, selected]);
   useEffect(() => {
@@ -470,6 +484,11 @@ function InspectorBody({ filming, mode }: { filming: StudioFilming; mode: 'scene
     if (steps.length) studio.batch(steps, { label: ripple ? 'Ripple trim' : 'Trim' });
   };
   return <div className="space-y-4 px-3 pb-3 text-ink">
+    {host.userAvatarControls ? createPortal(<dialog ref={avatarDialog} aria-label="Choose scene avatar" onCancel={() => setChoosingAvatar(false)} onClose={() => setChoosingAvatar(false)} className="m-auto max-h-[85vh] w-[min(48rem,calc(100vw-2rem))] overflow-hidden rounded-lg border border-ink/20 bg-paper p-0 text-ink shadow-xl backdrop:bg-black/60">
+      <div className="flex items-center justify-between border-b border-ink/10 px-4 py-3"><h2 className="flex items-center gap-2 text-sm font-semibold"><Users className="size-4" />Choose scene avatar</h2><button className={button} onClick={() => setChoosingAvatar(false)}>Done</button></div>
+      <p className="px-4 pt-3 text-xs text-ink/60">Choose from your available character library. The chosen character replaces My avatar in the live world. Record a new take to use it in the film; existing recordings keep their original character.</p>
+      <div className="max-h-[65vh] overflow-y-auto p-4">{choosingAvatar ? host.userAvatarControls('characters') : null}</div>
+    </dialog>, document.body) : null}
     <label className="block text-xs font-semibold">Production mode<select aria-label="Filming mode" value={studio.mode} disabled={disabled} className={input}
       onChange={(e) => studio.setMode(e.target.value as 'gameplay' | 'production')}>
       <option value="production">Film / series</option><option value="gameplay">Gameplay recording</option>
@@ -494,13 +513,37 @@ function InspectorBody({ filming, mode }: { filming: StudioFilming; mode: 'scene
       </> : <p className="text-xs text-ink/45">Select a timeline clip to edit it. Drag clips to move, drag an edge to trim (with Ripple on, everything after follows on every track; Shift: the opposite). Keys: Ctrl+K split, Delete, Shift+Delete (the opposite of Ripple), Ctrl+Z undo, M marker, Space play, Left/Right frame.</p>}
     </fieldset> : null}
     {mode === 'scene' ? <>
-    <fieldset aria-label="Scene dialogue and motion" data-film-id="film.scene" disabled={disabled} className="space-y-3 rounded-lg border border-ink/10 p-3">
+    <div role="tablist" aria-label="Scene inspector tools" className="sticky top-0 z-10 grid grid-cols-3 border-b border-ink/15 bg-paper">
+      {inspectorTabs.map(({ id, label, icon: Icon }, index) => <button key={id} id={`${inspectorId}-${id}`} role="tab" aria-selected={inspectorTab === id} aria-controls={`${inspectorId}-panel`} tabIndex={inspectorTab === id ? 0 : -1}
+        onClick={() => setInspectorTab(id)} onKeyDown={event => {
+          const next = event.key === 'ArrowRight' ? (index + 1) % 3 : event.key === 'ArrowLeft' ? (index + 2) % 3 : event.key === 'Home' ? 0 : event.key === 'End' ? 2 : -1;
+          if (next < 0) return; event.preventDefault(); setInspectorTab(inspectorTabs[next]!.id);
+          (event.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>('[role="tab"]')[next])?.focus();
+        }} className={`flex min-w-0 flex-col items-center gap-1 border-b-2 px-1 py-2.5 text-xs font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand ${inspectorTab === id ? 'border-brand text-ink' : 'border-transparent text-ink/50 hover:bg-ink/5 hover:text-ink'}`}><Icon className="size-4" />{label}</button>)}
+    </div>
+    <div id={`${inspectorId}-panel`} role="tabpanel" aria-labelledby={`${inspectorId}-${inspectorTab}`} className="space-y-3">
+    {inspectorTab === 'voices' ? <section aria-label="Scene voices" className="space-y-3">
+      <div className="flex items-center justify-between gap-2"><h3 className="flex items-center gap-2 text-sm font-semibold"><Mic className="size-4" />Dialogue & saved voices</h3><span className="text-xs text-ink/50">{studio.plan.filter(cue => cue.actor !== SCENE_ACTOR && cue.text.trim()).length} lines</span></div>
+      <p className="text-xs leading-relaxed text-ink/60">Choose a character, write a line, then select one of your saved voices below.</p>
+      {host.userAvatarControls ? <button className={`${button} w-full`} disabled={disabled} onClick={() => setChoosingAvatar(true)}><Users className="size-3.5" />Choose avatar from library</button> : null}
+      <details open={!studio.plan.some(cue => cue.actor !== SCENE_ACTOR && cue.text.trim())} className="space-y-2 border-y border-ink/10 py-2"><summary className="cursor-pointer text-xs font-semibold">Add dialogue line</summary>
+      <label className="block text-xs">Character<select aria-label="Dialogue character" className={input} value={actor === SCENE_ACTOR ? 'self' : actor} disabled={disabled} onChange={event => setActor(event.target.value)}>{actors.filter(a => a.id !== SCENE_ACTOR).map(a => <option key={a.id} value={a.id}>{a.label}</option>)}</select></label>
+      <label className="block text-xs">New dialogue<textarea aria-label="New scene dialogue" className={input} rows={3} value={dialogue} maxLength={500} disabled={disabled} placeholder="Write what this character says…" onChange={event => setDialogue(event.target.value)} /></label>
+      <button className={`${button} w-full`} disabled={disabled || !dialogue.trim() || studio.plan.length >= 30} onClick={() => attempt(filming, () => {
+        const speaker = actor === SCENE_ACTOR ? 'self' : actor;
+        studio.setPlan([...studio.plan, { id: crypto.randomUUID(), actor: speaker, label: actors.find(a => a.id === speaker)?.label ?? speaker, action: 'none', start: 0, end: filming.output.seconds, text: dialogue.trim(), volume: 1 }]); setDialogue('');
+      })}><Plus className="size-3.5" />Add dialogue line</button>
+      </details>
+      <button className={`${button} w-full`} disabled={disabled} onClick={() => studio.setWorkspace('captions')}><Languages className="size-3.5" />Captions & dubbing</button>
+    </section> : null}
+    {inspectorTab === 'scene' ? <fieldset aria-label="Scene dialogue and motion" data-film-id="film.scene" disabled={disabled} className="space-y-3 rounded-lg border border-ink/10 p-3">
       <legend className="px-1 text-xs font-semibold">Characters · dialogue · motion</legend>
       <label className="block text-xs text-ink/60">Shot length (seconds)<input aria-label="Shot length (seconds)" data-film-id="film.scene.length" className={input} type="number" min={1} max={30} step="0.5"
         value={filming.output.seconds} onChange={(e) => { const seconds = Number(e.target.value); if (seconds >= 1 && seconds <= 30) filming.setOutput({ ...filming.output, seconds }); }} /></label>
       <label className="block text-xs text-ink/60">Character<select aria-label="Scene character" value={actor} className={input} onChange={(e) => { setActor(e.target.value); setAction('none'); }}>
         {actors.map((a) => <option key={a.id} value={a.id}>{a.label} · {a.id === 'self' ? 'avatar' : a.id.slice(-5)}</option>)}
       </select></label>
+      {host.userAvatarControls ? <button className={`${button} w-full`} disabled={disabled} onClick={() => setChoosingAvatar(true)}><Users className="size-3.5" />Choose avatar from library</button> : null}
       <label className="block text-xs text-ink/60">Action<select aria-label="Scene action" value={action} className={input} onChange={(e) => setAction(e.target.value)}>
         <option value="none">No movement</option>
         {(actor === 'self' ? filming.actions : actor === SCENE_ACTOR ? [...SCENE_FX_ACTIONS] : ['dance', 'bob', 'spin', 'sway', 'run'].map((id) => ({ id, label: id === 'run' ? 'run (walk its spots faster)' : id }))).map((a) => <option key={a.id} value={a.id}>{a.label}</option>)}
@@ -532,32 +575,38 @@ function InspectorBody({ filming, mode }: { filming: StudioFilming; mode: 'scene
         studio.must('cues.set', { media: media.id, cues: studio.plan.map((c) => ({ ...c, end: Math.min(c.end, limit) })).filter((c) => c.start < c.end) });
         studio.setMessage('Dialogue saved. Re-record to apply changed actor motion.');
       })}>Save scene cues to this shot</button> : null}
-    </fieldset>
-    <div className="space-y-2">{studio.plan.map((cue) => <div key={cue.id} className="space-y-2 rounded-lg border border-ink/10 bg-paper/40 p-3 text-xs">
+    </fieldset> : null}
+    {inspectorTab !== 'shot' ? <div className="space-y-2">{studio.plan.filter(cue => inspectorTab === 'scene' || (cue.actor !== SCENE_ACTOR && cue.text.trim())).map((cue) => <div key={cue.id} className="space-y-2 rounded-lg border border-ink/10 bg-paper/40 p-3 text-xs">
       <div className="flex items-center justify-between"><strong className="truncate">{cue.label}</strong><button aria-label={`Remove cue ${cue.id}`} className={button} disabled={disabled}
         onClick={() => attempt(filming, () => studio.setPlan(studio.plan.filter((c) => c.id !== cue.id)))}><Trash2 className="size-3" /></button></div>
-      <p className="text-ink/50">{cue.action} · {cue.start}–{cue.end}s</p><p className="break-words">{cue.text}</p>
+      <p className="text-ink/50">{cue.action === 'none' ? 'Dialogue only' : filming.actions.find(a => a.id === cue.action)?.label ?? cue.action} · {cue.start}–{cue.end}s</p>{inspectorTab === 'scene' ? <p className="break-words">{cue.text}</p> : null}
       {cue.at || cue.to?.length ? <p className="text-ink/50">{cue.at ? `From ${spotText(cue.at)}` : 'From where it stands'}{cue.to?.length ? ` → ${cue.to.map(spotText).join(' → ')}` : ''}</p> : null}
-      <label className="block">Voice / sound<input aria-label={`Audio for ${cue.id}`} type="file" accept="audio/*" disabled={disabled} className="mt-1 w-full text-[10px]" onChange={(e) => {
+      {inspectorTab === 'voices' ? <label className="block">Dialogue<textarea aria-label={`Dialogue for ${cue.id}`} className={input} rows={2} maxLength={500} value={cue.text} disabled={disabled} onChange={event => studio.setPlan(previous => previous.map(c => c.id === cue.id ? { ...c, text: event.target.value, audio: undefined, voice: undefined } : c))} /></label> : null}
+      {inspectorTab === 'voices' && cue.actor !== SCENE_ACTOR ? <SceneVoice filming={filming} cue={cue} disabled={disabled} /> : null}
+      {inspectorTab === 'voices' ? <details className="border-t border-ink/10 pt-2"><summary className="cursor-pointer text-xs text-ink/60">Audio file & volume</summary>
+      <label className="mt-2 block">Import audio<input aria-label={`Audio for ${cue.id}`} type="file" accept="audio/*" disabled={disabled} className="mt-1 w-full text-[10px]" onChange={(e) => {
         const chosen = e.target.files?.[0]; if (!chosen) return;
         const controller = new AbortController(); importing.current.add(controller);
         void mediaDuration(chosen, controller.signal).then((duration) => {
           if (controller.signal.aborted) return;
           if (duration > 180) throw new Error('Choose audio up to 180 seconds.');
-          attempt(filming, () => { const audio = studio.addAudio(chosen); studio.setPlan((previous) => previous.map((c) => c.id === cue.id ? { ...c, audio } : c)); });
+          attempt(filming, () => { const audio = studio.addAudio(chosen); studio.setPlan((previous) => previous.map((c) => c.id === cue.id ? { ...c, audio, voice: undefined } : c)); });
         }).catch((error) => { if (!controller.signal.aborted) studio.setMessage(error instanceof Error ? error.message : 'Audio could not be decoded.'); })
           .finally(() => importing.current.delete(controller));
       }} /></label>
       {cue.audio ? <p className="text-emerald-600">Audio attached</p> : null}
       <label className="block text-ink/60">Volume<input key={`${cue.id}-${cue.volume}`} aria-label={`Volume for ${cue.id}`} className={input} type="number" min={0} max={2} step="0.1" defaultValue={cue.volume} disabled={disabled}
         onBlur={(e) => { const volume = Number(e.target.value); if (volume !== cue.volume) attempt(filming, () => studio.setPlan((previous) => previous.map((c) => c.id === cue.id ? { ...c, volume } : c))); }} /></label>
-    </div>)}</div>
-    {media ? <fieldset aria-label="Shot workflow" disabled={disabled} className="space-y-2 rounded-lg border border-ink/10 p-3">
+      </details> : null}
+    </div>)}</div> : null}
+    {inspectorTab === 'shot' && media ? <fieldset aria-label="Shot workflow" disabled={disabled} className="space-y-2 rounded-lg border border-ink/10 p-3">
       <legend className="px-1 text-xs font-semibold">Shot workflow</legend>
       <div className="border-l-2 border-brand/30 pl-3 text-xs text-ink/50">World → camera → character cues → capture → trim → output</div>
       <button className={`${button} w-full`} onClick={() => media.camera ? filming.apply(media.camera) : filming.reset()}><Camera className="size-3" />Apply shot camera</button>
       <button className={`${button} w-full`} onClick={() => { if (media.camera) filming.apply(media.camera); else filming.reset(); record(filming, clip!.id); }}><Circle className="size-3 text-red-500" />Re-record this shot</button>
     </fieldset> : null}
+    {inspectorTab === 'shot' && !media ? <p className="text-xs text-ink/60">Select a recorded shot on the timeline to apply its camera or re-record it.</p> : null}
+    </div>
     <p className="text-[10px] leading-relaxed text-ink/45">Avatar actions use compatible library clips. Object motions move a non-colliding, anchored character as a whole; animated mouths require a compatible rig. Dialogue text and attached audio appear in preview/export.</p>
     </> : null}
   </div>;

@@ -3,7 +3,7 @@ import {
   __require
 } from "./chunk-NSBPE2FW.js";
 
-// ../../../node_modules/.pnpm/onnxruntime-web@1.26.0-dev.20260416-b7804b056c/node_modules/onnxruntime-web/dist/ort.webgpu.bundle.min.mjs
+// ../../../../../genvr/node_modules/.pnpm/onnxruntime-web@1.26.0-dev.20260416-b7804b056c/node_modules/onnxruntime-web/dist/ort.webgpu.bundle.min.mjs
 var ort_webgpu_bundle_min_exports = {};
 __export(ort_webgpu_bundle_min_exports, {
   InferenceSession: () => qf,
@@ -3900,10 +3900,10 @@ var gl = Zr;
 }
 Object.defineProperty(K.versions, "web", { value: Ja, enumerable: true });
 
-// ../../../node_modules/.pnpm/onnxruntime-common@1.24.0-dev.20251116-b39e144322/node_modules/onnxruntime-common/dist/esm/version.js
+// ../../../../../genvr/node_modules/.pnpm/onnxruntime-common@1.24.0-dev.20251116-b39e144322/node_modules/onnxruntime-common/dist/esm/version.js
 var version = "1.24.0-dev.20251116-b39e144322";
 
-// ../../../node_modules/.pnpm/onnxruntime-common@1.24.0-dev.20251116-b39e144322/node_modules/onnxruntime-common/dist/esm/env-impl.js
+// ../../../../../genvr/node_modules/.pnpm/onnxruntime-common@1.24.0-dev.20251116-b39e144322/node_modules/onnxruntime-common/dist/esm/env-impl.js
 var logLevelValue = "warning";
 var env = {
   wasm: {},
@@ -3925,7 +3925,7 @@ var env = {
 };
 Object.defineProperty(env, "logLevel", { enumerable: true });
 
-// ../../../node_modules/.pnpm/onnxruntime-common@1.24.0-dev.20251116-b39e144322/node_modules/onnxruntime-common/dist/esm/tensor-conversion-impl.js
+// ../../../../../genvr/node_modules/.pnpm/onnxruntime-common@1.24.0-dev.20251116-b39e144322/node_modules/onnxruntime-common/dist/esm/tensor-conversion-impl.js
 var tensorToDataURL = (tensor, options) => {
   const canvas = typeof document !== "undefined" ? document.createElement("canvas") : new OffscreenCanvas(1, 1);
   canvas.width = tensor.dims[3];
@@ -4084,7 +4084,7 @@ var tensorToImageData = (tensor, options) => {
   return image;
 };
 
-// ../../../node_modules/.pnpm/onnxruntime-common@1.24.0-dev.20251116-b39e144322/node_modules/onnxruntime-common/dist/esm/tensor-factory-impl.js
+// ../../../../../genvr/node_modules/.pnpm/onnxruntime-common@1.24.0-dev.20251116-b39e144322/node_modules/onnxruntime-common/dist/esm/tensor-factory-impl.js
 var bufferToTensor = (buffer, options) => {
   if (buffer === void 0) {
     throw new Error("Image buffer must be defined");
@@ -4293,7 +4293,7 @@ var tensorFromMLTensor = (mlTensor, options) => {
 };
 var tensorFromPinnedBuffer = (type, buffer, dims) => new Tensor({ location: "cpu-pinned", type, data: buffer, dims: dims ?? [buffer.length] });
 
-// ../../../node_modules/.pnpm/onnxruntime-common@1.24.0-dev.20251116-b39e144322/node_modules/onnxruntime-common/dist/esm/tensor-impl-type-mapping.js
+// ../../../../../genvr/node_modules/.pnpm/onnxruntime-common@1.24.0-dev.20251116-b39e144322/node_modules/onnxruntime-common/dist/esm/tensor-impl-type-mapping.js
 var NUMERIC_TENSOR_TYPE_TO_TYPEDARRAY_MAP = /* @__PURE__ */ new Map([
   ["float32", Float32Array],
   ["uint8", Uint8Array],
@@ -4342,7 +4342,7 @@ var checkTypedArray = () => {
   }
 };
 
-// ../../../node_modules/.pnpm/onnxruntime-common@1.24.0-dev.20251116-b39e144322/node_modules/onnxruntime-common/dist/esm/tensor-utils-impl.js
+// ../../../../../genvr/node_modules/.pnpm/onnxruntime-common@1.24.0-dev.20251116-b39e144322/node_modules/onnxruntime-common/dist/esm/tensor-utils-impl.js
 var calculateSize = (dims) => {
   let size = 1;
   for (let i = 0; i < dims.length; i++) {
@@ -4394,7 +4394,7 @@ var tensorReshape = (tensor, dims) => {
   }
 };
 
-// ../../../node_modules/.pnpm/onnxruntime-common@1.24.0-dev.20251116-b39e144322/node_modules/onnxruntime-common/dist/esm/tensor-impl.js
+// ../../../../../genvr/node_modules/.pnpm/onnxruntime-common@1.24.0-dev.20251116-b39e144322/node_modules/onnxruntime-common/dist/esm/tensor-impl.js
 var Tensor = class {
   /**
    * implementation.
@@ -4661,10 +4661,10 @@ var Tensor = class {
   }
 };
 
-// ../../../node_modules/.pnpm/onnxruntime-common@1.24.0-dev.20251116-b39e144322/node_modules/onnxruntime-common/dist/esm/tensor.js
+// ../../../../../genvr/node_modules/.pnpm/onnxruntime-common@1.24.0-dev.20251116-b39e144322/node_modules/onnxruntime-common/dist/esm/tensor.js
 var Tensor2 = Tensor;
 
-// ../../../node_modules/.pnpm/@huggingface+transformers@4.2.0/node_modules/@huggingface/transformers/dist/transformers.web.js
+// ../../../../../genvr/node_modules/.pnpm/@huggingface+transformers@4.2.0/node_modules/@huggingface/transformers/dist/transformers.web.js
 var __defProp = Object.defineProperty;
 var __export2 = (target, all) => {
   for (var name in all)

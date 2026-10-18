@@ -17,11 +17,13 @@ import {
   getGround,
   groundRef,
   itemBoundsForStyle,
+  itemFootprint,
   replayWorldPackage,
   smallStarterCommands,
   starterGroundMaterials,
-  starterWorldCommands
-} from "./chunk-Y2ORNEXY.js";
+  starterWorldCommands,
+  supportsWorldStarter
+} from "./chunk-GXONDH5X.js";
 
 // src/studio-project.ts
 var STUDIO_PROJECT_BYTES = 64 * 1024 * 1024;
@@ -32,6 +34,7 @@ var StudioProject = external_exports.object({
   title: external_exports.string().trim().min(1).max(120),
   play: PlaySettings,
   world: WorldDocument,
+  avatarBodies: external_exports.record(external_exports.string().min(1).max(120), external_exports.enum(["robot", "human", "classic", "simple", "starter"])).optional(),
   terrainChunks: external_exports.array(external_exports.string().max(16 * 1024 * 1024)).max(4096),
   assets: WorldPackage.shape.assets
 }).strict();
@@ -98,6 +101,7 @@ function fromState(state, title, play = defaultPlaySettings(), assets = []) {
   });
 }
 function createStudioProject(style, kind, play = defaultPlaySettings()) {
+  if (!supportsWorldStarter(style, kind)) throw new Error(`The ${kind} starter is not available for ${style}. Choose a supported world type.`);
   const seed = crypto.getRandomValues(new Uint32Array(1))[0] & 2147483647;
   const world = style === "realistic" && kind !== "empty" && kind !== "small" ? { seed, kind, generator: WORLD_GENERATOR } : void 0;
   const baseplate = style === "realistic" && kind === "empty", ground = getGround("baseplate");
@@ -121,8 +125,10 @@ function createStudioProject(style, kind, play = defaultPlaySettings()) {
     return itemBoundsForStyle(item, style);
   })) applyCommand(state, command);
   else if (world) {
-    for (const command of starterWorldCommands(doc, world, (x, z) => state.terrain.heightAt(x, z))) applyCommand(state, command);
-    state.doc.spawn.position = [0, state.terrain.heightAt(0, 0) + 1, 0];
+    for (const command of starterWorldCommands(doc, world, (x, z) => state.terrain.heightAt(x, z), (id) => {
+      const item = getCoreItem(id);
+      return item ? itemFootprint(item, style) : null;
+    })) applyCommand(state, command);
   }
   return fromState(state, "My place", play);
 }

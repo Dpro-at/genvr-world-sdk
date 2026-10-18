@@ -1,5 +1,8 @@
 'use client';
+import { LightingPanel } from './lighting-panel';
 
+
+import { useStudioHost } from '../../lib/studio-host';
 import { useEffect, useState } from 'react';
 import { FilmCamera } from '@genvr/contracts';
 import { FILM_PRESETS } from '@genvr/runtime';
@@ -9,8 +12,9 @@ import { HistoryPanel, ShotsPanel } from './film/panels';
 const BUTTON = 'rounded-lg bg-paper px-3 py-2 text-sm font-bold hover:bg-ink/10 disabled:opacity-40';
 /** Left dock of Filming: the camera while shooting; the shots and history in the other workspaces (FILM-04). */
 export function FilmingPanel({ filming }: { filming: StudioFilming }) {
+  const host = useStudioHost();
   if (filming.studio.workspace !== 'shoot') return <div className="space-y-2 pt-1"><ShotsPanel filming={filming} /><HistoryPanel filming={filming} /></div>;
-  return <CameraPanel filming={filming} />;
+  return <div className="space-y-4">{host.userAvatarControls ? <details className="rounded-xl border border-ink/10 p-3"><summary className="cursor-pointer text-sm font-bold">Cast character</summary><p className="mt-2 text-xs text-ink/60">Choose the character for My avatar. Direct its movement and facial cues in Scene inspector.</p>{host.userAvatarControls('characters')}</details> : null}<LightingPanel filming={filming} /><CameraPanel filming={filming} /></div>;
 }
 
 function CameraPanel({ filming }: { filming: StudioFilming }) {

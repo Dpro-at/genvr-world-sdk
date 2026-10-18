@@ -13,7 +13,7 @@ import { mediaDuration } from './render';
  * The Studio Filming project in this browser: a film (`@genvr/film`) edited only through its
  * command session, the recordings it shows, and the editor's view state.
  */
-export function useVideoStudio(place: string, key: string | null) {
+export function useVideoStudio(place: string, key: string | null, filmExample?: string | false) {
   const [, setVersion] = useState(0);
   const film = useRef<FilmSession>(null as unknown as FilmSession);
   if (!film.current) film.current = new FilmSession(emptyFilm(), () => crypto.randomUUID(), () => setVersion((n) => n + 1));
@@ -29,7 +29,7 @@ export function useVideoStudio(place: string, key: string | null) {
       // `?tab=story` (the Publish page's link) opens the Story workspace.
       if (new URLSearchParams(window.location.search).get('tab') === 'story') return 'story';
       const saved = localStorage.getItem('genvr-film-workspace');
-      return saved === 'edit' || saved === 'captions' || saved === 'sound' || saved === 'colour' || saved === 'story' ? saved : 'shoot';
+      return saved === 'edit' || saved === 'captions' || saved === 'sound' || saved === 'transitions' || saved === 'colour' || saved === 'story' ? saved : 'shoot';
     }
     catch { return 'shoot'; }
   });
@@ -51,7 +51,7 @@ export function useVideoStudio(place: string, key: string | null) {
     let live = true;
     void storage(`${key}:before-open`).then((kept) => { if (live) setPrevious(!!kept); }).catch(() => {});
     return () => { live = false; };
-  }, [key]);
+  }, [key, filmExample]);
   const [ready, setReady] = useState(false);
   const [loadedKey, setLoadedKey] = useState<string | null>(null);
   const [saveable, setSaveable] = useState(false);
@@ -78,6 +78,19 @@ export function useVideoStudio(place: string, key: string | null) {
         if (cancelled) return;
         film.current.load(loaded); setAssets(stored.assets);
       }
+      if (!stored && filmExample) {
+        try {
+          const response = await fetch(filmExample);
+          if (!response.ok) throw new Error('Example unavailable');
+          const example = readFilmFile(new Uint8Array(await response.arrayBuffer()));
+          if (cancelled) return;
+          film.current.load(example.project);
+          setAssets(example.assets.map(a => ({ id: a.id, blob: new Blob([a.bytes as BlobPart], { type: a.type }) })));
+          setWorkspace('sound');
+          setMessage('Example scene ready. Choose a language in Sound or Captions, then Play. Shoot opens your live world.');
+        } catch { if (!cancelled) setMessage('Example could not load. Your empty film is ready to use.'); }
+      }
+      if (cancelled) return;
       setLoadedKey(key); setSaveable(true); setReady(true);
     }).catch((error) => {
       if (cancelled) return;
@@ -162,6 +175,7 @@ export function useVideoStudio(place: string, key: string | null) {
 
   /** Brings a sound file (music, ambience, a voice) into the film and places it at the playhead on a sound track (FILM-08). */
   const addSound = async (file: File) => {
+    if (file.size > 20 * 1024 * 1024) throw new Error('Choose audio up to 20 MB.');
     if (!file.type.startsWith('audio/')) throw new Error('Choose a sound file (mp3, wav, ogg, m4a).');
     const seconds = await mediaDuration(file, new AbortController().signal);
     const asset = addAudio(file);
@@ -170,14 +184,18 @@ export function useVideoStudio(place: string, key: string | null) {
     pendingAudio.current.delete(asset);
     const placed = film.current.run('clip.place', { media: media.id });
     setMessage(placed.ok ? `${media.name} placed on the sound track.` : `${media.name} added to Shots. ${placed.reason}`);
+    if (!placed.ok) throw new Error(placed.reason);
+    if (typeof placed.result === 'string') film.current.run('select.set', { clips: [placed.result] });
+    setWorkspace('sound');
+    return { media: media.id, clip: placed.result };
   };
 
   /** A spoken voice for one language (FILM-12b): its sound file becomes that language's voice track, one undo step. */
-  const addVoice = async (lang: string, name: string, blob: Blob) => {
+  const addVoice = async (lang: string, name: string, blob: Blob, options: { start?: number; append?: boolean } = {}) => {
     const seconds = await mediaDuration(blob, new AbortController().signal);
     const asset = addAudio(blob);
     const media: Media = { id: crypto.randomUUID(), kind: 'audio', asset, name: name.slice(0, 120), duration: fromSeconds(Math.min(seconds, LIMITS.filmSeconds)), camera: null, cues: [] };
-    const done = film.current.batch([{ id: 'media.add', args: { media, place: 'none' } }, { id: 'voice.set', args: { lang, name: name.slice(0, 40), media: media.id } }], { label: `Voice: ${name}` });
+    const done = film.current.batch([{ id: 'media.add', args: { media, place: 'none' } }, { id: 'voice.set', args: { lang, name: name.slice(0, 40), media: media.id, ...options } }], { label: `Voice: ${name}` });
     if (!done.ok) throw new Error(done.failed.reason);
     pendingAudio.current.delete(asset);
   };

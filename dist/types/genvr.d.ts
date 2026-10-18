@@ -37,6 +37,17 @@ export declare class GenvrClient {
         world: WorldDocument;
         terrain: string[];
     }>;
+    /** Browse approved public catalog items. Availability is separate from purchase rights. */
+    catalogItems(options?: {
+        after?: string;
+        limit?: number;
+        q?: string;
+    }): Promise<{
+        items: unknown[];
+        next: string | null;
+    }>;
+    /** The server enforces approved/free or authenticated entitlement before issuing asset links. */
+    readItemPackage(id: string): Promise<Record<string, unknown>>;
     linkedIdentity(): Promise<{
         id: string;
         name: string;

@@ -1,3 +1,4 @@
+import { avatarMotionEntry, avatarMotionLibraryRevision, resolveAvatarLibraryMotion, subscribeAvatarMotionLibrary } from './avatar-motion-library.js';
 import {
   AnimationMixer,
   LoopOnce,
@@ -22,6 +23,43 @@ export class AvatarAnimator {
   #mixer: AnimationMixer;
   readonly #actions = new Map<string, AnimationAction>();
   #current: AnimationAction | null = null;
+  #base = new Map<string, AnimationClip>();
+  #library = new Set<string>();
+  #pendingLibrary = new Map<string, Promise<void>>();
+  #requested = '';
+  #generation = 0;
+  #unsubscribe: (() => void) | null = null;
+  #restoreLibrary = () => {
+    this.#generation++;
+    for (const name of this.#library) {
+      const original = this.#base.get(name);
+      if (original) this.register(original);
+      else { const action = this.#actions.get(name); if (action) { action.stop(); this.#mixer.uncacheAction(action.getClip()); this.#actions.delete(name); if (this.#current === action) this.#current = null; } }
+    }
+    this.#library.clear();
+    this.#pendingLibrary.clear();
+    const requested = this.#requested;
+    this.play(this.#actions.has(requested) || avatarMotionEntry(requested) ? requested : this.baseClip, 0);
+  };
+  #loadLibrary(name: string): Promise<void> {
+    const pending = this.#pendingLibrary.get(name);
+    if (pending) return pending;
+    if (!avatarMotionEntry(name) || this.#library.has(name)) return Promise.resolve();
+    this.#library.add(name);
+    const generation = this.#generation, revision = avatarMotionLibraryRevision(), root = this.#mixer.getRoot() as Object3D;
+    const loaded = resolveAvatarLibraryMotion(root, name).then(result => {
+      if (!result || generation !== this.#generation || revision !== avatarMotionLibraryRevision()) return;
+      this.register(result.clip, !result.loop);
+      if (this.#requested === name) this.play(name, 0);
+    });
+    this.#pendingLibrary.set(name, loaded);
+    return loaded;
+  }
+  /** Preload a library clip before a recording begins without changing the current pose. */
+  async prepare(name: string): Promise<boolean> {
+    await this.#loadLibrary(name);
+    return this.#actions.has(name);
+  }
   readonly #onFinished = (event: { action: AnimationAction }) => {
     if (event.action === this.#current) this.play(this.baseClip);
   };
@@ -53,6 +91,8 @@ export class AvatarAnimator {
   #bind(root: Object3D, clips: readonly AnimationClip[]): AnimationMixer {
     const mixer = new AnimationMixer(root);
     this.#mixer = mixer;
+    this.#base = new Map(clips.map(clip => [clip.name, clip]));
+    this.#unsubscribe = subscribeAvatarMotionLibrary(this.#restoreLibrary);
     for (const clip of clips) {
       const action = mixer.clipAction(clip);
       if (ONE_SHOT_CLIPS.has(clip.name)) {
@@ -65,6 +105,12 @@ export class AvatarAnimator {
     }
     mixer.addEventListener('finished', this.#onFinished as never);
     return mixer;
+  }
+
+  register(clip: AnimationClip, once = ONE_SHOT_CLIPS.has(clip.name)): void {
+    const previous = this.#actions.get(clip.name);
+    if (previous) { previous.stop(); this.#mixer.uncacheAction(previous.getClip()); if (previous === this.#current) this.#current = null; }
+    const action = this.#mixer.clipAction(clip); action.setLoop(once ? LoopOnce : LoopRepeat, once ? 1 : Infinity); action.clampWhenFinished = once; this.#actions.set(clip.name, action);
   }
 
   get clipNames(): string[] {
@@ -82,8 +128,9 @@ export class AvatarAnimator {
 
   /** Crossfades to a clip; returns false when the avatar has no such clip. */
   play(name: string, fade = this.fade): boolean {
+    this.#requested = name; this.#loadLibrary(name);
     const next = this.#actions.get(name);
-    if (!next) return false;
+    if (!next) return !!avatarMotionEntry(name);
     if (next === this.#current) return true;
     next.reset().setEffectiveTimeScale(1).setEffectiveWeight(1);
     if (this.#current) next.crossFadeFrom(this.#current, fade, true);
@@ -95,7 +142,7 @@ export class AvatarAnimator {
   /** Plays a clip from its start, even when it is already playing (a second strike right after one). */
   replay(name: string, fade = this.fade): boolean {
     const action = this.#actions.get(name);
-    if (!action) return false;
+    if (!action) return this.play(name, fade);
     if (action === this.#current) {
       action.reset().play();
       return true;
@@ -113,10 +160,13 @@ export class AvatarAnimator {
   }
 
   dispose(): void {
+    this.#generation++; this.#unsubscribe?.(); this.#unsubscribe = null; this.#library.clear();
     this.#mixer.removeEventListener('finished', this.#onFinished as never);
     this.#mixer.stopAllAction();
     this.#mixer.uncacheRoot(this.#mixer.getRoot());
     this.#actions.clear();
+    this.#library.clear();
+    this.#pendingLibrary.clear();
     this.#current = null;
   }
 }

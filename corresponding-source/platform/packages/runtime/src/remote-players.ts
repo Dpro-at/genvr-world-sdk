@@ -1,3 +1,5 @@
+import { avatarMotionEntry } from './avatar-motion-library.js';
+import type { AnimationClip } from 'three/webgpu';
 import {
   CanvasTexture,
   Group,
@@ -312,6 +314,16 @@ export class RemotePlayers {
     remote.strikeLeft = remote.animator.duration('Strike') || STRIKE_HOLD_SECONDS;
     this.onStrike?.(remote.avatar.root.position);
     return true;
+  }
+
+  registerPresentation(id: string, clip: AnimationClip): boolean {
+    const player = this.#players.get(id); if (!player) return false; player.animator.register(clip); return true;
+  }
+
+  playPresentation(id: string, clip: string): boolean {
+    const player = this.#players.get(id);
+    if (!player || !player.animator.clipNames.includes(clip) && !avatarMotionEntry(clip)) return false;
+    player.target.clip = clip; player.shown = clip; player.animator.play(clip); return true;
   }
 
   /** The clip currently shown on a player, or null when not shown (tests and tools). */

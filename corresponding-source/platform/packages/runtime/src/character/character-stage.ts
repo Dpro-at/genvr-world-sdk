@@ -1,3 +1,7 @@
+import { avatarMotionEntry, resolveAvatarLibraryMotion } from '../avatar-motion-library.js';
+import type { FaceUniforms } from './human/face.js';
+import { retargetAvatarMotion } from '../avatar-motion.js';
+import type { AvatarExpression } from '../avatar-expression.js';
 import {
   AnimationMixer,
   BufferAttribute,
@@ -64,6 +68,9 @@ export interface CharacterStageInfo {
   /** Standing height at rest (m). */
   height: number;
   clip: string | null;
+  expression: AvatarExpression;
+  expressionSupported: boolean;
+  mouth: import('@genvr/contracts').MouthShape;
   backend: 'WebGPU' | 'WebGL';
 }
 
@@ -89,7 +96,13 @@ export interface CharacterStage {
   setColors(colors: CharacterStageColors): void;
   /** Plays a clip in a loop (the editor previews every move in a loop). */
   play(clip: string): void;
+  presentAnimation(id: string): boolean;
+  setMouth(shape: import('@genvr/contracts').MouthShape): void;
+  presentExpression(expression: AvatarExpression): boolean;
+  importAvatarMotion(id: string, data: ArrayBuffer): Promise<boolean>;
   setPaused(paused: boolean): void;
+  /** Manual eyelid inspection: null restores automatic blinking. */
+  setEyeClosure(amount: number | null): void;
   resetView(): void;
   /** Close-up on the face from the front (face work: eyes, mouth, lines). */
   focusFace(): void;
@@ -118,7 +131,7 @@ interface Base {
   arms: BufferGeometry;
   /** Quad edges only (bodies made of quads): the wireframe shows the quads, not their diagonals. */
   quadWire: BufferGeometry | null;
-  material: Material;
+  material: Material | Material[];
   hasModel: boolean;
 }
 
@@ -166,6 +179,8 @@ export async function createCharacterStage({
   colors?: CharacterStageColors;
   viewCube?: boolean;
 }): Promise<CharacterStage> {
+  let eyeClosure = -1;
+  let currentExpression: AvatarExpression = 'neutral';
   const renderer = new WebGPURenderer({ antialias: true, alpha: true });
   await renderer.init();
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -184,7 +199,9 @@ export async function createCharacterStage({
   const sun = new DirectionalLight(0xffffff, 2.2);
   sun.position.set(2.5, 5, 3.5);
   sun.castShadow = true;
-  sun.shadow.mapSize.set(1024, 1024);
+  sun.shadow.mapSize.set(2048, 2048);
+  sun.shadow.normalBias = .008;
+  sun.shadow.bias = -.00015;
   Object.assign(sun.shadow.camera, { left: -2, right: 2, top: 3, bottom: -1, far: 15 });
   scene.add(sun);
   const fill = new DirectionalLight(0xffffff, 0.6);
@@ -272,6 +289,7 @@ export async function createCharacterStage({
   let handsUp = true;
   let paused = false;
   let base: Base | null = null;
+  const sourceColors = new WeakMap<Material, Color>();
   let height = 1.8;
   let clips: AnimationClip[] = [];
   let clipName = recipe.animations.idle;
@@ -338,7 +356,7 @@ export async function createCharacterStage({
     const material =
       base && base.mesh === mesh && base.material !== mesh.material
         ? base.material
-        : (mesh.material as Material);
+        : mesh.material;
     base = {
       mesh,
       body,
@@ -399,7 +417,9 @@ export async function createCharacterStage({
     restart(clipName, action?.time ?? 0);
   };
 
+  let motionRequest = 0;
   const restart = (name: string, time = 0) => {
+    motionRequest++;
     const clip = clips.find((entry) => entry.name === name) ?? clips.find((entry) => entry.name === 'Idle');
     mixer.stopAllAction();
     mixer.uncacheRoot(avatar.root);
@@ -419,6 +439,8 @@ export async function createCharacterStage({
     if (!base) return;
     const setup = viewModeSetup(mode);
     const mesh = base.mesh;
+    // The inspection stage keeps ground shadows without self-shadow acne on a deforming face.
+    mesh.receiveShadow = false;
     mesh.geometry =
       setup.body === 'arms'
         ? base.arms
@@ -446,9 +468,9 @@ export async function createCharacterStage({
             : setup.body === 'normals'
               ? normals
               : base.material;
-    for (const one of [clay, ghost, normals, base.material] as Material[]) {
+    for (const one of [clay, ghost, normals, ...(Array.isArray(base.material) ? base.material : [base.material])]) {
       const shaded = one as Material & { flatShading?: boolean };
-      if (shaded.flatShading !== (shading === 'flat') && one !== base.material) {
+      if (shaded.flatShading !== (shading === 'flat') && one !== base.material && !(Array.isArray(base.material) && base.material.includes(one))) {
         shaded.flatShading = shading === 'flat';
         one.needsUpdate = true;
       }
@@ -458,8 +480,13 @@ export async function createCharacterStage({
     const outline = mesh.userData.outline as { visible: boolean } | undefined;
     if (outline) outline.visible = setup.body === 'own';
     // Mesh bodies take the recipe's tint (block bodies paint their colour areas).
-    const own = base.material as Material & { color?: Color };
-    if (base.hasModel && own.color) own.color.set(recipe.colors.tint);
+    for (const material of Array.isArray(base.material) ? base.material : [base.material]) {
+      const own = material as Material & { color?: Color };
+      if (base.hasModel && own.color) {
+        if (!sourceColors.has(material)) sourceColors.set(material, own.color.clone());
+        own.color.copy(sourceColors.get(material)!).multiply(new Color(recipe.colors.tint));
+      }
+    }
     // Face details hung on bones (the block mouth) belong to the textured look only.
     for (const bone of mesh.skeleton.bones)
       for (const child of bone.children) if (!(child as Bone).isBone) child.visible = setup.body === 'own';
@@ -484,6 +511,9 @@ export async function createCharacterStage({
       bones: avatar.skeleton.bones.length,
       height: Math.round(height * 100) / 100,
       clip: clipName,
+      expression: currentExpression,
+      expressionSupported: avatar.expressionSupported,
+      mouth: avatar.mouth,
       backend,
     };
   };
@@ -587,7 +617,10 @@ export async function createCharacterStage({
         const side = Math.sign(base!.bones[base!.mesh.skeleton.bones.indexOf(bone)]!.rest.x) || 1;
         bone.quaternion.premultiply(forward(side));
       }
-    if (!paused) avatar.updateSprings(delta);
+    if (!paused) { avatar.updateSprings(delta); avatar.updateExpression(delta); }
+    const material = base?.material;
+    const face = (Array.isArray(material) ? material[0] : material)?.userData.face as FaceUniforms | undefined;
+    if (face) face.eyeClosure.value = eyeClosure;
     avatar.root.updateMatrixWorld(true);
     if (firstPerson && base) {
       const head = base.mesh.skeleton.bones[base.roles.indexOf('head')];
@@ -610,6 +643,20 @@ export async function createCharacterStage({
     renderer.setSize(width, heightPx);
   });
   resize.observe(container);
+
+  const presentAnimation = (id: string): boolean => {
+      const name = id === 'idle' ? 'Idle' : CORE_ANIMATIONS.find(row => row.manifest.id === id)?.clip ?? id;
+      if (avatarMotionEntry(name)) {
+        const request = ++motionRequest, geometry = avatar.mesh.geometry;
+        void resolveAvatarLibraryMotion(avatar.root, name).then(result => {
+          if (!result || request !== motionRequest || avatar.mesh.geometry !== geometry) return;
+          clips = [...clips.filter(clip => clip.name !== name), result.clip];
+          restart(name); emit();
+        });
+        return true;
+      }
+      if (!clips.some(clip => clip.name === name)) return false; restart(name); emit(); return true;
+  };
 
   return {
     get info() {
@@ -665,9 +712,19 @@ export async function createCharacterStage({
       wire.color.set(colors.line);
       anatomyLine.value.set(colors.line);
     },
+    presentAnimation,
+    setMouth(shape) { avatar.setMouth(shape); },
+    presentExpression(expression) { if (expression !== 'neutral' && !avatar.expressionSupported) return false; currentExpression = expression; avatar.setExpression(expression); emit(); return true; },
+    async importAvatarMotion(id, data) {
+      const clip = await retargetAvatarMotion(data, avatar, id); clips = [...clips.filter(row => row.name !== id), clip]; emit(); return true;
+    },
     play(name) {
+      if (avatarMotionEntry(name)) { presentAnimation(name); return; }
       restart(name);
       emit();
+    },
+    setEyeClosure(amount) {
+      eyeClosure = amount === null || !Number.isFinite(amount) ? -1 : Math.max(0, Math.min(1, amount));
     },
     setPaused(next) {
       paused = next;
@@ -707,6 +764,7 @@ export async function createCharacterStage({
         base.arms.dispose();
         base.quadWire?.dispose();
       }
+      motionRequest++;
       avatar.dispose();
       for (const one of [clay, ghost, wire, normals, dotMaterial] as Material[]) one.dispose();
       boneLines.geometry.dispose();

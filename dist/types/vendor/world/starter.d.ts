@@ -9,7 +9,7 @@ import type { TerrainData } from './terrain-data.js';
  * than one big command on purpose: each piece keeps its own exact inverse, which is the rule every
  * command in this package follows, and `applyBatch` is what makes the lot one undo step.
  */
-export declare function starterWorldCommands(doc: Pick<WorldDocument, 'instances' | 'sizeTier' | 'environment' | 'terrain' | 'style'>, world: WorldSeed, 
+export declare function starterWorldCommands(doc: Pick<WorldDocument, 'instances' | 'sizeTier' | 'environment' | 'terrain' | 'style' | 'spawn'>, world: WorldSeed, 
 /**
  * Ground height after the world is given. Callers with no stored chunks can pass
  * `worldHeightAt`; a place that has been built in must apply `generate_world` first and then
@@ -38,3 +38,5 @@ export declare function starterWater(world: WorldSeed, sizeTier: SizeTier, style
  * the river's bed carved and any lake basin dug. What "untouched" means for a starter world.
  */
 export declare function starterGround(world: WorldSeed, sizeTier: SizeTier, style?: Style): TerrainData;
+/** A stable shore arrival, with an open sea view and room to extend the starter. */
+export declare function islandShore(heightAt: (x: number, z: number) => number, half: number): number;

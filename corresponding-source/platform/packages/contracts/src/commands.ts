@@ -1,3 +1,4 @@
+import { SceneLights } from './lighting.js';
 import { z } from 'zod';
 import { Id, Params, Quat, SizeTier, Transform, Vec2, Vec3 } from './common.js';
 import { Game } from './game.js';
@@ -184,6 +185,7 @@ export const CommandPayload = z.discriminatedUnion('type', [
     params: z.object({ groupId: Id, name: ObjectName, instanceIds: z.array(Id).max(500) }),
   }),
   z.object({ type: z.literal('ungroup_items'), params: z.object({ groupId: Id }) }),
+  z.object({ type: z.literal('set_lighting'), params: z.object({ lights: SceneLights.optional() }) }),
   z.object({ type: z.literal('set_style'), params: StyleSelection }),
   z.object({
     type: z.literal('set_sky'),

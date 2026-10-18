@@ -1,3 +1,4 @@
+import { type AvatarExpression } from './avatar-expression.js';
 import { AnimationClip, Bone, BufferGeometry, Group, Matrix4, Skeleton, SkinnedMesh, Vector3, type Material } from 'three/webgpu';
 import type { AvatarBodyType, AvatarScale, BodyId, MouthShape } from '../contracts/index.js';
 import { type AnimationItem, type AvatarBody } from '../core-library/index.js';
@@ -6,11 +7,11 @@ import type { HumanData } from './character/human/format.js';
 /**
  * The Genvr avatar (tasks P2-05, P2-20, P2-22): blocky characters built from the Core Library
  * body types, each with its own skeleton: Classic (Roblox-like, 15 joints, the main avatar) and
- * Starter (the first test body on the standard 52-bone Mixamo rig). The rest pose is a T-pose
+ * Starter (the first test body on the standard 52-bone humanoid rig). The rest pose is a T-pose
  * facing +z with every bone's axes aligned to the world, feet at y = 0. Changing the body type
  * rebuilds the skeleton inside the same scene objects.
  */
-/** The standard 52-bone rig (Mixamo names, same as agent_player): the Starter body's joints. */
+/** The standard 52-bone humanoid rig: the Starter body's joints. */
 export declare const STANDARD_BONES: readonly string[];
 export type StandardBone = string;
 export declare const bonePrefix = "mixamorig";
@@ -53,7 +54,7 @@ export interface HandGrip {
 /**
  * The right hand of a body and its skeleton: the joint that carries the hand (the body's fit for
  * the standard `RightHand` bone, else the joint that bone moves), found by its node name so rigs
- * with a bone prefix (Mixamo, mesh bodies) work too. The palm is the middle of the hand's block
+ * with a bone prefix (imported mesh bodies) work too. The palm is the middle of the hand's block
  * (the fit box, or the hand joint's parts); rigged hands without blocks hold a little past the
  * wrist toward the knuckles. Null when the body has no right hand.
  */
@@ -117,6 +118,9 @@ export interface GenvrAvatar {
      * show it through their mouth blend shapes; bodies without either (2D bodies for now) ignore it.
      */
     setMouth(shape: MouthShape): void;
+    readonly expressionSupported: boolean;
+    setExpression(expression: AvatarExpression): void;
+    updateExpression(delta: number): void;
     /** The mouth shape shown now (`X` at rest, and for bodies that cannot show one). */
     readonly mouth: MouthShape;
     /** Height of the top of the head above the feet at rest (m); follows the body type. */
@@ -143,7 +147,7 @@ export interface GenvrAvatar {
 }
 interface BodyModel {
     geometry: BufferGeometry;
-    material: Material;
+    material: Material | Material[];
     /** The model's morph target names (its blend shapes), by index. */
     morphs?: Record<string, number>;
     /** How the model's mouth blend shapes show the nine mouth shapes (lip sync P2-44); null without them. */
@@ -157,12 +161,16 @@ interface BodyModel {
 /**
  * A model's skinned geometry bound to the body's own skeleton: vertices moved to their bind
  * position (the model's T-pose rest) and each skin index pointed at the body joint with the same
- * bone name (glTF drops the `:` of `mixamorig:Hips`, like our node names). Unknown bones fall to
+ * canonical bone name (including supported external namespaces). Unknown bones fall to
  * the root.
  */
 export declare function bindModelGeometry(body: AvatarBody, source: BufferGeometry, boneNames: readonly string[], bindMatrix?: Matrix4): BufferGeometry;
+/** Retains every material primitive in a locally imported character. */
+export declare function mergeLocalBodyPrimitives(body: AvatarBody, scene: Group): BodyModel;
 /** Loads a mesh body's model once (null for block bodies or when it cannot be loaded). */
 export declare function loadBodyModel(body: AvatarBody): Promise<BodyModel | null>;
+/** Register a user-selected local body without replacing the host's item resolver. */
+export declare function registerLocalAvatarBody(body: AvatarBody): () => void;
 /** How the app turns a body item id into a body (the place's body route and `bodyFromItem`); null: unknown. */
 export declare function setItemBodyResolver(resolver: ((id: string) => Promise<AvatarBody | null>) | null): void;
 /** Loads the model of a look's body (if it has one) before an avatar wears it. */

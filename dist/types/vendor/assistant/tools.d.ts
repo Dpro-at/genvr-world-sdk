@@ -4,6 +4,172 @@ export declare const BUILD_BLOCKS: readonly ["grass", "dirt", "sand", "stone", "
 /** Most items one `place_items` call places (one saved change holds at most 200 commands). */
 export declare const PLACE_ITEMS_MAX = 200;
 export declare const TOOL_ARGS: {
+    readonly avatar_voice: z.ZodObject<{
+        action: z.ZodEnum<{
+            audio: "audio";
+            models: "models";
+            install: "install";
+            voices: "voices";
+            clone: "clone";
+            assign: "assign";
+            speak: "speak";
+            job: "job";
+            recordings: "recordings";
+            replay: "replay";
+            demo: "demo";
+            playback: "playback";
+            demo_all: "demo_all";
+            preview: "preview";
+            preview_demo: "preview_demo";
+            prepare_previews: "prepare_previews";
+            remove: "remove";
+            design: "design";
+            save_design: "save_design";
+            export_voice: "export_voice";
+        }>;
+        preview: z.ZodOptional<z.ZodBoolean>;
+        voiceType: z.ZodOptional<z.ZodEnum<{
+            male: "male";
+            female: "female";
+            child: "child";
+        }>>;
+        description: z.ZodOptional<z.ZodString>;
+        confirm: z.ZodOptional<z.ZodBoolean>;
+        command: z.ZodOptional<z.ZodEnum<{
+            play: "play";
+            pause: "pause";
+            stop: "stop";
+            seek: "seek";
+            rate: "rate";
+            volume: "volume";
+        }>>;
+        value: z.ZodOptional<z.ZodNumber>;
+        demoId: z.ZodOptional<z.ZodString>;
+        audioId: z.ZodOptional<z.ZodString>;
+        model: z.ZodOptional<z.ZodString>;
+        jobId: z.ZodOptional<z.ZodString>;
+        voiceId: z.ZodOptional<z.ZodString>;
+        name: z.ZodOptional<z.ZodString>;
+        audio: z.ZodOptional<z.ZodString>;
+        consent: z.ZodOptional<z.ZodBoolean>;
+        projectId: z.ZodOptional<z.ZodString>;
+        target: z.ZodDefault<z.ZodString>;
+        text: z.ZodOptional<z.ZodString>;
+        language: z.ZodOptional<z.ZodString>;
+    }, z.core.$strict>;
+    readonly user_avatar_library: z.ZodObject<{
+        action: z.ZodEnum<{
+            assign: "assign";
+            play: "play";
+            list: "list";
+        }>;
+        target: z.ZodDefault<z.ZodString>;
+        id: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+        query: z.ZodDefault<z.ZodString>;
+        offset: z.ZodDefault<z.ZodNumber>;
+        limit: z.ZodDefault<z.ZodNumber>;
+    }, z.core.$strict>;
+    readonly present_avatar: z.ZodObject<{
+        event: z.ZodDiscriminatedUnion<[z.ZodObject<{
+            kind: z.ZodLiteral<"animation">;
+            target: z.ZodDefault<z.ZodString>;
+            animation: z.ZodString;
+            duration: z.ZodDefault<z.ZodNumber>;
+        }, z.core.$strict>, z.ZodObject<{
+            kind: z.ZodLiteral<"expression">;
+            target: z.ZodDefault<z.ZodString>;
+            expression: z.ZodEnum<{
+                neutral: "neutral";
+                smile: "smile";
+                angry: "angry";
+                sad: "sad";
+                surprised: "surprised";
+                thinking: "thinking";
+            }>;
+            duration: z.ZodDefault<z.ZodNumber>;
+        }, z.core.$strict>, z.ZodObject<{
+            kind: z.ZodLiteral<"effect">;
+            effect: z.ZodEnum<{
+                snow: "snow";
+                rain: "rain";
+                matrix: "matrix";
+                emoji: "emoji";
+                fireflies: "fireflies";
+                starfield: "starfield";
+                fire: "fire";
+                lightning: "lightning";
+                aurora: "aurora";
+                glitch: "glitch";
+                scanlines: "scanlines";
+                hologram: "hologram";
+                vignette: "vignette";
+                confetti: "confetti";
+            }>;
+            enabled: z.ZodBoolean;
+            intensity: z.ZodDefault<z.ZodNumber>;
+            duration: z.ZodDefault<z.ZodNumber>;
+        }, z.core.$strict>, z.ZodObject<{
+            kind: z.ZodLiteral<"notification">;
+            notification: z.ZodObject<{
+                type: z.ZodEnum<{
+                    msg: "msg";
+                    task: "task";
+                    approval: "approval";
+                    email: "email";
+                    whatsapp: "whatsapp";
+                    facebook: "facebook";
+                    instagram: "instagram";
+                    telegram: "telegram";
+                    discord: "discord";
+                    stripe: "stripe";
+                    paypal: "paypal";
+                    bank: "bank";
+                    applepay: "applepay";
+                    stock: "stock";
+                    calendar: "calendar";
+                    terminal: "terminal";
+                    gif: "gif";
+                    twitter: "twitter";
+                    tiktok: "tiktok";
+                    linkedin: "linkedin";
+                    snapchat: "snapchat";
+                    youtube: "youtube";
+                    reddit: "reddit";
+                    twitch: "twitch";
+                    otp: "otp";
+                    faceid: "faceid";
+                    sms_otp: "sms_otp";
+                }>;
+                title: z.ZodString;
+                body: z.ZodString;
+                sourceId: z.ZodOptional<z.ZodString>;
+                from: z.ZodOptional<z.ZodString>;
+                needsApproval: z.ZodOptional<z.ZodBoolean>;
+                canReply: z.ZodOptional<z.ZodBoolean>;
+                terminalCmd: z.ZodOptional<z.ZodString>;
+                terminalOutput: z.ZodOptional<z.ZodString>;
+                gifUrl: z.ZodOptional<z.ZodString>;
+                otpCode: z.ZodOptional<z.ZodString>;
+                biometricDevice: z.ZodOptional<z.ZodString>;
+                phoneNumber: z.ZodOptional<z.ZodString>;
+            }, z.core.$strict>;
+            duration: z.ZodDefault<z.ZodNumber>;
+        }, z.core.$strict>, z.ZodObject<{
+            kind: z.ZodLiteral<"card">;
+            title: z.ZodString;
+            spec: z.ZodObject<{
+                root: z.ZodString;
+                elements: z.ZodRecord<z.ZodString, z.ZodObject<{
+                    type: z.ZodString;
+                    props: z.ZodRecord<z.ZodString, z.ZodUnknown>;
+                    children: z.ZodArray<z.ZodString>;
+                }, z.core.$strict>>;
+            }, z.core.$strip>;
+            duration: z.ZodDefault<z.ZodNumber>;
+        }, z.core.$strict>, z.ZodObject<{
+            kind: z.ZodLiteral<"clear">;
+        }, z.core.$strict>], "kind">;
+    }, z.core.$strict>;
     readonly get_resource_controls: z.ZodObject<{
         item_id: z.ZodString;
     }, z.core.$strip>;
@@ -68,11 +234,11 @@ export declare const TOOL_ARGS: {
             sand: "sand";
             brick: "brick";
             stone: "stone";
+            path: "path";
             gravel: "gravel";
             planks: "planks";
             cobble: "cobble";
             paving: "paving";
-            path: "path";
         }>;
         height: z.ZodOptional<z.ZodNumber>;
         raise: z.ZodOptional<z.ZodNumber>;
@@ -91,11 +257,11 @@ export declare const TOOL_ARGS: {
             sand: "sand";
             brick: "brick";
             stone: "stone";
+            path: "path";
             gravel: "gravel";
             planks: "planks";
             cobble: "cobble";
             paving: "paving";
-            path: "path";
         }>;
         height: z.ZodOptional<z.ZodNumber>;
     }, z.core.$strip>;
@@ -107,11 +273,11 @@ export declare const TOOL_ARGS: {
             sand: "sand";
             brick: "brick";
             stone: "stone";
+            path: "path";
             gravel: "gravel";
             planks: "planks";
             cobble: "cobble";
             paving: "paving";
-            path: "path";
         }>;
         x1: z.ZodNumber;
         z1: z.ZodNumber;
@@ -972,7 +1138,7 @@ export declare const MCP_BULK_TOOLS: readonly ToolName[];
 export declare const TOOL_DEFINITIONS: {
     type: "function";
     function: {
-        name: "place_item" | "set_style" | "set_sky" | "set_weather" | "sculpt_terrain" | "paint_terrain" | "add_water" | "draw_road" | "draw_river" | "set_game" | "set_story" | "set_script" | "set_sea" | "draw_wall" | "get_resource_controls" | "set_resource_params" | "get_world_summary" | "get_game" | "search_catalog" | "scatter_items" | "build_platforms" | "move_item" | "remove_items" | "fill_blocks" | "block_line" | "block_floor" | "dig_blocks" | "pave_area" | "build_house" | "make_world" | "cover_ground" | "set_ground_heights" | "place_items" | "paint_ground_rule" | "set_rules" | "set_zone" | "set_ride" | "get_script_api" | "get_scripts" | "test_script" | "get_script_logs" | "ask_user";
+        name: "place_item" | "set_style" | "set_sky" | "set_weather" | "sculpt_terrain" | "paint_terrain" | "add_water" | "draw_road" | "draw_river" | "set_game" | "set_story" | "set_script" | "set_sea" | "draw_wall" | "avatar_voice" | "user_avatar_library" | "present_avatar" | "get_resource_controls" | "set_resource_params" | "get_world_summary" | "get_game" | "search_catalog" | "scatter_items" | "build_platforms" | "move_item" | "remove_items" | "fill_blocks" | "block_line" | "block_floor" | "dig_blocks" | "pave_area" | "build_house" | "make_world" | "cover_ground" | "set_ground_heights" | "place_items" | "paint_ground_rule" | "set_rules" | "set_zone" | "set_ride" | "get_script_api" | "get_scripts" | "test_script" | "get_script_logs" | "ask_user";
         description: string;
         parameters: Record<string, unknown>;
     };
@@ -986,7 +1152,7 @@ export declare function toolDefinitions(place: {
 }): {
     type: "function";
     function: {
-        name: "place_item" | "set_style" | "set_sky" | "set_weather" | "sculpt_terrain" | "paint_terrain" | "add_water" | "draw_road" | "draw_river" | "set_game" | "set_story" | "set_script" | "set_sea" | "draw_wall" | "get_resource_controls" | "set_resource_params" | "get_world_summary" | "get_game" | "search_catalog" | "scatter_items" | "build_platforms" | "move_item" | "remove_items" | "fill_blocks" | "block_line" | "block_floor" | "dig_blocks" | "pave_area" | "build_house" | "make_world" | "cover_ground" | "set_ground_heights" | "place_items" | "paint_ground_rule" | "set_rules" | "set_zone" | "set_ride" | "get_script_api" | "get_scripts" | "test_script" | "get_script_logs" | "ask_user";
+        name: "place_item" | "set_style" | "set_sky" | "set_weather" | "sculpt_terrain" | "paint_terrain" | "add_water" | "draw_road" | "draw_river" | "set_game" | "set_story" | "set_script" | "set_sea" | "draw_wall" | "avatar_voice" | "user_avatar_library" | "present_avatar" | "get_resource_controls" | "set_resource_params" | "get_world_summary" | "get_game" | "search_catalog" | "scatter_items" | "build_platforms" | "move_item" | "remove_items" | "fill_blocks" | "block_line" | "block_floor" | "dig_blocks" | "pave_area" | "build_house" | "make_world" | "cover_ground" | "set_ground_heights" | "place_items" | "paint_ground_rule" | "set_rules" | "set_zone" | "set_ride" | "get_script_api" | "get_scripts" | "test_script" | "get_script_logs" | "ask_user";
         description: string;
         parameters: Record<string, unknown>;
     };

@@ -23,7 +23,7 @@ type Point = [number, number];
  * command in this package follows, and `applyBatch` is what makes the lot one undo step.
  */
 export function starterWorldCommands(
-  doc: Pick<WorldDocument, 'instances' | 'sizeTier' | 'environment' | 'terrain' | 'style'>,
+  doc: Pick<WorldDocument, 'instances' | 'sizeTier' | 'environment' | 'terrain' | 'style' | 'spawn'>,
   world: WorldSeed,
   /**
    * Ground height after the world is given. Callers with no stored chunks can pass
@@ -52,6 +52,26 @@ export function starterWorldCommands(
     { type: 'generate_world', params: { world } },
     ...starterWater(world, doc.sizeTier, doc.style.base),
   );
+  if (world.kind === 'island') {
+    const shore = islandShore(heightAt, SIZE_TIERS[doc.sizeTier].sideMeters / 2);
+    commands.push({ type: 'set_style', params: { ...doc.style, woods: { on: false, density: 1 } } });
+    commands.push({ type: 'set_spawn', params: { spawn: { ...doc.spawn, position: [0, heightAt(0, shore - 12) + 1, shore - 12] } } });
+    const layout = [
+      ['genvr.core.tidewater.palm', -13, -6, 0.7, 0.2],
+      ['genvr.core.tidewater.palm', 17, -11, 0.85, -0.5],
+      ['genvr.core.rock', -7, -4, 0.6, 0.6],
+      ['genvr.core.rock', -10, -7, 0.4, -0.2],
+      ['genvr.core.rowboat', 7, -2, 1, 0.5],
+      ['genvr.core.tidewater.sea-shell', -3, -3, 1.5, 0.7],
+    ] as const;
+    let next = 0;
+    for (const [itemId, x, dz, scale, yaw] of layout) {
+      while (taken.has(`spawn-${next}`)) next++;
+      const instanceId = `spawn-${next++}`; taken.add(instanceId);
+      commands.push({ type: 'place_item', params: { instanceId, itemId, position: [x, heightAt(x, shore + dz), shore + dz], rotation: [0, Math.sin(yaw / 2), 0, Math.cos(yaw / 2)], scale: [scale, scale, scale], rest: true } });
+    }
+    return commands;
+  }
   let n = 0;
   for (const thing of spawnRing({ heightAt }, world, undefined, footprint)) {
     // A place given a world twice must not clash with the first ring's ids.
@@ -208,9 +228,14 @@ function planWater(world: WorldSeed, sizeTier: SizeTier, style: Style) {
   const side = world.seed % 2 === 0 ? 1 : -1;
   const commands = ((): CommandPayload[] => {
     switch (world.kind) {
-      case 'island':
-        // The shape makes the coast; the sea only says how high the water stands.
-        return [{ type: 'set_sea', params: { level: ISLAND_SEA_LEVEL } }];
+      case 'island': {
+        const shore = islandShore((x, z) => terrain.heightAt(x, z), half);
+        const berth: CommandPayload = { type: 'sculpt_terrain', params: { area: circleArea(7, shore - 2, 4), operation: 'flatten', strength: 1, targetHeight: Math.max(ISLAND_SEA_LEVEL + .4, terrain.heightAt(7, shore - 2)), soft: false } };
+        // Plan on the same shaped ground used by undo and regeneration.
+        applyCommand(scratch, berth);
+        return [{ type: 'set_sea', params: { level: ISLAND_SEA_LEVEL } }, berth,
+          { type: 'paint_terrain', params: { area: circleArea(0, shore - 5, 35), soilId: 'sand' } }];
+      }
       case 'plain':
         return lake(lowestNear(-half * 0.6, -half * 0.25, 0, half * 0.4));
       case 'valley': {
@@ -229,4 +254,11 @@ function planWater(world: WorldSeed, sizeTier: SizeTier, style: Style) {
     }
   })();
   return { commands, scratch };
+}
+
+
+/** A stable shore arrival, with an open sea view and room to extend the starter. */
+export function islandShore(heightAt: (x: number, z: number) => number, half: number): number {
+  for (let z = CLEARING_RADIUS * 2.5; z < half * .9; z += 1) if (heightAt(0, z) <= ISLAND_SEA_LEVEL + 1) return z;
+  return half * .6;
 }

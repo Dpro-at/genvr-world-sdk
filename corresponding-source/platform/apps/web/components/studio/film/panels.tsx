@@ -1,10 +1,12 @@
 'use client';
 import { useState } from 'react';
-import { Clapperboard, Film, History, Mic, Palette, Route, Trash2, Type, Volume2, VolumeX } from 'lucide-react';
+import { ArrowRightLeft, Clapperboard, Film, History, Mic, Palette, Route, Trash2, Type, Volume2, VolumeX } from 'lucide-react';
 import type { FilmWorkspace } from '@genvr/contracts';
 import { toSeconds, type Media } from '@genvr/film';
 import { fitMusicSteps, loudnessSteps } from '../../../lib/video-studio/sound-jobs';
 import { stripOf, useJob } from '../../../lib/video-studio/thumbs';
+import { SoundEditor, EnvironmentSound } from './sound-editor';
+import { languageOf } from '../../../lib/video-studio/subtitles';
 import { SubtitlesSection } from './subtitles-panel';
 import type { StudioFilming } from '../../../lib/use-studio-filming';
 
@@ -17,6 +19,7 @@ export const WORKSPACES: { id: FilmWorkspace; label: string; icon: typeof Film; 
   { id: 'edit', label: 'Edit', icon: Film, hint: 'Shots, Source and Program, clip settings' },
   { id: 'captions', label: 'Captions', icon: Type, hint: 'Every caption and line of dialogue' },
   { id: 'sound', label: 'Sound', icon: Mic, hint: 'Track and clip volumes' },
+  { id: 'transitions', label: 'Transitions', icon: ArrowRightLeft, hint: 'Cuts, transitions, opening and ending' },
   { id: 'colour', label: 'Colour', icon: Palette, hint: 'Looks, colour settings, before / after, waveform' },
   { id: 'story', label: 'Story', icon: Route, hint: 'Scroll page: camera stops, words, flight preview' },
 ];
@@ -51,12 +54,7 @@ export function ShotsPanel({ filming }: { filming: StudioFilming }) {
   return <section aria-label="Shots" data-film-id="film.shots" className="space-y-1 px-2 pb-3">
     <div className="flex items-center justify-between">
       <h3 className={heading}><Film className="size-3.5" />Shots · {studio.project.media.length}</h3>
-      <label className={`${button} cursor-pointer`} data-film-id="film.shots.import" title="Import a sound file (music, ambience, a voice) onto a sound track">
-        <Mic className="size-3" />Import sound
-        <input type="file" accept="audio/*" className="hidden" disabled={off} onChange={(e) => {
-          const file = e.target.files?.[0]; e.target.value = '';
-          if (file) void studio.addSound(file).catch((error) => studio.setMessage(error instanceof Error ? error.message : 'Could not import the sound.'));
-        }} /></label>
+      <button className={button} disabled={off} data-film-id="film.shots.import" onClick={() => studio.setWorkspace('sound')}><Mic className="size-3" />Sound tools</button>
     </div>
     {!studio.project.media.length ? <p className="px-1 text-xs text-ink/45">Recordings appear here. Record in the Shoot workspace.</p> : null}
     {studio.project.media.map((media) => <div key={media.id} data-film-id={`film.shots.${media.id}`}
@@ -95,6 +93,28 @@ export function HistoryPanel({ filming }: { filming: StudioFilming }) {
   </section>;
 }
 
+/** Alternative sound and captions share one picture timeline. */
+function LanguageVersions({ filming }: { filming: StudioFilming }) {
+  const studio = filming.studio;
+  const tracks = studio.project.tracks.filter(t => t.kind === 'caption' && t.lang);
+  if (!tracks.length) return null;
+  return <fieldset className="space-y-2 rounded-lg border border-ink/10 p-2" disabled={studio.rendering || filming.busy}>
+    <legend className="px-1 text-xs font-semibold">Scene language</legend>
+    <p className="text-[11px] text-ink/55">Same picture · switch audio and captions, then press Play.</p>
+    {tracks.map(t => {
+      const sound = studio.project.tracks.find(row => row.kind === 'sound' && row.lang === t.lang);
+      return <label key={t.id} className={`flex cursor-pointer items-center gap-2 rounded-md border p-2 text-xs ${!t.hidden ? 'border-brand bg-brand/10' : 'border-ink/10'}`}>
+        <input type="radio" name={`scene-language-${studio.workspace}`} aria-label={`Scene language ${t.lang}`} checked={!t.hidden}
+          onChange={() => { studio.run('subtitles.show', { lang: t.lang }); studio.setPlayhead(0); }} />
+        <span className="min-w-0"><span className="block font-semibold">{languageOf(t.lang!)?.native ?? t.lang}</span>
+          <span className="block truncate text-[10px] text-ink/55">{sound ? `Voice · ${sound.name.replace(/^[A-Z]{2,3} · /, '').split(' · ')[0]}` : 'Captions only'}</span></span>
+      </label>;
+    })}
+    <button type="button" className={`${button} w-full`} onClick={() => studio.setWorkspace('shoot')}><Clapperboard className="size-3.5" />Change character in Shoot</button>
+    <p className="text-[10px] text-ink/55">Choose an avatar in Scene inspector, then record a new take. Recorded video keeps its original character.</p>
+  </fieldset>;
+}
+
 /** Every caption clip and every line of dialogue on the film, in time order. */
 export function CaptionsPanel({ filming }: { filming: StudioFilming }) {
   const studio = filming.studio, off = studio.rendering || filming.busy;
@@ -111,7 +131,8 @@ export function CaptionsPanel({ filming }: { filming: StudioFilming }) {
       .map((cue) => ({ key: `${c.id}-${cue.id}`, at: toSeconds(c.start + Math.max(0, cue.start - c.in)), cue, clip: c.id }));
   })).sort((a, b) => a.at - b.at);
   return <section aria-label="Captions" data-film-id="film.captions" className="space-y-3 px-3 pb-3 text-ink">
-    <SubtitlesSection filming={filming} />
+    <LanguageVersions filming={filming} />
+    <details><summary className="cursor-pointer text-xs font-semibold">Generate or export captions</summary><SubtitlesSection filming={filming} /></details>
     <div className="flex items-center justify-between">
       <h3 className={heading}><Type className="size-3.5" />Captions · {captions.length}</h3>
       <button className={button} disabled={off} data-film-id="film.captions.add" onClick={() => studio.run('caption.add', { text: 'New caption' })}>Add at playhead</button>
@@ -148,9 +169,13 @@ export function SoundPanel({ filming }: { filming: StudioFilming }) {
   const studio = filming.studio, off = studio.rendering || filming.busy;
   const clips = studio.project.tracks.flatMap((t) => t.clips.flatMap((c) => c.type === 'media' ? [{ track: t, clip: c }] : []));
   return <section aria-label="Sound" data-film-id="film.sound" className="space-y-3 px-3 pb-3 text-ink">
+    <EnvironmentSound filming={filming} />
+    <SoundEditor filming={filming} />
+    <LanguageVersions filming={filming} />
+    <details><summary className="cursor-pointer text-xs font-semibold">Mixer · tracks, fades & loudness</summary>
     <h3 className={heading}><Volume2 className="size-3.5" />Tracks</h3>
     {studio.project.tracks.filter((t) => t.kind === 'sound').map((t) => <div key={t.id} className="flex items-center gap-2 text-xs">
-      <span className="w-8 font-bold">{t.name}</span>
+      <span className="min-w-0 flex-1 truncate font-bold" title={t.name}>{t.name}</span>
       <button className={button} disabled={off} aria-pressed={t.muted} data-film-id={`film.sound.${t.id}.mute`} onClick={() => studio.run('track.set', { track: t.id, muted: !t.muted })}>
         {t.muted ? <VolumeX className="size-3.5" /> : <Volume2 className="size-3.5" />}{t.muted ? 'Muted' : 'Mute'}</button>
       <button className={`${button} ${t.solo ? 'bg-amber-500/30' : ''}`} disabled={off} aria-pressed={t.solo} data-film-id={`film.sound.${t.id}.solo`}
@@ -193,6 +218,7 @@ export function SoundPanel({ filming }: { filming: StudioFilming }) {
           defaultValue={toSeconds(clip.fade?.out ?? 0)} key={`o${clip.fade?.out}`} onBlur={(e) => studio.run('clip.fade', { clip: clip.id, out: Number(e.target.value) })} /></label>
       </div> : null}
     </div>)}
-    <p className="text-[10px] text-ink/45">Studio recordings are silent for now (the world's sound is not recorded yet); volumes, fades and ducking apply to dialogue sounds and imported audio.</p>
+    </details>
+    <p className="text-[10px] text-ink/45">World sound can be recorded with the take. Scene dialogue and imported audio remain separate for volume, fades and ducking.</p>
   </section>;
 }

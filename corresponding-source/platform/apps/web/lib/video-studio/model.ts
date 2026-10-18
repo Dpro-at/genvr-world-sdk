@@ -6,7 +6,7 @@ export interface Asset { id: string; blob: Blob }
 /** A cue as the editor shows it: seconds of its recording. The film stores ticks (`@genvr/film`). */
 export interface SceneCue {
   id: string; actor: string; label: string; action: string; start: number; end: number;
-  text: string; audio?: string; volume: number;
+  text: string; audio?: string; voice?: import('@genvr/contracts').FilmCueVoice; volume: number;
   /** FILM-10: where the avatar stands at the cue start, and the spots it walks to (world metres). */
   at?: { x: number; z: number }; to?: Array<{ x: number; z: number }>;
 }

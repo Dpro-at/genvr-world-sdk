@@ -269,6 +269,12 @@ async function picture(compositor: FilmCompositor | null, layers: PlanLayer[], v
 }
 const sizeOf = (canvas: HTMLCanvasElement) => ({ width: canvas.width, height: canvas.height });
 
+/** Only placed, audible picture clips need a media-element audio mix. */
+export function hasPictureSound(project: FilmProject): boolean {
+  return project.tracks.some(track => track.kind === 'picture' && !track.hidden && !track.muted &&
+    track.clips.some(clip => clip.type === 'media' && project.media.find(media => media.id === clip.media)?.hasSound));
+}
+
 /** Preview and export share one timeline plan and clock. Output is real-time WebM. */
 export async function render(project: FilmProject, assets: Asset[], canvas: HTMLCanvasElement,
   signal: AbortSignal, progress: (seconds: number) => void, record: boolean, from = 0,
@@ -290,7 +296,7 @@ export async function render(project: FilmProject, assets: Asset[], canvas: HTML
   const start = record ? first : Math.max(first, Math.min(from, duration - .05));
   try {
     const buffers = new Map<string, AudioBuffer>();
-    const withSound = project.media.some((m) => m.hasSound);
+    const withSound = hasPictureSound(project);
     if (sounds.length || withSound) {
       audio = new AudioContext(); await audio.resume(); destination = audio.createMediaStreamDestination();
       for (const asset of new Set(sounds.map((s) => s.asset))) {

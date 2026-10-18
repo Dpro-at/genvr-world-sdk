@@ -3,11 +3,11 @@ import { type AvatarLook, type HumanBuild } from './avatar-look.js';
 /**
  * Character recipe (CHAR-01, plan docs/superpowers/plans/2026-10-05-character-editor-phase1.md): a character as
  * settings only, never meshes. The editor shapes and colours one of the bodies on its own skeleton; clothes,
- * animations and effects are slots for library items made for the same 52-bone Mixamo-name rig (phase 2).
+ * animations and effects are slots for library items made for the same standard 52-bone humanoid rig (phase 2).
  */
 export declare const CHARACTER_RECIPE_VERSION = 1;
 /** The one rig every recipe, garment and animation item is made for. */
-export declare const CHARACTER_RIG = "mixamo-52";
+export declare const CHARACTER_RIG = "genvr-humanoid-52";
 /** Largest recipe as JSON (bytes of UTF-16 text length; recipes are small ASCII settings). */
 export declare const MAX_RECIPE_JSON = 8192;
 /** Shape factors (1 = the body as made). Height and size keep the head; weight widens across the bones. */
@@ -174,7 +174,7 @@ export declare const RecipeEffect: z.ZodObject<{
 }, z.core.$strict>;
 export declare const CharacterRecipe: z.ZodObject<{
     version: z.ZodDefault<z.ZodLiteral<1>>;
-    rig: z.ZodDefault<z.ZodLiteral<"mixamo-52">>;
+    rig: z.ZodPreprocess<z.ZodDefault<z.ZodLiteral<"genvr-humanoid-52">>, unknown>;
     name: z.ZodDefault<z.ZodString>;
     body: z.ZodDefault<z.ZodUnion<readonly [z.ZodEnum<{
         flat: "flat";
@@ -184,6 +184,7 @@ export declare const CharacterRecipe: z.ZodObject<{
         "anime-boy": "anime-boy";
         warrior: "warrior";
         human: "human";
+        robot: "robot";
     }>, z.ZodType<`user.${string}`, unknown, z.core.$ZodTypeInternals<`user.${string}`, unknown>>]>>;
     base: z.ZodDefault<z.ZodEnum<{
         human: "human";
