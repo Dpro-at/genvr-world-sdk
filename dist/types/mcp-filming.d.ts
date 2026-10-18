@@ -73,6 +73,12 @@ export declare const FILMING_ARGS: {
     }, z.core.$strict>;
     studio_action: z.ZodObject<{
         operation: z.ZodDiscriminatedUnion<[z.ZodObject<{
+            kind: z.ZodLiteral<"manual_record">;
+            action: z.ZodEnum<{
+                start: "start";
+                stop: "stop";
+            }>;
+        }, z.core.$strict>, z.ZodObject<{
             kind: z.ZodLiteral<"lighting">;
             lights: z.ZodOptional<z.ZodArray<z.ZodObject<{
                 id: z.ZodString;

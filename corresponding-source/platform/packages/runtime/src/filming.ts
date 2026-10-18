@@ -117,6 +117,8 @@ export async function captureFilm(
   onProgress?: (seconds: number) => void,
   /** Sound recorded with the picture (FILM-08: the world's mix); silent video when absent. */
   sound?: MediaStream | null,
+  /** Finish normally and retain the take; cancellation still discards it. */
+  finish?: AbortSignal,
 ): Promise<Blob> {
   const settings = command.settings;
   const out = document.createElement('canvas');
@@ -217,7 +219,7 @@ export async function captureFilm(
     began = performance.now();
     onStart?.();
     track.requestFrame();
-    await Promise.race([delay(command.settings.seconds * 1000), result.then(() => undefined)]);
+    await Promise.race([recordingWindow(command.settings.seconds * 1000, signal, finish), result.then(() => undefined)]);
     if (frames === 0) throw new Error('No frames rendered during video capture.');
     context.drawImage(held, 0, 0); track.requestFrame();
     await delay(50);
@@ -231,4 +233,9 @@ export async function captureFilm(
     if (recorder.state !== 'inactive') recorder.stop();
     stream.getTracks().forEach((track) => track.stop());
   }
+}
+
+/** A normal End scene is different from cancelling/discarding a capture. */
+export function recordingWindow(ms:number,cancel:AbortSignal,finish?:AbortSignal):Promise<void>{
+ return new Promise((resolve,reject)=>{let timer:ReturnType<typeof setTimeout>;const clean=()=>{clearTimeout(timer);cancel.removeEventListener('abort',abort);finish?.removeEventListener('abort',done);};const done=()=>{clean();resolve();};const abort=()=>{clean();reject(new Error('Capture cancelled.'));};timer=setTimeout(done,ms);cancel.addEventListener('abort',abort,{once:true});finish?.addEventListener('abort',done,{once:true});if(cancel.aborted)abort();else if(finish?.aborted)done();});
 }

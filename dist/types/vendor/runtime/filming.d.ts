@@ -57,4 +57,8 @@ export declare function captureFilm(canvas: HTMLCanvasElement, command: Extract<
 /** Seconds recorded so far (video only), about four times a second. */
 onProgress?: (seconds: number) => void, 
 /** Sound recorded with the picture (FILM-08: the world's mix); silent video when absent. */
-sound?: MediaStream | null): Promise<Blob>;
+sound?: MediaStream | null, 
+/** Finish normally and retain the take; cancellation still discards it. */
+finish?: AbortSignal): Promise<Blob>;
+/** A normal End scene is different from cancelling/discarding a capture. */
+export declare function recordingWindow(ms: number, cancel: AbortSignal, finish?: AbortSignal): Promise<void>;

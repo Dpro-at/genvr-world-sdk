@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["../../../apps/web/lib/video-studio/fonts.css"],
-  "sourcesContent": ["@font-face { font-family: 'Genvr Film Nunito'; src: url('./font-assets/nunito-latin.woff2') format('woff2'); font-weight: 400 900; font-display: swap; }\n@font-face { font-family: 'Genvr Film Merriweather'; src: url('./font-assets/merriweather-latin.woff2') format('woff2'); font-weight: 400 900; font-display: swap; }\n@font-face { font-family: 'Genvr Film JetBrains Mono'; src: url('./font-assets/jetbrainsmono-latin.woff2') format('woff2'); font-weight: 400 700; font-display: swap; }\n@font-face { font-family: 'Genvr Film Bebas Neue'; src: url('./font-assets/bebasneue-latin.woff2') format('woff2'); font-weight: 400; font-display: swap; }\n"],
-  "mappings": ";AAAA;AAAa,eAAa;AAAqB,OAAK,qCAAwC,OAAO;AAAU,eAAa,IAAI;AAAK,gBAAc;AAAM;AACvJ;AAAa,eAAa;AAA2B,OAAK,2CAA8C,OAAO;AAAU,eAAa,IAAI;AAAK,gBAAc;AAAM;AACnK;AAAa,eAAa;AAA6B,OAAK,4CAA+C,OAAO;AAAU,eAAa,IAAI;AAAK,gBAAc;AAAM;AACtK;AAAa,eAAa;AAAyB,OAAK,wCAA2C,OAAO;AAAU,eAAa;AAAK,gBAAc;AAAM;",
-  "names": []
-}

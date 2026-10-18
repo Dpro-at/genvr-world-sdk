@@ -174,7 +174,7 @@ import {
   resolveAvatarLibraryMotion,
   retargetAvatarMotion,
   subscribeAvatarMotionLibrary
-} from "./chunk-5K7VLRXN.js";
+} from "./chunk-DWNSVDYZ.js";
 import {
   FONT_CLASSES
 } from "./chunk-7V6ZMJK5.js";
@@ -338,7 +338,7 @@ import {
   zoneFromParams,
   zoneShapeOfItem,
   zoneSize
-} from "./chunk-K7QWXLXO.js";
+} from "./chunk-AOB5SLAG.js";
 import {
   __commonJS,
   __export,
@@ -63978,7 +63978,7 @@ var FilmRig = class {
     }
   }
 };
-async function captureFilm(canvas, command, signal, subscribe, onStart, onProgress, sound) {
+async function captureFilm(canvas, command, signal, subscribe, onStart, onProgress, sound, finish2) {
   const settings2 = command.settings;
   const out = document.createElement("canvas");
   out.width = settings2.width;
@@ -64145,7 +64145,7 @@ async function captureFilm(canvas, command, signal, subscribe, onStart, onProgre
     began = performance.now();
     onStart?.();
     track3.requestFrame();
-    await Promise.race([delay(command.settings.seconds * 1e3), result.then(() => void 0)]);
+    await Promise.race([recordingWindow(command.settings.seconds * 1e3, signal, finish2), result.then(() => void 0)]);
     if (frames2 === 0)
       throw new Error("No frames rendered during video capture.");
     context3.drawImage(held, 0, 0);
@@ -64162,6 +64162,31 @@ async function captureFilm(canvas, command, signal, subscribe, onStart, onProgre
       recorder.stop();
     stream.getTracks().forEach((track4) => track4.stop());
   }
+}
+function recordingWindow(ms, cancel, finish2) {
+  return new Promise((resolve, reject) => {
+    let timer;
+    const clean2 = () => {
+      clearTimeout(timer);
+      cancel.removeEventListener("abort", abort);
+      finish2?.removeEventListener("abort", done);
+    };
+    const done = () => {
+      clean2();
+      resolve();
+    };
+    const abort = () => {
+      clean2();
+      reject(new Error("Capture cancelled."));
+    };
+    timer = setTimeout(done, ms);
+    cancel.addEventListener("abort", abort, { once: true });
+    finish2?.addEventListener("abort", done, { once: true });
+    if (cancel.aborted)
+      abort();
+    else if (finish2?.aborted)
+      done();
+  });
 }
 
 // ../runtime/dist/item-pictures.js
@@ -75759,7 +75784,7 @@ function correctionsFor(placeId) {
 // ../../apps/web/lib/script-engine.ts
 var loading = null;
 function load() {
-  loading ??= import("./dist-I3HC5V4U.js").catch((error) => {
+  loading ??= import("./dist-VSDL73CT.js").catch((error) => {
     loading = null;
     throw error;
   });
@@ -92719,7 +92744,7 @@ function CharacterStageView({
     };
     void (async () => {
       try {
-        const { createCharacterStage } = await import("./character-6C35MVGK.js");
+        const { createCharacterStage } = await import("./character-PZRTUKFG.js");
         if (cancelled || !container.current) return;
         made = await createCharacterStage({
           container: container.current,
@@ -93487,18 +93512,18 @@ function StudioChrome({
         "Follow"
       ] }),
       /* @__PURE__ */ (0, import_jsx_runtime62.jsx)(ToolbarMenu, { label: "Lighting", icon: Lightbulb, children: /* @__PURE__ */ (0, import_jsx_runtime62.jsx)(LightingPanel, { filming }) }),
-      /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)("button", { type: "button", "aria-label": "Record take", disabled: !filming.studio.ready || filming.busy || filming.studio.rendering, className: "flex items-center gap-1 rounded border border-red-500/40 px-2 py-1.5 text-xs font-bold disabled:opacity-40", onClick: () => {
-        filming.studio.setWorkspace("shoot");
-        filming.studio.setPreviewing(false);
-        if (filming.studio.mode === "gameplay") filming.reset();
-        const [w2, h2] = filming.output.size.split("x").map(Number);
-        void filming.take("video", filming.output.seconds, w2, h2, true, void 0, filming.studio.plan);
+      /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)("button", { type: "button", "aria-label": "Start scene", disabled: !filming.studio.ready || filming.busy || filming.studio.rendering, className: "flex items-center gap-1 rounded border border-red-500/40 px-2 py-1.5 text-xs font-bold disabled:opacity-40", title: "Manual recording \xB7 WASD/arrows move, Shift runs, mouse controls the live camera \xB7 up to 30 seconds", onClick: (event2) => {
+        event2.currentTarget.blur();
+        filming.startManual();
       }, children: [
         /* @__PURE__ */ (0, import_jsx_runtime62.jsx)(Circle, { className: "size-3 fill-red-500 text-red-500" }),
-        "Record \xB7 ",
-        filming.output.seconds,
-        "s"
-      ] })
+        "Start scene"
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)("button", { type: "button", "aria-label": "End scene", disabled: !filming.manualRecording, className: "flex items-center gap-1 rounded border border-ink/20 px-2 py-1.5 text-xs font-bold disabled:opacity-40", onClick: () => filming.endManual(), children: [
+        /* @__PURE__ */ (0, import_jsx_runtime62.jsx)(Square, { className: "size-3 fill-current" }),
+        "End scene"
+      ] }),
+      filming.manualRecording ? /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("span", { role: "status", className: "text-[10px] text-red-500", children: "Recording \xB7 move with keyboard and mouse \xB7 auto ends at 30s" }) : null
     ] }) }) : null,
     characterWorkspace ? /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("div", { style: { gridArea: "viewport" }, className: "relative z-20 min-h-0 min-w-0", children: /* @__PURE__ */ (0, import_jsx_runtime62.jsx)(CharacterStageView, { editor: character }) }) : null,
     testing && tab === "filming" ? /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)(
@@ -94350,6 +94375,8 @@ function useStudioFilming(place3, runtime, container, log3, editing, storageKey,
   const originalFov = (0, import_react66.useRef)(/* @__PURE__ */ new WeakMap());
   const cleanup = (0, import_react66.useRef)(null);
   const storyPreview = (0, import_react66.useRef)(null);
+  const manualFinish = (0, import_react66.useRef)(null), manualBegan = (0, import_react66.useRef)(0);
+  const [manualRecording, setManualRecording] = (0, import_react66.useState)(false);
   const localBusy = (0, import_react66.useRef)(false), remoteBusy = (0, import_react66.useRef)(false), connecting = (0, import_react66.useRef)(false);
   const epoch = (0, import_react66.useRef)(0), abort = (0, import_react66.useRef)(new AbortController());
   const logger = (0, import_react66.useRef)(log3);
@@ -94760,6 +94787,8 @@ function useStudioFilming(place3, runtime, container, log3, editing, storageKey,
         if (operation.lights && !runtime.current?.applyCommand({ type: "set_lighting", params: { lights: operation.lights } })) throw new Error("Could not update scene lights.");
         return reply({ result: { lights: runtime.current?.world.environment.lighting ?? [] } });
       }
+      case "manual_record":
+        throw new Error("Manual recording is handled by the live session.");
       case "sound_import": {
         const bytes3 = Uint8Array.from(atob(operation.data), (ch) => ch.charCodeAt(0));
         if (bytes3.length > 8 * 1024 * 1024) throw new Error("MCP audio import supports up to 8 MB; use Sound to import files up to 20 MB.");
@@ -95019,7 +95048,7 @@ function useStudioFilming(place3, runtime, container, log3, editing, storageKey,
       }
     }
   };
-  const take = async (kind, seconds2, width, height, timeline = false, replace, cues2 = []) => {
+  const take = async (kind, seconds2, width, height, timeline = false, replace, cues2 = [], manual = false) => {
     if (localBusy.current || remoteBusy.current || latestStudio.current.isRendering()) return;
     const canvas = container.current?.querySelector("canvas");
     if (!canvas) return;
@@ -95040,13 +95069,20 @@ function useStudioFilming(place3, runtime, container, log3, editing, storageKey,
         placeCast(cues2);
       }
       live = kind === "video" && timeline ? liveTake() : null;
+      if (manual) manualFinish.current = new AbortController();
       const blob = await captureFilm(canvas, command, abort.current.signal, subscribe, () => {
+        if (manual) {
+          manualBegan.current = performance.now();
+          setManualRecording(true);
+        }
         live?.start();
         if (timeline) sceneSpeech.current?.start();
         if (timeline) directing.current = { cues: [...cues2].sort((a2, b2) => a2.start - b2.start), start: performance.now(), started: /* @__PURE__ */ new Set(), activeSelf: null };
       }, (done) => {
         if (current2 === epoch.current) report(`Recording ${done.toFixed(1)} / ${seconds2} s\u2026`);
-      }, sound);
+      }, sound, manual ? manualFinish.current?.signal : void 0);
+      if (manual) setManualRecording(false);
+      const elapsed = manual ? Math.min(seconds2, (performance.now() - manualBegan.current) / 1e3) : seconds2;
       const stopped = live?.stop();
       live = null;
       if (current2 !== epoch.current) return;
@@ -95055,7 +95091,7 @@ function useStudioFilming(place3, runtime, container, log3, editing, storageKey,
         try {
           const duration = await mediaDuration(blob, abort.current.signal);
           if (current2 !== epoch.current) return;
-          checkTakeLength(duration, seconds2);
+          checkTakeLength(duration, elapsed);
           studio.addRecording(blob, duration, rig.current.settings, replace, cues2, !!sound?.getAudioTracks().length);
           stopped?.place(() => shotStart(replace));
           if (!replace) addSceneFx(cues2);
@@ -95078,6 +95114,12 @@ function useStudioFilming(place3, runtime, container, log3, editing, storageKey,
       live?.cancel();
       if (current2 === epoch.current) report(error instanceof Error ? error.message : "Capture failed.");
     } finally {
+      if (manual) {
+        manualFinish.current?.abort();
+        manualFinish.current = null;
+        manualBegan.current = 0;
+        setManualRecording(false);
+      }
       releaseViewport();
       if (current2 === epoch.current) {
         localBusy.current = false;
@@ -95092,7 +95134,25 @@ function useStudioFilming(place3, runtime, container, log3, editing, storageKey,
       }
     }
   };
+  const startManual = () => {
+    if (!latestStudio.current.ready) throw new Error("Wait for the film project to load.");
+    if (localBusy.current || remoteBusy.current || latestStudio.current.isRendering()) throw new Error("Wait for the current capture or render.");
+    reset();
+    latestStudio.current.setWorkspace("shoot");
+    latestStudio.current.setPreviewing(false);
+    const [width, height] = outputRef.current.size.split("x").map(Number);
+    void take("video", 30, width, height, true, void 0, [], true);
+  };
+  const endManual = () => {
+    if (!manualFinish.current || !manualBegan.current) throw new Error("Wait for Start scene to begin recording.");
+    manualFinish.current.abort();
+  };
   const runLocalStudioOperation = async (operation, signal) => {
+    if (operation.kind === "manual_record") {
+      if (operation.action === "start") startManual();
+      else endManual();
+      return new Blob([JSON.stringify({ result: { state: operation.action === "start" ? "starting" : "finishing" } })], { type: "application/json" });
+    }
     if (localBusy.current || remoteBusy.current || latestStudio.current.isRendering()) throw new Error("Wait for the current capture or render.");
     remoteBusy.current = true;
     setBusy(true);
@@ -95112,6 +95172,9 @@ function useStudioFilming(place3, runtime, container, log3, editing, storageKey,
     });
   };
   return {
+    startManual,
+    endManual,
+    manualRecording,
     assignSavedVoice: async (voiceId, target2 = "self") => {
       if (!voice.current) throw new Error("Voice service unavailable.");
       return voice.current({ action: "assign", voiceId, target: target2, projectId: place3 });
@@ -95809,7 +95872,7 @@ function Editor({ initial, storage: storage7, options, leave, beforeClose }) {
       const matching = entries.filter((row) => `${row.id} ${row.name}`.toLowerCase().includes(query.query.toLowerCase()) && (!query.category || row.categories.some((category) => category.toLowerCase() === query.category.toLowerCase())));
       return { total: entries.length, matched: matching.length, offset: query.offset, entries: matching.slice(query.offset, query.offset + query.limit), expressions: EXPRESSIONS, expressionSupported: runtime.current.supportsAvatarExpression("self"), viewportConnected: true };
     }
-    if (latestFilm.current.isBusy()) throw new Error("Wait for the current recording.");
+    if (latestFilm.current.isBusy() && !(tool2 === "studio_action" && args.operation?.kind === "manual_record")) throw new Error("Wait for the current recording.");
     if (tool2 === "get_camera") return { camera: latestFilm.current.camera, view: latestFilm.current.cameraView() };
     if (tool2 === "set_camera") {
       latestFilm.current.apply(FilmCamera.parse(args.camera));
@@ -96407,4 +96470,4 @@ three/examples/jsm/libs/fflate.module.js:
   version 0.8.2
   *)
 */
-//# sourceMappingURL=chunk-6G47KVKS.js.map
+//# sourceMappingURL=chunk-VGB6TE74.js.map

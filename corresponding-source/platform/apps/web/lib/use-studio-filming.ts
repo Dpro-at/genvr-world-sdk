@@ -52,6 +52,8 @@ export function useStudioFilming(place: string, runtime: RefObject<GenvrRuntime 
   const cleanup = useRef<(() => void) | null>(null);
   /** Story panel preview (SCROLL-02): the camera holds this point of the story's flight. */
   const storyPreview = useRef<{ path: FilmWaypoint[]; time: number; cut: boolean } | null>(null);
+  const manualFinish=useRef<AbortController|null>(null), manualBegan=useRef(0);
+  const [manualRecording,setManualRecording]=useState(false);
   const localBusy = useRef(false), remoteBusy = useRef(false), connecting = useRef(false);
   const epoch = useRef(0), abort = useRef(new AbortController());
   const logger = useRef(log); logger.current = log;
@@ -334,6 +336,7 @@ export function useStudioFilming(place: string, runtime: RefObject<GenvrRuntime 
         if(operation.lights && !runtime.current?.applyCommand({type:'set_lighting',params:{lights:operation.lights}})) throw new Error('Could not update scene lights.');
         return reply({result:{lights:runtime.current?.world.environment.lighting ?? []}});
       }
+      case 'manual_record': throw new Error('Manual recording is handled by the live session.');
       case 'sound_import': {
         const bytes = Uint8Array.from(atob(operation.data), ch => ch.charCodeAt(0));
         if (bytes.length > 8 * 1024 * 1024) throw new Error('MCP audio import supports up to 8 MB; use Sound to import files up to 20 MB.');
@@ -520,7 +523,7 @@ export function useStudioFilming(place: string, runtime: RefObject<GenvrRuntime 
     }
   };
   const take = async (kind: 'photo' | 'video', seconds: number, width: number, height: number,
-    timeline = false, replace?: string, cues: SceneCue[] = []) => {
+    timeline = false, replace?: string, cues: SceneCue[] = [], manual = false) => {
     if (localBusy.current || remoteBusy.current || latestStudio.current.isRendering()) return;
     const canvas = container.current?.querySelector('canvas'); if (!canvas) return;
     localBusy.current = true; setBusy(true); prepare(); const current = epoch.current;
@@ -536,11 +539,15 @@ export function useStudioFilming(place: string, runtime: RefObject<GenvrRuntime 
       const sound = kind === 'video' ? worldSound() : null;
       if (timeline) { await prepareCast(cues); placeCast(cues); }
       live = kind === 'video' && timeline ? liveTake() : null;
+      if(manual)manualFinish.current=new AbortController();
       const blob = await captureFilm(canvas, command, abort.current.signal, subscribe, () => {
+        if(manual){manualBegan.current=performance.now();setManualRecording(true);}
         live?.start();
         if (timeline) sceneSpeech.current?.start();
         if (timeline) directing.current = { cues: [...cues].sort((a, b) => a.start - b.start), start: performance.now(), started: new Set(), activeSelf: null };
-      }, (done) => { if (current === epoch.current) report(`Recording ${done.toFixed(1)} / ${seconds} s…`); }, sound);
+      }, (done) => { if (current === epoch.current) report(`Recording ${done.toFixed(1)} / ${seconds} s…`); }, sound, manual ? manualFinish.current?.signal : undefined);
+      if(manual)setManualRecording(false);
+      const elapsed=manual ? Math.min(seconds,(performance.now()-manualBegan.current)/1000) : seconds;
       const stopped = live?.stop(); live = null;
       if (current !== epoch.current) return;
       if (!blob.size) throw new Error(EMPTY_TAKE);
@@ -548,7 +555,7 @@ export function useStudioFilming(place: string, runtime: RefObject<GenvrRuntime 
         try {
           const duration = await mediaDuration(blob, abort.current.signal);
           if (current !== epoch.current) return;
-          checkTakeLength(duration, seconds);
+          checkTakeLength(duration, elapsed);
           studio.addRecording(blob, duration, rig.current.settings, replace, cues, !!sound?.getAudioTracks().length);
           stopped?.place(() => shotStart(replace));
           if (!replace) addSceneFx(cues);
@@ -563,13 +570,22 @@ export function useStudioFilming(place: string, runtime: RefObject<GenvrRuntime 
       document.body.append(link); link.click(); link.remove(); setTimeout(() => URL.revokeObjectURL(url), 60000);
       report(fallbackMessage ?? `${kind === 'photo' ? 'Photo' : 'Silent video'} downloaded.`);
     } catch (error) { live?.cancel(); if (current === epoch.current) report(error instanceof Error ? error.message : 'Capture failed.'); }
-    finally { releaseViewport(); if (current === epoch.current) {
+    finally { if(manual){manualFinish.current?.abort();manualFinish.current=null;manualBegan.current=0;setManualRecording(false);} releaseViewport(); if (current === epoch.current) {
       localBusy.current = false;
       sceneSpeech.current?.stop(); directing.current = null; runtime.current?.clearSceneMotions(); runtime.current?.stopSceneAnimation(); runtime.current?.presentExpression('self', 'neutral'); runtime.current?.sceneWalk(null);
       setBusy(remoteBusy.current); if (!rig.current.settings) runtime.current?.setMarkersVisible(isEditing.current());
     } }
   };
+  const startManual = () => {
+    if(!latestStudio.current.ready)throw new Error('Wait for the film project to load.');
+    if(localBusy.current||remoteBusy.current||latestStudio.current.isRendering())throw new Error('Wait for the current capture or render.');
+    reset();latestStudio.current.setWorkspace('shoot');latestStudio.current.setPreviewing(false);
+    const [width,height]=outputRef.current.size.split('x').map(Number);
+    void take('video',30,width!,height!,true,undefined,[],true);
+  };
+  const endManual = () => {if(!manualFinish.current||!manualBegan.current)throw new Error('Wait for Start scene to begin recording.');manualFinish.current.abort();};
   const runLocalStudioOperation = async (operation: FilmStudioOperation, signal: AbortSignal) => {
+    if(operation.kind==='manual_record'){if(operation.action==='start')startManual();else endManual();return new Blob([JSON.stringify({result:{state:operation.action==='start'?'starting':'finishing'}})],{type:'application/json'});}
     if (localBusy.current || remoteBusy.current || latestStudio.current.isRendering()) throw new Error('Wait for the current capture or render.');
     remoteBusy.current = true; setBusy(true);
     try { return await handleStudio(operation, signal); }
@@ -579,7 +595,7 @@ export function useStudioFilming(place: string, runtime: RefObject<GenvrRuntime 
     const canvas = container.current?.querySelector('canvas'); if (!canvas) throw new Error('World canvas unavailable.');
     prepare(); return captureFilm(canvas, { kind: 'photo', settings: FilmPhoto.parse(raw) }, signal, subscribe, () => {}, () => {});
   };
-  return { assignSavedVoice: async (voiceId: string, target = 'self') => { if (!voice.current) throw new Error('Voice service unavailable.'); return voice.current({ action: 'assign', voiceId, target, projectId: place }); },
+  return { startManual, endManual, manualRecording, assignSavedVoice: async (voiceId: string, target = 'self') => { if (!voice.current) throw new Error('Voice service unavailable.'); return voice.current({ action: 'assign', voiceId, target, projectId: place }); },
     selectedVoice: async (target = 'self') => { if(!voice.current)return ''; const library = await voice.current({action:'voices',target:'self'}) as {assignments?:Record<string,string>}; return library.assignments?.[place+':'+target] ?? ''; },
     previewSavedVoice: async (voiceId: string) => { if (!voice.current) throw new Error('Voice service unavailable.'); return voice.current({ action: 'preview', voiceId, target: 'self' }); }, voiceAvailable: Boolean(voiceService), voiceLibrary: async () => { if (!voice.current) return { voices: [], models: [] }; const [library, catalog] = await Promise.all([voice.current({ action: 'voices', target: 'self' }), voice.current({ action: 'models', target: 'self' })]); return { ...(library as { voices: Array<{ id: string; name: string; language?: string; voiceType?: string; model: string }> }), ...(catalog as { models: Array<{ id: string; languages: string[] }> }) }; }, handleStudio: runLocalStudioOperation, capturePhoto, camera, studio, output, setOutput, busy, connected, message, onFilmFrame, onRendered, releaseRuntime, apply, preset, reset, connect, take,
     previewStory, cameraView,

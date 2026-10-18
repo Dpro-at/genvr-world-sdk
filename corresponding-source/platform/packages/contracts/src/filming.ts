@@ -71,6 +71,7 @@ export const FilmStudioStep = z.object({ id: commandId, args: z.record(z.string(
  * `split`, `remove`, `trim`, `cues`, `undo`, `redo` kinds are kept for existing agents.
  */
 export const FilmStudioOperation = z.discriminatedUnion('kind', [
+  z.object({ kind: z.literal('manual_record'), action:z.enum(['start','stop']) }).strict(),
   z.object({ kind: z.literal('lighting'), lights: SceneLights.optional() }).strict(),
   z.object({ kind: z.literal('inspect') }).strict(),
   z.object({ kind: z.literal('commands') }).strict(),

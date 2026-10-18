@@ -155,6 +155,12 @@ export declare const FilmStudioStep: z.ZodObject<{
  * `split`, `remove`, `trim`, `cues`, `undo`, `redo` kinds are kept for existing agents.
  */
 export declare const FilmStudioOperation: z.ZodDiscriminatedUnion<[z.ZodObject<{
+    kind: z.ZodLiteral<"manual_record">;
+    action: z.ZodEnum<{
+        start: "start";
+        stop: "stop";
+    }>;
+}, z.core.$strict>, z.ZodObject<{
     kind: z.ZodLiteral<"lighting">;
     lights: z.ZodOptional<z.ZodArray<z.ZodObject<{
         id: z.ZodString;
@@ -431,6 +437,12 @@ export declare const FilmCommand: z.ZodDiscriminatedUnion<[z.ZodObject<{
 }, z.core.$strip>, z.ZodObject<{
     kind: z.ZodLiteral<"studio">;
     operation: z.ZodDiscriminatedUnion<[z.ZodObject<{
+        kind: z.ZodLiteral<"manual_record">;
+        action: z.ZodEnum<{
+            start: "start";
+            stop: "stop";
+        }>;
+    }, z.core.$strict>, z.ZodObject<{
         kind: z.ZodLiteral<"lighting">;
         lights: z.ZodOptional<z.ZodArray<z.ZodObject<{
             id: z.ZodString;

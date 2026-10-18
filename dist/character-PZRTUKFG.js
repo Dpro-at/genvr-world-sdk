@@ -12,8 +12,8 @@ import {
   shapedBody,
   shapedJoints,
   viewModeSetup
-} from "./chunk-5K7VLRXN.js";
-import "./chunk-K7QWXLXO.js";
+} from "./chunk-DWNSVDYZ.js";
+import "./chunk-AOB5SLAG.js";
 import "./chunk-PX6F3LHL.js";
 export {
   CHARACTER_VIEW_MODES,
@@ -30,4 +30,4 @@ export {
   shapedJoints,
   viewModeSetup
 };
-//# sourceMappingURL=character-6C35MVGK.js.map
+//# sourceMappingURL=character-PZRTUKFG.js.map

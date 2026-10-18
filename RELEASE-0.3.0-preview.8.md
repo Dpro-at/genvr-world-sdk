@@ -1,5 +1,7 @@
 # 0.3.0-preview.8
 
+Superseded by preview.9 before npm publication. Install `3d-world-sdk@0.3.0-preview.9`.
+
 The Studio now offers quick filming tools for character and saved voice selection, camera presets, follow, lighting and recording. Build and Filming share the same live world. Character controls use visible sections again.
 
 - Persist up to four actor-following or fixed spotlights with shared manual and MCP controls.

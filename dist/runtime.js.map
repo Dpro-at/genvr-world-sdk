@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["../src/runtime.ts"],
-  "sourcesContent": ["import { createRuntime, type RuntimeOptions, type GenvrRuntime } from '@genvr/runtime';\nimport { WorldSession } from './session.js';\nexport { createRuntime, type GenvrRuntime, type RuntimeOptions } from '@genvr/runtime';\n/** Browser-only subpath; the authoring core has no WebGL, DOM or React side effects. */\nexport async function previewWorld(session: WorldSession, container: HTMLElement,\n  options: Omit<RuntimeOptions, 'container' | 'world' | 'terrainChunks' | 'onCommand'> = {}): Promise<GenvrRuntime> {\n  return createRuntime({ ...options, container, world: session.world, terrainChunks: session.terrainChunks,\n    fetchPackage: options.fetchPackage ?? (id => session.itemPackage(id)),\n    // A viewer is read-only. All edits use the session tools/commands, followed by a fresh preview.\n    editable: false, viewOnly: true,\n  });\n}\n"],
-  "mappings": ";;;;;;AAIA,eAAsB,aAAa,SAAuB,WACxD,UAAuF,CAAC,GAA0B;AAClH,SAAO,cAAc;AAAA,IAAE,GAAG;AAAA,IAAS;AAAA,IAAW,OAAO,QAAQ;AAAA,IAAO,eAAe,QAAQ;AAAA,IACzF,cAAc,QAAQ,iBAAiB,QAAM,QAAQ,YAAY,EAAE;AAAA;AAAA,IAEnE,UAAU;AAAA,IAAO,UAAU;AAAA,EAC7B,CAAC;AACH;",
-  "names": []
-}

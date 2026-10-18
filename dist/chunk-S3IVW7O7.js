@@ -21097,6 +21097,7 @@ var FilmWorkspace = external_exports.enum(["shoot", "edit", "captions", "sound",
 var commandId = external_exports.string().min(1).max(60).regex(/^[a-z]+\.[a-zA-Z]+$/);
 var FilmStudioStep = external_exports.object({ id: commandId, args: external_exports.record(external_exports.string(), external_exports.unknown()).default({}) }).strict();
 var FilmStudioOperation = external_exports.discriminatedUnion("kind", [
+  external_exports.object({ kind: external_exports.literal("manual_record"), action: external_exports.enum(["start", "stop"]) }).strict(),
   external_exports.object({ kind: external_exports.literal("lighting"), lights: SceneLights.optional() }).strict(),
   external_exports.object({ kind: external_exports.literal("inspect") }).strict(),
   external_exports.object({ kind: external_exports.literal("commands") }).strict(),
@@ -41374,4 +41375,4 @@ export {
   replayWorldPackage,
   WorldSession
 };
-//# sourceMappingURL=chunk-GXONDH5X.js.map
+//# sourceMappingURL=chunk-S3IVW7O7.js.map

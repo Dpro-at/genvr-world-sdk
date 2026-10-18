@@ -23,7 +23,7 @@ async function copy(source, destination, options = {}) {
 const temp = await mkdtemp(resolve(tmpdir(), 'genvr-sdk-pack-'));
 try {
 const root = resolve(temp, 'package'); await mkdir(root);
-await copy('dist', resolve(root, 'dist'), { recursive: true, filter: source => !source.endsWith('.tgz') });
+await copy('dist', resolve(root, 'dist'), { recursive: true, filter: source => !source.endsWith('.tgz') && !source.endsWith('.map') });
 // Package the canonical launcher, never a host's locally configured preview HTML.
 const studioTemplate = await readFile('studio/index.html', 'utf8');
 await unlink(resolve(root, 'dist/studio.html'));

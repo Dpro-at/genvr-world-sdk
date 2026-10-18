@@ -230,7 +230,7 @@ function Editor({ initial, storage, options, leave, beforeClose }: { initial: St
       const matching = entries.filter(row => `${row.id} ${row.name}`.toLowerCase().includes(query.query.toLowerCase()) && (!query.category || row.categories.some(category => category.toLowerCase() === query.category!.toLowerCase())));
       return { total: entries.length, matched: matching.length, offset: query.offset, entries: matching.slice(query.offset, query.offset + query.limit), expressions: EXPRESSIONS, expressionSupported: runtime.current.supportsAvatarExpression('self'), viewportConnected: true };
     }
-    if (latestFilm.current.isBusy()) throw new Error('Wait for the current recording.');
+    if (latestFilm.current.isBusy() && !(tool==='studio_action' && (args.operation as {kind?:string})?.kind==='manual_record')) throw new Error('Wait for the current recording.');
     if (tool === 'get_camera') return { camera: latestFilm.current.camera, view: latestFilm.current.cameraView() };
     if (tool === 'set_camera') { latestFilm.current.apply(FilmCamera.parse(args.camera)); return { camera: FilmCamera.parse(args.camera) }; }
     if (tool === 'reset_camera') { latestFilm.current.reset(); return { camera: null }; }
