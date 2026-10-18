@@ -10,3 +10,6 @@ export { studioAgentLook, syncStudioAgents, StudioAgent, StudioAgents } from './
 export * from './avatar-presentation.js';
 
 export * from './user-avatar-library.js';
+
+export * from './avatar-live-embed.js';
+export * from './studio-sharing.js';

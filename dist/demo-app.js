@@ -22423,6 +22423,20 @@ function supportsWorldStarter(style, kind) {
   return WORLD_STARTERS[style]?.includes(kind) ?? false;
 }
 
+// ../contracts/dist/studio-sharing.js
+var StudioShareRequest = external_exports.object({
+  projectId: external_exports.string().min(1).max(120),
+  surface: external_exports.enum(["world", "avatar-live"]),
+  layout: external_exports.enum(["large", "desktop", "browser", "compact", "banner", "circle", "watch"]).optional(),
+  access: external_exports.enum(["private", "public", "invite"]),
+  guests: external_exports.array(external_exports.string().trim().min(1).max(254)).max(100),
+  password: external_exports.string().min(4).max(128).optional(),
+  allowJoining: external_exports.boolean()
+}).strict().superRefine((request, ctx) => {
+  if (request.access === "invite" && !request.guests.length)
+    ctx.addIssue({ code: "custom", message: "Choose at least one invited person." });
+});
+
 // ../core-library/dist/manifest.js
 var ALL_STYLES = ["blocky", "realistic", "anime", "voxel"];
 function coreManifest(input2) {
@@ -25729,7 +25743,8 @@ var breathe = (t9, amount) => [
     RightForeArm: [0, 8, 0],
     Spine2: [-amount * 2, 0, 0],
     Head: [amount, amount * 2, 0],
-    hipsY: amount * 8e-3
+    hipsY: amount * 8e-3,
+    grip: 0.12
   }
 ];
 var idle_default = defineAnimation({
@@ -36210,12 +36225,34 @@ var PresentationSpec = external_exports.object({
 });
 var Target = external_exports.string().regex(/^(self|[A-Za-z0-9_-]{1,100})$/).default("self");
 var Duration = external_exports.number().int().min(200).max(6e4).default(5500);
+var WorldPoint = external_exports.object({ x: external_exports.number().finite(), y: external_exports.number().finite(), z: external_exports.number().finite() }).strict();
+var AvatarLiveDisplay = external_exports.object({
+  open: external_exports.boolean().default(false),
+  layout: external_exports.enum(["large", "desktop", "browser", "compact", "banner", "circle", "watch"]).default("large"),
+  background: external_exports.enum(["world", "color", "transparent", "office", "living_room", "conference", "stage", "studio", "classroom", "image", "video"]).default("office"),
+  color: external_exports.string().regex(/^#[0-9a-fA-F]{6}$/).default("#101827"),
+  media: Url.optional(),
+  worldId: external_exports.string().min(1).max(200).nullable().optional(),
+  worldSpot: external_exports.object({ position: WorldPoint, target: WorldPoint, player: WorldPoint }).strict().nullable().optional(),
+  framing: external_exports.enum(["full", "bust", "face"]).default("full")
+}).strict();
 var AvatarPresentationEvent = external_exports.discriminatedUnion("kind", [
   external_exports.object({ kind: external_exports.literal("animation"), target: Target, animation: external_exports.string().min(1).max(150).describe("Available animation IDs: idle, " + CORE_ANIMATIONS.map((row) => row.manifest.id).join(", ")), duration: Duration }).strict(),
   external_exports.object({ kind: external_exports.literal("expression"), target: Target, expression: external_exports.enum(EXPRESSIONS), duration: Duration }).strict(),
   external_exports.object({ kind: external_exports.literal("effect"), effect: external_exports.enum(EFFECTS), enabled: external_exports.boolean(), intensity: external_exports.number().min(0).max(1).default(0.6), duration: Duration }).strict(),
   external_exports.object({ kind: external_exports.literal("notification"), notification: PresentationNotification, duration: Duration }).strict(),
   external_exports.object({ kind: external_exports.literal("card"), title: external_exports.string().max(200), spec: PresentationSpec, duration: Duration }).strict(),
+  external_exports.object({
+    kind: external_exports.literal("display"),
+    open: AvatarLiveDisplay.shape.open.removeDefault().optional(),
+    layout: AvatarLiveDisplay.shape.layout.removeDefault().optional(),
+    background: AvatarLiveDisplay.shape.background.removeDefault().optional(),
+    color: AvatarLiveDisplay.shape.color.removeDefault().optional(),
+    framing: AvatarLiveDisplay.shape.framing.removeDefault().optional(),
+    media: AvatarLiveDisplay.shape.media,
+    worldId: AvatarLiveDisplay.shape.worldId,
+    worldSpot: AvatarLiveDisplay.shape.worldSpot
+  }).strict(),
   external_exports.object({ kind: external_exports.literal("clear") }).strict()
 ]);
 
@@ -36245,6 +36282,7 @@ var Area2 = {
 };
 var PLACE_ITEMS_MAX = 200;
 var TOOL_ARGS = {
+  share_studio: external_exports.object({ action: external_exports.enum(["inspect", "open", "create"]), request: StudioShareRequest.optional() }).strict(),
   avatar_voice: external_exports.object({ action: external_exports.enum(["models", "install", "voices", "clone", "assign", "speak", "job", "recordings", "audio", "replay", "demo", "playback", "demo_all", "preview", "preview_demo", "prepare_previews", "remove", "design", "save_design", "export_voice"]), preview: external_exports.boolean().optional(), voiceType: external_exports.enum(["male", "female", "child"]).optional(), description: external_exports.string().max(400).optional(), confirm: external_exports.boolean().optional(), command: external_exports.enum(["play", "pause", "stop", "seek", "rate", "volume"]).optional(), value: external_exports.number().finite().optional(), demoId: external_exports.string().max(80).optional(), audioId: external_exports.string().uuid().optional(), model: external_exports.string().max(80).optional(), jobId: external_exports.string().uuid().optional(), voiceId: external_exports.string().uuid().optional(), name: external_exports.string().max(80).optional(), audio: external_exports.string().max(12 * 1024 * 1024).optional(), consent: external_exports.boolean().optional(), projectId: external_exports.string().max(120).optional(), target: external_exports.string().regex(/^(self|[A-Za-z0-9_-]{1,100})$/).default("self"), text: external_exports.string().max(1200).optional(), language: external_exports.string().max(8).optional() }).strict(),
   user_avatar_library: external_exports.object({ action: external_exports.enum(["list", "assign", "play"]), target: external_exports.string().regex(/^(self|[A-Za-z0-9_-]{1,100})$/).default("self"), id: external_exports.string().max(150).nullable().optional(), query: external_exports.string().max(200).default(""), offset: external_exports.number().int().min(0).default(0), limit: external_exports.number().int().min(1).max(100).default(30) }).strict(),
   present_avatar: external_exports.object({ event: AvatarPresentationEvent }).strict(),
@@ -36546,7 +36584,8 @@ var TOOL_ARGS = {
 var DESCRIPTIONS = {
   avatar_voice: "Manage local avatar voices: design a synthetic voice using language/voiceType/text/description, audition its draft, save_design with audioId/name, then assign separately. Models and installation, authorized reference voice profiles (clone), assign a voice, generate speech (speak), and poll job status. Call models/voices first; install and speak return job IDs. Audio stays local. Arabic support depends on the selected model.",
   user_avatar_library: "List private user characters and motions, assign an available character ID to self or a host agent, or play an available private motion ID. No asset publishing or redistribution. List before choosing IDs.",
-  present_avatar: "Optionally show a gesture, facial expression, visual effect, notification or rich card when useful. Transient, never saves the world. target is self or a host agent ID. Use only available Core animation IDs. Never invent live app or stock data. No action permissions are granted by a card.",
+  share_studio: "Inspect sharing capability, open the separate Share dialog, or create a host-authorized world/Avatar Live link. Creating requires explicit user authorization and an attached platform sharing service; local SDK cannot publish private data. Password enforcement belongs to the host server.",
+  present_avatar: "Use kind display to open/configure Avatar Live layouts (large, desktop, browser, compact, banner, circle, watch), background and framing. For saved world backgrounds, use worldId from inspect_studio.availableWorlds and optional worldSpot {position,target,player} XYZ coordinates; set worldId/worldSpot to null for the current live world view. Optionally show a gesture, facial expression, visual effect, notification or rich card when useful. Transient, never saves the world. target is self or a host agent ID. Use only available Core animation IDs. Never invent live app or stock data. No action permissions are granted by a card.",
   get_resource_controls: "Read supported controls, scope, source defaults and documentation for a Core model or ocean resource. Models use instance-scoped set_resource_params; oceans use world-scoped set_sea. Empty model controls means no generated settings; creator package controls are not described.",
   set_resource_params: "Change supported generated controls on one placed Core item. Use keys and ranges from get_resource_controls; null removes an instance override and restores its resource default. Saved as a normal undoable change. Does not change world defaults or arbitrary script parameters.",
   get_world_summary: "Describe the place now: size, style, sky, items with ids and positions, roads, walls, water, rivers, and the sea. Items come 100 at a time; more_items_from names the from_item of the next page.",
@@ -39797,6 +39836,8 @@ function executeTool(name, args, host, random12 = Math.random) {
     return done(host.apply(commands), success2.replace("{count}", String(valid.length)));
   };
   switch (name) {
+    case "share_studio":
+      return { ok: false, result: "Use the asynchronous tool runner for sharing." };
     case "avatar_voice":
       return { ok: false, result: "Use the asynchronous tool runner for voice operations." };
     case "user_avatar_library":
@@ -40802,6 +40843,15 @@ async function callTool(name, rawArgs, host, { signal, random: random12 = Math.r
   const parsed = parseArgs(name, rawArgs);
   if ("error" in parsed)
     return { outcome: { ok: false, result: `Error: ${parsed.error}` }, args: rawArgs };
+  if (name === "share_studio") {
+    if (!host.shareStudio)
+      return { outcome: { ok: false, result: "Sharing is not connected in this host." }, args: parsed.args };
+    try {
+      return { outcome: { ok: true, result: JSON.stringify(await host.shareStudio(parsed.args)) }, args: parsed.args };
+    } catch (error63) {
+      return { outcome: { ok: false, result: error63 instanceof Error ? error63.message : String(error63) }, args: parsed.args };
+    }
+  }
   if (name === "avatar_voice") {
     if (!host.avatarVoice)
       return { outcome: { ok: false, result: "Local voice service is not connected in this host." }, args: parsed.args };
@@ -157936,6 +157986,7 @@ async function createRuntime({ onFilmFrame, onRendered, container, world, terrai
   let airDashed = false;
   let dropLeft = 0;
   let controlsEnabled = true;
+  let presentationBackdrop = false, presentationNavigation = false;
   let padSitDown = false;
   let interactHeld = false;
   let rideNow = null;
@@ -158186,7 +158237,7 @@ async function createRuntime({ onFilmFrame, onRendered, container, world, terrai
     const dt2 = Math.min(Math.max(raw, 0), 0.05);
     wakeClock += dt2;
     wake.tick(wakeClock);
-    const intent = controlsEnabled ? mergeIntents(sources.map((source) => source.read())) : { direction: { x: 0, z: 0 }, speed: 0, jump: false };
+    const intent = controlsEnabled && (!presentationBackdrop || presentationNavigation) ? mergeIntents(sources.map((source) => source.read())) : { direction: { x: 0, z: 0 }, speed: 0, jump: false };
     if (jumpQueued) {
       intent.jump = true;
       jumpQueued = false;
@@ -158195,7 +158246,7 @@ async function createRuntime({ onFilmFrame, onRendered, container, world, terrai
       intent.dash = true;
       dashQueued = false;
     }
-    const pad = controlsEnabled ? firstGamepad() : null;
+    const pad = controlsEnabled && (!presentationBackdrop || presentationNavigation) ? firstGamepad() : null;
     if (pad) {
       if (stickValue(pad.axes[2]) !== 0 || stickValue(pad.axes[3]) !== 0)
         lookIdle = 0;
@@ -158592,6 +158643,10 @@ async function createRuntime({ onFilmFrame, onRendered, container, world, terrai
         const { x: x2, z: z3 } = camera.position;
         character.teleport({ x: x2, y: groundHeight(x2, z3) + 0.05, z: z3 });
       }
+    }
+    if (presentationBackdrop) {
+      avatar.root.visible = false;
+      heldTool.setVisible(false);
     }
     nativeTerrain?.update(camera, state.doc.environment.sea?.level ?? 0);
     const travelled = /* @__PURE__ */ new Map();
@@ -159181,6 +159236,10 @@ async function createRuntime({ onFilmFrame, onRendered, container, world, terrai
     },
     setVoiceRecordingStream: (stream) => audio.setVoiceRecordingStream(stream),
     setAudioVolumes: (volumes) => audio.setVolumes(volumes),
+    setPresentationBackdrop: (on2, navigation = false) => {
+      presentationBackdrop = on2;
+      presentationNavigation = navigation;
+    },
     setAvatarLook: (look) => {
       if (avatar.setLook(look))
         animator.rebind(avatar.mesh, avatar.clips);

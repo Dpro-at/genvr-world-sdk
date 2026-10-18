@@ -1,8 +1,8 @@
 import { findAvatarMotion, avatarMotionEntries, motionCategories } from '@genvr/runtime';
-import { AvatarPresentationEvent, type PresentationNotification, type PresentationSpec } from '@genvr/assistant';
+import { AvatarLiveDisplay, AvatarPresentationEvent, type PresentationNotification, type PresentationSpec } from '@genvr/assistant';
 import { CORE_ANIMATIONS } from '@genvr/core-library';
 import type { GenvrRuntime } from '@genvr/runtime';
-export { AvatarPresentationEvent, EXPRESSIONS, EFFECTS, NOTIFICATION_TYPES } from '@genvr/assistant';
+export { AvatarLiveDisplay, AvatarPresentationEvent, EXPRESSIONS, EFFECTS, NOTIFICATION_TYPES } from '@genvr/assistant';
 export type { PresentationNotification, PresentationSpec } from '@genvr/assistant';
 
 export const PRESENTATION_ANIMATIONS = CORE_ANIMATIONS.map(row => ({ id: row.manifest.id, label: row.manifest.name, clip: row.clip }));
@@ -24,6 +24,7 @@ export interface AvatarPresentationOptions {
   subscribe?(projectId: string, emit: (event: unknown) => string | null): () => void;
 }
 export interface PresentationState {
+  display: AvatarLiveDisplay;
   notifications: Array<PresentationNotification & { id: string; repliedWith?: string }>;
   cards: Array<{ id: string; title: string; spec: PresentationSpec; duration: number }>;
   effects: Partial<Record<string, number>>;
@@ -33,11 +34,12 @@ export interface PresentationState {
 type Runtime = Pick<GenvrRuntime, 'presentAnimation' | 'presentExpression'> & Partial<Pick<GenvrRuntime, 'importAvatarMotion'>>;
 /** One controller per mounted viewport. The assistant, host and sidebar use the same validated executor. */
 export class AvatarPresentation {
-  #state: PresentationState = { notifications: [], cards: [], effects: {}, lastAction: '', motions: [] };
+  #state: PresentationState = { display: AvatarLiveDisplay.parse({}), notifications: [], cards: [], effects: {}, lastAction: '', motions: [] };
   #listeners = new Set<() => void>();
   #timers = new Map<string, ReturnType<typeof setTimeout>>();
   #disposed = false;
   #serial = 0;
+  #media = new Set<string>();
   constructor(private runtime: () => Runtime | null, readonly options: AvatarPresentationOptions = {}) {}
   snapshot = () => this.#state;
   describe = () => 'Shared library: '+avatarMotionEntries().map(row=>`${row.id} (${row.name}, ${motionCategories(row.name, row.category).join('/')})`).join('; ')+'; Imported motion IDs: ' + this.#state.motions.map(row => `${row.id} (${row.label}, target ${row.target})`).join('; ');
@@ -65,6 +67,11 @@ export class AvatarPresentation {
         if (!rt.presentExpression(target, event.expression)) return 'The selected avatar has no supported facial controls, or the target is unavailable.';
         this.#later(`expression:${target}`, event.duration, () => { rt.presentExpression(target, 'neutral'); });
       }
+    } else if (event.kind === 'display') {
+      const { kind: _kind, ...patch } = event;
+      const display = AvatarLiveDisplay.parse({ ...this.#state.display, ...patch });
+      if (['image', 'video'].includes(display.background) && !display.media) return 'Choose background media first.';
+      this.#publish({ display });
     } else if (event.kind === 'effect') {
       const effects = { ...this.#state.effects };
       this.#cancel(`effect:${event.effect}`);
@@ -86,6 +93,12 @@ export class AvatarPresentation {
     this.#publish({ lastAction: event.kind });
     return null;
   };
+  localMedia(file: Blob): string {
+    if(this.#disposed||this.options.enabled===false)throw new Error('Avatar presentation is disabled.');
+    if(file.size>20*1024*1024||! /^(image|video)\//.test(file.type))throw new Error('Choose image/video media smaller than 20 MB.');
+    for(const url of this.#media)URL.revokeObjectURL(url);this.#media.clear();
+    const url=URL.createObjectURL(file);this.#media.add(url);return url;
+  }
   async importMotion(target: string, label: string, data: ArrayBuffer, slot?: 'user-library'): Promise<void> {
     if (this.#disposed || this.options.enabled === false) throw new Error('Avatar presentation is disabled.');
     const replacing = slot && this.#state.motions.some(row => row.target === target && row.id === `motion:${slot}`);
@@ -116,5 +129,6 @@ export class AvatarPresentation {
     }
     this.#timers.clear(); this.#publish({ notifications: [], cards: [], effects: {} });
   }
-  dispose() { this.clear(); this.#disposed = true; this.#listeners.clear(); }
+  dispose() {
+    for(const url of this.#media)URL.revokeObjectURL(url);this.#media.clear(); this.clear(); this.#disposed = true; this.#listeners.clear(); }
 }

@@ -27,6 +27,7 @@ onQueue?: (ahead: number) => void) => Promise<{
 }>;
 /** What the assistant can see and change: the editor's world (the studio runtime). */
 export interface AssistantHost {
+    shareStudio?(input: ToolArgs<'share_studio'>): Promise<unknown>;
     presentAvatar?(event: AvatarPresentationEvent): string | null;
     presentationInfo?(): string;
     avatarVoice?(input: ToolArgs<'avatar_voice'>): Promise<unknown>;

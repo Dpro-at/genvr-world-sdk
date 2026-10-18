@@ -1,9 +1,13 @@
+import { previewRGBA } from './readback.js';
 import { avatarMotionEntry, resolveAvatarLibraryMotion } from '../avatar-motion-library.js';
 import type { FaceUniforms } from './human/face.js';
 import { retargetAvatarMotion } from '../avatar-motion.js';
 import type { AvatarExpression } from '../avatar-expression.js';
 import {
   AnimationMixer,
+  RenderTarget,
+  UnsignedByteType,
+  SRGBColorSpace,
   BufferAttribute,
   BufferGeometry,
   Color,
@@ -36,6 +40,7 @@ import {
   type Bone,
   type Material,
   type Node,
+  type Object3D,
   type SkinnedMesh,
 } from 'three/webgpu';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -103,6 +108,9 @@ export interface CharacterStage {
   setPaused(paused: boolean): void;
   /** Manual eyelid inspection: null restores automatic blinking. */
   setEyeClosure(amount: number | null): void;
+  capturePreview(options?: {width:number;height:number;framing:'full'|'bust'|'face';anchor?:number}): Promise<string>;
+  setEnvironment(environment: Object3D | null): void;
+  frameAvatar(framing: 'full' | 'bust' | 'face', horizontalAnchor?: number): void;
   resetView(): void;
   /** Close-up on the face from the front (face work: eyes, mouth, lines). */
   focusFace(): void;
@@ -173,15 +181,20 @@ export async function createCharacterStage({
   recipe: firstRecipe,
   colors: firstColors = { line: '#0a0a0a', grid: '#a1a1aa' },
   viewCube: showCube = true,
+  forceWebGL = false,
 }: {
   container: HTMLElement;
   recipe: CharacterRecipe;
   colors?: CharacterStageColors;
   viewCube?: boolean;
+  forceWebGL?: boolean;
 }): Promise<CharacterStage> {
+  let disposed=false;
+  let previewRenderer:WebGPURenderer|null=null;
+  let previewInit:Promise<WebGPURenderer>|null=null;
   let eyeClosure = -1;
   let currentExpression: AvatarExpression = 'neutral';
-  const renderer = new WebGPURenderer({ antialias: true, alpha: true });
+  const renderer = new WebGPURenderer({ antialias: true, alpha: true, forceWebGL });
   await renderer.init();
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.setSize(container.clientWidth, Math.max(1, container.clientHeight));
@@ -195,6 +208,10 @@ export async function createCharacterStage({
     : 'WebGPU';
 
   const scene = new Scene();
+  let environment: Object3D | null = null;
+  let portraitSize:{width:number;height:number}|null=null;
+  let portraitAnchor=.5;
+  let portrait: 'full' | 'bust' | 'face' | null = null;
   scene.add(new HemisphereLight(0xffffff, 0x8c8c8c, 1.6));
   const sun = new DirectionalLight(0xffffff, 2.2);
   sun.position.set(2.5, 5, 3.5);
@@ -548,6 +565,21 @@ export async function createCharacterStage({
     );
     controls.update();
   };
+  const frameAvatar = (framing: 'full' | 'bust' | 'face', horizontalAnchor = .5) => {
+    portraitAnchor=Math.max(.2,Math.min(.8,horizontalAnchor));
+    portrait = framing;
+    const fraction = framing === 'full' ? 1.12 : framing === 'bust' ? .60 : .27;
+    const center = height * (framing === 'full' ? .52 : framing === 'bust' ? .74 : .91);
+    const half = height * fraction / 2;
+    const tangent = Math.tan(camera.fov * Math.PI / 360);
+    const distance = Math.max(half / tangent, height * .30 / (tangent * Math.max(.15, camera.aspect)));
+    const w=Math.max(1,portraitSize?.width??container.clientWidth),h=Math.max(1,portraitSize?.height??container.clientHeight);
+    camera.clearViewOffset();
+    if(portraitAnchor!==.5)camera.setViewOffset(w,h,(.5-portraitAnchor)*w,0,w,h);
+    controls.target.set(0, center, 0);
+    camera.position.set(0, center, distance);
+    controls.update();
+  };
   const focusFace = () => {
     // The eyes sit about 8 % of the height below the top of the head.
     const eyes = height * 0.92;
@@ -641,6 +673,7 @@ export async function createCharacterStage({
     camera.aspect = width / heightPx;
     camera.updateProjectionMatrix();
     renderer.setSize(width, heightPx);
+    if (portrait) frameAvatar(portrait,portraitAnchor);
   });
   resize.observe(container);
 
@@ -729,6 +762,23 @@ export async function createCharacterStage({
     setPaused(next) {
       paused = next;
     },
+    async capturePreview(options){
+      if(!previewInit)previewInit=(async()=>{const capture=new WebGPURenderer({antialias:true,alpha:true,forceWebGL:true});await capture.init();if(disposed){capture.dispose();throw new Error('Character stage closed.');}capture.shadowMap.enabled=true;previewRenderer=capture;return capture;})();
+      const capture=await previewInit;
+      if(disposed)throw new Error('Character stage closed.');
+      const width=Math.max(1,Math.round(options?.width??container.clientWidth)),heightPx=Math.max(1,Math.round(options?.height??container.clientHeight));
+      const oldCamera=camera.clone(),oldTarget=controls.target.clone(),oldPortrait=portrait,oldAnchor=portraitAnchor,oldRenderTarget=capture.getRenderTarget();
+      const target=new RenderTarget(width,heightPx,{type:UnsignedByteType});target.texture.colorSpace=SRGBColorSpace;
+      let pixels:Promise<import('three').TypedArray>;
+      try{portraitSize={width,height:heightPx};camera.aspect=width/heightPx;camera.updateProjectionMatrix();frameAvatar(options?.framing??portrait??'full',options?.anchor??portraitAnchor);capture.setRenderTarget(target);capture.render(scene,camera);pixels=capture.readRenderTargetPixelsAsync(target,0,0,width,heightPx);}
+      catch(error){target.dispose();throw error;}
+      finally{capture.setRenderTarget(oldRenderTarget);portraitSize=null;camera.copy(oldCamera);controls.target.copy(oldTarget);portrait=oldPortrait;portraitAnchor=oldAnchor;controls.update();}
+      try{const source=await pixels;const bytes=previewRGBA(source as Uint8Array,width,heightPx,true);
+        const canvas=document.createElement('canvas');canvas.width=width;canvas.height=heightPx;canvas.getContext('2d')!.putImageData(new ImageData(bytes,width,heightPx),0,0);return canvas.toDataURL('image/png');
+      }finally{target.dispose();}
+    },
+    setEnvironment(next) { if (environment) scene.remove(environment); environment = next; if (next) scene.add(next); },
+    frameAvatar,
     resetView,
     focusFace,
     lookFrom,
@@ -751,6 +801,7 @@ export async function createCharacterStage({
       return () => listeners.delete(listener);
     },
     dispose() {
+      disposed=true;previewRenderer?.dispose();
       painting?.dispose();
       renderer.setAnimationLoop(null);
       resize.disconnect();

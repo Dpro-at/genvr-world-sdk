@@ -4,15 +4,15 @@ import * as FX from './effects';
 import { NotifStack } from './notifications';
 import { SpecRenderer } from './cards';
 
-export function PresentationViewport({ controller, agents = [] }: { controller: AvatarPresentation; agents?: Array<{ id: string; name: string }> }) {
+export function PresentationViewport({ controller, agents = [], compact = false }: { controller: AvatarPresentation; agents?: Array<{ id: string; name: string }>; compact?: boolean }) {
   const state = useSyncExternalStore(controller.subscribe, controller.snapshot);
   const [error, setError] = useState(''), [reduced, setReduced] = useState(false);
   useEffect(() => { const media = matchMedia('(prefers-reduced-motion: reduce)'); const update = () => setReduced(media.matches); update(); media.addEventListener('change', update); return () => media.removeEventListener('change', update); }, []);
   const execute = (event: unknown) => { setError(controller.execute(event) ?? ''); };
   const fx = state.effects;
   const run = async (task: () => Promise<unknown>) => { try { await task(); setError(''); } catch (e) { setError(e instanceof Error ? e.message : 'Action failed.'); } };
-  return <div className="absolute inset-0 pointer-events-none overflow-hidden" data-avatar-presentation>
-    <style>{`@keyframes notif-slide { from { transform:translateX(110%); opacity:0 } to { transform:translateX(0); opacity:1 } } [data-avatar-presentation] .w-72 { width:min(18rem,calc(100vw - 24px)); } @media(prefers-reduced-motion:reduce){[data-avatar-presentation] *{animation:none!important;transition:none!important}}`}</style>
+  return <div className="absolute inset-0 pointer-events-none overflow-hidden" data-avatar-presentation data-compact={compact || undefined}>
+    <style>{`[data-avatar-presentation][data-compact] .w-72 {width:100%;} [data-avatar-presentation][data-compact] .top-16 {top:8px;left:2px;right:4px;max-width:none!important;} [data-avatar-presentation][data-compact] [data-presentation-cards] {left:2px;right:4px;} @keyframes notif-slide { from { transform:translateX(110%); opacity:0 } to { transform:translateX(0); opacity:1 } } [data-avatar-presentation] .w-72 { width:min(18rem,calc(100vw - 24px)); } @media(prefers-reduced-motion:reduce){[data-avatar-presentation] *{animation:none!important;transition:none!important}}`}</style>
     {!reduced ? <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
       {fx.matrix !== undefined ? <FX.MatrixRain opacity={fx.matrix} /> : null}
       {fx.emoji !== undefined ? <FX.EmojiRain pack={['🎉', '✨', '🎊', '🥳']} onDone={() => execute({ kind: 'effect', effect: 'emoji', enabled: false })} /> : null}

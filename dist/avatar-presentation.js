@@ -1,7 +1,7 @@
 import { findAvatarMotion, avatarMotionEntries, motionCategories } from '@genvr/runtime';
-import { AvatarPresentationEvent } from '@genvr/assistant';
+import { AvatarLiveDisplay, AvatarPresentationEvent } from '@genvr/assistant';
 import { CORE_ANIMATIONS } from '@genvr/core-library';
-export { AvatarPresentationEvent, EXPRESSIONS, EFFECTS, NOTIFICATION_TYPES } from '@genvr/assistant';
+export { AvatarLiveDisplay, AvatarPresentationEvent, EXPRESSIONS, EFFECTS, NOTIFICATION_TYPES } from '@genvr/assistant';
 export const PRESENTATION_ANIMATIONS = CORE_ANIMATIONS.map(row => ({ id: row.manifest.id, label: row.manifest.name, clip: row.clip }));
 const aliases = { expr_wave: 'Wave', expr_think: 'Think', expr_happy: 'Cheer', expr_confident: 'Salute', expr_wonder: 'Cheer', expr_nod: 'Clap', expr_shrug: 'Stretch', talk: 'Point', talk_explain: 'Point', talk_calm: 'Think', talk_excited: 'Cheer', dance_hype: 'Dance', dance: 'Dance', run: 'Run', walk: 'Walk' };
 export function resolvePresentationAnimation(id) {
@@ -15,11 +15,12 @@ export function resolvePresentationAnimation(id) {
 export class AvatarPresentation {
     runtime;
     options;
-    #state = { notifications: [], cards: [], effects: {}, lastAction: '', motions: [] };
+    #state = { display: AvatarLiveDisplay.parse({}), notifications: [], cards: [], effects: {}, lastAction: '', motions: [] };
     #listeners = new Set();
     #timers = new Map();
     #disposed = false;
     #serial = 0;
+    #media = new Set();
     constructor(runtime, options = {}) {
         this.runtime = runtime;
         this.options = options;
@@ -60,6 +61,13 @@ export class AvatarPresentation {
                 this.#later(`expression:${target}`, event.duration, () => { rt.presentExpression(target, 'neutral'); });
             }
         }
+        else if (event.kind === 'display') {
+            const { kind: _kind, ...patch } = event;
+            const display = AvatarLiveDisplay.parse({ ...this.#state.display, ...patch });
+            if (['image', 'video'].includes(display.background) && !display.media)
+                return 'Choose background media first.';
+            this.#publish({ display });
+        }
         else if (event.kind === 'effect') {
             const effects = { ...this.#state.effects };
             this.#cancel(`effect:${event.effect}`);
@@ -90,6 +98,18 @@ export class AvatarPresentation {
         this.#publish({ lastAction: event.kind });
         return null;
     };
+    localMedia(file) {
+        if (this.#disposed || this.options.enabled === false)
+            throw new Error('Avatar presentation is disabled.');
+        if (file.size > 20 * 1024 * 1024 || !/^(image|video)\//.test(file.type))
+            throw new Error('Choose image/video media smaller than 20 MB.');
+        for (const url of this.#media)
+            URL.revokeObjectURL(url);
+        this.#media.clear();
+        const url = URL.createObjectURL(file);
+        this.#media.add(url);
+        return url;
+    }
     async importMotion(target, label, data, slot) {
         if (this.#disposed || this.options.enabled === false)
             throw new Error('Avatar presentation is disabled.');
@@ -135,6 +155,13 @@ export class AvatarPresentation {
         this.#timers.clear();
         this.#publish({ notifications: [], cards: [], effects: {} });
     }
-    dispose() { this.clear(); this.#disposed = true; this.#listeners.clear(); }
+    dispose() {
+        for (const url of this.#media)
+            URL.revokeObjectURL(url);
+        this.#media.clear();
+        this.clear();
+        this.#disposed = true;
+        this.#listeners.clear();
+    }
 }
 //# sourceMappingURL=avatar-presentation.js.map

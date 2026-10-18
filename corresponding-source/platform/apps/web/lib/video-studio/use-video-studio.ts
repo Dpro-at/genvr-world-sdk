@@ -17,6 +17,8 @@ export function useVideoStudio(place: string, key: string | null, filmExample?: 
   const [, setVersion] = useState(0);
   const film = useRef<FilmSession>(null as unknown as FilmSession);
   if (!film.current) film.current = new FilmSession(emptyFilm(), () => crypto.randomUUID(), () => setVersion((n) => n + 1));
+  const transport = useRef<{play():void;stop():void}|null>(null);
+  const [filmPlaying,setFilmPlaying]=useState(false);
   const [assets, setAssets] = useState<Asset[]>([]);
   const [open, setOpen] = useState(false), [mode, setMode] = useState<'gameplay' | 'production'>('production');
   const [rendering, updateRendering] = useState(false), [previewing, setPreviewing] = useState(false);
@@ -255,6 +257,7 @@ export function useVideoStudio(place: string, key: string | null, filmExample?: 
 
   const selection = film.current.state.selection;
   return {
+    transport, filmPlaying, setFilmPlaying,
     identity: key, film: film.current, project, assets, length: toSeconds(filmLength(project)),
     selection, selected: selection.length === 1 ? selection[0]! : null,
     select: (clip: string | null) => { film.current.run('select.set', { clips: clip ? [clip] : [] }); },

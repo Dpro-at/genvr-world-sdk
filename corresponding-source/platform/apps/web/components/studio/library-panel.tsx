@@ -454,7 +454,7 @@ export function LibraryPanel({
         </div>
       ) : null}
 
-      <div role="tablist" aria-label="Kinds" className="scroll-row flex gap-1 overflow-x-auto pb-0.5">
+      <div role="tablist" aria-label="Kinds" className="grid grid-cols-3 gap-1.5 pb-1">
         {kinds.filter(entry => host.platform || entry.id !== 'free').map((entry) => (
           <button
             key={entry.id}
@@ -468,11 +468,11 @@ export function LibraryPanel({
               setGroup(undefined);
               setDetails(null);
             }}
-            className={`flex shrink-0 flex-col items-center rounded-lg px-2 py-1 text-[11px] font-bold ${
+            className={`flex min-h-14 min-w-0 flex-col justify-center gap-1 items-center rounded-xl px-1.5 py-2 text-xs font-bold ${
               kind === entry.id ? 'bg-ink text-on-brand' : 'text-ink/60 hover:bg-ink/5'
             }`}
           >
-            <entry.Icon className="size-4" aria-hidden />
+            <entry.Icon className="size-5" aria-hidden />
             {entry.label}
           </button>
         ))}

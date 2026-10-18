@@ -1,4 +1,5 @@
 import type { AvatarExpression } from '../avatar-expression.js';
+import { type Object3D } from 'three/webgpu';
 import { type CharacterRecipe } from '../../contracts/index.js';
 import { type ViewFace } from '../view-cube.js';
 import { type MusclePaintMode } from './muscle-paint-mode.js';
@@ -50,6 +51,14 @@ export interface CharacterStage {
     setPaused(paused: boolean): void;
     /** Manual eyelid inspection: null restores automatic blinking. */
     setEyeClosure(amount: number | null): void;
+    capturePreview(options?: {
+        width: number;
+        height: number;
+        framing: 'full' | 'bust' | 'face';
+        anchor?: number;
+    }): Promise<string>;
+    setEnvironment(environment: Object3D | null): void;
+    frameAvatar(framing: 'full' | 'bust' | 'face', horizontalAnchor?: number): void;
     resetView(): void;
     /** Close-up on the face from the front (face work: eyes, mouth, lines). */
     focusFace(): void;
@@ -67,9 +76,10 @@ export interface CharacterStage {
  * The character editor's stage (CHAR-01): one character on a calm floor, with the editor's view modes, shaping and
  * clips. Uses the game's own avatar (`createGenvrAvatar`), so every body, clip and spring looks as in play.
  */
-export declare function createCharacterStage({ container, recipe: firstRecipe, colors: firstColors, viewCube: showCube, }: {
+export declare function createCharacterStage({ container, recipe: firstRecipe, colors: firstColors, viewCube: showCube, forceWebGL, }: {
     container: HTMLElement;
     recipe: CharacterRecipe;
     colors?: CharacterStageColors;
     viewCube?: boolean;
+    forceWebGL?: boolean;
 }): Promise<CharacterStage>;

@@ -7,3 +7,5 @@ export { TOOL_DEFINITIONS, streamingChatModel, type ChatModel, type ChatMessage,
 export { studioAgentLook, syncStudioAgents, StudioAgent, StudioAgents } from './studio-agents.js';
 export * from './avatar-presentation.js';
 export * from './user-avatar-library.js';
+export * from './avatar-live-embed.js';
+export * from './studio-sharing.js';

@@ -247,7 +247,7 @@ export function VoicePanel({
     <section
       role="dialog"
       aria-label="Avatar voice"
-      className="fixed inset-x-4 bottom-4 top-16 z-50 mx-auto flex max-w-[1040px] flex-col overflow-hidden rounded-xl border border-ink/15 bg-surface text-ink shadow-2xl"
+      className="fixed inset-x-4 bottom-4 top-16 z-[130] mx-auto flex max-w-[1040px] flex-col overflow-hidden rounded-xl border border-ink/15 bg-surface text-ink shadow-2xl"
     >
       <header className="flex h-14 shrink-0 items-center gap-3 border-b border-ink/10 px-4">
         <Mic className="size-5" />

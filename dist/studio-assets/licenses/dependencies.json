@@ -8,25 +8,9 @@
     ]
   },
   {
-    "name": "react-dom",
-    "version": "19.3.0",
-    "license": "MIT",
-    "files": [
-      "LICENSE"
-    ]
-  },
-  {
     "name": "lucide-react",
     "version": "1.48.0",
     "license": "ISC",
-    "files": [
-      "LICENSE"
-    ]
-  },
-  {
-    "name": "three",
-    "version": "0.186.1",
-    "license": "MIT",
     "files": [
       "LICENSE"
     ]
@@ -40,12 +24,44 @@
     ]
   },
   {
+    "name": "three",
+    "version": "0.186.1",
+    "license": "MIT",
+    "files": [
+      "LICENSE"
+    ]
+  },
+  {
     "name": "@dimforge/rapier3d-compat",
     "version": "0.20.0",
     "license": "Apache-2.0",
     "files": [
       "LICENSE"
     ]
+  },
+  {
+    "name": "react-dom",
+    "version": "19.3.0",
+    "license": "MIT",
+    "files": [
+      "LICENSE"
+    ]
+  },
+  {
+    "name": "@mediapipe/tasks-vision",
+    "version": "1.1.0",
+    "license": "Apache-2.0",
+    "files": [
+      "mediapipe-LICENSE.txt"
+    ],
+    "provenance": {
+      "files": [
+        "mediapipe-LICENSE.txt"
+      ],
+      "sources": [
+        "https://raw.githubusercontent.com/google-ai-edge/mediapipe/v0.10.32/LICENSE"
+      ]
+    }
   },
   {
     "name": "scheduler",
@@ -94,22 +110,6 @@
     "files": [
       "LICENSE.txt"
     ]
-  },
-  {
-    "name": "@mediapipe/tasks-vision",
-    "version": "1.1.0",
-    "license": "Apache-2.0",
-    "files": [
-      "mediapipe-LICENSE.txt"
-    ],
-    "provenance": {
-      "files": [
-        "mediapipe-LICENSE.txt"
-      ],
-      "sources": [
-        "https://raw.githubusercontent.com/google-ai-edge/mediapipe/v0.10.32/LICENSE"
-      ]
-    }
   },
   {
     "name": "onnxruntime-web",

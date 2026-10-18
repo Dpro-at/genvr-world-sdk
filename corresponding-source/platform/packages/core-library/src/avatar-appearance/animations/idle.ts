@@ -10,6 +10,7 @@ const breathe = (t: number, amount: number): Key => [
     Spine2: [-amount * 2, 0, 0],
     Head: [amount, amount * 2, 0],
     hipsY: amount * 0.008,
+    grip: 0.12,
   },
 ];
 

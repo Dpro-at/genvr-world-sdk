@@ -85,3 +85,11 @@ Call avatar_voice with action models and voices before choosing IDs. Install dow
 
 
 Use `avatar_voice` action `design` with language, voiceType (`male`, `female`, `child`), text and optional description to audition a synthetic draft. Poll the job; its result.id is the audioId. Call `save_design` with audioId/name only after selecting the preview; this does not assign an avatar. Call `assign` separately with voiceId/projectId/target. `export_voice` returns a reference WAV with embedded language/type/model metadata. Discover and install both Voice Designer and Multilingual Voice before design; the designer supplies an English reference and the multilingual model synthesizes the selected output language. Child-style is a synthetic cartoon trait, not an age-verified speaker. Listen before claiming a specific timbre or accent.
+
+## Avatar Live
+
+Use the separate Avatar Live toolbar action for direct display presets. `present_avatar` kind `display` opens/closes the viewer and selects layout, framing and background. Layout IDs: large, desktop, browser, compact, banner, circle, watch. Wait until inspect_studio reports a ready avatar before sending motion/expression commands. Native and private host motions use their existing IDs; do not rename proprietary assets into public package content. Speech remains on avatar_voice with the current saved voice assignment. Notifications/cards have a reserved right-side area.
+
+Share is a separate toolbar action. `share_studio` action inspect reports whether a real hosting adapter exists; open shows its controls. Create only with explicit user authorization, a request for the current project, and the host adapter. Public/private/invite rules, passwords and joining are enforced by the host server. A local iframe is not a public share, and access controls must never be claimed operational without this adapter.
+
+For a saved-world background, inspect `availableWorlds` via `inspect_studio`, then use `present_avatar` display with `background: "world"`, `worldId`, and optional `worldSpot: {position,target,player}` XYZ objects. Only use permitted IDs. The UI supports read-only WASD/mouse exploration and Use this spot; neither operation edits the source project. Reset worldId/worldSpot to null to use the current live world view.

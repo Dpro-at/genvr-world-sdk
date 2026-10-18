@@ -1,4 +1,5 @@
 'use client';
+import type { CharacterEditor } from './character-editor/use-character-editor';
 import { QuickVoice } from './film/quick-voice';
 import { BodySection } from './character-editor/character-controls';
 import { LightingPanel } from './lighting-panel';
@@ -8,7 +9,7 @@ import { recipeLook } from '@genvr/contracts';
 
 import type { PlayDevice } from '@genvr/contracts';
 import type { GenvrRuntime, ToolStatus } from '@genvr/runtime';
-import { Mic, Camera, Users, Focus, Lightbulb, Circle, Globe, Play, Redo2, Square, Undo2, type LucideIcon, Settings2, Volume2, VolumeX } from 'lucide-react';
+import { Share2, Mic, Camera, Users, Focus, Lightbulb, Circle, Globe, Play, Redo2, Square, Undo2, type LucideIcon, Settings2, Volume2, VolumeX } from 'lucide-react';
 import { useEffect, type ReactNode, type RefObject } from 'react';
 import { toolsFor } from '../build-panel';
 import { EnvironmentPicker } from '../environment-picker';
@@ -120,6 +121,7 @@ function DockedTimeline({ filming }: { filming: StudioFilming }) {
  * be resized or hidden; sizes are remembered. Phones and tablets keep the simple layout.
  */
 export function StudioChrome({
+  onCharacter,
   runtime,
   placeId,
   devices,
@@ -160,6 +162,7 @@ export function StudioChrome({
   /** Device preview (emulator) settings. */
   preview: PreviewState;
   onPreview: (preview: PreviewState) => void;
+  onCharacter?: (editor: CharacterEditor) => void;
   testing: boolean;
   onTesting: (testing: boolean) => void;
   logs: LogEntry[];
@@ -172,7 +175,9 @@ export function StudioChrome({
   const filmWorkspace = tab === 'filming';
   // The Avatar tab is the character editor (CHAR-01): its own stage over the viewport, the world rests meanwhile.
   const character = useCharacterEditor();
+  useEffect(()=>{onCharacter?.(character);},[character]);
   useEffect(() => host.characterBody?.(body => character.change(recipe => ({ ...recipe, body }))), [host.characterBody]);
+  useEffect(() => { host.characterRecipe?.(character.recipe); }, [character.recipe, host.characterRecipe]);
   useEffect(() => { host.characterLook?.(recipeLook(character.recipe)); }, [character.recipe, host.characterLook]);
   const characterWorkspace = tab === 'avatar' && !testing;
   useEffect(() => {
@@ -456,9 +461,13 @@ export function StudioChrome({
               Publish
             </a>
           ) : null}
+          {host.share ? <button type="button" onClick={host.share} className="ml-1 inline-flex items-center gap-1.5 rounded-lg border border-ink/20 px-3 py-1.5 text-xs font-bold"><Share2 className="size-4"/>Share</button> : null}
+          {host.avatarLive ? <button type="button" onClick={host.avatarLive} className="ml-1 inline-flex items-center gap-1.5 rounded-lg border border-ink/20 px-3 py-1.5 text-xs font-bold"><Users className="size-4"/>Avatar Live</button> : null}
           <button
             type="button"
             onClick={(event) => {
+              if (tab === 'avatar' && host.avatarLive) { host.avatarLive(); return; }
+              if (filmWorkspace) { if(filming.studio.filmPlaying)filming.studio.transport.current?.stop();else filming.studio.transport.current?.play(); return; }
               rt()?.setTool(null);
               onTesting(!testing);
               event.currentTarget.blur();
@@ -466,7 +475,7 @@ export function StudioChrome({
             className="ml-1 inline-flex items-center gap-1.5 rounded-lg bg-brand px-3 py-1.5 text-xs font-bold text-on-brand"
           >
             {testing ? <Square className="size-4" aria-hidden /> : <Play className="size-4" aria-hidden />}
-            {testing ? 'Stop test' : 'Test'}
+            {filmWorkspace ? (filming.studio.filmPlaying ? 'Pause film' : 'Play film') : tab === 'avatar' && host.avatarLive ? 'Preview avatar' : testing ? 'Stop test' : 'Test world'}
           </button>
         </div>
       </header>

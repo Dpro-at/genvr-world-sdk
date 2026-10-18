@@ -1,6 +1,6 @@
-import { type PresentationNotification, type PresentationSpec } from './vendor/assistant/index.js';
+import { AvatarLiveDisplay, type PresentationNotification, type PresentationSpec } from './vendor/assistant/index.js';
 import type { GenvrRuntime } from './vendor/runtime/index.js';
-export { AvatarPresentationEvent, EXPRESSIONS, EFFECTS, NOTIFICATION_TYPES } from './vendor/assistant/index.js';
+export { AvatarLiveDisplay, AvatarPresentationEvent, EXPRESSIONS, EFFECTS, NOTIFICATION_TYPES } from './vendor/assistant/index.js';
 export type { PresentationNotification, PresentationSpec } from './vendor/assistant/index.js';
 export declare const PRESENTATION_ANIMATIONS: {
     id: string;
@@ -20,6 +20,7 @@ export interface AvatarPresentationOptions {
     subscribe?(projectId: string, emit: (event: unknown) => string | null): () => void;
 }
 export interface PresentationState {
+    display: AvatarLiveDisplay;
     notifications: Array<PresentationNotification & {
         id: string;
         repliedWith?: string;
@@ -49,6 +50,7 @@ export declare class AvatarPresentation {
     describe: () => string;
     subscribe: (listener: () => void) => () => void;
     execute: (input: unknown) => string | null;
+    localMedia(file: Blob): string;
     importMotion(target: string, label: string, data: ArrayBuffer, slot?: 'user-library'): Promise<void>;
     dismiss: (id: string) => void;
     approve(id: string): Promise<void>;

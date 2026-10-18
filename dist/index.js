@@ -2,8 +2,9 @@ import {
   avatarMotionEntries,
   avatarMotionEntry,
   motionCategories
-} from "./chunk-ALAIKSVF.js";
+} from "./chunk-ZN3IOLCR.js";
 import {
+  AvatarLiveDisplay,
   AvatarLook,
   AvatarPresentationEvent,
   CORE_ANIMATIONS,
@@ -14,6 +15,7 @@ import {
   NOTIFICATION_TYPES,
   PACKAGE_WORK_BUDGET,
   SDK_VERSION,
+  StudioShareRequest,
   TOOL_DEFINITIONS,
   WORLD_PACKAGE_BYTES,
   WORLD_PACKAGE_COMMANDS,
@@ -25,7 +27,7 @@ import {
   readWorldPackage,
   replayWorldPackage,
   streamingChatModel
-} from "./chunk-S3IVW7O7.js";
+} from "./chunk-TG6FSO3V.js";
 
 // src/storage.ts
 function browserStorage(storage, prefix2 = "genvr.world.") {
@@ -221,11 +223,12 @@ var AvatarPresentation = class {
   }
   runtime;
   options;
-  #state = { notifications: [], cards: [], effects: {}, lastAction: "", motions: [] };
+  #state = { display: AvatarLiveDisplay.parse({}), notifications: [], cards: [], effects: {}, lastAction: "", motions: [] };
   #listeners = /* @__PURE__ */ new Set();
   #timers = /* @__PURE__ */ new Map();
   #disposed = false;
   #serial = 0;
+  #media = /* @__PURE__ */ new Set();
   snapshot = () => this.#state;
   describe = () => "Shared library: " + avatarMotionEntries().map((row) => `${row.id} (${row.name}, ${motionCategories(row.name, row.category).join("/")})`).join("; ") + "; Imported motion IDs: " + this.#state.motions.map((row) => `${row.id} (${row.label}, target ${row.target})`).join("; ");
   subscribe = (listener) => {
@@ -271,6 +274,11 @@ var AvatarPresentation = class {
           rt.presentExpression(target, "neutral");
         });
       }
+    } else if (event.kind === "display") {
+      const { kind: _kind, ...patch } = event;
+      const display = AvatarLiveDisplay.parse({ ...this.#state.display, ...patch });
+      if (["image", "video"].includes(display.background) && !display.media) return "Choose background media first.";
+      this.#publish({ display });
     } else if (event.kind === "effect") {
       const effects = { ...this.#state.effects };
       this.#cancel(`effect:${event.effect}`);
@@ -297,6 +305,15 @@ var AvatarPresentation = class {
     this.#publish({ lastAction: event.kind });
     return null;
   };
+  localMedia(file) {
+    if (this.#disposed || this.options.enabled === false) throw new Error("Avatar presentation is disabled.");
+    if (file.size > 20 * 1024 * 1024 || !/^(image|video)\//.test(file.type)) throw new Error("Choose image/video media smaller than 20 MB.");
+    for (const url2 of this.#media) URL.revokeObjectURL(url2);
+    this.#media.clear();
+    const url = URL.createObjectURL(file);
+    this.#media.add(url);
+    return url;
+  }
   async importMotion(target, label, data, slot) {
     if (this.#disposed || this.options.enabled === false) throw new Error("Avatar presentation is disabled.");
     const replacing = slot && this.#state.motions.some((row) => row.target === target && row.id === `motion:${slot}`);
@@ -334,6 +351,8 @@ var AvatarPresentation = class {
     this.#publish({ notifications: [], cards: [], effects: {} });
   }
   dispose() {
+    for (const url of this.#media) URL.revokeObjectURL(url);
+    this.#media.clear();
     this.clear();
     this.#disposed = true;
     this.#listeners.clear();
@@ -454,8 +473,38 @@ function browserUserAvatarStorage(scope, factory = indexedDB) {
 async function avatarDigest(bytes) {
   return Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256", bytes)), (value) => value.toString(16).padStart(2, "0")).join("");
 }
+
+// src/avatar-live-embed.ts
+var AVATAR_LIVE_LAYOUTS = [
+  { id: "large", name: "Large screen", width: 960, height: 600 },
+  { id: "desktop", name: "Desktop window", width: 720, height: 520 },
+  { id: "browser", name: "Browser panel", width: 540, height: 420 },
+  { id: "compact", name: "Compact window", width: 380, height: 360 },
+  { id: "banner", name: "Website banner", width: 960, height: 260 },
+  { id: "circle", name: "Circle widget", width: 480, height: 280 },
+  { id: "watch", name: "Watch circle", width: 360, height: 220 }
+];
+function avatarLiveEmbed(baseUrl, projectId, layout, display) {
+  const preset = AVATAR_LIVE_LAYOUTS.find((row) => row.id === layout);
+  if (!preset) throw new Error("Unknown Avatar Live layout.");
+  const url = new URL(baseUrl);
+  if (!["http:", "https:"].includes(url.protocol) || url.username || url.password) throw new Error("Expected a public HTTP URL without credentials.");
+  if (display) {
+    const state = AvatarLiveDisplay.parse({ ...display, layout });
+    for (const key of ["background", "color", "framing"]) url.searchParams.set(key, state[key]);
+    if (state.media) url.searchParams.set("media", state.media);
+    if (state.worldId) url.searchParams.set("worldId", state.worldId);
+    if (state.worldSpot) url.searchParams.set("worldSpot", JSON.stringify(state.worldSpot));
+  }
+  url.searchParams.set("avatar-live", preset.id);
+  url.searchParams.set("project", projectId);
+  const escaped = url.href.replaceAll("&", "&amp;").replaceAll('"', "&quot;").replaceAll("<", "&lt;");
+  return { id: `avatar-live-${preset.id}`, url: url.href, localOnly: Boolean(display?.media?.startsWith("blob:")) || ["localhost", "127.0.0.1", "[::1]"].includes(url.hostname), iframe: `<iframe title="Avatar Live" src="${escaped}" width="${preset.width}" height="${preset.height}" allow="autoplay" style="border:0;max-width:100%" loading="lazy"></iframe>` };
+}
 export {
   ACCOUNT_LINK_SCOPES,
+  AVATAR_LIVE_LAYOUTS,
+  AvatarLiveDisplay,
   AvatarPresentation,
   AvatarPresentationEvent,
   EFFECTS,
@@ -469,6 +518,7 @@ export {
   SDK_VERSION,
   StudioAgent,
   StudioAgents,
+  StudioShareRequest,
   TOOL_DEFINITIONS,
   USER_AVATAR_BYTES,
   UserAvatarMetadata,
@@ -477,6 +527,7 @@ export {
   WorldPackage,
   WorldSession,
   avatarDigest,
+  avatarLiveEmbed,
   browserStorage,
   browserUserAvatarStorage,
   openWorld,

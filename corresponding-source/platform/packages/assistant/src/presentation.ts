@@ -31,12 +31,34 @@ export const PresentationSpec = z.object({
 });
 const Target = z.string().regex(/^(self|[A-Za-z0-9_-]{1,100})$/).default('self');
 const Duration = z.number().int().min(200).max(60000).default(5500);
+const WorldPoint = z.object({ x:z.number().finite(), y:z.number().finite(), z:z.number().finite() }).strict();
+export const AvatarLiveDisplay = z.object({
+  open: z.boolean().default(false),
+  layout: z.enum(['large', 'desktop', 'browser', 'compact', 'banner', 'circle', 'watch']).default('large'),
+  background: z.enum(['world', 'color', 'transparent', 'office', 'living_room', 'conference', 'stage', 'studio', 'classroom', 'image', 'video']).default('office'),
+  color: z.string().regex(/^#[0-9a-fA-F]{6}$/).default('#101827'),
+  media: Url.optional(),
+  worldId: z.string().min(1).max(200).nullable().optional(),
+  worldSpot: z.object({position:WorldPoint,target:WorldPoint,player:WorldPoint}).strict().nullable().optional(),
+  framing: z.enum(['full', 'bust', 'face']).default('full'),
+}).strict();
+export type AvatarLiveDisplay = z.infer<typeof AvatarLiveDisplay>;
 export const AvatarPresentationEvent = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('animation'), target: Target, animation: z.string().min(1).max(150).describe('Available animation IDs: idle, ' + CORE_ANIMATIONS.map(row => row.manifest.id).join(', ')), duration: Duration }).strict(),
   z.object({ kind: z.literal('expression'), target: Target, expression: z.enum(EXPRESSIONS), duration: Duration }).strict(),
   z.object({ kind: z.literal('effect'), effect: z.enum(EFFECTS), enabled: z.boolean(), intensity: z.number().min(0).max(1).default(0.6), duration: Duration }).strict(),
   z.object({ kind: z.literal('notification'), notification: PresentationNotification, duration: Duration }).strict(),
   z.object({ kind: z.literal('card'), title: z.string().max(200), spec: PresentationSpec, duration: Duration }).strict(),
+  z.object({ kind: z.literal('display'),
+    open: AvatarLiveDisplay.shape.open.removeDefault().optional(),
+    layout: AvatarLiveDisplay.shape.layout.removeDefault().optional(),
+    background: AvatarLiveDisplay.shape.background.removeDefault().optional(),
+    color: AvatarLiveDisplay.shape.color.removeDefault().optional(),
+    framing: AvatarLiveDisplay.shape.framing.removeDefault().optional(),
+    media: AvatarLiveDisplay.shape.media,
+    worldId: AvatarLiveDisplay.shape.worldId,
+    worldSpot: AvatarLiveDisplay.shape.worldSpot,
+  }).strict(),
   z.object({ kind: z.literal('clear') }).strict(),
 ]);
 export type AvatarPresentationEvent = z.infer<typeof AvatarPresentationEvent>;

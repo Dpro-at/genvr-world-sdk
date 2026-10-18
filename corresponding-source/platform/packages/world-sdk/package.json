@@ -1,6 +1,6 @@
 {
   "name": "@genvr/world-sdk",
-  "version": "0.3.0-preview.9",
+  "version": "0.3.0-preview.10",
   "license": "AGPL-3.0-only",
   "description": "Standalone Genvr world authoring, local persistence and explicit platform publication adapters.",
   "type": "module",

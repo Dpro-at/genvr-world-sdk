@@ -1,9 +1,9 @@
 import {
   mountStudio
-} from "./chunk-VGB6TE74.js";
-import "./chunk-DWNSVDYZ.js";
+} from "./chunk-IVWTN37D.js";
 import "./chunk-7V6ZMJK5.js";
-import "./chunk-AOB5SLAG.js";
+import "./chunk-DGPEIZEL.js";
+import "./chunk-OOWEURE5.js";
 import "./chunk-PX6F3LHL.js";
 
 // studio/browser.tsx

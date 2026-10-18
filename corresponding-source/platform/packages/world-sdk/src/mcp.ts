@@ -45,7 +45,7 @@ server.setRequestHandler(CallToolRequestSchema, async request => {
     if (isFilmingTool(request.params.name) && live) return { content: [{ type: 'text', text: JSON.stringify(await live.filming(request.params.name, args)) }] };
     if (isFilmingTool(request.params.name)) return await callFilmingTool(request.params.name, args, process.env.GENVR_HOST_MCP_URL, process.env.GENVR_HOST_MCP_TOKEN);
     let text: string;
-    if (LIVE_TOOLS.some(tool => tool.name === request.params.name) || (live && ['user_avatar_library', 'present_avatar'].includes(request.params.name))) {
+    if (LIVE_TOOLS.some(tool => tool.name === request.params.name) || (live && ['user_avatar_library', 'present_avatar', 'share_studio'].includes(request.params.name))) {
       if (!live) throw new Error('Set GENVR_STUDIO_CONNECTION to the connection file printed by genvr-studio.');
       const result = request.params.name === 'list_studio_sessions' ? { sessions: await live.sessions() } : request.params.name === 'select_studio_session' ? await live.select(args) : await live.call(request.params.name, args);
       text = typeof result === 'string' ? result : JSON.stringify(result);

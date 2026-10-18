@@ -137,6 +137,9 @@ export function VideoEditor({ filming }: { filming: StudioFilming }) {
       if (!exporting) { studio.setPlayhead(reached); if (!live) draw(reached); }
     }
   };
+  studio.transport.current={play:()=>{if(!running)void play(false);},stop:()=>cancel.current?.abort()};
+  useEffect(()=>{studio.setFilmPlaying(running);},[running]);
+  useEffect(()=>()=>{studio.transport.current=null;studio.setFilmPlaying(false);},[]);
   /** Moves the playhead and shows that frame on Program (no playback). */
   const showFrame = (seconds: number) => {
     const at = Math.max(0, Math.min(seconds, studio.length || 0));

@@ -84,6 +84,7 @@ export type ChatModel = (
 
 /** What the assistant can see and change: the editor's world (the studio runtime). */
 export interface AssistantHost {
+  shareStudio?(input: ToolArgs<'share_studio'>): Promise<unknown>;
   presentAvatar?(event: AvatarPresentationEvent): string | null;
   presentationInfo?(): string;
   avatarVoice?(input: ToolArgs<'avatar_voice'>): Promise<unknown>;
@@ -477,6 +478,7 @@ export function executeTool(
   };
 
   switch (name) {
+    case 'share_studio': return {ok:false,result:'Use the asynchronous tool runner for sharing.'};
     case 'avatar_voice': return { ok:false, result:'Use the asynchronous tool runner for voice operations.' };
     case 'user_avatar_library': return { ok: false, result: 'Use the asynchronous tool runner for private library operations.' };
     case 'present_avatar': {
@@ -1640,6 +1642,10 @@ async function callTool(
     return { outcome: { ok: false, result: `Error: there is no tool named ${name}.` }, args: rawArgs };
   const parsed = parseArgs(name, rawArgs);
   if ('error' in parsed) return { outcome: { ok: false, result: `Error: ${parsed.error}` }, args: rawArgs };
+  if(name==='share_studio'){
+    if(!host.shareStudio)return {outcome:{ok:false,result:'Sharing is not connected in this host.'},args:parsed.args};
+    try{return {outcome:{ok:true,result:JSON.stringify(await host.shareStudio(parsed.args as ToolArgs<'share_studio'>))},args:parsed.args};}catch(error){return {outcome:{ok:false,result:error instanceof Error?error.message:String(error)},args:parsed.args};}
+  }
   if (name === 'avatar_voice') {
     if (!host.avatarVoice) return {outcome:{ok:false,result:'Local voice service is not connected in this host.'},args:parsed.args};
     try {return {outcome:{ok:true,result:JSON.stringify(await host.avatarVoice(parsed.args as ToolArgs<'avatar_voice'>))},args:parsed.args};}

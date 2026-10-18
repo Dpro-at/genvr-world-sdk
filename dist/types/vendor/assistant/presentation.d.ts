@@ -53,6 +53,57 @@ export declare const PresentationSpec: z.ZodObject<{
         children: z.ZodArray<z.ZodString>;
     }, z.core.$strict>>;
 }, z.core.$strip>;
+export declare const AvatarLiveDisplay: z.ZodObject<{
+    open: z.ZodDefault<z.ZodBoolean>;
+    layout: z.ZodDefault<z.ZodEnum<{
+        large: "large";
+        desktop: "desktop";
+        browser: "browser";
+        compact: "compact";
+        banner: "banner";
+        circle: "circle";
+        watch: "watch";
+    }>>;
+    background: z.ZodDefault<z.ZodEnum<{
+        color: "color";
+        world: "world";
+        transparent: "transparent";
+        office: "office";
+        living_room: "living_room";
+        conference: "conference";
+        stage: "stage";
+        studio: "studio";
+        classroom: "classroom";
+        image: "image";
+        video: "video";
+    }>>;
+    color: z.ZodDefault<z.ZodString>;
+    media: z.ZodOptional<z.ZodString>;
+    worldId: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    worldSpot: z.ZodOptional<z.ZodNullable<z.ZodObject<{
+        position: z.ZodObject<{
+            x: z.ZodNumber;
+            y: z.ZodNumber;
+            z: z.ZodNumber;
+        }, z.core.$strict>;
+        target: z.ZodObject<{
+            x: z.ZodNumber;
+            y: z.ZodNumber;
+            z: z.ZodNumber;
+        }, z.core.$strict>;
+        player: z.ZodObject<{
+            x: z.ZodNumber;
+            y: z.ZodNumber;
+            z: z.ZodNumber;
+        }, z.core.$strict>;
+    }, z.core.$strict>>>;
+    framing: z.ZodDefault<z.ZodEnum<{
+        full: "full";
+        bust: "bust";
+        face: "face";
+    }>>;
+}, z.core.$strict>;
+export type AvatarLiveDisplay = z.infer<typeof AvatarLiveDisplay>;
 export declare const AvatarPresentationEvent: z.ZodDiscriminatedUnion<[z.ZodObject<{
     kind: z.ZodLiteral<"animation">;
     target: z.ZodDefault<z.ZodString>;
@@ -149,6 +200,56 @@ export declare const AvatarPresentationEvent: z.ZodDiscriminatedUnion<[z.ZodObje
         }, z.core.$strict>>;
     }, z.core.$strip>;
     duration: z.ZodDefault<z.ZodNumber>;
+}, z.core.$strict>, z.ZodObject<{
+    kind: z.ZodLiteral<"display">;
+    open: z.ZodOptional<z.ZodBoolean>;
+    layout: z.ZodOptional<z.ZodEnum<{
+        large: "large";
+        desktop: "desktop";
+        browser: "browser";
+        compact: "compact";
+        banner: "banner";
+        circle: "circle";
+        watch: "watch";
+    }>>;
+    background: z.ZodOptional<z.ZodEnum<{
+        color: "color";
+        world: "world";
+        transparent: "transparent";
+        office: "office";
+        living_room: "living_room";
+        conference: "conference";
+        stage: "stage";
+        studio: "studio";
+        classroom: "classroom";
+        image: "image";
+        video: "video";
+    }>>;
+    color: z.ZodOptional<z.ZodString>;
+    framing: z.ZodOptional<z.ZodEnum<{
+        full: "full";
+        bust: "bust";
+        face: "face";
+    }>>;
+    media: z.ZodOptional<z.ZodString>;
+    worldId: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    worldSpot: z.ZodOptional<z.ZodNullable<z.ZodObject<{
+        position: z.ZodObject<{
+            x: z.ZodNumber;
+            y: z.ZodNumber;
+            z: z.ZodNumber;
+        }, z.core.$strict>;
+        target: z.ZodObject<{
+            x: z.ZodNumber;
+            y: z.ZodNumber;
+            z: z.ZodNumber;
+        }, z.core.$strict>;
+        player: z.ZodObject<{
+            x: z.ZodNumber;
+            y: z.ZodNumber;
+            z: z.ZodNumber;
+        }, z.core.$strict>;
+    }, z.core.$strict>>>;
 }, z.core.$strict>, z.ZodObject<{
     kind: z.ZodLiteral<"clear">;
 }, z.core.$strict>], "kind">;

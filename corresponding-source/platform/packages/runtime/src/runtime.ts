@@ -497,6 +497,7 @@ export interface GenvrRuntime {
   setVoiceRecordingStream(stream: MediaStream | null): void;
   setAudioVolumes(volumes: { effects: number; ambience: number }): void;
   /** The player's own avatar: colors and worn clothing and accessories (P2-20). */
+  setPresentationBackdrop(on: boolean, navigation?: boolean): void;
   setAvatarLook(look: AvatarLook): void;
   /** Stops or restarts rendering (the studio pauses its own view while a device emulator runs). */
   setPaused(paused: boolean): void;
@@ -2169,6 +2170,7 @@ export async function createRuntime({
   let airDashed = false;
   let dropLeft = 0;
   let controlsEnabled = true;
+  let presentationBackdrop=false, presentationNavigation=false;
   let padSitDown = false;
   let interactHeld = false;
 
@@ -2471,7 +2473,7 @@ export async function createRuntime({
     // ring's age can never mean two different things.
     wakeClock += dt;
     wake.tick(wakeClock);
-    const intent = controlsEnabled
+    const intent = controlsEnabled && (!presentationBackdrop || presentationNavigation)
       ? mergeIntents(sources.map((source) => source.read()))
       : { direction: { x: 0, z: 0 }, speed: 0, jump: false };
     if (jumpQueued) {
@@ -2483,7 +2485,7 @@ export async function createRuntime({
       dashQueued = false;
     }
     // Game controller: the right stick turns the camera, B / Circle sits (docs/PLAYER-UI.md keys).
-    const pad = controlsEnabled ? firstGamepad() : null;
+    const pad = controlsEnabled && (!presentationBackdrop || presentationNavigation) ? firstGamepad() : null;
     if (pad) {
       if (stickValue(pad.axes[2]) !== 0 || stickValue(pad.axes[3]) !== 0) lookIdle = 0;
       orbit.yaw -= stickValue(pad.axes[2]) * 2.4 * dt * view.sensitivity;
@@ -2958,6 +2960,7 @@ export async function createRuntime({
         character.teleport({ x, y: groundHeight(x, z) + 0.05, z });
       }
     }
+    if(presentationBackdrop){avatar.root.visible=false;heldTool.setVisible(false);}
     nativeTerrain?.update(camera, state.doc.environment.sea?.level ?? 0);
     // Filming objects walking their spots (FILM-10b); a motion on the same object plays on top.
     const travelled = new Map<string, ScenePose>();
@@ -3608,6 +3611,7 @@ export async function createRuntime({
     setSpeechMouth: (id, shape) => { const speaker=id==='self'?avatar:remotePlayers.avatarOf(id); if(!speaker)return false; speaker.setMouth(shape);return true; },
     setVoiceRecordingStream: stream => audio.setVoiceRecordingStream(stream),
     setAudioVolumes: (volumes) => audio.setVolumes(volumes),
+    setPresentationBackdrop: (on, navigation=false) => {presentationBackdrop=on;presentationNavigation=navigation;},
     setAvatarLook: (look) => {
       // Another body type brings another skeleton: the animator binds to its clips.
       if (avatar.setLook(look)) animator.rebind(avatar.mesh, avatar.clips);

@@ -354,6 +354,7 @@ export interface GenvrRuntime {
         ambience: number;
     }): void;
     /** The player's own avatar: colors and worn clothing and accessories (P2-20). */
+    setPresentationBackdrop(on: boolean, navigation?: boolean): void;
     setAvatarLook(look: AvatarLook): void;
     /** Stops or restarts rendering (the studio pauses its own view while a device emulator runs). */
     setPaused(paused: boolean): void;

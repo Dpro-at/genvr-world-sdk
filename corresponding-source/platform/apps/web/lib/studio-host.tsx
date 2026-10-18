@@ -15,6 +15,10 @@ export interface StudioHost {
   presentationControls?: (section: 'motions' | 'expressions' | 'effects' | 'notifications' | 'cards', search?: string) => ReactNode;
   presentationOverlay?: () => ReactNode;
   characterBody?: (change: (id: import('@genvr/contracts').BodyId) => void) => () => void;
+  shareStudio?: import('@genvr/assistant').AssistantHost['shareStudio'];
+  share?: () => void;
+  avatarLive?: () => void;
+  characterRecipe?: (recipe: import('@genvr/contracts').CharacterRecipe) => void;
   characterLook?: (look: AvatarLook) => void;
   presentationStage?: (stage: CharacterStage | null) => void;
   presentationInfo?: () => string;

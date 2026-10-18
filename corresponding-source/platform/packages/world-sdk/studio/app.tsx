@@ -1,3 +1,9 @@
+import { ShareDialog } from './share-dialog';
+import type { StudioSharing } from '../src/studio-sharing';
+import { AvatarLive, AVATAR_LIVE_LAYOUTS, avatarLiveEmbed } from './presentation/avatar-live';
+import { QuickVoice } from '../../../apps/web/components/studio/film/quick-voice';
+import { BodySection } from '../../../apps/web/components/studio/character-editor/character-controls';
+import type { CharacterEditor } from '../../../apps/web/components/studio/character-editor/use-character-editor';
 import { connectLiveStudio, liveStudioOptions, type LiveStudioOptions } from './live-studio';
 import { AvatarSpeechPlayer, type AvatarSpeechPlayback } from './avatar-speech-player';
 import { VoicePanel } from './voice-panel';
@@ -7,14 +13,14 @@ import { registerAvatarMotionLibrary, avatarMotionEntries, motionCategories, typ
 import { browserUserAvatarStorage, type UserAvatarStorage } from '../src/user-avatar-library';
 import { UserAvatarSession } from './user-avatar-session';
 import { UserAvatarPanel } from './user-avatar-panel';
-import { DEFAULT_AVATAR_LOOK, FilmCamera, FilmStudioOperation, type AvatarLook, type BodyId } from '@genvr/contracts';
+import { DEFAULT_AVATAR_LOOK, DEFAULT_CHARACTER_RECIPE, readCharacterRecipe, recipeLook, FilmCamera, FilmStudioOperation, type AvatarLook, type BodyId } from '@genvr/contracts';
 import type { CharacterStage } from '@genvr/runtime/character';
 import { PresentationControls } from './presentation/controls';
 import { AvatarPresentation, type AvatarPresentationOptions } from '../src/avatar-presentation';
 import { PresentationViewport } from './presentation/viewport';
 import { createRoot } from 'react-dom/client';
-import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { Clapperboard, Download, FolderOpen, House, Save, Settings2, Mic, X } from 'lucide-react';
+import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
+import { Monitor, Share2, Clapperboard, Download, FolderOpen, House, Save, Settings2, Mic, X } from 'lucide-react';
 import { createRuntime, DEFAULT_BRUSH, DEFAULT_RIVER, type GenvrRuntime, type ToolStatus } from '@genvr/runtime';
 import { runTool, TOOL_ARGS, EXPRESSIONS, type AssistantHost, type ChatModel } from '@genvr/assistant';
 import { CreateFlow, type CreationOptions } from '../../../apps/web/components/create-flow';
@@ -27,7 +33,7 @@ import { studioGrid, useIsDesktop, useStudioLayout } from '../../../apps/web/com
 import { DEFAULT_PREVIEW } from '../../../apps/web/components/studio/device-bar';
 import { DeviceEmulator } from '../../../apps/web/components/studio/device-emulator';
 import type { LogEntry } from '../../../apps/web/components/studio/console-panel';
-import { StudioHostProvider } from '../../../apps/web/lib/studio-host';
+import { StudioHostProvider, useStudioHost } from '../../../apps/web/lib/studio-host';
 import { setPlatformEnabled } from '../../../apps/web/lib/api';
 import { useStudioFilming } from '../../../apps/web/lib/use-studio-filming';
 import { browserStudioStorage, createStudioProject, importStudioProject, readStudioProject, STUDIO_PROJECT_BYTES, type StudioProject, type StudioStorage } from '../src/studio-project';
@@ -35,7 +41,7 @@ import { syncStudioAgents, type StudioAgent } from '../src/studio-agents';
 import type { StoreEntry } from '../../../apps/web/lib/store-items';
 import { StudioSaveQueue, flushStudioClose } from '../src/studio-save';
 
-export interface StudioOptions { filmExample?: string | false; liveBridge?: LiveStudioOptions; motionLibrary?: AvatarMotionLibrary; userLibrary?: false | { scope: string; storage?: UserAvatarStorage }; presentation?: AvatarPresentationOptions; storage?: StudioStorage; model?: ChatModel; forceWebGL?: boolean; initialProjectId?: string; agents?: (projectId: string) => Promise<StudioAgent[]>; catalog?: { list(): Promise<StoreEntry[]>; asset(id: string): Promise<StudioProject['assets'][number]> }; }
+export interface StudioOptions { sharing?: StudioSharing; filmExample?: string | false; liveBridge?: LiveStudioOptions; motionLibrary?: AvatarMotionLibrary; userLibrary?: false | { scope: string; storage?: UserAvatarStorage }; presentation?: AvatarPresentationOptions; storage?: StudioStorage; model?: ChatModel; forceWebGL?: boolean; initialProjectId?: string; agents?: (projectId: string) => Promise<StudioAgent[]>; catalog?: { list(): Promise<StoreEntry[]>; asset(id: string): Promise<StudioProject['assets'][number]> }; }
 const message = (error: unknown) => error instanceof Error ? error.message : 'Operation failed.';
 const button = 'inline-flex size-10 shrink-0 items-center justify-center rounded-lg hover:bg-ink/10 disabled:opacity-40';
 function IconButton({ label, children, ...props }: { label: string; children: ReactNode } & React.ButtonHTMLAttributes<HTMLButtonElement>) {
@@ -53,15 +59,47 @@ function Editor({ initial, storage, options, leave, beforeClose }: { initial: St
   const characterFingerprint = useRef('');
   const speechPlayback = useRef<AvatarSpeechPlayback|null>(null);
   const registerSpeech = useRef((value:AvatarSpeechPlayback|null)=>{speechPlayback.current=value;}).current;
+  const sharedCharacter=useRef<CharacterEditor|null>(null);
+  const liveStage = useRef<CharacterStage | null>(null);
+  const [livePlayerHost,setLivePlayerHost]=useState<HTMLDivElement|null>(null);
+  const worldPreview=useRef<((canvas:HTMLCanvasElement)=>void)|null>(null);
+  const sharePreviewPending=useRef(false);
+  const [sharePreparing,setSharePreparing]=useState(false);
+  const [sharePreviewError,setSharePreviewError]=useState('');
+  const [sharePreview,setSharePreview]=useState<Record<string,string>>({});
+  const openShare=async()=>{
+    setShareOpen(true);setSharePreparing(true);setSharePreviewError('');const previews:Record<string,string>={},stage=liveStage.current;
+    let worldSnapshot:HTMLCanvasElement|null=null;
+    if(stage&&presentation.snapshot().display.background==='world')worldSnapshot=await new Promise<HTMLCanvasElement|null>(resolve=>{const timer=setTimeout(()=>{worldPreview.current=null;resolve(null);},1500);worldPreview.current=source=>{clearTimeout(timer);const image=document.createElement('canvas');image.width=source.width;image.height=source.height;image.getContext('2d')!.drawImage(source,0,0);resolve(image);};});
+    if(stage)for(const row of AVATAR_LIVE_LAYOUTS){try{
+      const round=['circle','watch'].includes(row.id),url=await stage.capturePreview({width:round?210:row.width,height:round?210:row.height,framing:round||row.id==='banner'?'bust':'full',anchor:round?.5:.28});
+      const image=new Image();image.src=url;await image.decode();
+      const canvas=document.createElement('canvas');canvas.width=row.width;canvas.height=row.height;const context=canvas.getContext('2d')!;
+      const display=presentation.snapshot().display;
+      if(display.background!=='transparent'){context.fillStyle=display.color;context.fillRect(0,0,row.width,row.height);}
+      const backdrop=display.background==='world'?worldSnapshot:display.background==='image'?document.querySelector<HTMLImageElement>('[data-avatar-live-frame] img'):display.background==='video'?document.querySelector<HTMLVideoElement>('[data-avatar-live-frame] video'):null;
+      if(backdrop)context.drawImage(backdrop,0,0,row.width,row.height);
+      if(round){const size=Math.min(210,row.width*.55,row.height),x=(row.width*.55-size)/2,y=(row.height-size)/2;context.save();context.beginPath();context.arc(x+size/2,y+size/2,size/2,0,Math.PI*2);context.clip();context.drawImage(image,x,y,size,size);context.restore();}
+      else context.drawImage(image,0,0,row.width,row.height);
+      if(round){const size=Math.min(210,row.width*.55,row.height),x=(row.width*.55-size)/2,y=(row.height-size)/2,crop=document.createElement('canvas');crop.width=size;crop.height=size;const ctx=crop.getContext('2d')!;ctx.beginPath();ctx.arc(size/2,size/2,size/2,0,Math.PI*2);ctx.clip();ctx.drawImage(canvas,x,y,size,size,0,0,size,size);previews[row.id]=crop.toDataURL('image/png');}else previews[row.id]=canvas.toDataURL('image/png');
+    }catch{}}
+    setSharePreview(previews);setSharePreparing(false);if(stage&&!Object.keys(previews).length)setSharePreviewError('Could not capture previews. Refresh to try again.');
+  };
+  const [shareOpen,setShareOpen]=useState(false);
+  const [liveRecipe,setLiveRecipe] = useState(()=>{try{return readCharacterRecipe(JSON.parse(localStorage.getItem('genvr-character-draft-v1')??'null'));}catch{return DEFAULT_CHARACTER_RECIPE;}});
+  const liveRecipeKey=useRef('');
+  const embedLayout = new URLSearchParams(window.location.search).get('avatar-live');
   const presentationStage = useRef<CharacterStage | null>(null);
   const [presentation] = useState(() => new AvatarPresentation(() => {
-    const world = runtime.current; if (!world) return null;
+    const world = runtime.current; if (!world || (presentation.snapshot().display.open&&!liveStage.current)) return null;
     return {
-      presentAnimation: (target, id) => target === 'self' && presentationStage.current ? presentationStage.current.presentAnimation(id) : world.presentAnimation(target, id),
-      presentExpression: (target, expression) => target === 'self' && presentationStage.current ? presentationStage.current.presentExpression(expression) : world.presentExpression(target, expression),
-      importAvatarMotion: (target, id, data) => target === 'self' && presentationStage.current ? presentationStage.current.importAvatarMotion(id, data) : world.importAvatarMotion(target, id, data),
+      presentAnimation: (target, id) => target === 'self' && (liveStage.current ?? presentationStage.current) ? (liveStage.current ?? presentationStage.current)!.presentAnimation(id) : world.presentAnimation(target, id),
+      presentExpression: (target, expression) => target === 'self' && (liveStage.current ?? presentationStage.current) ? (liveStage.current ?? presentationStage.current)!.presentExpression(expression) : world.presentExpression(target, expression),
+      importAvatarMotion: (target, id, data) => target === 'self' && (liveStage.current ?? presentationStage.current) ? (liveStage.current ?? presentationStage.current)!.importAvatarMotion(id, data) : world.importAvatarMotion(target, id, data),
     };
   }, options.presentation));
+  const presentationState=useSyncExternalStore(presentation.subscribe,presentation.snapshot);
+  useEffect(()=>{if(embedLayout){const query=new URLSearchParams(window.location.search);const values=Object.fromEntries(['background','color','framing','media','worldId'].flatMap(key=>query.has(key)?[[key,query.get(key)]]:[]));presentation.execute({kind:'display',open:true,layout:embedLayout,framing:['watch','circle','banner'].includes(embedLayout)?'bust':'full',...values,...(query.has('worldSpot')?(()=>{try{return {worldSpot:JSON.parse(query.get('worldSpot')!)};}catch{return {};}})():{})});}},[]);
   const [presentationAgents, setPresentationAgents] = useState<StudioAgent[]>([]);
   const [library] = useState(() => !options.userLibrary ? null : options.userLibrary.storage ?? browserUserAvatarStorage(options.userLibrary.scope));
   const [userAvatars] = useState(() => library ? new UserAvatarSession(library) : null);
@@ -85,7 +123,7 @@ function Editor({ initial, storage, options, leave, beforeClose }: { initial: St
     if (builtin) avatarBodies[target] = builtin as NonNullable<StudioProject['avatarBodies']>[string]; else delete avatarBodies[target];
     project.current = { ...project.current, avatarBodies }; changed();
     if (look) localLooks.current.set(target, look); else localLooks.current.delete(target);
-    if (target === 'self') { runtime.current.setAvatarLook(look ?? DEFAULT_AVATAR_LOOK); selfLibraryBody.current?.(look?.body ?? 'classic'); }
+    if (target === 'self') { setLiveRecipe(current=>({...current,body:look?.body??'classic'})); liveStage.current?.setRecipe({...liveRecipe,body:look?.body??'classic'}); runtime.current.setAvatarLook(look ?? DEFAULT_AVATAR_LOOK); selfLibraryBody.current?.(look?.body ?? 'classic'); }
     else syncStudioAgents(runtime.current, agentRows.current, localLooks.current);
   };
   const playUserMotion = async (target: string, id: string) => {
@@ -105,6 +143,7 @@ function Editor({ initial, storage, options, leave, beforeClose }: { initial: St
   const [ready, setReady] = useState(false), [error, setError] = useState<string | null>(null), [saved, setSaved] = useState('Loading');
   const [metadata, setMetadata] = useState(initial), [settings, setSettings] = useState(false), [testing, setTesting] = useState(false);
   const [tab, setTab] = useState<StudioTab>('build'), [preview, setPreview] = useState(DEFAULT_PREVIEW);
+  useEffect(()=>{const world=runtime.current;if(!world||!presentationState.display.open)return;const background=presentationState.display.background==='world'&&!presentationState.display.worldId;world.setPresentationBackdrop(background);world.setPaused(!background);return()=>{world.setPresentationBackdrop(false);world.setPaused(tab==='avatar'&&!testing);};},[presentationState.display.open,presentationState.display.background,presentationState.display.worldId,ready]);
   const [logs, setLogs] = useState<LogEntry[]>([]), desktop = useIsDesktop();
   const [layout, setLayout] = useStudioLayout(tab === 'filming' ? 'filming' : 'build');
   const [status, setStatus] = useState<ToolStatus>({ tool: null, points: 0, canFinish: false, message: null, placeItemId: null,
@@ -151,13 +190,13 @@ function Editor({ initial, storage, options, leave, beforeClose }: { initial: St
     void createRuntime({ container: container.current!, world: initial.world, terrainChunks: initial.terrainChunks, editable: true,
       playView: initial.play.view, sideMoves: initial.play.moves, loadSignal: abort.signal, fetchPackage: asset,
       emulateTouch: !desktop,
-      forceWebGL: options.forceWebGL, onToolStatus: setStatus, onCommand: changed,
-      onFilmFrame: (...args) => latestFilm.current.onFilmFrame(...args), onRendered: () => latestFilm.current.onRendered(),
+      forceWebGL: options.forceWebGL || Boolean(embedLayout), onToolStatus: setStatus, onCommand: changed,
+      onFilmFrame: (...args) => latestFilm.current.onFilmFrame(...args), onRendered: () => {latestFilm.current.onRendered();const callback=worldPreview.current,source=container.current?.querySelector('canvas');if(callback&&source&&!presentation.snapshot().display.worldId){worldPreview.current=null;callback(source);}},
     }).then(view => {
       current = view;
       if (abort.signal.aborted) { view.dispose(); return; }
       runtime.current = view; view.setSimulating(false); view.setControlsEnabled(true);
-      void restoreLibrary('self').then(() => { if (!abort.signal.aborted && localLooks.current.has('self')) view.setAvatarLook(localLooks.current.get('self')!); }).catch(error => { if (!abort.signal.aborted) setError(message(error)); });
+      void restoreLibrary('self').then(() => { if (!abort.signal.aborted && localLooks.current.has('self')) { const look=localLooks.current.get('self')!;view.setAvatarLook(look);setLiveRecipe(current=>({...current,body:look.body,colors:{...current.colors,skin:look.skin,hair:look.hair,top:look.shirt,bottom:look.pants,shoes:look.shoes}})); } }).catch(error => { if (!abort.signal.aborted) setError(message(error)); });
       setReady(true); setSaved('Saved locally');
     }).catch(error => { if (!abort.signal.aborted) setError(message(error)); });
     const beforeUnload = (event: BeforeUnloadEvent) => { if (dirty.current) { event.preventDefault(); event.returnValue = ''; } };
@@ -217,10 +256,11 @@ function Editor({ initial, storage, options, leave, beforeClose }: { initial: St
       if (typeof args.data !== 'string' || args.data.length > 12 * 1024 * 1024 || typeof args.duration !== 'number' || args.duration <= 0 || args.duration > 120 || typeof args.target !== 'string') throw new Error('Invalid avatar speech.');
       if(!speechPlayback.current)throw new Error('Speech player is not ready.');
       await speechPlayback.current.load({data:args.data,target:args.target,duration:args.duration,...(typeof args.text==='string'?{text:args.text}:{})});
-      return {started:true,target:args.target,mouthSync:runtime.current.supportsAvatarExpression(args.target)};
+      return {started:true,target:args.target,mouthSync:args.target==='self'&&liveStage.current?liveStage.current.info.expressionSupported:runtime.current.supportsAvatarExpression(args.target)};
     }
-    if (tool === 'inspect_studio') return { projectId: initial.id, world: { style: runtime.current.world.style.base, kind: runtime.current.world.terrain.world?.kind ?? 'empty', seed: runtime.current.world.terrain.world?.seed, spawn: runtime.current.world.spawn, itemCount: runtime.current.world.instances.length }, ...(args.include_checks === true ? { checks: runtime.current.checkWorld() } : {}), workspace: tab, lighting: runtime.current.world.environment.lighting ?? [], speech:speechPlayback.current?.snapshot(), avatar: presentationStage.current?.info ?? runtime.current.avatarState, camera: latestFilm.current.camera, spot: latestFilm.current.avatarSpot(), actorPosition: runtime.current.localPlayer, expressionSupported: runtime.current.supportsAvatarExpression('self'), plan: latestFilm.current.studio.plan, presentation: presentation.snapshot().lastAction };
-    if (tool === 'present_avatar') { const { event } = TOOL_ARGS.present_avatar.parse(raw); const error = presentation.execute(event); if (error) throw new Error(error); return { executed: true, event: event.kind }; }
+    if(tool==='share_studio')return shareStudio(TOOL_ARGS.share_studio.parse(raw));
+    if (tool === 'inspect_studio') return { availableWorlds:await storage.list(), projectId: initial.id, world: { style: runtime.current.world.style.base, kind: runtime.current.world.terrain.world?.kind ?? 'empty', seed: runtime.current.world.terrain.world?.seed, spawn: runtime.current.world.spawn, itemCount: runtime.current.world.instances.length }, ...(args.include_checks === true ? { checks: runtime.current.checkWorld() } : {}), workspace: tab, lighting: runtime.current.world.environment.lighting ?? [], speech:speechPlayback.current?.snapshot(), avatar: liveStage.current?.info ?? presentationStage.current?.info ?? runtime.current.avatarState, camera: latestFilm.current.camera, spot: latestFilm.current.avatarSpot(), actorPosition: runtime.current.localPlayer, expressionSupported: liveStage.current?.info.expressionSupported ?? runtime.current.supportsAvatarExpression('self'), plan: latestFilm.current.studio.plan, avatarLive: presentation.snapshot().display, presentation: presentation.snapshot().lastAction };
+    if (tool === 'present_avatar') { const { event } = TOOL_ARGS.present_avatar.parse(raw); if(event.kind==='display'&&event.worldId&&event.worldId!==initial.id)await storage.read(event.worldId); const error = presentation.execute(event); if (error) throw new Error(error); return { executed: true, event: event.kind }; }
     if (tool === 'user_avatar_library') {
       const result = await runTool(tool, raw, { userAvatarLibrary, presentAvatar: presentation.execute } as AssistantHost);
       if (!result.ok) throw new Error(result.result); return result.result;
@@ -228,7 +268,7 @@ function Editor({ initial, storage, options, leave, beforeClose }: { initial: St
     if (tool === 'list_avatar_motions') {
       const query = AvatarCatalogQuery.parse(raw), entries = [...CORE_ANIMATIONS.map(row => ({ id: row.manifest.id, name: row.manifest.name, categories: motionCategories(row.manifest.name), source: 'native' })), ...avatarMotionEntries().map(row => ({ id: row.id, name: row.name, categories: motionCategories(row.name, row.category), source: 'private-host-library' }))];
       const matching = entries.filter(row => `${row.id} ${row.name}`.toLowerCase().includes(query.query.toLowerCase()) && (!query.category || row.categories.some(category => category.toLowerCase() === query.category!.toLowerCase())));
-      return { total: entries.length, matched: matching.length, offset: query.offset, entries: matching.slice(query.offset, query.offset + query.limit), expressions: EXPRESSIONS, expressionSupported: runtime.current.supportsAvatarExpression('self'), viewportConnected: true };
+      return { total: entries.length, matched: matching.length, offset: query.offset, entries: matching.slice(query.offset, query.offset + query.limit), expressions: EXPRESSIONS, expressionSupported: liveStage.current?.info.expressionSupported ?? runtime.current.supportsAvatarExpression('self'), viewportConnected: true };
     }
     if (latestFilm.current.isBusy() && !(tool==='studio_action' && (args.operation as {kind?:string})?.kind==='manual_record')) throw new Error('Wait for the current recording.');
     if (tool === 'get_camera') return { camera: latestFilm.current.camera, view: latestFilm.current.cameraView() };
@@ -245,8 +285,15 @@ function Editor({ initial, storage, options, leave, beforeClose }: { initial: St
   };
   useEffect(() => {
     if (!ready || !options.liveBridge) return;
-    return connectLiveStudio(options.liveBridge, initial, { avatar: true, privateLibrary: Boolean(library), filming: true, voice: true }, (tool, args, signal) => liveExecutor.current(tool, args, signal), setLiveConnected);
+    return connectLiveStudio(options.liveBridge, initial, { avatar: true, privateLibrary: Boolean(library), filming: true, voice: true, avatarLive: true, sharing: Boolean(options.sharing) }, (tool, args, signal) => liveExecutor.current(tool, args, signal), setLiveConnected);
   }, [ready, initial.id, options.liveBridge]);
+  const shareStudio: NonNullable<AssistantHost['shareStudio']> = async input => {
+    if(input.action==='inspect')return {available:Boolean(options.sharing),localOnly:!options.sharing,projectId:initial.id,layouts:AVATAR_LIVE_LAYOUTS};
+    if(input.action==='open'){openShare();return {opened:true};}
+    if(!options.sharing)throw new Error('Connect your hosting sharing service to create access-controlled links.');
+    if(!input.request||input.request.projectId!==initial.id)throw new Error('Choose this project and explicit access settings.');
+    return options.sharing.create(input.request);
+  };
   beforeClose.current = flush;
   const goHome = async () => { if (await flush()) leave(); };
   const test = (value: boolean) => { if (value) runtime.current?.setTool(null); setTesting(value); };
@@ -255,13 +302,16 @@ function Editor({ initial, storage, options, leave, beforeClose }: { initial: St
     userAvatarControls: library ? (section, search) => { return <UserAvatarPanel storage={library} section={section} search={search} agents={presentationAgents} assign={assignUserAvatar} play={playUserMotion} />; } : undefined,
     presentationControls: options.presentation?.enabled === false ? undefined : (section, search) => <PresentationControls controller={presentation} section={section} search={search} agents={presentationAgents} />,
     presentationOverlay: () => options.presentation?.enabled === false ? null : <PresentationViewport controller={presentation} />,
+    shareStudio, share: openShare,
+    avatarLive: () => { presentation.execute({kind:'display',open:true}); },
+    characterRecipe: recipe => { const key=JSON.stringify(recipe); if(key!==liveRecipeKey.current){liveRecipeKey.current=key;setLiveRecipe(recipe);} },
     characterLook: look => { const key = JSON.stringify(look); if (runtime.current && key !== characterFingerprint.current) { runtime.current.setAvatarLook(look); characterFingerprint.current = key; } },
     userAvatarLibrary, avatarVoice,
     characterBody: change => { selfLibraryBody.current = change; return () => { if (selfLibraryBody.current === change) selfLibraryBody.current = undefined; }; },
     presentationStage: stage => { presentationStage.current = stage; },
     presentAvatar: presentation.execute, presentationInfo: () => presentation.describe() + "; Available targets: self, " + presentationAgents.map(row => `${row.id} (${row.name})`).join(", "), ...(options.catalog ? { catalog: options.catalog } : {}), ...(options.model ? { model: options.model } : {}), leave: () => { void goHome(); }, settings: () => setSettings(true) }}>
     <div className="flex h-dvh flex-col overflow-hidden bg-paper text-ink">
-      <div className="flex h-12 shrink-0 items-center gap-1 border-b border-ink/10 bg-surface px-2">
+      <div style={embedLayout?{display:'none'}:undefined} className="flex h-12 shrink-0 items-center gap-1 border-b border-ink/10 bg-surface px-2">
         <IconButton label="My projects" disabled={(!ready && !error) || filming.busy || filming.studio.rendering} onClick={() => void goHome()}><House className="size-4" /></IconButton>
         <span className="truncate text-xs font-bold">Local Studio</span>{options.liveBridge ? <span role="status" aria-label="Live MCP connection" className="rounded-full border border-ink/10 px-2 py-1 text-[10px]">{liveConnected ? 'MCP connected' : 'MCP connecting'}</span> : null}{agentCount !== null ? <span className="text-xs" role="status">{agentCount} agents</span> : null}
         <span className="min-w-0 flex-1 truncate text-xs text-ink/60" role="status">{saved}</span>
@@ -269,19 +319,22 @@ function Editor({ initial, storage, options, leave, beforeClose }: { initial: St
         <IconButton label="Export project" disabled={!ready} onClick={() => { try { download(snapshot()); } catch (error) { setError(message(error)); } }}><Download className="size-4" /></IconButton>
         {options.liveBridge ? <IconButton label="Avatar voice" disabled={!ready} onClick={() => setVoiceOpen(value => !value)}><Mic className="size-4" /></IconButton> : null}
         <IconButton label="Place settings" disabled={!ready} onClick={() => setSettings(true)}><Settings2 className="size-4" /></IconButton>
+        {!desktop ? <><IconButton label="Avatar Live" onClick={()=>presentation.execute({kind:'display',open:true})}><Monitor className="size-4"/></IconButton><IconButton label="Share" onClick={openShare}><Share2 className="size-4"/></IconButton></>:null}
         {!desktop ? <IconButton label="Filming" disabled={!ready} onClick={() => { runtime.current?.setTool(null); setTab('filming'); }}><Clapperboard className="size-4" /></IconButton> : null}
       </div>
       {error ? <div role="alert" className="flex items-center gap-2 bg-coral px-3 py-2 text-sm text-white"><span className="flex-1">{error}</span><button aria-label="Dismiss error" onClick={() => setError(null)}><X className="size-4" /></button></div> : null}
       {voiceOpen && options.liveBridge ? <VoicePanel connection={options.liveBridge} projectId={initial.id} agents={presentationAgents} playerHost={setVoicePlayerHost} close={()=>setVoiceOpen(false)} /> : null}
-      <main className="relative min-h-0 flex-1" style={desktop ? studioGrid(layout, testing) : undefined}>
+      {shareOpen?<ShareDialog projectId={initial.id} layout={presentationState.display.layout} display={presentationState.display} preview={sharePreview} initialSurface={presentationState.display.open?'avatar-live':'world'} preparing={sharePreparing} previewError={sharePreviewError} requestPreview={()=>{if(liveStage.current)void openShare();else{sharePreviewPending.current=true;presentation.execute({kind:'display',open:true});}}} sharing={options.sharing} close={()=>setShareOpen(false)}/>:null}
+      {presentationState.display.open ? <AvatarLive controller={presentation} recipe={liveRecipe} onStage={stage=>{liveStage.current=stage;if(stage&&sharePreviewPending.current){sharePreviewPending.current=false;void openShare();}}} projectId={initial.id} embedded={Boolean(embedLayout)} onShare={openShare} playerHost={setLivePlayerHost} worldViewport={container.current} onWorldRendered={canvas=>{const callback=worldPreview.current;if(callback){worldPreview.current=null;callback(canvas);}}} worldStorage={storage} currentProject={()=>project.current} characters={<LiveCharacters editor={sharedCharacter.current}/>} voice={<><QuickVoice filming={filming}/><button className="mt-3 rounded border border-ink/20 p-2 text-xs" onClick={()=>setVoiceOpen(true)}>Open voice generator</button></>}/> : null}
+      <main inert={presentationState.display.open||undefined} style={embedLayout?{display:'none'}:desktop ? studioGrid(layout, testing) : undefined} className="relative min-h-0 flex-1">
         <div className="relative min-h-0 min-w-0 overflow-hidden" style={desktop ? { gridArea: 'viewport', visibility: preview.model ? 'hidden' : undefined } : { height: '100%' }}>
           <div ref={container} className="h-full w-full" />
 
           {ready && (tab !== 'avatar' || testing) && options.presentation?.enabled !== false ? <PresentationViewport controller={presentation} agents={presentationAgents} /> : null}
           {!ready ? <p className="absolute inset-x-0 top-1/2 text-center text-sm">{error ? 'Could not open the world' : 'Loading world'}</p> : null}
         </div>
-        <div style={desktop?{gridArea:'viewport'}:undefined} className={desktop?'pointer-events-none relative z-30 min-h-0 min-w-0':'pointer-events-none absolute inset-0 z-30'}><AvatarSpeechPlayer portal={voicePlayerHost} register={registerSpeech} mouth={(target,shape)=>{runtime.current?.setSpeechMouth(target,shape);if(target==='self')presentationStage.current?.setMouth(shape);}} recording={stream=>runtime.current?.setVoiceRecordingStream(stream)} /></div>
-        {ready && desktop ? <StudioChrome runtime={runtime} filming={filming} placeId={initial.id} devices={metadata.play.devices} isOwner status={status}
+        <div style={{...(desktop?{gridArea:'viewport'}:{}),...(presentationState.display.open?{position:'fixed',left:0,right:0,bottom:0,zIndex:140}:{} )}} className={desktop?'pointer-events-none relative z-30 min-h-0 min-w-0':'pointer-events-none absolute inset-0 z-30'}><AvatarSpeechPlayer portal={voicePlayerHost??livePlayerHost} register={registerSpeech} mouth={(target,shape)=>{runtime.current?.setSpeechMouth(target,shape);if(target==='self'){presentationStage.current?.setMouth(shape);liveStage.current?.setMouth(shape);}}} recording={stream=>runtime.current?.setVoiceRecordingStream(stream)} /></div>
+        {ready && desktop ? <StudioChrome onCharacter={editor=>{sharedCharacter.current=editor;}} runtime={runtime} filming={filming} placeId={initial.id} devices={metadata.play.devices} isOwner status={status}
           title={metadata.title} saveText={saved} style={runtime.current?.world.style.base ?? initial.world.style.base}
           layout={layout} onLayout={setLayout} tab={tab} onTab={next => { setTab(next); setPreview(DEFAULT_PREVIEW); }} preview={preview} onPreview={next => {
             if (next.model && options.storage) { setError('Device preview requires the default local project storage.'); return; }
@@ -313,7 +366,7 @@ function App({ options, beforeClose }: { options: StudioOptions; beforeClose: Be
   const [project, setProject] = useState<StudioProject | null>(null), [recent, setRecent] = useState<Array<{ id: string; title: string }>>([]);
   const [error, setError] = useState<string | null>(null), picker = useRef<HTMLInputElement>(null);
   const refresh = () => { void storage.list().then(setRecent).catch(error => setError(message(error))); };
-  useEffect(() => { refresh(); if (options.initialProjectId) void open(options.initialProjectId); }, []);
+  useEffect(() => { refresh(); const id=new URLSearchParams(window.location.search).get('project')??options.initialProjectId; if(id)void open(id); }, []);
   const open = async (id: string) => { try { setProject(await storage.read(id)); setError(null); } catch (error) { setError(message(error)); } };
   const create = async ({ style, worldKind, play }: CreationOptions) => {
     const next = createStudioProject(style, worldKind, play); await storage.write(next); setProject(next);
@@ -377,3 +430,22 @@ export function mountAvatarPresentation(container: HTMLElement, runtime: Pick<Ge
   const unsubscribe = options.subscribe?.('', controller.execute);
   return { execute: controller.execute, controller, dispose() { unsubscribe?.(); root.unmount(); controller.dispose(); } };
 }
+
+function LiveCharacters({editor}:{editor:CharacterEditor|null}){
+ const host=useStudioHost();
+ if(!editor)return <p className="text-xs">Character controls are loading.</p>;
+ return <><BodySection editor={editor}/>{host.userAvatarControls?.('characters','',body=>editor.change(recipe=>({...recipe,body})))}</>;
+}
+
+export interface AvatarLiveOptions extends AvatarPresentationOptions { recipe?: import('@genvr/contracts').CharacterRecipe; display?: Partial<import('@genvr/assistant').AvatarLiveDisplay>; projectId?: string; }
+/** Mount an independent direct avatar viewer, without loading the world editor. */
+export function mountAvatarLive(container: HTMLElement, options: AvatarLiveOptions = {}) {
+ let stage: CharacterStage|null=null, speech:AvatarSpeechPlayback|null=null, recipe=options.recipe??DEFAULT_CHARACTER_RECIPE;
+ const controller=new AvatarPresentation(()=>stage?{presentAnimation:(target,id)=>target==='self'&&(stage?.presentAnimation(id)??false),presentExpression:(target,expression)=>target==='self'&&(stage?.presentExpression(expression)??false),importAvatarMotion:async(target,id,data)=>target==='self'&&Boolean(await stage?.importAvatarMotion(id,data))}:null,options);
+ controller.execute({kind:'display',...options.display,open:true});
+ const root=createRoot(container);
+ const draw=()=>root.render(<><AvatarLive controller={controller} recipe={recipe} onStage={value=>{stage=value;}} projectId={options.projectId??'avatar'} embedded/><AvatarSpeechPlayer register={value=>{speech=value;}} mouth={(_target,shape)=>stage?.setMouth(shape)} recording={()=>{}}/></>);
+ draw();const unsubscribe=options.subscribe?.(options.projectId??'',controller.execute);
+ return {execute:controller.execute,controller,setRecipe(next:import('@genvr/contracts').CharacterRecipe){recipe=next;draw();},speak(input:Parameters<AvatarSpeechPlayback['load']>[0]){if(!speech)throw new Error('Avatar speech player is loading.');return speech.load(input);},speechControl(command:string,value?:number){if(!speech)throw new Error('Avatar speech player is loading.');return speech.control(command,value);},snapshot:()=>({display:controller.snapshot().display,avatar:stage?.info,speech:speech?.snapshot()}),dispose(){unsubscribe?.();root.unmount();controller.dispose();}};
+}
+export { AVATAR_LIVE_LAYOUTS, avatarLiveEmbed } from '../src/avatar-live-embed';

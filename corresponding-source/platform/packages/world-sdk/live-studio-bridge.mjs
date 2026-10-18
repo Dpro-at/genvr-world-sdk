@@ -1,5 +1,5 @@
 import { randomBytes, randomUUID, timingSafeEqual } from 'node:crypto';
-const allowed = new Set(['present_avatar', 'user_avatar_library', 'list_avatar_motions', 'inspect_studio', 'studio_action', 'set_camera', 'get_camera', 'reset_camera', 'capture_photo', 'avatar_speech', 'avatar_speech_control']);
+const allowed = new Set(['share_studio', 'present_avatar', 'user_avatar_library', 'list_avatar_motions', 'inspect_studio', 'studio_action', 'set_camera', 'get_camera', 'reset_camera', 'capture_photo', 'avatar_speech', 'avatar_speech_control']);
 /** Authenticated loopback mailbox. Only named Studio operations cross the boundary. */
 export function createLiveStudioBridge({ token = randomBytes(32).toString('hex'), timeout = 60000, voice } = {}) {
   const sessions = new Map(), pending = new Map();
