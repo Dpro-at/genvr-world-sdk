@@ -17,6 +17,20 @@ export interface PublishWorldOptions {
     };
     content: ContentAnswers;
 }
+export type WorldAccess = {
+    mode: 'private' | 'friends' | 'invite' | 'public';
+} | {
+    mode: 'password';
+    password: string;
+};
+export interface WorldInvite {
+    id: string;
+    token: string;
+    expiresAt: string;
+    role: 'player' | 'builder';
+}
+/** A link never grants access by itself. The Genvr server checks the signed-in visitor. */
+export declare function worldShareUrl(webUrl: string, id: string, invite?: string): string;
 export interface SubmitItemOptions {
     name: string;
     kind: 'props-and-decor' | 'nature' | 'structures' | 'vehicles' | 'characters' | 'building-blocks';
@@ -66,6 +80,29 @@ export declare class GenvrClient {
     }>;
     /** Explicit user action, separate from AI generation and importing a private draft. */
     publishWorld(id: string, options: PublishWorldOptions): Promise<Record<string, unknown>>;
+    /** Server-owned metadata, including isOwner/status/accessMode; no ownership is accepted from the host. */
+    experience(id: string): Promise<Record<string, unknown>>;
+    setAccess(id: string, access: WorldAccess): Promise<Record<string, unknown>>;
+    /** Return to draft; access mode is retained. Set access to private separately before importing. */
+    unpublishWorld(id: string): Promise<Record<string, unknown>>;
+    createInvite(id: string, options?: {
+        role?: 'player' | 'builder';
+        expiresInHours?: number;
+    }): Promise<WorldInvite>;
+    /** Revoking an invite stops new acceptance; existing members retain their server-assigned role. */
+    revokeInvite(id: string, inviteId: string): Promise<void>;
+    joinWorld(id: string, options?: {
+        password?: string;
+        invite?: string;
+    }): Promise<{
+        allowed: boolean;
+        reason?: string;
+    }>;
+    joinTicket(id: string): Promise<{
+        ticket: string;
+        url: string;
+        expiresIn: number;
+    }>;
     /** Submit to the existing moderated store; this does not approve or list the item. */
     submitItem(options: SubmitItemOptions): Promise<{
         id: string;

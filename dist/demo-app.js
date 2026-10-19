@@ -3583,15 +3583,15 @@ var $ZodObjectJIT = /* @__PURE__ */ $constructor("$ZodObjectJIT", (inst, def) =>
     const syms = normalized.symbolKeys;
     const doc = new Doc(["payload", "ctx"], { shape: shape3, inst, memo: memo2, syms });
     const parseStr = (k2) => `shape[${k2}]._zod.run({ value: input[${k2}], issues: [] }, ctx)`;
-    const prefixStr = (id, k2) => `
-          let ${id}_ab = false;
-          for (let i = 0; i < ${id}.issues.length; i++) {
-            const iss = ${id}.issues[i];
+    const prefixStr = (id2, k2) => `
+          let ${id2}_ab = false;
+          for (let i = 0; i < ${id2}.issues.length; i++) {
+            const iss = ${id2}.issues[i];
             iss.path = iss.path ? [${k2}, ...iss.path] : [${k2}];
             payload.issues.push(iss);
-            if (iss.continue !== true) ${id}_ab = true;
+            if (iss.continue !== true) ${id2}_ab = true;
           }
-          if (${id}_ab && ctx && ctx.abortEarly) {
+          if (${id2}_ab && ctx && ctx.abortEarly) {
             payload.value = newResult;
             return payload;
           }`;
@@ -3605,34 +3605,34 @@ var $ZodObjectJIT = /* @__PURE__ */ $constructor("$ZodObjectJIT", (inst, def) =>
     for (const key2 of normalized.allKeys) {
       if (key2 === "__proto__")
         continue;
-      const id = ids[key2];
+      const id2 = ids[key2];
       const k2 = typeof key2 === "symbol" ? `syms[${syms.indexOf(key2)}]` : esc(key2);
       const isPresent = `${k2} in input`;
       const schema = shape3[key2];
       const optin = schema?._zod?.optin;
       const isOptionalIn = optin !== void 0;
       const isOptionalOut = schema?._zod?.optout === "optional";
-      doc.write(`const ${id} = ${parseStr(k2)};`);
+      doc.write(`const ${id2} = ${parseStr(k2)};`);
       if (isOptionalIn && isOptionalOut) {
-        const assign3 = optin === "optional" ? `${id}_present` : `${id}.value !== undefined || ${id}_present`;
+        const assign3 = optin === "optional" ? `${id2}_present` : `${id2}.value !== undefined || ${id2}_present`;
         doc.write(`
-        const ${id}_present = ${isPresent};
-        if (!${id}.issues.length || ${id}_present) {
-          if (${id}.issues.length) {${prefixStr(id, k2)}
+        const ${id2}_present = ${isPresent};
+        if (!${id2}.issues.length || ${id2}_present) {
+          if (${id2}.issues.length) {${prefixStr(id2, k2)}
           }
 
           if (${assign3}) {
-            newResult[${k2}] = ${id}.value;
+            newResult[${k2}] = ${id2}.value;
           }
         }
 
       `);
       } else if (!isOptionalIn) {
         doc.write(`
-        const ${id}_present = ${isPresent};
-        if (${id}.issues.length) {${prefixStr(id, k2)}
+        const ${id2}_present = ${isPresent};
+        if (${id2}.issues.length) {${prefixStr(id2, k2)}
         }
-        if (!${id}_present && !${id}.issues.length) {
+        if (!${id2}_present && !${id2}.issues.length) {
           payload.issues.push({
             code: "invalid_type",
             expected: "nonoptional",
@@ -3645,22 +3645,22 @@ var $ZodObjectJIT = /* @__PURE__ */ $constructor("$ZodObjectJIT", (inst, def) =>
           }
         }
 
-        if (${id}_present) {
-          newResult[${k2}] = ${id}.value;
+        if (${id2}_present) {
+          newResult[${k2}] = ${id2}.value;
         }
 
       `);
       } else {
         doc.write(`
-        if (${id}.issues.length) {${prefixStr(id, k2)}
+        if (${id2}.issues.length) {${prefixStr(id2, k2)}
         }
       `);
         if (optin === "defaulted") {
-          doc.write(`newResult[${k2}] = ${id}.value;`);
+          doc.write(`newResult[${k2}] = ${id2}.value;`);
         } else {
           doc.write(`
-        if (${id}.value !== undefined || ${isPresent}) {
-          newResult[${k2}] = ${id}.value;
+        if (${id2}.value !== undefined || ${isPresent}) {
+          newResult[${k2}] = ${id2}.value;
         }
       `);
         }
@@ -15678,26 +15678,26 @@ function extractDefs(ctx, schema) {
     return;
   const idToSchema = /* @__PURE__ */ new Map();
   for (const entry of ctx.seen.entries()) {
-    const id = ctx.metadataRegistry.get(entry[0])?.id;
-    if (id) {
-      const existing = idToSchema.get(id);
+    const id2 = ctx.metadataRegistry.get(entry[0])?.id;
+    if (id2) {
+      const existing = idToSchema.get(id2);
       if (existing && existing !== entry[0]) {
-        throw new Error(`Duplicate schema id "${id}" detected during JSON Schema conversion. Two different schemas cannot share the same id when converted together.`);
+        throw new Error(`Duplicate schema id "${id2}" detected during JSON Schema conversion. Two different schemas cannot share the same id when converted together.`);
       }
-      idToSchema.set(id, entry[0]);
+      idToSchema.set(id2, entry[0]);
     }
   }
   const makeURI = (entry) => {
     const defsSegment = ctx.target === "draft-2020-12" ? "$defs" : "definitions";
     if (ctx.external) {
       const externalId = ctx.external.registry.get(entry[0])?.id;
-      const uriGenerator = ctx.external.uri ?? ((id2) => id2);
+      const uriGenerator = ctx.external.uri ?? ((id3) => id3);
       if (externalId) {
         return { ref: uriGenerator(externalId) };
       }
-      const id = entry[1].defId ?? entry[1].schema.id ?? `schema${ctx.counter++}`;
-      entry[1].defId = id;
-      return { defId: id, ref: `${uriGenerator("__shared")}#/${defsSegment}/${encodeJSONPointerSegment(id)}` };
+      const id2 = entry[1].defId ?? entry[1].schema.id ?? `schema${ctx.counter++}`;
+      entry[1].defId = id2;
+      return { defId: id2, ref: `${uriGenerator("__shared")}#/${defsSegment}/${encodeJSONPointerSegment(id2)}` };
     }
     const uriPrefix = `#`;
     const defUriPrefix = `${uriPrefix}/${defsSegment}/`;
@@ -15745,8 +15745,8 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
         continue;
       }
     }
-    const id = ctx.metadataRegistry.get(entry[0])?.id;
-    if (id) {
+    const id2 = ctx.metadataRegistry.get(entry[0])?.id;
+    if (id2) {
       extractToDef(entry);
       continue;
     }
@@ -15979,10 +15979,10 @@ function finalize(ctx, schema) {
   } else {
   }
   if (ctx.external?.uri) {
-    const id = ctx.external.registry.get(schema)?.id;
-    if (!id)
+    const id2 = ctx.external.registry.get(schema)?.id;
+    if (!id2)
       throw new Error("Schema is missing an `id` property");
-    result.$id = ctx.external.uri(id);
+    result.$id = ctx.external.uri(id2);
   }
   assignProps(result, root.defId ? root.schema : root.def ?? root.schema);
   const rootMetaId = ctx.metadataRegistry.get(schema)?.id;
@@ -16588,7 +16588,7 @@ function stringifyKeyNames(bySchema, json2, visited) {
   const values = json2.enum ?? (json2.const !== void 0 ? [json2.const] : void 0);
   if (!numericType && !values?.some((v2) => typeof v2 === "number"))
     return json2;
-  const { minimum, maximum, exclusiveMinimum, exclusiveMaximum, multipleOf, format, id, ...rest3 } = json2;
+  const { minimum, maximum, exclusiveMinimum, exclusiveMaximum, multipleOf, format, id: id2, ...rest3 } = json2;
   if (rest3.enum)
     rest3.enum = rest3.enum.map((v2) => typeof v2 === "number" ? String(v2) : v2);
   else if (typeof rest3.const === "number")
@@ -16818,7 +16818,7 @@ function toJSONSchema(input2, params) {
       const [_2, schema] = entry;
       processSchema(schema, ctx2);
     }
-    const schemas = {};
+    const schemas2 = {};
     const external = {
       registry: registry2,
       uri: params?.uri,
@@ -16828,15 +16828,15 @@ function toJSONSchema(input2, params) {
     for (const entry of registry2._idmap.entries()) {
       const [key2, schema] = entry;
       extractDefs(ctx2, schema);
-      assignProp(schemas, key2, finalize(ctx2, schema));
+      assignProp(schemas2, key2, finalize(ctx2, schema));
     }
     if (Object.keys(defs).length > 0) {
       const defsSegment = ctx2.target === "draft-2020-12" ? "$defs" : "definitions";
-      schemas.__shared = {
+      schemas2.__shared = {
         [defsSegment]: defs
       };
     }
-    return { schemas };
+    return { schemas: schemas2 };
   }
   const ctx = initializeContext({ ...params, processors: allProcessors });
   processSchema(input2, ctx);
@@ -21290,8 +21290,8 @@ var TerrainFieldSets = external_exports.record(TerrainFieldId, TerrainFieldSetMe
   if (entries.length > 4)
     ctx.addIssue({ code: "custom", message: "At most four field sets per world" });
   let bytes2 = 0;
-  for (const [id, set3] of entries) {
-    if (id !== set3.descriptor.id)
+  for (const [id2, set3] of entries) {
+    if (id2 !== set3.descriptor.id)
       ctx.addIssue({ code: "custom", message: "Field set key/id mismatch" });
     bytes2 += set3.descriptor.width * set3.descriptor.height * set3.descriptor.channels.reduce((n3, c2) => n3 + (c2.encoding === "u8" ? 1 : 4), 0);
   }
@@ -22535,9 +22535,9 @@ var tidewater_ocean_default = ocean;
 
 // ../core-library/dist/environment/water/index.js
 var OCEAN_RESOURCES = [tidewater_ocean_default];
-var getOceanResource = (id) => OCEAN_RESOURCES.find((item4) => item4.resourceId === id);
-function describeOceanControls(id) {
-  const item4 = getOceanResource(id);
+var getOceanResource = (id2) => OCEAN_RESOURCES.find((item4) => item4.resourceId === id2);
+function describeOceanControls(id2) {
+  const item4 = getOceanResource(id2);
   return item4 ? {
     resourceId: item4.resourceId,
     scope: "world",
@@ -23002,8 +23002,8 @@ var REALISTIC_LOOKS = {
 };
 
 // ../core-library/dist/3d-models/_realistic.js
-var realisticLook = (id) => {
-  const look = REALISTIC_LOOKS[id];
+var realisticLook = (id2) => {
+  const look = REALISTIC_LOOKS[id2];
   return look ? { realistic: look } : {};
 };
 
@@ -25498,12 +25498,12 @@ var CORE_ITEMS = [
 ];
 var EXPERIMENTAL_ITEMS = [...TIDEWATER_ITEMS];
 var byId = new Map([...CORE_ITEMS, ...EXPERIMENTAL_ITEMS].map((item4) => [item4.manifest.id, item4]));
-function generatedParamKeys(id) {
-  const item4 = byId.get(id);
+function generatedParamKeys(id2) {
+  const item4 = byId.get(id2);
   const look = item4 ? anyGeneratedLook(item4) : null;
   return look ? Object.keys(look.generated.params).sort() : [];
 }
-var getCoreItem = (id) => byId.get(id);
+var getCoreItem = (id2) => byId.get(id2);
 
 // ../core-library/dist/avatar-appearance/_joint-math.js
 var RAD = Math.PI / 180;
@@ -27292,7 +27292,7 @@ var SKIN_MATERIALS = [
     animated: false
   }
 ];
-var findSkinMaterial = (id) => id ? SKIN_MATERIALS.find((material2) => material2.id === id) : void 0;
+var findSkinMaterial = (id2) => id2 ? SKIN_MATERIALS.find((material2) => material2.id === id2) : void 0;
 
 // ../core-library/dist/avatar-appearance/bodies/_human-joints.js
 var HUMAN_BOY_JOINTS = [
@@ -27657,8 +27657,8 @@ var byId2 = new Map(CORE_WEARABLES.map((item4) => [item4.manifest.id, item4]));
 var place = (item4) => `${item4.slot}:${item4.layer}`;
 function wornItems(ids) {
   const byPlace = /* @__PURE__ */ new Map();
-  for (const id of ids) {
-    const item4 = byId2.get(id);
+  for (const id2 of ids) {
+    const item4 = byId2.get(id2);
     if (item4)
       byPlace.set(place(item4), item4);
   }
@@ -27670,7 +27670,7 @@ function wornItems(ids) {
 }
 
 // ../core-library/dist/avatar-appearance/_body-type.js
-var isItemBodyId = (id) => id.startsWith("user.");
+var isItemBodyId = (id2) => id2.startsWith("user.");
 function defineBody(body) {
   const { name, triangles, ...rest3 } = body;
   return {
@@ -28430,11 +28430,11 @@ var robot_default = defineBody({
 var AVATAR_BODIES = [classic_default, simple_default, starter_default, flat_default, anime_boy_default, warrior_default, human_default, robot_default];
 var PLAYER_BODIES = AVATAR_BODIES.filter((body) => !body.flat);
 var bodies = new Map(AVATAR_BODIES.map((body) => [body.id, body]));
-var findBody = (id) => bodies.get(id ?? "classic") ?? classic_default;
+var findBody = (id2) => bodies.get(id2 ?? "classic") ?? classic_default;
 var sized = /* @__PURE__ */ new Map();
 var round = (value2) => Math.round(value2 * 100) / 100;
-function sizedBody(id, scale5 = NORMAL_AVATAR_SCALE) {
-  const base = findBody(id);
+function sizedBody(id2, scale5 = NORMAL_AVATAR_SCALE) {
+  const base = findBody(id2);
   if (base.model)
     return base;
   const h2 = round(scale5.height);
@@ -28595,7 +28595,7 @@ var MAX_FAVORITE_ANIMATIONS = 8;
 var DEFAULT_FAVORITE_ANIMATIONS = CORE_EMOTES.slice(0, MAX_FAVORITE_ANIMATIONS).map((animation8) => animation8.manifest.id);
 var AVATAR_CLIPS = CORE_ANIMATIONS.map((animation8) => animation8.clip);
 var byId3 = new Map(CORE_ANIMATIONS.map((animation8) => [animation8.manifest.id, animation8]));
-var findAnimation = (id) => byId3.get(id);
+var findAnimation = (id2) => byId3.get(id2);
 
 // ../core-library/dist/drawn.js
 function defineDrawn(item4) {
@@ -30371,7 +30371,7 @@ var lane_default = defineRoad({ id: "genvr.core.road.lane", name: "Local Street"
 var ROAD_TYPES = [street_default, lane_default, dirt_default2, tram_default, rail_default, fantasy_default, path_default2];
 var DEFAULT_ROAD_TYPE = ROAD_TYPES[0];
 var byId4 = new Map(ROAD_TYPES.map((type) => [type.id, type]));
-var getRoadType = (id) => (id ? byId4.get(id) : void 0) ?? DEFAULT_ROAD_TYPE;
+var getRoadType = (id2) => (id2 ? byId4.get(id2) : void 0) ?? DEFAULT_ROAD_TYPE;
 
 // ../core-library/dist/environment/sky/_sky.js
 function defineSky(sky) {
@@ -30784,7 +30784,7 @@ function queryLibrary(filter = {}, entries = LIBRARY) {
   });
 }
 var byId5 = new Map(LIBRARY.map((entry) => [entry.manifest.id, entry]));
-var getLibraryItem = (id) => byId5.get(id);
+var getLibraryItem = (id2) => byId5.get(id2);
 
 // ../core-library/dist/item-tags.js
 var CURATED = `
@@ -31048,7 +31048,7 @@ function decodeTerrainFieldTile(descriptor, input2) {
   return {
     tx: tile2.tx,
     tz: tile2.tz,
-    channels: Object.fromEntries(Object.entries(tile2.channels).map(([id, text2]) => [id, fromBase64(text2)]))
+    channels: Object.fromEntries(Object.entries(tile2.channels).map(([id2, text2]) => [id2, fromBase64(text2)]))
   };
 }
 function serializeTerrainFieldTile(descriptor, input2) {
@@ -32763,12 +32763,12 @@ function starterWorldCommands(doc, world, heightAt, footprint) {
   for (const thing of spawnRing({ heightAt }, world, void 0, footprint)) {
     while (taken.has(`spawn-${n3}`))
       n3 += 1;
-    const id = `spawn-${n3}`;
-    taken.add(id);
+    const id2 = `spawn-${n3}`;
+    taken.add(id2);
     commands.push({
       type: "place_item",
       params: {
-        instanceId: id,
+        instanceId: id2,
         itemId: thing.itemId,
         position: thing.position,
         rotation: [0, Math.sin(thing.yaw / 2), 0, Math.cos(thing.yaw / 2)],
@@ -33065,8 +33065,8 @@ function initializeTerrainFieldSets(state) {
     metadata.tiles.sort();
   if (state.doc.terrain.fieldSets)
     state.doc.terrain.fieldSets = sets;
-  for (const [id, set3] of Object.entries(sets))
-    state.terrain.fieldSets.set(id, new TerrainFieldStore(set3.descriptor));
+  for (const [id2, set3] of Object.entries(sets))
+    state.terrain.fieldSets.set(id2, new TerrainFieldStore(set3.descriptor));
 }
 function loadTerrainFieldTile(state, input2) {
   const tile2 = TerrainFieldTile.parse(input2);
@@ -33078,14 +33078,14 @@ function loadTerrainFieldTile(state, input2) {
     throw new TerrainFieldStateError("invalid", "Duplicate stored field tile");
   store.replace(tile2, store.revision);
 }
-function requireSet(state, id) {
-  const metadata = state.doc.terrain.fieldSets?.[id], store = state.terrain.fieldSets.get(id);
+function requireSet(state, id2) {
+  const metadata = state.doc.terrain.fieldSets?.[id2], store = state.terrain.fieldSets.get(id2);
   if (!metadata || !store)
-    throw new TerrainFieldStateError("not_found", `Field set ${id} not found`);
+    throw new TerrainFieldStateError("not_found", `Field set ${id2} not found`);
   return { metadata, store };
 }
-function referencedTile(state, id, tx, tz) {
-  const { metadata, store } = requireSet(state, id), tile2 = store.getTile(tx, tz);
+function referencedTile(state, id2, tx, tz) {
+  const { metadata, store } = requireSet(state, id2), tile2 = store.getTile(tx, tz);
   const exists = metadata.tiles.includes(`${tx},${tz}`);
   if (exists && !tile2)
     throw new TerrainFieldStateError("invalid", "Referenced field tile was not loaded; load its exact old row before editing");
@@ -33096,7 +33096,7 @@ function referencedTile(state, id, tx, tz) {
 function sameTile(a2, b2) {
   if (!a2 || !b2)
     return a2 === b2;
-  return a2.kind === b2.kind && a2.setId === b2.setId && a2.tx === b2.tx && a2.tz === b2.tz && a2.cols === b2.cols && a2.rows === b2.rows && Object.keys(a2.channels).length === Object.keys(b2.channels).length && Object.entries(a2.channels).every(([id, bytes2]) => b2.channels[id] === bytes2);
+  return a2.kind === b2.kind && a2.setId === b2.setId && a2.tx === b2.tx && a2.tz === b2.tz && a2.cols === b2.cols && a2.rows === b2.rows && Object.keys(a2.channels).length === Object.keys(b2.channels).length && Object.entries(a2.channels).every(([id2, bytes2]) => b2.channels[id2] === bytes2);
 }
 function encodeTerrainFieldRow(state, key2) {
   const { setId, tx, tz } = parseFieldTileStorageKey(key2);
@@ -33107,12 +33107,12 @@ function encodeTerrainFieldRow(state, key2) {
 }
 function loadedTerrainFieldKeys(state) {
   const keys = [];
-  for (const [id, metadata] of Object.entries(state.doc.terrain.fieldSets ?? {})) {
-    const { store } = requireSet(state, id);
+  for (const [id2, metadata] of Object.entries(state.doc.terrain.fieldSets ?? {})) {
+    const { store } = requireSet(state, id2);
     for (const coord of metadata.tiles) {
       const [tx, tz] = coord.split(",").map(Number);
       if (store.getTile(tx, tz))
-        keys.push(fieldTileStorageKey(id, tx, tz));
+        keys.push(fieldTileStorageKey(id2, tx, tz));
     }
   }
   return keys;
@@ -33128,15 +33128,15 @@ function validateInverseTile(descriptor, input2, setId, tx, tz) {
 function applyFieldCommand(state, command) {
   const none = /* @__PURE__ */ new Set();
   if (command.type === "create_field_set") {
-    const descriptor = command.params.descriptor, id = descriptor.id;
-    if (state.doc.terrain.fieldSets?.[id] || state.terrain.fieldSets.has(id))
-      throw new TerrainFieldStateError("duplicate", `Field set ${id} already exists`);
-    const sets = TerrainFieldSets.parse({ ...state.doc.terrain.fieldSets, [id]: { descriptor, tiles: [] } });
+    const descriptor = command.params.descriptor, id2 = descriptor.id;
+    if (state.doc.terrain.fieldSets?.[id2] || state.terrain.fieldSets.has(id2))
+      throw new TerrainFieldStateError("duplicate", `Field set ${id2} already exists`);
+    const sets = TerrainFieldSets.parse({ ...state.doc.terrain.fieldSets, [id2]: { descriptor, tiles: [] } });
     const store2 = new TerrainFieldStore(descriptor);
     state.doc.terrain.fieldSets = sets;
-    state.terrain.fieldSets.set(id, store2);
-    state.terrain.removedFieldSets.delete(id);
-    return { inverse: { type: "remove_field_set", params: { setId: id } }, changedChunks: none };
+    state.terrain.fieldSets.set(id2, store2);
+    state.terrain.removedFieldSets.delete(id2);
+    return { inverse: { type: "remove_field_set", params: { setId: id2 } }, changedChunks: none };
   }
   if (command.type === "remove_field_set") {
     const { setId: setId2 } = command.params, { metadata: metadata2, store: store2 } = requireSet(state, setId2);
@@ -33919,9 +33919,9 @@ var VoxelData = class {
       this.#roads.set(road.id, { signature, plan });
       touched.push(plan);
     }
-    for (const [id, { plan }] of [...this.#roads])
-      if (!seen.has(id)) {
-        this.#roads.delete(id);
+    for (const [id2, { plan }] of [...this.#roads])
+      if (!seen.has(id2)) {
+        this.#roads.delete(id2);
         touched.push(plan);
       }
     for (const plan of touched)
@@ -33950,9 +33950,9 @@ var VoxelData = class {
       this.#walls.set(wall.id, { signature, plan });
       touched.push(plan);
     }
-    for (const [id, { plan }] of [...this.#walls])
-      if (!seen.has(id)) {
-        this.#walls.delete(id);
+    for (const [id2, { plan }] of [...this.#walls])
+      if (!seen.has(id2)) {
+        this.#walls.delete(id2);
         touched.push(plan);
       }
     for (const plan of touched)
@@ -33964,9 +33964,9 @@ var VoxelData = class {
   }
   /** The wall whose blocks stand at (x, z), the newest first, or null. */
   wallAt(x2, z3) {
-    for (const [id, { plan }] of [...this.#walls].reverse())
+    for (const [id2, { plan }] of [...this.#walls].reverse())
       if (onVoxelWall(plan, x2, z3))
-        return id;
+        return id2;
     return null;
   }
   /** Room floors of closed walls: the outline and the level of the plank floor. */
@@ -33978,9 +33978,9 @@ var VoxelData = class {
   }
   /** The road whose bed covers (x, z), the newest first, or null. */
   roadAt(x2, z3) {
-    for (const [id, { plan }] of [...this.#roads].reverse())
+    for (const [id2, { plan }] of [...this.#roads].reverse())
       if (onVoxelRoad(plan, x2, z3))
-        return id;
+        return id2;
     return null;
   }
   /** Chunk keys whose blocks changed since the last call (to redraw them and their colliders). */
@@ -34496,11 +34496,11 @@ function createWorldState(doc, encodedChunks = [], options = {}) {
   terrain.world = doc.terrain.world ?? null;
   const edits = [];
   initializeTerrainFieldSets({ doc, terrain });
-  for (const [id, store] of options.fieldStores ?? []) {
-    const metadata = doc.terrain.fieldSets?.[id];
+  for (const [id2, store] of options.fieldStores ?? []) {
+    const metadata = doc.terrain.fieldSets?.[id2];
     if (!metadata || !store.complete || metadata.tiles.length !== store.tileCount || JSON.stringify(metadata.descriptor) !== JSON.stringify(store.descriptor))
       throw new CommandError("invalid", "Provided field store does not match complete persisted metadata");
-    terrain.fieldSets.set(id, store);
+    terrain.fieldSets.set(id2, store);
   }
   for (const encoded of encodedChunks) {
     const payload = JSON.parse(encoded);
@@ -34909,8 +34909,8 @@ function applyToDocument(state, input2) {
       };
     }
     case "rename": {
-      const { kind, id, name } = command.params;
-      const target2 = kind === "item" ? doc.instances[findIndex(doc.instances, (i2) => i2.instanceId === id, "Instance")] : kind === "road" ? doc.roads[findIndex(doc.roads, (r3) => r3.id === id, "Road")] : kind === "wall" ? findWall(doc, id) : kind === "water" ? doc.environment.water[findIndex(doc.environment.water, (w4) => w4.id === id, "Water")] : kind === "river" ? doc.environment.rivers[findIndex(doc.environment.rivers, (r3) => r3.id === id, "River")] : findGroup(doc, id);
+      const { kind, id: id2, name } = command.params;
+      const target2 = kind === "item" ? doc.instances[findIndex(doc.instances, (i2) => i2.instanceId === id2, "Instance")] : kind === "road" ? doc.roads[findIndex(doc.roads, (r3) => r3.id === id2, "Road")] : kind === "wall" ? findWall(doc, id2) : kind === "water" ? doc.environment.water[findIndex(doc.environment.water, (w4) => w4.id === id2, "Water")] : kind === "river" ? doc.environment.rivers[findIndex(doc.environment.rivers, (r3) => r3.id === id2, "River")] : findGroup(doc, id2);
       if (kind === "group" && name === null)
         throw new CommandError("invalid", "A group needs a name.");
       const before = target2.name ?? null;
@@ -34918,7 +34918,7 @@ function applyToDocument(state, input2) {
         delete target2.name;
       else
         target2.name = name;
-      return { inverse: { type: "rename", params: { kind, id, name: before } }, changedChunks: none };
+      return { inverse: { type: "rename", params: { kind, id: id2, name: before } }, changedChunks: none };
     }
     case "set_item_flags": {
       const p2 = command.params;
@@ -34965,7 +34965,7 @@ function applyToDocument(state, input2) {
         throw new CommandError("duplicate", `Group ${groupId} exists.`);
       if (new Set(instanceIds).size !== instanceIds.length)
         throw new CommandError("invalid", "An item is listed twice.");
-      const members2 = instanceIds.map((id) => doc.instances[findIndex(doc.instances, (i2) => i2.instanceId === id, "Instance")]);
+      const members2 = instanceIds.map((id2) => doc.instances[findIndex(doc.instances, (i2) => i2.instanceId === id2, "Instance")]);
       if (members2.some((m2) => m2.groupId))
         throw new CommandError("invalid", "An item is already in a group.");
       doc.groups.push({ id: groupId, name });
@@ -35940,20 +35940,20 @@ var Replica = class {
     return this.#pending;
   }
   /** Records a command that was just applied locally (already in the state). */
-  track(id, command, inverse4) {
-    this.#pending.push({ id, command, inverse: inverse4 });
+  track(id2, command, inverse4) {
+    this.#pending.push({ id: id2, command, inverse: inverse4 });
   }
   /** The server accepted one of our commands (it is now part of the confirmed history). */
-  confirm(id) {
-    this.#pending = this.#pending.filter((pending) => pending.id !== id);
+  confirm(id2) {
+    this.#pending = this.#pending.filter((pending) => pending.id !== id2);
   }
   /** A command from someone else, in server order. */
   applyRemote(command) {
     return this.#rebase(() => applyCommand(this.state, command).changedChunks);
   }
   /** The server refused one of our commands: take it out of the local world. */
-  reject(id) {
-    return this.#rebase(() => /* @__PURE__ */ new Set(), id);
+  reject(id2) {
+    return this.#rebase(() => /* @__PURE__ */ new Set(), id2);
   }
   /** Forgets pending commands (e.g. after reloading the world from the server). */
   clear() {
@@ -36207,17 +36207,17 @@ var PresentationSpec = external_exports.object({
   if (!Object.hasOwn(spec.elements, spec.root))
     ctx.addIssue({ code: "custom", message: "Missing card root." });
   let visits = 0;
-  const visit2 = (id, ancestors, depth3) => {
+  const visit2 = (id2, ancestors, depth3) => {
     if (++visits > 300) {
       ctx.addIssue({ code: "custom", message: "Card tree exceeds render budget." });
       return;
     }
-    const node2 = Object.hasOwn(spec.elements, id) ? spec.elements[id] : void 0;
-    if (!node2 || ancestors.has(id) || depth3 > 12) {
+    const node2 = Object.hasOwn(spec.elements, id2) ? spec.elements[id2] : void 0;
+    if (!node2 || ancestors.has(id2) || depth3 > 12) {
       ctx.addIssue({ code: "custom", message: "Invalid card tree." });
       return;
     }
-    const next2 = new Set(ancestors).add(id);
+    const next2 = new Set(ancestors).add(id2);
     for (const child of node2.children)
       visit2(child, next2, depth3 + 1);
   };
@@ -37379,29 +37379,29 @@ var cellsOf = (rect) => {
 var SpatialGrid = class {
   #cells = /* @__PURE__ */ new Map();
   #cellsOfId = /* @__PURE__ */ new Map();
-  set(id, rect) {
-    this.delete(id);
+  set(id2, rect) {
+    this.delete(id2);
     const cells13 = cellsOf(rect);
-    this.#cellsOfId.set(id, cells13);
+    this.#cellsOfId.set(id2, cells13);
     for (const key2 of cells13) {
       const list2 = this.#cells.get(key2);
       if (list2)
-        list2.push(id);
+        list2.push(id2);
       else
-        this.#cells.set(key2, [id]);
+        this.#cells.set(key2, [id2]);
     }
   }
-  delete(id) {
-    const cells13 = this.#cellsOfId.get(id);
+  delete(id2) {
+    const cells13 = this.#cellsOfId.get(id2);
     if (!cells13)
       return;
     for (const key2 of cells13) {
       const list2 = this.#cells.get(key2);
-      const i2 = list2?.indexOf(id) ?? -1;
+      const i2 = list2?.indexOf(id2) ?? -1;
       if (list2 && i2 >= 0)
         list2.splice(i2, 1);
     }
-    this.#cellsOfId.delete(id);
+    this.#cellsOfId.delete(id2);
   }
   /** Ids near a rect, deduplicated only when the rect spans more than one cell (the common case). */
   near(rect) {
@@ -37411,11 +37411,11 @@ var SpatialGrid = class {
     const seen = /* @__PURE__ */ new Set();
     const found = [];
     for (const key2 of cells13)
-      for (const id of this.#cells.get(key2) ?? []) {
-        if (seen.has(id))
+      for (const id2 of this.#cells.get(key2) ?? []) {
+        if (seen.has(id2))
           continue;
-        seen.add(id);
-        found.push(id);
+        seen.add(id2);
+        found.push(id2);
       }
     return found;
   }
@@ -37447,9 +37447,9 @@ var Frontier = class {
   #less(a2, b2) {
     return a2.y < b2.y || a2.y === b2.y && a2.id < b2.id;
   }
-  push(id, y3) {
+  push(id2, y3) {
     const heap = this.#heap;
-    heap.push({ id, y: y3 });
+    heap.push({ id: id2, y: y3 });
     let i2 = heap.length - 1;
     while (i2 > 0) {
       const parent = i2 - 1 >> 1;
@@ -37509,14 +37509,14 @@ function settleChain(doc, shapeOf2, surfaces, resting, apply, limits = { levels:
     boxFor(instance3);
   const bottomOf = (instance3) => boxFor(instance3)?.min[1] ?? instance3.transform.position[1];
   const frontier = new Frontier();
-  for (const [id, was] of resting) {
+  for (const [id2, was] of resting) {
     if (!was)
       continue;
-    const instance3 = instanceById.get(id);
+    const instance3 = instanceById.get(id2);
     if (!instance3)
       continue;
-    depth3.set(id, 0);
-    frontier.push(id, bottomOf(instance3));
+    depth3.set(id2, 0);
+    frontier.push(id2, bottomOf(instance3));
   }
   const requeueCount = /* @__PURE__ */ new Map();
   const REQUEUE_LIMIT = 4;
@@ -37535,24 +37535,24 @@ function settleChain(doc, shapeOf2, surfaces, resting, apply, limits = { levels:
   let truncated = false;
   let totalProcessed = 0;
   for (; ; ) {
-    let id = frontier.pop();
-    while (id !== void 0 && done.has(id))
-      id = frontier.pop();
-    if (id === void 0)
+    let id2 = frontier.pop();
+    while (id2 !== void 0 && done.has(id2))
+      id2 = frontier.pop();
+    if (id2 === void 0)
       break;
-    if (totalProcessed >= limits.items || (depth3.get(id) ?? 0) >= limits.levels) {
+    if (totalProcessed >= limits.items || (depth3.get(id2) ?? 0) >= limits.levels) {
       truncated = true;
       break;
     }
-    const next2 = instanceById.get(id);
+    const next2 = instanceById.get(id2);
     if (!next2)
       continue;
-    done.add(id);
+    done.add(id2);
     totalProcessed++;
     const shape3 = shapeOf2(next2.itemId);
     if (!shape3)
       continue;
-    const fromY = defaultFromY(next2, shape3) + (lift.get(id) ?? 0);
+    const fromY = defaultFromY(next2, shape3) + (lift.get(id2) ?? 0);
     const result = rest(next2, shape3, surfaces, void 0, void 0, { fromY });
     const oldY = next2.transform.position[1];
     if (Math.abs(result.position[1] - oldY) < MOVE && sameRotation(next2.transform.rotation, result.rotation))
@@ -37562,7 +37562,7 @@ function settleChain(doc, shapeOf2, surfaces, resting, apply, limits = { levels:
     const oldTop = oldBox.max[1];
     const dy = result.position[1] - oldY;
     for (const otherId of grid.near(oldRect)) {
-      if (otherId === id)
+      if (otherId === id2)
         continue;
       const other = instanceById.get(otherId);
       if (!other)
@@ -37576,7 +37576,7 @@ function settleChain(doc, shapeOf2, surfaces, resting, apply, limits = { levels:
         const otherShape = shapeOf2(other.itemId);
         const isRestingNow = followsSupport(other, otherShape, surfaces);
         resting.set(other.instanceId, isRestingNow);
-        const d2 = (depth3.get(id) ?? 0) + 1;
+        const d2 = (depth3.get(id2) ?? 0) + 1;
         depth3.set(other.instanceId, d2);
         if (isRestingNow)
           frontier.push(other.instanceId, bottomOf(other));
@@ -37584,17 +37584,17 @@ function settleChain(doc, shapeOf2, surfaces, resting, apply, limits = { levels:
     }
     const command = {
       type: "transform_item",
-      params: { instanceId: id, position: result.position, rotation: result.rotation }
+      params: { instanceId: id2, position: result.position, rotation: result.rotation }
     };
     apply(command);
-    box3.delete(id);
-    grid.delete(id);
+    box3.delete(id2);
+    grid.delete(id2);
     boxFor(next2);
     commands.push(command);
-    if (result.grade && !options?.deferGrade?.(id)) {
+    if (result.grade && !options?.deferGrade?.(id2)) {
       const grownRect = rectOfPoints(offsetPolygon(result.grade.area, BLEND));
       for (const otherId of grid.near(grownRect)) {
-        if (otherId === id)
+        if (otherId === id2)
           continue;
         const other = instanceById.get(otherId);
         if (!other)
@@ -37604,7 +37604,7 @@ function settleChain(doc, shapeOf2, surfaces, resting, apply, limits = { levels:
         if (!otherShape || !otherBox || !overlaps(grownRect, rectOf(otherBox)))
           continue;
         if (followsSupport(other, otherShape, surfaces))
-          requeue(other, id);
+          requeue(other, id2);
       }
       for (const flatten of gradeCommands(result.grade)) {
         apply(flatten);
@@ -38943,10 +38943,10 @@ function validateWorld(doc, env) {
     const spawnPoints = doc.instances.filter((instance3) => instance3.itemId === SPAWN_POINT_ID);
     const taken = new Set(doc.instances.map((instance3) => instance3.instanceId));
     const freeId = (base) => {
-      let id = base;
-      for (let n3 = 2; taken.has(id); n3++)
-        id = `${base}-${n3}`;
-      return id;
+      let id2 = base;
+      for (let n3 = 2; taken.has(id2); n3++)
+        id2 = `${base}-${n3}`;
+      return id2;
     };
     const placeSpawn = (x2, team) => ({
       type: "place_item",
@@ -38989,7 +38989,7 @@ function validateWorld(doc, env) {
       }
     const loadout = doc.game.loadout;
     if (loadout)
-      for (const itemId of new Set(loadout.items.filter((id) => !isTool(id))))
+      for (const itemId of new Set(loadout.items.filter((id2) => !isTool(id2))))
         add3({
           id: `game-loadout-not-tool:${itemId}`,
           code: "game-loadout-not-tool",
@@ -39439,16 +39439,16 @@ function getScripts(args, host) {
 function newScriptId(random12, taken) {
   let draw = random12;
   for (; ; ) {
-    const id = `scr-${Math.floor(draw() * 2 ** 32).toString(16).padStart(8, "0").slice(-8)}`;
-    if (!taken.has(id))
-      return id;
+    const id2 = `scr-${Math.floor(draw() * 2 ** 32).toString(16).padStart(8, "0").slice(-8)}`;
+    if (!taken.has(id2))
+      return id2;
     draw = Math.random;
   }
 }
-async function scriptChecks(host, id) {
+async function scriptChecks(host, id2) {
   const doc = host.world();
-  const lines = checkScripts(doc).filter((f2) => f2.script?.id === id || !f2.script && f2.code.startsWith("script-")).map((f2) => `- ${f2.level} ${f2.code}${f2.script?.line ? ` line ${f2.script.line}` : ""}: ${f2.message}`);
-  const script = doc.scripts?.find((s2) => s2.id === id);
+  const lines = checkScripts(doc).filter((f2) => f2.script?.id === id2 || !f2.script && f2.code.startsWith("script-")).map((f2) => `- ${f2.level} ${f2.code}${f2.script?.line ? ` line ${f2.script.line}` : ""}: ${f2.message}`);
+  const script = doc.scripts?.find((s2) => s2.id === id2);
   if (script?.enabled && host.scripts) {
     const compiled = await host.scripts.compileCheck(script.source);
     if (!compiled.ok)
@@ -39469,7 +39469,7 @@ async function setScript(args, host, random12) {
       return fail(error64);
     return { ok: true, result: asData(`Removed script "${existing.name}" (${existing.id}).`) };
   }
-  let id;
+  let id2;
   let body;
   if (existing) {
     if (args.name === void 0 && args.source === void 0 && args.enabled === void 0)
@@ -39477,7 +39477,7 @@ async function setScript(args, host, random12) {
     const { id: _id2, from, ...rest3 } = existing;
     void _id2;
     const kept = from && (args.source === void 0 || args.source === existing.source) ? { ...rest3, from } : rest3;
-    id = existing.id;
+    id2 = existing.id;
     body = {
       ...kept,
       ...args.name !== void 0 ? { name: args.name } : {},
@@ -39489,7 +39489,7 @@ async function setScript(args, host, random12) {
       return fail("a new script needs a name (and its source).");
     if (scripts.length >= SCRIPT_LIMITS.scripts)
       return fail(`the place has ${scripts.length} scripts; a place may have at most ${SCRIPT_LIMITS.scripts} scripts.`);
-    id = newScriptId(random12, new Set(scripts.map((s2) => s2.id)));
+    id2 = newScriptId(random12, new Set(scripts.map((s2) => s2.id)));
     body = {
       name: args.name,
       api: SCRIPT_API_VERSION,
@@ -39502,19 +39502,19 @@ async function setScript(args, host, random12) {
     const issue2 = parsed.error.issues[0];
     return fail(`invalid ${issue2?.path.join(".") || "script"}: ${issue2?.message ?? "check the values"}.`);
   }
-  const next2 = existing ? scripts.map((s2) => s2.id === id ? { id, ...parsed.data } : s2) : [...scripts, { id, ...parsed.data }];
+  const next2 = existing ? scripts.map((s2) => s2.id === id2 ? { id: id2, ...parsed.data } : s2) : [...scripts, { id: id2, ...parsed.data }];
   const whole = PlaceScripts.safeParse(next2);
   if (!whole.success)
     return fail(whole.error.issues[0]?.message ?? "the scripts are over the limits.");
-  const error63 = host.apply([{ type: "set_script", params: { scriptId: id, script: parsed.data } }]);
+  const error63 = host.apply([{ type: "set_script", params: { scriptId: id2, script: parsed.data } }]);
   if (error63)
     return fail(error63);
-  const checks = await scriptChecks(host, id);
+  const checks = await scriptChecks(host, id2);
   const script = parsed.data;
   return {
     ok: true,
     result: asData([
-      `${existing ? "Changed" : "Added"} script "${script.name}" (${id}), ${script.enabled ? "switched on" : "switched off"}, ${script.source.length} characters. A saved change restarts the match in open rooms.`,
+      `${existing ? "Changed" : "Added"} script "${script.name}" (${id2}), ${script.enabled ? "switched on" : "switched off"}, ${script.source.length} characters. A saved change restarts the match in open rooms.`,
       `Checks for this script: ${checks.length === 0 ? "none." : ""}`,
       ...checks
     ].join("\n"))
@@ -39550,8 +39550,8 @@ async function testScript(args, host) {
       return fail(`the place has no script ${args.script_id}. Use get_scripts for ids.`);
     target2 = args.source === void 0 ? saved : { ...saved, source: args.source };
   } else {
-    const id = newScriptId(() => 0, new Set(scripts.map((s2) => s2.id)));
-    target2 = { id, name: "draft", api: SCRIPT_API_VERSION, enabled: true, source: args.source ?? "" };
+    const id2 = newScriptId(() => 0, new Set(scripts.map((s2) => s2.id)));
+    target2 = { id: id2, name: "draft", api: SCRIPT_API_VERSION, enabled: true, source: args.source ?? "" };
   }
   if (!host.scripts)
     return fail("dry runs are not available here (the script engine is not loaded).");
@@ -39807,11 +39807,11 @@ function executeTool(name, args, host, random12 = Math.random) {
   const half = SIZE_TIERS[world.sizeTier].sideMeters / 2;
   const inside2 = (x2, z3) => Math.abs(x2) <= half && Math.abs(z3) <= half;
   const line = host.sideLine?.() ?? null;
-  const unknownItem = (id) => {
-    const core = getCoreItem(id);
+  const unknownItem = (id2) => {
+    const core = getCoreItem(id2);
     if (core && !core.manifest.styles.includes(world.style.base))
-      return `Item "${id}" does not support the ${world.style.base} world style. Use search_catalog for compatible items.`;
-    return core || host.isPlaceable?.(id) || offered.get(host)?.has(id) ? null : `Unknown item "${id}". Use search_catalog to find item ids.`;
+      return `Item "${id2}" does not support the ${world.style.base} world style. Use search_catalog for compatible items.`;
+    return core || host.isPlaceable?.(id2) || offered.get(host)?.has(id2) ? null : `Unknown item "${id2}". Use search_catalog to find item ids.`;
   };
   const ground = (x2, z3) => Math.round(host.heightAt(x2 + 0.5, z3 + 0.5));
   const builder = host.focus();
@@ -39984,8 +39984,8 @@ function executeTool(name, args, host, random12 = Math.random) {
     }
     case "scatter_items": {
       const a2 = args;
-      for (const id of a2.itemIds) {
-        const missing = unknownItem(id);
+      for (const id2 of a2.itemIds) {
+        const missing = unknownItem(id2);
         if (missing)
           return { ok: false, result: `Error: ${missing}` };
       }
@@ -40223,7 +40223,7 @@ function executeTool(name, args, host, random12 = Math.random) {
     case "remove_items": {
       const { instanceIds } = args;
       const existing = new Set(world.instances.map((i2) => i2.instanceId));
-      const missing = instanceIds.filter((id) => !existing.has(id));
+      const missing = instanceIds.filter((id2) => !existing.has(id2));
       if (missing.length)
         return { ok: false, result: `Error: no items with ids ${missing.join(", ")}.` };
       return done(host.apply(instanceIds.map((instanceId) => ({ type: "remove_item", params: { instanceId } }))), `Removed ${instanceIds.length} items.`);
@@ -40590,7 +40590,7 @@ function executeTool(name, args, host, random12 = Math.random) {
       if (a2.respawn_seconds !== void 0)
         next2.respawn = { delaySec: a2.respawn_seconds, protectSec: current.respawn?.protectSec ?? 2 };
       if (a2.tools !== void 0) {
-        const notTool = a2.tools.find((id) => !getLibraryItem(id)?.manifest.tool);
+        const notTool = a2.tools.find((id2) => !getLibraryItem(id2)?.manifest.tool);
         if (notTool !== void 0)
           return {
             ok: false,
@@ -40965,7 +40965,7 @@ async function readChatStream(body, onText, onQueue) {
 var CORRECTION_WINDOW_MS = 10 * 60 * 1e3;
 
 // src/session.ts
-var SDK_VERSION = "0.3.0-preview.3";
+var SDK_VERSION = "0.3.0-preview.12";
 var PACKAGE_WORK_BUDGET = 5e6;
 function readWorldPackage(input2) {
   const text2 = typeof input2 === "string" ? input2 : JSON.stringify(input2);
@@ -41144,7 +41144,7 @@ var WorldSession = class _WorldSession {
       heightAt: (x2, z3) => this.heightAt(x2, z3),
       focus: () => ({ x: 0, z: 0 }),
       blockGround: () => !!this.#state.voxels,
-      isPlaceable: (id) => !!getCoreItem(id) || this.#record.assets.some((asset) => asset.id === id),
+      isPlaceable: (id2) => !!getCoreItem(id2) || this.#record.assets.some((asset) => asset.id === id2),
       apply: (commands) => {
         try {
           this.apply(commands);
@@ -41195,9 +41195,9 @@ var WorldSession = class _WorldSession {
     });
   }
   /** File URLs are embedded data URLs, not expiring platform URLs. */
-  async itemPackage(id) {
-    const asset = this.#record.assets.find((asset2) => asset2.id === id);
-    return asset ? { id, manifest: asset.manifest, files: asset.files.map((file2) => ({
+  async itemPackage(id2) {
+    const asset = this.#record.assets.find((asset2) => asset2.id === id2);
+    return asset ? { id: id2, manifest: asset.manifest, files: asset.files.map((file2) => ({
       path: file2.path,
       contentType: file2.contentType,
       size: Math.floor(file2.data.length * 3 / 4) - (file2.data.endsWith("==") ? 2 : file2.data.endsWith("=") ? 1 : 0),
@@ -41208,15 +41208,15 @@ var WorldSession = class _WorldSession {
 
 // src/storage.ts
 function browserStorage(storage8, prefix = "genvr.world.") {
-  return { read: async (id) => storage8.getItem(prefix + id), write: async (id, data) => {
-    storage8.setItem(prefix + id, data);
+  return { read: async (id2) => storage8.getItem(prefix + id2), write: async (id2, data) => {
+    storage8.setItem(prefix + id2, data);
   } };
 }
 async function saveWorld(session2, storage8) {
   await storage8.write(session2.export().id, session2.serialize());
 }
-async function openWorld(id, storage8, onEvent) {
-  const data = await storage8.read(id);
+async function openWorld(id2, storage8, onEvent) {
+  const data = await storage8.read(id2);
   if (!data) throw new Error("Saved world not found.");
   return new WorldSession(data, onEvent);
 }
@@ -41260,8 +41260,8 @@ var GenvrClient = class _GenvrClient {
     if (!response.ok) throw new GenvrError(data.message ?? `Genvr returned ${response.status}.`, response.status, data);
     return data;
   }
-  async readWorld(id) {
-    const response = await this.#request(`/v1/experiences/${encodeURIComponent(id)}/world`, void 0, "GET");
+  async readWorld(id2) {
+    const response = await this.#request(`/v1/experiences/${encodeURIComponent(id2)}/world`, void 0, "GET");
     if (!Array.isArray(response.terrain) || !response.terrain.every((row) => typeof row === "string")) throw new Error("Invalid world terrain response.");
     return { world: WorldDocument.parse(response.world), terrain: response.terrain };
   }
@@ -41276,9 +41276,9 @@ var GenvrClient = class _GenvrClient {
     return { items: data.items, next: data.next };
   }
   /** The server enforces approved/free or authenticated entitlement before issuing asset links. */
-  async readItemPackage(id) {
-    if (!/^[A-Za-z0-9._-]{1,128}$/.test(id) || id.includes("..")) throw new Error("Invalid item ID.");
-    return this.#request(`/v1/items/${encodeURIComponent(id)}/package`, void 0, "GET");
+  async readItemPackage(id2) {
+    if (!/^[A-Za-z0-9._-]{1,128}$/.test(id2) || id2.includes("..")) throw new Error("Invalid item ID.");
+    return this.#request(`/v1/items/${encodeURIComponent(id2)}/package`, void 0, "GET");
   }
   async linkedIdentity() {
     const user = await this.#request("/v1/account-links/session", void 0, "GET");
@@ -41302,9 +41302,39 @@ var GenvrClient = class _GenvrClient {
     return { id: target2.id, version: Number(saved.version) };
   }
   /** Explicit user action, separate from AI generation and importing a private draft. */
-  async publishWorld(id, options) {
+  async publishWorld(id2, options) {
     ContentAnswers.parse(options.content);
-    return this.#request(`/v1/experiences/${encodeURIComponent(id)}/publish`, options);
+    return this.#request(`/v1/experiences/${encodeURIComponent(id2)}/publish`, options);
+  }
+  /** Server-owned metadata, including isOwner/status/accessMode; no ownership is accepted from the host. */
+  async experience(id2) {
+    return this.#request(`/v1/experiences/${encodeURIComponent(id2)}`, void 0, "GET");
+  }
+  async setAccess(id2, access2) {
+    return this.#request(`/v1/experiences/${encodeURIComponent(id2)}/access`, access2, "PUT");
+  }
+  /** Return to draft; access mode is retained. Set access to private separately before importing. */
+  async unpublishWorld(id2) {
+    return this.#request(`/v1/experiences/${encodeURIComponent(id2)}/unpublish`);
+  }
+  async createInvite(id2, options = {}) {
+    const value2 = await this.#request(`/v1/experiences/${encodeURIComponent(id2)}/invites`, options);
+    if (typeof value2.id !== "string" || typeof value2.token !== "string" || typeof value2.expiresAt !== "string" || !["player", "builder"].includes(String(value2.role))) throw new Error("Invalid world invitation response.");
+    return value2;
+  }
+  /** Revoking an invite stops new acceptance; existing members retain their server-assigned role. */
+  async revokeInvite(id2, inviteId) {
+    await this.#request(`/v1/experiences/${encodeURIComponent(id2)}/invites/${encodeURIComponent(inviteId)}`, void 0, "DELETE");
+  }
+  async joinWorld(id2, options = {}) {
+    const value2 = await this.#request(`/v1/experiences/${encodeURIComponent(id2)}/join`, options);
+    if (typeof value2.allowed !== "boolean" || value2.reason !== void 0 && typeof value2.reason !== "string") throw new Error("Invalid join response.");
+    return value2;
+  }
+  async joinTicket(id2) {
+    const value2 = await this.#request(`/v1/experiences/${encodeURIComponent(id2)}/join-ticket`);
+    if (typeof value2.ticket !== "string" || typeof value2.url !== "string" || typeof value2.expiresIn !== "number" || value2.expiresIn <= 0) throw new Error("Invalid join ticket response.");
+    return value2;
   }
   /** Submit to the existing moderated store; this does not approve or list the item. */
   async submitItem(options) {
@@ -41312,6 +41342,9 @@ var GenvrClient = class _GenvrClient {
     return { id: String(item4.id) };
   }
 };
+
+// src/account-link.ts
+var ACCOUNT_LINK_SCOPES = ["worlds:read", "worlds:write", "worlds:publish", "worlds:join", "items:submit"];
 
 // src/studio-agents.ts
 var StudioAgent = external_exports.object({
@@ -48357,8 +48390,8 @@ var Object3D = class _Object3D extends EventDispatcher {
    * @param {number} id - The id.
    * @return {Object3D|undefined} The found 3D object. Returns `undefined` if no 3D object has been found.
    */
-  getObjectById(id) {
-    return this.getObjectByProperty("id", id);
+  getObjectById(id2) {
+    return this.getObjectByProperty("id", id2);
   }
   /**
    * Searches through the 3D object and its children, starting with the 3D object
@@ -66033,10 +66066,10 @@ var NodeMaterialObserver = class {
           changed = true;
           continue;
         }
-        const id = attribute12.isInterleavedBufferAttribute ? attribute12.data.uuid : attribute12.id;
+        const id2 = attribute12.isInterleavedBufferAttribute ? attribute12.data.uuid : attribute12.id;
         const version2 = attribute12.isInterleavedBufferAttribute ? attribute12.data.version : attribute12.version;
-        if (storedAttributeData.id !== id || storedAttributeData.version !== version2) {
-          storedAttributeData.id = id;
+        if (storedAttributeData.id !== id2 || storedAttributeData.version !== version2) {
+          storedAttributeData.id = id2;
           storedAttributeData.version = version2;
           changed = true;
         }
@@ -70374,7 +70407,7 @@ var BufferAttributeNode = class extends InputNode {
    * @return {string} The hash.
    */
   getHash(builder) {
-    let id;
+    let id2;
     if (this.bufferStride === 0 && this.bufferOffset === 0) {
       let bufferData = builder.globalCache.getData(this.value);
       if (bufferData === void 0) {
@@ -70383,11 +70416,11 @@ var BufferAttributeNode = class extends InputNode {
         };
         builder.globalCache.setData(this.value, bufferData);
       }
-      id = bufferData.node.id;
+      id2 = bufferData.node.id;
     } else {
-      id = this.id;
+      id2 = this.id;
     }
-    return String(id);
+    return String(id2);
   }
   /**
    * This method is overwritten since the node type is inferred from
@@ -73645,7 +73678,7 @@ var StorageBufferNode = class extends BufferNode {
    * @return {string} The hash.
    */
   getHash(builder) {
-    let id;
+    let id2;
     if (this.bufferCount === 0) {
       let bufferData = builder.globalCache.getData(this.value);
       if (bufferData === void 0) {
@@ -73654,11 +73687,11 @@ var StorageBufferNode = class extends BufferNode {
         };
         builder.globalCache.setData(this.value, bufferData);
       }
-      id = bufferData.node.id;
+      id2 = bufferData.node.id;
     } else {
-      id = this.id;
+      id2 = this.id;
     }
-    return String(id);
+    return String(id2);
   }
   /**
    * Overwrites the default implementation to return a fixed value `'indirectStorageBuffer'` or `'storageBuffer'`.
@@ -73909,22 +73942,22 @@ var instancedMesh = /* @__PURE__ */ Fn(([instancedMesh3]) => {
   instance(instanceMatrix2, instanceColor3);
 }, "void");
 var _previousBatchingMatrices = /* @__PURE__ */ new WeakMap();
-var getBatchingColor = /* @__PURE__ */ Fn(([colorsTexture, id]) => {
+var getBatchingColor = /* @__PURE__ */ Fn(([colorsTexture, id2]) => {
   const size = int3(textureSize(textureLoad(colorsTexture), 0).x).toConst();
-  const j2 = int3(id);
+  const j2 = int3(id2);
   const x2 = j2.mod(size).toConst();
   const y3 = j2.div(size).toConst();
   return textureLoad(colorsTexture, ivec2(x2, y3));
 });
-var getIndirectIndex = /* @__PURE__ */ Fn(([indirectTexture, id]) => {
+var getIndirectIndex = /* @__PURE__ */ Fn(([indirectTexture, id2]) => {
   const size = int3(textureSize(textureLoad(indirectTexture), 0).x).toConst();
-  const x2 = int3(id).mod(size).toConst();
-  const y3 = int3(id).div(size).toConst();
+  const x2 = int3(id2).mod(size).toConst();
+  const y3 = int3(id2).div(size).toConst();
   return textureLoad(indirectTexture, ivec2(x2, y3)).x;
 });
-function createBatchingMatrixNode(matricesTexture, id) {
+function createBatchingMatrixNode(matricesTexture, id2) {
   const size = int3(textureSize(textureLoad(matricesTexture), 0).x).toConst();
-  const j2 = float(id).mul(4).toInt().toConst();
+  const j2 = float(id2).mul(4).toInt().toConst();
   const x2 = j2.mod(size).toConst();
   const y3 = j2.div(size).toConst();
   return mat4(
@@ -73934,14 +73967,14 @@ function createBatchingMatrixNode(matricesTexture, id) {
     textureLoad(matricesTexture, ivec2(x2.add(3), y3))
   );
 }
-function getPreviousNode(batchMesh, id) {
+function getPreviousNode(batchMesh, id2) {
   let data = _previousBatchingMatrices.get(batchMesh);
   if (data === void 0) {
     const { image, format, type } = batchMesh._matricesTexture;
     const previousMatricesTexture = new DataTexture(image.data.slice(), image.width, image.height, format, type);
     data = {
       previousMatricesTexture,
-      node: createBatchingMatrixNode(previousMatricesTexture, id)
+      node: createBatchingMatrixNode(previousMatricesTexture, id2)
     };
     _previousBatchingMatrices.set(batchMesh, data);
   }
@@ -79937,8 +79970,8 @@ var RenderObject = class {
       for (const name in attributesId) {
         const attribute12 = this.geometry.getAttribute(name);
         if (attribute12 === void 0) return true;
-        const id = attribute12.isInterleavedBufferAttribute ? attribute12.data.uuid : attribute12.id;
-        if (attributesId[name] !== id) {
+        const id2 = attribute12.isInterleavedBufferAttribute ? attribute12.data.uuid : attribute12.id;
+        if (attributesId[name] !== id2) {
           return true;
         }
       }
@@ -86511,9 +86544,9 @@ var outgoingLight = property("vec3", "outgoingLight");
 var sortLights = (lights3) => {
   return lights3.sort((a2, b2) => a2.id - b2.id);
 };
-var getLightNodeById = (id, lightNodes) => {
+var getLightNodeById = (id2, lightNodes) => {
   for (const lightNode of lightNodes) {
-    if (lightNode.isAnalyticLightNode && lightNode.light.id === id) {
+    if (lightNode.isAnalyticLightNode && lightNode.light.id === id2) {
       return lightNode;
     }
   }
@@ -91842,9 +91875,9 @@ var NodeBuilder = class {
     if (nodeVar === void 0) {
       const idNS = readOnly ? "_const" : "_var";
       const vars = this.vars[shaderStage] || (this.vars[shaderStage] = []);
-      const id = this.vars[idNS] || (this.vars[idNS] = 0);
+      const id2 = this.vars[idNS] || (this.vars[idNS] = 0);
       if (name === null) {
-        name = (readOnly ? "nodeConst" : "nodeVar") + id;
+        name = (readOnly ? "nodeConst" : "nodeVar") + id2;
         this.vars[idNS]++;
       }
       if (subBuildVariable !== "variable") {
@@ -98455,11 +98488,11 @@ var NodeSampledTexture = class extends SampledTexture {
    * @param {UniformGroupNode} groupNode - The uniform group node.
    * @param {?string} [access=null] - The access type.
    */
-  constructor(name, textureNode, groupNode, access = null) {
+  constructor(name, textureNode, groupNode, access2 = null) {
     super(name, textureNode ? textureNode.value : null);
     this.textureNode = textureNode;
     this.groupNode = groupNode;
-    this.access = access;
+    this.access = access2;
   }
   /**
    * Updates the binding.
@@ -98485,8 +98518,8 @@ var NodeSampledCubeTexture = class extends NodeSampledTexture {
    * @param {UniformGroupNode} groupNode - The uniform group node.
    * @param {?string} [access=null] - The access type.
    */
-  constructor(name, textureNode, groupNode, access = null) {
-    super(name, textureNode, groupNode, access);
+  constructor(name, textureNode, groupNode, access2 = null) {
+    super(name, textureNode, groupNode, access2);
     this.isSampledCubeTexture = true;
   }
 };
@@ -98499,8 +98532,8 @@ var NodeSampledTexture3D = class extends NodeSampledTexture {
    * @param {UniformGroupNode} groupNode - The uniform group node.
    * @param {?string} [access=null] - The access type.
    */
-  constructor(name, textureNode, groupNode, access = null) {
-    super(name, textureNode, groupNode, access);
+  constructor(name, textureNode, groupNode, access2 = null) {
+    super(name, textureNode, groupNode, access2);
     this.isSampledTexture3D = true;
   }
 };
@@ -100291,16 +100324,16 @@ var Backend = class {
     const contextData = this.get(abstractRenderContext);
     const frame = this.renderer.info.frame;
     let prefix;
-    let id = abstractRenderContext.id;
+    let id2 = abstractRenderContext.id;
     if (Array.isArray(abstractRenderContext)) {
-      id = abstractRenderContext.map((c2) => c2.id).join(",");
+      id2 = abstractRenderContext.map((c2) => c2.id).join(",");
       prefix = "c:" + this.renderer.info.compute.frameCalls;
     } else if (abstractRenderContext.isComputeNode === true) {
       prefix = "c:" + this.renderer.info.compute.frameCalls;
     } else {
       prefix = "r:" + this.renderer.info.render.frameCalls;
     }
-    contextData.timestampUID = prefix + ":" + id + ":f" + frame;
+    contextData.timestampUID = prefix + ":" + id2 + ":f" + frame;
   }
   /**
    * Returns a unique identifier for the given render context that can be used
@@ -100868,11 +100901,11 @@ var WebGLState = class {
    *
    * @param {GLenum} id - The capability to enable.
    */
-  enable(id) {
+  enable(id2) {
     const { enabled } = this;
-    if (enabled[id] !== true) {
-      this.gl.enable(id);
-      enabled[id] = true;
+    if (enabled[id2] !== true) {
+      this.gl.enable(id2);
+      enabled[id2] = true;
     }
   }
   /**
@@ -100883,11 +100916,11 @@ var WebGLState = class {
    *
    * @param {GLenum} id - The capability to enable.
    */
-  disable(id) {
+  disable(id2) {
     const { enabled } = this;
-    if (enabled[id] !== false) {
-      this.gl.disable(id);
-      enabled[id] = false;
+    if (enabled[id2] !== false) {
+      this.gl.disable(id2);
+      enabled[id2] = false;
     }
   }
   /**
@@ -108339,17 +108372,17 @@ var WGSLNodeBuilder = class extends NodeBuilder {
       const bindings5 = this.getBindGroupArray(groupName, shaderStage);
       if (type === "texture" || type === "cubeTexture" || type === "cubeDepthTexture" || type === "storageTexture" || type === "texture3D") {
         let texture27 = null;
-        const access = this.getNodeAccess(node2, shaderStage);
+        const access2 = this.getNodeAccess(node2, shaderStage);
         if (type === "texture" || type === "storageTexture") {
           if (node2.value.is3DTexture === true) {
-            texture27 = new NodeSampledTexture3D(uniformNode.name, uniformNode.node, group2, access);
+            texture27 = new NodeSampledTexture3D(uniformNode.name, uniformNode.node, group2, access2);
           } else {
-            texture27 = new NodeSampledTexture(uniformNode.name, uniformNode.node, group2, access);
+            texture27 = new NodeSampledTexture(uniformNode.name, uniformNode.node, group2, access2);
           }
         } else if (type === "cubeTexture" || type === "cubeDepthTexture") {
-          texture27 = new NodeSampledCubeTexture(uniformNode.name, uniformNode.node, group2, access);
+          texture27 = new NodeSampledCubeTexture(uniformNode.name, uniformNode.node, group2, access2);
         } else if (type === "texture3D") {
-          texture27 = new NodeSampledTexture3D(uniformNode.name, uniformNode.node, group2, access);
+          texture27 = new NodeSampledTexture3D(uniformNode.name, uniformNode.node, group2, access2);
         }
         texture27.store = node2.isStorageTextureNode === true;
         texture27.mipLevel = texture27.store ? node2.mipLevel : 0;
@@ -108885,11 +108918,11 @@ ${flowData.code}
           }
         } else if (uniform32.node.isStorageTextureNode === true) {
           const format = getFormat(texture27, backend.device);
-          const access = this.getStorageAccess(uniform32.node, shaderStage);
+          const access2 = this.getStorageAccess(uniform32.node, shaderStage);
           const is3D = uniform32.node.value.is3DTexture;
           const isArrayTexture = uniform32.node.value.isArrayTexture;
           const dimension = is3D ? "3d" : `2d${isArrayTexture ? "_array" : ""}`;
-          textureType = `texture_storage_${dimension}<${format}, ${access}>`;
+          textureType = `texture_storage_${dimension}<${format}, ${access2}>`;
         } else if (texture27.isArrayTexture === true || texture27.isDataArrayTexture === true || texture27.isCompressedArrayTexture === true) {
           const componentPrefix = this.getComponentTypeFromTexture(texture27).charAt(0);
           textureType = `texture_2d_array<${componentPrefix}32>`;
@@ -109278,12 +109311,12 @@ ${vars}
    * @param {number} [group=0] - The group index.
    * @return {string} The WGSL snippet representing a struct binding.
    */
-  _getWGSLStructBinding(name, vars, access, binding = 0, group2 = 0) {
+  _getWGSLStructBinding(name, vars, access2, binding = 0, group2 = 0) {
     const structName = name + "Struct";
     const structSnippet = this._getWGSLStruct(structName, vars);
     return `${structSnippet}
 @binding( ${binding} ) @group( ${group2} )
-var<${access}> ${name} : ${structName};`;
+var<${access2}> ${name} : ${structName};`;
   }
 };
 var _bufferDescriptor$3 = new GPUBufferDescriptor();
@@ -109868,10 +109901,10 @@ var WebGPUBindingUtils = class {
       } else if (binding.isSampledTexture && binding.store) {
         const storageTexture7 = {};
         storageTexture7.format = this.backend.get(binding.texture).texture.format;
-        const access = binding.access;
-        if (access === NodeAccess.READ_WRITE) {
+        const access2 = binding.access;
+        if (access2 === NodeAccess.READ_WRITE) {
           storageTexture7.access = GPUStorageTextureAccess.ReadWrite;
-        } else if (access === NodeAccess.WRITE_ONLY) {
+        } else if (access2 === NodeAccess.WRITE_ONLY) {
           storageTexture7.access = GPUStorageTextureAccess.WriteOnly;
         } else {
           storageTexture7.access = GPUStorageTextureAccess.ReadOnly;
@@ -113266,12 +113299,12 @@ var SceneLighting = class {
   }
   update(settings, anchor2) {
     const ids = new Set(settings.map((s2) => s2.id));
-    for (const [id, row] of this.entries)
-      if (!ids.has(id)) {
+    for (const [id2, row] of this.entries)
+      if (!ids.has(id2)) {
         row.light.removeFromParent();
         row.target.removeFromParent();
         row.light.dispose();
-        this.entries.delete(id);
+        this.entries.delete(id2);
       }
     for (const s2 of settings) {
       let row = this.entries.get(s2.id);
@@ -117738,8 +117771,8 @@ var subscribeAvatarMotionLibrary = (listener) => {
   };
 };
 function avatarMotionEntry(name) {
-  const id = active?.replacements?.[name] ?? name;
-  return active?.entries.find((entry) => entry.id === id);
+  const id2 = active?.replacements?.[name] ?? name;
+  return active?.entries.find((entry) => entry.id === id2);
 }
 async function resolveAvatarLibraryMotion(root, name) {
   const library = active, entry = avatarMotionEntry(name);
@@ -122469,10 +122502,10 @@ var MeshoptDecoder = (function() {
     }
     return new Promise(function(resolve, reject) {
       var data = new Uint8Array(source);
-      var id = ++requestId;
+      var id2 = ++requestId;
       worker.pending += count3;
-      worker.requests[id] = { resolve, reject };
-      worker.object.postMessage({ id, count: count3, size, source: data, mode, filter }, [data.buffer]);
+      worker.requests[id2] = { resolve, reject };
+      worker.object.postMessage({ id: id2, count: count3, size, source: data, mode, filter }, [data.buffer]);
     });
   }
   function workerProcess(event) {
@@ -123313,7 +123346,7 @@ function addCard(b2, { center: center2, size, normal: normal2, yaw, lobeC, lobeR
   }
   b2.quad(ids[0], ids[1], ids[2], ids[3]);
 }
-function lobeCards(lobe, id, { count: count3, size, crownC, crownR, rand: rand3, flexFn, hScale, part, flatten = 0.6 }) {
+function lobeCards(lobe, id2, { count: count3, size, crownC, crownR, rand: rand3, flexFn, hScale, part, flatten = 0.6 }) {
   const lobeC = new Vector3(lobe[0], lobe[1], lobe[2]);
   const R2 = lobe[3];
   const cards = [];
@@ -123336,7 +123369,7 @@ function lobeCards(lobe, id, { count: count3, size, crownC, crownR, rand: rand3,
       yaw: rand3() * 6.283,
       lobeC,
       lobeR: R2,
-      lobeId: id,
+      lobeId: id2,
       crownC,
       crownR,
       rand: rand3,
@@ -123347,7 +123380,7 @@ function lobeCards(lobe, id, { count: count3, size, crownC, crownR, rand: rand3,
   }
   return cards;
 }
-function clumpCards(lobe, id, { clumps, clumpR, cardsPer, size, crownC, crownR, rand: rand3, flexFn, hScale, part, flatten = 0.7 }) {
+function clumpCards(lobe, id2, { clumps, clumpR, cardsPer, size, crownC, crownR, rand: rand3, flexFn, hScale, part, flatten = 0.7 }) {
   const lobeC = new Vector3(lobe[0], lobe[1], lobe[2]);
   const R2 = lobe[3];
   const cards = [], tips = [];
@@ -123374,7 +123407,7 @@ function clumpCards(lobe, id, { clumps, clumpR, cardsPer, size, crownC, crownR, 
         yaw: rand3() * 6.283,
         lobeC,
         lobeR: R2,
-        lobeId: id,
+        lobeId: id2,
         crownC,
         crownR,
         rand: rand3,
@@ -123557,10 +123590,10 @@ function lobeVariantGeometry(geometry, table, offset) {
   const data = new Float32Array(src);
   for (let i2 = 0; i2 < pos.count; i2++) {
     const o2 = i2 * stride2;
-    const id = src[o2 + lobe.offset + 3];
-    if (id < 0)
+    const id2 = src[o2 + lobe.offset + 3];
+    if (id2 < 0)
       continue;
-    const k2 = 1 - table[offset + id];
+    const k2 = 1 - table[offset + id2];
     for (let c2 = 0; c2 < 3; c2++)
       data[o2 + pos.offset + c2] = data[o2 + pos.offset + c2] + src[o2 + lobe.offset + c2] * k2;
   }
@@ -123683,10 +123716,10 @@ var materialMakers = /* @__PURE__ */ new Map();
 var materials = /* @__PURE__ */ new Map();
 var builds = /* @__PURE__ */ new Map();
 var buildCount = 0;
-function registerGenerator(id, generator) {
-  generators.set(id, generator);
+function registerGenerator(id2, generator) {
+  generators.set(id2, generator);
   for (const key2 of [...builds.keys()])
-    if (key2.startsWith(`${id}|`))
+    if (key2.startsWith(`${id2}|`))
       builds.delete(key2);
 }
 function registerGeneratorMaterial(key2, make) {
@@ -123706,11 +123739,11 @@ function paramsKey(params) {
   return Object.keys(params).sort().map((key2) => `${key2}=${JSON.stringify(params[key2])}`).join(",");
 }
 var IDENTITY = new Matrix4();
-function buildGenerated(id, params) {
-  const generator = generators.get(id);
+function buildGenerated(id2, params) {
+  const generator = generators.get(id2);
   if (!generator)
     return null;
-  const key2 = `${id}|${paramsKey(params)}`;
+  const key2 = `${id2}|${paramsKey(params)}`;
   let model2 = builds.get(key2);
   if (model2)
     return model2;
@@ -124147,10 +124180,10 @@ var ItemsView = class {
   /** Recomposes every instance's matrix in a type with its current coarse-ground offset. */
   #reapplyOffsets(type) {
     let changed = false;
-    type.ids.forEach((id, index) => {
-      if (id.startsWith("scatter:") || this.#live.has(id))
+    type.ids.forEach((id2, index) => {
+      if (id2.startsWith("scatter:") || this.#live.has(id2))
         return;
-      const instance3 = this.#instancesById.get(id);
+      const instance3 = this.#instancesById.get(id2);
       if (!instance3)
         return;
       const { position, rotation: rotation2, scale: scale5 } = instance3.transform;
@@ -124216,17 +124249,17 @@ var ItemsView = class {
     for (const [key2, type] of [...this.#types])
       if (type.model.id === itemId)
         this.#removeType(key2);
-    for (const [id, entry] of [...this.#animated])
+    for (const [id2, entry] of [...this.#animated])
       if (entry.itemId === itemId)
-        this.#removeAnimated(id);
+        this.#removeAnimated(id2);
     for (const instance3 of doc.instances)
       if (instance3.itemId === itemId)
         this.#colliders.delete(`item:${instance3.instanceId}`);
-    for (const [id, entry] of [...this.#loose]) {
-      if (doc.instances.find((instance3) => instance3.instanceId === id)?.itemId !== itemId)
+    for (const [id2, entry] of [...this.#loose]) {
+      if (doc.instances.find((instance3) => instance3.instanceId === id2)?.itemId !== itemId)
         continue;
       this.physics.removeBody(entry.body);
-      this.#loose.delete(id);
+      this.#loose.delete(id2);
     }
     this.sync(doc);
   }
@@ -124276,9 +124309,9 @@ var ItemsView = class {
     }
     for (const instance3 of moving.values())
       this.#syncAnimated(instance3);
-    for (const id of [...this.#animated.keys()])
-      if (!moving.has(id))
-        this.#removeAnimated(id);
+    for (const id2 of [...this.#animated.keys()])
+      if (!moving.has(id2))
+        this.#removeAnimated(id2);
     const byKey = /* @__PURE__ */ new Map();
     for (const instance3 of all3) {
       if (moving.has(instance3.instanceId))
@@ -124293,7 +124326,7 @@ var ItemsView = class {
     for (const [key2, type] of [...this.#types]) {
       if (byKey.has(key2))
         continue;
-      if (type.ids.some((id) => id.startsWith("scatter:")))
+      if (type.ids.some((id2) => id2.startsWith("scatter:")))
         this.#emptyType(type);
       else if (!type.emptied)
         this.#removeType(key2);
@@ -124331,20 +124364,20 @@ var ItemsView = class {
       this.physics.removeStructure(key2);
       this.#colliders.delete(key2);
     }
-    for (const [id, entry] of [...this.#loose]) {
-      if (loose.has(id))
+    for (const [id2, entry] of [...this.#loose]) {
+      if (loose.has(id2))
         continue;
       this.physics.removeBody(entry.body);
-      this.#loose.delete(id);
+      this.#loose.delete(id2);
     }
-    for (const [id, entry] of [...this.#live]) {
-      if (this.#instancesById.has(id)) {
-        this.#applyLive(id);
+    for (const [id2, entry] of [...this.#live]) {
+      if (this.#instancesById.has(id2)) {
+        this.#applyLive(id2);
         continue;
       }
       if (entry.body)
         this.physics.removeBody(entry.body);
-      this.#live.delete(id);
+      this.#live.delete(id2);
     }
     this.#syncPlinths();
   }
@@ -124597,8 +124630,8 @@ var ItemsView = class {
   updateLoose() {
     if (this.#loose.size === 0)
       return;
-    for (const [id, item4] of this.#animated) {
-      const entry = this.#loose.get(id);
+    for (const [id2, item4] of this.#animated) {
+      const entry = this.#loose.get(id2);
       if (!entry)
         continue;
       const t9 = entry.body.translation();
@@ -124608,13 +124641,13 @@ var ItemsView = class {
     }
     for (const type of this.#types.values()) {
       let changed = false;
-      type.ids.forEach((id, index) => {
-        const entry = this.#loose.get(id);
+      type.ids.forEach((id2, index) => {
+        const entry = this.#loose.get(id2);
         if (!entry)
           return;
         const t9 = entry.body.translation();
         const r3 = entry.body.rotation();
-        const scale5 = this.#instances.find((instance3) => instance3.instanceId === id)?.transform.scale;
+        const scale5 = this.#instances.find((instance3) => instance3.instanceId === id2)?.transform.scale;
         this.#position.set(t9.x, t9.y, t9.z);
         this.#quaternion.set(r3.x, r3.y, r3.z, r3.w);
         this.#scale.set(scale5?.[0] ?? 1, scale5?.[1] ?? 1, scale5?.[2] ?? 1);
@@ -125100,9 +125133,9 @@ var ItemsView = class {
       return slots[instanceIndex4] ?? null;
     if (typeof hit !== "string") {
       for (let object2 = hit; object2; object2 = object2.parent) {
-        const id = object2.userData.itemInstanceId;
-        if (typeof id === "string")
-          return id;
+        const id2 = object2.userData.itemInstanceId;
+        if (typeof id2 === "string")
+          return id2;
       }
     }
     const meshName = typeof hit === "string" ? hit : hit.name;
@@ -125153,8 +125186,8 @@ var ItemsView = class {
   dispose() {
     for (const itemId of [...this.#types.keys()])
       this.#removeType(itemId);
-    for (const id of [...this.#animated.keys()])
-      this.#removeAnimated(id);
+    for (const id2 of [...this.#animated.keys()])
+      this.#removeAnimated(id2);
     for (const key2 of this.#colliders.keys())
       this.physics.removeStructure(key2);
     this.#colliders.clear();
@@ -125309,7 +125342,7 @@ function makeWorley(P2, seed) {
   const out = { f1: 0, edge: 0, id: 0, dx: 0, dy: 0 };
   return (x2, y3, R2 = 2) => {
     const xi = Math.floor(x2), yi2 = Math.floor(y3);
-    let f1 = 99, id = 0, kn = 0;
+    let f1 = 99, id2 = 0, kn = 0;
     for (let j2 = -1; j2 <= 1; j2++) {
       const row = (yi2 + j2 + 2) * Q3 + 2 + xi;
       for (let i2 = -1; i2 <= 1; i2++) {
@@ -125318,7 +125351,7 @@ function makeWorley(P2, seed) {
         const d2 = dx * dx + dy * dy;
         if (d2 < f1) {
           f1 = d2;
-          id = pid[k2];
+          id2 = pid[k2];
           kn = k2;
         }
       }
@@ -125343,7 +125376,7 @@ function makeWorley(P2, seed) {
     }
     out.f1 = Math.sqrt(f1);
     out.edge = edge;
-    out.id = id;
+    out.id = id2;
     out.dx = x2 - px2[kn];
     out.dy = y3 - py2[kn];
     return out;
@@ -126383,7 +126416,7 @@ var TidewaterGround = class {
       return false;
     const table = t2.uniformArray(ids, "float");
     const layers2 = t2.attribute("groundLayers", "vec3"), bary = t2.attribute("groundBary", "vec3");
-    const weight = (id) => fixedLayer !== void 0 ? t2.float(ids[fixedLayer] === id ? 1 : 0) : t2.select(table.element(layers2.x).equal(id), bary.x, 0).add(t2.select(table.element(layers2.y).equal(id), bary.y, 0)).add(t2.select(table.element(layers2.z).equal(id), bary.z, 0));
+    const weight = (id2) => fixedLayer !== void 0 ? t2.float(ids[fixedLayer] === id2 ? 1 : 0) : t2.select(table.element(layers2.x).equal(id2), bary.x, 0).add(t2.select(table.element(layers2.y).equal(id2), bary.y, 0)).add(t2.select(table.element(layers2.z).equal(id2), bary.z, 0));
     const weights = GROUND_VARIANTS.map((_2, i2) => weight(i2 + 1));
     const coverage = weights.reduce((a2, b2) => a2.add(b2)).clamp(0, 1);
     const total = coverage.max(1e-5);
@@ -128531,10 +128564,10 @@ var CanopyLoading = class {
     } catch {
     }
   }
-  request(id) {
+  request(id2) {
     if (this.closed || this.failed || this.resource)
       return;
-    this.waiting.add(id);
+    this.waiting.add(id2);
     if (this.busy)
       return;
     this.busy = true;
@@ -129729,13 +129762,13 @@ function decodeProxy(buffer3) {
   };
 }
 var loads = /* @__PURE__ */ new Map();
-function loadHumanProxy(base, id) {
-  const url2 = `${base}proxies/${id}.bin`;
+function loadHumanProxy(base, id2) {
+  const url2 = `${base}proxies/${id2}.bin`;
   let load = loads.get(url2);
   if (!load) {
     load = fetch(url2).then((response) => {
       if (!response.ok)
-        throw new Error(`Proxy ${id}: HTTP ${response.status}`);
+        throw new Error(`Proxy ${id2}: HTTP ${response.status}`);
       return response.arrayBuffer();
     }).then(decodeProxy);
     load.catch(() => loads.delete(url2));
@@ -131279,26 +131312,26 @@ var itemBodies = /* @__PURE__ */ new Map();
 var itemBodyLoads = /* @__PURE__ */ new Map();
 var localItemBodies = /* @__PURE__ */ new Map();
 var itemBodyResolver = null;
-function loadItemBody(id) {
-  const local2 = localItemBodies.get(id);
+function loadItemBody(id2) {
+  const local2 = localItemBodies.get(id2);
   if (local2)
     return Promise.resolve(local2.body);
-  const known = itemBodies.get(id);
+  const known = itemBodies.get(id2);
   if (known)
     return Promise.resolve(known);
-  let load = itemBodyLoads.get(id);
+  let load = itemBodyLoads.get(id2);
   if (!load) {
-    load = (itemBodyResolver ? itemBodyResolver(id) : Promise.resolve(null)).then((body) => {
+    load = (itemBodyResolver ? itemBodyResolver(id2) : Promise.resolve(null)).then((body) => {
       if (body)
-        itemBodies.set(id, body);
+        itemBodies.set(id2, body);
       else
-        itemBodyLoads.delete(id);
+        itemBodyLoads.delete(id2);
       return body;
     }).catch(() => {
-      itemBodyLoads.delete(id);
+      itemBodyLoads.delete(id2);
       return null;
     });
-    itemBodyLoads.set(id, load);
+    itemBodyLoads.set(id2, load);
   }
   return load;
 }
@@ -131405,9 +131438,9 @@ function createGenvrAvatar(look = DEFAULT_LOOK, options = {}) {
     const known = lookBody(next2);
     if (known)
       return known;
-    const id = next2.body;
-    void loadItemBody(id).then((itemBody) => {
-      if (!itemBody || wantedLook.body !== id)
+    const id2 = next2.body;
+    void loadItemBody(id2).then((itemBody) => {
+      if (!itemBody || wantedLook.body !== id2)
         return;
       wanted = itemBody;
       const ready2 = shown(itemBody);
@@ -131474,25 +131507,25 @@ function createGenvrAvatar(look = DEFAULT_LOOK, options = {}) {
   const syncHair = () => {
     const ids = body.generated === "human" && body.model ? Object.values(wantedLook.humanHair ?? {}).filter(Boolean) : [];
     const full = fullOf(mesh.geometry);
-    for (const [id, part] of hairParts)
-      if (!ids.includes(id) || part.userData.fitFor !== full || part.parent !== mesh) {
+    for (const [id2, part] of hairParts)
+      if (!ids.includes(id2) || part.userData.fitFor !== full || part.parent !== mesh) {
         part.removeFromParent();
         part.material.dispose();
-        hairParts.delete(id);
+        hairParts.delete(id2);
       }
     if (!ids.length)
       return;
     const base = body.model.replace(/[^/]*$/, "");
-    for (const id of ids) {
-      const shown2 = hairParts.get(id);
+    for (const id2 of ids) {
+      const shown2 = hairParts.get(id2);
       if (shown2) {
         setHumanHairColor(shown2.material, wantedLook.hair);
         continue;
       }
-      const proxy = humanProxies.get(base + id);
+      const proxy = humanProxies.get(base + id2);
       if (!proxy) {
-        void loadHumanProxy(base, id).then((loaded) => {
-          humanProxies.set(base + id, loaded);
+        void loadHumanProxy(base, id2).then((loaded) => {
+          humanProxies.set(base + id2, loaded);
           if (!disposed)
             syncHair();
         }).catch(() => {
@@ -131507,7 +131540,7 @@ function createGenvrAvatar(look = DEFAULT_LOOK, options = {}) {
       useDualQuaternionSkinning(part);
       part.userData.fitFor = full;
       mesh.add(part);
-      hairParts.set(id, part);
+      hairParts.set(id2, part);
     }
   };
   syncHair();
@@ -132270,12 +132303,12 @@ var ItemTools = class {
     const hit = groupId ? instances.filter((i2) => i2.groupId === groupId).map((i2) => i2.instanceId) : picked ? [picked] : [];
     if (add3) {
       const current = new Set(this.#selected);
-      const all3 = hit.length > 0 && hit.every((id) => current.has(id));
-      for (const id of hit) {
+      const all3 = hit.length > 0 && hit.every((id2) => current.has(id2));
+      for (const id2 of hit) {
         if (all3)
-          current.delete(id);
+          current.delete(id2);
         else
-          current.add(id);
+          current.add(id2);
       }
       this.#selected = [...current];
     } else {
@@ -132436,12 +132469,12 @@ var ItemTools = class {
     const ignore = this.#moving ? this.#selected[0] ?? null : null;
     const grid = this.options.items.model(itemId).grid;
     for (const hit of this.options.cast(clientX, clientY, this.options.surfaces())) {
-      const id = this.options.items.instanceIdAt(hit.object, hit.instanceId);
-      if (id && id === ignore)
+      const id2 = this.options.items.instanceIdAt(hit.object, hit.instanceId);
+      if (id2 && id2 === ignore)
         continue;
       const onTerrain = hit.object.name.startsWith("terrain:");
       if (grid)
-        return this.#gridCell(hit, id, grid, onTerrain);
+        return this.#gridCell(hit, id2, grid, onTerrain);
       const x2 = this.#snapValue(hit.point.x);
       const z3 = this.#snapValue(hit.point.z);
       return [x2, round8(onTerrain ? this.options.heightAt(x2, z3) : hit.point.y), z3];
@@ -133148,7 +133181,7 @@ function createLacePixels(size = 512) {
   };
   const voronoi = (x2, y3, n3, s2) => {
     const i2 = Math.floor(x2), j2 = Math.floor(y3);
-    let f1 = 9, f2 = 9, id = 0;
+    let f1 = 9, f2 = 9, id2 = 0;
     for (let dj = -1; dj <= 1; dj++)
       for (let di = -1; di <= 1; di++) {
         const ci2 = i2 + di, cj = j2 + dj;
@@ -133158,11 +133191,11 @@ function createLacePixels(size = 512) {
         if (d2 < f1) {
           f2 = f1;
           f1 = d2;
-          id = hash12(wi, wj, s2 + 2);
+          id2 = hash12(wi, wj, s2 + 2);
         } else if (d2 < f2)
           f2 = d2;
       }
-    return [f1, f2, id];
+    return [f1, f2, id2];
   };
   const sstep = (a2, b2, x2) => {
     const t9 = Math.min(1, Math.max(0, (x2 - a2) / (b2 - a2)));
@@ -133836,12 +133869,12 @@ var WakeField = class {
    * A swimmer is here now. A ring is dropped only once they have moved `RING_SPACING`, so the
    * trail is even however often this is called and standing still does not fill it up.
    */
-  follow(id, x2, z3, speed, now) {
+  follow(id2, x2, z3, speed, now) {
     if (this.#capacity === 0)
       return;
-    const last = this.#last.get(id);
+    const last = this.#last.get(id2);
     if (!last) {
-      this.#last.set(id, { x: x2, z: z3 });
+      this.#last.set(id2, { x: x2, z: z3 });
       this.#drop(x2, z3, speed, now);
       return;
     }
@@ -133854,11 +133887,11 @@ var WakeField = class {
       this.#drop(last.x + (x2 - last.x) * t9, last.z + (z3 - last.z) * t9, speed, now);
     }
     const covered = steps * RING_SPACING / moved2;
-    this.#last.set(id, { x: last.x + (x2 - last.x) * covered, z: last.z + (z3 - last.z) * covered });
+    this.#last.set(id2, { x: last.x + (x2 - last.x) * covered, z: last.z + (z3 - last.z) * covered });
   }
   /** A swimmer stopped swimming or left: their trail stays and fades, but no more is added. */
-  forget(id) {
-    this.#last.delete(id);
+  forget(id2) {
+    this.#last.delete(id2);
   }
   #drop(x2, z3, speed, now) {
     const spread = Math.max(MIN_SPREAD, speed * SPREAD_SHARE);
@@ -135926,19 +135959,19 @@ var WaterView = class {
     const tidewater = this.#syncTidewater(doc);
     this.#lastDoc = doc;
     this.#syncSound(doc, tidewater);
-    for (const [index, { id, body }] of this.#shapes(doc, !tidewater).entries()) {
-      wanted.add(id);
+    for (const [index, { id: id2, body }] of this.#shapes(doc, !tidewater).entries()) {
+      wanted.add(id2);
       const reflect4 = index < this.#reflectingBodies();
       const q2 = this.#quality;
       const signature = `${reflect4}:${q2.grid}:${q2.waves}:${q2.refraction}:${q2.caustics}:${this.#clarity.value}:${this.#waveScale}:${this.#wake ? "wake" : "flat"}:${JSON.stringify(body)}`;
-      if (this.#built.get(id)?.signature === signature)
+      if (this.#built.get(id2)?.signature === signature)
         continue;
-      this.#remove(id);
-      this.#built.set(id, this.#build(body, id, signature, reflect4));
+      this.#remove(id2);
+      this.#built.set(id2, this.#build(body, id2, signature, reflect4));
     }
-    for (const id of [...this.#built.keys()])
-      if (!wanted.has(id))
-        this.#remove(id);
+    for (const id2 of [...this.#built.keys()])
+      if (!wanted.has(id2))
+        this.#remove(id2);
   }
   /** How many bodies mirror the world: never more than the budget, none when they are off. */
   #reflectingBodies() {
@@ -135947,8 +135980,8 @@ var WaterView = class {
     return Math.max(0, Math.min(this.#quality.reflect, MAX_REFLECTING_BODIES));
   }
   #rebuild(doc) {
-    for (const id of [...this.#built.keys()])
-      this.#remove(id);
+    for (const id2 of [...this.#built.keys()])
+      this.#remove(id2);
     this.sync(doc);
   }
   /**
@@ -135969,7 +136002,7 @@ var WaterView = class {
       built.depth.needsUpdate = true;
     }
   }
-  #build(body, id, signature, reflect4) {
+  #build(body, id2, signature, reflect4) {
     const map2 = bakeWaterDepth(body, this.heightAt);
     const depth3 = new DataTexture(map2.data, map2.width, map2.height, RedFormat, UnsignedByteType);
     depth3.magFilter = LinearFilter;
@@ -135984,21 +136017,21 @@ var WaterView = class {
     mesh.rotation.x = -Math.PI / 2;
     mesh.position.y = body.level + 0.02;
     mesh.receiveShadow = true;
-    mesh.name = `water:${id}`;
+    mesh.name = `water:${id2}`;
     if (mirror2)
       mesh.add(mirror2);
     this.group.add(mesh);
     return { signature, mesh, material: material2, depth: depth3, body, caustics };
   }
-  #remove(id) {
-    const built = this.#built.get(id);
+  #remove(id2) {
+    const built = this.#built.get(id2);
     if (!built)
       return;
     this.group.remove(built.mesh);
     built.mesh.geometry.dispose();
     built.material.dispose();
     built.depth.dispose();
-    this.#built.delete(id);
+    this.#built.delete(id2);
   }
   // ---- the surf sound's shore (Tidewater plan task 6)
   #ground = null;
@@ -136081,8 +136114,8 @@ var WaterView = class {
     this.#disposed = true;
     this.#dropSoundShore();
     this.#dropTidewater();
-    for (const id of [...this.#built.keys()])
-      this.#remove(id);
+    for (const id2 of [...this.#built.keys()])
+      this.#remove(id2);
     this.#caustics?.dispose();
     this.#blank.dispose();
     this.#groundWetness?.dispose();
@@ -136279,17 +136312,17 @@ var RiverView = class {
       if (built)
         this.#built.set(profile.id, built);
     }
-    for (const id of [...this.#built.keys()])
-      if (!wanted.has(id))
-        this.#remove(id);
+    for (const id2 of [...this.#built.keys()])
+      if (!wanted.has(id2))
+        this.#remove(id2);
   }
   /** The ground changed: the profiles follow the new terrain, so everything is drawn again. */
   groundChanged(doc) {
     this.#rebuild(doc);
   }
   #rebuild(doc) {
-    for (const id of [...this.#built.keys()])
-      this.#remove(id);
+    for (const id2 of [...this.#built.keys()])
+      this.#remove(id2);
     this.sync(doc);
   }
   #build(profile, signature) {
@@ -136323,8 +136356,8 @@ var RiverView = class {
     }
     return { signature, mesh, material: material2, spray, profile };
   }
-  #remove(id) {
-    const built = this.#built.get(id);
+  #remove(id2) {
+    const built = this.#built.get(id2);
     if (!built)
       return;
     this.group.remove(built.mesh);
@@ -136335,11 +136368,11 @@ var RiverView = class {
       built.spray.geometry.dispose();
       built.spray.material.dispose();
     }
-    this.#built.delete(id);
+    this.#built.delete(id2);
   }
   dispose() {
-    for (const id of [...this.#built.keys()])
-      this.#remove(id);
+    for (const id2 of [...this.#built.keys()])
+      this.#remove(id2);
     this.#profiles = [];
   }
 };
@@ -136625,10 +136658,10 @@ var ROOF_SURFACES = {
   thatch: { name: "reed-roof-03", mean: "#41372a" }
 };
 var PLASTER = ["#efe8dc", "#e8dcc0", "#e6d39c", "#dcc6a6", "#cbc8c1", "#e3c7b8", "#d3d8cf", "#efe3cf"];
-function hash8(id) {
+function hash8(id2) {
   let h2 = 2166136261;
-  for (let i2 = 0; i2 < id.length; i2 += 1)
-    h2 = Math.imul(h2 ^ id.charCodeAt(i2), 16777619);
+  for (let i2 = 0; i2 < id2.length; i2 += 1)
+    h2 = Math.imul(h2 ^ id2.charCodeAt(i2), 16777619);
   return h2 >>> 0;
 }
 function tint(target2, mean, scale5 = 1) {
@@ -137129,9 +137162,9 @@ var StructuresView = class {
       this.#profiles.set(road.id, profile);
       return profile;
     });
-    for (const id of this.#profiles.keys())
-      if (!doc.roads.some((r3) => r3.id === id))
-        this.#profiles.delete(id);
+    for (const id2 of this.#profiles.keys())
+      if (!doc.roads.some((r3) => r3.id === id2))
+        this.#profiles.delete(id2);
     const junctions = planJunctions(doc.roads.map((road, i2) => ({ ...road, samples: profiles[i2].samples })));
     doc.roads.forEach((road, i2) => {
       const key2 = `road:${road.id}`;
@@ -137240,7 +137273,7 @@ var StructuresView = class {
     if (!inCell.length)
       return;
     const merged = /* @__PURE__ */ new Map();
-    const add3 = (key2, kind, material2, arrays, id) => {
+    const add3 = (key2, kind, material2, arrays, id2) => {
       let entry = merged.get(key2);
       if (!entry)
         merged.set(key2, entry = { arrays: { positions: [], normals: [], uvs: [], colors: [], indices: [] }, owners: [], material: material2, kind });
@@ -137251,14 +137284,14 @@ var StructuresView = class {
       for (const index of arrays.indices)
         entry.arrays.indices.push(offset + index);
       for (let t9 = 0; t9 < arrays.indices.length / 3; t9 += 1)
-        entry.owners.push(id);
+        entry.owners.push(id2);
     };
     for (const [key2, { parts: parts6 }] of inCell) {
-      const id = key2.slice("wall:".length);
-      add3(`facade:${parts6.facadeSurface}`, "walls", this.buildingMaterials.facade(parts6.facadeSurface), parts6.facade, id);
-      add3(`roof:${parts6.roofSurface}`, "roofs", this.buildingMaterials.roof(parts6.roofSurface), parts6.roof, id);
-      add3("glass", "windows", this.buildingMaterials.glass, parts6.glass, id);
-      add3("frames", "windows", this.buildingMaterials.frames, parts6.frames, id);
+      const id2 = key2.slice("wall:".length);
+      add3(`facade:${parts6.facadeSurface}`, "walls", this.buildingMaterials.facade(parts6.facadeSurface), parts6.facade, id2);
+      add3(`roof:${parts6.roofSurface}`, "roofs", this.buildingMaterials.roof(parts6.roofSurface), parts6.roof, id2);
+      add3("glass", "windows", this.buildingMaterials.glass, parts6.glass, id2);
+      add3("frames", "windows", this.buildingMaterials.frames, parts6.frames, id2);
     }
     const meshes = [];
     const windows = [];
@@ -137937,11 +137970,11 @@ var BuildTools = class {
           this.options.apply({ type: "remove_road", params: { roadId } });
         return;
       }
-      const [kind, id] = hit.name.split(":");
+      const [kind, id2] = hit.name.split(":");
       if (kind === "road")
-        this.options.apply({ type: "remove_road", params: { roadId: id } });
+        this.options.apply({ type: "remove_road", params: { roadId: id2 } });
       else if (kind === "wall" || kind === "floor")
-        this.options.apply({ type: "remove_wall", params: { wallId: id } });
+        this.options.apply({ type: "remove_wall", params: { wallId: id2 } });
       return;
     }
     if (!hit || !hit.name.startsWith("wall:")) {
@@ -137963,8 +137996,8 @@ var BuildTools = class {
       return null;
     const x2 = hit.point.x - hit.face.normal.x * 0.5;
     const z3 = hit.point.z - hit.face.normal.z * 0.5;
-    const id = this.options.wallAt(x2, z3);
-    const wall = id ? this.options.world().walls.find((w4) => w4.id === id) : void 0;
+    const id2 = this.options.wallAt(x2, z3);
+    const wall = id2 ? this.options.world().walls.find((w4) => w4.id === id2) : void 0;
     return wall ? { wall, x: x2, z: z3 } : null;
   }
   /** Mouse hover: shows where the next point would go. */
@@ -138036,8 +138069,8 @@ var BuildTools = class {
       return null;
     const wallIdAt = hit.object.userData.wallIdAt;
     if (wallIdAt) {
-      const id = hit.faceIndex == null ? null : wallIdAt(hit.faceIndex);
-      return id ? { name: `wall:${id}`, point: hit.point } : null;
+      const id2 = hit.faceIndex == null ? null : wallIdAt(hit.faceIndex);
+      return id2 ? { name: `wall:${id2}`, point: hit.point } : null;
     }
     return { name: hit.object.name, point: hit.point };
   }
@@ -138448,8 +138481,8 @@ function memoryOf(history, context3) {
 }
 function track(surfaces, state, command) {
   if (command.type === "place_item" || command.type === "transform_item" || command.type === "remove_item") {
-    const id = command.params.instanceId;
-    surfaces.update(state.doc.instances.find((i2) => i2.instanceId === id) ?? null, id);
+    const id2 = command.params.instanceId;
+    surfaces.update(state.doc.instances.find((i2) => i2.instanceId === id2) ?? null, id2);
   }
 }
 function planned(state, command) {
@@ -138622,19 +138655,19 @@ function applyRest(history, state, context3, input2, gradeNow) {
     dz = to[2] - mover.transform.position[2];
     if (Math.abs(dx) > SIDEWAYS || Math.abs(dz) > SIDEWAYS) {
       carried = carriedBy(state, context3, surfaces, mover.instanceId, memory.ownMoved);
-      for (const { id, parent } of carried)
-        if (!memory.parents.has(id))
-          memory.parents.set(id, parent);
+      for (const { id: id2, parent } of carried)
+        if (!memory.parents.has(id2))
+          memory.parents.set(id2, parent);
     }
-    reseat = [...memory.ownMoved].filter((id) => id !== mover.instanceId && memory.parents.get(id) === mover.instanceId);
+    reseat = [...memory.ownMoved].filter((id2) => id2 !== mover.instanceId && memory.parents.get(id2) === mover.instanceId);
     memory.ownMoved.add(mover.instanceId);
   }
-  const carriedMoves = carried.flatMap(({ id }) => {
-    const instance3 = state.doc.instances.find((i2) => i2.instanceId === id);
+  const carriedMoves = carried.flatMap(({ id: id2 }) => {
+    const instance3 = state.doc.instances.find((i2) => i2.instanceId === id2);
     if (!instance3)
       return [];
     const [x2, y3, z3] = instance3.transform.position;
-    return [{ type: "transform_item", params: { instanceId: id, position: [x2 + dx, y3, z3 + dz] } }];
+    return [{ type: "transform_item", params: { instanceId: id2, position: [x2 + dx, y3, z3 + dz] } }];
   });
   const regions = [command, ...grade2, ...carriedMoves].map((next2) => regionOf(next2, state.doc, context3.shapeOf));
   const region = regions.includes("all") ? "all" : regions.flat();
@@ -138654,7 +138687,7 @@ function applyRest(history, state, context3, input2, gradeNow) {
         surfaces.setLayers(context3.layers());
     }
   };
-  const heightOf = (id) => state.doc.instances.find((i2) => i2.instanceId === id)?.transform.position[1] ?? 0;
+  const heightOf = (id2) => state.doc.instances.find((i2) => i2.instanceId === id2)?.transform.position[1] ?? 0;
   try {
     for (const flatten of grade2)
       run(flatten);
@@ -138670,8 +138703,8 @@ function applyRest(history, state, context3, input2, gradeNow) {
     run(command);
     if (moverId)
       risen.set(moverId, heightOf(moverId) - before);
-    for (const { id, parent } of carried) {
-      const instance3 = state.doc.instances.find((i2) => i2.instanceId === id);
+    for (const { id: id2, parent } of carried) {
+      const instance3 = state.doc.instances.find((i2) => i2.instanceId === id2);
       const shape3 = instance3 && context3.shapeOf(instance3.itemId);
       if (!instance3 || !shape3)
         continue;
@@ -138684,12 +138717,12 @@ function applyRest(history, state, context3, input2, gradeNow) {
       const result = rest(across2, shape3, surfaces, void 0, void 0, { fromY });
       run({
         type: "transform_item",
-        params: { instanceId: id, position: result.position, rotation: result.rotation }
+        params: { instanceId: id2, position: result.position, rotation: result.rotation }
       });
-      risen.set(id, result.position[1] - y3);
+      risen.set(id2, result.position[1] - y3);
     }
-    for (const id of reseat) {
-      const instance3 = state.doc.instances.find((i2) => i2.instanceId === id);
+    for (const id2 of reseat) {
+      const instance3 = state.doc.instances.find((i2) => i2.instanceId === id2);
       const shape3 = instance3 && context3.shapeOf(instance3.itemId);
       const fromY = instance3 && shape3 ? liftOnto(instance3, shape3) : void 0;
       if (!instance3 || !shape3 || fromY === void 0)
@@ -138699,18 +138732,18 @@ function applyRest(history, state, context3, input2, gradeNow) {
         continue;
       run({
         type: "transform_item",
-        params: { instanceId: id, position: result.position, rotation: result.rotation }
+        params: { instanceId: id2, position: result.position, rotation: result.rotation }
       });
     }
     if (command.type === "place_item" || command.type === "transform_item")
       resting.delete(command.params.instanceId);
-    for (const { id } of carried)
-      resting.delete(id);
-    for (const id of reseat)
-      resting.delete(id);
+    for (const { id: id2 } of carried)
+      resting.delete(id2);
+    for (const id2 of reseat)
+      resting.delete(id2);
     settleChain(state.doc, context3.shapeOf, surfaces, resting, run, void 0, defer ? {
-      deferGrade: (id) => {
-        memory.pendingGrades.add(id);
+      deferGrade: (id2) => {
+        memory.pendingGrades.add(id2);
         return true;
       }
     } : void 0);
@@ -139292,7 +139325,7 @@ var FOLLOW = 12;
 var STRIKE_HOLD_SECONDS = 0.5;
 var SNAP_DISTANCE = 8;
 var SHIRTS = ["#6d4aff", "#2ed3a0", "#ff6b6b", "#ffc93c", "#29c7ff", "#ff8fd8", "#8bc34a", "#ff9f43"];
-function lookFor(id, look) {
+function lookFor(id2, look) {
   if (look) {
     try {
       return normalizeAvatarLook(JSON.parse(look));
@@ -139300,7 +139333,7 @@ function lookFor(id, look) {
     }
   }
   let hash12 = 0;
-  for (const char of id)
+  for (const char of id2)
     hash12 = hash12 * 31 + char.charCodeAt(0) | 0;
   return { ...DEFAULT_LOOK, shirt: SHIRTS[Math.abs(hash12) % SHIRTS.length] };
 }
@@ -139416,21 +139449,21 @@ var RemotePlayers = class {
   ids() {
     return [...this.#players.keys()];
   }
-  upsert(id, state) {
-    const existing = this.#players.get(id);
+  upsert(id2, state) {
+    const existing = this.#players.get(id2);
     if (existing) {
       existing.target = { ...state };
       const look = state.look ?? "";
       if (look !== existing.look) {
         existing.look = look;
-        if (existing.avatar.setLook(lookFor(id, look)))
+        if (existing.avatar.setLook(lookFor(id2, look)))
           existing.animator.rebind(existing.avatar.mesh, existing.avatar.clips);
       }
       this.#holdTool(existing, state.tool ?? "");
       this.#hold(existing, state.hand ?? 0);
       return;
     }
-    const avatar = createGenvrAvatar(lookFor(id, state.look), {
+    const avatar = createGenvrAvatar(lookFor(id2, state.look), {
       cubes: this.#cubes,
       onBodyReady: () => animator.rebind(avatar.mesh, avatar.clips)
     });
@@ -139441,7 +139474,7 @@ var RemotePlayers = class {
     avatar.root.position.set(state.x, state.y, state.z);
     avatar.root.rotation.y = state.yaw;
     this.group.add(avatar.root);
-    this.#players.set(id, {
+    this.#players.set(id2, {
       follow: { x: state.x, y: state.y, z: state.z, yaw: state.yaw },
       avatar,
       animator,
@@ -139459,15 +139492,15 @@ var RemotePlayers = class {
       flash: 0,
       downTime: 0
     });
-    this.#holdTool(this.#players.get(id), state.tool ?? "");
-    this.#hold(this.#players.get(id), state.hand ?? 0);
+    this.#holdTool(this.#players.get(id2), state.tool ?? "");
+    this.#hold(this.#players.get(id2), state.hand ?? 0);
   }
   /**
    * Another player struck with their tool (P9-12, the room's `struck`): the Strike clip plays from its
    * start on them, even right after another, and the strike is heard there. False when not shown.
    */
-  strike(id) {
-    const remote = this.#players.get(id);
+  strike(id2) {
+    const remote = this.#players.get(id2);
     if (!remote)
       return false;
     remote.animator.replay("Strike");
@@ -139476,15 +139509,15 @@ var RemotePlayers = class {
     this.onStrike?.(remote.avatar.root.position);
     return true;
   }
-  registerPresentation(id, clip) {
-    const player = this.#players.get(id);
+  registerPresentation(id2, clip) {
+    const player = this.#players.get(id2);
     if (!player)
       return false;
     player.animator.register(clip);
     return true;
   }
-  playPresentation(id, clip) {
-    const player = this.#players.get(id);
+  playPresentation(id2, clip) {
+    const player = this.#players.get(id2);
     if (!player || !player.animator.clipNames.includes(clip) && !avatarMotionEntry(clip))
       return false;
     player.target.clip = clip;
@@ -139493,8 +139526,8 @@ var RemotePlayers = class {
     return true;
   }
   /** The clip currently shown on a player, or null when not shown (tests and tools). */
-  shownClip(id) {
-    return this.#players.get(id)?.shown ?? null;
+  shownClip(id2) {
+    return this.#players.get(id2)?.shown ?? null;
   }
   /**
    * The player the local player's strike would reach (P9-12): the nearest one standing inside the
@@ -139505,7 +139538,7 @@ var RemotePlayers = class {
     const fz = Math.cos(from.yaw);
     let best = null;
     let bestDistance = Infinity;
-    for (const [id, remote] of this.#players) {
+    for (const [id2, remote] of this.#players) {
       const { x: x2, z: z3, down: down4 } = remote.target;
       if (down4)
         continue;
@@ -139517,18 +139550,18 @@ var RemotePlayers = class {
       const cos9 = distance3 < 1e-6 ? 1 : (dx * fx + dz * fz) / distance3;
       if (Math.acos(Math.min(1, Math.max(-1, cos9))) > arcDeg * Math.PI / 360)
         continue;
-      best = id;
+      best = id2;
       bestDistance = distance3;
     }
     return best;
   }
   /** The avatar of a player shown here (their mouth speaks, lip sync P2-44); null for players not shown. */
-  avatarOf(id) {
-    return this.#players.get(id)?.avatar ?? null;
+  avatarOf(id2) {
+    return this.#players.get(id2)?.avatar ?? null;
   }
   /** Flashes a player red for a moment (they were hit, P9-12); false for players not shown. */
-  flash(id) {
-    const remote = this.#players.get(id);
+  flash(id2) {
+    const remote = this.#players.get(id2);
     if (!remote)
       return false;
     remote.flash = HIT_FLASH_SECONDS;
@@ -139539,8 +139572,8 @@ var RemotePlayers = class {
    * Where a damage number starts over a player (P9-12): a little above their head, and above their
    * name tag when names show. Null for players not shown.
    */
-  numberAnchor(id) {
-    const remote = this.#players.get(id);
+  numberAnchor(id2) {
+    const remote = this.#players.get(id2);
     if (!remote)
       return null;
     const { position } = remote.avatar.root;
@@ -139548,8 +139581,8 @@ var RemotePlayers = class {
     const y3 = position.y + (this.showNames ? Math.max(above, NAME_TAG_TOP) : above);
     return { x: position.x, y: y3, z: position.z };
   }
-  remove(id) {
-    const remote = this.#players.get(id);
+  remove(id2) {
+    const remote = this.#players.get(id2);
     if (!remote)
       return;
     this.group.remove(remote.avatar.root);
@@ -139561,7 +139594,7 @@ var RemotePlayers = class {
     remote.held?.geometry.dispose();
     remote.held?.material.dispose();
     this.#dropTool(remote);
-    this.#players.delete(id);
+    this.#players.delete(id2);
   }
   /** Call every frame with the local player's position (for level of detail). */
   update(dt2, viewer) {
@@ -139637,8 +139670,8 @@ var RemotePlayers = class {
     }
   }
   dispose() {
-    for (const id of [...this.#players.keys()])
-      this.remove(id);
+    for (const id2 of [...this.#players.keys()])
+      this.remove(id2);
     this.#faces?.dispose();
   }
 };
@@ -139895,9 +139928,9 @@ var ScatterView = class {
     const out = [];
     for (const layer2 of this.#layers) {
       for (const thing of scatterInChunk(this.ground, world, layer2, this.terrain, cx, cz, this.options)) {
-        const id = `scatter:${layer2.id}:${thing.x.toFixed(2)},${thing.z.toFixed(2)}`;
+        const id2 = `scatter:${layer2.id}:${thing.x.toFixed(2)},${thing.z.toFixed(2)}`;
         out.push({
-          instanceId: id,
+          instanceId: id2,
           itemId: thing.itemId,
           transform: {
             position: [thing.x, thing.y, thing.z],
@@ -154939,10 +154972,10 @@ var TerrainFieldTextures = class _TerrainFieldTextures {
   constructor(store, channels = store.descriptor.channels.map((c2) => c2.id), defer) {
     this.store = store;
     this.descriptor = store.descriptor;
-    if (!channels.length || new Set(channels).size !== channels.length || channels.some((id) => !this.descriptor.channels.some((c2) => c2.id === id)))
+    if (!channels.length || new Set(channels).size !== channels.length || channels.some((id2) => !this.descriptor.channels.some((c2) => c2.id === id2)))
       throw new RangeError("Choose unique declared terrain field channels");
     this.channels = Object.freeze([...channels]);
-    this.byteLength = this.descriptor.width * this.descriptor.height * this.channels.reduce((sum, id) => sum + (this.descriptor.channels.find((c2) => c2.id === id).encoding === "f32le" ? 4 : 1), 0);
+    this.byteLength = this.descriptor.width * this.descriptor.height * this.channels.reduce((sum, id2) => sum + (this.descriptor.channels.find((c2) => c2.id === id2).encoding === "f32le" ? 4 : 1), 0);
     if (defer !== DEFER_SNAPSHOT)
       this.refresh();
   }
@@ -155008,9 +155041,9 @@ var TerrainFieldTextures = class _TerrainFieldTextures {
       throw new Error("A GPU field snapshot requires every tile");
     const revision2 = this.store.revision;
     const d2 = this.descriptor;
-    const arrays = new Map(this.channels.map((id) => [
-      id,
-      d2.channels.find((c2) => c2.id === id).encoding === "f32le" ? new Float32Array(d2.width * d2.height) : new Uint8Array(d2.width * d2.height)
+    const arrays = new Map(this.channels.map((id2) => [
+      id2,
+      d2.channels.find((c2) => c2.id === id2).encoding === "f32le" ? new Float32Array(d2.width * d2.height) : new Uint8Array(d2.width * d2.height)
     ]));
     for (let tz = 0; tz * TERRAIN_FIELD_TILE_SIZE < d2.height; tz++) {
       for (let tx = 0; tx * TERRAIN_FIELD_TILE_SIZE < d2.width; tx++) {
@@ -155018,9 +155051,9 @@ var TerrainFieldTextures = class _TerrainFieldTextures {
         if (!tile2)
           throw new Error("Missing terrain field tile");
         const raw = decodeTerrainFieldTile(d2, tile2);
-        for (const id of this.channels) {
-          const target2 = arrays.get(id);
-          const bytes2 = raw.channels[id];
+        for (const id2 of this.channels) {
+          const target2 = arrays.get(id2);
+          const bytes2 = raw.channels[id2];
           const view = new DataView(bytes2.buffer, bytes2.byteOffset, bytes2.byteLength);
           for (let row = 0; row < tile2.rows; row++) {
             const offset = (tz * TERRAIN_FIELD_TILE_SIZE + row) * d2.width + tx * TERRAIN_FIELD_TILE_SIZE;
@@ -155035,19 +155068,19 @@ var TerrainFieldTextures = class _TerrainFieldTextures {
     }
     if (revision2 !== this.store.revision)
       throw new Error("Terrain fields changed while building GPU snapshot");
-    for (const [id, data] of arrays) {
-      const existing = this.textures.get(id);
+    for (const [id2, data] of arrays) {
+      const existing = this.textures.get(id2);
       if (existing)
         existing.image = { data, width: d2.width, height: d2.height };
       else {
         const texture27 = new DataTexture(data, d2.width, d2.height, RedFormat, data instanceof Float32Array ? FloatType : UnsignedByteType);
-        texture27.name = `terrain-field:${d2.id}:${id}`;
+        texture27.name = `terrain-field:${d2.id}:${id2}`;
         texture27.minFilter = texture27.magFilter = NearestFilter;
         texture27.generateMipmaps = false;
         texture27.unpackAlignment = 1;
-        this.textures.set(id, texture27);
+        this.textures.set(id2, texture27);
       }
-      this.textures.get(id).needsUpdate = true;
+      this.textures.get(id2).needsUpdate = true;
     }
     this.#revision = revision2;
     return true;
@@ -155635,10 +155668,10 @@ function inspectResources(input2, options = {}) {
       break;
   }
   let slots = 0;
-  const markItem = (id, triangles, visible2, shared) => {
-    if (typeof id !== "string" || wanted && id !== wanted)
+  const markItem = (id2, triangles, visible2, shared) => {
+    if (typeof id2 !== "string" || wanted && id2 !== wanted)
       return;
-    const row = rows.get(id);
+    const row = rows.get(id2);
     if (!row)
       return;
     row.meshParts++;
@@ -156912,8 +156945,8 @@ async function createRuntime({ onFilmFrame, onRendered, container, world, terrai
     }
     const materials2 = state.doc.terrain.materials ?? {};
     const palette = Array.from({ length: 16 }, (_2, slot) => {
-      const id = materials2[String(slot)]?.id;
-      const chosen = id ? getGround(id)?.name : void 0;
+      const id2 = materials2[String(slot)]?.id;
+      const chosen = id2 ? getGround(id2)?.name : void 0;
       return chosen ?? (slot < SOILS.length ? DEFAULT_GROUND[SOILS[slot]] : void 0);
     });
     groundPalette = palette;
@@ -157196,8 +157229,8 @@ async function createRuntime({ onFilmFrame, onRendered, container, world, terrai
       fingers.set(event.pointerId, { x: event.clientX, y: event.clientY });
       if (fingers.size === 2) {
         touch.release();
-        for (const id of fingers.keys())
-          tools?.endStroke(id);
+        for (const id2 of fingers.keys())
+          tools?.endStroke(id2);
         dragging = null;
         gesture = twoFingers();
         return;
@@ -157374,8 +157407,8 @@ async function createRuntime({ onFilmFrame, onRendered, container, world, terrai
         throw error63;
       }
     },
-    reload: (id) => items.reload(id, state.doc),
-    notify: (id) => tools?.itemModelChanged(id),
+    reload: (id2) => items.reload(id2, state.doc),
+    notify: (id2) => tools?.itemModelChanged(id2),
     report: (error63) => console.warn("Canopy resource preparation or preview refresh failed.", error63)
   });
   const items = new ItemsView(physics, (itemId, params) => {
@@ -157759,10 +157792,10 @@ async function createRuntime({ onFilmFrame, onRendered, container, world, terrai
     regrowScatter(steps);
     refresh(steps.flatMap((step4) => [...step4.result.changedChunks]));
     for (const step4 of steps) {
-      const id = newCommandId();
+      const id2 = newCommandId();
       if (collaborative)
-        replica.track(id, step4.applied, step4.result.inverse);
-      onCommand?.(step4.applied, id, source);
+        replica.track(id2, step4.applied, step4.result.inverse);
+      onCommand?.(step4.applied, id2, source);
     }
     return true;
   };
@@ -157834,8 +157867,8 @@ async function createRuntime({ onFilmFrame, onRendered, container, world, terrai
   const onPressStart = (event) => {
     presses.set(event.pointerId, { x: event.clientX, y: event.clientY, time: performance.now() });
     if (presses.size > 1)
-      for (const id of presses.keys())
-        presses.set(id, { x: -1e6, y: -1e6, time: 0 });
+      for (const id2 of presses.keys())
+        presses.set(id2, { x: -1e6, y: -1e6, time: 0 });
   };
   const onPressEnd = (event) => {
     const press = presses.get(event.pointerId);
@@ -158061,7 +158094,7 @@ async function createRuntime({ onFilmFrame, onRendered, container, world, terrai
     snapDistance: (item4) => (rideSetup(item4)?.ride.maxSpeed ?? 0) * 0.6
   };
   const applyRidePoses = (rows) => {
-    const busy2 = (id) => steered.has(id) || rideNow?.instanceId === id;
+    const busy2 = (id2) => steered.has(id2) || rideNow?.instanceId === id2;
     const seen = /* @__PURE__ */ new Set();
     for (const row of rows) {
       seen.add(row.instanceId);
@@ -158072,13 +158105,13 @@ async function createRuntime({ onFilmFrame, onRendered, container, world, terrai
       if (!busy2(row.instanceId))
         items.setLivePose(row.instanceId, row, true);
     }
-    for (const id of [...rideRows.keys()]) {
-      if (seen.has(id))
+    for (const id2 of [...rideRows.keys()]) {
+      if (seen.has(id2))
         continue;
-      rideRows.delete(id);
-      remoteLean.delete(id);
-      if (!busy2(id))
-        items.setLivePose(id, null);
+      rideRows.delete(id2);
+      remoteLean.delete(id2);
+      if (!busy2(id2))
+        items.setLivePose(id2, null);
     }
   };
   const endRideHere = (exit) => {
@@ -158139,13 +158172,13 @@ async function createRuntime({ onFilmFrame, onRendered, container, world, terrai
   const sceneMotions = /* @__PURE__ */ new Map();
   const sceneTravels = /* @__PURE__ */ new Map();
   const clearSceneMotions = () => {
-    for (const id of sceneTravels.keys())
-      if (!sceneMotions.has(id) && !steered.has(id) && rideNow?.instanceId !== id && !rideRows.has(id) && !remoteLean.has(id))
-        items.setLivePose(id, null);
+    for (const id2 of sceneTravels.keys())
+      if (!sceneMotions.has(id2) && !steered.has(id2) && rideNow?.instanceId !== id2 && !rideRows.has(id2) && !remoteLean.has(id2))
+        items.setLivePose(id2, null);
     sceneTravels.clear();
-    for (const id of sceneMotions.keys())
-      if (!steered.has(id) && rideNow?.instanceId !== id && !rideRows.has(id) && !remoteLean.has(id))
-        items.setLivePose(id, null);
+    for (const id2 of sceneMotions.keys())
+      if (!steered.has(id2) && rideNow?.instanceId !== id2 && !rideRows.has(id2) && !remoteLean.has(id2))
+        items.setLivePose(id2, null);
     sceneMotions.clear();
   };
   const toggleSit = () => {
@@ -158183,8 +158216,8 @@ async function createRuntime({ onFilmFrame, onRendered, container, world, terrai
     toggleSit();
   };
   window.addEventListener("keydown", onSitKey);
-  const playAnimation = (id) => {
-    const animation8 = findAnimation(id);
+  const playAnimation = (id2) => {
+    const animation8 = findAnimation(id2);
     if (!animation8)
       return false;
     if (animation8.manifest.id === SIT_ANIMATION_ID) {
@@ -158266,8 +158299,8 @@ async function createRuntime({ onFilmFrame, onRendered, container, world, terrai
     steeredNow.clear();
     remotePlayers.update(dt2, avatar.root.position);
     steered.clear();
-    for (const id of steeredNow)
-      steered.add(id);
+    for (const id2 of steeredNow)
+      steered.add(id2);
     const riding = rideNow;
     let moved2 = 0;
     let climbSpeed = null;
@@ -158487,13 +158520,13 @@ async function createRuntime({ onFilmFrame, onRendered, container, world, terrai
     else
       groundSpeed.sample(feet.x, feet.z, dt2);
     const onStructure = feet.y - groundHeight(feet.x, feet.z) > 0.08;
-    for (const [id, speech] of speeches) {
-      const speaker = id === "self" ? avatar : remotePlayers.avatarOf(id);
+    for (const [id2, speech] of speeches) {
+      const speaker = id2 === "self" ? avatar : remotePlayers.avatarOf(id2);
       const now = speech.now();
       if (!speaker || !speech.mouth.speaking(now)) {
         speaker?.setMouth("X");
         speech.onMouth?.("X");
-        speeches.delete(id);
+        speeches.delete(id2);
         continue;
       }
       const shape3 = speech.mouth.shapeAt(now);
@@ -158501,8 +158534,8 @@ async function createRuntime({ onFilmFrame, onRendered, container, world, terrai
       speech.onMouth?.(shape3);
     }
     avatar.updateExpression(dt2);
-    for (const id of remotePlayers.ids())
-      remotePlayers.avatarOf(id)?.updateExpression(dt2);
+    for (const id2 of remotePlayers.ids())
+      remotePlayers.avatarOf(id2)?.updateExpression(dt2);
     audio.update(dt2, moved2, character.grounded && !sitting && !riding, swimming ? "water" : onStructure ? "hard" : soilAt(feet.x, feet.z));
     terrainColliders.update(feet.x, feet.z);
     if (!activeSurface)
@@ -158650,28 +158683,28 @@ async function createRuntime({ onFilmFrame, onRendered, container, world, terrai
     }
     nativeTerrain?.update(camera, state.doc.environment.sea?.level ?? 0);
     const travelled = /* @__PURE__ */ new Map();
-    for (const [id, travel] of sceneTravels) {
-      if (steered.has(id) || rideNow?.instanceId === id || rideRows.has(id) || remoteLean.has(id) || rideSetup(id)) {
-        sceneTravels.delete(id);
+    for (const [id2, travel] of sceneTravels) {
+      if (steered.has(id2) || rideNow?.instanceId === id2 || rideRows.has(id2) || remoteLean.has(id2) || rideSetup(id2)) {
+        sceneTravels.delete(id2);
         continue;
       }
-      travelled.set(id, travelPose(travel.start, travel.spots, travel.speed, (performance.now() - travel.startedAt) / 1e3, groundHeight, travel.lift));
+      travelled.set(id2, travelPose(travel.start, travel.spots, travel.speed, (performance.now() - travel.startedAt) / 1e3, groundHeight, travel.lift));
     }
-    for (const [id, motion] of sceneMotions) {
-      if (steered.has(id) || rideNow?.instanceId === id || rideRows.has(id) || remoteLean.has(id)) {
-        sceneMotions.delete(id);
+    for (const [id2, motion] of sceneMotions) {
+      if (steered.has(id2) || rideNow?.instanceId === id2 || rideRows.has(id2) || remoteLean.has(id2)) {
+        sceneMotions.delete(id2);
         continue;
       }
       const time13 = (performance.now() - motion.startedAt) / 1e3;
-      if (time13 >= motion.seconds || rideSetup(id)) {
-        items.setLivePose(id, travelled.get(id) ?? null, false);
-        sceneMotions.delete(id);
+      if (time13 >= motion.seconds || rideSetup(id2)) {
+        items.setLivePose(id2, travelled.get(id2) ?? null, false);
+        sceneMotions.delete(id2);
       } else
-        items.setLivePose(id, scenePose(travelled.get(id) ?? motion.base, motion.motion, time13), false);
+        items.setLivePose(id2, scenePose(travelled.get(id2) ?? motion.base, motion.motion, time13), false);
     }
-    for (const [id, pose2] of travelled)
-      if (!sceneMotions.has(id))
-        items.setLivePose(id, pose2, false);
+    for (const [id2, pose2] of travelled)
+      if (!sceneMotions.has(id2))
+        items.setLivePose(id2, pose2, false);
     const profileEnvironment = profileFrames ? performance.now() : 0;
     environment.update(dt2, p2, time12 / 1e3, camera.position, camera);
     nightLights.update(camera.position, environment.night);
@@ -158709,13 +158742,13 @@ async function createRuntime({ onFilmFrame, onRendered, container, world, terrai
     submerged += ((under ? 1 : 0) - submerged) * Math.min(1, dt2 / post.fadeSeconds);
     post.setSubmerged(submerged);
     audio.setUnderwater(submerged > 0.5);
-    sceneLighting.update(state.doc.environment.lighting ?? [], (id) => {
-      if (id === "self")
+    sceneLighting.update(state.doc.environment.lighting ?? [], (id2) => {
+      if (id2 === "self")
         return avatar.root.position;
-      const live = remotePlayers.numberAnchor(id);
+      const live = remotePlayers.numberAnchor(id2);
       if (live)
         return { x: live.x, y: live.y - 1.5, z: live.z };
-      const instance3 = state.doc.instances.find((row) => row.instanceId === id);
+      const instance3 = state.doc.instances.find((row) => row.instanceId === id2);
       return instance3 ? { x: instance3.transform.position[0], y: instance3.transform.position[1], z: instance3.transform.position[2] } : null;
     });
     surf.update(dt2, camera.position, Date.now() + serverOffset, water.surfShore(), water.surfGround());
@@ -158816,7 +158849,7 @@ async function createRuntime({ onFilmFrame, onRendered, container, world, terrai
     exportSelectedItems: async (ids) => {
       if (!editable || simulating)
         throw new Error("Stop Test before saving an item.");
-      const selected = ids.map((id) => state.doc.instances.find((i2) => i2.instanceId === id));
+      const selected = ids.map((id2) => state.doc.instances.find((i2) => i2.instanceId === id2));
       if (selected.some((i2) => !i2))
         throw new Error("The selection changed. Select the item again.");
       return exportBuilderSelection(selected, (i2) => items.model(i2.itemId, i2.params));
@@ -158884,7 +158917,7 @@ async function createRuntime({ onFilmFrame, onRendered, container, world, terrai
     restingPoint: (x2, z3, on2) => restingPoint(state.doc, { groundAt: heightAt, itemShape, floors: roomFloors() }, x2, z3, on2),
     itemName: (itemId) => getCoreItem(itemId)?.manifest.name ?? packages?.get(itemId)?.manifest.name ?? null,
     previewSelectedItems: async (ids) => {
-      const selected = ids.map((id) => state.doc.instances.find((i2) => i2.instanceId === id));
+      const selected = ids.map((id2) => state.doc.instances.find((i2) => i2.instanceId === id2));
       if (selected.some((i2) => !i2))
         throw new Error("The selection changed.");
       const assembly = builderAssembly(selected, (i2) => items.model(i2.itemId, i2.params));
@@ -158894,7 +158927,7 @@ async function createRuntime({ onFilmFrame, onRendered, container, world, terrai
         assembly.dispose();
       }
     },
-    preview: (kind, id) => kind === "item" ? previews.item(id) : previews.road(id),
+    preview: (kind, id2) => kind === "item" ? previews.item(id2) : previews.road(id2),
     setRoadType: (typeId) => tools?.setRoadType(typeId),
     setRiver: (settings) => tools?.setRiver(settings),
     setRoad: (settings) => tools?.setRoad(settings),
@@ -158958,34 +158991,34 @@ async function createRuntime({ onFilmFrame, onRendered, container, world, terrai
       refresh(result.changedChunks);
       return { dropped: result.dropped, resync: result.resync };
     },
-    confirmCommand: (id) => replica.confirm(id),
-    pendingCommands: () => replica.pending.map(({ id, command }) => ({ id, command })),
-    rejectCommand: (id) => {
-      const result = replica.reject(id);
+    confirmCommand: (id2) => replica.confirm(id2),
+    pendingCommands: () => replica.pending.map(({ id: id2, command }) => ({ id: id2, command })),
+    rejectCommand: (id2) => {
+      const result = replica.reject(id2);
       restSurfaces = null;
       refresh(result.changedChunks);
       return { dropped: result.dropped, resync: result.resync };
     },
-    upsertRemotePlayer: (id, state2) => {
+    upsertRemotePlayer: (id2, state2) => {
       if (state2.clip === "Swim")
-        wake.follow(id, state2.x, state2.z, SWIM.speed, wakeClock);
+        wake.follow(id2, state2.x, state2.z, SWIM.speed, wakeClock);
       else
-        wake.forget(id);
-      remotePlayers.upsert(id, state2);
+        wake.forget(id2);
+      remotePlayers.upsert(id2, state2);
     },
-    removeRemotePlayer: (id) => {
-      wake.forget(id);
-      remotePlayers.remove(id);
+    removeRemotePlayer: (id2) => {
+      wake.forget(id2);
+      remotePlayers.remove(id2);
     },
     remotePlayerIds: () => remotePlayers.ids(),
     toggleSit,
-    async importAvatarMotion(target2, id, data) {
-      if (!/^motion:[A-Za-z0-9_-]{1,100}$/.test(id))
+    async importAvatarMotion(target2, id2, data) {
+      if (!/^motion:[A-Za-z0-9_-]{1,100}$/.test(id2))
         throw new Error("Invalid motion ID.");
       const actor = target2 === "self" ? avatar : remotePlayers.avatarOf(target2);
       if (!actor)
         return false;
-      const clip = await retargetAvatarMotion(data, actor, id);
+      const clip = await retargetAvatarMotion(data, actor, id2);
       if (target2 === "self") {
         animator.register(clip);
         return true;
@@ -158994,20 +159027,20 @@ async function createRuntime({ onFilmFrame, onRendered, container, world, terrai
         return false;
       return remotePlayers.registerPresentation(target2, clip);
     },
-    presentAnimation(target2, id) {
+    presentAnimation(target2, id2) {
       if (target2 === "self") {
-        if (id === "idle") {
+        if (id2 === "idle") {
           emote = null;
           return true;
         }
-        if (id.startsWith("motion:") && (animator.clipNames.includes(id) || !!avatarMotionEntry(id))) {
-          emote = { clip: id, left: null };
+        if (id2.startsWith("motion:") && (animator.clipNames.includes(id2) || !!avatarMotionEntry(id2))) {
+          emote = { clip: id2, left: null };
           return true;
         }
-        return playAnimation(id);
+        return playAnimation(id2);
       }
-      const animation8 = findAnimation(id);
-      return remotePlayers.playPresentation(target2, id === "idle" ? "Idle" : id.startsWith("motion:") ? id : animation8?.clip ?? "");
+      const animation8 = findAnimation(id2);
+      return remotePlayers.playPresentation(target2, id2 === "idle" ? "Idle" : id2.startsWith("motion:") ? id2 : animation8?.clip ?? "");
     },
     supportsAvatarExpression(target2) {
       return Boolean((target2 === "self" ? avatar : remotePlayers.avatarOf(target2))?.expressionSupported);
@@ -159020,15 +159053,15 @@ async function createRuntime({ onFilmFrame, onRendered, container, world, terrai
       return true;
     },
     playAnimation,
-    sceneMotion: (id, motion, seconds) => {
+    sceneMotion: (id2, motion, seconds) => {
       if (!["dance", "bob", "spin", "sway"].includes(motion) || !Number.isFinite(seconds) || seconds <= 0 || seconds > 30)
         return false;
-      const instance3 = state.doc.instances.find((i2) => i2.instanceId === id);
-      if (!instance3 || instance3.anchored === false || rideSetup(id) || rideRows.has(id) || steered.has(id) || remoteLean.has(id) || (getCoreItem(instance3.itemId)?.manifest.physics?.collider ?? packages?.get(instance3.itemId)?.manifest.physics?.collider) !== "none")
+      const instance3 = state.doc.instances.find((i2) => i2.instanceId === id2);
+      if (!instance3 || instance3.anchored === false || rideSetup(id2) || rideRows.has(id2) || steered.has(id2) || remoteLean.has(id2) || (getCoreItem(instance3.itemId)?.manifest.physics?.collider ?? packages?.get(instance3.itemId)?.manifest.physics?.collider) !== "none")
         return false;
       const rotation2 = new Euler().setFromQuaternion(new Quaternion().fromArray(instance3.transform.rotation), "YXZ");
       const [x2, y3, z3] = instance3.transform.position;
-      const base = sceneMotions.get(id)?.base ?? {
+      const base = sceneMotions.get(id2)?.base ?? {
         x: x2,
         y: y3,
         z: z3,
@@ -159036,20 +159069,20 @@ async function createRuntime({ onFilmFrame, onRendered, container, world, terrai
         pitch: rotation2.x,
         roll: rotation2.z
       };
-      sceneMotions.set(id, { base, motion, startedAt: performance.now(), seconds });
+      sceneMotions.set(id2, { base, motion, startedAt: performance.now(), seconds });
       return true;
     },
-    sceneTravel: (id, from, to, run = false) => {
+    sceneTravel: (id2, from, to, run = false) => {
       if (!to.length || to.length > 8 || ![...from ? [from] : [], ...to].every((p2) => Number.isFinite(p2.x) && Number.isFinite(p2.z)))
         return false;
-      const instance3 = state.doc.instances.find((i2) => i2.instanceId === id);
-      if (!instance3 || instance3.anchored === false || rideSetup(id) || rideRows.has(id) || steered.has(id) || remoteLean.has(id) || (getCoreItem(instance3.itemId)?.manifest.physics?.collider ?? packages?.get(instance3.itemId)?.manifest.physics?.collider) !== "none")
+      const instance3 = state.doc.instances.find((i2) => i2.instanceId === id2);
+      if (!instance3 || instance3.anchored === false || rideSetup(id2) || rideRows.has(id2) || steered.has(id2) || remoteLean.has(id2) || (getCoreItem(instance3.itemId)?.manifest.physics?.collider ?? packages?.get(instance3.itemId)?.manifest.physics?.collider) !== "none")
         return false;
       const rotation2 = new Euler().setFromQuaternion(new Quaternion().fromArray(instance3.transform.rotation), "YXZ");
       const [x2, y3, z3] = instance3.transform.position;
       const lift = y3 - groundHeight(x2, z3);
       const sx2 = from?.x ?? x2, sz2 = from?.z ?? z3;
-      sceneTravels.set(id, {
+      sceneTravels.set(id2, {
         start: {
           x: sx2,
           y: groundHeight(sx2, sz2) + lift,
@@ -159067,14 +159100,14 @@ async function createRuntime({ onFilmFrame, onRendered, container, world, terrai
     },
     sceneActorIds: () => state.doc.instances.filter((instance3) => instance3.anchored !== false && !rideSetup(instance3.instanceId) && (getCoreItem(instance3.itemId)?.manifest.physics?.collider ?? packages?.get(instance3.itemId)?.manifest.physics?.collider) === "none").map((i2) => i2.instanceId),
     clearSceneMotions,
-    prepareSceneAnimation: (id) => animator.prepare(findAnimation(id)?.clip ?? id),
-    playSceneAnimation: (id) => {
-      if (id.startsWith("motion:") && (avatarMotionEntry(id) || animator.clipNames.includes(id))) {
-        sceneAnimation.start(id, null);
-        animator.play(id);
+    prepareSceneAnimation: (id2) => animator.prepare(findAnimation(id2)?.clip ?? id2),
+    playSceneAnimation: (id2) => {
+      if (id2.startsWith("motion:") && (avatarMotionEntry(id2) || animator.clipNames.includes(id2))) {
+        sceneAnimation.start(id2, null);
+        animator.play(id2);
         return true;
       }
-      const animation8 = findAnimation(id);
+      const animation8 = findAnimation(id2);
       if (!animation8 || !animator.clipNames.includes(animation8.clip))
         return false;
       sceneAnimation.start(animation8.clip, animation8.kind === "once" ? animator.duration(animation8.clip) : null);
@@ -159134,8 +159167,8 @@ async function createRuntime({ onFilmFrame, onRendered, container, world, terrai
       emote = strike;
       return true;
     },
-    showStrike: (id) => {
-      remotePlayers.strike(id);
+    showStrike: (id2) => {
+      remotePlayers.strike(id2);
     },
     setKnockedOut: (on2) => {
       knockedOut = on2;
@@ -159144,8 +159177,8 @@ async function createRuntime({ onFilmFrame, onRendered, container, world, terrai
       const at3 = avatar.root.position;
       return remotePlayers.inReach({ x: at3.x, z: at3.z, yaw: avatar.root.rotation.y }, reach2, arcDeg);
     },
-    say: async (id, line, onMouth) => {
-      const speaker = id === "self" ? avatar : remotePlayers.avatarOf(id);
+    say: async (id2, line, onMouth) => {
+      const speaker = id2 === "self" ? avatar : remotePlayers.avatarOf(id2);
       if (!speaker)
         return false;
       const at3 = speaker.root.position;
@@ -159154,21 +159187,21 @@ async function createRuntime({ onFilmFrame, onRendered, container, world, terrai
           return false;
         const mouth = new SpeechMouth();
         mouth.speak(line.voice, started.startedAt, line.voice.cues.length > 0 ? void 0 : started.analyser);
-        speeches.get(id)?.mouth.stop();
-        speeches.set(id, { mouth, now: started.now, ...onMouth ? { onMouth } : {} });
+        speeches.get(id2)?.mouth.stop();
+        speeches.set(id2, { mouth, now: started.now, ...onMouth ? { onMouth } : {} });
         return true;
       });
     },
-    showHit: (id, damage) => {
+    showHit: (id2, damage) => {
       let anchor2;
-      if (id === "self") {
+      if (id2 === "self") {
         selfFlash = HIT_FLASH_SECONDS;
         avatar.setFlash(1);
         const at3 = avatar.root.position;
         anchor2 = { x: at3.x, y: at3.y + avatar.headTop + NUMBER_ABOVE_HEAD, z: at3.z };
       } else {
-        remotePlayers.flash(id);
-        anchor2 = remotePlayers.numberAnchor(id);
+        remotePlayers.flash(id2);
+        anchor2 = remotePlayers.numberAnchor(id2);
       }
       if (!anchor2)
         return;
@@ -159227,8 +159260,8 @@ async function createRuntime({ onFilmFrame, onRendered, container, world, terrai
         post.resetHistory();
       }
     },
-    setSpeechMouth: (id, shape3) => {
-      const speaker = id === "self" ? avatar : remotePlayers.avatarOf(id);
+    setSpeechMouth: (id2, shape3) => {
+      const speaker = id2 === "self" ? avatar : remotePlayers.avatarOf(id2);
       if (!speaker)
         return false;
       speaker.setMouth(shape3);
@@ -160401,6 +160434,47 @@ var UserAvatarMetadata = external_exports.object({
   duration: external_exports.number().positive().max(120).optional()
 }).strict();
 
+// src/publication-tools.ts
+var id = external_exports.string().min(1).max(128);
+var access = external_exports.discriminatedUnion("mode", [external_exports.object({ mode: external_exports.enum(["private", "public", "invite", "friends"]) }).strict(), external_exports.object({ mode: external_exports.literal("password"), password: external_exports.string().min(4).max(64) }).strict()]);
+var schemas = {
+  genvr_link_start: external_exports.object({ clientName: external_exports.string().min(1).max(80), scopes: external_exports.array(external_exports.enum(ACCOUNT_LINK_SCOPES)).min(1).max(ACCOUNT_LINK_SCOPES.length).optional() }).strict(),
+  genvr_link_poll: external_exports.object({}).strict(),
+  genvr_identity: external_exports.object({}).strict(),
+  genvr_disconnect: external_exports.object({}).strict(),
+  genvr_create_draft: external_exports.object({ localId: id, confirm: external_exports.literal(true) }).strict(),
+  genvr_upload_world: external_exports.object({ localId: id, id, baseVersion: external_exports.number().int().min(0), confirm: external_exports.literal(true), itemMap: external_exports.record(external_exports.string(), external_exports.string()).optional() }).strict(),
+  genvr_read_world: external_exports.object({ id }).strict(),
+  genvr_experience: external_exports.object({ id }).strict(),
+  genvr_publish_world: external_exports.object({ id, title: external_exports.string().trim().min(1).max(60), description: external_exports.string().max(1e3).optional(), type: external_exports.enum(["game", "event", "social"]), access: external_exports.discriminatedUnion("mode", [external_exports.object({ mode: external_exports.enum(["public", "invite", "friends"]) }).strict(), external_exports.object({ mode: external_exports.literal("password"), password: external_exports.string().min(4).max(64) }).strict()]), content: ContentAnswers, confirm: external_exports.literal(true) }).strict(),
+  genvr_set_access: external_exports.object({ id, access, confirm: external_exports.literal(true) }).strict(),
+  genvr_unpublish_world: external_exports.object({ id, confirm: external_exports.literal(true) }).strict(),
+  genvr_create_invite: external_exports.object({ id, role: external_exports.literal("player").default("player"), expiresInHours: external_exports.number().int().min(1).max(720).default(72), confirm: external_exports.literal(true) }).strict(),
+  genvr_revoke_invite: external_exports.object({ id, inviteId: id, confirm: external_exports.literal(true) }).strict(),
+  genvr_share_url: external_exports.object({ id, invite: external_exports.string().max(128).optional() }).strict(),
+  genvr_join_world: external_exports.object({ id, password: external_exports.string().max(64).optional(), invite: external_exports.string().max(128).optional() }).strict(),
+  genvr_join_ticket: external_exports.object({ id }).strict()
+};
+var descriptions = {
+  genvr_link_start: "Start browser account consent. Return the user code/page; never ask for a password. No uploads.",
+  genvr_link_poll: "Poll the pending browser consent after its interval. Tokens stay in process memory and are never returned.",
+  genvr_identity: "Read the actual linked account identity.",
+  genvr_disconnect: "Revoke this process account link.",
+  genvr_create_draft: "Explicitly create one private server draft for the current local-file world. Confirm owner intent; retain the returned ID. No automatic retry.",
+  genvr_upload_world: "Explicitly upload the selected local-file world to an existing owned private draft with optimistic baseVersion. No private library scan or asset submission.",
+  genvr_read_world: "Read a permitted server world/version without replacing the local project.",
+  genvr_experience: "Read server world ownership/status/access metadata.",
+  genvr_publish_world: "Publish an owned draft after explicit owner confirmation, access choice and content questionnaire.",
+  genvr_set_access: "Change owned world access after explicit confirmation; private excludes ordinary players.",
+  genvr_unpublish_world: "Return owned world to draft; also set access private before reimporting.",
+  genvr_create_invite: "Create a revocable player invite. Builder invitations grant editing and are only available through the host UI.",
+  genvr_revoke_invite: "Revoke an invite for new acceptances; existing members retain access.",
+  genvr_share_url: "Build a website share URL. It does not grant access or publish anything.",
+  genvr_join_world: "Ask the server to join as the linked account under existing access rules.",
+  genvr_join_ticket: "Request a short-lived realtime ticket. Server access rules still apply."
+};
+var PUBLICATION_TOOLS = Object.entries(schemas).map(([name, schema]) => ({ name, description: descriptions[name], inputSchema: external_exports.toJSONSchema(schema, { target: "draft-7" }) }));
+
 // src/runtime.ts
 async function previewWorld(session2, container, options = {}) {
   return createRuntime({
@@ -160408,7 +160482,7 @@ async function previewWorld(session2, container, options = {}) {
     container,
     world: session2.world,
     terrainChunks: session2.terrainChunks,
-    fetchPackage: options.fetchPackage ?? ((id) => session2.itemPackage(id)),
+    fetchPackage: options.fetchPackage ?? ((id2) => session2.itemPackage(id2)),
     // A viewer is read-only. All edits use the session tools/commands, followed by a fresh preview.
     editable: false,
     viewOnly: true
@@ -160416,8 +160490,8 @@ async function previewWorld(session2, container, options = {}) {
 }
 
 // demo/app.ts
-var byId6 = (id) => document.getElementById(id);
-var value = (id) => byId6(id).value;
+var byId6 = (id2) => document.getElementById(id2);
+var value = (id2) => byId6(id2).value;
 var storage7 = browserStorage(localStorage);
 var session = WorldSession.create({ id: "local.demo", title: "My garden" });
 var runtime;
@@ -160430,8 +160504,8 @@ async function render() {
   runtime = void 0;
   runtime = await previewWorld(session, byId6("view"), { forceWebGL: true });
 }
-function action(id, run, redraw = false) {
-  byId6(id).addEventListener("click", async () => {
+function action(id2, run, redraw = false) {
+  byId6(id2).addEventListener("click", async () => {
     if (busy) return;
     busy = true;
     document.querySelectorAll("button").forEach((b2) => b2.disabled = true);

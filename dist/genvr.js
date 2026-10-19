@@ -9,6 +9,16 @@ export class GenvrError extends Error {
         this.details = details;
     }
 }
+/** A link never grants access by itself. The Genvr server checks the signed-in visitor. */
+export function worldShareUrl(webUrl, id, invite) {
+    const base = new URL(webUrl);
+    if ((base.protocol !== 'https:' && !(base.protocol === 'http:' && ['localhost', '127.0.0.1'].includes(base.hostname))) || base.username || base.password || base.search || base.hash)
+        throw new Error('Unsafe Genvr web URL.');
+    const url = new URL(`${base.pathname.replace(/\/$/, '')}/places/${encodeURIComponent(id)}`, base.origin);
+    if (invite)
+        url.searchParams.set('invite', invite);
+    return url.href;
+}
 /** Credentials live in the caller's fetch implementation (cookie/Bearer), never in the world file. */
 export class GenvrClient {
     baseUrl;
@@ -89,6 +99,39 @@ export class GenvrClient {
     async publishWorld(id, options) {
         ContentAnswers.parse(options.content);
         return this.#request(`/v1/experiences/${encodeURIComponent(id)}/publish`, options);
+    }
+    /** Server-owned metadata, including isOwner/status/accessMode; no ownership is accepted from the host. */
+    async experience(id) {
+        return this.#request(`/v1/experiences/${encodeURIComponent(id)}`, undefined, 'GET');
+    }
+    async setAccess(id, access) {
+        return this.#request(`/v1/experiences/${encodeURIComponent(id)}/access`, access, 'PUT');
+    }
+    /** Return to draft; access mode is retained. Set access to private separately before importing. */
+    async unpublishWorld(id) {
+        return this.#request(`/v1/experiences/${encodeURIComponent(id)}/unpublish`);
+    }
+    async createInvite(id, options = {}) {
+        const value = await this.#request(`/v1/experiences/${encodeURIComponent(id)}/invites`, options);
+        if (typeof value.id !== 'string' || typeof value.token !== 'string' || typeof value.expiresAt !== 'string' || !['player', 'builder'].includes(String(value.role)))
+            throw new Error('Invalid world invitation response.');
+        return value;
+    }
+    /** Revoking an invite stops new acceptance; existing members retain their server-assigned role. */
+    async revokeInvite(id, inviteId) {
+        await this.#request(`/v1/experiences/${encodeURIComponent(id)}/invites/${encodeURIComponent(inviteId)}`, undefined, 'DELETE');
+    }
+    async joinWorld(id, options = {}) {
+        const value = await this.#request(`/v1/experiences/${encodeURIComponent(id)}/join`, options);
+        if (typeof value.allowed !== 'boolean' || (value.reason !== undefined && typeof value.reason !== 'string'))
+            throw new Error('Invalid join response.');
+        return value;
+    }
+    async joinTicket(id) {
+        const value = await this.#request(`/v1/experiences/${encodeURIComponent(id)}/join-ticket`);
+        if (typeof value.ticket !== 'string' || typeof value.url !== 'string' || typeof value.expiresIn !== 'number' || value.expiresIn <= 0)
+            throw new Error('Invalid join ticket response.');
+        return value;
     }
     /** Submit to the existing moderated store; this does not approve or list the item. */
     async submitItem(options) {

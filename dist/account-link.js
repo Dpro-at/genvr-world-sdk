@@ -1,4 +1,4 @@
-export const ACCOUNT_LINK_SCOPES = ['worlds:read', 'worlds:write', 'worlds:publish', 'items:submit'];
+export const ACCOUNT_LINK_SCOPES = ['worlds:read', 'worlds:write', 'worlds:publish', 'worlds:join', 'items:submit'];
 /** Host opens verificationUri and shows userCode; passwords remain in Genvr's browser sign-in. */
 export class GenvrAccountLink {
     apiUrl;

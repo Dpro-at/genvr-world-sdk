@@ -2,7 +2,7 @@ import {
   avatarMotionEntries,
   avatarMotionEntry,
   motionCategories
-} from "./chunk-ZN3IOLCR.js";
+} from "./chunk-O3NO5EO2.js";
 import {
   AvatarLiveDisplay,
   AvatarLook,
@@ -27,19 +27,19 @@ import {
   readWorldPackage,
   replayWorldPackage,
   streamingChatModel
-} from "./chunk-TG6FSO3V.js";
+} from "./chunk-YCFPFEVX.js";
 
 // src/storage.ts
 function browserStorage(storage, prefix2 = "genvr.world.") {
-  return { read: async (id) => storage.getItem(prefix2 + id), write: async (id, data) => {
-    storage.setItem(prefix2 + id, data);
+  return { read: async (id2) => storage.getItem(prefix2 + id2), write: async (id2, data) => {
+    storage.setItem(prefix2 + id2, data);
   } };
 }
 async function saveWorld(session, storage) {
   await storage.write(session.export().id, session.serialize());
 }
-async function openWorld(id, storage, onEvent) {
-  const data = await storage.read(id);
+async function openWorld(id2, storage, onEvent) {
+  const data = await storage.read(id2);
   if (!data) throw new Error("Saved world not found.");
   return new WorldSession(data, onEvent);
 }
@@ -54,6 +54,13 @@ var GenvrError = class extends Error {
   status;
   details;
 };
+function worldShareUrl(webUrl, id2, invite) {
+  const base = new URL(webUrl);
+  if (base.protocol !== "https:" && !(base.protocol === "http:" && ["localhost", "127.0.0.1"].includes(base.hostname)) || base.username || base.password || base.search || base.hash) throw new Error("Unsafe Genvr web URL.");
+  const url = new URL(`${base.pathname.replace(/\/$/, "")}/places/${encodeURIComponent(id2)}`, base.origin);
+  if (invite) url.searchParams.set("invite", invite);
+  return url.href;
+}
 var GenvrClient = class _GenvrClient {
   constructor(baseUrl, fetcher = (input, init) => globalThis.fetch(input, init)) {
     this.baseUrl = baseUrl;
@@ -83,8 +90,8 @@ var GenvrClient = class _GenvrClient {
     if (!response.ok) throw new GenvrError(data.message ?? `Genvr returned ${response.status}.`, response.status, data);
     return data;
   }
-  async readWorld(id) {
-    const response = await this.#request(`/v1/experiences/${encodeURIComponent(id)}/world`, void 0, "GET");
+  async readWorld(id2) {
+    const response = await this.#request(`/v1/experiences/${encodeURIComponent(id2)}/world`, void 0, "GET");
     if (!Array.isArray(response.terrain) || !response.terrain.every((row) => typeof row === "string")) throw new Error("Invalid world terrain response.");
     return { world: WorldDocument.parse(response.world), terrain: response.terrain };
   }
@@ -99,9 +106,9 @@ var GenvrClient = class _GenvrClient {
     return { items: data.items, next: data.next };
   }
   /** The server enforces approved/free or authenticated entitlement before issuing asset links. */
-  async readItemPackage(id) {
-    if (!/^[A-Za-z0-9._-]{1,128}$/.test(id) || id.includes("..")) throw new Error("Invalid item ID.");
-    return this.#request(`/v1/items/${encodeURIComponent(id)}/package`, void 0, "GET");
+  async readItemPackage(id2) {
+    if (!/^[A-Za-z0-9._-]{1,128}$/.test(id2) || id2.includes("..")) throw new Error("Invalid item ID.");
+    return this.#request(`/v1/items/${encodeURIComponent(id2)}/package`, void 0, "GET");
   }
   async linkedIdentity() {
     const user = await this.#request("/v1/account-links/session", void 0, "GET");
@@ -125,9 +132,39 @@ var GenvrClient = class _GenvrClient {
     return { id: target.id, version: Number(saved.version) };
   }
   /** Explicit user action, separate from AI generation and importing a private draft. */
-  async publishWorld(id, options) {
+  async publishWorld(id2, options) {
     ContentAnswers.parse(options.content);
-    return this.#request(`/v1/experiences/${encodeURIComponent(id)}/publish`, options);
+    return this.#request(`/v1/experiences/${encodeURIComponent(id2)}/publish`, options);
+  }
+  /** Server-owned metadata, including isOwner/status/accessMode; no ownership is accepted from the host. */
+  async experience(id2) {
+    return this.#request(`/v1/experiences/${encodeURIComponent(id2)}`, void 0, "GET");
+  }
+  async setAccess(id2, access2) {
+    return this.#request(`/v1/experiences/${encodeURIComponent(id2)}/access`, access2, "PUT");
+  }
+  /** Return to draft; access mode is retained. Set access to private separately before importing. */
+  async unpublishWorld(id2) {
+    return this.#request(`/v1/experiences/${encodeURIComponent(id2)}/unpublish`);
+  }
+  async createInvite(id2, options = {}) {
+    const value = await this.#request(`/v1/experiences/${encodeURIComponent(id2)}/invites`, options);
+    if (typeof value.id !== "string" || typeof value.token !== "string" || typeof value.expiresAt !== "string" || !["player", "builder"].includes(String(value.role))) throw new Error("Invalid world invitation response.");
+    return value;
+  }
+  /** Revoking an invite stops new acceptance; existing members retain their server-assigned role. */
+  async revokeInvite(id2, inviteId) {
+    await this.#request(`/v1/experiences/${encodeURIComponent(id2)}/invites/${encodeURIComponent(inviteId)}`, void 0, "DELETE");
+  }
+  async joinWorld(id2, options = {}) {
+    const value = await this.#request(`/v1/experiences/${encodeURIComponent(id2)}/join`, options);
+    if (typeof value.allowed !== "boolean" || value.reason !== void 0 && typeof value.reason !== "string") throw new Error("Invalid join response.");
+    return value;
+  }
+  async joinTicket(id2) {
+    const value = await this.#request(`/v1/experiences/${encodeURIComponent(id2)}/join-ticket`);
+    if (typeof value.ticket !== "string" || typeof value.url !== "string" || typeof value.expiresIn !== "number" || value.expiresIn <= 0) throw new Error("Invalid join ticket response.");
+    return value;
   }
   /** Submit to the existing moderated store; this does not approve or list the item. */
   async submitItem(options) {
@@ -137,7 +174,7 @@ var GenvrClient = class _GenvrClient {
 };
 
 // src/account-link.ts
-var ACCOUNT_LINK_SCOPES = ["worlds:read", "worlds:write", "worlds:publish", "items:submit"];
+var ACCOUNT_LINK_SCOPES = ["worlds:read", "worlds:write", "worlds:publish", "worlds:join", "items:submit"];
 var GenvrAccountLink = class {
   constructor(apiUrl, fetcher = (input, init) => globalThis.fetch(input, init)) {
     this.apiUrl = apiUrl;
@@ -189,7 +226,7 @@ var colors = ["#4263eb", "#2b8a3e", "#d48806", "#8950c6"];
 function studioAgentLook(preset) {
   if (!Number.isInteger(preset) || preset < 0 || preset > 7) throw new Error("Unknown agent avatar.");
   const wear = [`genvr.core.clothing.${preset < 4 ? "hoodie" : "jacket"}`, "genvr.core.clothing.boots"];
-  if (!wear.every((id) => findWearable(id))) throw new Error("Agent clothing is unavailable.");
+  if (!wear.every((id2) => findWearable(id2))) throw new Error("Agent clothing is unavailable.");
   return AvatarLook.parse({ ...DEFAULT_AVATAR_LOOK, body: "classic", shirt: colors[preset % 4], wear });
 }
 var prefix = "host-agent:";
@@ -203,7 +240,7 @@ function syncStudioAgents(runtime, input, localLooks = /* @__PURE__ */ new Map()
     if (!Number.isFinite(y)) throw new Error("Agent ground is unavailable.");
     return { id: prefix + row.id, state: { name: row.name, x, y, z, yaw: Math.PI, clip: "Idle", look: JSON.stringify(localLooks.get(row.id) ?? studioAgentLook(row.avatar)) } };
   });
-  for (const id of runtime.remotePlayerIds()) if (id.startsWith(prefix) && !wanted.has(id)) runtime.removeRemotePlayer(id);
+  for (const id2 of runtime.remotePlayerIds()) if (id2.startsWith(prefix) && !wanted.has(id2)) runtime.removeRemotePlayer(id2);
   for (const row of placed) runtime.upsertRemotePlayer(row.id, row.state);
   return rows.length;
 }
@@ -211,10 +248,10 @@ function syncStudioAgents(runtime, input, localLooks = /* @__PURE__ */ new Map()
 // src/avatar-presentation.ts
 var PRESENTATION_ANIMATIONS = CORE_ANIMATIONS.map((row) => ({ id: row.manifest.id, label: row.manifest.name, clip: row.clip }));
 var aliases = { expr_wave: "Wave", expr_think: "Think", expr_happy: "Cheer", expr_confident: "Salute", expr_wonder: "Cheer", expr_nod: "Clap", expr_shrug: "Stretch", talk: "Point", talk_explain: "Point", talk_calm: "Think", talk_excited: "Cheer", dance_hype: "Dance", dance: "Dance", run: "Run", walk: "Walk" };
-function resolvePresentationAnimation(id) {
-  if (id === "idle") return id;
-  if (avatarMotionEntry(id)) return id;
-  return PRESENTATION_ANIMATIONS.find((row) => row.id === id || row.clip === id || row.clip === aliases[id])?.id ?? null;
+function resolvePresentationAnimation(id2) {
+  if (id2 === "idle") return id2;
+  if (avatarMotionEntry(id2)) return id2;
+  return PRESENTATION_ANIMATIONS.find((row) => row.id === id2 || row.clip === id2 || row.clip === aliases[id2])?.id ?? null;
 }
 var AvatarPresentation = class {
   constructor(runtime, options = {}) {
@@ -263,8 +300,8 @@ var AvatarPresentation = class {
       if (!rt) return "Avatar is not ready.";
       if (event.kind === "animation") {
         const custom = this.#state.motions.find((row) => row.target === event.target && row.id === event.animation);
-        const id = custom?.id ?? resolvePresentationAnimation(event.animation);
-        if (!id || !rt.presentAnimation(target, id)) return "Animation or target is unavailable.";
+        const id2 = custom?.id ?? resolvePresentationAnimation(event.animation);
+        if (!id2 || !rt.presentAnimation(target, id2)) return "Animation or target is unavailable.";
         this.#later(`animation:${target}`, event.duration, () => {
           rt.presentAnimation(target, "idle");
         });
@@ -292,15 +329,15 @@ var AvatarPresentation = class {
       } else delete effects[event.effect];
       this.#publish({ effects });
     } else if (event.kind === "notification") {
-      const id = `notice-${++this.#serial}`;
-      const notification = { ...event.notification, id };
+      const id2 = `notice-${++this.#serial}`;
+      const notification = { ...event.notification, id: id2 };
       notification.canReply = !!notification.canReply && !!this.options.actions?.reply;
       this.#publish({ notifications: [...this.#state.notifications.slice(-4), notification] });
-      if (!notification.needsApproval) this.#later(id, event.duration, () => this.dismiss(id));
+      if (!notification.needsApproval) this.#later(id2, event.duration, () => this.dismiss(id2));
     } else if (event.kind === "card") {
-      const id = `card-${++this.#serial}`;
-      this.#publish({ cards: [...this.#state.cards.slice(-2), { ...event, id }] });
-      this.#later(id, event.duration, () => this.dismiss(id));
+      const id2 = `card-${++this.#serial}`;
+      this.#publish({ cards: [...this.#state.cards.slice(-2), { ...event, id: id2 }] });
+      this.#later(id2, event.duration, () => this.dismiss(id2));
     } else this.clear();
     this.#publish({ lastAction: event.kind });
     return null;
@@ -321,25 +358,25 @@ var AvatarPresentation = class {
     if (!/^[A-Za-z0-9_-]{1,100}$/.test(target) || data.byteLength > 16 * 1024 * 1024) throw new Error("Invalid motion input.");
     const rt = this.runtime();
     if (!rt?.importAvatarMotion) throw new Error("Motion import is unavailable in this viewport.");
-    const id = slot ? `motion:${slot}` : `motion:${++this.#serial}`;
-    if (!await rt.importAvatarMotion(target === "self" ? target : `host-agent:${target}`, id, data)) throw new Error("Avatar target is unavailable.");
-    if (!this.#disposed) this.#publish({ motions: [...this.#state.motions.filter((row) => row.target !== target || row.id !== id), { target, id, label: label.slice(0, 150) }], lastAction: "motion imported" });
+    const id2 = slot ? `motion:${slot}` : `motion:${++this.#serial}`;
+    if (!await rt.importAvatarMotion(target === "self" ? target : `host-agent:${target}`, id2, data)) throw new Error("Avatar target is unavailable.");
+    if (!this.#disposed) this.#publish({ motions: [...this.#state.motions.filter((row) => row.target !== target || row.id !== id2), { target, id: id2, label: label.slice(0, 150) }], lastAction: "motion imported" });
   }
-  dismiss = (id) => {
-    this.#cancel(id);
-    this.#publish({ notifications: this.#state.notifications.filter((row) => row.id !== id), cards: this.#state.cards.filter((row) => row.id !== id) });
+  dismiss = (id2) => {
+    this.#cancel(id2);
+    this.#publish({ notifications: this.#state.notifications.filter((row) => row.id !== id2), cards: this.#state.cards.filter((row) => row.id !== id2) });
   };
-  async approve(id) {
-    const notice = this.#state.notifications.find((row) => row.id === id);
+  async approve(id2) {
+    const notice = this.#state.notifications.find((row) => row.id === id2);
     if (!notice?.needsApproval || !this.options.actions?.approve) throw new Error("No approval action is connected.");
     await this.options.actions.approve(notice);
-    if (!this.#disposed) this.dismiss(id);
+    if (!this.#disposed) this.dismiss(id2);
   }
-  async reply(id, text) {
-    const notice = this.#state.notifications.find((row) => row.id === id);
+  async reply(id2, text) {
+    const notice = this.#state.notifications.find((row) => row.id === id2);
     if (!notice?.canReply || !text.trim() || !this.options.actions?.reply) throw new Error("Reply is unavailable.");
     await this.options.actions.reply(notice, text.trim());
-    if (!this.#disposed) this.#publish({ notifications: this.#state.notifications.map((row) => row.id === id ? { ...row, repliedWith: text.trim() } : row) });
+    if (!this.#disposed) this.#publish({ notifications: this.#state.notifications.map((row) => row.id === id2 ? { ...row, repliedWith: text.trim() } : row) });
   }
   clear() {
     for (const [key, timer] of this.#timers) {
@@ -412,7 +449,7 @@ function browserUserAvatarStorage(scope, factory = indexedDB) {
     });
   };
   const key = (project, target) => JSON.stringify([project, target]);
-  const changeAsset = async (id, asset) => {
+  const changeAsset = async (id2, asset) => {
     const db = await open();
     await new Promise((resolve, reject) => {
       const tx = db.transaction(["assets", "metadata"], "readwrite");
@@ -420,8 +457,8 @@ function browserUserAvatarStorage(scope, factory = indexedDB) {
         tx.objectStore("assets").put(asset);
         tx.objectStore("metadata").put(asset.metadata);
       } else {
-        tx.objectStore("assets").delete(id);
-        tx.objectStore("metadata").delete(id);
+        tx.objectStore("assets").delete(id2);
+        tx.objectStore("metadata").delete(id2);
       }
       tx.oncomplete = () => resolve();
       tx.onerror = tx.onabort = () => reject(tx.error ?? new Error("Library write failed."));
@@ -433,8 +470,8 @@ function browserUserAvatarStorage(scope, factory = indexedDB) {
     async list() {
       return (await run("metadata", "readonly", (store) => store.getAll())).map((row) => UserAvatarMetadata.parse(row)).sort((a, b) => a.name.localeCompare(b.name));
     },
-    async get(id) {
-      const row = await run("assets", "readonly", (store) => store.get(id));
+    async get(id2) {
+      const row = await run("assets", "readonly", (store) => store.get(id2));
       return row ? { ...row, metadata: UserAvatarMetadata.parse(row.metadata) } : null;
     },
     async put(asset) {
@@ -442,18 +479,18 @@ function browserUserAvatarStorage(scope, factory = indexedDB) {
       if (!(asset.data instanceof ArrayBuffer) || asset.data.byteLength < 24 || asset.data.byteLength > USER_AVATAR_BYTES || new DataView(asset.data).getUint32(0, true) !== 1179937895) throw new Error("Invalid local avatar GLB.");
       await changeAsset(metadata.id, { metadata, data: asset.data });
     },
-    async remove(id) {
-      await changeAsset(id);
+    async remove(id2) {
+      await changeAsset(id2);
     },
     async assignment(project, target) {
       return await run("assignments", "readonly", (store) => store.get(key(project, target))) ?? null;
     },
-    async assign(project, target, id) {
-      if (id) {
-        const asset = await run("assets", "readonly", (store) => store.get(id));
+    async assign(project, target, id2) {
+      if (id2) {
+        const asset = await run("assets", "readonly", (store) => store.get(id2));
         if (asset?.metadata.kind !== "character") throw new Error("Choose a character from your library.");
       }
-      if (id) await run("assignments", "readwrite", (store) => store.put(id, key(project, target)));
+      if (id2) await run("assignments", "readwrite", (store) => store.put(id2, key(project, target)));
       else await run("assignments", "readwrite", (store) => store.delete(key(project, target)));
     },
     subscribe(listener) {
@@ -501,6 +538,140 @@ function avatarLiveEmbed(baseUrl, projectId, layout, display) {
   const escaped = url.href.replaceAll("&", "&amp;").replaceAll('"', "&quot;").replaceAll("<", "&lt;");
   return { id: `avatar-live-${preset.id}`, url: url.href, localOnly: Boolean(display?.media?.startsWith("blob:")) || ["localhost", "127.0.0.1", "[::1]"].includes(url.hostname), iframe: `<iframe title="Avatar Live" src="${escaped}" width="${preset.width}" height="${preset.height}" allow="autoplay" style="border:0;max-width:100%" loading="lazy"></iframe>` };
 }
+
+// src/publication-tools.ts
+var id = external_exports.string().min(1).max(128);
+var access = external_exports.discriminatedUnion("mode", [external_exports.object({ mode: external_exports.enum(["private", "public", "invite", "friends"]) }).strict(), external_exports.object({ mode: external_exports.literal("password"), password: external_exports.string().min(4).max(64) }).strict()]);
+var schemas = {
+  genvr_link_start: external_exports.object({ clientName: external_exports.string().min(1).max(80), scopes: external_exports.array(external_exports.enum(ACCOUNT_LINK_SCOPES)).min(1).max(ACCOUNT_LINK_SCOPES.length).optional() }).strict(),
+  genvr_link_poll: external_exports.object({}).strict(),
+  genvr_identity: external_exports.object({}).strict(),
+  genvr_disconnect: external_exports.object({}).strict(),
+  genvr_create_draft: external_exports.object({ localId: id, confirm: external_exports.literal(true) }).strict(),
+  genvr_upload_world: external_exports.object({ localId: id, id, baseVersion: external_exports.number().int().min(0), confirm: external_exports.literal(true), itemMap: external_exports.record(external_exports.string(), external_exports.string()).optional() }).strict(),
+  genvr_read_world: external_exports.object({ id }).strict(),
+  genvr_experience: external_exports.object({ id }).strict(),
+  genvr_publish_world: external_exports.object({ id, title: external_exports.string().trim().min(1).max(60), description: external_exports.string().max(1e3).optional(), type: external_exports.enum(["game", "event", "social"]), access: external_exports.discriminatedUnion("mode", [external_exports.object({ mode: external_exports.enum(["public", "invite", "friends"]) }).strict(), external_exports.object({ mode: external_exports.literal("password"), password: external_exports.string().min(4).max(64) }).strict()]), content: ContentAnswers, confirm: external_exports.literal(true) }).strict(),
+  genvr_set_access: external_exports.object({ id, access, confirm: external_exports.literal(true) }).strict(),
+  genvr_unpublish_world: external_exports.object({ id, confirm: external_exports.literal(true) }).strict(),
+  genvr_create_invite: external_exports.object({ id, role: external_exports.literal("player").default("player"), expiresInHours: external_exports.number().int().min(1).max(720).default(72), confirm: external_exports.literal(true) }).strict(),
+  genvr_revoke_invite: external_exports.object({ id, inviteId: id, confirm: external_exports.literal(true) }).strict(),
+  genvr_share_url: external_exports.object({ id, invite: external_exports.string().max(128).optional() }).strict(),
+  genvr_join_world: external_exports.object({ id, password: external_exports.string().max(64).optional(), invite: external_exports.string().max(128).optional() }).strict(),
+  genvr_join_ticket: external_exports.object({ id }).strict()
+};
+var descriptions = {
+  genvr_link_start: "Start browser account consent. Return the user code/page; never ask for a password. No uploads.",
+  genvr_link_poll: "Poll the pending browser consent after its interval. Tokens stay in process memory and are never returned.",
+  genvr_identity: "Read the actual linked account identity.",
+  genvr_disconnect: "Revoke this process account link.",
+  genvr_create_draft: "Explicitly create one private server draft for the current local-file world. Confirm owner intent; retain the returned ID. No automatic retry.",
+  genvr_upload_world: "Explicitly upload the selected local-file world to an existing owned private draft with optimistic baseVersion. No private library scan or asset submission.",
+  genvr_read_world: "Read a permitted server world/version without replacing the local project.",
+  genvr_experience: "Read server world ownership/status/access metadata.",
+  genvr_publish_world: "Publish an owned draft after explicit owner confirmation, access choice and content questionnaire.",
+  genvr_set_access: "Change owned world access after explicit confirmation; private excludes ordinary players.",
+  genvr_unpublish_world: "Return owned world to draft; also set access private before reimporting.",
+  genvr_create_invite: "Create a revocable player invite. Builder invitations grant editing and are only available through the host UI.",
+  genvr_revoke_invite: "Revoke an invite for new acceptances; existing members retain access.",
+  genvr_share_url: "Build a website share URL. It does not grant access or publish anything.",
+  genvr_join_world: "Ask the server to join as the linked account under existing access rules.",
+  genvr_join_ticket: "Request a short-lived realtime ticket. Server access rules still apply."
+};
+var PUBLICATION_MUTATION_TOOLS = /* @__PURE__ */ new Set(["genvr_create_draft", "genvr_upload_world", "genvr_publish_world", "genvr_set_access", "genvr_unpublish_world", "genvr_create_invite", "genvr_revoke_invite"]);
+var PUBLICATION_TOOLS = Object.entries(schemas).map(([name, schema]) => ({ name, description: descriptions[name], inputSchema: external_exports.toJSONSchema(schema, { target: "draft-7" }) }));
+var GenvrPublicationTools = class {
+  constructor(options = {}) {
+    this.options = options;
+    if (options.apiUrl && options.accessToken) this.#client = GenvrClient.linked(options.apiUrl, options.accessToken, options.fetcher);
+  }
+  options;
+  #client;
+  #pending;
+  #nextPoll = 0;
+  capabilities() {
+    return { configured: Boolean(this.options.apiUrl), linked: Boolean(this.#client), mutations: Boolean(this.options.allowMutations), localFileWorldOnly: true };
+  }
+  /** Tools to list: mutations are hidden unless the host opted in. */
+  tools() {
+    return PUBLICATION_TOOLS.filter((tool) => this.options.allowMutations || !PUBLICATION_MUTATION_TOOLS.has(tool.name));
+  }
+  handles(name) {
+    return Object.hasOwn(schemas, name);
+  }
+  async call(name, args, session) {
+    if (!this.handles(name)) throw new Error("Unknown publication tool.");
+    if (!this.options.allowMutations && PUBLICATION_MUTATION_TOOLS.has(name)) throw new Error("World publication changes are disabled. The host must set GENVR_MCP_PUBLICATION=1 after providing its own user approval.");
+    schemas[name].parse(args);
+    if (name === "genvr_share_url") {
+      const v = schemas.genvr_share_url.parse(args);
+      if (!this.options.webUrl) throw new Error("Configure GENVR_WEB_URL.");
+      return { url: worldShareUrl(this.options.webUrl, v.id, v.invite) };
+    }
+    if (!this.options.apiUrl) throw new Error("Configure GENVR_API_URL for account publication.");
+    const link = new GenvrAccountLink(this.options.apiUrl, this.options.fetcher);
+    if (name === "genvr_link_start") {
+      const v = schemas.genvr_link_start.parse(args);
+      if (this.#client) throw new Error("Already linked; disconnect explicitly before changing accounts.");
+      const scopes = v.scopes ?? (this.options.allowMutations ? ["worlds:read", "worlds:write", "worlds:publish", "worlds:join"] : ["worlds:read", "worlds:join"]);
+      this.#pending = await link.start(v.clientName, scopes);
+      this.#nextPoll = (this.options.now?.() ?? Date.now()) + this.#pending.interval * 1e3;
+      const { deviceCode: _secret, ...visible } = this.#pending;
+      return visible;
+    }
+    if (name === "genvr_link_poll") {
+      if (!this.#pending) throw new Error("Start account linking first.");
+      const now = this.options.now?.() ?? Date.now();
+      if (now < this.#nextPoll) throw new Error("Wait for the account link polling interval.");
+      this.#nextPoll = now + this.#pending.interval * 1e3;
+      const result = await link.poll(this.#pending);
+      if (result.status === "pending") return result;
+      this.#client = GenvrClient.linked(this.options.apiUrl, result.account.accessToken, this.options.fetcher);
+      this.#pending = void 0;
+      return { status: "linked", scopes: result.account.scopes, expiresAt: result.account.expiresAt };
+    }
+    const client = this.#client;
+    if (!client) throw new Error("Link a Genvr account first.");
+    if (name === "genvr_identity") return client.linkedIdentity();
+    if (name === "genvr_disconnect") {
+      await client.disconnect();
+      this.#client = void 0;
+      return { disconnected: true };
+    }
+    if (name === "genvr_create_draft" || name === "genvr_upload_world") {
+      const v = name === "genvr_create_draft" ? schemas.genvr_create_draft.parse(args) : schemas.genvr_upload_world.parse(args);
+      if (!session || session.export().id !== v.localId) throw new Error("Open the exact intended local-file world first; live viewport projects are not implicitly uploaded.");
+      if (name === "genvr_create_draft") return client.createDraft(session);
+      const upload = v;
+      return client.uploadWorld(session, upload, upload.itemMap);
+    }
+    if (name === "genvr_read_world") return client.readWorld(schemas.genvr_read_world.parse(args).id);
+    if (name === "genvr_experience") return client.experience(schemas.genvr_experience.parse(args).id);
+    if (name === "genvr_publish_world") {
+      const v = schemas.genvr_publish_world.parse(args);
+      return client.publishWorld(v.id, { title: v.title, type: v.type, content: v.content, access: v.access, ...v.description !== void 0 ? { description: v.description } : {} });
+    }
+    if (name === "genvr_set_access") {
+      const v = schemas.genvr_set_access.parse(args);
+      return client.setAccess(v.id, v.access);
+    }
+    if (name === "genvr_unpublish_world") return client.unpublishWorld(schemas.genvr_unpublish_world.parse(args).id);
+    if (name === "genvr_create_invite") {
+      const v = schemas.genvr_create_invite.parse(args);
+      return client.createInvite(v.id, { role: v.role, expiresInHours: v.expiresInHours });
+    }
+    if (name === "genvr_revoke_invite") {
+      const v = schemas.genvr_revoke_invite.parse(args);
+      await client.revokeInvite(v.id, v.inviteId);
+      return { revoked: true };
+    }
+    if (name === "genvr_join_world") {
+      const { id: id2, ...v } = schemas.genvr_join_world.parse(args);
+      return client.joinWorld(id2, { ...v.password !== void 0 ? { password: v.password } : {}, ...v.invite !== void 0 ? { invite: v.invite } : {} });
+    }
+    return client.joinTicket(schemas.genvr_join_ticket.parse(args).id);
+  }
+};
 export {
   ACCOUNT_LINK_SCOPES,
   AVATAR_LIVE_LAYOUTS,
@@ -512,9 +683,12 @@ export {
   GenvrAccountLink,
   GenvrClient,
   GenvrError,
+  GenvrPublicationTools,
   NOTIFICATION_TYPES,
   PACKAGE_WORK_BUDGET,
   PRESENTATION_ANIMATIONS,
+  PUBLICATION_MUTATION_TOOLS,
+  PUBLICATION_TOOLS,
   SDK_VERSION,
   StudioAgent,
   StudioAgents,
@@ -537,6 +711,7 @@ export {
   saveWorld,
   streamingChatModel,
   studioAgentLook,
-  syncStudioAgents
+  syncStudioAgents,
+  worldShareUrl
 };
 //# sourceMappingURL=index.js.map

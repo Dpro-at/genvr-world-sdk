@@ -1,4 +1,4 @@
-export declare const ACCOUNT_LINK_SCOPES: readonly ["worlds:read", "worlds:write", "worlds:publish", "items:submit"];
+export declare const ACCOUNT_LINK_SCOPES: readonly ["worlds:read", "worlds:write", "worlds:publish", "worlds:join", "items:submit"];
 export type AccountLinkScope = typeof ACCOUNT_LINK_SCOPES[number];
 export interface AccountLinkRequest {
     deviceCode: string;

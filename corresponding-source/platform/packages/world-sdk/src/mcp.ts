@@ -1,4 +1,4 @@
-import { GenvrPublicationTools, PUBLICATION_TOOLS } from './publication-tools.js';
+import { GenvrPublicationTools } from './publication-tools.js';
 import { callLiveStudio } from './live-studio.js';
 import { LiveStudioClient, LIVE_TOOLS } from './mcp-live.js';
 import { FILMING_TOOLS, isFilmingTool, callFilmingTool } from './mcp-filming.js';
@@ -18,7 +18,7 @@ await mkdir(root, { recursive: true });
 const realRoot = await realpath(root);
 const live = process.env.GENVR_STUDIO_CONNECTION ? new LiveStudioClient(process.env.GENVR_STUDIO_CONNECTION, realRoot) : undefined;
 let session: WorldSession | undefined;
-const publication = new GenvrPublicationTools({ ...(process.env.GENVR_API_URL ? { apiUrl: process.env.GENVR_API_URL } : {}), ...(process.env.GENVR_WEB_URL ? { webUrl: process.env.GENVR_WEB_URL } : {}), ...(process.env.GENVR_ACCOUNT_TOKEN ? { accessToken: process.env.GENVR_ACCOUNT_TOKEN } : {}) });
+const publication = new GenvrPublicationTools({ ...(process.env.GENVR_API_URL ? { apiUrl: process.env.GENVR_API_URL } : {}), ...(process.env.GENVR_WEB_URL ? { webUrl: process.env.GENVR_WEB_URL } : {}), ...(process.env.GENVR_ACCOUNT_TOKEN ? { accessToken: process.env.GENVR_ACCOUNT_TOKEN } : {}), allowMutations: process.env.GENVR_MCP_PUBLICATION === '1' });
 const server = new Server({ name: '3d-world-sdk', version: SDK_VERSION }, { capabilities: { tools: {} } });
 const GUIDE_PARTS = ['workflow', 'tools', 'sizes', 'games', 'scripts', 'mistakes'] as const;
 const localTools = [
@@ -30,7 +30,7 @@ const localTools = [
   { name: 'save_world_local', description: 'Save the current world in the configured local folder.', inputSchema: { type: 'object' as const, properties: {}, additionalProperties: false } },
   { name: 'open_world_local', description: 'Open a saved world by ID in the configured local folder.', inputSchema: { type: 'object' as const, properties: { id: { type: 'string' } }, required: ['id'], additionalProperties: false } },
 ];
-server.setRequestHandler(ListToolsRequestSchema, async () => ({ tools: [ ...PUBLICATION_TOOLS, ...localTools, ...LIVE_TOOLS, ...FILMING_TOOLS,
+server.setRequestHandler(ListToolsRequestSchema, async () => ({ tools: [ ...publication.tools(), ...localTools, ...LIVE_TOOLS, ...FILMING_TOOLS,
   ...TOOL_DEFINITIONS.map(tool => ({ name: tool.function.name, description: tool.function.description,
     inputSchema: tool.function.parameters as { type: 'object' } })),
 ] }));

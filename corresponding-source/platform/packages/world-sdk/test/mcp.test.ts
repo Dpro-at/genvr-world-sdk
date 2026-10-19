@@ -14,7 +14,8 @@ it('an independent agent creates, edits, saves and reopens a world through MCP s
     await client.connect(transport);
     const listed = await client.listTools();
     expect(listed.tools.some(tool => tool.name === 'place_item')).toBe(true);
-    expect(listed.tools.some(tool => tool.name === 'genvr_publish_world')).toBe(true);
+    expect(listed.tools.some(tool => tool.name === 'genvr_identity')).toBe(true);
+    expect(listed.tools.some(tool => tool.name === 'genvr_publish_world')).toBe(false);
     expect((await client.callTool({ name: 'genvr_identity', arguments: {} })).isError).toBe(true);
     const capabilities = await client.callTool({ name: 'get_studio_capabilities', arguments: {} });
     expect(JSON.parse((capabilities.content as Array<{ text: string }>)[0]!.text)).toMatchObject({ liveViewport: false, accountUploads: false });

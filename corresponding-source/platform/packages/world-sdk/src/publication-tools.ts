@@ -14,7 +14,7 @@ const schemas = {
   genvr_publish_world: z.object({ id, title: z.string().trim().min(1).max(60), description: z.string().max(1000).optional(), type: z.enum(['game', 'event', 'social']), access: z.discriminatedUnion('mode', [z.object({ mode: z.enum(['public', 'invite', 'friends']) }).strict(), z.object({ mode: z.literal('password'), password: z.string().min(4).max(64) }).strict()]), content: ContentAnswers, confirm: z.literal(true) }).strict(),
   genvr_set_access: z.object({ id, access, confirm: z.literal(true) }).strict(),
   genvr_unpublish_world: z.object({ id, confirm: z.literal(true) }).strict(),
-  genvr_create_invite: z.object({ id, role: z.enum(['player', 'builder']).default('player'), expiresInHours: z.number().int().min(1).max(720).default(72), confirm: z.literal(true) }).strict(),
+  genvr_create_invite: z.object({ id, role: z.literal('player').default('player'), expiresInHours: z.number().int().min(1).max(720).default(72), confirm: z.literal(true) }).strict(),
   genvr_revoke_invite: z.object({ id, inviteId: id, confirm: z.literal(true) }).strict(),
   genvr_share_url: z.object({ id, invite: z.string().max(128).optional() }).strict(),
   genvr_join_world: z.object({ id, password: z.string().max(64).optional(), invite: z.string().max(128).optional() }).strict(),
@@ -30,23 +30,28 @@ const descriptions: Record<keyof typeof schemas, string> = {
   genvr_publish_world: 'Publish an owned draft after explicit owner confirmation, access choice and content questionnaire.',
   genvr_set_access: 'Change owned world access after explicit confirmation; private excludes ordinary players.',
   genvr_unpublish_world: 'Return owned world to draft; also set access private before reimporting.',
-  genvr_create_invite: 'Create a revocable owner-authorized invite. Builder role grants editing; require deliberate owner choice.',
+  genvr_create_invite: 'Create a revocable player invite. Builder invitations grant editing and are only available through the host UI.',
   genvr_revoke_invite: 'Revoke an invite for new acceptances; existing members retain access.',
   genvr_share_url: 'Build a website share URL. It does not grant access or publish anything.',
   genvr_join_world: 'Ask the server to join as the linked account under existing access rules.',
   genvr_join_ticket: 'Request a short-lived realtime ticket. Server access rules still apply.',
 };
+/** Account-changing tools; `confirm:true` is agent-supplied, so the host must opt in to exposing them. */
+export const PUBLICATION_MUTATION_TOOLS: ReadonlySet<string> = new Set(['genvr_create_draft', 'genvr_upload_world', 'genvr_publish_world', 'genvr_set_access', 'genvr_unpublish_world', 'genvr_create_invite', 'genvr_revoke_invite']);
 export const PUBLICATION_TOOLS = Object.entries(schemas).map(([name, schema]) => ({ name, description: descriptions[name as keyof typeof schemas], inputSchema: z.toJSONSchema(schema, { target: 'draft-7' }) as { type: 'object' } }));
 /** Host-configured endpoint and in-memory account credentials; no project/storage/library mutations. */
 export class GenvrPublicationTools {
   #client: GenvrClient | undefined; #pending: AccountLinkRequest | undefined; #nextPoll = 0;
-  constructor(readonly options: { apiUrl?: string; webUrl?: string; accessToken?: string; fetcher?: typeof fetch; now?: () => number } = {}) {
+  constructor(readonly options: { apiUrl?: string; webUrl?: string; accessToken?: string; allowMutations?: boolean; fetcher?: typeof fetch; now?: () => number } = {}) {
     if (options.apiUrl && options.accessToken) this.#client = GenvrClient.linked(options.apiUrl, options.accessToken, options.fetcher);
   }
-  capabilities() { return { configured: Boolean(this.options.apiUrl), linked: Boolean(this.#client), localFileWorldOnly: true }; }
+  capabilities() { return { configured: Boolean(this.options.apiUrl), linked: Boolean(this.#client), mutations: Boolean(this.options.allowMutations), localFileWorldOnly: true }; }
+  /** Tools to list: mutations are hidden unless the host opted in. */
+  tools() { return PUBLICATION_TOOLS.filter(tool => this.options.allowMutations || !PUBLICATION_MUTATION_TOOLS.has(tool.name)); }
   handles(name: string) { return Object.hasOwn(schemas, name); }
   async call(name: string, args: unknown, session?: WorldSession): Promise<unknown> {
     if (!this.handles(name)) throw new Error('Unknown publication tool.');
+    if (!this.options.allowMutations && PUBLICATION_MUTATION_TOOLS.has(name)) throw new Error('World publication changes are disabled. The host must set GENVR_MCP_PUBLICATION=1 after providing its own user approval.');
     // Parse once before any side effects, then narrow each command with its own schema.
     schemas[name as keyof typeof schemas].parse(args);
     if (name === 'genvr_share_url') { const v = schemas.genvr_share_url.parse(args); if (!this.options.webUrl) throw new Error('Configure GENVR_WEB_URL.'); return { url: worldShareUrl(this.options.webUrl, v.id, v.invite) }; }
@@ -55,7 +60,8 @@ export class GenvrPublicationTools {
     if (name === 'genvr_link_start') {
       const v = schemas.genvr_link_start.parse(args);
       if (this.#client) throw new Error('Already linked; disconnect explicitly before changing accounts.');
-      this.#pending = await link.start(v.clientName, v.scopes ?? ['worlds:read', 'worlds:write', 'worlds:publish', 'worlds:join']);
+      const scopes = v.scopes ?? (this.options.allowMutations ? ['worlds:read', 'worlds:write', 'worlds:publish', 'worlds:join'] : ['worlds:read', 'worlds:join']);
+      this.#pending = await link.start(v.clientName, scopes);
       this.#nextPoll = (this.options.now?.() ?? Date.now()) + this.#pending.interval * 1000;
       const { deviceCode: _secret, ...visible } = this.#pending; return visible;
     }
@@ -74,7 +80,7 @@ export class GenvrPublicationTools {
       const v = name === 'genvr_create_draft' ? schemas.genvr_create_draft.parse(args) : schemas.genvr_upload_world.parse(args);
       if (!session || session.export().id !== v.localId) throw new Error('Open the exact intended local-file world first; live viewport projects are not implicitly uploaded.');
       if (name === 'genvr_create_draft') return client.createDraft(session);
-      const upload = schemas.genvr_upload_world.parse(args); return client.uploadWorld(session, upload, upload.itemMap);
+      const upload = v as z.infer<typeof schemas.genvr_upload_world>; return client.uploadWorld(session, upload, upload.itemMap);
     }
     if (name === 'genvr_read_world') return client.readWorld(schemas.genvr_read_world.parse(args).id);
     if (name === 'genvr_experience') return client.experience(schemas.genvr_experience.parse(args).id);
