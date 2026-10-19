@@ -3,7 +3,7 @@ import { getCoreItem } from '@genvr/core-library';
 import { runAssistant, runTool, type AssistantHost, type ChatModel, type ChatMessage, type AssistantEvent, type AvatarPresentationEvent } from '@genvr/assistant';
 import { applyCommand, createWorldState, encodeTerrain, planWaterFill, type WorldState } from '@genvr/world';
 
-export const SDK_VERSION = '0.3.0-preview.12';
+export const SDK_VERSION = '0.3.0-preview.13';
 export const PACKAGE_WORK_BUDGET = 5_000_000;
 export type WorldEvent = { type: 'changed' | 'saved' | 'opened'; id: string } | { type: 'assistant'; event: AssistantEvent };
 export interface NewWorldOptions {

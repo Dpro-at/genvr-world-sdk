@@ -24,6 +24,14 @@
     ]
   },
   {
+    "name": "react-dom",
+    "version": "19.3.0",
+    "license": "MIT",
+    "files": [
+      "LICENSE"
+    ]
+  },
+  {
     "name": "three",
     "version": "0.186.1",
     "license": "MIT",
@@ -35,14 +43,6 @@
     "name": "@dimforge/rapier3d-compat",
     "version": "0.20.0",
     "license": "Apache-2.0",
-    "files": [
-      "LICENSE"
-    ]
-  },
-  {
-    "name": "react-dom",
-    "version": "19.3.0",
-    "license": "MIT",
     "files": [
       "LICENSE"
     ]

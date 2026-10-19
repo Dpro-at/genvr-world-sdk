@@ -1,7 +1,7 @@
 import { CommandPayload, WorldDocument, WorldPackage, type ItemPackage } from '@genvr/contracts';
 import { type ChatModel, type AssistantEvent, type AvatarPresentationEvent } from '@genvr/assistant';
 import { type WorldState } from '@genvr/world';
-export declare const SDK_VERSION = "0.3.0-preview.12";
+export declare const SDK_VERSION = "0.3.0-preview.13";
 export declare const PACKAGE_WORK_BUDGET = 5000000;
 export type WorldEvent = {
     type: 'changed' | 'saved' | 'opened';

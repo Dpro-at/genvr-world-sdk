@@ -899,10 +899,10 @@ var require_react_dom_production = __commonJS({
       };
     }
     var ReactSharedInternals = React.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE;
-    function getCrossOriginStringAs(as, input5) {
+    function getCrossOriginStringAs(as, input4) {
       if ("font" === as) return "";
-      if ("string" === typeof input5)
-        return "use-credentials" === input5 ? input5 : "";
+      if ("string" === typeof input4)
+        return "use-credentials" === input4 ? input4 : "";
     }
     exports.__DOM_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE = Internals;
     exports.browser = function(reason) {
@@ -16536,8 +16536,21 @@ var __iconData88 = {
 __iconData88.node;
 var House = createLucideIcon(__iconData88);
 
-// ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/lamp-floor.mjs
+// ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/image.mjs
 var __iconData89 = {
+  name: "image",
+  size: 24,
+  node: [
+    ["rect", { width: "18", height: "18", x: "3", y: "3", rx: "2", ry: "2", key: "1m3agn" }],
+    ["circle", { cx: "9", cy: "9", r: "2", key: "af1f0g" }],
+    ["path", { d: "m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21", key: "1xmnt7" }]
+  ]
+};
+__iconData89.node;
+var Image2 = createLucideIcon(__iconData89);
+
+// ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/lamp-floor.mjs
+var __iconData90 = {
   name: "lamp-floor",
   size: 24,
   node: [
@@ -16552,11 +16565,11 @@ var __iconData89 = {
     ["path", { d: "M9 22h6", key: "1rlq3v" }]
   ]
 };
-__iconData89.node;
-var LampFloor = createLucideIcon(__iconData89);
+__iconData90.node;
+var LampFloor = createLucideIcon(__iconData90);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/languages.mjs
-var __iconData90 = {
+var __iconData91 = {
   name: "languages",
   size: 24,
   node: [
@@ -16568,11 +16581,11 @@ var __iconData90 = {
     ["path", { d: "M14 18h6", key: "1m8k6r" }]
   ]
 };
-__iconData90.node;
-var Languages = createLucideIcon(__iconData90);
+__iconData91.node;
+var Languages = createLucideIcon(__iconData91);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/layers.mjs
-var __iconData91 = {
+var __iconData92 = {
   name: "layers",
   size: 24,
   node: [
@@ -16600,21 +16613,8 @@ var __iconData91 = {
   ],
   aliases: ["layers-3"]
 };
-__iconData91.node;
-var Layers = createLucideIcon(__iconData91);
-
-// ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/layout-template.mjs
-var __iconData92 = {
-  name: "layout-template",
-  size: 24,
-  node: [
-    ["rect", { width: "18", height: "7", x: "3", y: "3", rx: "1", key: "f1a2em" }],
-    ["rect", { width: "9", height: "7", x: "3", y: "14", rx: "1", key: "jqznyg" }],
-    ["rect", { width: "5", height: "7", x: "16", y: "14", rx: "1", key: "q5h2i8" }]
-  ]
-};
 __iconData92.node;
-var LayoutTemplate = createLucideIcon(__iconData92);
+var Layers = createLucideIcon(__iconData92);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/leaf.mjs
 var __iconData93 = {
@@ -16773,8 +16773,20 @@ var __iconData103 = {
 __iconData103.node;
 var Magnet = createLucideIcon(__iconData103);
 
-// ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/map-pin.mjs
+// ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/mail.mjs
 var __iconData104 = {
+  name: "mail",
+  size: 24,
+  node: [
+    ["path", { d: "m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7", key: "132q7q" }],
+    ["rect", { x: "2", y: "4", width: "20", height: "16", rx: "2", key: "izxlao" }]
+  ]
+};
+__iconData104.node;
+var Mail = createLucideIcon(__iconData104);
+
+// ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/map-pin.mjs
+var __iconData105 = {
   name: "map-pin",
   size: 24,
   node: [
@@ -16788,11 +16800,11 @@ var __iconData104 = {
     ["circle", { cx: "12", cy: "10", r: "3", key: "ilqhr7" }]
   ]
 };
-__iconData104.node;
-var MapPin = createLucideIcon(__iconData104);
+__iconData105.node;
+var MapPin = createLucideIcon(__iconData105);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/map.mjs
-var __iconData105 = {
+var __iconData106 = {
   name: "map",
   size: 24,
   node: [
@@ -16807,11 +16819,11 @@ var __iconData105 = {
     ["path", { d: "M9 3.236v15", key: "1uimfh" }]
   ]
 };
-__iconData105.node;
-var Map2 = createLucideIcon(__iconData105);
+__iconData106.node;
+var Map2 = createLucideIcon(__iconData106);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/maximize-2.mjs
-var __iconData106 = {
+var __iconData107 = {
   name: "maximize-2",
   size: 24,
   node: [
@@ -16821,11 +16833,11 @@ var __iconData106 = {
     ["path", { d: "M9 21H3v-6", key: "wtvkvv" }]
   ]
 };
-__iconData106.node;
-var Maximize2 = createLucideIcon(__iconData106);
+__iconData107.node;
+var Maximize2 = createLucideIcon(__iconData107);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/medal.mjs
-var __iconData107 = {
+var __iconData108 = {
   name: "medal",
   size: 24,
   node: [
@@ -16843,11 +16855,45 @@ var __iconData107 = {
     ["path", { d: "M12 18v-2h-.5", key: "fawc4q" }]
   ]
 };
-__iconData107.node;
-var Medal = createLucideIcon(__iconData107);
+__iconData108.node;
+var Medal = createLucideIcon(__iconData108);
+
+// ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/message-circle.mjs
+var __iconData109 = {
+  name: "message-circle",
+  size: 24,
+  node: [
+    [
+      "path",
+      {
+        d: "M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719",
+        key: "1sd12s"
+      }
+    ]
+  ]
+};
+__iconData109.node;
+var MessageCircle = createLucideIcon(__iconData109);
+
+// ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/message-square.mjs
+var __iconData110 = {
+  name: "message-square",
+  size: 24,
+  node: [
+    [
+      "path",
+      {
+        d: "M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z",
+        key: "18887p"
+      }
+    ]
+  ]
+};
+__iconData110.node;
+var MessageSquare = createLucideIcon(__iconData110);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/mic.mjs
-var __iconData108 = {
+var __iconData111 = {
   name: "mic",
   size: 24,
   node: [
@@ -16856,20 +16902,20 @@ var __iconData108 = {
     ["rect", { x: "9", y: "2", width: "6", height: "13", rx: "3", key: "s6n7sd" }]
   ]
 };
-__iconData108.node;
-var Mic = createLucideIcon(__iconData108);
+__iconData111.node;
+var Mic = createLucideIcon(__iconData111);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/minus.mjs
-var __iconData109 = {
+var __iconData112 = {
   name: "minus",
   size: 24,
   node: [["path", { d: "M5 12h14", key: "1ays0h" }]]
 };
-__iconData109.node;
-var Minus = createLucideIcon(__iconData109);
+__iconData112.node;
+var Minus = createLucideIcon(__iconData112);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/monitor.mjs
-var __iconData110 = {
+var __iconData113 = {
   name: "monitor",
   size: 24,
   node: [
@@ -16878,11 +16924,11 @@ var __iconData110 = {
     ["line", { x1: "12", x2: "12", y1: "17", y2: "21", key: "vw1qmm" }]
   ]
 };
-__iconData110.node;
-var Monitor = createLucideIcon(__iconData110);
+__iconData113.node;
+var Monitor = createLucideIcon(__iconData113);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/moon.mjs
-var __iconData111 = {
+var __iconData114 = {
   name: "moon",
   size: 24,
   node: [
@@ -16895,20 +16941,20 @@ var __iconData111 = {
     ]
   ]
 };
-__iconData111.node;
-var Moon = createLucideIcon(__iconData111);
+__iconData114.node;
+var Moon = createLucideIcon(__iconData114);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/mountain.mjs
-var __iconData112 = {
+var __iconData115 = {
   name: "mountain",
   size: 24,
   node: [["path", { d: "m8 3 4 8 5-5 5 15H2L8 3z", key: "otkl63" }]]
 };
-__iconData112.node;
-var Mountain = createLucideIcon(__iconData112);
+__iconData115.node;
+var Mountain = createLucideIcon(__iconData115);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/mouse-pointer-2.mjs
-var __iconData113 = {
+var __iconData116 = {
   name: "mouse-pointer-2",
   size: 24,
   node: [
@@ -16921,11 +16967,11 @@ var __iconData113 = {
     ]
   ]
 };
-__iconData113.node;
-var MousePointer2 = createLucideIcon(__iconData113);
+__iconData116.node;
+var MousePointer2 = createLucideIcon(__iconData116);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/move-horizontal.mjs
-var __iconData114 = {
+var __iconData117 = {
   name: "move-horizontal",
   size: 24,
   node: [
@@ -16934,11 +16980,11 @@ var __iconData114 = {
     ["path", { d: "m6 8-4 4 4 4", key: "15zrgr" }]
   ]
 };
-__iconData114.node;
-var MoveHorizontal = createLucideIcon(__iconData114);
+__iconData117.node;
+var MoveHorizontal = createLucideIcon(__iconData117);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/move.mjs
-var __iconData115 = {
+var __iconData118 = {
   name: "move",
   size: 24,
   node: [
@@ -16950,11 +16996,11 @@ var __iconData115 = {
     ["path", { d: "m9 5 3-3 3 3", key: "l8vdw6" }]
   ]
 };
-__iconData115.node;
-var Move = createLucideIcon(__iconData115);
+__iconData118.node;
+var Move = createLucideIcon(__iconData118);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/music-2.mjs
-var __iconData116 = {
+var __iconData119 = {
   name: "music-2",
   size: 24,
   node: [
@@ -16962,11 +17008,11 @@ var __iconData116 = {
     ["path", { d: "M12 18V2l7 4", key: "g04rme" }]
   ]
 };
-__iconData116.node;
-var Music2 = createLucideIcon(__iconData116);
+__iconData119.node;
+var Music2 = createLucideIcon(__iconData119);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/music.mjs
-var __iconData117 = {
+var __iconData120 = {
   name: "music",
   size: 24,
   node: [
@@ -16975,11 +17021,11 @@ var __iconData117 = {
     ["circle", { cx: "18", cy: "16", r: "3", key: "1hluhg" }]
   ]
 };
-__iconData117.node;
-var Music = createLucideIcon(__iconData117);
+__iconData120.node;
+var Music = createLucideIcon(__iconData120);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/orbit.mjs
-var __iconData118 = {
+var __iconData121 = {
   name: "orbit",
   size: 24,
   node: [
@@ -16990,11 +17036,11 @@ var __iconData118 = {
     ["circle", { cx: "5", cy: "19", r: "2", key: "v8kfzx" }]
   ]
 };
-__iconData118.node;
-var Orbit = createLucideIcon(__iconData118);
+__iconData121.node;
+var Orbit = createLucideIcon(__iconData121);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/package.mjs
-var __iconData119 = {
+var __iconData122 = {
   name: "package",
   size: 24,
   node: [
@@ -17010,11 +17056,11 @@ var __iconData119 = {
     ["path", { d: "m7.5 4.27 9 5.15", key: "1c824w" }]
   ]
 };
-__iconData119.node;
-var Package = createLucideIcon(__iconData119);
+__iconData122.node;
+var Package = createLucideIcon(__iconData122);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/paintbrush.mjs
-var __iconData120 = {
+var __iconData123 = {
   name: "paintbrush",
   size: 24,
   node: [
@@ -17035,11 +17081,11 @@ var __iconData120 = {
     ]
   ]
 };
-__iconData120.node;
-var Paintbrush = createLucideIcon(__iconData120);
+__iconData123.node;
+var Paintbrush = createLucideIcon(__iconData123);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/palette.mjs
-var __iconData121 = {
+var __iconData124 = {
   name: "palette",
   size: 24,
   node: [
@@ -17056,11 +17102,11 @@ var __iconData121 = {
     ["circle", { cx: "8.5", cy: "7.5", r: ".5", fill: "currentColor", key: "fotxhn" }]
   ]
 };
-__iconData121.node;
-var Palette = createLucideIcon(__iconData121);
+__iconData124.node;
+var Palette = createLucideIcon(__iconData124);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/panel-left-close.mjs
-var __iconData122 = {
+var __iconData125 = {
   name: "panel-left-close",
   size: 24,
   node: [
@@ -17070,11 +17116,11 @@ var __iconData122 = {
   ],
   aliases: ["sidebar-close"]
 };
-__iconData122.node;
-var PanelLeftClose = createLucideIcon(__iconData122);
+__iconData125.node;
+var PanelLeftClose = createLucideIcon(__iconData125);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/panels-top-left.mjs
-var __iconData123 = {
+var __iconData126 = {
   name: "panels-top-left",
   size: 24,
   node: [
@@ -17084,11 +17130,11 @@ var __iconData123 = {
   ],
   aliases: ["layout"]
 };
-__iconData123.node;
-var PanelsTopLeft = createLucideIcon(__iconData123);
+__iconData126.node;
+var PanelsTopLeft = createLucideIcon(__iconData126);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/party-popper.mjs
-var __iconData124 = {
+var __iconData127 = {
   name: "party-popper",
   size: 24,
   node: [
@@ -17121,11 +17167,11 @@ var __iconData124 = {
     ]
   ]
 };
-__iconData124.node;
-var PartyPopper = createLucideIcon(__iconData124);
+__iconData127.node;
+var PartyPopper = createLucideIcon(__iconData127);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/pause.mjs
-var __iconData125 = {
+var __iconData128 = {
   name: "pause",
   size: 24,
   node: [
@@ -17133,11 +17179,11 @@ var __iconData125 = {
     ["rect", { x: "5", y: "3", width: "5", height: "18", rx: "1", key: "1wsw3u" }]
   ]
 };
-__iconData125.node;
-var Pause = createLucideIcon(__iconData125);
+__iconData128.node;
+var Pause = createLucideIcon(__iconData128);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/person-standing.mjs
-var __iconData126 = {
+var __iconData129 = {
   name: "person-standing",
   size: 24,
   node: [
@@ -17147,11 +17193,11 @@ var __iconData126 = {
     ["path", { d: "M12 10v4", key: "1kjpxc" }]
   ]
 };
-__iconData126.node;
-var PersonStanding = createLucideIcon(__iconData126);
+__iconData129.node;
+var PersonStanding = createLucideIcon(__iconData129);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/pickaxe.mjs
-var __iconData127 = {
+var __iconData130 = {
   name: "pickaxe",
   size: 24,
   node: [
@@ -17179,11 +17225,11 @@ var __iconData127 = {
     ]
   ]
 };
-__iconData127.node;
-var Pickaxe = createLucideIcon(__iconData127);
+__iconData130.node;
+var Pickaxe = createLucideIcon(__iconData130);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/pipette.mjs
-var __iconData128 = {
+var __iconData131 = {
   name: "pipette",
   size: 24,
   node: [
@@ -17204,11 +17250,11 @@ var __iconData128 = {
     ["path", { d: "m2 22 .414-.414", key: "jhxm08" }]
   ]
 };
-__iconData128.node;
-var Pipette = createLucideIcon(__iconData128);
+__iconData131.node;
+var Pipette = createLucideIcon(__iconData131);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/play.mjs
-var __iconData129 = {
+var __iconData132 = {
   name: "play",
   size: 24,
   node: [
@@ -17221,11 +17267,11 @@ var __iconData129 = {
     ]
   ]
 };
-__iconData129.node;
-var Play = createLucideIcon(__iconData129);
+__iconData132.node;
+var Play = createLucideIcon(__iconData132);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/plus.mjs
-var __iconData130 = {
+var __iconData133 = {
   name: "plus",
   size: 24,
   node: [
@@ -17233,11 +17279,11 @@ var __iconData130 = {
     ["path", { d: "M12 5v14", key: "s699le" }]
   ]
 };
-__iconData130.node;
-var Plus = createLucideIcon(__iconData130);
+__iconData133.node;
+var Plus = createLucideIcon(__iconData133);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/pointer.mjs
-var __iconData131 = {
+var __iconData134 = {
   name: "pointer",
   size: 24,
   node: [
@@ -17254,29 +17300,29 @@ var __iconData131 = {
     ]
   ]
 };
-__iconData131.node;
-var Pointer = createLucideIcon(__iconData131);
+__iconData134.node;
+var Pointer = createLucideIcon(__iconData134);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/rectangle-horizontal.mjs
-var __iconData132 = {
+var __iconData135 = {
   name: "rectangle-horizontal",
   size: 24,
   node: [["rect", { width: "20", height: "12", x: "2", y: "6", rx: "2", key: "9lu3g6" }]]
 };
-__iconData132.node;
-var RectangleHorizontal = createLucideIcon(__iconData132);
+__iconData135.node;
+var RectangleHorizontal = createLucideIcon(__iconData135);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/rectangle-vertical.mjs
-var __iconData133 = {
+var __iconData136 = {
   name: "rectangle-vertical",
   size: 24,
   node: [["rect", { width: "12", height: "20", x: "6", y: "2", rx: "2", key: "1oxtiu" }]]
 };
-__iconData133.node;
-var RectangleVertical = createLucideIcon(__iconData133);
+__iconData136.node;
+var RectangleVertical = createLucideIcon(__iconData136);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/redo-2.mjs
-var __iconData134 = {
+var __iconData137 = {
   name: "redo-2",
   size: 24,
   node: [
@@ -17284,11 +17330,11 @@ var __iconData134 = {
     ["path", { d: "M20 9H9.5A5.5 5.5 0 0 0 4 14.5A5.5 5.5 0 0 0 9.5 20H13", key: "6uklza" }]
   ]
 };
-__iconData134.node;
-var Redo2 = createLucideIcon(__iconData134);
+__iconData137.node;
+var Redo2 = createLucideIcon(__iconData137);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/refresh-cw.mjs
-var __iconData135 = {
+var __iconData138 = {
   name: "refresh-cw",
   size: 24,
   node: [
@@ -17298,11 +17344,11 @@ var __iconData135 = {
     ["path", { d: "M8 16H3v5", key: "1cv678" }]
   ]
 };
-__iconData135.node;
-var RefreshCw = createLucideIcon(__iconData135);
+__iconData138.node;
+var RefreshCw = createLucideIcon(__iconData138);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/rotate-ccw-clock.mjs
-var __iconData136 = {
+var __iconData139 = {
   name: "rotate-ccw-clock",
   size: 24,
   node: [
@@ -17312,11 +17358,11 @@ var __iconData136 = {
   ],
   aliases: ["history"]
 };
-__iconData136.node;
-var RotateCcwClock = createLucideIcon(__iconData136);
+__iconData139.node;
+var RotateCcwClock = createLucideIcon(__iconData139);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/rotate-ccw.mjs
-var __iconData137 = {
+var __iconData140 = {
   name: "rotate-ccw",
   size: 24,
   node: [
@@ -17324,11 +17370,11 @@ var __iconData137 = {
     ["path", { d: "M3 3v5h5", key: "1xhq8a" }]
   ]
 };
-__iconData137.node;
-var RotateCcw = createLucideIcon(__iconData137);
+__iconData140.node;
+var RotateCcw = createLucideIcon(__iconData140);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/rotate-cw.mjs
-var __iconData138 = {
+var __iconData141 = {
   name: "rotate-cw",
   size: 24,
   node: [
@@ -17336,11 +17382,11 @@ var __iconData138 = {
     ["path", { d: "M21 3v5h-5", key: "1q7to0" }]
   ]
 };
-__iconData138.node;
-var RotateCw = createLucideIcon(__iconData138);
+__iconData141.node;
+var RotateCw = createLucideIcon(__iconData141);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/route.mjs
-var __iconData139 = {
+var __iconData142 = {
   name: "route",
   size: 24,
   node: [
@@ -17349,11 +17395,11 @@ var __iconData139 = {
     ["circle", { cx: "18", cy: "5", r: "3", key: "gq8acd" }]
   ]
 };
-__iconData139.node;
-var Route = createLucideIcon(__iconData139);
+__iconData142.node;
+var Route = createLucideIcon(__iconData142);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/ruler.mjs
-var __iconData140 = {
+var __iconData143 = {
   name: "ruler",
   size: 24,
   node: [
@@ -17370,11 +17416,11 @@ var __iconData140 = {
     ["path", { d: "m17.5 15.5 2-2", key: "wo5hmg" }]
   ]
 };
-__iconData140.node;
-var Ruler = createLucideIcon(__iconData140);
+__iconData143.node;
+var Ruler = createLucideIcon(__iconData143);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/save.mjs
-var __iconData141 = {
+var __iconData144 = {
   name: "save",
   size: 24,
   node: [
@@ -17389,11 +17435,11 @@ var __iconData141 = {
     ["path", { d: "M7 3v4a1 1 0 0 0 1 1h7", key: "t51u73" }]
   ]
 };
-__iconData141.node;
-var Save = createLucideIcon(__iconData141);
+__iconData144.node;
+var Save = createLucideIcon(__iconData144);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/scan-eye.mjs
-var __iconData142 = {
+var __iconData145 = {
   name: "scan-eye",
   size: 24,
   node: [
@@ -17411,11 +17457,11 @@ var __iconData142 = {
     ]
   ]
 };
-__iconData142.node;
-var ScanEye = createLucideIcon(__iconData142);
+__iconData145.node;
+var ScanEye = createLucideIcon(__iconData145);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/scan-face.mjs
-var __iconData143 = {
+var __iconData146 = {
   name: "scan-face",
   size: 24,
   node: [
@@ -17428,11 +17474,11 @@ var __iconData143 = {
     ["path", { d: "M15 9h.01", key: "x1ddxp" }]
   ]
 };
-__iconData143.node;
-var ScanFace = createLucideIcon(__iconData143);
+__iconData146.node;
+var ScanFace = createLucideIcon(__iconData146);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/scissors.mjs
-var __iconData144 = {
+var __iconData147 = {
   name: "scissors",
   size: 24,
   node: [
@@ -17443,11 +17489,11 @@ var __iconData144 = {
     ["path", { d: "M14.8 14.8 20 20", key: "ptml3r" }]
   ]
 };
-__iconData144.node;
-var Scissors = createLucideIcon(__iconData144);
+__iconData147.node;
+var Scissors = createLucideIcon(__iconData147);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/search.mjs
-var __iconData145 = {
+var __iconData148 = {
   name: "search",
   size: 24,
   node: [
@@ -17455,11 +17501,11 @@ var __iconData145 = {
     ["circle", { cx: "11", cy: "11", r: "8", key: "4ej97u" }]
   ]
 };
-__iconData145.node;
-var Search = createLucideIcon(__iconData145);
+__iconData148.node;
+var Search = createLucideIcon(__iconData148);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/settings-2.mjs
-var __iconData146 = {
+var __iconData149 = {
   name: "settings-2",
   size: 24,
   node: [
@@ -17469,11 +17515,29 @@ var __iconData146 = {
     ["circle", { cx: "7", cy: "7", r: "3", key: "dfmy0x" }]
   ]
 };
-__iconData146.node;
-var Settings2 = createLucideIcon(__iconData146);
+__iconData149.node;
+var Settings2 = createLucideIcon(__iconData149);
+
+// ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/settings.mjs
+var __iconData150 = {
+  name: "settings",
+  size: 24,
+  node: [
+    [
+      "path",
+      {
+        d: "M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915",
+        key: "1i5ecw"
+      }
+    ],
+    ["circle", { cx: "12", cy: "12", r: "3", key: "1v7zrd" }]
+  ]
+};
+__iconData150.node;
+var Settings = createLucideIcon(__iconData150);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/shapes.mjs
-var __iconData147 = {
+var __iconData151 = {
   name: "shapes",
   size: 24,
   node: [
@@ -17488,11 +17552,11 @@ var __iconData147 = {
     ["circle", { cx: "17.5", cy: "17.5", r: "3.5", key: "w3z12y" }]
   ]
 };
-__iconData147.node;
-var Shapes = createLucideIcon(__iconData147);
+__iconData151.node;
+var Shapes = createLucideIcon(__iconData151);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/share-2.mjs
-var __iconData148 = {
+var __iconData152 = {
   name: "share-2",
   size: 24,
   node: [
@@ -17503,11 +17567,11 @@ var __iconData148 = {
     ["line", { x1: "15.41", x2: "8.59", y1: "6.51", y2: "10.49", key: "1n3mei" }]
   ]
 };
-__iconData148.node;
-var Share2 = createLucideIcon(__iconData148);
+__iconData152.node;
+var Share2 = createLucideIcon(__iconData152);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/shield-check.mjs
-var __iconData149 = {
+var __iconData153 = {
   name: "shield-check",
   size: 24,
   node: [
@@ -17521,11 +17585,11 @@ var __iconData149 = {
     ["path", { d: "m9 12 2 2 4-4", key: "dzmm74" }]
   ]
 };
-__iconData149.node;
-var ShieldCheck = createLucideIcon(__iconData149);
+__iconData153.node;
+var ShieldCheck = createLucideIcon(__iconData153);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/shrub.mjs
-var __iconData150 = {
+var __iconData154 = {
   name: "shrub",
   size: 24,
   node: [
@@ -17537,11 +17601,11 @@ var __iconData150 = {
     ]
   ]
 };
-__iconData150.node;
-var Shrub = createLucideIcon(__iconData150);
+__iconData154.node;
+var Shrub = createLucideIcon(__iconData154);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/shuffle.mjs
-var __iconData151 = {
+var __iconData155 = {
   name: "shuffle",
   size: 24,
   node: [
@@ -17552,11 +17616,11 @@ var __iconData151 = {
     ["path", { d: "M22 18h-6.041a4 4 0 0 1-3.3-1.8l-.359-.45", key: "os18l9" }]
   ]
 };
-__iconData151.node;
-var Shuffle = createLucideIcon(__iconData151);
+__iconData155.node;
+var Shuffle = createLucideIcon(__iconData155);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/sliders-horizontal.mjs
-var __iconData152 = {
+var __iconData156 = {
   name: "sliders-horizontal",
   size: 24,
   node: [
@@ -17571,11 +17635,11 @@ var __iconData152 = {
     ["path", { d: "M8 12H3", key: "a7s4jb" }]
   ]
 };
-__iconData152.node;
-var SlidersHorizontal = createLucideIcon(__iconData152);
+__iconData156.node;
+var SlidersHorizontal = createLucideIcon(__iconData156);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/smartphone.mjs
-var __iconData153 = {
+var __iconData157 = {
   name: "smartphone",
   size: 24,
   node: [
@@ -17583,11 +17647,11 @@ var __iconData153 = {
     ["path", { d: "M12 18h.01", key: "mhygvu" }]
   ]
 };
-__iconData153.node;
-var Smartphone = createLucideIcon(__iconData153);
+__iconData157.node;
+var Smartphone = createLucideIcon(__iconData157);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/snowflake.mjs
-var __iconData154 = {
+var __iconData158 = {
   name: "snowflake",
   size: 24,
   node: [
@@ -17605,11 +17669,11 @@ var __iconData154 = {
     ["path", { d: "m7 3 3 6h4", key: "1otusx" }]
   ]
 };
-__iconData154.node;
-var Snowflake = createLucideIcon(__iconData154);
+__iconData158.node;
+var Snowflake = createLucideIcon(__iconData158);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/sparkle.mjs
-var __iconData155 = {
+var __iconData159 = {
   name: "sparkle",
   size: 24,
   node: [
@@ -17622,11 +17686,11 @@ var __iconData155 = {
     ]
   ]
 };
-__iconData155.node;
-var Sparkle = createLucideIcon(__iconData155);
+__iconData159.node;
+var Sparkle = createLucideIcon(__iconData159);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/sparkles.mjs
-var __iconData156 = {
+var __iconData160 = {
   name: "sparkles",
   size: 24,
   node: [
@@ -17643,11 +17707,11 @@ var __iconData156 = {
   ],
   aliases: ["stars"]
 };
-__iconData156.node;
-var Sparkles = createLucideIcon(__iconData156);
+__iconData160.node;
+var Sparkles = createLucideIcon(__iconData160);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/spline.mjs
-var __iconData157 = {
+var __iconData161 = {
   name: "spline",
   size: 24,
   node: [
@@ -17656,11 +17720,11 @@ var __iconData157 = {
     ["path", { d: "M5 17A12 12 0 0 1 17 5", key: "1okkup" }]
   ]
 };
-__iconData157.node;
-var Spline = createLucideIcon(__iconData157);
+__iconData161.node;
+var Spline = createLucideIcon(__iconData161);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/sprout.mjs
-var __iconData158 = {
+var __iconData162 = {
   name: "sprout",
   size: 24,
   node: [
@@ -17675,11 +17739,11 @@ var __iconData158 = {
     ["path", { d: "M5 21h14", key: "11awu3" }]
   ]
 };
-__iconData158.node;
-var Sprout = createLucideIcon(__iconData158);
+__iconData162.node;
+var Sprout = createLucideIcon(__iconData162);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/square-dashed.mjs
-var __iconData159 = {
+var __iconData163 = {
   name: "square-dashed",
   size: 24,
   node: [
@@ -17698,20 +17762,20 @@ var __iconData159 = {
   ],
   aliases: ["box-select"]
 };
-__iconData159.node;
-var SquareDashed = createLucideIcon(__iconData159);
+__iconData163.node;
+var SquareDashed = createLucideIcon(__iconData163);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/square.mjs
-var __iconData160 = {
+var __iconData164 = {
   name: "square",
   size: 24,
   node: [["rect", { width: "18", height: "18", x: "3", y: "3", rx: "2", key: "afitv7" }]]
 };
-__iconData160.node;
-var Square = createLucideIcon(__iconData160);
+__iconData164.node;
+var Square = createLucideIcon(__iconData164);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/sun-medium.mjs
-var __iconData161 = {
+var __iconData165 = {
   name: "sun-medium",
   size: 24,
   node: [
@@ -17726,11 +17790,11 @@ var __iconData161 = {
     ["path", { d: "m17.657 17.657.707.707", key: "vl76zb" }]
   ]
 };
-__iconData161.node;
-var SunMedium = createLucideIcon(__iconData161);
+__iconData165.node;
+var SunMedium = createLucideIcon(__iconData165);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/sun-moon.mjs
-var __iconData162 = {
+var __iconData166 = {
   name: "sun-moon",
   size: 24,
   node: [
@@ -17747,11 +17811,11 @@ var __iconData162 = {
     ["path", { d: "M20 12h2", key: "1q8mjw" }]
   ]
 };
-__iconData162.node;
-var SunMoon = createLucideIcon(__iconData162);
+__iconData166.node;
+var SunMoon = createLucideIcon(__iconData166);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/sun.mjs
-var __iconData163 = {
+var __iconData167 = {
   name: "sun",
   size: 24,
   node: [
@@ -17766,11 +17830,11 @@ var __iconData163 = {
     ["path", { d: "m19.07 4.93-1.41 1.41", key: "1shlcs" }]
   ]
 };
-__iconData163.node;
-var Sun = createLucideIcon(__iconData163);
+__iconData167.node;
+var Sun = createLucideIcon(__iconData167);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/sunset.mjs
-var __iconData164 = {
+var __iconData168 = {
   name: "sunset",
   size: 24,
   node: [
@@ -17784,11 +17848,11 @@ var __iconData164 = {
     ["path", { d: "M16 18a4 4 0 0 0-8 0", key: "1lzouq" }]
   ]
 };
-__iconData164.node;
-var Sunset = createLucideIcon(__iconData164);
+__iconData168.node;
+var Sunset = createLucideIcon(__iconData168);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/swords.mjs
-var __iconData165 = {
+var __iconData169 = {
   name: "swords",
   size: 24,
   node: [
@@ -17814,11 +17878,11 @@ var __iconData165 = {
     ["path", { d: "M7.5 16.5 4 20", key: "14nozp" }]
   ]
 };
-__iconData165.node;
-var Swords = createLucideIcon(__iconData165);
+__iconData169.node;
+var Swords = createLucideIcon(__iconData169);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/table-2.mjs
-var __iconData166 = {
+var __iconData170 = {
   name: "table-2",
   size: 24,
   node: [
@@ -17827,11 +17891,11 @@ var __iconData166 = {
     ["rect", { x: "3", y: "3", width: "18", height: "18", rx: "2", key: "h1oib" }]
   ]
 };
-__iconData166.node;
-var Table2 = createLucideIcon(__iconData166);
+__iconData170.node;
+var Table2 = createLucideIcon(__iconData170);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/tablet.mjs
-var __iconData167 = {
+var __iconData171 = {
   name: "tablet",
   size: 24,
   node: [
@@ -17839,11 +17903,11 @@ var __iconData167 = {
     ["line", { x1: "12", x2: "12.01", y1: "18", y2: "18", key: "1dp563" }]
   ]
 };
-__iconData167.node;
-var Tablet = createLucideIcon(__iconData167);
+__iconData171.node;
+var Tablet = createLucideIcon(__iconData171);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/text-align-center.mjs
-var __iconData168 = {
+var __iconData172 = {
   name: "text-align-center",
   size: 24,
   node: [
@@ -17853,11 +17917,11 @@ var __iconData168 = {
   ],
   aliases: ["align-center"]
 };
-__iconData168.node;
-var TextAlignCenter = createLucideIcon(__iconData168);
+__iconData172.node;
+var TextAlignCenter = createLucideIcon(__iconData172);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/text-align-end.mjs
-var __iconData169 = {
+var __iconData173 = {
   name: "text-align-end",
   size: 24,
   node: [
@@ -17867,11 +17931,11 @@ var __iconData169 = {
   ],
   aliases: ["align-right"]
 };
-__iconData169.node;
-var TextAlignEnd = createLucideIcon(__iconData169);
+__iconData173.node;
+var TextAlignEnd = createLucideIcon(__iconData173);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/text-align-start.mjs
-var __iconData170 = {
+var __iconData174 = {
   name: "text-align-start",
   size: 24,
   node: [
@@ -17881,11 +17945,11 @@ var __iconData170 = {
   ],
   aliases: ["text", "align-left"]
 };
-__iconData170.node;
-var TextAlignStart = createLucideIcon(__iconData170);
+__iconData174.node;
+var TextAlignStart = createLucideIcon(__iconData174);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/timer.mjs
-var __iconData171 = {
+var __iconData175 = {
   name: "timer",
   size: 24,
   node: [
@@ -17894,11 +17958,11 @@ var __iconData171 = {
     ["circle", { cx: "12", cy: "14", r: "8", key: "1e1u0o" }]
   ]
 };
-__iconData171.node;
-var Timer2 = createLucideIcon(__iconData171);
+__iconData175.node;
+var Timer2 = createLucideIcon(__iconData175);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/traffic-cone.mjs
-var __iconData172 = {
+var __iconData176 = {
   name: "traffic-cone",
   size: 24,
   node: [
@@ -17914,11 +17978,11 @@ var __iconData172 = {
     ["path", { d: "M9.194 6.57a5 2.5 0 0 0 5.61 0", key: "15hn5c" }]
   ]
 };
-__iconData172.node;
-var TrafficCone = createLucideIcon(__iconData172);
+__iconData176.node;
+var TrafficCone = createLucideIcon(__iconData176);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/trash.mjs
-var __iconData173 = {
+var __iconData177 = {
   name: "trash",
   size: 24,
   node: [
@@ -17930,11 +17994,11 @@ var __iconData173 = {
   ],
   aliases: ["trash-2"]
 };
-__iconData173.node;
-var Trash = createLucideIcon(__iconData173);
+__iconData177.node;
+var Trash = createLucideIcon(__iconData177);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/tree-deciduous.mjs
-var __iconData174 = {
+var __iconData178 = {
   name: "tree-deciduous",
   size: 24,
   node: [
@@ -17948,11 +18012,11 @@ var __iconData174 = {
     ["path", { d: "M12 19v3", key: "npa21l" }]
   ]
 };
-__iconData174.node;
-var TreeDeciduous = createLucideIcon(__iconData174);
+__iconData178.node;
+var TreeDeciduous = createLucideIcon(__iconData178);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/tree-palm.mjs
-var __iconData175 = {
+var __iconData179 = {
   name: "tree-palm",
   size: 24,
   node: [
@@ -17972,11 +18036,11 @@ var __iconData175 = {
   ],
   aliases: ["palmtree"]
 };
-__iconData175.node;
-var TreePalm = createLucideIcon(__iconData175);
+__iconData179.node;
+var TreePalm = createLucideIcon(__iconData179);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/tree-pine.mjs
-var __iconData176 = {
+var __iconData180 = {
   name: "tree-pine",
   size: 24,
   node: [
@@ -17990,11 +18054,11 @@ var __iconData176 = {
     ["path", { d: "M12 22v-3", key: "kmzjlo" }]
   ]
 };
-__iconData176.node;
-var TreePine = createLucideIcon(__iconData176);
+__iconData180.node;
+var TreePine = createLucideIcon(__iconData180);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/trees.mjs
-var __iconData177 = {
+var __iconData181 = {
   name: "trees",
   size: 24,
   node: [
@@ -18013,11 +18077,11 @@ var __iconData177 = {
     ]
   ]
 };
-__iconData177.node;
-var Trees = createLucideIcon(__iconData177);
+__iconData181.node;
+var Trees = createLucideIcon(__iconData181);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/triangle-alert.mjs
-var __iconData178 = {
+var __iconData182 = {
   name: "triangle-alert",
   size: 24,
   node: [
@@ -18033,11 +18097,11 @@ var __iconData178 = {
   ],
   aliases: ["alert-triangle"]
 };
-__iconData178.node;
-var TriangleAlert = createLucideIcon(__iconData178);
+__iconData182.node;
+var TriangleAlert = createLucideIcon(__iconData182);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/tv.mjs
-var __iconData179 = {
+var __iconData183 = {
   name: "tv",
   size: 24,
   node: [
@@ -18045,11 +18109,11 @@ var __iconData179 = {
     ["rect", { width: "20", height: "15", x: "2", y: "7", rx: "2", key: "1e6viu" }]
   ]
 };
-__iconData179.node;
-var Tv = createLucideIcon(__iconData179);
+__iconData183.node;
+var Tv = createLucideIcon(__iconData183);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/type.mjs
-var __iconData180 = {
+var __iconData184 = {
   name: "type",
   size: 24,
   node: [
@@ -18058,11 +18122,11 @@ var __iconData180 = {
     ["path", { d: "M9 20h6", key: "s66wpe" }]
   ]
 };
-__iconData180.node;
-var Type = createLucideIcon(__iconData180);
+__iconData184.node;
+var Type = createLucideIcon(__iconData184);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/undo-2.mjs
-var __iconData181 = {
+var __iconData185 = {
   name: "undo-2",
   size: 24,
   node: [
@@ -18070,11 +18134,11 @@ var __iconData181 = {
     ["path", { d: "M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5a5.5 5.5 0 0 1-5.5 5.5H11", key: "f3b9sd" }]
   ]
 };
-__iconData181.node;
-var Undo2 = createLucideIcon(__iconData181);
+__iconData185.node;
+var Undo2 = createLucideIcon(__iconData185);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/ungroup.mjs
-var __iconData182 = {
+var __iconData186 = {
   name: "ungroup",
   size: 24,
   node: [
@@ -18082,11 +18146,11 @@ var __iconData182 = {
     ["rect", { x: "3", y: "3", width: "10", height: "7", rx: "2", key: "1ljebb" }]
   ]
 };
-__iconData182.node;
-var Ungroup = createLucideIcon(__iconData182);
+__iconData186.node;
+var Ungroup = createLucideIcon(__iconData186);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/upload.mjs
-var __iconData183 = {
+var __iconData187 = {
   name: "upload",
   size: 24,
   node: [
@@ -18095,11 +18159,11 @@ var __iconData183 = {
     ["path", { d: "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4", key: "ih7n3h" }]
   ]
 };
-__iconData183.node;
-var Upload = createLucideIcon(__iconData183);
+__iconData187.node;
+var Upload = createLucideIcon(__iconData187);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/user-round.mjs
-var __iconData184 = {
+var __iconData188 = {
   name: "user-round",
   size: 24,
   node: [
@@ -18108,11 +18172,11 @@ var __iconData184 = {
   ],
   aliases: ["user-2"]
 };
-__iconData184.node;
-var UserRound = createLucideIcon(__iconData184);
+__iconData188.node;
+var UserRound = createLucideIcon(__iconData188);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/user.mjs
-var __iconData185 = {
+var __iconData189 = {
   name: "user",
   size: 24,
   node: [
@@ -18120,11 +18184,11 @@ var __iconData185 = {
     ["circle", { cx: "12", cy: "7", r: "4", key: "17ys0d" }]
   ]
 };
-__iconData185.node;
-var User = createLucideIcon(__iconData185);
+__iconData189.node;
+var User = createLucideIcon(__iconData189);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/users.mjs
-var __iconData186 = {
+var __iconData190 = {
   name: "users",
   size: 24,
   node: [
@@ -18134,11 +18198,11 @@ var __iconData186 = {
     ["circle", { cx: "9", cy: "7", r: "4", key: "nufk8" }]
   ]
 };
-__iconData186.node;
-var Users = createLucideIcon(__iconData186);
+__iconData190.node;
+var Users = createLucideIcon(__iconData190);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/volume-2.mjs
-var __iconData187 = {
+var __iconData191 = {
   name: "volume-2",
   size: 24,
   node: [
@@ -18153,11 +18217,11 @@ var __iconData187 = {
     ["path", { d: "M19.364 18.364a9 9 0 0 0 0-12.728", key: "ijwkga" }]
   ]
 };
-__iconData187.node;
-var Volume2 = createLucideIcon(__iconData187);
+__iconData191.node;
+var Volume2 = createLucideIcon(__iconData191);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/volume-x.mjs
-var __iconData188 = {
+var __iconData192 = {
   name: "volume-x",
   size: 24,
   node: [
@@ -18172,11 +18236,11 @@ var __iconData188 = {
     ["path", { d: "m16.5 9.5 5 5", key: "1akey5" }]
   ]
 };
-__iconData188.node;
-var VolumeX = createLucideIcon(__iconData188);
+__iconData192.node;
+var VolumeX = createLucideIcon(__iconData192);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/wand-sparkles.mjs
-var __iconData189 = {
+var __iconData193 = {
   name: "wand-sparkles",
   size: 24,
   node: [
@@ -18197,34 +18261,11 @@ var __iconData189 = {
   ],
   aliases: ["wand-2"]
 };
-__iconData189.node;
-var WandSparkles = createLucideIcon(__iconData189);
-
-// ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/watch.mjs
-var __iconData190 = {
-  name: "watch",
-  size: 24,
-  node: [
-    ["path", { d: "M12 10v2.2l1.6 1", key: "n3r21l" }],
-    [
-      "path",
-      {
-        d: "m16.13 7.66-.81-4.05a2 2 0 0 0-2-1.61h-2.68a2 2 0 0 0-2 1.61l-.78 4.05",
-        key: "18k57s"
-      }
-    ],
-    [
-      "path",
-      { d: "m7.88 16.36.8 4a2 2 0 0 0 2 1.61h2.72a2 2 0 0 0 2-1.61l.81-4.05", key: "16ny36" }
-    ],
-    ["circle", { cx: "12", cy: "12", r: "6", key: "1vlfrh" }]
-  ]
-};
-__iconData190.node;
-var Watch = createLucideIcon(__iconData190);
+__iconData193.node;
+var WandSparkles = createLucideIcon(__iconData193);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/waves-horizontal.mjs
-var __iconData191 = {
+var __iconData194 = {
   name: "waves-horizontal",
   size: 24,
   node: [
@@ -18234,11 +18275,11 @@ var __iconData191 = {
   ],
   aliases: ["waves"]
 };
-__iconData191.node;
-var WavesHorizontal = createLucideIcon(__iconData191);
+__iconData194.node;
+var WavesHorizontal = createLucideIcon(__iconData194);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/wind.mjs
-var __iconData192 = {
+var __iconData195 = {
   name: "wind",
   size: 24,
   node: [
@@ -18247,11 +18288,11 @@ var __iconData192 = {
     ["path", { d: "M9.8 4.4A2 2 0 1 1 11 8H2", key: "75valh" }]
   ]
 };
-__iconData192.node;
-var Wind = createLucideIcon(__iconData192);
+__iconData195.node;
+var Wind = createLucideIcon(__iconData195);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/wrench.mjs
-var __iconData193 = {
+var __iconData196 = {
   name: "wrench",
   size: 24,
   node: [
@@ -18264,11 +18305,11 @@ var __iconData193 = {
     ]
   ]
 };
-__iconData193.node;
-var Wrench = createLucideIcon(__iconData193);
+__iconData196.node;
+var Wrench = createLucideIcon(__iconData196);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/x.mjs
-var __iconData194 = {
+var __iconData197 = {
   name: "x",
   size: 24,
   node: [
@@ -18276,11 +18317,11 @@ var __iconData194 = {
     ["path", { d: "m6 6 12 12", key: "d8bk6v" }]
   ]
 };
-__iconData194.node;
-var X = createLucideIcon(__iconData194);
+__iconData197.node;
+var X = createLucideIcon(__iconData197);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/zap.mjs
-var __iconData195 = {
+var __iconData198 = {
   name: "zap",
   size: 24,
   node: [
@@ -18293,8 +18334,8 @@ var __iconData195 = {
     ]
   ]
 };
-__iconData195.node;
-var Zap = createLucideIcon(__iconData195);
+__iconData198.node;
+var Zap = createLucideIcon(__iconData198);
 
 // ../world/dist/terrain-fields.js
 var stride = (channel) => channel.encoding === "u8" ? 1 : 4;
@@ -18345,18 +18386,18 @@ function validateBytes(descriptor, channel, bytes3, count3) {
     }
   }
 }
-function validateTerrainFieldTile(descriptor, input5) {
-  const d2 = TerrainFieldDescriptor.parse(descriptor), tile = TerrainFieldTile.parse(input5);
-  if (tile.setId !== d2.id)
+function validateTerrainFieldTile(descriptor, input4) {
+  const d2 = TerrainFieldDescriptor.parse(descriptor), tile3 = TerrainFieldTile.parse(input4);
+  if (tile3.setId !== d2.id)
     throw new Error("Field tile belongs to another set");
-  const { cols, rows: rows2 } = terrainFieldTileShape(d2, tile.tx, tile.tz);
-  if (tile.cols !== cols || tile.rows !== rows2)
+  const { cols, rows: rows2 } = terrainFieldTileShape(d2, tile3.tx, tile3.tz);
+  if (tile3.cols !== cols || tile3.rows !== rows2)
     throw new Error("Field tile shape does not match descriptor");
-  if (Object.keys(tile.channels).length !== d2.channels.length || d2.channels.some((c2) => !Object.hasOwn(tile.channels, c2.id)))
+  if (Object.keys(tile3.channels).length !== d2.channels.length || d2.channels.some((c2) => !Object.hasOwn(tile3.channels, c2.id)))
     throw new Error("Field tile must contain every declared channel exactly once");
   let size = 0;
   for (const channel of d2.channels) {
-    const text4 = tile.channels[channel.id];
+    const text4 = tile3.channels[channel.id];
     const count3 = cols * rows2, expected = count3 * stride(channel);
     if (text4.length !== Math.ceil(expected / 3) * 4 || !canonicalBase64.test(text4))
       throw new Error("Invalid base64 or byte length");
@@ -18368,18 +18409,18 @@ function validateTerrainFieldTile(descriptor, input5) {
   }
   if (size > TERRAIN_FIELD_TILE_MAX_BYTES)
     throw new RangeError("Field tile exceeds byte budget");
-  return tile;
+  return tile3;
 }
-function decodeTerrainFieldTile(descriptor, input5) {
-  const tile = validateTerrainFieldTile(descriptor, input5);
+function decodeTerrainFieldTile(descriptor, input4) {
+  const tile3 = validateTerrainFieldTile(descriptor, input4);
   return {
-    tx: tile.tx,
-    tz: tile.tz,
-    channels: Object.fromEntries(Object.entries(tile.channels).map(([id2, text4]) => [id2, fromBase64(text4)]))
+    tx: tile3.tx,
+    tz: tile3.tz,
+    channels: Object.fromEntries(Object.entries(tile3.channels).map(([id2, text4]) => [id2, fromBase64(text4)]))
   };
 }
-function serializeTerrainFieldTile(descriptor, input5) {
-  return JSON.stringify(validateTerrainFieldTile(descriptor, input5));
+function serializeTerrainFieldTile(descriptor, input4) {
+  return JSON.stringify(validateTerrainFieldTile(descriptor, input4));
 }
 var TerrainFieldStore = class {
   #descriptor;
@@ -18404,8 +18445,8 @@ var TerrainFieldStore = class {
     return this.tileCount === Math.ceil(this.#descriptor.width / TERRAIN_FIELD_TILE_SIZE) * Math.ceil(this.#descriptor.height / TERRAIN_FIELD_TILE_SIZE);
   }
   getTile(tx, tz) {
-    const tile = this.#tiles.get(terrainFieldTileKey(this.#descriptor, tx, tz));
-    return tile ? TerrainFieldTile.parse(tile) : null;
+    const tile3 = this.#tiles.get(terrainFieldTileKey(this.#descriptor, tx, tz));
+    return tile3 ? TerrainFieldTile.parse(tile3) : null;
   }
   /** Scalar access never exposes mutable storage bytes. Decode validated channels once, on demand. */
   readValue(channelId, col, row) {
@@ -18415,8 +18456,8 @@ var TerrainFieldStore = class {
     const tx = Math.floor(col / TERRAIN_FIELD_TILE_SIZE);
     const tz = Math.floor(row / TERRAIN_FIELD_TILE_SIZE);
     const key2 = `f:${this.#descriptor.id}:${tx},${tz}`;
-    const tile = this.#tiles.get(key2);
-    if (!tile)
+    const tile3 = this.#tiles.get(key2);
+    if (!tile3)
       return null;
     let channels2 = this.#decoded.get(key2);
     if (!channels2) {
@@ -18425,11 +18466,11 @@ var TerrainFieldStore = class {
     }
     let view = channels2.get(channelId);
     if (!view) {
-      const bytes3 = decodeStoredChannel(tile.channels[channelId]);
+      const bytes3 = decodeStoredChannel(tile3.channels[channelId]);
       view = new DataView(bytes3.buffer, bytes3.byteOffset, bytes3.byteLength);
       channels2.set(channelId, view);
     }
-    const index = (row - tz * TERRAIN_FIELD_TILE_SIZE) * tile.cols + col - tx * TERRAIN_FIELD_TILE_SIZE;
+    const index = (row - tz * TERRAIN_FIELD_TILE_SIZE) * tile3.cols + col - tx * TERRAIN_FIELD_TILE_SIZE;
     return channel.encoding === "u8" ? view.getUint8(index) : view.getFloat32(index * 4, true);
   }
   /** Lossless raw row into caller-owned Float64 storage. Invalid/missing input leaves target untouched. */
@@ -18442,8 +18483,8 @@ var TerrainFieldStore = class {
     let col = startCol;
     while (col < startCol + target2.length) {
       const tx = Math.floor(col / TERRAIN_FIELD_TILE_SIZE), key2 = `f:${this.#descriptor.id}:${tx},${tz}`;
-      const tile = this.#tiles.get(key2);
-      if (!tile)
+      const tile3 = this.#tiles.get(key2);
+      if (!tile3)
         return false;
       let channels2 = this.#decoded.get(key2);
       if (!channels2) {
@@ -18452,13 +18493,13 @@ var TerrainFieldStore = class {
       }
       let view = channels2.get(channelId);
       if (!view) {
-        const bytes3 = decodeStoredChannel(tile.channels[channelId]);
+        const bytes3 = decodeStoredChannel(tile3.channels[channelId]);
         view = new DataView(bytes3.buffer, bytes3.byteOffset, bytes3.byteLength);
         channels2.set(channelId, view);
       }
       const localCol = col - tx * TERRAIN_FIELD_TILE_SIZE;
-      const count3 = Math.min(tile.cols - localCol, startCol + target2.length - col);
-      segments.push({ view, index: (row - tz * TERRAIN_FIELD_TILE_SIZE) * tile.cols + localCol, count: count3 });
+      const count3 = Math.min(tile3.cols - localCol, startCol + target2.length - col);
+      segments.push({ view, index: (row - tz * TERRAIN_FIELD_TILE_SIZE) * tile3.cols + localCol, count: count3 });
       col += count3;
     }
     let cursor = 0;
@@ -18485,12 +18526,12 @@ var TerrainFieldStore = class {
     this.#decoded.clear();
   }
   /** Suitable for inverse payloads; expectedRevision guards this store only, not a DB transaction. */
-  replace(input5, expectedRevision) {
+  replace(input4, expectedRevision) {
     this.#guardRevision(expectedRevision);
-    const tile = validateTerrainFieldTile(this.#descriptor, input5);
-    const key2 = terrainFieldTileKey(this.#descriptor, tile.tx, tile.tz);
-    const previous = this.getTile(tile.tx, tile.tz);
-    this.#tiles.set(key2, tile);
+    const tile3 = validateTerrainFieldTile(this.#descriptor, input4);
+    const key2 = terrainFieldTileKey(this.#descriptor, tile3.tx, tile3.tz);
+    const previous = this.getTile(tile3.tx, tile3.tz);
+    this.#tiles.set(key2, tile3);
     this.#decoded.delete(key2);
     this.#revision++;
     return { key: key2, previous, revision: this.#revision };
@@ -18700,8 +18741,8 @@ var TerrainData = class {
     return this.#surfaceRevision;
   }
   /** Atomic binding validation; legacy chunks remain dormant and unchanged. */
-  bindSurface(input5) {
-    const surface3 = input5 ? TerrainActiveSurface.parse(input5) : null;
+  bindSurface(input4) {
+    const surface3 = input4 ? TerrainActiveSurface.parse(input4) : null;
     let sampler6 = null;
     if (surface3) {
       const store = this.fieldSets.get(surface3.setId);
@@ -18711,9 +18752,9 @@ var TerrainData = class {
       if (!descriptor.heightBinding)
         throw new Error("Active terrain surface requires descriptor.heightBinding");
       for (const material2 of surface3.materialBindings ?? [])
-        for (const input6 of Object.values(material2.inputs))
-          if (!descriptor.channels.some((channel) => channel.id === input6.channel))
-            throw new Error(`Unknown material input channel ${input6.channel}`);
+        for (const input5 of Object.values(material2.inputs))
+          if (!descriptor.channels.some((channel) => channel.id === input5.channel))
+            throw new Error(`Unknown material input channel ${input5.channel}`);
       sampler6 = new TerrainFieldSampler(store);
     }
     this.#surfaceSampler?.dispose();
@@ -20395,15 +20436,15 @@ function initializeTerrainFieldSets(state) {
   for (const [id2, set] of Object.entries(sets))
     state.terrain.fieldSets.set(id2, new TerrainFieldStore(set.descriptor));
 }
-function loadTerrainFieldTile(state, input5) {
-  const tile = TerrainFieldTile.parse(input5);
-  const { metadata, store } = requireSet(state, tile.setId);
-  const coord = `${tile.tx},${tile.tz}`;
+function loadTerrainFieldTile(state, input4) {
+  const tile3 = TerrainFieldTile.parse(input4);
+  const { metadata, store } = requireSet(state, tile3.setId);
+  const coord = `${tile3.tx},${tile3.tz}`;
   if (!metadata.tiles.includes(coord))
     throw new TerrainFieldStateError("invalid", "Stored field tile has no metadata reference");
-  if (store.getTile(tile.tx, tile.tz))
+  if (store.getTile(tile3.tx, tile3.tz))
     throw new TerrainFieldStateError("invalid", "Duplicate stored field tile");
-  store.replace(tile, store.revision);
+  store.replace(tile3, store.revision);
 }
 function requireSet(state, id2) {
   const metadata = state.doc.terrain.fieldSets?.[id2], store = state.terrain.fieldSets.get(id2);
@@ -20412,13 +20453,13 @@ function requireSet(state, id2) {
   return { metadata, store };
 }
 function referencedTile(state, id2, tx, tz) {
-  const { metadata, store } = requireSet(state, id2), tile = store.getTile(tx, tz);
+  const { metadata, store } = requireSet(state, id2), tile3 = store.getTile(tx, tz);
   const exists = metadata.tiles.includes(`${tx},${tz}`);
-  if (exists && !tile)
+  if (exists && !tile3)
     throw new TerrainFieldStateError("invalid", "Referenced field tile was not loaded; load its exact old row before editing");
-  if (!exists && tile)
+  if (!exists && tile3)
     throw new TerrainFieldStateError("invalid", "Loaded field tile has no metadata reference");
-  return tile;
+  return tile3;
 }
 function sameTile(a2, b2) {
   if (!a2 || !b2)
@@ -20429,8 +20470,8 @@ function encodeTerrainFieldRow(state, key2) {
   const { setId, tx, tz } = parseFieldTileStorageKey(key2);
   if (!state.doc.terrain.fieldSets?.[setId] && state.terrain.removedFieldSets.has(setId))
     return "";
-  const tile = referencedTile(state, setId, tx, tz), { store } = requireSet(state, setId);
-  return tile ? serializeTerrainFieldTile(store.descriptor, tile) : "";
+  const tile3 = referencedTile(state, setId, tx, tz), { store } = requireSet(state, setId);
+  return tile3 ? serializeTerrainFieldTile(store.descriptor, tile3) : "";
 }
 function loadedTerrainFieldKeys(state) {
   const keys = [];
@@ -20444,13 +20485,13 @@ function loadedTerrainFieldKeys(state) {
   }
   return keys;
 }
-function validateInverseTile(descriptor, input5, setId, tx, tz) {
-  if (!input5)
+function validateInverseTile(descriptor, input4, setId, tx, tz) {
+  if (!input4)
     return null;
-  const tile = validateTerrainFieldTile(descriptor, input5);
-  if (tile.setId !== setId || tile.tx !== tx || tile.tz !== tz)
+  const tile3 = validateTerrainFieldTile(descriptor, input4);
+  if (tile3.setId !== setId || tile3.tx !== tx || tile3.tz !== tz)
     throw new TerrainFieldStateError("invalid", "Inverse field tile coordinates mismatch");
-  return tile;
+  return tile3;
 }
 function applyFieldCommand(state, command) {
   const none = /* @__PURE__ */ new Set();
@@ -21993,14 +22034,14 @@ var itemExtras = (i3) => ({
   ...i3.floats !== void 0 ? { floats: i3.floats } : {}
 });
 var findWall = (doc, wallId) => doc.walls[findIndex(doc.walls, (w2) => w2.id === wallId, "Wall")];
-function applyCommand(state, input5) {
-  const result = applyToDocument(state, input5);
+function applyCommand(state, input4) {
+  const result = applyToDocument(state, input4);
   state.voxels?.setRoads(state.doc.roads);
   state.voxels?.setWalls(state.doc.walls);
   return result;
 }
-function applyToDocument(state, input5) {
-  const parsed = CommandPayload.safeParse(input5);
+function applyToDocument(state, input4) {
+  const parsed = CommandPayload.safeParse(input4);
   if (!parsed.success)
     throw new CommandError("invalid", parsed.error.issues[0]?.message ?? "Invalid command.");
   const command = parsed.data;
@@ -23401,17 +23442,17 @@ var DEG = Math.PI / 180;
 function approach(value, target2, step3) {
   return value < target2 ? Math.min(target2, value + step3) : Math.max(target2, value - step3);
 }
-function stepRide(ride, state, input5, surface3, dt, speedFactor = 1, out = { dx: 0, dy: 0, dz: 0 }) {
+function stepRide(ride, state, input4, surface3, dt, speedFactor = 1, out = { dx: 0, dy: 0, dz: 0 }) {
   out.dx = 0;
   out.dy = 0;
   out.dz = 0;
   if (!(dt > 0))
     return out;
-  const throttle = Math.max(-1, Math.min(1, input5.throttle || 0));
-  const steer = Math.max(-1, Math.min(1, input5.steer || 0));
+  const throttle = Math.max(-1, Math.min(1, input4.throttle || 0));
+  const steer = Math.max(-1, Math.min(1, input4.steer || 0));
   const top = ride.maxSpeed * speedFactor;
   const stranded = ride.model === "water" && surface3.water === null;
-  const brakeHard = input5.up && ride.model !== "air";
+  const brakeHard = input4.up && ride.model !== "air";
   let target2 = throttle >= 0 ? throttle * top : throttle * ride.reverse * top;
   if (stranded || brakeHard)
     target2 = 0;
@@ -23435,7 +23476,7 @@ function stepRide(ride, state, input5, surface3, dt, speedFactor = 1, out = { dx
   out.dx = (next3 * sin14 - state.side * cos9) * dt;
   out.dz = (next3 * cos9 + state.side * sin14) * dt;
   if (ride.model === "air") {
-    let vy = ride.climb * ((input5.up ? 1 : 0) - (input5.down ? 1 : 0));
+    let vy = ride.climb * ((input4.up ? 1 : 0) - (input4.down ? 1 : 0));
     const low = LOW_SPEED * ride.maxSpeed;
     if (ride.glide && Math.abs(next3) < low)
       vy -= GRAVITY * ride.gravity * (1 - Math.abs(next3) / low);
@@ -23595,7 +23636,7 @@ var WorldPoint = external_exports.object({ x: external_exports.number().finite()
 var AvatarLiveDisplay = external_exports.object({
   open: external_exports.boolean().default(false),
   layout: external_exports.enum(["large", "desktop", "browser", "compact", "banner", "circle", "watch"]).default("large"),
-  background: external_exports.enum(["world", "color", "transparent", "office", "living_room", "conference", "stage", "studio", "classroom", "image", "video"]).default("office"),
+  background: external_exports.enum(["world", "color", "transparent", "office", "living_room", "conference", "stage", "studio", "classroom", "image", "video"]).default("color"),
   color: external_exports.string().regex(/^#[0-9a-fA-F]{6}$/).default("#101827"),
   media: Url.optional(),
   worldId: external_exports.string().min(1).max(200).nullable().optional(),
@@ -28490,29 +28531,42 @@ function avatarLiveEmbed(baseUrl, projectId, layout, display) {
 
 // studio/share-dialog.tsx
 var import_jsx_runtime = __toESM(require_jsx_runtime(), 1);
-var icons = [Monitor, AppWindow, PanelsTopLeft, LayoutTemplate, RectangleHorizontal, Circle, Watch];
-function ShareDialog({ projectId, layout, display, preview, preparing, previewError, requestPreview, initialSurface, sharing, close }) {
-  const [surface3, setSurface] = (0, import_react4.useState)(initialSurface ?? "world"), [access, setAccess] = (0, import_react4.useState)("private"), [guests, setGuests] = (0, import_react4.useState)(""), [password, setPassword] = (0, import_react4.useState)(""), [protectedLink, setProtectedLink] = (0, import_react4.useState)(false), [allowJoining, setAllowJoining] = (0, import_react4.useState)(true), [selected2, setSelected] = (0, import_react4.useState)([layout]), [results, setResults] = (0, import_react4.useState)({}), [busy, setBusy] = (0, import_react4.useState)(false), [error, setError] = (0, import_react4.useState)(""), [copied, setCopied] = (0, import_react4.useState)(""), [expanded, setExpanded] = (0, import_react4.useState)(null);
+var ACCESS = [
+  { id: "public", label: "Anyone with the link", hint: "No sign-in needed", Icon: Globe },
+  { id: "invite", label: "Only invited people", hint: "By email or account", Icon: Mail },
+  { id: "password", label: "With a password", hint: "Share the password separately", Icon: Lock }
+];
+var LOOKS = [
+  { id: "circle", label: "Bubble", Icon: Circle },
+  { id: "desktop", label: "Side window", Icon: AppWindow },
+  { id: "banner", label: "Banner", Icon: RectangleHorizontal }
+];
+var field = "mt-1 w-full rounded-lg border border-ink/20 bg-paper p-2 text-sm";
+var tile = (on) => `flex min-h-14 flex-col items-start justify-center gap-1 rounded-xl border-2 px-3 py-2 text-left text-xs ${on ? "border-ink bg-ink/5 font-bold" : "border-ink/15 hover:bg-ink/5"}`;
+var pill = (on) => `inline-flex min-h-9 items-center gap-2 rounded-lg px-3 text-xs font-bold ${on ? "bg-ink text-on-brand" : "hover:bg-ink/5"}`;
+function ShareDialog({ projectId, layout, display, initialSurface, sharing, close }) {
+  const [surface3, setSurface] = (0, import_react4.useState)(initialSurface ?? "avatar-live");
+  const [access, setAccess] = (0, import_react4.useState)("public"), [guests, setGuests] = (0, import_react4.useState)(""), [password, setPassword] = (0, import_react4.useState)("");
+  const [talk, setTalk] = (0, import_react4.useState)(true);
+  const [look, setLook] = (0, import_react4.useState)(LOOKS.some((l2) => l2.id === layout) ? layout : "circle");
+  const [result, setResult] = (0, import_react4.useState)(null), [busy, setBusy] = (0, import_react4.useState)(false), [error, setError] = (0, import_react4.useState)(""), [copied, setCopied] = (0, import_react4.useState)("");
   const reset = () => {
-    setResults({});
+    setResult(null);
     setCopied("");
   };
-  const toggle = (id2) => setSelected((current2) => current2.includes(id2) ? current2.filter((row) => row !== id2) : [...current2, id2]);
-  const embed = (id2) => avatarLiveEmbed(results[id2]?.url ?? window.location.href, projectId, id2, { ...display, framing: ["circle", "watch", "banner"].includes(id2) ? "bust" : "full" });
+  const shareLayout = surface3 === "world" ? void 0 : look;
+  const code2 = surface3 === "avatar-live" ? avatarLiveEmbed(result?.url ?? window.location.href, projectId, look, { ...display, framing: ["circle", "watch", "banner"].includes(look) ? "bust" : display?.framing ?? "full" }) : null;
   const create = async () => {
     if (!sharing) return;
     setBusy(true);
     setError("");
     try {
       if (display?.media?.startsWith("blob:") && ["image", "video"].includes(display.background)) throw new Error("Use hosted background media before creating public links.");
-      const layouts = surface3 === "world" ? ["world"] : selected2;
-      if (!layouts.length) throw new Error("Select one or more display frames.");
-      for (const id2 of layouts) {
-        const request = StudioShareRequest.parse({ projectId, surface: surface3, access, layout: id2 === "world" ? void 0 : id2, guests: access === "invite" ? guests.split(/[\n,]/).map((s2) => s2.trim()).filter(Boolean) : [], password: protectedLink ? password : void 0, allowJoining });
-        const next3 = await sharing.create(request), url = new URL(next3.url);
-        if (!["https:", "http:"].includes(url.protocol) || url.username || url.password || typeof next3.id !== "string") throw new Error("The hosting service returned an invalid share.");
-        setResults((current2) => ({ ...current2, [id2]: next3 }));
-      }
+      if (access === "password" && password.length < 4) throw new Error("Use a password of at least 4 characters.");
+      const request = StudioShareRequest.parse({ projectId, surface: surface3, access: access === "password" ? "public" : access, layout: shareLayout, guests: access === "invite" ? guests.split(/[\n,]/).map((s2) => s2.trim()).filter(Boolean) : [], password: access === "password" ? password : void 0, allowJoining: talk });
+      const next3 = await sharing.create(request), url = new URL(next3.url);
+      if (!["https:", "http:"].includes(url.protocol) || url.username || url.password || typeof next3.id !== "string") throw new Error("The hosting service returned an invalid share.");
+      setResult(next3);
       setPassword("");
     } catch (e2) {
       setError(e2 instanceof Error ? e2.message : "Sharing failed.");
@@ -28525,133 +28579,131 @@ function ShareDialog({ projectId, layout, display, preview, preparing, previewEr
       await navigator.clipboard.writeText(text4);
       setCopied(label3);
     } catch {
-      setError("Select and copy the code below.");
+      setError("Select and copy the text below.");
     }
   };
-  const field5 = "mt-1 w-full rounded-lg border border-ink/20 bg-paper p-2 text-sm";
+  const size = AVATAR_LIVE_LAYOUTS.find((l2) => l2.id === look);
   return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { onKeyDown: (event2) => {
     if (event2.key === "Escape") {
       event2.stopPropagation();
       close();
     }
-  }, className: "fixed inset-0 z-[150] flex items-center justify-center bg-black/70 p-4", children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("section", { role: "dialog", "aria-modal": "true", "aria-label": "Share", className: "flex max-h-[94dvh] w-full max-w-6xl flex-col overflow-hidden rounded-2xl border border-ink/15 bg-surface text-ink shadow-2xl", children: [
+  }, className: "fixed inset-0 z-[150] flex items-start justify-center overflow-auto bg-black/70 p-4 pt-12", children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("section", { role: "dialog", "aria-modal": "true", "aria-label": "Share", className: "flex w-full max-w-2xl flex-col overflow-hidden rounded-2xl border border-ink/15 bg-surface text-ink shadow-2xl", children: [
     /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("header", { className: "flex items-center gap-3 border-b border-ink/10 px-5 py-4", children: [
       /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Link2, { className: "size-5" }),
       /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "flex-1", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", { className: "text-base font-bold", children: "Share your experience" }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { className: "mt-1 text-xs text-ink/60", children: "Every display has its own frame and embed code." })
+        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", { className: "text-base font-bold", children: surface3 === "avatar-live" ? "Share your agent" : "Share your world" }),
+        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { className: "mt-1 text-xs text-ink/60", children: surface3 === "avatar-live" ? "People open a page where they can see and talk to your agent." : "Share the world you built with the access you choose." })
       ] }),
       /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { "aria-label": "Close sharing", onClick: close, className: "rounded-lg p-2 hover:bg-ink/10", children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(X, { className: "size-4" }) })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "flex min-h-0 flex-1 flex-col overflow-auto md:flex-row", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("aside", { className: "w-full shrink-0 space-y-4 border-r border-ink/10 p-5 md:w-72", onChange: reset, children: [
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "grid grid-cols-2 gap-2", children: [{ id: "world", label: "World", Icon: Globe }, { id: "avatar-live", label: "Avatar Live", Icon: Monitor }].map(({ id: id2, label: label3, Icon: Icon2 }) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", { "aria-pressed": surface3 === id2, onClick: () => {
-          setSurface(id2);
+    /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "space-y-5 overflow-auto p-5", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { role: "group", "aria-label": "What to share", className: "inline-flex gap-1 rounded-xl border border-ink/15 p-1", children: [["avatar-live", "Avatar Live", Monitor], ["world", "World", Globe]].map(([id2, label3, Icon2]) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", { "aria-pressed": surface3 === id2, className: pill(surface3 === id2), onClick: () => {
+        setSurface(id2);
+        reset();
+      }, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Icon2, { className: "size-4" }),
+        label3
+      ] }, id2)) }),
+      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("fieldset", { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("legend", { className: "mb-2 flex items-center gap-2 text-xs font-bold", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ShieldCheck, { className: "size-4" }),
+          "Who can open it"
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "grid grid-cols-1 gap-2 sm:grid-cols-3", children: ACCESS.map(({ id: id2, label: label3, hint, Icon: Icon2 }) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", { "aria-pressed": access === id2, className: tile(access === id2), onClick: () => {
+          setAccess(id2);
           reset();
-        }, className: `flex flex-col items-start gap-2 rounded-lg border p-3 text-xs font-bold ${surface3 === id2 ? "border-ink bg-ink/5" : "border-ink/15"}`, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Icon2, { className: "size-5" }),
-          label3
-        ] }, id2)) }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("fieldset", { className: "space-y-2", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("legend", { className: "mb-2 text-xs font-bold", children: "Who has access?" }),
-          [{ id: "private", label: "Only me", detail: "Your account only", Icon: LockKeyhole }, { id: "invite", label: "Invited people", detail: "People you choose", Icon: Users }, { id: "public", label: "Anyone with the link", detail: "Open with a shared link", Icon: Globe }].map(({ id: id2, label: label3, detail, Icon: Icon2 }) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("label", { className: `flex cursor-pointer items-center gap-2 rounded-lg border p-2.5 ${access === id2 ? "border-ink bg-ink/5" : "border-ink/10"}`, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Icon2, { className: "size-4 shrink-0" }),
-            /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { className: "flex-1", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "block text-xs font-semibold", children: label3 }),
-              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "block text-[11px] text-ink/55", children: detail })
-            ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("input", { type: "radio", name: "share-access", checked: access === id2, onChange: () => setAccess(id2) })
-          ] }, id2))
-        ] }),
-        access === "invite" ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("label", { className: "block text-xs font-bold", children: [
-          "People / account IDs",
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("textarea", { "aria-label": "Invited people", className: field5, value: guests, onChange: (e2) => setGuests(e2.target.value), placeholder: "One account or email per line" })
-        ] }) : null,
-        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("label", { className: "flex items-center justify-between gap-2 text-xs", children: [
-          "Allow people to join",
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("input", { type: "checkbox", checked: allowJoining, onChange: (e2) => setAllowJoining(e2.target.checked) })
-        ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("label", { className: "flex items-center justify-between gap-2 text-xs", children: [
-          "Protect with a password",
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("input", { type: "checkbox", checked: protectedLink, onChange: (e2) => setProtectedLink(e2.target.checked) })
-        ] }),
-        protectedLink ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("label", { className: "block text-xs font-bold", children: [
-          "Password",
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("input", { "aria-label": "Share password", type: "password", autoComplete: "new-password", className: field5, value: password, onChange: (e2) => setPassword(e2.target.value) })
-        ] }) : null,
-        !sharing ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { role: "status", className: "rounded-lg border border-ink/15 bg-paper p-3 text-xs leading-relaxed", children: "Local preview. Public links, invitations and passwords require your platform's sharing service. Private libraries stay on your device." }) : null,
-        error ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { role: "alert", className: "text-xs text-red-500", children: error }) : null
-      ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "min-w-0 flex-1 overflow-auto p-5", children: surface3 === "avatar-live" ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "mb-4 flex flex-wrap items-center gap-2", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "flex-1", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", { className: "text-sm font-bold", children: "Display frames" }),
-            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { className: "mt-1 text-xs text-ink/60", children: "Preview every size. Select several or copy one code." })
+        }, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { className: "flex items-center gap-2 font-bold", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Icon2, { className: "size-4" }),
+            label3
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { disabled: preparing, className: "rounded border border-ink/15 px-3 py-2 text-xs disabled:opacity-40", onClick: requestPreview, children: preparing ? "Rendering\u2026" : "Refresh previews" }),
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { className: "rounded border border-ink/15 px-3 py-2 text-xs", onClick: () => setSelected(AVATAR_LIVE_LAYOUTS.map((row) => row.id)), children: "Select all" }),
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { className: "rounded border border-ink/15 px-3 py-2 text-xs", onClick: () => setSelected([]), children: "Clear" })
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "text-ink/60", children: hint })
+        ] }, id2)) }),
+        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("p", { className: "mt-2 flex items-center gap-2 text-[11px] text-ink/55", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)(User, { className: "size-3.5" }),
+          '"Signed-in people only" comes with Genvr hosting.'
         ] }),
-        previewError ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { role: "alert", className: "mb-3 text-xs text-red-500", children: previewError }) : null,
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "grid grid-cols-1 gap-4 lg:grid-cols-2", children: AVATAR_LIVE_LAYOUTS.map((row, index) => {
-          const Icon2 = icons[index], code2 = embed(row.id), round9 = ["circle", "watch"].includes(row.id), active = selected2.includes(row.id);
-          return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("article", { "aria-label": `${row.name} share frame`, className: `overflow-hidden rounded-xl border ${active ? "border-ink/60" : "border-ink/15"}`, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "flex items-center gap-2 bg-paper px-3 py-2", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Icon2, { className: "size-4" }),
-              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "flex-1 text-xs font-bold", children: row.name }),
-              /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("label", { className: "flex items-center gap-1 text-xs", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("input", { "aria-label": `Select ${row.name}`, type: "checkbox", checked: active, onChange: () => toggle(row.id) }),
-                "Select"
-              ] })
-            ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "flex h-44 items-center justify-center p-3", children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "relative overflow-hidden", style: { width: round9 ? 144 : "100%", maxWidth: round9 ? 144 : Math.min(350, 152 * row.width / row.height), aspectRatio: round9 ? "1" : `${row.width}/${row.height}`, maxHeight: 152, borderRadius: round9 ? "50%" : 0 }, children: preview?.[row.id] ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", { alt: `${row.name} avatar preview`, src: preview[row.id], className: "h-full w-full object-contain" }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "flex h-full items-center justify-center", children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { className: "px-3 text-center text-xs text-white/60", children: preparing ? "Rendering preview\u2026" : "Open Avatar Live to preview this display." }) }) }) }),
-            /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "space-y-2 border-t border-ink/10 p-3", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "flex items-center gap-2 text-[10px] text-ink/55", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "flex-1", children: code2.id }),
-                /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { children: [
-                  row.width,
-                  " \xD7 ",
-                  row.height
-                ] })
-              ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "flex gap-2", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", { "aria-label": `Copy ${row.name} iframe`, onClick: () => void copy(code2.iframe, row.id), className: "flex flex-1 items-center justify-center gap-2 rounded-lg border border-ink/20 px-2 py-2 text-xs font-bold", children: [
-                  copied === row.id ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Check, { className: "size-3" }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Copy, { className: "size-3" }),
-                  copied === row.id ? "Copied" : "Copy iframe"
-                ] }),
-                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { "aria-label": `Show ${row.name} code`, onClick: () => setExpanded(expanded === row.id ? null : row.id), className: "rounded-lg border border-ink/20 px-3 py-2 text-xs", children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Code, { className: "size-4" }) })
-              ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("textarea", { "aria-label": `${row.name} iframe code`, readOnly: true, className: `${field5} ${expanded === row.id ? "h-36" : "h-20"} text-[10px]`, value: code2.iframe }),
-              code2.localOnly ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { className: "text-[10px] text-ink/50", children: "Local preview code" }) : null
-            ] })
-          ] }, row.id);
-        }) })
-      ] }) : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "flex min-h-80 flex-col items-center justify-center gap-4 text-center", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Globe, { className: "size-12 text-ink/40" }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", { className: "text-lg font-bold", children: "Your world, one link" }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { className: "max-w-sm text-sm text-ink/60", children: "Share the world you built, with the access and joining rules you choose." }),
-        results.world ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("input", { "aria-label": "World share link", readOnly: true, className: field5, value: results.world.url }),
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { className: "rounded border border-ink/20 px-4 py-2 text-xs", onClick: () => void copy(results.world.url, "world"), children: copied === "world" ? "Copied" : "Copy world link" })
+        access === "invite" ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("label", { className: "mt-3 block text-xs font-bold", children: [
+          "Invite people",
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("textarea", { "aria-label": "Invited people", className: field, value: guests, onChange: (e2) => {
+            setGuests(e2.target.value);
+            reset();
+          }, placeholder: "One email or account per line" })
+        ] }) : null,
+        access === "password" ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("label", { className: "mt-3 block text-xs font-bold", children: [
+          "Password for the link",
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("input", { "aria-label": "Share password", type: "password", autoComplete: "new-password", className: field, value: password, onChange: (e2) => {
+            setPassword(e2.target.value);
+            reset();
+          } })
         ] }) : null
-      ] }) })
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("fieldset", { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("legend", { className: "mb-2 flex items-center gap-2 text-xs font-bold", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Users, { className: "size-4" }),
+          surface3 === "avatar-live" ? "Visitors can" : "People can"
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "inline-flex gap-1 rounded-xl border border-ink/15 p-1", children: [[false, surface3 === "avatar-live" ? "Watch only" : "Look around", Eye], [true, surface3 === "avatar-live" ? "Talk to the agent" : "Join and play", MessageCircle]].map(([value, label3, Icon2]) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", { "aria-pressed": talk === value, className: pill(talk === value), onClick: () => {
+          setTalk(value);
+          reset();
+        }, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Icon2, { className: "size-4" }),
+          label3
+        ] }, label3)) }),
+        surface3 === "avatar-live" ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { className: "mt-2 text-[11px] text-ink/55", children: "Talking follows Settings \u2192 What it may do. Visitors never see your files or approvals." }) : null
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("h3", { className: "mb-2 flex items-center gap-2 text-xs font-bold", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Link2, { className: "size-4" }),
+          "Link"
+        ] }),
+        result ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "flex gap-2", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("input", { "aria-label": "Share link", readOnly: true, className: "w-full rounded-lg border border-ink/20 bg-paper p-2 text-sm", value: result.url }),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", { onClick: () => void copy(result.url, "link"), className: "inline-flex min-h-10 shrink-0 items-center gap-2 rounded-lg bg-ink px-4 text-xs font-bold text-on-brand", children: [
+            copied === "link" ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Check, { className: "size-4" }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Copy, { className: "size-4" }),
+            copied === "link" ? "Copied" : "Copy link"
+          ] })
+        ] }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { className: "rounded-lg border border-ink/15 bg-paper p-3 text-xs text-ink/70", children: sharing ? 'Press "Create link" to make the link with these rules.' : "Local preview. A public link needs a hosting service (for example Genvr hosting). Private libraries stay on your device." })
+      ] }),
+      code2 ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "mb-2 flex flex-wrap items-center justify-between gap-2", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("h3", { className: "flex items-center gap-2 text-xs font-bold", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Code, { className: "size-4" }),
+            "Add to your website"
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { role: "group", "aria-label": "Website look", className: "inline-flex gap-1 rounded-xl border border-ink/15 p-1", children: LOOKS.map(({ id: id2, label: label3, Icon: Icon2 }) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", { "aria-pressed": look === id2, className: pill(look === id2), onClick: () => {
+            setLook(id2);
+            setCopied("");
+          }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Icon2, { className: "size-4" }),
+            label3
+          ] }, id2)) })
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("textarea", { "aria-label": "Website code", readOnly: true, className: `${field} h-24 text-[11px]`, value: code2.iframe }),
+        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "mt-2 flex flex-wrap items-center gap-3", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", { onClick: () => void copy(code2.iframe, "code"), className: "inline-flex min-h-10 items-center gap-2 rounded-lg border border-ink/20 px-3 text-xs font-bold", children: [
+            copied === "code" ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Check, { className: "size-4" }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Copy, { className: "size-4" }),
+            copied === "code" ? "Copied" : "Copy code"
+          ] }),
+          code2.localOnly ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "text-[11px] text-ink/55", children: "Local preview code: it works only on this computer until the link is hosted." }) : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { className: "text-[11px] text-ink/55", children: [
+            size?.width,
+            " \xD7 ",
+            size?.height
+          ] })
+        ] })
+      ] }) : null,
+      error ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { role: "alert", className: "text-xs text-red-500", children: error }) : null
     ] }),
     /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("footer", { className: "flex flex-wrap items-center justify-end gap-2 border-t border-ink/10 px-5 py-3", children: [
-      surface3 === "avatar-live" ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { className: "mr-auto text-xs text-ink/60", children: [
-          selected2.length,
-          " displays selected"
-        ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { disabled: !selected2.length, onClick: () => void copy(selected2.map((id2) => embed(id2).iframe).join("\n"), "selected"), className: "rounded-lg border border-ink/20 px-3 py-2 text-xs font-bold disabled:opacity-40", children: copied === "selected" ? "Copied" : "Copy selected codes" })
-      ] }) : null,
-      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { onClick: close, className: "rounded-lg px-4 py-2 text-xs", children: "Close" }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { onClick: () => void create(), disabled: !sharing || busy, className: "rounded-lg bg-ink px-4 py-2 text-xs font-bold text-on-brand disabled:opacity-40", children: busy ? "Creating\u2026" : "Create share links" })
+      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { onClick: close, className: "min-h-10 rounded-lg px-4 text-xs", children: "Close" }),
+      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { onClick: () => void create(), disabled: !sharing || busy, className: "min-h-10 rounded-lg bg-ink px-4 text-xs font-bold text-on-brand disabled:opacity-40", children: busy ? "Creating\u2026" : "Create link" })
     ] })
   ] }) });
 }
 
 // studio/presentation/avatar-live.tsx
-var import_react11 = __toESM(require_react(), 1);
+var import_react10 = __toESM(require_react(), 1);
 
 // studio/presentation/viewport.tsx
 var import_react8 = __toESM(require_react(), 1);
@@ -29811,7 +29863,7 @@ function Chart({ type, p: p2 }) {
 
 // studio/presentation/viewport.tsx
 var import_jsx_runtime5 = __toESM(require_jsx_runtime(), 1);
-function PresentationViewport({ controller, agents = [], compact = false }) {
+function PresentationViewport({ controller, agents = [], compact = false, showEffects = true, showNotifications = true, notificationFilter }) {
   const state = (0, import_react8.useSyncExternalStore)(controller.subscribe, controller.snapshot);
   const [error, setError] = (0, import_react8.useState)(""), [reduced, setReduced] = (0, import_react8.useState)(false);
   (0, import_react8.useEffect)(() => {
@@ -29835,7 +29887,7 @@ function PresentationViewport({ controller, agents = [], compact = false }) {
   };
   return /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "absolute inset-0 pointer-events-none overflow-hidden", "data-avatar-presentation": true, "data-compact": compact || void 0, children: [
     /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("style", { children: `[data-avatar-presentation][data-compact] .w-72 {width:100%;} [data-avatar-presentation][data-compact] .top-16 {top:8px;left:2px;right:4px;max-width:none!important;} [data-avatar-presentation][data-compact] [data-presentation-cards] {left:2px;right:4px;} @keyframes notif-slide { from { transform:translateX(110%); opacity:0 } to { transform:translateX(0); opacity:1 } } [data-avatar-presentation] .w-72 { width:min(18rem,calc(100vw - 24px)); } @media(prefers-reduced-motion:reduce){[data-avatar-presentation] *{animation:none!important;transition:none!important}}` }),
-    !reduced ? /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "absolute inset-0 pointer-events-none", "aria-hidden": "true", children: [
+    !reduced && showEffects ? /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "absolute inset-0 pointer-events-none", "aria-hidden": "true", children: [
       fx.matrix !== void 0 ? /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(MatrixRain, { opacity: fx.matrix }) : null,
       fx.emoji !== void 0 ? /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(EmojiRain, { pack: ["\u{1F389}", "\u2728", "\u{1F38A}", "\u{1F973}"], onDone: () => execute({ kind: "effect", effect: "emoji", enabled: false }) }) : null,
       fx.snow !== void 0 ? /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(SnowEffect, { opacity: fx.snow }) : null,
@@ -29851,8 +29903,8 @@ function PresentationViewport({ controller, agents = [], compact = false }) {
       fx.vignette !== void 0 ? /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(VignettePulseEffect, { opacity: fx.vignette }) : null,
       fx.confetti !== void 0 ? /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(ConfettiEffect, { onDone: () => execute({ kind: "effect", effect: "confetti", enabled: false }) }) : null
     ] }) : null,
-    /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "absolute inset-0", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(NotifStack, { notifs: state.notifications, onDismiss: controller.dismiss, onApprove: (id2) => {
+    showNotifications ? /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "absolute inset-0", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(NotifStack, { notifs: notificationFilter ? state.notifications.filter((n2) => notificationFilter(n2.type)) : state.notifications, onDismiss: controller.dismiss, onApprove: (id2) => {
         void run(() => controller.approve(id2));
       }, onUpdate: async (id2, changes) => {
         if (changes.repliedWith) {
@@ -29878,14 +29930,15 @@ function PresentationViewport({ controller, agents = [], compact = false }) {
         ] }),
         /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "p-3 overflow-auto max-h-80", children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(SpecRenderer, { spec: item.spec }) })
       ] }, item.id)) })
-    ] }),
+    ] }) : null,
     error ? /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { role: "alert", className: "pointer-events-auto absolute left-2 bottom-2 z-50 bg-red-950 text-white rounded p-2 text-xs max-w-72", onClick: () => setError(""), children: error }) : null,
     /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("output", { className: "sr-only", "aria-live": "polite", children: state.lastAction })
   ] });
 }
 
-// studio/presentation/controls.tsx
+// studio/presentation/world-background.tsx
 var import_react9 = __toESM(require_react(), 1);
+var import_react_dom = __toESM(require_react_dom(), 1);
 
 // ../runtime/dist/scene-lighting.js
 var SceneLighting = class {
@@ -30035,10 +30088,10 @@ var GroundBounce = class {
       const normal = mix(options.normalNode(xz), vec3(0, 1, 0), wet);
       const top = max(height, options.seaLevel);
       const pos = vec3(xz.x, top, xz.y);
-      const field5 = (options.groundShadowNode ? vec2(-1e4, 0) : this.#heightfieldOccluderNode(pos)).toVar();
-      textureStore(this.shadowMap, uvec2(globalId.xy), vec4(field5, 0, 1));
-      const width = field5.y.mul(0.012).add(0.35);
-      const visibility = options.groundShadowNode?.(pos) ?? smoothstep5(width.negate(), width, pos.y.sub(field5.x));
+      const field6 = (options.groundShadowNode ? vec2(-1e4, 0) : this.#heightfieldOccluderNode(pos)).toVar();
+      textureStore(this.shadowMap, uvec2(globalId.xy), vec4(field6, 0, 1));
+      const width = field6.y.mul(0.012).add(0.35);
+      const visibility = options.groundShadowNode?.(pos) ?? smoothstep5(width.negate(), width, pos.y.sub(field6.x));
       const reflect3 = bakeEquation(options.albedoNode(xz), normal, options.sunDirection, visibility);
       textureStore(this.raw, uvec2(globalId.xy), vec4(reflect3, top));
     })().compute([Math.ceil(n2 / 8), Math.ceil(n2 / 8)], [8, 8, 1]);
@@ -30080,9 +30133,9 @@ var GroundBounce = class {
   heightfieldVisibilityNode(position) {
     if (this.#options.groundShadowNode)
       return this.#options.groundShadowNode(position);
-    const field5 = texture(this.shadowMap, position.xz.sub(this.origin).div(this.size)).level(0);
-    const width = field5.y.mul(0.012).add(0.35);
-    return mix(float(1), smoothstep5(width.negate(), width, position.y.sub(field5.x)), this.ready);
+    const field6 = texture(this.shadowMap, position.xz.sub(this.origin).div(this.size)).level(0);
+    const width = field6.y.mul(0.012).add(0.35);
+    return mix(float(1), smoothstep5(width.negate(), width, position.y.sub(field6.x)), this.ready);
   }
   update(renderer2, force = false) {
     const sun = this.#options.sunDirection.value;
@@ -31092,7 +31145,7 @@ var GLTFExporter = class {
    * @param {GLTFExporter~OnError} onError - A callback function that is executed when an error happens.
    * @param {GLTFExporter~Options} options - options
    */
-  parse(input5, onDone, onError, options) {
+  parse(input4, onDone, onError, options) {
     const writer = new GLTFWriter();
     const plugins = [];
     for (let i3 = 0, il = this.pluginCallbacks.length; i3 < il; i3++) {
@@ -31100,7 +31153,7 @@ var GLTFExporter = class {
     }
     writer.setPlugins(plugins);
     writer.setTextureUtils(this.textureUtils);
-    writer.writeAsync(input5, onDone, options).catch(onError);
+    writer.writeAsync(input4, onDone, options).catch(onError);
   }
   /**
    * Async version of {@link GLTFExporter#parse}.
@@ -31109,10 +31162,10 @@ var GLTFExporter = class {
    * @param {GLTFExporter~Options} options - options.
    * @return {Promise<ArrayBuffer|string>} A Promise that resolved with the exported glTF data.
    */
-  parseAsync(input5, options) {
+  parseAsync(input4, options) {
     const scope = this;
     return new Promise(function(resolve, reject) {
-      scope.parse(input5, resolve, reject, options);
+      scope.parse(input4, resolve, reject, options);
     });
   }
 };
@@ -31286,7 +31339,7 @@ var GLTFWriter = class {
    * @param {Function} onDone Callback on completed
    * @param {Object} options options
    */
-  async writeAsync(input5, onDone, options = {}) {
+  async writeAsync(input4, onDone, options = {}) {
     this.options = Object.assign({
       // default options
       binary: false,
@@ -31300,7 +31353,7 @@ var GLTFWriter = class {
     if (this.options.animations.length > 0) {
       this.options.trs = true;
     }
-    await this.processInputAsync(input5);
+    await this.processInputAsync(input4);
     await Promise.all(this.pending);
     const writer = this;
     const buffers2 = writer.buffers;
@@ -32498,18 +32551,18 @@ var GLTFWriter = class {
   /**
    * @param {THREE.Object3D|Array<THREE.Object3D>} input
    */
-  async processInputAsync(input5) {
+  async processInputAsync(input4) {
     const options = this.options;
-    input5 = input5 instanceof Array ? input5 : [input5];
+    input4 = input4 instanceof Array ? input4 : [input4];
     await this._invokeAllAsync(function(ext) {
-      ext.beforeParse && ext.beforeParse(input5);
+      ext.beforeParse && ext.beforeParse(input4);
     });
     const objectsWithoutScene = [];
-    for (let i3 = 0; i3 < input5.length; i3++) {
-      if (input5[i3] instanceof Scene) {
-        await this.processSceneAsync(input5[i3]);
+    for (let i3 = 0; i3 < input4.length; i3++) {
+      if (input4[i3] instanceof Scene) {
+        await this.processSceneAsync(input4[i3]);
       } else {
-        objectsWithoutScene.push(input5[i3]);
+        objectsWithoutScene.push(input4[i3]);
       }
     }
     if (objectsWithoutScene.length > 0) {
@@ -32518,20 +32571,20 @@ var GLTFWriter = class {
     for (let i3 = 0; i3 < this.skins.length; ++i3) {
       this.processSkin(this.skins[i3]);
     }
-    if (input5.length === 1) {
+    if (input4.length === 1) {
       for (let i3 = 0; i3 < options.animations.length; ++i3) {
-        this.processAnimation(options.animations[i3], input5[0]);
+        this.processAnimation(options.animations[i3], input4[0]);
       }
     } else {
-      for (let i3 = 0; i3 < input5.length; i3++) {
+      for (let i3 = 0; i3 < input4.length; i3++) {
         const animations = options.animations[i3] || [];
         for (let j2 = 0; j2 < animations.length; ++j2) {
-          this.processAnimation(animations[j2], input5[i3]);
+          this.processAnimation(animations[j2], input4[i3]);
         }
       }
     }
     await this._invokeAllAsync(function(ext) {
-      ext.afterParse && ext.afterParse(input5);
+      ext.afterParse && ext.afterParse(input4);
     });
   }
   async _invokeAllAsync(func) {
@@ -35511,7 +35564,7 @@ var ItemsView = class {
       instance2.transform.scale
     ]);
     const signature = `${realistic}|${ctx.stepVersion()}`;
-    const same = signature === this.#plinthSignature && inputs.length === this.#plinthInputs.length && inputs.every((input5, i3) => input5 === this.#plinthInputs[i3]);
+    const same = signature === this.#plinthSignature && inputs.length === this.#plinthInputs.length && inputs.every((input4, i3) => input4 === this.#plinthInputs[i3]);
     if (same)
       return;
     this.#plinthSignature = signature;
@@ -35952,36 +36005,36 @@ function validateGrid(res, texel) {
   if (!Number.isInteger(res) || res < 8 || res % 4 !== 0 || !Number.isFinite(texel) || texel <= 0)
     throw new RangeError("Terrain bake requires res >=8 divisible by4 and positive finite texel.");
 }
-function sampleTerrainFields(input5) {
-  validateGrid(input5.res, input5.texel);
-  const n2 = input5.res * input5.res;
+function sampleTerrainFields(input4) {
+  validateGrid(input4.res, input4.texel);
+  const n2 = input4.res * input4.res;
   const out = {
-    res: input5.res,
-    texel: input5.texel,
-    origin: input5.origin,
+    res: input4.res,
+    texel: input4.texel,
+    origin: input4.origin,
     heights: new Float32Array(n2),
     rock: new Float32Array(n2),
     sand: new Uint8Array(n2),
     path: new Uint8Array(n2),
     gully: new Uint8Array(n2)
   };
-  if (input5.pads)
-    out.pads = input5.pads;
+  if (input4.pads)
+    out.pads = input4.pads;
   const masks = ["sand", "path", "gully", "seagrass", "rubble", "scarp"];
   for (const name2 of masks)
-    if (input5[`${name2}At`] && !out[name2])
+    if (input4[`${name2}At`] && !out[name2])
       out[name2] = new Uint8Array(n2);
-  for (let j2 = 0; j2 < input5.res; j2++)
-    for (let i3 = 0; i3 < input5.res; i3++) {
-      const x3 = input5.origin + (i3 + 0.5) * input5.texel, z2 = input5.origin + (j2 + 0.5) * input5.texel;
-      const k2 = j2 * input5.res + i3;
-      const h2 = input5.heightAt(x3, z2);
+  for (let j2 = 0; j2 < input4.res; j2++)
+    for (let i3 = 0; i3 < input4.res; i3++) {
+      const x3 = input4.origin + (i3 + 0.5) * input4.texel, z2 = input4.origin + (j2 + 0.5) * input4.texel;
+      const k2 = j2 * input4.res + i3;
+      const h2 = input4.heightAt(x3, z2);
       if (!Number.isFinite(h2))
         throw new RangeError("Terrain height must be finite.");
       out.heights[k2] = h2;
-      out.rock[k2] = Math.max(0, Math.min(1, input5.rockAt?.(x3, z2) ?? 0));
+      out.rock[k2] = Math.max(0, Math.min(1, input4.rockAt?.(x3, z2) ?? 0));
       for (const name2 of masks) {
-        const fn = input5[`${name2}At`], data = out[name2];
+        const fn = input4[`${name2}At`], data = out[name2];
         if (fn && data)
           data[k2] = Math.round(Math.max(0, Math.min(255, fn(x3, z2))));
       }
@@ -35992,9 +36045,9 @@ var AO_STEPS = [4, 8, 13, 19, 27, 38, 52, 72, 100];
 var AO_DIRS = 8;
 function bakeTerrainMaps(terrain) {
   validateGrid(terrain.res, terrain.texel);
-  for (const field5 of ["heights", "rock", "sand", "path", "gully", "seagrass", "rubble", "scarp"]) {
-    if (terrain[field5] && terrain[field5].length !== terrain.res * terrain.res)
-      throw new RangeError(`Terrain ${field5} length does not match resolution.`);
+  for (const field6 of ["heights", "rock", "sand", "path", "gully", "seagrass", "rubble", "scarp"]) {
+    if (terrain[field6] && terrain[field6].length !== terrain.res * terrain.res)
+      throw new RangeError(`Terrain ${field6} length does not match resolution.`);
   }
   const t0 = performance.now();
   const { res, heights: H2, rock, texel, origin } = terrain;
@@ -36779,29 +36832,29 @@ fn twGround_terGustAt( xz: vec2f, offset: vec2f ,terrainDetailTex:texture_2d<f32
 }fn twGround_terDetail(uv: vec2f,terrainDetailTex:texture_2d<f32>,smpAniso4Repeat:sampler) -> vec4f { return textureSample(terrainDetailTex,smpAniso4Repeat,uv); }`;
 
 // ../runtime/dist/tidewater-ground/ground-shading.js
-function createTidewaterGroundGraph(input5) {
+function createTidewaterGroundGraph(input4) {
   const t8 = TSL;
-  const detail = t8.texture(input5.detailTexture);
+  const detail = t8.texture(input4.detailTexture);
   const f2 = t8.wgslFn(GROUND_WGSL);
-  const weights = input5.layerWeights;
-  let nr = input5.normalRock, sp = input5.splat;
+  const weights = input4.layerWeights;
+  let nr = input4.normalRock, sp = input4.splat;
   if (weights) {
     const total = t8.max(t8.add(weights.beachSand ?? 0, weights.seabedSand ?? 0, weights.rock ?? 0, weights.grass ?? 0, weights.dirt ?? 0, weights.rubble ?? 0, weights.seagrass ?? 0), 1e-6);
     nr = t8.vec4(nr.xy, t8.clamp(t8.div(weights.rock ?? 0, total), 0, 1), nr.w);
     sp = t8.vec4(t8.clamp(t8.div(t8.add(weights.beachSand ?? 0, weights.seabedSand ?? 0), total), 0, 1), t8.clamp(t8.div(weights.dirt ?? 0, total), 0, 1), weights.seagrass === void 0 ? sp.z : t8.clamp(t8.div(weights.seagrass, total), 0, 1), t8.clamp(t8.div(weights.rubble ?? 0, total), 0, 1));
   }
   const surface3 = f2({
-    position: input5.position,
+    position: input4.position,
     normalRock: nr,
     splat: sp,
-    cameraPosition: input5.cameraPosition,
-    wetFoam: input5.wetFoam ?? t8.vec2(t8.smoothstep(0.5, 0, input5.position.y), 0),
-    windDirection: input5.windDirection ?? t8.vec2(0, -1),
-    windSpeed: input5.windSpeed ?? t8.float(0),
-    gustOffset: input5.gustOffset ?? t8.vec2(0),
-    swellDirection: input5.swellDirection ?? t8.vec2(-0.11914522, -0.99287684),
-    reefWeight: input5.reefWeight ?? t8.float(0),
-    wetDarken: input5.wetDarken ?? t8.float(0.58),
+    cameraPosition: input4.cameraPosition,
+    wetFoam: input4.wetFoam ?? t8.vec2(t8.smoothstep(0.5, 0, input4.position.y), 0),
+    windDirection: input4.windDirection ?? t8.vec2(0, -1),
+    windSpeed: input4.windSpeed ?? t8.float(0),
+    gustOffset: input4.gustOffset ?? t8.vec2(0),
+    swellDirection: input4.swellDirection ?? t8.vec2(-0.11914522, -0.99287684),
+    reefWeight: input4.reefWeight ?? t8.float(0),
+    wetDarken: input4.wetDarken ?? t8.float(0.58),
     terrainDetailTex: detail,
     smpAniso4Repeat: t8.sampler(detail)
   });
@@ -37570,24 +37623,24 @@ fn vegPlantDeform( P: vec3f, N0: vec3f, iPos: vec4f, iDat: vec4f, veg: vec4f, aM
 	return out;
 }
 `;
-function plantDeformation(provider, input5) {
+function plantDeformation(provider, input4) {
   const t8 = TSL;
-  const wind = vegetationWind(provider, input5.instancePosition.xz);
+  const wind = vegetationWind(provider, input4.instancePosition.xz);
   const result = t8.wgslFn(PLANT_DEFORMATION_WGSL)({
-    P: input5.position,
-    N0: input5.normal,
-    iPos: input5.instancePosition,
-    iDat: input5.instanceData,
-    veg: input5.vegetation,
-    aMat: input5.material,
-    aLobe: input5.lobe,
-    lodRange: input5.lodRange,
-    time: input5.time,
+    P: input4.position,
+    N0: input4.normal,
+    iPos: input4.instancePosition,
+    iDat: input4.instanceData,
+    veg: input4.vegetation,
+    aMat: input4.material,
+    aLobe: input4.lobe,
+    lodRange: input4.lodRange,
+    time: input4.time,
     strength: wind.strength,
     gust: wind.gust,
     windDirection: wind.direction,
     windPerpendicular: wind.perpendicular,
-    camera: input5.camera
+    camera: input4.camera
   });
   return {
     position: result.element(0),
@@ -38080,9 +38133,9 @@ var LeafAtlas = class {
     this.baked = true;
   }
   /** Preserve the source top-row render-target storage versus bottom-up card coordinates. */
-  sample(st, tile) {
+  sample(st, tile3) {
     const t8 = TSL;
-    const uv6 = t8.vec2(t8.fract(t8.mul(tile, 0.5)).mul(2), t8.floor(t8.mul(tile, 0.5))).add(t8.clamp(st, 4e-3, 0.996)).mul(0.5);
+    const uv6 = t8.vec2(t8.fract(t8.mul(tile3, 0.5)).mul(2), t8.floor(t8.mul(tile3, 0.5))).add(t8.clamp(st, 4e-3, 0.996)).mul(0.5);
     return t8.texture(this.texture, t8.vec2(uv6.x, uv6.y.oneMinus()));
   }
   dispose() {
@@ -38559,7 +38612,7 @@ function createCanopyMaterial(b2) {
     geoN.assign(b2.instance ? t8.select(b2.instance.enabled, d2.normal, t8.normalLocal) : d2.normal);
     return b2.instance ? t8.select(b2.instance.enabled, d2.position, t8.positionLocal) : d2.position;
   })();
-  const tile = t8.wgslFn("fn twTile(seed:f32,shrub:bool)->f32{let spT=floor(fract(seed*5.31)*4.0);let p=fract(seed*3.17);let spS=select(select(2.0,1.0,p<0.6),0.0,p<0.45);return select(select(0.0,1.0,fract(spT*.5)>.25),select(2.0,3.0,spS==1.0),shrub);}")({ seed: iDat.w, shrub: aMat.x.greaterThan(2.5) });
+  const tile3 = t8.wgslFn("fn twTile(seed:f32,shrub:bool)->f32{let spT=floor(fract(seed*5.31)*4.0);let p=fract(seed*3.17);let spS=select(select(2.0,1.0,p<0.6),0.0,p<0.45);return select(select(0.0,1.0,fract(spT*.5)>.25),select(2.0,3.0,spS==1.0),shrub);}")({ seed: iDat.w, shrub: aMat.x.greaterThan(2.5) });
   const shade = t8.wgslFn(CANOPY_SHADE_WGSL)({
     st: t8.uv(),
     aMat,
@@ -38569,7 +38622,7 @@ function createCanopyMaterial(b2) {
     N: geoN.normalize().mul(t8.select(t8.frontFacing, 1, -1)),
     V: t8.positionViewDirection.transformDirection(t8.cameraWorldMatrix),
     P: t8.positionWorld,
-    L0: b2.atlas.sample(t8.uv(), tile),
+    L0: b2.atlas.sample(t8.uv(), tile3),
     camera: t8.cameraPosition,
     sunDirection: b2.sunDirection,
     night: b2.night
@@ -39344,7 +39397,7 @@ function shoreSwashThickness(M2, front) {
   const fm = front.add(SWASH_OVERSHOOT);
   return M2.clamp(M2.min(fm.mul(0.3), M2.max(fm.sub(0.1), 0).mul(BEACH_SLOPE * 0.22).add(0.03)), -0.1, 0.12);
 }
-function shoreFieldSample(field5, xz, origin, size, res) {
+function shoreFieldSample(field6, xz, origin, size, res) {
   const f2 = xz.sub(origin).div(size).mul(res).sub(0.5);
   const top = res.sub(1.001);
   const fc = TN.clamp(f2, TN.vec2(0, 0), TN.vec2(top, top));
@@ -39353,7 +39406,7 @@ function shoreFieldSample(field5, xz, origin, size, res) {
   const ii = TN.ivec2(i3);
   const last = TN.int(res).sub(1);
   const mx = TN.ivec2(last, last);
-  const load2 = (o2) => field5.load(TN.min(ii.add(o2), mx)).level(0);
+  const load2 = (o2) => field6.load(TN.min(ii.add(o2), mx)).level(0);
   const a2 = load2(TN.ivec2(0, 0));
   const b2 = load2(TN.ivec2(1, 0));
   const c2 = load2(TN.ivec2(0, 1));
@@ -39553,22 +39606,22 @@ var AvatarAnimator = class {
   }
 };
 var SWIM_CRAWL_SPEED = 1.8;
-function locomotionClip(input5) {
-  if (input5.sitting === "seat")
+function locomotionClip(input4) {
+  if (input4.sitting === "seat")
     return { clip: "Sit", speed: 1 };
-  if (input5.sitting === "ground")
+  if (input4.sitting === "ground")
     return { clip: "SitGround", speed: 1 };
-  if (input5.climbing != null)
-    return { clip: "Climb", speed: Math.min(1.8, Math.abs(input5.climbing) / 0.9) };
-  if (input5.swimming)
-    return input5.speed > SWIM_CRAWL_SPEED ? { clip: "Swim", speed: Math.min(1.55, Math.max(1, input5.speed / 1.8)) } : { clip: "SwimBreast", speed: input5.speed > 0.2 ? 1 : 0.55 };
-  if (!input5.grounded)
+  if (input4.climbing != null)
+    return { clip: "Climb", speed: Math.min(1.8, Math.abs(input4.climbing) / 0.9) };
+  if (input4.swimming)
+    return input4.speed > SWIM_CRAWL_SPEED ? { clip: "Swim", speed: Math.min(1.55, Math.max(1, input4.speed / 1.8)) } : { clip: "SwimBreast", speed: input4.speed > 0.2 ? 1 : 0.55 };
+  if (!input4.grounded)
     return { clip: "Jump", speed: 1 };
-  if (input5.speed < 0.3)
+  if (input4.speed < 0.3)
     return { clip: "Idle", speed: 1 };
-  const running = input5.speed > (input5.walkSpeed + input5.runSpeed) / 2;
-  const reference2 = running ? input5.runSpeed : input5.walkSpeed;
-  return { clip: running ? "Run" : "Walk", speed: Math.min(1.6, Math.max(0.5, input5.speed / reference2)) };
+  const running = input4.speed > (input4.walkSpeed + input4.runSpeed) / 2;
+  const reference2 = running ? input4.runSpeed : input4.walkSpeed;
+  return { clip: running ? "Run" : "Walk", speed: Math.min(1.6, Math.max(0.5, input4.speed / reference2)) };
 }
 
 // ../runtime/dist/gizmo.js
@@ -40697,15 +40750,15 @@ function buildRoad(road, samples, heightAt, materials2, options = {}) {
         const p2 = samples[j2];
         return [p2.x + f2[j2].nx * s2 * width, surface3(j2, s2 * width), p2.z + f2[j2].nz * s2 * width];
       };
-      const tile = photo ? photoTile(photo) : ROAD_TILE;
-      const v0 = samples[i3].distance / tile;
-      const v1 = samples[i3 + 1].distance / tile;
+      const tile3 = photo ? photoTile(photo) : ROAD_TILE;
+      const v0 = samples[i3].distance / tile3;
+      const v1 = samples[i3 + 1].distance / tile3;
       const corners = [corner(i3, s0), corner(i3 + 1, s0), corner(i3 + 1, s1), corner(i3, s1)];
       if (crossings.some((c2) => c2.above && corners.every((p2) => insideOf(c2, p2))))
         continue;
       const middle = [0, 0, 0].map((_2, axis) => corners.reduce((sum, p2) => sum + p2[axis], 0) / 4);
       const plain = !photo && MARKED.has(type.look) && crossings.some((c2) => insideOf(c2, middle));
-      const [u0, u1] = photo ? [s0 * width / tile, s1 * width / tile] : plain ? [PLAIN_U, PLAIN_U] : [s0 + 0.5, s1 + 0.5];
+      const [u0, u1] = photo ? [s0 * width / tile3, s1 * width / tile3] : plain ? [PLAIN_U, PLAIN_U] : [s0 + 0.5, s1 + 0.5];
       top.quad(corners[0], corners[1], corners[2], corners[3], [
         [u0, v0],
         [u0, v1],
@@ -40726,7 +40779,7 @@ function buildRoad(road, samples, heightAt, materials2, options = {}) {
   const walkSolid = new Builder();
   const sidewalk = road.sidewalk ?? 0;
   if (sidewalk > 0 && (type.look === "street" || type.look === "lane")) {
-    const tile = photoTile(SIDEWALK.ground);
+    const tile3 = photoTile(SIDEWALK.ground);
     const cut = (x3, z2) => crossings.some((c2) => lineDistance(c2.line, x3, z2) <= c2.half + (c2.above ? c2.sidewalk : 0));
     const sides = road.sidewalkSide === "right" ? [1] : road.sidewalkSide === "left" ? [-1] : [-1, 1];
     for (const side2 of sides) {
@@ -40759,9 +40812,9 @@ function buildRoad(road, samples, heightAt, materials2, options = {}) {
           const level2 = (t8, offset) => lerp3(surface3(i3, offset), surface3(i3 + 1, offset), t8);
           const top2 = (t8) => level2(t8, middle) + SIDEWALK.kerb;
           const ground = (p3) => heightAt(p3.x + p3.nx * outer, p3.z + p3.nz * outer) - 0.05;
-          const v0 = lerp3(samples[i3].distance, samples[i3 + 1].distance, t0) / tile;
-          const v1 = lerp3(samples[i3].distance, samples[i3 + 1].distance, t1) / tile;
-          const u2 = (o2) => o2 / tile;
+          const v0 = lerp3(samples[i3].distance, samples[i3 + 1].distance, t0) / tile3;
+          const v1 = lerp3(samples[i3].distance, samples[i3 + 1].distance, t1) / tile3;
+          const u2 = (o2) => o2 / tile3;
           const [p2, q2] = side2 > 0 ? [inner, outer] : [outer, inner];
           const topQuad = [at3(a2, p2, top2(t0)), at3(b2, p2, top2(t1)), at3(b2, q2, top2(t1)), at3(a2, q2, top2(t0))];
           walk.quad(topQuad[0], topQuad[1], topQuad[2], topQuad[3], [
@@ -40776,8 +40829,8 @@ function buildRoad(road, samples, heightAt, materials2, options = {}) {
           const edgeUv = [
             [0, v0],
             [0, v1],
-            [SIDEWALK.kerb / tile, v1],
-            [SIDEWALK.kerb / tile, v0]
+            [SIDEWALK.kerb / tile3, v1],
+            [SIDEWALK.kerb / tile3, v0]
           ];
           if (side2 > 0) {
             walk.quad(kerb[3], kerb[2], kerb[1], kerb[0], edgeUv);
@@ -41523,22 +41576,22 @@ var GroundWetness = class {
     return t2.wgslFn(GROUND_WETNESS_WGSL)(t2.texture(this.state), t2.texture(this.#lace), xz, heightSeaRelative, this.region, this.availableNode);
   }
   /** Current source simulation has no spray emitter in Genvr: deposit is explicitly zero. */
-  update(renderer2, dt, input5) {
+  update(renderer2, dt, input4) {
     if (this.#disposed)
       return;
     if (!Number.isFinite(dt) || dt <= 0)
       return;
     this.#ensure();
     this.#dt.value = dt;
-    this.#clock.value.set(input5.time, input5.level, input5.period, input5.amplitude);
-    this.#origin.value.set(-input5.extent, -input5.extent);
-    this.#size.value = input5.extent * 2;
-    this.#depth.value = input5.depthTexture;
-    this.#field.value = input5.fieldTexture;
-    this.#enabled.value = input5.enabled;
-    this.availableNode.value = input5.enabled > 0 ? 1 : 0;
-    if (input5.swellDirection)
-      this.swellDirectionNode.value.set(...input5.swellDirection);
+    this.#clock.value.set(input4.time, input4.level, input4.period, input4.amplitude);
+    this.#origin.value.set(-input4.extent, -input4.extent);
+    this.#size.value = input4.extent * 2;
+    this.#depth.value = input4.depthTexture;
+    this.#field.value = input4.fieldTexture;
+    this.#enabled.value = input4.enabled;
+    this.availableNode.value = input4.enabled > 0 ? 1 : 0;
+    if (input4.swellDirection)
+      this.swellDirectionNode.value.set(...input4.swellDirection);
     if (this.#reset) {
       renderer2.compute(this.#clear);
       this.#reset = false;
@@ -41672,16 +41725,16 @@ var WakeField = class {
       ring.set(0, 0, -1e3, 0);
   }
 };
-function wakeNodes(field5, worldX, worldZ) {
-  const clock = field5.clock;
+function wakeNodes(field6, worldX, worldZ) {
+  const clock = field6.clock;
   let lift = float3(0);
   let foam = float3(0);
   for (let i3 = 0; i3 < MAX_RINGS; i3 += 1) {
-    const ring = field5.rings.element(i3);
+    const ring = field6.rings.element(i3);
     const age = clock.sub(ring.z);
     const distance2 = vec23(worldX.sub(ring.x), worldZ.sub(ring.y)).length();
     const radius = ring.w.mul(age);
-    const alive = float3(i3).lessThan(field5.live).and(age.greaterThan(0)).and(age.lessThan(RING_LIFE));
+    const alive = float3(i3).lessThan(field6.live).and(age.greaterThan(0)).and(age.lessThan(RING_LIFE));
     const edge = exp3(distance2.sub(radius).abs().mul(-RING_BAND));
     const fade = max4(float3(1).sub(age.div(RING_LIFE)), 0);
     const here = sin(distance2.sub(radius).mul(RING_WAVES)).mul(RING_HEIGHT).mul(edge).mul(fade);
@@ -42287,11 +42340,11 @@ var DEFAULT_SWELL_DIR = (() => {
   const l2 = Math.hypot(-0.12, -1);
   return [-0.12 / l2, -1 / l2];
 })();
-function computeShoreField(input5) {
+function computeShoreField(input4) {
   const GRAVITY5 = 9.81;
-  const { depth: depth2, res, origin, size } = input5;
-  const maxDepth = input5.maxDepth ?? 25;
-  const minDepth = input5.minDepth ?? 0.25;
+  const { depth: depth2, res, origin, size } = input4;
+  const maxDepth = input4.maxDepth ?? 25;
+  const minDepth = input4.minDepth ?? 0.25;
   const h2 = size / res;
   const N5 = res * res;
   const keys = new Float64Array(N5 * 4);
@@ -42340,8 +42393,8 @@ function computeShoreField(input5) {
   }
   const T2 = new Float32Array(N5).fill(Infinity);
   const state = new Uint8Array(N5);
-  const sdx = input5.swellDir[0];
-  const sdz = input5.swellDir[1];
+  const sdx = input4.swellDir[0];
+  const sdz = input4.swellDir[1];
   const c0 = Math.sqrt(GRAVITY5 * maxDepth);
   for (let j2 = 0; j2 < res; j2 += 1)
     for (let i3 = 0; i3 < res; i3 += 1) {
@@ -42560,10 +42613,10 @@ self.onmessage = (event) => {
     return null;
   }
 }
-function solveShoreField(input5) {
+function solveShoreField(input4) {
   const worker3 = makeWorker();
   if (!worker3)
-    return new Promise((resolve) => setTimeout(() => resolve(computeShoreField(input5)), 0));
+    return new Promise((resolve) => setTimeout(() => resolve(computeShoreField(input4)), 0));
   return new Promise((resolve, reject) => {
     worker3.onmessage = (event2) => {
       worker3.terminate();
@@ -42573,20 +42626,20 @@ function solveShoreField(input5) {
       worker3.terminate();
       event2.preventDefault();
       try {
-        resolve(computeShoreField(input5));
+        resolve(computeShoreField(input4));
       } catch (error) {
         reject(error instanceof Error ? error : new Error(String(error)));
       }
     };
-    worker3.postMessage(input5);
+    worker3.postMessage(input4);
   });
 }
 async function shoreFieldFromHeights(request) {
   const res = request.res ?? SHORE_FIELD_RES;
   const depth2 = shoreDepthGrid(request.heightAt, request.level, request.extent, res);
   const swellDir = request.swellDir ?? autoSwellDirection(depth2, res);
-  const field5 = await solveShoreField({ depth: depth2, res, origin: -request.extent, size: request.extent * 2, swellDir });
-  return { ...field5, swellDir };
+  const field6 = await solveShoreField({ depth: depth2, res, origin: -request.extent, size: request.extent * 2, swellDir });
+  return { ...field6, swellDir };
 }
 
 // ../runtime/dist/ocean/sea-detail.js
@@ -42811,8 +42864,8 @@ function halfTexture(depths, cells) {
   tex.needsUpdate = true;
   return tex;
 }
-function fieldTexture(field5) {
-  const tex = field5 ? new DataTexture(field5.data, field5.res, field5.res, RGBAFormat, FloatType) : new DataTexture(new Float32Array([1e5, 0.02, 0, 1e5]), 1, 1, RGBAFormat, FloatType);
+function fieldTexture(field6) {
+  const tex = field6 ? new DataTexture(field6.data, field6.res, field6.res, RGBAFormat, FloatType) : new DataTexture(new Float32Array([1e5, 0.02, 0, 1e5]), 1, 1, RGBAFormat, FloatType);
   tex.magFilter = NearestFilter;
   tex.minFilter = NearestFilter;
   tex.generateMipmaps = false;
@@ -42946,7 +42999,7 @@ var TidewaterSea = class {
   async #solveShore() {
     const token = this.#solveToken += 1;
     try {
-      const field5 = await shoreFieldFromHeights({
+      const field6 = await shoreFieldFromHeights({
         heightAt: this.heightAt,
         level: this.#levelValue,
         extent: this.#extentValue,
@@ -42954,7 +43007,7 @@ var TidewaterSea = class {
       });
       if (this.#disposed || token !== this.#solveToken)
         return;
-      this.#pendingField = field5;
+      this.#pendingField = field6;
       if (!this.#hasField)
         this.#applyField();
       else
@@ -42964,23 +43017,23 @@ var TidewaterSea = class {
     }
   }
   #applyField() {
-    const field5 = this.#pendingField;
-    if (!field5)
+    const field6 = this.#pendingField;
+    if (!field6)
       return;
     this.#pendingField = null;
-    this.swellDirection = field5.swellDir;
-    const next3 = fieldTexture(field5);
+    this.swellDirection = field6.swellDir;
+    const next3 = fieldTexture(field6);
     for (const node of this.#fieldNodes)
       node.value = next3;
     this.#field.dispose();
     this.#field = next3;
-    this.#fieldRes.value = field5.res;
+    this.#fieldRes.value = field6.res;
     if (this.swellDirection)
       this.#swellDirU.value.set(this.swellDirection[0], this.swellDirection[1]);
     this.#hasField = true;
     this.#shoreTarget = 1;
     this.#surfShore = {
-      field: field5,
+      field: field6,
       heightAt: this.heightAt,
       level: this.#levelValue,
       swellDir: this.swellDirection ?? [0, -1],
@@ -43838,14 +43891,14 @@ var WaterView = class {
         extent: this.seaExtent,
         res: SOUND_SHORE_RES,
         swellDir: swell.direction
-      }).then((field5) => {
+      }).then((field6) => {
         if (this.#disposed || token !== this.#soundToken)
           return;
         this.#soundShore = {
-          field: field5,
+          field: field6,
           heightAt: this.heightAt,
           level: sea.level,
-          swellDir: field5.swellDir,
+          swellDir: field6.swellDir,
           period: swell.period,
           amplitude: swell.amplitude
         };
@@ -44361,12 +44414,12 @@ function buildPaving(paving, heightAt, materials2, level = 0) {
   const lift = PAVING_LIFT + Math.min(level, MAX_PAVING_LEVEL) * LEVEL_LIFT2;
   const contour = paving.area.map(([x3, z2]) => new Vector2(x3, z2));
   const triangles = ShapeUtils.triangulateShape(contour, []);
-  const tile = getGround(paving.materialId)?.tile ?? 3;
+  const tile3 = getGround(paving.materialId)?.tile ?? 3;
   const positions = [];
   const uvs = [];
   const corner = (x3, z2) => {
     positions.push(x3, heightAt(x3, z2) + lift, z2);
-    uvs.push(x3 / tile, z2 / tile);
+    uvs.push(x3 / tile3, z2 / tile3);
   };
   const split3 = (a2, b2, c2, depth2) => {
     const ab = a2.distanceTo(b2);
@@ -46150,7 +46203,7 @@ var RideController = class {
     return this.#tilt;
   }
   /** One step of `dt` seconds with the rider's input and `set_speed` factor. */
-  step(input5, dt, speedFactor) {
+  step(input4, dt, speedFactor) {
     if (!(dt > 0))
       return;
     const state = this.#state;
@@ -46159,7 +46212,7 @@ var RideController = class {
     this.#under.water = surface3.water;
     const yawBefore = state.yaw;
     const fromY = state.y;
-    const delta2 = stepRide(this.ride, state, input5, this.#under, dt, speedFactor, this.#delta);
+    const delta2 = stepRide(this.ride, state, input4, this.#under, dt, speedFactor, this.#delta);
     if (this.ride.model === "air") {
       const ahead = this.#surfaceAt(state.x + delta2.dx, state.z + delta2.dz, this.#ahead);
       delta2.dy = airCeiling(this.ride, fromY, fromY + delta2.dy, ahead.ground - this.#below, dt) - fromY;
@@ -46328,8 +46381,8 @@ function carriedBy(state, context3, surfaces, moverId, exclude) {
   }
   return carried;
 }
-function applyWithRest(history, state, context3, input5) {
-  return applyRest(history, state, context3, input5, false);
+function applyWithRest(history, state, context3, input4) {
+  return applyRest(history, state, context3, input4, false);
 }
 function endRestGroup(history, state, context3) {
   const steps = [];
@@ -46355,12 +46408,12 @@ function beginRestGroup(history, state, context3) {
   history.beginGroup();
   return steps;
 }
-function applyRest(history, state, context3, input5, gradeNow) {
+function applyRest(history, state, context3, input4, gradeNow) {
   let surfaces = context3.surfaces();
   const own = !history.grouping;
   const memory = own ? freshMemory(-1) : memoryOf(history, context3);
   const defer = !own && !gradeNow;
-  let command = input5;
+  let command = input4;
   let grade2 = [];
   let regrade = null;
   const moverId = command.type === "transform_item" ? command.params.instanceId : null;
@@ -51111,13 +51164,13 @@ var MotionBlur = class {
       return p2.mul(min7(1, float12(20).div(max12(p2.length(), 1e-6))));
     };
     this.#tileKernel = Fn9(() => {
-      const tile = ivec25(globalId7.xy);
-      If8(tile.x.lessThan(this.#tiles.x).and(tile.y.lessThan(this.#tiles.y)), () => {
+      const tile3 = ivec25(globalId7.xy);
+      If8(tile3.x.lessThan(this.#tiles.x).and(tile3.y.lessThan(this.#tiles.y)), () => {
         const best = vec213(0).toVar(), longest = float12(0).toVar(), shortest = float12(1e8).toVar();
         const inSize = vec213(TSL.textureSize(texture12(velocity3), 0));
         Loop5({ start: int2(0), end: int2(400), type: "int", condition: "<", name: "motionTap" }, ({ motionTap }) => {
           const lane = motionTap.div(4), k2 = motionTap.mod(4);
-          const p2 = vec213(tile).mul(20).add(vec213(lane.mod(10).mul(2).add(k2.mod(2)), lane.div(10).mul(2).add(k2.div(2)))).add(0.5);
+          const p2 = vec213(tile3).mul(20).add(vec213(lane.mod(10).mul(2).add(k2.mod(2)), lane.div(10).mul(2).add(k2.div(2)))).add(0.5);
           const q2 = ivec25(min7(p2.div(this.#size).mul(inSize), inSize.sub(1)));
           const uv6 = p2.div(this.#size);
           const ndc = uv6.mul(2).sub(1).mul(vec213(1, -1));
@@ -51132,16 +51185,16 @@ var MotionBlur = class {
           });
           shortest.assign(min7(shortest, l2));
         });
-        textureStore7(this.tileMax, tile, vec412(best, longest.sqrt(), shortest.sqrt()));
+        textureStore7(this.tileMax, tile3, vec412(best, longest.sqrt(), shortest.sqrt()));
       });
     })().computeKernel([8, 8, 1]);
     this.#neighborKernel = Fn9(() => {
-      const tile = ivec25(globalId7.xy);
-      If8(tile.x.lessThan(this.#tiles.x).and(tile.y.lessThan(this.#tiles.y)), () => {
+      const tile3 = ivec25(globalId7.xy);
+      If8(tile3.x.lessThan(this.#tiles.x).and(tile3.y.lessThan(this.#tiles.y)), () => {
         const best = vec412(0).toVar(), shortest = float12(1e8).toVar();
         for (let y2 = -1; y2 <= 1; y2++)
           for (let x3 = -1; x3 <= 1; x3++) {
-            const q2 = ivec25(clamp13(tile.add(ivec25(x3, y2)), ivec25(0), this.#tiles.sub(1)));
+            const q2 = ivec25(clamp13(tile3.add(ivec25(x3, y2)), ivec25(0), this.#tiles.sub(1)));
             const m2 = textureLoad7(this.tileMax, q2).toVar();
             let take = m2.z.greaterThan(best.z);
             if (x3 !== 0 && y2 !== 0)
@@ -51149,7 +51202,7 @@ var MotionBlur = class {
             If8(take, () => best.assign(m2));
             shortest.assign(min7(shortest, m2.w));
           }
-        textureStore7(this.neighborMax, tile, vec412(best.xyz, shortest));
+        textureStore7(this.neighborMax, tile3, vec412(best.xyz, shortest));
       });
     })().computeKernel([8, 8, 1]);
   }
@@ -51543,10 +51596,10 @@ var TidewaterBloom = class {
   meterTexture = this.down[3];
   #passes = [];
   #disposed = false;
-  constructor(input5) {
-    this.input = input5;
+  constructor(input4) {
+    this.input = input4;
     for (let i3 = 0; i3 < 5; i3++) {
-      const src = texture14(i3 === 0 ? input5 : this.down[i3 - 1]), target2 = this.down[i3], size = uniform17(new Vector2());
+      const src = texture14(i3 === 0 ? input4 : this.down[i3 - 1]), target2 = this.down[i3], size = uniform17(new Vector2());
       const kernel = Fn12(() => {
         const p2 = globalId8.xy;
         If10(p2.x.lessThan(size.x).and(p2.y.lessThan(size.y)), () => {
@@ -51633,11 +51686,11 @@ var TidewaterExposure = class {
   #reset;
   #resetPending = false;
   #disposed = false;
-  constructor(input5) {
-    this.input = input5;
+  constructor(input4) {
+    this.input = input4;
     for (const value of [...Object.values(this.params), this.dt, this.night])
       value.setGroup(TSL.renderGroup);
-    const sums = workgroupArray3("vec2", 256), src = texture15(input5), p2 = this.params;
+    const sums = workgroupArray3("vec2", 256), src = texture15(input4), p2 = this.params;
     this.#kernel = Fn13(() => {
       const lane = localId3.x;
       sums.element(lane).assign(meter(src, lane));
@@ -51758,10 +51811,10 @@ function createFinalNode(options) {
 }
 
 // ../runtime/dist/post/beauty.js
-function underwaterBeauty(input5, depth2, camera, under, caustics, rays) {
+function underwaterBeauty(input4, depth2, camera, under, caustics, rays) {
   const N5 = TSL, uv6 = N5.uv();
   const sway = N5.vec2(N5.sin(N5.time.mul(1.7).add(uv6.y.mul(9))).mul(35e-4), N5.sin(N5.time.mul(2.3).add(uv6.x.mul(7))).mul(35e-4 * 0.7)).mul(under);
-  let picture2 = N5.texture(input5, uv6.add(sway)).rgb;
+  let picture2 = N5.texture(input4, uv6.add(sway)).rgb;
   if (caustics)
     picture2 = picture2.add(N5.texture(caustics, uv6.mul(N5.vec2(2.1, 1.4)).add(N5.time.mul(0.03))).r.mul(N5.texture(caustics, uv6.mul(N5.vec2(1.5, 1.1)).sub(N5.time.mul(0.022))).r).mul(0.22).mul(under));
   if (rays)
@@ -52085,10 +52138,10 @@ var _size2 = /* @__PURE__ */ new Vector2();
 var _BlurDirectionX = /* @__PURE__ */ new Vector2(1, 0);
 var _BlurDirectionY = /* @__PURE__ */ new Vector2(0, 1);
 var _rendererState2;
-var luminosityHighPass = Fn4(({ input: input5, threshold, smoothWidth }) => {
-  const v2 = luminance(input5.rgb);
+var luminosityHighPass = Fn4(({ input: input4, threshold, smoothWidth }) => {
+  const v2 = luminance(input4.rgb);
   const alpha = smoothstep13(threshold, threshold.add(smoothWidth), v2);
-  return mix9(vec47(0), input5, alpha);
+  return mix9(vec47(0), input4, alpha);
 });
 var BloomNode = class extends TempNode {
   static get type() {
@@ -55232,14 +55285,14 @@ var EnvironmentView = class {
     const clouds = this.#clouds;
     const wind = (this.#weather?.wind ?? 0) * 2 + CLOUDS.speed;
     this.#cloudDrift += wind * dt;
-    const field5 = CLOUDS.field;
-    const wrap2 = (value) => (value % field5 + field5) % field5;
+    const field6 = CLOUDS.field;
+    const wrap2 = (value) => (value % field6 + field6) % field6;
     const cubes = this.#cloudCubes;
     this.#dummy.rotation.set(0, 0, 0);
     this.#dummy.scale.setScalar(1);
     for (let i3 = 0; i3 < clouds.count; i3 += 1) {
       const o2 = i3 * 5;
-      this.#dummy.position.set(center.x - field5 / 2 + wrap2(cubes[o2] + this.#cloudDrift - center.x) + cubes[o2 + 2], cubes[o2 + 3], center.z - field5 / 2 + wrap2(cubes[o2 + 1] - center.z) + cubes[o2 + 4]);
+      this.#dummy.position.set(center.x - field6 / 2 + wrap2(cubes[o2] + this.#cloudDrift - center.x) + cubes[o2 + 2], cubes[o2 + 3], center.z - field6 / 2 + wrap2(cubes[o2 + 1] - center.z) + cubes[o2 + 4]);
       this.#dummy.updateMatrix();
       clouds.setMatrixAt(i3, this.#dummy.matrix);
     }
@@ -55921,8 +55974,8 @@ function surfFormat(canPlay) {
 function surfAlong(x3, z2, swellDir) {
   return -x3 * swellDir[1] + z2 * swellDir[0];
 }
-function fieldAt(field5, x3, z2, out) {
-  const { res, data, origin, size } = field5;
+function fieldAt(field6, x3, z2, out) {
+  const { res, data, origin, size } = field6;
   const fx = clamp19((x3 - origin) / size * res - 0.5, 0, res - 1.001);
   const fz = clamp19((z2 - origin) / size * res - 0.5, 0, res - 1.001);
   const i3 = Math.floor(fx);
@@ -55941,10 +55994,10 @@ function fieldAt(field5, x3, z2, out) {
   return out;
 }
 function buildSurfStations(shore, lx, lz) {
-  const { field: field5, swellDir } = shore;
+  const { field: field6, swellDir } = shore;
   const f2 = [0, 0, 0, 0];
   const h2 = (x3, z2) => shore.heightAt(x3, z2) - shore.level;
-  fieldAt(field5, lx, lz, f2);
+  fieldAt(field6, lx, lz, f2);
   let ex = Math.hypot(f2[1], f2[2]);
   const dx = ex > 1e-3 ? f2[1] / ex : swellDir[0];
   const dz = ex > 1e-3 ? f2[2] / ex : swellDir[1];
@@ -55975,7 +56028,7 @@ function buildSurfStations(shore, lx, lz) {
     const o2 = (k2 - (SURF.stations - 1) / 2) * SURF.gap;
     let x3 = w0.x + tx * o2;
     let z2 = w0.z + tz * o2;
-    fieldAt(field5, x3, z2, f2);
+    fieldAt(field6, x3, z2, f2);
     ex = Math.hypot(f2[1], f2[2]);
     if (ex < 1e-3)
       continue;
@@ -55995,7 +56048,7 @@ function buildSurfStations(shore, lx, lz) {
     }
     if (!ok)
       continue;
-    fieldAt(field5, x3, z2, f2);
+    fieldAt(field6, x3, z2, f2);
     const n2 = SURF.transect;
     const st = {
       x: x3,
@@ -56014,7 +56067,7 @@ function buildSurfStations(shore, lx, lz) {
       const xx = x3 - ldx * r3;
       const zz = z2 - ldz * r3;
       st.depth[r3] = -h2(xx, zz);
-      st.T[r3] = fieldAt(field5, xx, zz, f2)[0];
+      st.T[r3] = fieldAt(field6, xx, zz, f2)[0];
       st.along[r3] = surfAlong(xx, zz, swellDir);
     }
     if (st.T[0] < 1e4 && st.Ts < 1e4)
@@ -62444,7 +62497,7 @@ var BoxCharacter = class {
 // ../runtime/dist/outer-ground.js
 var CELLS = 128;
 var SINK2 = 0.05;
-function outerGroundGeometry(heightAt, half, tile) {
+function outerGroundGeometry(heightAt, half, tile3) {
   const outer = half * 2;
   const step3 = outer * 2 / CELLS;
   const clamp22 = (v2) => Math.min(half, Math.max(-half, v2));
@@ -62471,7 +62524,7 @@ function outerGroundGeometry(heightAt, half, tile) {
       const z2 = -outer + j2 * step3;
       const k2 = j2 * n2 + i3;
       positions.set([x3, heightOf(x3, z2), z2], k2 * 3);
-      uvs.set([x3 / tile, -z2 / tile], k2 * 2);
+      uvs.set([x3 / tile3, -z2 / tile3], k2 * 2);
     }
   const indices = [];
   const inside2 = (x3, z2) => Math.abs(x3) < half - 1e-6 && Math.abs(z2) < half - 1e-6;
@@ -62505,13 +62558,13 @@ function swimLookForward(yaw, orbitPitch, neutralPitch) {
 function swimFallout(feetY, swimming, waterLevel) {
   return feetY < -30 && !(swimming && waterLevel !== null);
 }
-function stepSwimMotion(state, input5, feetY, floatFeetY, dt) {
+function stepSwimMotion(state, input4, feetY, floatFeetY, dt) {
   if (!(dt > 0) || !Number.isFinite(dt))
     return { x: 0, y: 0, z: 0 };
   const wish = {
-    x: input5.forward.x * input5.direction.z + input5.right.x * input5.direction.x,
-    y: input5.forward.y * input5.direction.z + Number(input5.ascend) - Number(input5.dive),
-    z: input5.forward.z * input5.direction.z + input5.right.z * input5.direction.x
+    x: input4.forward.x * input4.direction.z + input4.right.x * input4.direction.x,
+    y: input4.forward.y * input4.direction.z + Number(input4.ascend) - Number(input4.dive),
+    z: input4.forward.z * input4.direction.z + input4.right.z * input4.direction.x
   };
   const length11 = Math.hypot(wish.x, wish.y, wish.z);
   if (length11 > 0) {
@@ -62519,14 +62572,14 @@ function stepSwimMotion(state, input5, feetY, floatFeetY, dt) {
     wish.y /= length11;
     wish.z /= length11;
   }
-  if (state.floating && feetY > floatFeetY - 0.388 && wish.y > -0.25 && !input5.dive)
+  if (state.floating && feetY > floatFeetY - 0.388 && wish.y > -0.25 && !input4.dive)
     wish.y = Math.max(wish.y, 0);
-  const speed = (input5.sprint ? 2.5 : 1.5) * (input5.ascend || input5.dive ? 1 : Math.min(1, Math.max(0, input5.magnitude)));
+  const speed = (input4.sprint ? 2.5 : 1.5) * (input4.ascend || input4.dive ? 1 : Math.min(1, Math.max(0, input4.magnitude)));
   const k2 = 1 - Math.exp(-dt * 3);
   state.velocity.x += (wish.x * speed - state.velocity.x) * k2;
   state.velocity.y += (wish.y * speed - state.velocity.y) * k2;
   state.velocity.z += (wish.z * speed - state.velocity.z) * k2;
-  const diving = input5.dive || input5.direction.z > 0 && input5.forward.y < -Math.sin(0.35) || wish.y < -0.1;
+  const diving = input4.dive || input4.direction.z > 0 && input4.forward.y < -Math.sin(0.35) || wish.y < -0.1;
   if (diving)
     state.floating = false;
   else if (feetY > floatFeetY - 0.15)
@@ -62903,8 +62956,8 @@ function realisticGroundMaterial(color2, surface3, tiles, rockLayer, snowLayer, 
   material2.normalNode = transformNormalToView3(bent);
   return { material: material2, rules };
 }
-function realisticOuterMaterial(color2, surface3, tile, layer2) {
-  const uv6 = positionWorld6.xz.div(tile);
+function realisticOuterMaterial(color2, surface3, tile3, layer2) {
+  const uv6 = positionWorld6.xz.div(tile3);
   const c2 = texture22(color2, uv6).depth(float23(layer2));
   const s2 = texture22(surface3, uv6).depth(float23(layer2));
   const variation = mx_noise_float2(positionWorld6.xz.mul(0.015)).mul(0.5).add(mx_noise_float2(positionWorld6.xz.mul(0.06)).mul(0.25));
@@ -63178,9 +63231,9 @@ async function hydrateTerrainFieldSet(metadata, version, loadPage, { signal, yie
     for (const row of response.tiles) {
       if (!row || typeof row !== "object")
         throw new Error("Invalid terrain field tile envelope");
-      const tile = row;
-      const key2 = `${tile.tx},${tile.tz}`;
-      if (tile.setId !== set.descriptor.id || !Number.isInteger(tile.tx) || !Number.isInteger(tile.tz) || !wanted.has(key2) || rows2.has(key2))
+      const tile3 = row;
+      const key2 = `${tile3.tx},${tile3.tz}`;
+      if (tile3.setId !== set.descriptor.id || !Number.isInteger(tile3.tx) || !Number.isInteger(tile3.tz) || !wanted.has(key2) || rows2.has(key2))
         throw new Error("Terrain field page has duplicate or unrequested coordinates");
       rows2.set(key2, TerrainFieldTile.parse(row));
     }
@@ -63357,18 +63410,18 @@ var TerrainFieldTextures = class _TerrainFieldTextures {
     ]));
     for (let tz = 0; tz * TERRAIN_FIELD_TILE_SIZE < d2.height; tz++) {
       for (let tx = 0; tx * TERRAIN_FIELD_TILE_SIZE < d2.width; tx++) {
-        const tile = this.store.getTile(tx, tz);
-        if (!tile)
+        const tile3 = this.store.getTile(tx, tz);
+        if (!tile3)
           throw new Error("Missing terrain field tile");
-        const raw = decodeTerrainFieldTile(d2, tile);
+        const raw = decodeTerrainFieldTile(d2, tile3);
         for (const id2 of this.channels) {
           const target2 = arrays.get(id2);
           const bytes3 = raw.channels[id2];
           const view = new DataView(bytes3.buffer, bytes3.byteOffset, bytes3.byteLength);
-          for (let row = 0; row < tile.rows; row++) {
+          for (let row = 0; row < tile3.rows; row++) {
             const offset = (tz * TERRAIN_FIELD_TILE_SIZE + row) * d2.width + tx * TERRAIN_FIELD_TILE_SIZE;
-            for (let col = 0; col < tile.cols; col++) {
-              const index = row * tile.cols + col;
+            for (let col = 0; col < tile3.cols; col++) {
+              const index = row * tile3.cols + col;
               target2[offset + col] = target2 instanceof Float32Array ? view.getFloat32(index * 4, true) : bytes3[index];
             }
           }
@@ -63717,12 +63770,12 @@ function createNativeGroundMaterial(gpu, surface3, seaLevel, providers = {}, sou
     };
     for (const binding of resolveTerrainSurface(d2, surface3).bindings) {
       const variant = binding.variant;
-      for (const [key2, input5] of Object.entries(binding.inputs)) {
-        const field5 = key2 === "scarp" ? "scarp" : mapped[variant];
-        const values = gpu.textures.get(input5.channel).image.data;
-        const output2 = fields[field5];
+      for (const [key2, input4] of Object.entries(binding.inputs)) {
+        const field6 = key2 === "scarp" ? "scarp" : mapped[variant];
+        const values = gpu.textures.get(input4.channel).image.data;
+        const output2 = fields[field6];
         for (let i3 = 0; i3 < count3; i3++)
-          output2[i3] = field5 === "rock" ? Math.max(0, Math.min(1, values[i3] * input5.scale)) : Math.round(Math.max(0, Math.min(1, values[i3] * input5.scale)) * 255);
+          output2[i3] = field6 === "rock" ? Math.max(0, Math.min(1, values[i3] * input4.scale)) : Math.round(Math.max(0, Math.min(1, values[i3] * input4.scale)) * 255);
       }
     }
     const baked = bakeTerrainMaps(fields);
@@ -63937,13 +63990,13 @@ function buffers(mesh) {
   add2(instanced.instanceColor);
   return result;
 }
-function inspectResources(input5, options = {}) {
+function inspectResources(input4, options = {}) {
   const started2 = performance.now(), deadline = started2 + DIAGNOSTIC_LIMITS.scanMs;
   const result = {
     capturedAt: Date.now(),
     scanMs: 0,
-    backend: text2(input5.backend),
-    paused: input5.paused,
+    backend: text2(input4.backend),
+    paused: input4.paused,
     resources: [],
     items: [],
     geometryBytes: 0,
@@ -63954,7 +64007,7 @@ function inspectResources(input5, options = {}) {
   const allBuffers = /* @__PURE__ */ new Set();
   const wanted = options.instanceId;
   let lookedUp = 0;
-  for (const item of input5.items) {
+  for (const item of input4.items) {
     if (++lookedUp > DIAGNOSTIC_LIMITS.itemLookups || lookedUp % 128 === 0 && performance.now() >= deadline) {
       result.truncated = true;
       break;
@@ -63993,7 +64046,7 @@ function inspectResources(input5, options = {}) {
       row.status = "hidden";
   };
   const visited = /* @__PURE__ */ new Set();
-  for (const resource of input5.resources.slice(0, DIAGNOSTIC_LIMITS.resources)) {
+  for (const resource of input4.resources.slice(0, DIAGNOSTIC_LIMITS.resources)) {
     const row = {
       id: text2(resource.id),
       label: text2(resource.label),
@@ -64069,7 +64122,7 @@ function inspectResources(input5, options = {}) {
       }
     }
   }
-  if (input5.resources.length > DIAGNOSTIC_LIMITS.resources)
+  if (input4.resources.length > DIAGNOSTIC_LIMITS.resources)
     result.truncated = true;
   result.items = [...rows2.values()].sort((a2, b2) => b2.visibleTriangles - a2.visibleTriangles || a2.instanceId.localeCompare(b2.instanceId));
   result.scanMs = performance.now() - started2;
@@ -65521,8 +65574,8 @@ async function createRuntime({ onFilmFrame, onRendered, container, world, terrai
   const neutralSwimPitch = 0.35;
   const orbit = { yaw: Math.PI, pitch: neutralSwimPitch, distance: 9 };
   let lookIdle = 10;
-  const keyboard = new KeyboardInput(window, () => !tools2?.arrowsNudge);
-  const touch = new TouchJoystickInput(canvas, emulateTouch, () => !tools2?.tool);
+  const keyboard = new KeyboardInput(window, () => !tools?.arrowsNudge);
+  const touch = new TouchJoystickInput(canvas, emulateTouch, () => !tools?.tool);
   const sources = [keyboard, touch, new GamepadInput()];
   const view = { sensitivity: 1, invert: false };
   const pitchSign = () => view.invert ? -1 : 1;
@@ -65540,7 +65593,7 @@ async function createRuntime({ onFilmFrame, onRendered, container, world, terrai
       if (fingers.size === 2) {
         touch.release();
         for (const id2 of fingers.keys())
-          tools2?.endStroke(id2);
+          tools?.endStroke(id2);
         dragging = null;
         gesture = twoFingers();
         return;
@@ -65548,9 +65601,9 @@ async function createRuntime({ onFilmFrame, onRendered, container, world, terrai
       if (fingers.size > 2)
         return;
     }
-    if (event2.pointerType === "touch" && event2.clientX <= canvas.clientWidth / 2 && !tools2?.tool)
+    if (event2.pointerType === "touch" && event2.clientX <= canvas.clientWidth / 2 && !tools?.tool)
       return;
-    if (event2.button === 0 && tools2?.startStroke(event2.pointerId, event2.clientX, event2.clientY, event2.shiftKey))
+    if (event2.button === 0 && tools?.startStroke(event2.pointerId, event2.clientX, event2.clientY, event2.shiftKey))
       return;
     dragging = event2.pointerId;
     last = { x: event2.clientX, y: event2.clientY };
@@ -65573,7 +65626,7 @@ async function createRuntime({ onFilmFrame, onRendered, container, world, terrai
       gesture = now;
       return;
     }
-    if (tools2?.moveStroke(event2.pointerId, event2.clientX, event2.clientY))
+    if (tools?.moveStroke(event2.pointerId, event2.clientX, event2.clientY))
       return;
     if (event2.pointerId !== dragging || touch.owns(event2.pointerId))
       return;
@@ -65587,7 +65640,7 @@ async function createRuntime({ onFilmFrame, onRendered, container, world, terrai
     fingers.delete(event2.pointerId);
     if (fingers.size < 2)
       gesture = null;
-    tools2?.endStroke(event2.pointerId, event2.clientX, event2.clientY);
+    tools?.endStroke(event2.pointerId, event2.clientX, event2.clientY);
     if (event2.pointerId === dragging)
       dragging = null;
   };
@@ -65718,7 +65771,7 @@ async function createRuntime({ onFilmFrame, onRendered, container, world, terrai
       }
     },
     reload: (id2) => items.reload(id2, state.doc),
-    notify: (id2) => tools2?.itemModelChanged(id2),
+    notify: (id2) => tools?.itemModelChanged(id2),
     report: (error) => console.warn("Canopy resource preparation or preview refresh failed.", error)
   });
   const items = new ItemsView(physics, (itemId, params) => {
@@ -65786,14 +65839,14 @@ async function createRuntime({ onFilmFrame, onRendered, container, world, terrai
     if (loaded)
       cutoutLeaves(loaded);
     items.reload(itemId, state.doc);
-    tools2?.itemModelChanged(itemId);
+    tools?.itemModelChanged(itemId);
   });
   packages?.onLoaded((itemId) => {
     restShapes.clear();
     restRules.clear();
     restSurfaces = null;
     items.reload(itemId, state.doc);
-    tools2?.itemModelChanged(itemId);
+    tools?.itemModelChanged(itemId);
   });
   items.onItemLoop = ({ sound, position }) => {
     if (sound)
@@ -66012,7 +66065,7 @@ async function createRuntime({ onFilmFrame, onRendered, container, world, terrai
     for (const itemId of new Set(state.doc.instances.map((instance2) => instance2.itemId)))
       if (getCoreItem(itemId)?.looks) {
         items.reload(itemId, state.doc);
-        tools2?.itemModelChanged(itemId);
+        tools?.itemModelChanged(itemId);
       }
   };
   const refresh = (changed) => {
@@ -66080,7 +66133,7 @@ async function createRuntime({ onFilmFrame, onRendered, container, world, terrai
     applyGround();
     applyGrass(keys.size > 0 || state.doc.roads.length !== grassRoads);
     grassRoads = state.doc.roads.length;
-    tools2?.afterCommand();
+    tools?.afterCommand();
   };
   const replica = new Replica(state);
   let collaborative = false;
@@ -66144,7 +66197,7 @@ async function createRuntime({ onFilmFrame, onRendered, container, world, terrai
       history.beginGroup();
     }
   };
-  const tools2 = editable ? new BuildTools({
+  const tools = editable ? new BuildTools({
     camera,
     canvas,
     scene,
@@ -66183,40 +66236,40 @@ async function createRuntime({ onFilmFrame, onRendered, container, world, terrai
   const onPressEnd = (event2) => {
     const press = presses.get(event2.pointerId);
     presses.delete(event2.pointerId);
-    if (!press || !tools2?.tool)
+    if (!press || !tools?.tool)
       return;
     const moved = Math.hypot(event2.clientX - press.x, event2.clientY - press.y);
     if (moved < 8 && performance.now() - press.time < 600)
-      tools2.tap(event2.clientX, event2.clientY, event2.shiftKey || event2.ctrlKey || event2.metaKey);
+      tools.tap(event2.clientX, event2.clientY, event2.shiftKey || event2.ctrlKey || event2.metaKey);
   };
   const onHover = (event2) => {
     if (event2.pointerType === "mouse" && event2.buttons === 0)
-      tools2?.hover(event2.clientX, event2.clientY);
+      tools?.hover(event2.clientX, event2.clientY);
   };
   const onToolKey = (event2) => {
-    if (!tools2?.tool || event2.target instanceof HTMLInputElement || event2.target instanceof HTMLTextAreaElement)
+    if (!tools?.tool || event2.target instanceof HTMLInputElement || event2.target instanceof HTMLTextAreaElement)
       return;
     if (event2.key === "Enter")
-      tools2.finish();
+      tools.finish();
     else if (event2.key === "Escape")
-      tools2.cancel();
+      tools.cancel();
     else if (event2.key === "Backspace")
-      tools2.removeLastPoint();
+      tools.removeLastPoint();
     else if (event2.key === "r" || event2.key === "R")
-      tools2.rotateItem();
+      tools.rotateItem();
     else if (event2.key === "Delete")
-      tools2.deleteItem();
+      tools.deleteItem();
     else if (event2.key.startsWith("Arrow") || event2.key === "PageUp" || event2.key === "PageDown") {
       const forward2 = { x: -Math.sin(orbit.yaw), z: -Math.cos(orbit.yaw) };
       const axis = Math.abs(forward2.x) > Math.abs(forward2.z) ? { fx: Math.sign(forward2.x), fz: 0 } : { fx: 0, fz: Math.sign(forward2.z) };
       const right2 = { x: -axis.fz, z: axis.fx };
       const scale = event2.shiftKey ? 5 : 1;
       const [dx, dy, dz] = event2.key === "ArrowUp" ? [axis.fx, 0, axis.fz] : event2.key === "ArrowDown" ? [-axis.fx, 0, -axis.fz] : event2.key === "ArrowRight" ? [right2.x, 0, right2.z] : event2.key === "ArrowLeft" ? [-right2.x, 0, -right2.z] : event2.key === "PageUp" ? [0, 1, 0] : [0, -1, 0];
-      if (tools2.nudge(dx * scale, dy * scale, dz * scale))
+      if (tools.nudge(dx * scale, dy * scale, dz * scale))
         event2.preventDefault();
     }
   };
-  if (tools2) {
+  if (tools) {
     canvas.addEventListener("pointerdown", onPressStart);
     canvas.addEventListener("pointerup", onPressEnd);
     canvas.addEventListener("pointermove", onHover);
@@ -66243,7 +66296,7 @@ async function createRuntime({ onFilmFrame, onRendered, container, world, terrai
   let handsMode = "place";
   let heldSent = 0;
   const heldTool = new HeldTool();
-  const handsOn = () => handsAllowed && simulating && !tools2?.tool && !heldTool.itemId;
+  const handsOn = () => handsAllowed && simulating && !tools?.tool && !heldTool.itemId;
   const handPresses = /* @__PURE__ */ new Map();
   const onHandsDown = (event2) => {
     if (!hands || !handsOn())
@@ -66521,7 +66574,7 @@ async function createRuntime({ onFilmFrame, onRendered, container, world, terrai
   const onSitKey = (event2) => {
     if (event2.code !== "KeyC" || event2.target instanceof HTMLInputElement)
       return;
-    if (tools2?.tool && tools2.tool !== "select")
+    if (tools?.tool && tools.tool !== "select")
       return;
     toggleSit();
   };
@@ -67164,7 +67217,7 @@ async function createRuntime({ onFilmFrame, onRendered, container, world, terrai
         throw new Error("The selection changed. Select the item again.");
       return exportBuilderSelection(selected2, (i3) => items.model(i3.itemId, i3.params));
     },
-    setTool: (tool2) => tools2?.setTool(tool2),
+    setTool: (tool2) => tools?.setTool(tool2),
     checkWorld,
     itemRules: (instanceId) => {
       const instance2 = state.doc.instances.find((i3) => i3.instanceId === instanceId);
@@ -67238,23 +67291,23 @@ async function createRuntime({ onFilmFrame, onRendered, container, world, terrai
       }
     },
     preview: (kind, id2) => kind === "item" ? previews.item(id2) : previews.road(id2),
-    setRoadType: (typeId) => tools2?.setRoadType(typeId),
-    setRiver: (settings2) => tools2?.setRiver(settings2),
-    setRoad: (settings2) => tools2?.setRoad(settings2),
-    setBrush: (settings2) => tools2?.setBrush(settings2),
-    setBlockTool: (settings2) => tools2?.setBlockTool(settings2),
-    setPlaceItem: (itemId) => tools2?.setPlaceItem(itemId),
-    rotateItem: () => tools2?.rotateItem(),
-    setSnap: (settings2) => tools2?.setSnap(settings2),
-    moveItem: () => tools2?.moveItem(),
-    duplicateItem: () => tools2?.duplicateItem(),
-    rowItems: (count3) => tools2?.rowItems(count3),
-    deleteItem: () => tools2?.deleteItem(),
-    selectItems: (ids2) => tools2?.selectItems(ids2),
-    addWater: (x3, z2) => tools2?.addWater(x3, z2) ?? "Building is off here.",
-    finishDrawing: () => tools2?.finish() ?? false,
-    cancelDrawing: () => tools2?.cancel(),
-    removeLastPoint: () => tools2?.removeLastPoint(),
+    setRoadType: (typeId) => tools?.setRoadType(typeId),
+    setRiver: (settings2) => tools?.setRiver(settings2),
+    setRoad: (settings2) => tools?.setRoad(settings2),
+    setBrush: (settings2) => tools?.setBrush(settings2),
+    setBlockTool: (settings2) => tools?.setBlockTool(settings2),
+    setPlaceItem: (itemId) => tools?.setPlaceItem(itemId),
+    rotateItem: () => tools?.rotateItem(),
+    setSnap: (settings2) => tools?.setSnap(settings2),
+    moveItem: () => tools?.moveItem(),
+    duplicateItem: () => tools?.duplicateItem(),
+    rowItems: (count3) => tools?.rowItems(count3),
+    deleteItem: () => tools?.deleteItem(),
+    selectItems: (ids2) => tools?.selectItems(ids2),
+    addWater: (x3, z2) => tools?.addWater(x3, z2) ?? "Building is off here.",
+    finishDrawing: () => tools?.finish() ?? false,
+    cancelDrawing: () => tools?.cancel(),
+    removeLastPoint: () => tools?.removeLastPoint(),
     get world() {
       return state.doc;
     },
@@ -67429,7 +67482,7 @@ async function createRuntime({ onFilmFrame, onRendered, container, world, terrai
     sceneWalk: (to, run = false) => {
       sceneWalkTo = to ? { x: to.x, z: to.z, run } : null;
     },
-    groundAt: (clientX, clientY) => tools2?.groundAt(clientX, clientY) ?? null,
+    groundAt: (clientX, clientY) => tools?.groundAt(clientX, clientY) ?? null,
     respawn: () => {
       if (rideNow)
         return;
@@ -67696,7 +67749,7 @@ async function createRuntime({ onFilmFrame, onRendered, container, world, terrai
       animator.dispose();
       avatar.dispose();
       remotePlayers.dispose();
-      tools2?.dispose();
+      tools?.dispose();
       canvas.removeEventListener("pointerdown", onPressStart);
       canvas.removeEventListener("pointerup", onPressEnd);
       canvas.removeEventListener("pointermove", onHover);
@@ -68307,18 +68360,18 @@ var CLAM_CLOSE_FRACTION = 0.6;
 var CLAM_GAPE = [0.3, 0.9];
 var CYCLE = 16;
 var END = 0.14;
-function buildClam(input5, level) {
+function buildClam(input4, level) {
   const lod = LEVELS[Math.min(LEVELS.length - 1, Math.max(0, level))];
-  const rnd = seeded3(input5.seed, 202);
-  const mantleColors = CLAM_MANTLE_COLORS[input5.mantle];
-  const half = input5.size / 2;
-  const height = input5.size * rnd.range(0.4, 0.47);
-  const bulge = input5.size * rnd.range(0.24, 0.27);
+  const rnd = seeded3(input4.seed, 202);
+  const mantleColors = CLAM_MANTLE_COLORS[input4.mantle];
+  const half = input4.size / 2;
+  const height = input4.size * rnd.range(0.4, 0.47);
+  const bulge = input4.size * rnd.range(0.24, 0.27);
   const folds = rnd.int(4, 6);
-  const fold = input5.size * rnd.range(0.045, 0.055);
-  const thick = input5.size * 0.011;
-  const gape = mix21(CLAM_GAPE[0], CLAM_GAPE[1], input5.open);
-  const speed = input5.speed * 2 * Math.PI / (CYCLE * rnd.range(0.85, 1.2));
+  const fold = input4.size * rnd.range(0.045, 0.055);
+  const thick = input4.size * 0.011;
+  const gape = mix21(CLAM_GAPE[0], CLAM_GAPE[1], input4.open);
+  const speed = input4.speed * 2 * Math.PI / (CYCLE * rnd.range(0.85, 1.2));
   const phase2 = rnd.range(0, Math.PI * 2);
   const closeAngle = CLAM_CLOSE_FRACTION * gape / 2;
   const crustSeed = rnd.range(0, 100);
@@ -68353,7 +68406,7 @@ function buildClam(input5, level) {
         color: mixColor2(outer, CLAM_SHELL.inner, lip * 0.5),
         inner: CLAM_SHELL.inner,
         spot: [...CLAM_SHELL.crust, 0.18 * (1 - lip)],
-        pattern: [1 / (input5.size * 0.05), 0.3 * (1 - lip), 0.72, 0.8],
+        pattern: [1 / (input4.size * 0.05), 0.3 * (1 - lip), 0.72, 0.8],
         line: t8 * growthLines,
         motion
       });
@@ -68403,7 +68456,7 @@ function buildClam(input5, level) {
       const lipY = mix21(lipB[1], lipA[1], s2) - thick * 1.4;
       const ends = Math.sin((psi - mantleEnd) / (Math.PI - 2 * mantleEnd) * Math.PI);
       const dome = height * 0.14 * (1 - w2 * w2) * Math.pow(ends, 0.6);
-      const frill = input5.size * 0.012 * Math.sin(psi * 15 + w2 * 2) * w2 * w2 * ends;
+      const frill = input4.size * 0.012 * Math.sin(psi * 15 + w2 * 2) * w2 * w2 * ends;
       const p2 = [mix21(lipB[0], lipA[0], s2), lipY + dome + frill, mix21(zB, zA2, s2)];
       const rim = smoothstep23(0.55, 1, Math.abs(w2));
       const tone2 = 0.9 + 0.2 * hash32(p2[0] * 50, p2[2] * 50, crustSeed);
@@ -68412,7 +68465,7 @@ function buildClam(input5, level) {
         color: scaleColor(mixColor2(mantleColors.base, mantleColors.edge, rim), tone2),
         inner: scaleColor(mantleColors.base, 0.55),
         spot: [...mantleColors.spot, 0.9 * (1 - rim * 0.6)],
-        pattern: [1 / (input5.size * 0.03), 0.25, 0.32, 0.35],
+        pattern: [1 / (input4.size * 0.03), 0.25, 0.32, 0.35],
         line: Math.abs(w2) * 4 + Math.sin(psi * 9) * 0.3,
         motion: [-w2 * closeAngle, phase2, speed, height * 0.06 * (1 - 0.5 * w2 * w2)]
       }));
@@ -68607,16 +68660,16 @@ function settle(mesh) {
     p2[i3 + 2] = p2[i3 + 2] - cz;
   }
 }
-function buildShell(input5, level) {
-  const rnd = seeded3(input5.seed, 303 + SHELL_KINDS.indexOf(input5.kind) * 17);
-  const colors2 = SHELL_COLORS[input5.kind][input5.tone];
+function buildShell(input4, level) {
+  const rnd = seeded3(input4.seed, 303 + SHELL_KINDS.indexOf(input4.kind) * 17);
+  const colors2 = SHELL_COLORS[input4.kind][input4.tone];
   const mesh = new SeaMesh();
-  if (input5.kind === "cowrie")
-    cowrie(mesh, input5.size, colors2, rnd, level);
-  else if (input5.kind === "scallop")
-    scallop(mesh, input5.size, colors2, rnd, level);
+  if (input4.kind === "cowrie")
+    cowrie(mesh, input4.size, colors2, rnd, level);
+  else if (input4.kind === "scallop")
+    scallop(mesh, input4.size, colors2, rnd, level);
   else
-    spiral(mesh, input5.kind, input5.size, colors2, rnd, level);
+    spiral(mesh, input4.kind, input4.size, colors2, rnd, level);
   settle(mesh);
   return mesh.build();
 }
@@ -68854,12 +68907,12 @@ var wrapPi = (a2) => {
     x3 += 2 * Math.PI;
   return x3 - Math.PI;
 };
-function buildStarfish(input5, level) {
+function buildStarfish(input4, level) {
   const lod = LEVELS2[Math.min(LEVELS2.length - 1, Math.max(0, level))];
-  const rnd = seeded3(input5.seed, 101);
-  const n2 = input5.arms;
-  const colors2 = STARFISH_COLORS[input5.palette];
-  const tipRadius = input5.size / 2;
+  const rnd = seeded3(input4.seed, 101);
+  const n2 = input4.arms;
+  const colors2 = STARFISH_COLORS[input4.palette];
+  const tipRadius = input4.size / 2;
   const discRadius = tipRadius * rnd.range(0.25, 0.3);
   const thickness2 = tipRadius * rnd.range(0.2, 0.25);
   const edge = thickness2 * 0.16;
@@ -68952,7 +69005,7 @@ function buildStarfish(input5, level) {
     const jitter = 0.9 + 0.2 * hash32(x3 * 40, 0, z2 * 40);
     const color2 = top ? scaleColor(mixColor2(colors2.top, colors2.tip, smoothstep23(0.45, 1, along)), jitter * (along < 0.3 ? 0.94 : 1)) : scaleColor(colors2.under, 0.95 + 0.1 * jitter);
     const knobs = top ? colors2.knobs * (1 - smoothstep23(0.8, 1, r3)) : 0;
-    const lift = input5.curl * STARFISH_CURL_LIFT * tipRadius * Math.pow(along, 2.5);
+    const lift = input4.curl * STARFISH_CURL_LIFT * tipRadius * Math.pow(along, 2.5);
     return mesh.add({
       p: [x3, y2, z2],
       color: color2,
@@ -69003,22 +69056,22 @@ var levels2 = (count3, make) => ({
 });
 var starfishGenerator = {
   build(params) {
-    const input5 = starfishParams(params);
+    const input4 = starfishParams(params);
     return levels2(STARFISH_LEVELS, (level) => [
-      { geometry: buildStarfish(input5, level), material: SEALIFE_MATERIALS.starfish }
+      { geometry: buildStarfish(input4, level), material: SEALIFE_MATERIALS.starfish }
     ]);
   }
 };
 var clamGenerator = {
   build(params) {
-    const input5 = clamParams(params);
-    return levels2(CLAM_LEVELS, (level) => [{ geometry: buildClam(input5, level), material: SEALIFE_MATERIALS.clam }]);
+    const input4 = clamParams(params);
+    return levels2(CLAM_LEVELS, (level) => [{ geometry: buildClam(input4, level), material: SEALIFE_MATERIALS.clam }]);
   }
 };
 var shellGenerator = {
   build(params) {
-    const input5 = shellParams(params);
-    return levels2(SHELL_LEVELS, (level) => [{ geometry: buildShell(input5, level), material: SEALIFE_MATERIALS.shell }]);
+    const input4 = shellParams(params);
+    return levels2(SHELL_LEVELS, (level) => [{ geometry: buildShell(input4, level), material: SEALIFE_MATERIALS.shell }]);
   }
 };
 
@@ -69075,328 +69128,14 @@ function motionCategories(name2, sourceCategory = "") {
 // ../runtime/dist/index.js
 registerSeaLife();
 
-// src/avatar-presentation.ts
-var PRESENTATION_ANIMATIONS = CORE_ANIMATIONS.map((row) => ({ id: row.manifest.id, label: row.manifest.name, clip: row.clip }));
-var aliases = { expr_wave: "Wave", expr_think: "Think", expr_happy: "Cheer", expr_confident: "Salute", expr_wonder: "Cheer", expr_nod: "Clap", expr_shrug: "Stretch", talk: "Point", talk_explain: "Point", talk_calm: "Think", talk_excited: "Cheer", dance_hype: "Dance", dance: "Dance", run: "Run", walk: "Walk" };
-function resolvePresentationAnimation(id2) {
-  if (id2 === "idle") return id2;
-  if (avatarMotionEntry(id2)) return id2;
-  return PRESENTATION_ANIMATIONS.find((row) => row.id === id2 || row.clip === id2 || row.clip === aliases[id2])?.id ?? null;
-}
-var AvatarPresentation = class {
-  constructor(runtime, options = {}) {
-    this.runtime = runtime;
-    this.options = options;
-  }
-  runtime;
-  options;
-  #state = { display: AvatarLiveDisplay.parse({}), notifications: [], cards: [], effects: {}, lastAction: "", motions: [] };
-  #listeners = /* @__PURE__ */ new Set();
-  #timers = /* @__PURE__ */ new Map();
-  #disposed = false;
-  #serial = 0;
-  #media = /* @__PURE__ */ new Set();
-  snapshot = () => this.#state;
-  describe = () => "Shared library: " + avatarMotionEntries().map((row) => `${row.id} (${row.name}, ${motionCategories(row.name, row.category).join("/")})`).join("; ") + "; Imported motion IDs: " + this.#state.motions.map((row) => `${row.id} (${row.label}, target ${row.target})`).join("; ");
-  subscribe = (listener) => {
-    this.#listeners.add(listener);
-    return () => {
-      this.#listeners.delete(listener);
-    };
-  };
-  #publish(next3) {
-    this.#state = { ...this.#state, ...next3 };
-    for (const listener of this.#listeners) listener();
-  }
-  #later(key2, duration, task) {
-    this.#cancel(key2);
-    this.#timers.set(key2, setTimeout(() => {
-      this.#timers.delete(key2);
-      if (!this.#disposed) task();
-    }, duration));
-  }
-  #cancel(key2) {
-    const timer = this.#timers.get(key2);
-    if (timer) clearTimeout(timer);
-    this.#timers.delete(key2);
-  }
-  execute = (input5) => {
-    if (this.#disposed || this.options.enabled === false) return "Avatar presentation is disabled.";
-    const parsed = AvatarPresentationEvent.safeParse(input5);
-    if (!parsed.success) return "Invalid avatar presentation event.";
-    const event2 = parsed.data, rt = this.runtime();
-    if (event2.kind === "animation" || event2.kind === "expression") {
-      const target2 = event2.target === "self" ? "self" : `host-agent:${event2.target}`;
-      if (!rt) return "Avatar is not ready.";
-      if (event2.kind === "animation") {
-        const custom = this.#state.motions.find((row) => row.target === event2.target && row.id === event2.animation);
-        const id2 = custom?.id ?? resolvePresentationAnimation(event2.animation);
-        if (!id2 || !rt.presentAnimation(target2, id2)) return "Animation or target is unavailable.";
-        this.#later(`animation:${target2}`, event2.duration, () => {
-          rt.presentAnimation(target2, "idle");
-        });
-      } else {
-        if (!rt.presentExpression(target2, event2.expression)) return "The selected avatar has no supported facial controls, or the target is unavailable.";
-        this.#later(`expression:${target2}`, event2.duration, () => {
-          rt.presentExpression(target2, "neutral");
-        });
-      }
-    } else if (event2.kind === "display") {
-      const { kind: _kind, ...patch } = event2;
-      const display = AvatarLiveDisplay.parse({ ...this.#state.display, ...patch });
-      if (["image", "video"].includes(display.background) && !display.media) return "Choose background media first.";
-      this.#publish({ display });
-    } else if (event2.kind === "effect") {
-      const effects = { ...this.#state.effects };
-      this.#cancel(`effect:${event2.effect}`);
-      if (event2.enabled) {
-        effects[event2.effect] = event2.intensity;
-        this.#later(`effect:${event2.effect}`, event2.duration, () => {
-          const next3 = { ...this.#state.effects };
-          delete next3[event2.effect];
-          this.#publish({ effects: next3 });
-        });
-      } else delete effects[event2.effect];
-      this.#publish({ effects });
-    } else if (event2.kind === "notification") {
-      const id2 = `notice-${++this.#serial}`;
-      const notification = { ...event2.notification, id: id2 };
-      notification.canReply = !!notification.canReply && !!this.options.actions?.reply;
-      this.#publish({ notifications: [...this.#state.notifications.slice(-4), notification] });
-      if (!notification.needsApproval) this.#later(id2, event2.duration, () => this.dismiss(id2));
-    } else if (event2.kind === "card") {
-      const id2 = `card-${++this.#serial}`;
-      this.#publish({ cards: [...this.#state.cards.slice(-2), { ...event2, id: id2 }] });
-      this.#later(id2, event2.duration, () => this.dismiss(id2));
-    } else this.clear();
-    this.#publish({ lastAction: event2.kind });
-    return null;
-  };
-  localMedia(file) {
-    if (this.#disposed || this.options.enabled === false) throw new Error("Avatar presentation is disabled.");
-    if (file.size > 20 * 1024 * 1024 || !/^(image|video)\//.test(file.type)) throw new Error("Choose image/video media smaller than 20 MB.");
-    for (const url2 of this.#media) URL.revokeObjectURL(url2);
-    this.#media.clear();
-    const url = URL.createObjectURL(file);
-    this.#media.add(url);
-    return url;
-  }
-  async importMotion(target2, label3, data, slot) {
-    if (this.#disposed || this.options.enabled === false) throw new Error("Avatar presentation is disabled.");
-    const replacing = slot && this.#state.motions.some((row) => row.target === target2 && row.id === `motion:${slot}`);
-    if (!replacing && this.#state.motions.length >= 32) throw new Error("At most 32 imported motions per viewport.");
-    if (!/^[A-Za-z0-9_-]{1,100}$/.test(target2) || data.byteLength > 16 * 1024 * 1024) throw new Error("Invalid motion input.");
-    const rt = this.runtime();
-    if (!rt?.importAvatarMotion) throw new Error("Motion import is unavailable in this viewport.");
-    const id2 = slot ? `motion:${slot}` : `motion:${++this.#serial}`;
-    if (!await rt.importAvatarMotion(target2 === "self" ? target2 : `host-agent:${target2}`, id2, data)) throw new Error("Avatar target is unavailable.");
-    if (!this.#disposed) this.#publish({ motions: [...this.#state.motions.filter((row) => row.target !== target2 || row.id !== id2), { target: target2, id: id2, label: label3.slice(0, 150) }], lastAction: "motion imported" });
-  }
-  dismiss = (id2) => {
-    this.#cancel(id2);
-    this.#publish({ notifications: this.#state.notifications.filter((row) => row.id !== id2), cards: this.#state.cards.filter((row) => row.id !== id2) });
-  };
-  async approve(id2) {
-    const notice = this.#state.notifications.find((row) => row.id === id2);
-    if (!notice?.needsApproval || !this.options.actions?.approve) throw new Error("No approval action is connected.");
-    await this.options.actions.approve(notice);
-    if (!this.#disposed) this.dismiss(id2);
-  }
-  async reply(id2, text4) {
-    const notice = this.#state.notifications.find((row) => row.id === id2);
-    if (!notice?.canReply || !text4.trim() || !this.options.actions?.reply) throw new Error("Reply is unavailable.");
-    await this.options.actions.reply(notice, text4.trim());
-    if (!this.#disposed) this.#publish({ notifications: this.#state.notifications.map((row) => row.id === id2 ? { ...row, repliedWith: text4.trim() } : row) });
-  }
-  clear() {
-    for (const [key2, timer] of this.#timers) {
-      clearTimeout(timer);
-      if (key2.startsWith("animation:")) this.runtime()?.presentAnimation(key2.slice(10), "idle");
-      if (key2.startsWith("expression:")) this.runtime()?.presentExpression(key2.slice(11), "neutral");
-    }
-    this.#timers.clear();
-    this.#publish({ notifications: [], cards: [], effects: {} });
-  }
-  dispose() {
-    for (const url of this.#media) URL.revokeObjectURL(url);
-    this.#media.clear();
-    this.clear();
-    this.#disposed = true;
-    this.#listeners.clear();
-  }
-};
-
-// studio/presentation/catalog.ts
-function singleSpec(type, props) {
-  return { root: "r", elements: { r: { type, props, children: [] } } };
-}
-var ALL_UI_COMPONENTS = [
-  // ── Pre-built multi-component demos ──────────────────────────────────────
-  { id: "stock_aapl", name: "AAPL Stock Today", category: "Demo", duration: 1e4, spec: { root: "r", elements: { r: { type: "Stack", props: { gap: "sm", direction: "vertical" }, children: ["m", "c"] }, m: { type: "Metric", props: { label: "AAPL \u2014 Apple Inc.", value: "$189.30", detail: "+$2.45 (+1.31%) today", trend: "up" }, children: [] }, c: { type: "LineChart", props: { title: null, data: [{ time: "9:30", price: 184.2 }, { time: "10:00", price: 185.8 }, { time: "10:30", price: 184.9 }, { time: "11:00", price: 186.2 }, { time: "11:30", price: 187.5 }, { time: "12:00", price: 186.8 }, { time: "12:30", price: 188.1 }, { time: "13:00", price: 189.3 }], xKey: "time", yKey: "price", color: "#22c55e", height: 110 }, children: [] } } } },
-  { id: "stock_tsla_down", name: "TSLA Stock Alert", category: "Demo", duration: 1e4, spec: { root: "r", elements: { r: { type: "Stack", props: { gap: "sm", direction: "vertical" }, children: ["m", "c"] }, m: { type: "Metric", props: { label: "TSLA \u2014 Tesla Inc.", value: "$218.50", detail: "-$8.20 (-3.62%) today", trend: "down" }, children: [] }, c: { type: "LineChart", props: { title: null, data: [{ time: "9:30", price: 227.1 }, { time: "10:00", price: 225.3 }, { time: "10:30", price: 224 }, { time: "11:00", price: 222.8 }, { time: "11:30", price: 221.4 }, { time: "12:00", price: 220.1 }, { time: "12:30", price: 219.3 }, { time: "13:00", price: 218.5 }], xKey: "time", yKey: "price", color: "#ef4444", height: 110 }, children: [] } } } },
-  { id: "calendar_today", name: "Today's Schedule", category: "Demo", duration: 9e3, spec: { root: "r", elements: { r: { type: "Stack", props: { gap: "sm", direction: "vertical" }, children: ["cv", "tl"] }, cv: { type: "CalendarView", props: { title: null, selectedDates: ["2026-02-18", "2026-02-20", "2026-02-25"] }, children: [] }, tl: { type: "Timeline", props: { items: [{ title: "Team Sync", description: "10:00 AM \u2014 Zoom", date: null, status: "completed" }, { title: "Design Review", description: "2:00 PM \u2014 Conference Room", date: null, status: "current" }, { title: "Client Call", description: "4:30 PM \u2014 Google Meet", date: null, status: "upcoming" }] }, children: [] } } } },
-  { id: "task_checklist", name: "Daily Tasks", category: "Demo", duration: 9e3, spec: { root: "r", elements: { r: { type: "Stack", props: { gap: "sm", direction: "vertical" }, children: ["h", "cl", "pb"] }, h: { type: "Heading", props: { text: "Today's Goals", level: "h3" }, children: [] }, cl: { type: "CheckboxList", props: { items: [{ id: "1", label: "Review pull requests", checked: true, disabled: null }, { id: "2", label: "Deploy v2.1 to staging", checked: true, disabled: null }, { id: "3", label: "Write release notes", checked: false, disabled: null }, { id: "4", label: "Update team on progress", checked: false, disabled: null }] }, children: [] }, pb: { type: "ProgressBar", props: { label: "Completion", value: 50, max: null, color: "success", showPercent: true }, children: [] } } } },
-  { id: "approval_choice", name: "Quick Decision", category: "Demo", duration: 12e3, spec: { root: "r", elements: { r: { type: "Stack", props: { gap: "md", direction: "vertical" }, children: ["al", "rg"] }, al: { type: "Alert", props: { title: "Deploy to Production?", description: "v2.1.0 has passed all staging checks. Estimated downtime: 2 minutes.", variant: "default" }, children: [] }, rg: { type: "RadioGroup", props: { label: "Your decision:", options: [{ value: "yes", label: "Yes \u2014 Deploy now" }, { value: "later", label: "Schedule for tonight" }, { value: "no", label: "No \u2014 Need more review" }], value: null, description: null }, children: [] } } } },
-  { id: "portfolio_summary", name: "Portfolio Overview", category: "Demo", duration: 1e4, spec: { root: "r", elements: { r: { type: "Stack", props: { gap: "sm", direction: "vertical" }, children: ["g", "pc"] }, g: { type: "Grid", props: { columns: 2, gap: "sm" }, children: ["m1", "m2"] }, m1: { type: "Metric", props: { label: "Total Value", value: "$24,830", detail: null, trend: "up" }, children: [] }, m2: { type: "Metric", props: { label: "Day P&L", value: "+$312", detail: "+1.27%", trend: "up" }, children: [] }, pc: { type: "PieChart", props: { title: "Allocation", data: [{ name: "Tech", value: 45 }, { name: "Finance", value: 20 }, { name: "Health", value: 15 }, { name: "Energy", value: 12 }, { name: "Other", value: 8 }], nameKey: "name", valueKey: "value", height: 140 }, children: [] } } } },
-  { id: "weather_report", name: "Weather Now", category: "Demo", duration: 8e3, spec: { root: "r", elements: { r: { type: "Stack", props: { gap: "sm", direction: "vertical" }, children: ["wc", "bc"] }, wc: { type: "WeatherCard", props: { location: "Berlin", temperature: 8, condition: "cloudy", humidity: 72, wind: 18, unit: "C", feelsLike: null, size: "md", forecast: null }, children: [] }, bc: { type: "BarChart", props: { title: "7-Day Forecast", data: [{ day: "Mon", temp: 8 }, { day: "Tue", temp: 10 }, { day: "Wed", temp: 7 }, { day: "Thu", temp: 12 }, { day: "Fri", temp: 15 }, { day: "Sat", temp: 14 }, { day: "Sun", temp: 11 }], xKey: "day", yKey: "temp", color: "#60a5fa", height: 80 }, children: [] } } } },
-  { id: "team_standup", name: "Team Standup", category: "Demo", duration: 1e4, spec: { root: "r", elements: { r: { type: "Stack", props: { gap: "sm", direction: "vertical" }, children: ["h", "t"] }, h: { type: "Heading", props: { text: "Daily Standup \u2014 Status", level: "h3" }, children: [] }, t: { type: "Table", props: { data: [{ name: "Ahmad", status: "Done", task: "API integration" }, { name: "Sarah", status: "In Progress", task: "UI redesign" }, { name: "Omar", status: "Blocked", task: "DB migration" }, { name: "Leila", status: "Done", task: "Tests" }], columns: [{ key: "name", label: "Name" }, { key: "status", label: "Status" }, { key: "task", label: "Task" }], emptyMessage: null }, children: [] } } } },
-  // ── Layout ───────────────────────────────────────────────────────────────
-  { id: "c_card", name: "Card", category: "Layout", duration: 6e3, spec: { root: "r", elements: { r: { type: "Card", props: { title: "Summary Card", description: "A container for grouping related content." }, children: ["c"] }, c: { type: "Metric", props: { label: "Total Items", value: "42", detail: null, trend: "neutral" }, children: [] } } } },
-  { id: "c_stack", name: "Stack", category: "Layout", duration: 7e3, spec: { root: "r", elements: { r: { type: "Stack", props: { gap: "md", direction: "vertical" }, children: ["m1", "m2", "m3"] }, m1: { type: "Metric", props: { label: "Revenue", value: "$12,450", detail: "+8.2%", trend: "up" }, children: [] }, m2: { type: "Metric", props: { label: "Users", value: "3,842", detail: "+124", trend: "up" }, children: [] }, m3: { type: "Metric", props: { label: "Errors", value: "12", detail: "-3", trend: "down" }, children: [] } } } },
-  { id: "c_grid", name: "Grid", category: "Layout", duration: 7e3, spec: { root: "r", elements: { r: { type: "Grid", props: { columns: 2, gap: "md" }, children: ["m1", "m2", "m3", "m4"] }, m1: { type: "Metric", props: { label: "Revenue", value: "$12,450", detail: null, trend: "up" }, children: [] }, m2: { type: "Metric", props: { label: "Users", value: "3,842", detail: null, trend: "up" }, children: [] }, m3: { type: "Metric", props: { label: "Churn", value: "1.2%", detail: null, trend: "down" }, children: [] }, m4: { type: "Metric", props: { label: "NPS", value: "72", detail: null, trend: "neutral" }, children: [] } } } },
-  { id: "c_separator", name: "Separator", category: "Layout", duration: 5e3, spec: { root: "r", elements: { r: { type: "Stack", props: { gap: "sm", direction: "vertical" }, children: ["t1", "s", "t2"] }, t1: { type: "Text", props: { content: "Section A \u2014 above the separator", muted: null, size: "sm" }, children: [] }, s: { type: "Separator", props: {}, children: [] }, t2: { type: "Text", props: { content: "Section B \u2014 below the separator", muted: true, size: "sm" }, children: [] } } } },
-  // ── Typography ───────────────────────────────────────────────────────────
-  { id: "c_heading", name: "Heading", category: "Typography", duration: 6e3, spec: { root: "r", elements: { r: { type: "Stack", props: { gap: "sm", direction: "vertical" }, children: ["h1", "h2", "h3", "h4"] }, h1: { type: "Heading", props: { text: "H1 \u2014 Main Title", level: "h1" }, children: [] }, h2: { type: "Heading", props: { text: "H2 \u2014 Section Title", level: "h2" }, children: [] }, h3: { type: "Heading", props: { text: "H3 \u2014 Subsection", level: "h3" }, children: [] }, h4: { type: "Heading", props: { text: "H4 \u2014 Label", level: "h4" }, children: [] } } } },
-  { id: "c_text", name: "Text", category: "Typography", duration: 6e3, spec: { root: "r", elements: { r: { type: "Stack", props: { gap: "sm", direction: "vertical" }, children: ["t1", "t2", "t3"] }, t1: { type: "Text", props: { content: "Normal text \u2014 the default paragraph style for body copy.", muted: null, size: "base" }, children: [] }, t2: { type: "Text", props: { content: "Muted text \u2014 used for secondary or supporting information.", muted: true, size: "sm" }, children: [] }, t3: { type: "Text", props: { content: "Large text \u2014 for introductory or featured paragraphs.", muted: null, size: "lg" }, children: [] } } } },
-  { id: "c_link", name: "Link", category: "Typography", duration: 5e3, spec: singleSpec("Link", { text: "Visit our documentation", href: "https://example.com" }) },
-  // ── Data Display ─────────────────────────────────────────────────────────
-  { id: "c_metric", name: "Metric", category: "Data", duration: 6e3, spec: { root: "r", elements: { r: { type: "Grid", props: { columns: 2, gap: "sm" }, children: ["m1", "m2", "m3", "m4"] }, m1: { type: "Metric", props: { label: "Revenue", value: "$48,200", detail: "+12% this month", trend: "up" }, children: [] }, m2: { type: "Metric", props: { label: "Expenses", value: "$18,750", detail: "-3% vs last month", trend: "down" }, children: [] }, m3: { type: "Metric", props: { label: "Active Users", value: "9,241", detail: null, trend: "neutral" }, children: [] }, m4: { type: "Metric", props: { label: "Retention", value: "94.2%", detail: "+1.1%", trend: "up" }, children: [] } } } },
-  { id: "c_badge", name: "Badge", category: "Data", duration: 6e3, spec: { root: "r", elements: { r: { type: "Stack", props: { gap: "sm", direction: "horizontal" }, children: ["b1", "b2", "b3", "b4", "b5", "b6"] }, b1: { type: "Badge", props: { text: "Default", variant: "default" }, children: [] }, b2: { type: "Badge", props: { text: "Active", variant: "success" }, children: [] }, b3: { type: "Badge", props: { text: "Warning", variant: "warning" }, children: [] }, b4: { type: "Badge", props: { text: "Error", variant: "destructive" }, children: [] }, b5: { type: "Badge", props: { text: "Secondary", variant: "secondary" }, children: [] }, b6: { type: "Badge", props: { text: "Outline", variant: "outline" }, children: [] } } } },
-  { id: "c_table", name: "Table", category: "Data", duration: 8e3, spec: singleSpec("Table", { data: [{ name: "Alice Smith", role: "Engineer", status: "Active", score: "98%" }, { name: "Bob Jones", role: "Designer", status: "Active", score: "94%" }, { name: "Carol Wu", role: "PM", status: "Inactive", score: "87%" }, { name: "David Kim", role: "DevOps", status: "Active", score: "92%" }], columns: [{ key: "name", label: "Name" }, { key: "role", label: "Role" }, { key: "status", label: "Status" }, { key: "score", label: "Score" }], emptyMessage: null }) },
-  { id: "c_callout", name: "Callout", category: "Data", duration: 7e3, spec: { root: "r", elements: { r: { type: "Stack", props: { gap: "sm", direction: "vertical" }, children: ["c1", "c2", "c3", "c4"] }, c1: { type: "Callout", props: { type: "info", title: "Info", content: "This is informational content about the system." }, children: [] }, c2: { type: "Callout", props: { type: "tip", title: "Tip", content: "Pro tip: use keyboard shortcuts to speed up your workflow." }, children: [] }, c3: { type: "Callout", props: { type: "warning", title: "Warning", content: "This action will affect all users in the organization." }, children: [] }, c4: { type: "Callout", props: { type: "important", title: "Important", content: "Please back up your data before proceeding." }, children: [] } } } },
-  { id: "c_timeline", name: "Timeline", category: "Data", duration: 8e3, spec: singleSpec("Timeline", { items: [{ title: "Project Kickoff", description: "Initial planning and team assembly", date: "2026-01-01", status: "completed" }, { title: "Design Phase", description: "UI/UX wireframes and prototyping", date: "2026-01-15", status: "completed" }, { title: "Development", description: "Core feature implementation", date: "2026-02-01", status: "current" }, { title: "Testing", description: "QA and bug fixes", date: "2026-03-01", status: "upcoming" }, { title: "Launch", description: "Production deployment", date: "2026-04-01", status: "upcoming" }] }) },
-  { id: "c_accordion", name: "Accordion", category: "Data", duration: 7e3, spec: singleSpec("Accordion", { items: [{ title: "What is Agent Player?", content: "An AI agent platform for deploying and managing conversational AI assistants with avatar support." }, { title: "How does voice work?", content: "Uses Edge TTS for synthesis and faster-whisper for transcription, running locally on your machine." }, { title: "Is my data private?", content: "Fully local: frontend, backend, and database all run on localhost. Only your message text reaches the Anthropic API." }] }) },
-  // ── Charts ────────────────────────────────────────────────────────────────
-  { id: "c_barchart", name: "BarChart", category: "Charts", duration: 8e3, spec: singleSpec("BarChart", { title: "Monthly Sales Q1 2026", data: [{ month: "Jan", sales: 12400 }, { month: "Feb", sales: 15800 }, { month: "Mar", sales: 14200 }, { month: "Apr", sales: 18900 }, { month: "May", sales: 17300 }, { month: "Jun", sales: 21100 }], xKey: "month", yKey: "sales", color: "#6366f1", height: 160 }) },
-  { id: "c_linechart", name: "LineChart", category: "Charts", duration: 8e3, spec: singleSpec("LineChart", { title: "Server Response Time (ms)", data: [{ time: "00:00", ms: 120 }, { time: "04:00", ms: 98 }, { time: "08:00", ms: 185 }, { time: "12:00", ms: 240 }, { time: "16:00", ms: 210 }, { time: "20:00", ms: 145 }, { time: "24:00", ms: 118 }], xKey: "time", yKey: "ms", color: "#22c55e", height: 160 }) },
-  { id: "c_piechart", name: "PieChart", category: "Charts", duration: 8e3, spec: singleSpec("PieChart", { title: "Traffic Sources", data: [{ source: "Organic", value: 42 }, { source: "Direct", value: 28 }, { source: "Social", value: 18 }, { source: "Email", value: 8 }, { source: "Other", value: 4 }], nameKey: "source", valueKey: "value", height: 180 }) },
-  { id: "c_areachart", name: "AreaChart", category: "Charts", duration: 8e3, spec: singleSpec("AreaChart", { title: "Active Users Over Time", data: [{ week: "W1", users: 1200 }, { week: "W2", users: 1450 }, { week: "W3", users: 1380 }, { week: "W4", users: 1820 }, { week: "W5", users: 2100 }, { week: "W6", users: 1950 }, { week: "W7", users: 2340 }], xKey: "week", yKey: "users", color: "#f59e0b", height: 160, gradient: true }) },
-  // ── Interactive ───────────────────────────────────────────────────────────
-  { id: "c_button", name: "Button", category: "Interactive", duration: 6e3, spec: { root: "r", elements: { r: { type: "Stack", props: { gap: "sm", direction: "horizontal" }, children: ["b1", "b2", "b3", "b4", "b5"] }, b1: { type: "Button", props: { label: "Default", variant: "default", size: null }, children: [] }, b2: { type: "Button", props: { label: "Secondary", variant: "secondary", size: null }, children: [] }, b3: { type: "Button", props: { label: "Outline", variant: "outline", size: null }, children: [] }, b4: { type: "Button", props: { label: "Ghost", variant: "ghost", size: null }, children: [] }, b5: { type: "Button", props: { label: "Destructive", variant: "destructive", size: null }, children: [] } } } },
-  { id: "c_checklist", name: "CheckboxList", category: "Interactive", duration: 7e3, spec: singleSpec("CheckboxList", { items: [{ id: "1", label: "Enable two-factor authentication", checked: true, disabled: null }, { id: "2", label: "Subscribe to product updates", checked: true, disabled: null }, { id: "3", label: "Allow anonymous analytics", checked: false, disabled: null }, { id: "4", label: "Enable beta features", checked: false, disabled: null }, { id: "5", label: "Legacy API (deprecated)", checked: false, disabled: true }] }) },
-  { id: "c_radiogrp", name: "RadioGroup", category: "Interactive", duration: 6e3, spec: singleSpec("RadioGroup", { label: "Select subscription plan", options: [{ value: "free", label: "Free \u2014 5 agents, 100 messages/day" }, { value: "pro", label: "Pro \u2014 25 agents, unlimited messages" }, { value: "enterprise", label: "Enterprise \u2014 unlimited everything" }], value: "free", description: "You can change your plan at any time." }) },
-  { id: "c_switchrow", name: "SwitchRow", category: "Interactive", duration: 6e3, spec: { root: "r", elements: { r: { type: "Stack", props: { gap: "sm", direction: "vertical" }, children: ["s1", "s2", "s3"] }, s1: { type: "SwitchRow", props: { label: "Dark Mode", description: "Use dark theme across the app", checked: true }, children: [] }, s2: { type: "SwitchRow", props: { label: "Email Notifications", description: "Receive alerts via email", checked: false }, children: [] }, s3: { type: "SwitchRow", props: { label: "Auto-save", description: "Save drafts automatically every 30 seconds", checked: true }, children: [] } } } },
-  { id: "c_sliderrow", name: "SliderRow", category: "Interactive", duration: 6e3, spec: { root: "r", elements: { r: { type: "Stack", props: { gap: "sm", direction: "vertical" }, children: ["s1", "s2", "s3"] }, s1: { type: "SliderRow", props: { label: "Volume", value: 70, min: 0, max: 100, step: null, showValue: true }, children: [] }, s2: { type: "SliderRow", props: { label: "Brightness", value: 85, min: 0, max: 100, step: null, showValue: true }, children: [] }, s3: { type: "SliderRow", props: { label: "Zoom Level", value: 4, min: 1, max: 10, step: 1, showValue: true }, children: [] } } } },
-  { id: "c_togglebtn", name: "ToggleButton", category: "Interactive", duration: 5e3, spec: { root: "r", elements: { r: { type: "Stack", props: { gap: "sm", direction: "horizontal" }, children: ["t1", "t2", "t3", "t4"] }, t1: { type: "ToggleButton", props: { label: "Bold", pressed: true, variant: "outline", size: null }, children: [] }, t2: { type: "ToggleButton", props: { label: "Italic", pressed: false, variant: "outline", size: null }, children: [] }, t3: { type: "ToggleButton", props: { label: "Underline", pressed: true, variant: "outline", size: null }, children: [] }, t4: { type: "ToggleButton", props: { label: "Strike", pressed: false, variant: "outline", size: null }, children: [] } } } },
-  { id: "c_togglegrp", name: "ToggleGroup", category: "Interactive", duration: 5e3, spec: singleSpec("ToggleGroup", { label: "View Mode", options: [{ value: "day", label: "Day" }, { value: "week", label: "Week" }, { value: "month", label: "Month" }, { value: "year", label: "Year" }], value: "week", variant: "outline" }) },
-  { id: "c_tabs", name: "Tabs", category: "Interactive", duration: 7e3, spec: { root: "r", elements: { r: { type: "Tabs", props: { defaultValue: "overview", tabs: [{ value: "overview", label: "Overview" }, { value: "metrics", label: "Metrics" }, { value: "settings", label: "Settings" }] }, children: ["tc1", "tc2", "tc3"] }, tc1: { type: "TabContent", props: { value: "overview" }, children: ["t1"] }, tc2: { type: "TabContent", props: { value: "metrics" }, children: ["t2"] }, tc3: { type: "TabContent", props: { value: "settings" }, children: ["t3"] }, t1: { type: "Text", props: { content: "Overview tab \u2014 general summary information.", muted: null, size: null }, children: [] }, t2: { type: "Metric", props: { label: "Key Metric", value: "98.7%", detail: "uptime this month", trend: "up" }, children: [] }, t3: { type: "Text", props: { content: "Settings tab \u2014 configuration options.", muted: true, size: "sm" }, children: [] } } } },
-  // ── Status / Feedback ─────────────────────────────────────────────────────
-  { id: "c_progress", name: "ProgressBar", category: "Status", duration: 6e3, spec: { root: "r", elements: { r: { type: "Stack", props: { gap: "sm", direction: "vertical" }, children: ["p1", "p2", "p3", "p4"] }, p1: { type: "ProgressBar", props: { label: "Upload Progress", value: 72, max: null, color: "default", showPercent: true }, children: [] }, p2: { type: "ProgressBar", props: { label: "Build Success Rate", value: 94, max: null, color: "success", showPercent: true }, children: [] }, p3: { type: "ProgressBar", props: { label: "Memory Usage", value: 68, max: null, color: "warning", showPercent: true }, children: [] }, p4: { type: "ProgressBar", props: { label: "Disk Usage", value: 89, max: null, color: "destructive", showPercent: true }, children: [] } } } },
-  { id: "c_alert", name: "Alert", category: "Status", duration: 6e3, spec: { root: "r", elements: { r: { type: "Stack", props: { gap: "sm", direction: "vertical" }, children: ["a1", "a2"] }, a1: { type: "Alert", props: { title: "Deployment Successful", description: "Version 2.1.0 has been deployed to production. All health checks passing.", variant: "default" }, children: [] }, a2: { type: "Alert", props: { title: "Critical Error", description: "Database connection failed. Service is degraded. Check your connection settings.", variant: "destructive" }, children: [] } } } },
-  { id: "c_skeleton", name: "SkeletonBlock", category: "Status", duration: 5e3, spec: { root: "r", elements: { r: { type: "Stack", props: { gap: "md", direction: "vertical" }, children: ["s1", "s2", "s3"] }, s1: { type: "SkeletonBlock", props: { lines: null, type: "avatar-row" }, children: [] }, s2: { type: "SkeletonBlock", props: { lines: 3, type: "text" }, children: [] }, s3: { type: "SkeletonBlock", props: { lines: null, type: "card" }, children: [] } } } },
-  { id: "c_usercard", name: "UserCard", category: "Status", duration: 6e3, spec: { root: "r", elements: { r: { type: "Stack", props: { gap: "sm", direction: "vertical" }, children: ["u1", "u2", "u3"] }, u1: { type: "UserCard", props: { name: "Ahmad Hassan", role: "Lead Engineer", email: "ahmad@example.com", src: null, size: "md" }, children: [] }, u2: { type: "UserCard", props: { name: "Sarah Chen", role: "Product Designer", email: "sarah@example.com", src: null, size: "md" }, children: [] }, u3: { type: "UserCard", props: { name: "Omar Al-Rashid", role: "DevOps", email: "omar@example.com", src: null, size: "md" }, children: [] } } } },
-  // ── Calendar ──────────────────────────────────────────────────────────────
-  { id: "c_calendar", name: "CalendarView", category: "Calendar", duration: 8e3, spec: singleSpec("CalendarView", { title: "February 2026", selectedDates: ["2026-02-18", "2026-02-19", "2026-02-20", "2026-02-25", "2026-02-26"] }) },
-  // ── Navigation ────────────────────────────────────────────────────────────
-  { id: "c_breadcrumb", name: "Breadcrumb", category: "Navigation", duration: 5e3, spec: singleSpec("Breadcrumb", { items: [{ label: "Dashboard", href: "/" }, { label: "Agents", href: "/agents" }, { label: "Configuration", href: "/agents/config" }, { label: "Max", href: null }] }) },
-  { id: "c_pagination", name: "PaginationBar", category: "Navigation", duration: 5e3, spec: singleSpec("PaginationBar", { currentPage: 4, totalPages: 12, showLabel: true }) },
-  { id: "c_carousel", name: "Carousel", category: "Navigation", duration: 8e3, spec: singleSpec("Carousel", { items: [{ title: "Feature 1", description: "Multi-agent orchestration with task pipelines", imageUrl: null }, { title: "Feature 2", description: "Real-time voice conversation with 3D avatar", imageUrl: null }, { title: "Feature 3", description: "Full agentic loop with 18 built-in tools", imageUrl: null }, { title: "Feature 4", description: "Generative UI with 53 components", imageUrl: null }], autoPlay: null }) },
-  // ── Advanced UI ───────────────────────────────────────────────────────────
-  { id: "c_tooltip", name: "TooltipText", category: "Advanced", duration: 6e3, spec: { root: "r", elements: { r: { type: "Stack", props: { gap: "sm", direction: "vertical" }, children: ["t1", "t2", "t3"] }, t1: { type: "TooltipText", props: { text: "P99 Latency", tooltip: "99th percentile response time \u2014 99% of requests complete within this time", muted: null }, children: [] }, t2: { type: "TooltipText", props: { text: "TTFB", tooltip: "Time To First Byte \u2014 measures server response speed", muted: true }, children: [] }, t3: { type: "TooltipText", props: { text: "Apdex Score", tooltip: "Application Performance Index \u2014 0.0 (worst) to 1.0 (perfect)", muted: null }, children: [] } } } },
-  { id: "c_collapsible", name: "CollapsibleSection", category: "Advanced", duration: 7e3, spec: { root: "r", elements: { r: { type: "CollapsibleSection", props: { title: "Advanced Configuration", defaultOpen: true }, children: ["c"] }, c: { type: "Stack", props: { gap: "sm", direction: "vertical" }, children: ["s1", "s2"] }, s1: { type: "SwitchRow", props: { label: "Debug Mode", description: "Log verbose output to console", checked: false }, children: [] }, s2: { type: "SwitchRow", props: { label: "Experimental Features", description: "Enable unstable features in development", checked: true }, children: [] } } } },
-  { id: "c_scrollbox", name: "ScrollBox", category: "Advanced", duration: 7e3, spec: { root: "r", elements: { r: { type: "ScrollBox", props: { maxHeight: 160 }, children: ["s"] }, s: { type: "Stack", props: { gap: "sm", direction: "vertical" }, children: ["i1", "i2", "i3", "i4", "i5", "i6", "i7", "i8"] }, i1: { type: "Text", props: { content: "\u2022 Log 001 \u2014 Server started on port 41522", muted: null, size: "sm" }, children: [] }, i2: { type: "Text", props: { content: "\u2022 Log 002 \u2014 Database connected successfully", muted: null, size: "sm" }, children: [] }, i3: { type: "Text", props: { content: "\u2022 Log 003 \u2014 3 agents loaded from config", muted: null, size: "sm" }, children: [] }, i4: { type: "Text", props: { content: "\u2022 Log 004 \u2014 WebSocket server listening", muted: null, size: "sm" }, children: [] }, i5: { type: "Text", props: { content: "\u2022 Log 005 \u2014 Cron scheduler initialized", muted: null, size: "sm" }, children: [] }, i6: { type: "Text", props: { content: "\u2022 Log 006 \u2014 Storage manager ready", muted: null, size: "sm" }, children: [] }, i7: { type: "Text", props: { content: "\u2022 Log 007 \u2014 TTS engine warm", muted: null, size: "sm" }, children: [] }, i8: { type: "Text", props: { content: "\u2022 Log 008 \u2014 Ready to accept connections", muted: true, size: "sm" }, children: [] } } } },
-  { id: "c_hovercard", name: "HoverCard", category: "Advanced", duration: 6e3, spec: singleSpec("HoverCard", { triggerText: "@ahmad.hassan", title: "Ahmad Hassan", description: "Lead Engineer \u2014 ahmad@example.com \u2014 Joined 2024" }) },
-  { id: "c_otp", name: "OTPDisplay", category: "Advanced", duration: 6e3, spec: singleSpec("OTPDisplay", { length: 6, label: "Verification Code", placeholder: null }) },
-  { id: "c_sidepanel", name: "SidePanel", category: "Advanced", duration: 7e3, spec: { root: "r", elements: { r: { type: "SidePanel", props: { title: "Agent Details", description: "Configuration and stats for this agent", side: "right" }, children: ["c"] }, c: { type: "Stack", props: { gap: "sm", direction: "vertical" }, children: ["u", "m"] }, u: { type: "UserCard", props: { name: "Max", role: "Primary Agent", email: null, src: null, size: "sm" }, children: [] }, m: { type: "Metric", props: { label: "Tasks Completed", value: "142", detail: "this week", trend: "up" }, children: [] } } } },
-  { id: "c_drawercard", name: "DrawerCard", category: "Advanced", duration: 7e3, spec: { root: "r", elements: { r: { type: "DrawerCard", props: { title: "Quick Actions", description: null }, children: ["c"] }, c: { type: "Stack", props: { gap: "sm", direction: "vertical" }, children: ["b1", "b2", "b3"] }, b1: { type: "Button", props: { label: "Create New Task", variant: "default", size: null }, children: [] }, b2: { type: "Button", props: { label: "View Analytics", variant: "outline", size: null }, children: [] }, b3: { type: "Button", props: { label: "Export Data", variant: "ghost", size: null }, children: [] } } } },
-  { id: "c_alertdlg", name: "AlertDialogCard", category: "Advanced", duration: 7e3, spec: singleSpec("AlertDialogCard", { title: "Delete Agent?", description: "This will permanently delete the agent and all associated data, including chat history, memory, and configuration. This action cannot be undone.", confirmLabel: "Delete Agent", cancelLabel: "Cancel", variant: "destructive" }) },
-  { id: "c_dialogcard", name: "DialogCard", category: "Advanced", duration: 6e3, spec: { root: "r", elements: { r: { type: "DialogCard", props: { title: "Edit Agent Profile", description: "Update agent name, emoji, and system prompt." }, children: ["c"] }, c: { type: "Stack", props: { gap: "sm", direction: "vertical" }, children: ["t", "b"] }, t: { type: "Text", props: { content: "Agent Name: Max\nRole: Primary assistant\nModel: Host model", muted: null, size: "sm" }, children: [] }, b: { type: "Button", props: { label: "Save Changes", variant: "default", size: null }, children: [] } } } },
-  { id: "c_dropdown", name: "DropdownList", category: "Advanced", duration: 7e3, spec: singleSpec("DropdownList", { label: "File", items: [{ label: "New Chat", shortcut: "Ctrl+N", disabled: null, separator: null }, { label: "Import Session", shortcut: "Ctrl+I", disabled: null, separator: null }, { label: "Export History", shortcut: null, disabled: null, separator: true }, { label: "Clear All", shortcut: null, disabled: false, separator: null }] }) },
-  { id: "c_command", name: "CommandSearch", category: "Advanced", duration: 8e3, spec: singleSpec("CommandSearch", { placeholder: "Search commands...", groups: [{ heading: "Navigation", items: [{ label: "Go to Dashboard", shortcut: "G D" }, { label: "Open Agent Chat", shortcut: "G C" }, { label: "View Tasks", shortcut: "G T" }] }, { heading: "Actions", items: [{ label: "New Task", shortcut: "Ctrl+K" }, { label: "Start Voice Chat", shortcut: "Space" }, { label: "Toggle Dark Mode", shortcut: null }] }] }) },
-  { id: "c_resizable", name: "ResizablePanel", category: "Advanced", duration: 6e3, spec: singleSpec("ResizablePanel", { direction: "horizontal", leftLabel: "Code Editor", rightLabel: "Preview", defaultSplit: 60 }) },
-  { id: "c_aspectbox", name: "AspectBox", category: "Advanced", duration: 6e3, spec: { root: "r", elements: { r: { type: "Stack", props: { gap: "sm", direction: "vertical" }, children: ["a1", "a2"] }, a1: { type: "AspectBox", props: { ratio: 1.78, label: "16:9 Video Frame", bg: null }, children: [] }, a2: { type: "AspectBox", props: { ratio: 1, label: "1:1 Square", bg: null }, children: [] } } } },
-  // ── File Formats ──────────────────────────────────────────────────────────
-  { id: "c_jsonview", name: "JsonViewer", category: "Format", duration: 9e3, spec: singleSpec("JsonViewer", { title: "API Response", data: { status: "success", user: { id: 42, name: "Ahmad Hassan", email: "ahmad@example.com", roles: ["admin", "editor"] }, meta: { timestamp: "2026-02-18T14:30:00Z", version: "2.1.0", requestId: "req_abc123" } }, maxHeight: 220, defaultExpanded: true }) },
-  { id: "c_markdown", name: "MarkdownBlock", category: "Format", duration: 9e3, spec: singleSpec("MarkdownBlock", { content: '## Agent Player v2.1\n\nKey features:\n\n- **18 agentic tools** \u2014 browser, desktop, storage\n- **Multi-agent pipelines** with task dependencies\n- **53 UI components** rendered from JSON spec\n- Voice chat with real-time lip sync\n\n> "The goal is a fully autonomous AI agent."\n\n```typescript\nconst agent = createAgent({ tools });\nawait agent.run("analyze the codebase");\n```', prose: true }) },
-  { id: "c_mdc", name: "MDCBlock", category: "Format", duration: 1e4, spec: singleSpec("MDCBlock", { content: '## System Status\n\nAll services are operational.\n\n::Metric{label="Uptime" value="99.97%" trend="up"}\n\nCurrent alerts:\n\n::Badge{text="3 warnings" variant="warning"}\n::Badge{text="0 errors" variant="success"}\n\nServer performance:\n\n::ProgressBar{label="CPU" value=42 color="default" showPercent=true}\n::ProgressBar{label="Memory" value=67 color="warning" showPercent=true}' }) },
-  // ── AI Components ─────────────────────────────────────────────────────────
-  { id: "c_avatarcard", name: "AvatarCard", category: "AI", duration: 1e4, spec: singleSpec("AvatarCard", { title: "Interactive Avatar", size: "md", removable: false }) },
-  { id: "c_supportchat", name: "SupportChatBlock", category: "AI", duration: 1e4, spec: singleSpec("SupportChatBlock", { agentName: "Max", height: 340, removable: false, bgColor: null }) },
-  { id: "c_agentportal", name: "AgentSupportPortal", category: "AI", duration: 1e4, spec: singleSpec("AgentSupportPortal", { height: 380, bgColor: null, title: "Choose your AI assistant" }) },
-  // ── Weather ───────────────────────────────────────────────────────────────
-  { id: "c_weather_sm", name: "WeatherCard sm", category: "Weather", duration: 7e3, spec: singleSpec("WeatherCard", { location: "Dubai", temperature: 32, condition: "sunny", humidity: 55, wind: 12, unit: "C", feelsLike: 36, size: "sm", forecast: null }) },
-  { id: "c_weather_md", name: "WeatherCard md", category: "Weather", duration: 7e3, spec: singleSpec("WeatherCard", { location: "London", temperature: 12, condition: "rainy", humidity: 85, wind: 24, unit: "C", feelsLike: 8, size: "md", forecast: null }) },
-  { id: "c_weather_lg", name: "WeatherCard lg", category: "Weather", duration: 1e4, spec: singleSpec("WeatherCard", { location: "New York", temperature: 18, condition: "partly-cloudy", humidity: 65, wind: 15, unit: "C", feelsLike: 16, size: "lg", forecast: [{ day: "Mon", condition: "sunny", high: 22, low: 14 }, { day: "Tue", condition: "cloudy", high: 19, low: 11 }, { day: "Wed", condition: "rainy", high: 15, low: 9 }, { day: "Thu", condition: "stormy", high: 13, low: 8 }, { day: "Fri", condition: "partly-cloudy", high: 17, low: 12 }] }) }
-];
-
-// studio/presentation/controls.tsx
-var import_jsx_runtime6 = __toESM(require_jsx_runtime(), 1);
-function PresentationControls({ controller, section, agents, search = "", includeAvailableMotions = false }) {
-  const state = (0, import_react9.useSyncExternalStore)(controller.subscribe, controller.snapshot);
-  const [category, setCategory] = (0, import_react9.useState)("all");
-  const available = [...PRESENTATION_ANIMATIONS.map((row) => ({ id: row.id, label: row.label, categories: motionCategories(row.clip) })), ...avatarMotionEntries().map((row) => ({ id: row.id, label: row.name, categories: motionCategories(row.name, row.category) }))];
-  const filtered = available.filter((row) => row.label.toLowerCase().includes(search.toLowerCase()) && (category === "all" || row.categories.some((value) => value === category)));
-  const [target2, setTarget] = (0, import_react9.useState)("self"), [error, setError] = (0, import_react9.useState)("");
-  const execute = (event2) => setError(controller.execute(event2) ?? "");
-  const matches2 = (value) => value.toLowerCase().includes(search.toLowerCase());
-  const control = (label3, onClick, active = false) => /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("button", { type: "button", onClick, "aria-pressed": active, className: `rounded-xl px-2 py-2 text-left text-xs font-bold ${active ? "bg-ink text-on-brand" : "bg-paper text-ink hover:bg-ink/10"}`, children: label3 }, label3);
-  return /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("section", { "aria-label": `Avatar ${section}`, className: "space-y-2 text-ink", children: [
-    section === "motions" || section === "expressions" ? /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("label", { className: "block text-xs font-bold", children: [
-      "Avatar",
-      /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("select", { "aria-label": `${section} target`, value: target2, onChange: (e2) => setTarget(e2.target.value), className: "mt-1 block w-full rounded-lg bg-paper p-2", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("option", { value: "self", children: "Current avatar" }),
-        agents.map((row) => /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("option", { value: row.id, children: row.name }, row.id))
-      ] })
-    ] }) : null,
-    section === "motions" ? /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(import_jsx_runtime6.Fragment, { children: [
-      includeAvailableMotions ? /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(import_jsx_runtime6.Fragment, { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("label", { className: "block text-xs", children: [
-          "Category",
-          /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("select", { "aria-label": "Live motion category", value: category, onChange: (e2) => setCategory(e2.target.value), className: "mt-1 w-full rounded bg-paper p-2", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("option", { value: "all", children: "All motions" }),
-            [...new Set(available.flatMap((row) => row.categories))].sort().map((row) => /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("option", { value: row, children: row }, row))
-          ] })
-        ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("p", { className: "text-xs text-ink/60", children: [
-          filtered.length,
-          " motions"
-        ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("div", { className: "grid grid-cols-2 gap-1.5", children: filtered.slice(0, 60).map((row) => control(row.label, () => execute({ kind: "animation", target: target2, animation: row.id }))) }),
-        filtered.length > 60 ? /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("p", { className: "text-xs text-ink/60", children: "Search to narrow these results." }) : null
-      ] }) : null,
-      /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("label", { className: "block rounded-xl border border-ink/10 p-2 text-xs font-bold", children: [
-        "Import GLB motion",
-        /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("input", { "aria-label": "Import avatar motion", type: "file", accept: ".glb", className: "mt-2 w-full text-[11px]", onChange: async (event2) => {
-          const file = event2.target.files?.[0];
-          event2.target.value = "";
-          if (!file) return;
-          try {
-            if (file.size > 16 * 1024 * 1024) throw new Error("Motion exceeds 16 MB.");
-            await controller.importMotion(target2, file.name, await file.arrayBuffer());
-            setError("");
-          } catch (e2) {
-            setError(String(e2));
-          }
-        } })
-      ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("div", { className: "grid grid-cols-2 gap-1.5", children: state.motions.filter((row) => row.target === target2 && matches2(row.label)).map((row) => control(row.label, () => execute({ kind: "animation", target: target2, animation: row.id }))) })
-    ] }) : null,
-    section === "expressions" ? /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(import_jsx_runtime6.Fragment, { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("h3", { className: "text-xs font-black", children: "Expressions" }),
-      /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("div", { className: "grid grid-cols-2 gap-1.5", children: EXPRESSIONS.filter(matches2).map((expression2) => control(expression2, () => execute({ kind: "expression", target: target2, expression: expression2 }))) })
-    ] }) : null,
-    section === "effects" ? /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(import_jsx_runtime6.Fragment, { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("h3", { className: "text-xs font-black", children: "Screen effects" }),
-      /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("div", { className: "grid grid-cols-2 gap-1.5", children: EFFECTS.filter(matches2).map((effect) => /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { children: [
-        control(effect, () => execute({ kind: "effect", effect, enabled: state.effects[effect] === void 0, duration: 6e4 }), state.effects[effect] !== void 0),
-        state.effects[effect] !== void 0 ? /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("input", { "aria-label": `${effect} intensity`, className: "w-full", type: "range", min: "0", max: "1", step: ".05", value: state.effects[effect], onChange: (e2) => execute({ kind: "effect", effect, enabled: true, intensity: Number(e2.target.value), duration: 6e4 }) }) : null
-      ] }, effect)) }),
-      control("Clear screen effects", () => {
-        for (const effect of EFFECTS) execute({ kind: "effect", effect, enabled: false });
-      })
-    ] }) : null,
-    section === "notifications" ? /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(import_jsx_runtime6.Fragment, { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("p", { className: "text-xs text-ink/60", children: "Preview cards. Your application supplies live events." }),
-      /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("div", { className: "grid grid-cols-2 gap-1.5", children: NOTIFICATION_TYPES.filter(matches2).map((type) => control(type, () => execute({ kind: "notification", notification: { type, title: `${type} preview`, body: "Example notification \u2014 connect your application for live events." } }))) })
-    ] }) : null,
-    section === "cards" ? /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(import_jsx_runtime6.Fragment, { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("p", { className: "text-xs text-ink/60", children: "Card previews use example data." }),
-      /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("div", { className: "grid grid-cols-2 gap-1.5", children: ALL_UI_COMPONENTS.filter((row) => matches2(row.name)).map((row) => control(row.name, () => execute({ kind: "card", title: row.name, spec: row.spec, duration: row.duration }))) })
-    ] }) : null,
-    error ? /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("p", { role: "alert", className: "text-xs text-red-600", children: error }) : null
-  ] });
-}
-
 // studio/presentation/world-background.tsx
-var import_react10 = __toESM(require_react(), 1);
-var import_react_dom = __toESM(require_react_dom(), 1);
-var import_jsx_runtime7 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime6 = __toESM(require_jsx_runtime(), 1);
 function WorldBackground({ storage: storage7, current: current2, display, change, embedded, onExploring, onRendered, controlsHost }) {
-  const pendingExplore = (0, import_react10.useRef)(false), beforeExploring = (0, import_react10.useRef)(null);
-  const container = (0, import_react10.useRef)(null), runtime = (0, import_react10.useRef)(null), latest = (0, import_react10.useRef)(null), state = (0, import_react10.useRef)({ exploring: false, spot: display.worldSpot, onRendered });
-  const [worlds, setWorlds] = (0, import_react10.useState)([]), [exploring, setExploring] = (0, import_react10.useState)(false), [ready2, setReady] = (0, import_react10.useState)(false), [error, setError] = (0, import_react10.useState)("");
+  const pendingExplore = (0, import_react9.useRef)(false), beforeExploring = (0, import_react9.useRef)(null);
+  const container = (0, import_react9.useRef)(null), runtime = (0, import_react9.useRef)(null), latest = (0, import_react9.useRef)(null), state = (0, import_react9.useRef)({ exploring: false, spot: display.worldSpot, onRendered });
+  const [worlds, setWorlds] = (0, import_react9.useState)([]), [exploring, setExploring] = (0, import_react9.useState)(false), [ready2, setReady] = (0, import_react9.useState)(false), [error, setError] = (0, import_react9.useState)("");
   state.current = { exploring, spot: display.worldSpot, onRendered };
-  (0, import_react10.useEffect)(() => {
+  (0, import_react9.useEffect)(() => {
     let active = true;
     storage7.list().then((rows2) => {
       if (active) setWorlds(rows2);
@@ -69407,13 +69146,13 @@ function WorldBackground({ storage: storage7, current: current2, display, change
       active = false;
     };
   }, [storage7]);
-  (0, import_react10.useEffect)(() => {
+  (0, import_react9.useEffect)(() => {
     onExploring(exploring);
     runtime.current?.setControlsEnabled(exploring);
     runtime.current?.setPresentationBackdrop(true, exploring);
     return () => onExploring(false);
   }, [exploring]);
-  (0, import_react10.useEffect)(() => {
+  (0, import_react9.useEffect)(() => {
     if (!display.worldId) return;
     const abort = new AbortController();
     let view = null;
@@ -69472,17 +69211,17 @@ function WorldBackground({ storage: storage7, current: current2, display, change
       runtime.current = null;
     };
   }, [display.worldId, storage7]);
-  return /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "absolute inset-0", "data-live-world-preview": true, children: [
-    display.worldId ? /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { ref: container, className: "absolute inset-0", tabIndex: 0, "aria-label": "Explore background world" }) : null,
-    !embedded && controlsHost ? (0, import_react_dom.createPortal)(/* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "flex flex-wrap items-center gap-2 rounded-lg border border-ink/15 p-2 text-xs text-ink", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("label", { className: "flex items-center gap-2", children: [
+  return /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "absolute inset-0", "data-live-world-preview": true, children: [
+    display.worldId ? /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("div", { ref: container, className: "absolute inset-0", tabIndex: 0, "aria-label": "Explore background world" }) : null,
+    !embedded && controlsHost ? (0, import_react_dom.createPortal)(/* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "flex flex-wrap items-center gap-2 rounded-lg border border-ink/15 p-2 text-xs text-ink", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("label", { className: "flex items-center gap-2", children: [
         "My worlds",
-        /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("select", { "aria-label": "Avatar background world", className: "max-w-52 rounded border border-ink/20 bg-paper p-2", value: display.worldId ?? "", onChange: (e2) => change({ worldId: e2.target.value || null, worldSpot: null }), children: [
-          /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("option", { value: "", children: "Current world \xB7 live view" }),
-          worlds.map((w2) => /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("option", { value: w2.id, children: w2.title }, w2.id))
+        /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("select", { "aria-label": "Avatar background world", className: "max-w-52 rounded border border-ink/20 bg-paper p-2", value: display.worldId ?? "", onChange: (e2) => change({ worldId: e2.target.value || null, worldSpot: null }), children: [
+          /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("option", { value: "", children: "Current world \xB7 live view" }),
+          worlds.map((w2) => /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("option", { value: w2.id, children: w2.title }, w2.id))
         ] })
       ] }),
-      !exploring ? /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("button", { className: "rounded bg-ink px-3 py-2 font-bold text-on-brand", disabled: !!display.worldId && !ready2, onClick: () => {
+      !exploring ? /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("button", { className: "rounded bg-ink px-3 py-2 font-bold text-on-brand", disabled: !!display.worldId && !ready2, onClick: () => {
         if (!display.worldId) {
           pendingExplore.current = true;
           change({ worldId: current2().id, worldSpot: null });
@@ -69491,13 +69230,13 @@ function WorldBackground({ storage: storage7, current: current2, display, change
         beforeExploring.current = latest.current;
         setExploring(true);
         container.current?.focus();
-      }, children: "Choose a spot" }) : /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)(import_jsx_runtime7.Fragment, { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { children: "WASD / arrows: walk \xB7 drag: look \xB7 scroll: zoom" }),
-        /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("button", { className: "rounded bg-ink px-3 py-2 font-bold text-on-brand", onClick: () => {
+      }, children: "Choose a spot" }) : /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(import_jsx_runtime6.Fragment, { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { children: "WASD / arrows: walk \xB7 drag: look \xB7 scroll: zoom" }),
+        /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("button", { className: "rounded bg-ink px-3 py-2 font-bold text-on-brand", onClick: () => {
           if (latest.current) change({ worldSpot: latest.current });
           setExploring(false);
         }, children: "Use this spot" }),
-        /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("button", { className: "rounded border border-ink/20 px-3 py-2", onClick: () => {
+        /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("button", { className: "rounded border border-ink/20 px-3 py-2", onClick: () => {
           const previous = display.worldSpot ?? beforeExploring.current;
           if (previous) {
             runtime.current?.teleportPlayer(previous.player);
@@ -69506,9 +69245,9 @@ function WorldBackground({ storage: storage7, current: current2, display, change
           setExploring(false);
         }, children: "Cancel" })
       ] }),
-      display.worldId && !ready2 ? /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { role: "status", children: "Loading world\u2026" }) : null,
-      display.worldSpot && !exploring ? /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { children: "Saved viewpoint" }) : null,
-      error ? /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { role: "alert", children: error }) : null
+      display.worldId && !ready2 ? /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { role: "status", children: "Loading world\u2026" }) : null,
+      display.worldSpot && !exploring ? /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { children: "Saved viewpoint" }) : null,
+      error ? /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { role: "alert", children: error }) : null
     ] }), controlsHost) : null
   ] });
 }
@@ -73438,16 +73177,81 @@ function disposeLiveRoom(root) {
 }
 
 // studio/presentation/avatar-live.tsx
-var import_jsx_runtime8 = __toESM(require_jsx_runtime(), 1);
-var backgrounds = [["world", "My worlds"], ["color", "Color"], ["transparent", "Transparent"], ["office", "Office"], ["living_room", "Living Room"], ["conference", "Conference Room"], ["stage", "Stage"], ["studio", "Studio"], ["classroom", "Classroom"], ["image", "Image / GIF"], ["video", "Video"]];
-var tools = [{ id: "display", label: "Display", Icon: Monitor }, { id: "characters", label: "Character", Icon: Users }, { id: "voice", label: "Voice", Icon: Mic }, { id: "motions", label: "Motions", Icon: Activity }, { id: "expressions", label: "Expressions", Icon: FaceSlightlySmiling }, { id: "effects", label: "Effects", Icon: Sparkles }, { id: "notifications", label: "Notifications", Icon: Bell }, { id: "cards", label: "UI cards", Icon: PanelsTopLeft }];
-var layoutIcons = [Monitor, AppWindow, PanelsTopLeft, LayoutTemplate, RectangleHorizontal, Circle, Watch];
-var input = "w-full rounded-lg border border-ink/20 bg-paper p-2 text-xs";
-function AvatarLive({ controller, recipe, onStage, projectId, characters, voice, embedded = false, onShare, playerHost, worldViewport, worldStorage, currentProject, onWorldRendered }) {
-  const { display } = (0, import_react11.useSyncExternalStore)(controller.subscribe, controller.snapshot);
-  const dialog = (0, import_react11.useRef)(null);
-  const worldBackground = (0, import_react11.useRef)(null);
-  (0, import_react11.useEffect)(() => {
+var import_jsx_runtime7 = __toESM(require_jsx_runtime(), 1);
+var VIEWS = [
+  { id: "chat", label: "Chat + avatar", hint: "Face and messages", layout: "desktop" },
+  { id: "call", label: "Video call", hint: "Face and microphone only", layout: "large" },
+  { id: "compact", label: "Compact", hint: "Small face, messages below", layout: "compact" },
+  { id: "watch", label: "Watch", hint: "Small circle, voice only", layout: "watch" }
+];
+var viewOf = (layout) => layout === "large" ? "call" : layout === "compact" ? "compact" : layout === "watch" || layout === "circle" ? "watch" : "chat";
+var SIZES = [{ id: "s", label: "Small", scale: 0.75 }, { id: "m", label: "Medium", scale: 1 }, { id: "l", label: "Large", scale: 1.25 }];
+var FRAMINGS = [{ id: "full", label: "Full body" }, { id: "bust", label: "Upper body" }, { id: "face", label: "Face" }];
+var NOTICE_GROUPS = [
+  { id: "approvals", label: "Approvals waiting", hint: "A card when your agent needs your OK", types: ["approval"] },
+  { id: "tasks", label: "Task finished", hint: "Short card when work is done", types: ["task"] },
+  { id: "messages", label: "New messages", hint: "Messages from your channels", types: ["msg", "email", "whatsapp", "facebook", "instagram", "telegram", "discord", "twitter", "tiktok", "linkedin", "snapchat", "youtube", "reddit", "twitch"] },
+  { id: "calendar", label: "Calendar reminders", hint: "Before a meeting starts", types: ["calendar"] },
+  { id: "other", label: "Other alerts", hint: "Payments, stocks, codes, terminal", types: [] }
+];
+var DEFAULT_PREFS = { size: "m", speak: true, notifications: true, effects: true, sidePanel: true, notice: { approvals: true, tasks: true, messages: true, calendar: true, other: true }, mode: "me" };
+var PREFS_KEY = "genvr-avatar-live-page";
+function readPrefs() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(PREFS_KEY) ?? "null");
+    return raw && typeof raw === "object" ? { ...DEFAULT_PREFS, ...raw, notice: { ...DEFAULT_PREFS.notice, ...raw.notice ?? {} } } : DEFAULT_PREFS;
+  } catch {
+    return DEFAULT_PREFS;
+  }
+}
+var SECTIONS = [
+  { id: "agent", label: "Agent", Icon: User },
+  { id: "look", label: "Look & voice", Icon: Mic },
+  { id: "background", label: "Background", Icon: Image2 },
+  { id: "display", label: "Display", Icon: Monitor },
+  { id: "where", label: "Where it shows", Icon: Globe },
+  { id: "allowed", label: "What it may do", Icon: ShieldCheck },
+  { id: "notifications", label: "Notifications", Icon: Bell }
+];
+var tile2 = (on) => `flex min-h-14 flex-col items-start justify-center gap-1 rounded-xl border-2 px-3 py-2 text-left text-xs ${on ? "border-ink bg-ink/5 font-bold" : "border-ink/15 hover:bg-ink/5"}`;
+var pill2 = (on) => `min-h-9 rounded-lg px-3 text-xs font-bold ${on ? "bg-ink text-on-brand" : "hover:bg-ink/5"}`;
+function Switch2({ label: label3, hint, checked: checked2, onChange }) {
+  return /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("label", { className: "flex min-h-12 items-center justify-between gap-3 rounded-lg border border-ink/15 px-3 py-2 text-xs", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("span", { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { className: "block font-bold", children: label3 }),
+      hint ? /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { className: "block text-ink/60", children: hint }) : null
+    ] }),
+    /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("input", { type: "checkbox", className: "size-5", checked: checked2, onChange: (e2) => onChange(e2.target.checked) })
+  ] });
+}
+function ViewDrawing({ view }) {
+  const face = "rounded bg-ink/60", line = "h-1 rounded bg-ink/25";
+  return /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("span", { "aria-hidden": "true", className: "mb-1 flex h-11 w-full rounded-md border border-ink/15 bg-paper p-1.5", children: [
+    view === "chat" ? /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("span", { className: "flex w-full gap-1", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { className: `${face} flex-1` }),
+      /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("span", { className: "flex flex-1 flex-col justify-center gap-1", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { className: line }),
+        /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { className: `${line} w-2/3` }),
+        /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { className: line })
+      ] })
+    ] }) : null,
+    view === "call" ? /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("span", { className: "flex w-full flex-col items-center gap-1", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { className: `${face} w-full flex-1` }),
+      /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { className: "size-2 rounded-full bg-ink/70" })
+    ] }) : null,
+    view === "compact" ? /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("span", { className: "flex w-full flex-col items-center gap-1", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { className: `${face} h-4 w-1/2` }),
+      /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { className: `${line} w-11/12` }),
+      /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { className: `${line} w-2/3` })
+    ] }) : null,
+    view === "watch" ? /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { className: "flex w-full items-center justify-center", children: /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { className: "size-7 rounded-full border-2 border-ink/40 bg-ink/60" }) }) : null
+  ] });
+}
+function AvatarLive({ controller, recipe, onStage, projectId, characters, voice, embedded = false, onShare, playerHost, worldViewport, worldStorage, currentProject, onWorldRendered, agent, conversation, activity, permissions, host }) {
+  const { display } = (0, import_react10.useSyncExternalStore)(controller.subscribe, controller.snapshot);
+  const dialog = (0, import_react10.useRef)(null);
+  const worldBackground = (0, import_react10.useRef)(null);
+  (0, import_react10.useEffect)(() => {
     if (display.background !== "world" || display.worldId || !worldViewport || !worldBackground.current) return;
     const parent = worldViewport.parentNode, next3 = worldViewport.nextSibling;
     worldBackground.current.appendChild(worldViewport);
@@ -73455,18 +73259,62 @@ function AvatarLive({ controller, recipe, onStage, projectId, characters, voice,
       if (parent) parent.insertBefore(worldViewport, next3?.parentNode === parent ? next3 : null);
     };
   }, [display.background, display.worldId, worldViewport]);
-  const container = (0, import_react11.useRef)(null), stage = (0, import_react11.useRef)(null);
-  const [faceSupported, setFaceSupported] = (0, import_react11.useState)(null);
-  const [ready2, setReady] = (0, import_react11.useState)(false), [error, setError] = (0, import_react11.useState)(""), [section, setSection] = (0, import_react11.useState)("display"), [search, setSearch] = (0, import_react11.useState)("");
-  const [mediaUrl, setMediaUrl] = (0, import_react11.useState)("");
-  const [exploring, setExploring] = (0, import_react11.useState)(false);
-  const [worldControls, setWorldControls] = (0, import_react11.useState)(null);
-  const current2 = (0, import_react11.useRef)({ recipe, onStage, framing: display.framing, round: display.layout === "circle" || display.layout === "watch" });
+  const container = (0, import_react10.useRef)(null), stage = (0, import_react10.useRef)(null);
+  const [faceSupported, setFaceSupported] = (0, import_react10.useState)(null);
+  const [ready2, setReady] = (0, import_react10.useState)(false), [error, setError] = (0, import_react10.useState)("");
+  const [exploring, setExploring] = (0, import_react10.useState)(false);
+  const [settingsOpen, setSettingsOpen] = (0, import_react10.useState)(false), [section, setSection] = (0, import_react10.useState)("agent");
+  const [bgHost, setBgHost] = (0, import_react10.useState)(null), [spotHost, setSpotHost] = (0, import_react10.useState)(null);
+  const [prefs, setPrefsState] = (0, import_react10.useState)(readPrefs);
+  const setPrefs = (patch) => setPrefsState((current3) => {
+    const next3 = { ...current3, ...patch };
+    try {
+      localStorage.setItem(PREFS_KEY, JSON.stringify(next3));
+    } catch {
+    }
+    return next3;
+  });
+  const player = (0, import_react10.useRef)(null);
+  const hostRef = (0, import_react10.useRef)(host);
+  hostRef.current = host;
+  (0, import_react10.useEffect)(() => {
+    hostRef.current?.onPrefs?.(prefs);
+  }, [prefs]);
+  (0, import_react10.useEffect)(() => {
+    hostRef.current?.onSettings?.(settingsOpen);
+  }, [settingsOpen]);
+  (0, import_react10.useEffect)(() => {
+    if (host?.settingsRequest) setSettingsOpen(true);
+  }, [host?.settingsRequest]);
+  (0, import_react10.useEffect)(() => {
+    if (!embedded || !settingsOpen) return;
+    const escape = (e2) => {
+      if (e2.key === "Escape") setSettingsOpen(false);
+    };
+    window.addEventListener("keydown", escape);
+    return () => window.removeEventListener("keydown", escape);
+  }, [embedded, settingsOpen]);
+  const current2 = (0, import_react10.useRef)({ recipe, onStage, framing: display.framing, round: display.layout === "circle" || display.layout === "watch" });
   current2.current = { recipe, onStage, framing: display.framing, round: display.layout === "circle" || display.layout === "watch" };
   const change = (patch) => setError(controller.execute({ kind: "display", ...patch }) ?? "");
   const preset = AVATAR_LIVE_LAYOUTS.find((row) => row.id === display.layout);
   const round9 = display.layout === "circle" || display.layout === "watch";
-  (0, import_react11.useEffect)(() => {
+  const view = viewOf(display.layout), scale = SIZES.find((s2) => s2.id === prefs.size)?.scale ?? 1;
+  (0, import_react10.useEffect)(() => {
+    if (exploring) setSettingsOpen(false);
+  }, [exploring]);
+  (0, import_react10.useEffect)(() => {
+    const host2 = player.current;
+    if (!host2) return;
+    const apply2 = () => host2.querySelectorAll("audio,video").forEach((media) => {
+      media.muted = !prefs.speak;
+    });
+    apply2();
+    const watch = new MutationObserver(apply2);
+    watch.observe(host2, { childList: true, subtree: true });
+    return () => watch.disconnect();
+  }, [prefs.speak, display.open]);
+  (0, import_react10.useEffect)(() => {
     let cancelled = false, made = null, stop = () => {
     };
     if (!display.open) return;
@@ -73505,16 +73353,16 @@ function AvatarLive({ controller, recipe, onStage, projectId, characters, voice,
       made?.dispose();
     };
   }, [display.open]);
-  (0, import_react11.useEffect)(() => {
+  (0, import_react10.useEffect)(() => {
     if (ready2) {
       stage.current?.setRecipe(recipe);
       stage.current?.frameAvatar(display.framing, round9 ? 0.5 : 0.28);
     }
   }, [recipe, ready2]);
-  (0, import_react11.useEffect)(() => {
+  (0, import_react10.useEffect)(() => {
     stage.current?.frameAvatar(display.framing, round9 ? 0.5 : 0.28);
   }, [display.framing, display.layout, ready2]);
-  (0, import_react11.useEffect)(() => {
+  (0, import_react10.useEffect)(() => {
     if (!ready2) return;
     const room = createLiveRoom(display.background);
     stage.current?.setEnvironment(room);
@@ -73523,12 +73371,19 @@ function AvatarLive({ controller, recipe, onStage, projectId, characters, voice,
       disposeLiveRoom(room);
     };
   }, [display.background, ready2]);
-  (0, import_react11.useEffect)(() => {
+  (0, import_react10.useEffect)(() => {
     if (!display.open || embedded) return;
     const previous = document.activeElement;
     dialog.current?.querySelector("button")?.focus();
     const escape = (e2) => {
-      if (e2.key === "Escape") change({ open: false });
+      if (e2.key === "Escape") {
+        if (settingsOpen) {
+          setSettingsOpen(false);
+          return;
+        }
+        if (exploring) return;
+        change({ open: false });
+      }
       if (e2.key === "Tab") {
         const nodes = Array.from(dialog.current?.querySelectorAll("button:not(:disabled),input,select,textarea,a[href]") ?? []);
         const first = nodes[0], last = nodes[nodes.length - 1];
@@ -73546,141 +73401,247 @@ function AvatarLive({ controller, recipe, onStage, projectId, characters, voice,
       window.removeEventListener("keydown", escape);
       if (previous?.isConnected) previous.focus();
     };
-  }, [display.open, embedded]);
+  }, [display.open, embedded, settingsOpen, exploring]);
   if (!display.open) return null;
+  const allowedNotice = (type) => {
+    const group2 = NOTICE_GROUPS.find((g2) => g2.types.includes(type))?.id ?? "other";
+    return prefs.notice[group2];
+  };
   const style = { background: display.background === "transparent" ? "transparent" : display.color };
-  const frame2 = /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { "data-avatar-live-frame": true, "data-layout": display.layout, className: "relative flex shrink-0 overflow-hidden", style: { ...style, width: "100%", maxWidth: preset.width, height: embedded ? "100%" : `min(${preset.height}px,65vh)`, minHeight: 180 }, children: [
-    display.background === "world" ? /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)(import_jsx_runtime8.Fragment, { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("div", { ref: worldBackground, className: "absolute inset-0", "aria-label": "Current world background" }),
-      worldStorage && currentProject ? /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(WorldBackground, { storage: worldStorage, current: currentProject, display, change, embedded, onExploring: setExploring, onRendered: onWorldRendered, controlsHost: worldControls }) : null
+  const width = Math.round(preset.width * (embedded ? 1 : scale)), height = Math.round(preset.height * (embedded ? 1 : scale));
+  const frame2 = /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { "data-avatar-live-frame": true, "data-layout": display.layout, className: `relative flex shrink-0 overflow-hidden ${exploring ? "outline-dashed outline-[3px] outline-white" : ""} ${!embedded && view !== "watch" ? "rounded-2xl" : ""}`, style: { ...style, width: "100%", maxWidth: width, height: embedded ? "100%" : `min(${height}px,65vh)`, minHeight: 180, boxShadow: exploring ? "0 0 0 9999px rgba(5,6,9,.35)" : void 0 }, children: [
+    display.background === "world" ? /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)(import_jsx_runtime7.Fragment, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { ref: worldBackground, className: "absolute inset-0", "aria-label": "Current world background" }),
+      worldStorage && currentProject ? /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(WorldBackground, { storage: worldStorage, current: currentProject, display, change, embedded, onExploring: setExploring, onRendered: onWorldRendered, controlsHost: exploring ? spotHost : bgHost }) : null
     ] }) : null,
-    display.media && display.background === "image" ? /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("img", { alt: "Avatar background", src: display.media, className: "absolute inset-0 h-full w-full object-cover" }) : null,
-    display.media && display.background === "video" ? /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("video", { src: display.media, muted: true, autoPlay: true, loop: true, playsInline: true, className: "absolute inset-0 h-full w-full object-cover" }, display.media) : null,
-    /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "relative flex h-full items-center justify-center", style: { width: round9 ? "55%" : "100%", minWidth: 0, pointerEvents: exploring ? "none" : void 0, visibility: exploring ? "hidden" : void 0 }, children: [
-      /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("div", { ref: container, "aria-label": "Live avatar viewport", className: "relative overflow-hidden", style: { height: round9 ? "auto" : "100%", maxHeight: "100%", width: "100%", maxWidth: round9 ? 210 : void 0, aspectRatio: round9 ? "1" : void 0, borderRadius: round9 ? "50%" : void 0, background: round9 ? "radial-gradient(ellipse at 50% 30%, #1e293b, #0c1120)" : void 0, border: round9 ? "2px solid #6366f166" : void 0 } }),
-      !ready2 ? /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { role: "status", className: "absolute text-xs text-white", children: "Loading avatar\u2026" }) : null
+    display.media && display.background === "image" ? /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("img", { alt: "Avatar background", src: display.media, className: "absolute inset-0 h-full w-full object-cover" }) : null,
+    display.media && display.background === "video" ? /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("video", { src: display.media, muted: true, autoPlay: true, loop: true, playsInline: true, className: "absolute inset-0 h-full w-full object-cover" }, display.media) : null,
+    /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "relative flex h-full items-center justify-center", style: { width: round9 ? "55%" : "100%", minWidth: 0, pointerEvents: exploring ? "none" : void 0, visibility: exploring ? "hidden" : void 0 }, children: [
+      /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { ref: container, "aria-label": "Live avatar viewport", className: "relative overflow-hidden", style: { height: round9 ? "auto" : "100%", maxHeight: "100%", width: "100%", maxWidth: round9 ? 210 : void 0, aspectRatio: round9 ? "1" : void 0, borderRadius: round9 ? "50%" : void 0, background: round9 ? "radial-gradient(ellipse at 50% 30%, #1e293b, #0c1120)" : void 0, border: round9 ? "2px solid #6366f166" : void 0 } }),
+      !ready2 ? /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { role: "status", className: "absolute text-xs text-white", children: "Loading avatar\u2026" }) : null
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("div", { className: "absolute right-0 top-0 h-full min-w-0", style: { width: "45%" }, "aria-label": "Live notifications", children: /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(PresentationViewport, { controller, compact: true }) })
-  ] });
-  return /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("section", { ref: dialog, role: embedded ? "region" : "dialog", "aria-modal": embedded ? void 0 : true, "aria-label": "Avatar Live", className: embedded ? "relative min-h-0 flex-1 h-full w-full" : "fixed inset-0 z-[100] flex flex-col bg-paper text-ink", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("style", { children: `[data-avatar-live-frame] [aria-label="View directions"]{display:none}` }),
-    !embedded ? /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("header", { className: "flex h-12 shrink-0 items-center gap-2 border-b border-ink/15 bg-surface px-3", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(Monitor, { className: "size-4" }),
-      /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("strong", { className: "flex-1 text-sm", children: "Avatar Live" }),
-      /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: "mr-3 text-xs text-ink/60", children: preset.name }),
-      onShare ? /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("button", { onClick: onShare, className: "mr-2 inline-flex items-center gap-2 rounded-lg border border-ink/15 px-3 py-1.5 text-xs font-bold", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(Share2, { className: "size-3.5" }),
-        "Share"
-      ] }) : null,
-      /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("button", { "aria-label": "Close Avatar Live", onClick: () => change({ open: false }), className: "rounded p-2", children: /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(X, { className: "size-4" }) })
+    exploring ? /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { "aria-hidden": "true", className: "pointer-events-none absolute inset-0 flex items-end justify-center", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("svg", { viewBox: "0 0 200 400", className: "h-[88%] opacity-40", children: /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("g", { fill: "#ffffff", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("rect", { x: "62", y: "122", width: "76", height: "150", rx: "30" }),
+        /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("rect", { x: "34", y: "132", width: "26", height: "110", rx: "13" }),
+        /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("rect", { x: "140", y: "132", width: "26", height: "110", rx: "13" }),
+        /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("rect", { x: "70", y: "262", width: "26", height: "118", rx: "12" }),
+        /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("rect", { x: "104", y: "262", width: "26", height: "118", rx: "12" }),
+        /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("circle", { cx: "100", cy: "72", r: "44" })
+      ] }) }),
+      /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("span", { className: "absolute left-3 top-3 rounded-full bg-black/70 px-3 py-1 text-xs font-bold text-white", children: [
+        VIEWS.find((v2) => v2.id === view).label,
+        " frame"
+      ] })
     ] }) : null,
-    /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: embedded ? "h-full w-full" : "flex min-h-0 flex-1 flex-col md:flex-row", children: [
-      !embedded ? /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("aside", { className: "w-full shrink-0 overflow-auto border-r border-ink/15 p-3 md:w-72", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("nav", { "aria-label": "Avatar Live tools", className: "sticky top-0 z-10 mb-4 grid bg-paper pb-2 grid-cols-2 gap-1", children: tools.map(({ id: id2, label: label3, Icon: Icon2 }) => /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("button", { onClick: () => setSection(id2), "aria-pressed": section === id2, className: `flex items-center gap-2 rounded-lg px-2 py-2.5 text-xs font-bold ${section === id2 ? "bg-ink text-on-brand" : "hover:bg-ink/5"}`, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(Icon2, { className: "size-4 shrink-0" }),
-          label3
-        ] }, id2)) }),
-        section === "display" ? /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "space-y-3", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("fieldset", { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("legend", { className: "mb-2 text-xs font-bold", children: "Display layout" }),
-            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("div", { className: "grid grid-cols-2 gap-2", children: AVATAR_LIVE_LAYOUTS.map((row, index) => {
-              const Icon2 = layoutIcons[index];
-              return /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("button", { "aria-label": `Layout ${row.name}`, "aria-pressed": display.layout === row.id, className: `flex min-h-16 flex-col items-start justify-center gap-2 rounded-lg border px-3 py-2 text-left text-xs ${display.layout === row.id ? "border-ink bg-ink/5 font-bold" : "border-ink/15 hover:bg-ink/5"}`, onClick: () => change({ layout: row.id, framing: ["circle", "watch", "banner"].includes(row.id) ? "bust" : "full" }), children: [
-                /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(Icon2, { className: "size-5" }),
-                row.name
-              ] }, row.id);
-            }) })
+    /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { className: "absolute right-0 top-0 h-full min-w-0", style: { width: "45%" }, "aria-label": "Live notifications", children: /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(PresentationViewport, { controller, compact: true, showEffects: prefs.effects, showNotifications: prefs.notifications, notificationFilter: allowedNotice }) })
+  ] });
+  const backgroundLabel = display.background === "world" ? "My worlds" : display.background === "color" ? "Color" : display.background === "transparent" ? "Transparent" : `${display.background.replace("_", " ")} (older option)`;
+  const settingsDialog = settingsOpen ? /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { className: "absolute inset-0 z-10 flex items-start justify-center bg-black/60 p-4 pt-16", onClick: (event2) => {
+    if (event2.target === event2.currentTarget) setSettingsOpen(false);
+  }, children: /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("section", { role: "dialog", "aria-modal": "true", "aria-label": "Avatar Live settings", className: "flex max-h-[85vh] w-full max-w-3xl flex-col overflow-hidden rounded-2xl border border-ink/15 bg-surface shadow-2xl", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("header", { className: "flex items-center justify-between border-b border-ink/10 px-5 py-3", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("h2", { className: "text-base font-bold", children: "Settings" }),
+      /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("button", { "aria-label": "Close settings", onClick: () => setSettingsOpen(false), className: "rounded-lg p-2 hover:bg-ink/10", children: /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(X, { className: "size-4" }) })
+    ] }),
+    /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "flex min-h-0 flex-1 flex-col md:flex-row", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("nav", { "aria-label": "Settings sections", className: "flex shrink-0 gap-1 overflow-auto border-b border-ink/10 p-2 md:w-52 md:flex-col md:border-b-0 md:border-r", children: SECTIONS.map(({ id: id2, label: label3, Icon: Icon2 }) => /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("button", { "aria-pressed": section === id2, onClick: () => setSection(id2), className: `flex min-h-10 shrink-0 items-center gap-2 rounded-lg px-3 text-left text-xs font-bold ${section === id2 ? "bg-ink text-on-brand" : "hover:bg-ink/5"}`, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(Icon2, { className: "size-4 shrink-0" }),
+        label3
+      ] }, id2)) }),
+      /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "min-w-0 flex-1 space-y-4 overflow-auto p-5", children: [
+        section === "agent" ? /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "space-y-3", children: [
+          agent ? /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "rounded-xl border border-ink/15 p-4", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { className: "block text-xs text-ink/60", children: "Linked agent" }),
+            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("strong", { className: "block text-base", children: agent.name }),
+            agent.detail ? /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { className: "text-xs text-ink/70", children: agent.detail }) : null
+          ] }) : /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("p", { className: "rounded-xl border border-ink/15 p-4 text-xs text-ink/70", children: "No agent app is connected. This Studio shows the avatar on its own; an agent app (for example Dpro) links its agent, conversation and activity here." }),
+          /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("p", { className: "text-xs text-ink/60", children: "The agent's memory, tools and permissions stay in its app. This page only gives it a face and a voice." })
+        ] }) : null,
+        section === "look" ? /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "space-y-4", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("h3", { className: "mb-2 text-xs font-bold", children: "Character" }),
+            characters ?? /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("p", { className: "text-xs text-ink/60", children: "The agent's character is chosen in its app." })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("label", { className: "block text-xs font-bold", children: [
-            "Background",
-            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("select", { "aria-label": "Avatar Live background", className: input, value: display.background, onChange: (e2) => {
-              if (["image", "video"].includes(e2.target.value) && !display.media) {
-                setMediaUrl("");
-                setSection("media");
-              } else change({ background: e2.target.value });
-            }, children: backgrounds.map(([id2, label3]) => /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("option", { value: id2, disabled: id2 === "world" && !worldViewport && !worldStorage, children: label3 }, id2)) })
-          ] }),
-          display.background === "world" ? /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("div", { ref: setWorldControls }) : null,
-          /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("label", { className: "block text-xs font-bold", children: [
-            "Background color",
-            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("input", { "aria-label": "Avatar Live color", type: "color", value: display.color, onChange: (e2) => change({ color: e2.target.value }) })
-          ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("label", { className: "block text-xs font-bold", children: [
-            "Camera framing",
-            /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("select", { "aria-label": "Avatar Live framing", className: input, value: display.framing, onChange: (e2) => change({ framing: e2.target.value }), children: [
-              /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("option", { value: "full", children: "Full body" }),
-              /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("option", { value: "bust", children: "Upper body" }),
-              /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("option", { value: "face", children: "Face" })
-            ] })
-          ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("p", { className: "text-xs text-ink/60", children: [
-            display.background === "world" ? "Your Build world is live behind the avatar. " : "",
-            "Drag to orbit. Scroll to zoom. Notifications have their own space on the right."
+          /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("h3", { className: "mb-2 text-xs font-bold", children: "Voice" }),
+            voice ?? (host?.voices ? /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("label", { className: "block text-xs font-bold", children: [
+              "Voice for ",
+              agent?.name ?? "the agent",
+              /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("select", { "aria-label": "Agent voice", className: "mt-1 w-full rounded-lg border border-ink/20 bg-paper p-2 text-sm", value: host.voiceId ?? "", onChange: (e2) => host.onVoice?.(e2.target.value), children: [
+                /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("option", { value: "", children: "No voice" }),
+                host.voices.map((v2) => /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("option", { value: v2.id, children: [
+                  v2.name,
+                  v2.language ? ` \xB7 ${v2.language}` : ""
+                ] }, v2.id))
+              ] }),
+              /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { className: "mt-1 block font-normal text-ink/60", children: "Saved voices from your voice library. Speech is made on this device." })
+            ] }) : null),
+            faceSupported === false ? /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("p", { className: "mt-2 text-xs text-ink/60", children: "This character has no face controls: the voice plays, but the mouth cannot move." }) : null
           ] })
         ] }) : null,
-        section === "media" ? /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "space-y-2", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("label", { className: "block text-xs font-bold", children: [
-            "Upload background",
-            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("input", { "aria-label": "Upload live background", type: "file", accept: "image/*,video/*", className: `${input} mt-2`, onChange: (event2) => {
-              const file = event2.target.files?.[0];
-              event2.target.value = "";
-              if (!file) return;
-              if (file.size > 20 * 1024 * 1024) {
-                setError("Choose media smaller than 20 MB.");
-                return;
-              }
-              if (!/^(image|video)\//.test(file.type)) {
-                setError("Choose an image or video.");
-                return;
-              }
-              const media = controller.localMedia(file);
-              change({ background: file.type.startsWith("video/") ? "video" : "image", media });
-              setSection("display");
-            } })
+        section === "background" ? /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "space-y-4", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("p", { className: "text-xs text-ink/70", children: [
+            "Now: ",
+            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("b", { children: backgroundLabel })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("label", { className: "text-xs", children: [
-            "Image, GIF or video URL",
-            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("input", { className: input, "aria-label": "Avatar Live media URL", value: mediaUrl, onChange: (e2) => setMediaUrl(e2.target.value) })
+          /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { className: "grid grid-cols-3 gap-2", children: [["world", "My worlds"], ["color", "Color"], ["transparent", "Transparent"]].map(([id2, label3]) => /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("button", { "aria-pressed": display.background === id2, disabled: id2 === "world" && !worldStorage && !worldViewport, className: `${tile2(display.background === id2)} disabled:opacity-40`, onClick: () => change({ background: id2 }), children: label3 }, id2)) }),
+          display.background === "world" ? /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "space-y-2", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("p", { className: "text-xs text-ink/70", children: [
+              "Pick one of your worlds, then ",
+              /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("b", { children: "Choose a spot" }),
+              ": walk to the view you like and keep it behind your agent. Your world is not changed."
+            ] }),
+            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { ref: setBgHost })
+          ] }) : null,
+          display.background === "color" ? /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("label", { className: "flex items-center gap-3 text-xs font-bold", children: [
+            "Color",
+            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("input", { "aria-label": "Avatar Live color", type: "color", value: display.color, onChange: (e2) => change({ color: e2.target.value }) })
+          ] }) : null,
+          display.background === "transparent" ? /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("p", { className: "text-xs text-ink/60", children: "No background: the avatar shows over your website or screen." }) : null
+        ] }) : null,
+        section === "display" ? /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "space-y-4", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("fieldset", { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("legend", { className: "mb-2 text-xs font-bold", children: "Show as" }),
+            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { className: "grid grid-cols-2 gap-2", children: VIEWS.map((row) => /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("button", { "aria-pressed": view === row.id, className: tile2(view === row.id), onClick: () => change({ layout: row.layout, framing: row.id === "watch" ? "bust" : display.framing }), children: [
+              /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(ViewDrawing, { view: row.id }),
+              /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { className: "font-bold", children: row.label }),
+              /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { className: "text-ink/60", children: row.hint })
+            ] }, row.id)) })
           ] }),
-          ["image", "video"].map((background) => /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("button", { className: input, onClick: () => {
-            const result = controller.execute({ kind: "display", background, media: mediaUrl });
-            setError(result ?? "");
-            if (!result) setSection("display");
-          }, children: [
-            "Use ",
-            background
-          ] }, background)),
-          /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("p", { className: "text-xs", children: "Use a hosted media URL for sharing." })
+          /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("fieldset", { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("legend", { className: "mb-2 text-xs font-bold", children: "Size" }),
+            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { className: "inline-flex gap-1 rounded-xl border border-ink/15 p-1", children: SIZES.map((row) => /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("button", { "aria-pressed": prefs.size === row.id, className: pill2(prefs.size === row.id), onClick: () => setPrefs({ size: row.id }), children: row.label }, row.id)) })
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("fieldset", { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("legend", { className: "mb-2 text-xs font-bold", children: "Framing" }),
+            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { className: "inline-flex gap-1 rounded-xl border border-ink/15 p-1", children: FRAMINGS.map((row) => /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("button", { "aria-pressed": display.framing === row.id, className: pill2(display.framing === row.id), onClick: () => change({ framing: row.id }), children: row.label }, row.id)) })
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("fieldset", { className: "space-y-2", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("legend", { className: "mb-2 text-xs font-bold", children: "Switches" }),
+            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(Switch2, { label: "Speak replies", hint: "The agent's voice plays aloud", checked: prefs.speak, onChange: (v2) => setPrefs({ speak: v2 }) }),
+            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(Switch2, { label: "Notifications", hint: "Cards from your agent on the right", checked: prefs.notifications, onChange: (v2) => setPrefs({ notifications: v2 }) }),
+            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(Switch2, { label: "Effects", hint: "Small screen effects your agent may show", checked: prefs.effects, onChange: (v2) => setPrefs({ effects: v2 }) }),
+            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(Switch2, { label: "Side panel", hint: "What it's doing, beside the chat", checked: prefs.sidePanel, onChange: (v2) => setPrefs({ sidePanel: v2 }) })
+          ] })
         ] }) : null,
-        section === "characters" ? characters : null,
-        section === "voice" ? /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)(import_jsx_runtime8.Fragment, { children: [
-          voice,
-          faceSupported === false ? /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("p", { className: "mt-3 text-xs text-ink/60", children: "This avatar has no facial rig. Audio plays, but its mouth cannot animate." }) : null
+        section === "where" ? /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "space-y-3", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("p", { className: "text-xs text-ink/70", children: [
+            "Exact sizes for screens and websites. Use ",
+            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("b", { children: "Share" }),
+            " to get a link or the website code."
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { className: "grid grid-cols-2 gap-2", children: AVATAR_LIVE_LAYOUTS.map((row) => /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("button", { "aria-label": `Layout ${row.name}`, "aria-pressed": display.layout === row.id, className: tile2(display.layout === row.id), onClick: () => change({ layout: row.id, framing: ["circle", "watch", "banner"].includes(row.id) ? "bust" : display.framing }), children: [
+            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { className: "font-bold", children: row.name }),
+            /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("span", { className: "text-ink/60", children: [
+              row.width,
+              " \xD7 ",
+              row.height
+            ] })
+          ] }, row.id)) })
         ] }) : null,
-        section === "expressions" && faceSupported === false ? /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("p", { role: "status", className: "mb-3 text-xs text-ink/60", children: "This avatar has no facial controls. Choose a compatible character such as Standard robot to preview expressions." }) : null,
-        ["motions", "expressions", "effects", "notifications", "cards"].includes(section) ? /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)(import_jsx_runtime8.Fragment, { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("input", { "aria-label": "Search live controls", className: `${input} mb-3`, placeholder: "Search", value: search, onChange: (e2) => setSearch(e2.target.value) }),
-          /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(PresentationControls, { controller, section, agents: [], search, includeAvailableMotions: true })
+        section === "allowed" ? /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "space-y-3", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("p", { className: "text-xs text-ink/70", children: "What the agent may do when other people talk to it." }),
+          permissions ?? /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("p", { className: "rounded-xl border border-ink/15 p-4 text-xs text-ink/60", children: "Set by your agent app. Visitors never see your files, approvals or other chats." })
+        ] }) : null,
+        section === "notifications" ? /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "space-y-2", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("p", { className: "text-xs text-ink/70", children: "What your agent shows on screen by itself." }),
+          /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(Switch2, { label: "Show notifications", checked: prefs.notifications, onChange: (v2) => setPrefs({ notifications: v2 }) }),
+          NOTICE_GROUPS.map((group2) => /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(Switch2, { label: group2.label, hint: group2.hint, checked: prefs.notice[group2.id], onChange: (v2) => setPrefs({ notice: { ...prefs.notice, [group2.id]: v2 } }) }, group2.id))
         ] }) : null
-      ] }) : null,
-      /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("div", { className: embedded ? "h-full w-full" : "flex min-h-0 min-w-0 flex-1 items-center justify-center overflow-auto bg-ink/5 p-4", children: frame2 })
+      ] })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("div", { ref: playerHost, className: "shrink-0 border-t border-ink/10 bg-surface p-3 empty:hidden" }),
-    error ? /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("p", { role: "alert", className: "bg-coral px-3 py-2 text-xs text-white", children: error }) : null
+    /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("footer", { className: "flex justify-end border-t border-ink/10 px-5 py-3", children: /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("button", { onClick: () => setSettingsOpen(false), className: "min-h-10 rounded-lg bg-ink px-5 text-xs font-bold text-on-brand", children: "Done" }) })
+  ] }) }) : null;
+  if (embedded) return /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("section", { ref: dialog, role: "region", "aria-label": "Avatar Live", className: "relative min-h-0 flex-1 h-full w-full", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("style", { children: `[data-avatar-live-frame] [aria-label="View directions"]{display:none}` }),
+    /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { className: "h-full w-full", children: frame2 }),
+    /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { ref: (element2) => {
+      player.current = element2;
+      playerHost?.(element2);
+    }, className: "shrink-0 empty:hidden" }),
+    host ? /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("button", { onClick: () => setSettingsOpen(true), "aria-haspopup": "dialog", "aria-label": "Avatar Live settings", className: "absolute left-2 top-2 z-[5] inline-flex min-h-9 items-center gap-2 rounded-lg bg-black/60 px-3 text-xs font-bold text-white hover:bg-black/80", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(Settings, { className: "size-4" }),
+      "Settings"
+    ] }) : null,
+    error && host ? /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("p", { role: "alert", className: "absolute inset-x-0 top-0 bg-coral px-3 py-2 text-xs text-white", children: error }) : null,
+    host ? settingsDialog : null
+  ] });
+  const talking = view === "chat" || view === "compact", side2 = prefs.sidePanel && talking;
+  return /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("section", { ref: dialog, role: "dialog", "aria-modal": "true", "aria-label": "Avatar Live", className: "fixed inset-0 z-[100] flex flex-col bg-paper text-ink", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("style", { children: `[data-avatar-live-frame] [aria-label="View directions"]{display:none}` }),
+    /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("header", { className: "flex min-h-14 shrink-0 flex-wrap items-center gap-3 border-b border-ink/15 bg-surface px-4 py-2", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(Monitor, { className: "size-4" }),
+      /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("strong", { className: "text-sm", children: "Avatar Live" }),
+      agent ? /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { className: "rounded-full border border-ink/15 px-3 py-1 text-xs font-bold", children: agent.name }) : null,
+      /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { role: "group", "aria-label": "Who it talks to", className: "flex gap-1 rounded-xl border border-ink/15 p-1", children: [["me", "For me"], ["customers", "For my customers"]].map(([id2, label3]) => /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("button", { "aria-pressed": prefs.mode === id2, className: pill2(prefs.mode === id2), onClick: () => setPrefs({ mode: id2 }), children: label3 }, id2)) }),
+      /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { className: "flex-1" }),
+      /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("button", { onClick: () => setSettingsOpen(true), "aria-haspopup": "dialog", className: "inline-flex min-h-10 items-center gap-2 rounded-lg border border-ink/15 px-3 text-xs font-bold", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(Settings, { className: "size-4" }),
+        "Settings"
+      ] }),
+      onShare ? /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("button", { onClick: onShare, className: "inline-flex min-h-10 items-center gap-2 rounded-lg bg-ink px-4 text-xs font-bold text-on-brand", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(Share2, { className: "size-4" }),
+        "Share"
+      ] }) : null,
+      /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("button", { "aria-label": "Close Avatar Live", onClick: () => change({ open: false }), className: "rounded p-2", children: /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(X, { className: "size-4" }) })
+    ] }),
+    /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "flex min-h-0 flex-1 flex-col md:flex-row", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("main", { className: "flex min-h-0 min-w-0 flex-1 flex-col items-center gap-4 overflow-auto bg-ink/5 p-4", children: [
+        exploring ? /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "w-full max-w-4xl rounded-xl border border-ink/15 bg-surface p-3 text-xs", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("strong", { className: "flex items-center gap-2 text-sm", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(MapPin, { className: "size-4" }),
+            "Choosing the background spot"
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("p", { className: "mt-1 text-ink/70", children: [
+            "Walk to the view you want behind your agent: ",
+            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("b", { children: "W A S D" }),
+            " or arrows to walk, drag to look, scroll for closer or farther. The dashed frame shows what will be behind your agent. Your world is not changed."
+          ] })
+        ] }) : null,
+        frame2,
+        exploring ? /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { ref: setSpotHost, className: "w-full max-w-4xl", "aria-label": "Spot controls" }) : null,
+        !exploring && talking ? /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { "aria-label": "Conversation", className: "w-full max-w-3xl", children: conversation ?? /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("p", { className: "rounded-xl border border-dashed border-ink/20 p-4 text-center text-xs text-ink/60", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(MessageSquare, { className: "mx-auto mb-2 size-5" }),
+          "Connect an agent app to talk here. The agent answers with this face and voice."
+        ] }) }) : null
+      ] }),
+      side2 && !exploring ? /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("aside", { className: "w-full shrink-0 overflow-auto border-l border-ink/15 p-4 md:w-80", children: prefs.mode === "me" ? /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)(import_jsx_runtime7.Fragment, { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("h2", { className: "mb-3 flex items-center gap-2 text-sm font-bold", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(Activity, { className: "size-4" }),
+          "What it's doing"
+        ] }),
+        activity ?? /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("p", { className: "text-xs text-ink/60", children: "Your agent's live work and approvals appear here when an agent app is connected." })
+      ] }) : /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)(import_jsx_runtime7.Fragment, { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("h2", { className: "mb-2 text-sm font-bold", children: "For your customers" }),
+        /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("p", { className: "mb-3 text-xs text-ink/70", children: "Put this agent on your website. Visitors talk to it; it answers with its own voice and face." }),
+        permissions ?? /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("p", { className: "rounded-lg border border-ink/15 p-3 text-xs text-ink/60", children: "What it may do for visitors is set by your agent app." }),
+        onShare ? /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("button", { onClick: onShare, className: "mt-3 inline-flex min-h-10 items-center gap-2 rounded-lg bg-ink px-4 text-xs font-bold text-on-brand", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(Share2, { className: "size-4" }),
+          "Get the link or website code"
+        ] }) : null
+      ] }) }) : null
+    ] }),
+    /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { ref: (element2) => {
+      player.current = element2;
+      playerHost?.(element2);
+    }, className: "shrink-0 border-t border-ink/10 bg-surface p-3 empty:hidden" }),
+    error ? /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("p", { role: "alert", className: "bg-coral px-3 py-2 text-xs text-white", children: error }) : null,
+    settingsDialog
   ] });
 }
 
 // ../../apps/web/components/studio/film/quick-voice.tsx
-var import_react12 = __toESM(require_react(), 1);
-var import_jsx_runtime9 = __toESM(require_jsx_runtime(), 1);
+var import_react11 = __toESM(require_react(), 1);
+var import_jsx_runtime8 = __toESM(require_jsx_runtime(), 1);
 function QuickVoice({ filming }) {
-  const [voices, setVoices] = (0, import_react12.useState)([]), [selected2, setSelected] = (0, import_react12.useState)(""), [busy, setBusy] = (0, import_react12.useState)(false);
+  const [voices, setVoices] = (0, import_react11.useState)([]), [selected2, setSelected] = (0, import_react11.useState)(""), [busy, setBusy] = (0, import_react11.useState)(false);
   const refresh = async () => {
     const [library, id2] = await Promise.all([filming.voiceLibrary(), filming.selectedVoice()]);
     setVoices(library.voices);
     setSelected(id2);
   };
-  (0, import_react12.useEffect)(() => {
+  (0, import_react11.useEffect)(() => {
     void refresh().catch((e2) => filming.studio.setMessage(e2.message));
   }, [filming.studio.identity]);
   const run = async (action) => {
@@ -73694,14 +73655,14 @@ function QuickVoice({ filming }) {
     }
   };
   const chosen = voices.find((v2) => v2.id === selected2);
-  return /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("section", { "aria-label": "Quick character voice", className: "space-y-2", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("div", { className: "flex items-center justify-between", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("strong", { className: "text-xs", children: "Character voice" }),
-      /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("button", { "aria-label": "Refresh quick voices", onClick: () => void run(refresh), disabled: busy, children: /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(RefreshCw, { className: "size-3.5" }) })
+  return /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("section", { "aria-label": "Quick character voice", className: "space-y-2", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "flex items-center justify-between", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("strong", { className: "text-xs", children: "Character voice" }),
+      /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("button", { "aria-label": "Refresh quick voices", onClick: () => void run(refresh), disabled: busy, children: /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(RefreshCw, { className: "size-3.5" }) })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("label", { className: "block text-xs", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("label", { className: "block text-xs", children: [
       "My avatar",
-      /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("select", { "aria-label": "Quick saved voice", className: "mt-1 w-full rounded border border-ink/15 bg-paper p-2", value: selected2, disabled: busy || filming.busy, onChange: (e2) => {
+      /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("select", { "aria-label": "Quick saved voice", className: "mt-1 w-full rounded border border-ink/15 bg-paper p-2", value: selected2, disabled: busy || filming.busy, onChange: (e2) => {
         const id2 = e2.target.value;
         if (id2) void run(async () => {
           await filming.assignSavedVoice(id2);
@@ -73709,36 +73670,36 @@ function QuickVoice({ filming }) {
           filming.studio.setMessage("Saved voice assigned to My avatar. New dialogue uses this voice; existing audio stays unchanged.");
         });
       }, children: [
-        /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("option", { value: "", children: "Choose saved voice" }),
-        voices.map((v2) => /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("option", { value: v2.id, children: v2.name }, v2.id))
+        /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("option", { value: "", children: "Choose saved voice" }),
+        voices.map((v2) => /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("option", { value: v2.id, children: v2.name }, v2.id))
       ] })
     ] }),
-    chosen ? /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)(import_jsx_runtime9.Fragment, { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("p", { className: "text-xs text-ink/60", children: [
+    chosen ? /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)(import_jsx_runtime8.Fragment, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("p", { className: "text-xs text-ink/60", children: [
         chosen.language?.toUpperCase() ?? "Multilingual",
         " \xB7 ",
         chosen.voiceType ?? "Reference"
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("button", { className: "flex items-center gap-1 rounded border border-ink/15 px-2 py-1.5 text-xs", disabled: busy || filming.busy, onClick: () => void run(() => filming.previewSavedVoice(chosen.id)), children: [
-        /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(Play, { className: "size-3.5" }),
+      /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("button", { className: "flex items-center gap-1 rounded border border-ink/15 px-2 py-1.5 text-xs", disabled: busy || filming.busy, onClick: () => void run(() => filming.previewSavedVoice(chosen.id)), children: [
+        /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(Play, { className: "size-3.5" }),
         "Listen"
       ] })
-    ] }) : /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("p", { className: "text-xs text-ink/55", children: "Create or import a saved voice in Avatar voice." }),
-    /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("p", { className: "text-[10px] text-ink/50", children: "New dialogue defaults to this voice. Generate scene dialogue to create speech; recorded audio is unchanged." })
+    ] }) : /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("p", { className: "text-xs text-ink/55", children: "Create or import a saved voice in Avatar voice." }),
+    /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("p", { className: "text-[10px] text-ink/50", children: "New dialogue defaults to this voice. Generate scene dialogue to create speech; recorded audio is unchanged." })
   ] });
 }
 
 // ../../apps/web/lib/studio-host.tsx
-var import_react13 = __toESM(require_react(), 1);
-var import_jsx_runtime10 = __toESM(require_jsx_runtime(), 1);
-var Context = (0, import_react13.createContext)({ platform: true });
+var import_react12 = __toESM(require_react(), 1);
+var import_jsx_runtime9 = __toESM(require_jsx_runtime(), 1);
+var Context = (0, import_react12.createContext)({ platform: true });
 function StudioHostProvider({ value, children }) {
-  return /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Context.Provider, { value, children });
+  return /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(Context.Provider, { value, children });
 }
-var useStudioHost = () => (0, import_react13.useContext)(Context);
+var useStudioHost = () => (0, import_react12.useContext)(Context);
 
 // ../../apps/web/components/studio/character-editor/character-controls.tsx
-var import_react16 = __toESM(require_react(), 1);
+var import_react15 = __toESM(require_react(), 1);
 
 // ../../apps/web/lib/face-fit/human-mean.json
 var human_mean_default = {
@@ -74081,7 +74042,7 @@ var FANTASY_SKINS = [
 }));
 
 // ../../apps/web/components/avatar-sketch.tsx
-var import_jsx_runtime11 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime10 = __toESM(require_jsx_runtime(), 1);
 var profile = (part2) => ({
   ...part2,
   center: [part2.center[2], part2.center[1], part2.center[0]],
@@ -74144,12 +74105,12 @@ function AvatarSketch({
   className
 }) {
   const body = findBody(look.body);
-  if (body.picture) return /* @__PURE__ */ (0, import_jsx_runtime11.jsx)("img", { src: body.picture, alt: "", className: `${className ?? ""} object-contain` });
+  if (body.picture) return /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("img", { src: body.picture, alt: "", className: `${className ?? ""} object-contain` });
   const sign3 = view === "front" ? 1 : -1;
   const parts = lookParts(look).map((part2) => body.flat ? profile(part2) : hang(part2, body));
   const frame2 = frameAround(focusParts(parts, focus), focus === "full" ? 0.04 : 0.06);
   const rects = parts.map((part2) => ({ part: part2, depth: sign3 * part2.center[2] + part2.size[2] / 2 })).sort((a2, b2) => a2.depth - b2.depth);
-  return /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
     "svg",
     {
       viewBox: `${frame2.left} ${-frame2.top} ${frame2.right - frame2.left} ${frame2.top - frame2.bottom}`,
@@ -74159,7 +74120,7 @@ function AvatarSketch({
       children: rects.map(({ part: part2 }, index) => {
         const [x3, y2] = part2.center;
         const [w2, h2] = part2.size;
-        return /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
+        return /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
           "rect",
           {
             x: sign3 * x3 - w2 / 2,
@@ -74179,24 +74140,24 @@ function AvatarSketch({
 }
 
 // ../../apps/web/components/studio/character-editor/muscle-paint-panel.tsx
-var import_react15 = __toESM(require_react(), 1);
+var import_react14 = __toESM(require_react(), 1);
 
 // ../../apps/web/components/studio/character-editor/paint-pose-panel.tsx
-var import_react14 = __toESM(require_react(), 1);
-var import_jsx_runtime12 = __toESM(require_jsx_runtime(), 1);
+var import_react13 = __toESM(require_react(), 1);
+var import_jsx_runtime11 = __toESM(require_jsx_runtime(), 1);
 var GROUPS = [...new Set(POSE_CONTROLS.map((control) => control.group))];
 
 // ../../apps/web/components/studio/character-editor/muscle-paint-panel.tsx
-var import_jsx_runtime13 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime12 = __toESM(require_jsx_runtime(), 1);
 
 // ../../apps/web/components/studio/character-editor/character-controls.tsx
-var import_jsx_runtime14 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime13 = __toESM(require_jsx_runtime(), 1);
 function EditorSection({ title, children }) {
-  const icons2 = { Characters: PersonStanding, Body: PersonStanding, Shape: Ruler, Face: ScanFace, Colours: Palette, "Character recipe": Save };
-  const Icon2 = icons2[title] ?? PersonStanding;
-  return /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)("section", { "aria-label": title, className: "mb-5", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)("h3", { className: "mb-2 flex items-center gap-2 text-xs font-bold text-ink/60", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(Icon2, { className: "size-4" }),
+  const icons = { Characters: PersonStanding, Body: PersonStanding, Shape: Ruler, Face: ScanFace, Colours: Palette, "Character recipe": Save };
+  const Icon2 = icons[title] ?? PersonStanding;
+  return /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("section", { "aria-label": title, className: "mb-5", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("h3", { className: "mb-2 flex items-center gap-2 text-xs font-bold text-ink/60", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(Icon2, { className: "size-4" }),
       title
     ] }),
     children
@@ -74205,26 +74166,26 @@ function EditorSection({ title, children }) {
 function BodySection({ editor }) {
   const { recipe } = editor;
   const look = recipeLook(recipe);
-  return /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)("div", { role: "radiogroup", "aria-label": "Body", className: "grid grid-cols-2 gap-2", children: [
-    PLAYER_BODIES.map((body) => /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("div", { role: "radiogroup", "aria-label": "Body", className: "grid grid-cols-2 gap-2", children: [
+    PLAYER_BODIES.map((body) => /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
       BodyCard,
       {
         on: recipe.body === body.id,
         label: body.manifest.name,
         note: `${body.joints.length} bones`,
         onPick: () => editor.change((current2) => ({ ...current2, body: body.id })),
-        children: /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(AvatarSketch, { look: { ...look, body: body.id }, className: "h-20 w-full" })
+        children: /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(AvatarSketch, { look: { ...look, body: body.id }, className: "h-20 w-full" })
       },
       body.id
     )),
-    editor.myBodies.map((body) => /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
+    editor.myBodies.map((body) => /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
       BodyCard,
       {
         on: recipe.body === body.id,
         label: body.name,
         note: "Uploaded",
         onPick: () => editor.change((current2) => ({ ...current2, body: body.id })),
-        children: /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(PersonStanding, { className: "h-20 w-full p-4 text-ink/40", strokeWidth: 1.5, "aria-hidden": true })
+        children: /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(PersonStanding, { className: "h-20 w-full p-4 text-ink/40", strokeWidth: 1.5, "aria-hidden": true })
       },
       body.id
     ))
@@ -74237,7 +74198,7 @@ function BodyCard({
   onPick,
   children
 }) {
-  return /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)(
+  return /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(
     "button",
     {
       type: "button",
@@ -74247,9 +74208,9 @@ function BodyCard({
       className: `relative flex flex-col items-center gap-0.5 rounded-2xl bg-paper px-2 pt-2 pb-1.5 text-xs font-bold text-ink transition active:scale-95 ${on ? "ring-2 ring-ink" : "hover:bg-ink/5"}`,
       children: [
         children,
-        /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("span", { className: "truncate", children: label3 }),
-        /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("span", { className: "text-[10px] font-semibold text-ink/50", children: note }),
-        on ? /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("span", { className: "absolute top-1.5 right-1.5 flex size-5 items-center justify-center rounded-full bg-ink text-on-brand", children: /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(Check, { className: "size-3", strokeWidth: 3, "aria-hidden": true }) }) : null
+        /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("span", { className: "truncate", children: label3 }),
+        /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("span", { className: "text-[10px] font-semibold text-ink/50", children: note }),
+        on ? /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("span", { className: "absolute top-1.5 right-1.5 flex size-5 items-center justify-center rounded-full bg-ink text-on-brand", children: /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(Check, { className: "size-3", strokeWidth: 3, "aria-hidden": true }) }) : null
       ]
     }
   );
@@ -74262,17 +74223,17 @@ var SHAPES = [
 function ShapeSection({ editor }) {
   const { recipe } = editor;
   const normal = JSON.stringify(recipe.shape) === JSON.stringify(NORMAL_CHARACTER_SHAPE);
-  return /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)("div", { className: "flex flex-col gap-2.5", children: [
+  return /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("div", { className: "flex flex-col gap-2.5", children: [
     SHAPES.map(({ key: key2, label: label3 }) => {
       const limits = CHARACTER_SHAPE_LIMITS[key2];
       const value = recipe.shape[key2];
-      return /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)(
+      return /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(
         "label",
         {
           className: "grid grid-cols-[4.75rem_minmax(0,1fr)_2.75rem] items-center gap-2 text-xs font-bold text-ink/75",
           children: [
             label3,
-            /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
+            /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
               "input",
               {
                 type: "range",
@@ -74288,7 +74249,7 @@ function ShapeSection({ editor }) {
                 className: "w-full accent-ink"
               }
             ),
-            /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)("span", { className: "text-right tabular-nums", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("span", { className: "text-right tabular-nums", children: [
               Math.round(value * 100),
               "%"
             ] })
@@ -74297,14 +74258,14 @@ function ShapeSection({ editor }) {
         key2
       );
     }),
-    findBody(recipe.body).generated === "human" ? /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(BuildControls, { editor }) : null,
-    /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)("div", { className: "flex items-center justify-between text-xs font-semibold text-ink/60", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)("span", { children: [
+    findBody(recipe.body).generated === "human" ? /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(BuildControls, { editor }) : null,
+    /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("div", { className: "flex items-center justify-between text-xs font-semibold text-ink/60", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("span", { children: [
         "Stands",
         " ",
-        /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("b", { className: "text-ink tabular-nums", children: editor.info ? `${editor.info.height.toFixed(2)} m` : "..." })
+        /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("b", { className: "text-ink tabular-nums", children: editor.info ? `${editor.info.height.toFixed(2)} m` : "..." })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
+      /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
         "button",
         {
           type: "button",
@@ -74402,17 +74363,17 @@ function BuildSlider({
   onShow
 }) {
   const percent2 = Math.round(value * 100);
-  return /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)(
+  return /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(
     "label",
     {
       title,
       className: "grid grid-cols-[6rem_minmax(0,1fr)_2.75rem] items-center gap-2 text-xs font-bold text-ink/75",
       children: [
-        /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)("span", { className: "flex min-w-0 items-center gap-1.5", children: [
-          color2 ? /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("span", { className: "size-2.5 shrink-0 rounded-full", style: { background: color2 }, "aria-hidden": true }) : null,
-          /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("span", { className: "truncate", children: label3 })
+        /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("span", { className: "flex min-w-0 items-center gap-1.5", children: [
+          color2 ? /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("span", { className: "size-2.5 shrink-0 rounded-full", style: { background: color2 }, "aria-hidden": true }) : null,
+          /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("span", { className: "truncate", children: label3 })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
           "input",
           {
             type: "range",
@@ -74427,7 +74388,7 @@ function BuildSlider({
             className: "w-full accent-ink"
           }
         ),
-        /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)("span", { className: "text-right tabular-nums", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("span", { className: "text-right tabular-nums", children: [
           min10 < 0 && percent2 > 0 ? `+${percent2}` : percent2,
           "%"
         ] })
@@ -74441,14 +74402,14 @@ function NumberField({
   value,
   onCommit
 }) {
-  const [draft, setDraft] = (0, import_react16.useState)(null);
+  const [draft, setDraft] = (0, import_react15.useState)(null);
   const commit = () => {
     if (draft !== null && draft.trim() !== "") onCommit(Number(draft));
     setDraft(null);
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)("label", { className: "flex items-center gap-1.5 rounded-lg px-2 py-1 ring-1 ring-ink/15", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("span", { className: "text-ink/60", children: label3 }),
-    /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("label", { className: "flex items-center gap-1.5 rounded-lg px-2 py-1 ring-1 ring-ink/15", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("span", { className: "text-ink/60", children: label3 }),
+    /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
       "input",
       {
         type: "number",
@@ -74463,19 +74424,19 @@ function NumberField({
         className: "w-full min-w-0 bg-transparent text-right tabular-nums text-ink outline-none"
       }
     ),
-    /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("span", { className: "text-ink/60", children: unit2 })
+    /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("span", { className: "text-ink/60", children: unit2 })
   ] });
 }
 function BuildGroup({ title, children }) {
-  return /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)("div", { className: "flex flex-col gap-2 border-t border-ink/10 pt-2.5", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("p", { className: "text-[11px] font-black uppercase tracking-wide text-ink/50", children: title }),
+  return /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("div", { className: "flex flex-col gap-2 border-t border-ink/10 pt-2.5", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("p", { className: "text-[11px] font-black uppercase tracking-wide text-ink/50", children: title }),
     children
   ] });
 }
 function BuildControls({ editor }) {
   const { recipe } = editor;
   const shape2 = recipe.shape;
-  const [step3, setStep] = (0, import_react16.useState)(FULL_BODY_STEP);
+  const [step3, setStep] = (0, import_react15.useState)(FULL_BODY_STEP);
   const set = (patch) => editor.change((current2) => ({ ...current2, shape: { ...current2.shape, ...patch } }));
   const kind = `${recipe.base} \xB7 ${recipe.sex} \xB7 ${recipe.style}`;
   const show = (view, muscle, fat) => () => {
@@ -74504,13 +74465,13 @@ function BuildControls({ editor }) {
     if (metres && kilograms > 0) set({ fat: fatForWeight(kilograms, metres) });
   };
   const part2 = BODY_STEPS[step3];
-  return /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)(import_jsx_runtime14.Fragment, { children: [
-    /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)("p", { className: "text-xs font-semibold capitalize text-ink/60", children: [
+  return /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(import_jsx_runtime13.Fragment, { children: [
+    /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("p", { className: "text-xs font-semibold capitalize text-ink/60", children: [
       "Character ",
-      /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("b", { className: "text-ink", children: kind })
+      /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("b", { className: "text-ink", children: kind })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)("div", { className: "grid grid-cols-2 gap-2 text-xs font-bold text-ink/75", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
+    /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("div", { className: "grid grid-cols-2 gap-2 text-xs font-bold text-ink/75", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
         NumberField,
         {
           label: "Height",
@@ -74519,7 +74480,7 @@ function BuildControls({ editor }) {
           onCommit: setHeight
         }
       ),
-      /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
+      /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
         NumberField,
         {
           label: "Weight",
@@ -74529,7 +74490,7 @@ function BuildControls({ editor }) {
         }
       )
     ] }),
-    recipe.style === "anime" ? /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
+    recipe.style === "anime" ? /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
       BuildSlider,
       {
         label: "Anime",
@@ -74539,7 +74500,7 @@ function BuildControls({ editor }) {
         onChange: (anime) => set({ anime })
       }
     ) : null,
-    /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("nav", { "aria-label": "Body steps", className: "grid grid-cols-5 gap-1 border-t border-ink/10 pt-2.5", children: [...BODY_STEPS.map((one2) => one2.title), "Full body"].map((title, index) => /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)(
+    /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("nav", { "aria-label": "Body steps", className: "grid grid-cols-5 gap-1 border-t border-ink/10 pt-2.5", children: [...BODY_STEPS.map((one2) => one2.title), "Full body"].map((title, index) => /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(
       "button",
       {
         type: "button",
@@ -74548,14 +74509,14 @@ function BuildControls({ editor }) {
         onClick: () => goTo(index),
         className: `flex flex-col items-center gap-0.5 rounded-lg px-0.5 py-1.5 text-[10px] font-bold leading-tight transition ${step3 === index ? "bg-ink text-on-brand" : "text-ink/70 ring-1 ring-ink/15 hover:text-ink"}`,
         children: [
-          /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("span", { className: "text-sm font-black tabular-nums", children: index + 1 }),
-          /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("span", { className: "w-full truncate text-center", children: title })
+          /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("span", { className: "text-sm font-black tabular-nums", children: index + 1 }),
+          /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("span", { className: "w-full truncate text-center", children: title })
         ]
       },
       title
     )) }),
-    part2 ? /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)(import_jsx_runtime14.Fragment, { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(BuildGroup, { title: `${part2.title}: muscles`, children: part2.muscles.map((zone) => /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
+    part2 ? /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(import_jsx_runtime13.Fragment, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(BuildGroup, { title: `${part2.title}: muscles`, children: part2.muscles.map((zone) => /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
         BuildSlider,
         {
           label: MUSCLE_LABEL[zone],
@@ -74566,7 +74527,7 @@ function BuildControls({ editor }) {
         },
         zone
       )) }),
-      /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(BuildGroup, { title: `${part2.title}: shape`, children: part2.fat.map((region) => /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
+      /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(BuildGroup, { title: `${part2.title}: shape`, children: part2.fat.map((region) => /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
         BuildSlider,
         {
           label: FAT_LABEL[region],
@@ -74576,10 +74537,10 @@ function BuildControls({ editor }) {
         },
         region
       )) })
-    ] }) : /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)(import_jsx_runtime14.Fragment, { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(BuildGroup, { title: "Body type", children: /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("div", { className: "grid grid-cols-2 gap-1.5", children: BODY_PRESETS.map((preset) => {
+    ] }) : /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(import_jsx_runtime13.Fragment, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(BuildGroup, { title: "Body type", children: /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("div", { className: "grid grid-cols-2 gap-1.5", children: BODY_PRESETS.map((preset) => {
         const on = shape2.muscle === preset.muscle && shape2.fat === preset.fat && shape2.definition === preset.definition;
-        return /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
+        return /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
           "button",
           {
             type: "button",
@@ -74596,8 +74557,8 @@ function BuildControls({ editor }) {
           preset.name
         );
       }) }) }),
-      /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)(BuildGroup, { title: "Whole body", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
+      /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(BuildGroup, { title: "Whole body", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
           BuildSlider,
           {
             label: "Muscle",
@@ -74606,7 +74567,7 @@ function BuildControls({ editor }) {
             onChange: (muscle) => set({ muscle })
           }
         ),
-        /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
           BuildSlider,
           {
             label: "Body mass",
@@ -74618,7 +74579,7 @@ function BuildControls({ editor }) {
             onChange: (fat) => set({ fat })
           }
         ),
-        /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
           BuildSlider,
           {
             label: "Definition",
@@ -74629,7 +74590,7 @@ function BuildControls({ editor }) {
             onChange: (definition) => set({ definition })
           }
         ),
-        /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
           BuildSlider,
           {
             label: "Fat spread",
@@ -74639,8 +74600,8 @@ function BuildControls({ editor }) {
             onChange: (fatPattern) => set({ fatPattern })
           }
         ),
-        false ? /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(MusclePaintPanel, { editor }) : null,
-        /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
+        false ? /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(MusclePaintPanel, { editor }) : null,
+        /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
           "button",
           {
             type: "button",
@@ -74718,12 +74679,12 @@ function HairChoices({ editor }) {
     else delete hair[slot];
     return { ...current2, hair };
   });
-  return /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)(BuildGroup, { title: "Hair, eyebrows and beard", children: [
-    HAIR_ROWS.map((row) => /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)("div", { className: "flex flex-col gap-1", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("p", { className: "text-xs font-bold text-ink/75", children: row.title }),
-      /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("div", { className: "grid grid-cols-3 gap-1", children: [void 0, ...row.styles].map((style) => {
+  return /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(BuildGroup, { title: "Hair, eyebrows and beard", children: [
+    HAIR_ROWS.map((row) => /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("div", { className: "flex flex-col gap-1", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("p", { className: "text-xs font-bold text-ink/75", children: row.title }),
+      /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("div", { className: "grid grid-cols-3 gap-1", children: [void 0, ...row.styles].map((style) => {
         const on = recipe.hair[row.slot] === style;
-        return /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
+        return /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
           "button",
           {
             type: "button",
@@ -74736,9 +74697,9 @@ function HairChoices({ editor }) {
         );
       }) })
     ] }, row.slot)),
-    /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)("label", { className: "flex items-center justify-between text-xs font-bold text-ink/75", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("label", { className: "flex items-center justify-between text-xs font-bold text-ink/75", children: [
       "Hair colour",
-      /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
+      /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
         "input",
         {
           type: "color",
@@ -74755,10 +74716,10 @@ function HairChoices({ editor }) {
   ] });
 }
 function FaceFromPhoto({ editor }) {
-  const input5 = (0, import_react16.useRef)(null);
-  const [busy, setBusy] = (0, import_react16.useState)(false);
-  const [message2, setMessage] = (0, import_react16.useState)(null);
-  const [previous, setPrevious] = (0, import_react16.useState)(null);
+  const input4 = (0, import_react15.useRef)(null);
+  const [busy, setBusy] = (0, import_react15.useState)(false);
+  const [message2, setMessage] = (0, import_react15.useState)(null);
+  const [previous, setPrevious] = (0, import_react15.useState)(null);
   const read2 = async (file) => {
     setBusy(true);
     setMessage("Reading the face...");
@@ -74782,15 +74743,15 @@ function FaceFromPhoto({ editor }) {
     } finally {
       URL.revokeObjectURL(url);
       setBusy(false);
-      if (input5.current) input5.current.value = "";
+      if (input4.current) input4.current.value = "";
     }
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)(BuildGroup, { title: "Face from a photo", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("p", { className: "text-xs text-ink/70", children: "One face, looking straight into the camera, head straight, good light, the face filling most of the photo. The photo stays on this device and is not saved." }),
-    /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(BuildGroup, { title: "Face from a photo", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("p", { className: "text-xs text-ink/70", children: "One face, looking straight into the camera, head straight, good light, the face filling most of the photo. The photo stays on this device and is not saved." }),
+    /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
       "input",
       {
-        ref: input5,
+        ref: input4,
         type: "file",
         accept: "image/*",
         className: "hidden",
@@ -74801,18 +74762,18 @@ function FaceFromPhoto({ editor }) {
         }
       }
     ),
-    /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)("div", { className: "flex gap-1.5", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
+    /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("div", { className: "flex gap-1.5", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
         "button",
         {
           type: "button",
           disabled: busy,
-          onClick: () => input5.current?.click(),
+          onClick: () => input4.current?.click(),
           className: "flex-1 rounded-lg bg-ink px-2 py-1.5 text-xs font-bold text-on-brand disabled:opacity-50",
           children: busy ? "Reading..." : "Choose a photo"
         }
       ),
-      previous && !busy ? /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
+      previous && !busy ? /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
         "button",
         {
           type: "button",
@@ -74826,28 +74787,28 @@ function FaceFromPhoto({ editor }) {
         }
       ) : null
     ] }),
-    message2 ? /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("p", { role: "status", className: "text-xs font-semibold text-ink/80", children: message2 }) : null
+    message2 ? /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("p", { role: "status", className: "text-xs font-semibold text-ink/80", children: message2 }) : null
   ] });
 }
 function FaceSection({ editor }) {
   const { recipe } = editor;
-  const [part2, setPart] = (0, import_react16.useState)("eyes");
+  const [part2, setPart] = (0, import_react15.useState)("eyes");
   const generated = findBody(recipe.body).generated === "human";
-  (0, import_react16.useEffect)(() => {
+  (0, import_react15.useEffect)(() => {
     if (generated) editor.stage.current?.focusFace();
   }, [editor.stage, generated]);
   if (!generated)
-    return /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("p", { className: "text-xs font-semibold text-ink/60", children: recipe.body === "robot" ? "Use Facial Expressions in Moves to change the screen expression." : "Face controls are for the generated human body." });
+    return /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("p", { className: "text-xs font-semibold text-ink/60", children: recipe.body === "robot" ? "Use Facial Expressions in Moves to change the screen expression." : "Face controls are for the generated human body." });
   const face = recipe.shape.face;
   const set = (feature, value) => editor.change((current2) => ({
     ...current2,
     shape: { ...current2.shape, face: { ...current2.shape.face, [feature]: value } }
   }));
   const lookAtFace = () => editor.stage.current?.focusFace();
-  return /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)("div", { className: "flex flex-col gap-2.5", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(FaceFromPhoto, { editor }),
-    /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(HairChoices, { editor }),
-    /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("nav", { "aria-label": "Face parts", className: "grid grid-cols-7 gap-1", children: Object.keys(FACE_PARTS).map((one2) => /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("div", { className: "flex flex-col gap-2.5", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(FaceFromPhoto, { editor }),
+    /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(HairChoices, { editor }),
+    /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("nav", { "aria-label": "Face parts", className: "grid grid-cols-7 gap-1", children: Object.keys(FACE_PARTS).map((one2) => /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
       "button",
       {
         type: "button",
@@ -74861,7 +74822,7 @@ function FaceSection({ editor }) {
       },
       one2
     )) }),
-    /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(BuildGroup, { title: FACE_PART_LABEL[part2], children: FACE_PARTS[part2].map((feature) => /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
+    /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(BuildGroup, { title: FACE_PART_LABEL[part2], children: FACE_PARTS[part2].map((feature) => /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
       BuildSlider,
       {
         label: FACE_LABEL[feature].label,
@@ -74872,7 +74833,7 @@ function FaceSection({ editor }) {
       },
       feature
     )) }),
-    /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
+    /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
       "button",
       {
         type: "button",
@@ -74910,14 +74871,14 @@ function ColorSection({ editor }) {
   const generated = findBody(recipe.body).generated === "human";
   const mesh = !generated && (Boolean(findBody(recipe.body).model) || recipe.body.startsWith("user."));
   const parts = generated ? ["skin"] : mesh ? ["tint"] : ["skin", "hair", "top", "bottom", "shoes"];
-  const [chosen, setChosen] = (0, import_react16.useState)("top");
+  const [chosen, setChosen] = (0, import_react15.useState)("top");
   const part2 = parts.includes(chosen) ? chosen : parts[0];
   const set = (color2) => editor.change((current2) => ({
     ...current2,
     colors: { ...current2.colors, [part2]: color2, ...part2 === "skin" ? { skinMaterial: "" } : {} }
   }));
-  return /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)("div", { className: "flex flex-col gap-3", children: [
-    mesh ? /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("p", { className: "text-xs font-semibold text-ink/60", children: "This body has one texture: the tint colours all of it. Colour areas come with the new body." }) : generated ? /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("p", { className: "text-xs font-semibold text-ink/60", children: "Skin colour" }) : /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("div", { role: "radiogroup", "aria-label": "Colour area", className: "grid grid-cols-5 gap-1", children: parts.map((entry) => /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)(
+  return /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("div", { className: "flex flex-col gap-3", children: [
+    mesh ? /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("p", { className: "text-xs font-semibold text-ink/60", children: "This body has one texture: the tint colours all of it. Colour areas come with the new body." }) : generated ? /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("p", { className: "text-xs font-semibold text-ink/60", children: "Skin colour" }) : /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("div", { role: "radiogroup", "aria-label": "Colour area", className: "grid grid-cols-5 gap-1", children: parts.map((entry) => /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(
       "button",
       {
         type: "button",
@@ -74926,7 +74887,7 @@ function ColorSection({ editor }) {
         onClick: () => setChosen(entry),
         className: "flex flex-col items-center gap-1 rounded-xl py-1 text-[11px] font-bold text-ink/70 hover:text-ink aria-checked:text-ink",
         children: [
-          /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
             "span",
             {
               className: `size-8 rounded-full ring-1 ring-ink/15 ${part2 === entry ? "ring-2 ring-ink ring-offset-2 ring-offset-surface" : ""}`,
@@ -74938,11 +74899,11 @@ function ColorSection({ editor }) {
       },
       entry
     )) }),
-    (part2 === "skin" ? SKIN_GROUPS : [{ name: "", colors: PALETTES[part2] }]).map((group2) => /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)("div", { className: "flex flex-col gap-2", children: [
-      group2.name ? /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("p", { className: "text-[11px] font-bold text-ink/50", children: group2.name }) : null,
-      /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("div", { className: "grid grid-cols-6 justify-items-center gap-y-2", children: group2.colors.map((color2) => {
+    (part2 === "skin" ? SKIN_GROUPS : [{ name: "", colors: PALETTES[part2] }]).map((group2) => /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("div", { className: "flex flex-col gap-2", children: [
+      group2.name ? /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("p", { className: "text-[11px] font-bold text-ink/50", children: group2.name }) : null,
+      /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("div", { className: "grid grid-cols-6 justify-items-center gap-y-2", children: group2.colors.map((color2) => {
         const on = recipe.colors[part2].toLowerCase() === color2;
-        return /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
+        return /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
           "button",
           {
             type: "button",
@@ -74956,19 +74917,19 @@ function ColorSection({ editor }) {
         );
       }) })
     ] }, group2.name)),
-    /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("div", { className: "grid grid-cols-6 justify-items-center gap-y-2", children: /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)(
+    /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("div", { className: "grid grid-cols-6 justify-items-center gap-y-2", children: /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(
       "label",
       {
         title: "Any colour",
         className: "relative flex size-8 cursor-pointer items-center justify-center rounded-full bg-paper text-ink/70 ring-1 ring-ink/15 hover:text-ink",
         children: [
-          /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(Pipette, { className: "size-4", "aria-hidden": true }),
-          /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)("span", { className: "sr-only", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(Pipette, { className: "size-4", "aria-hidden": true }),
+          /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("span", { className: "sr-only", children: [
             "Any ",
             PART_LABEL[part2],
             " colour"
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
             "input",
             {
               type: "color",
@@ -74980,7 +74941,7 @@ function ColorSection({ editor }) {
         ]
       }
     ) }),
-    generated ? /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(SkinMaterialSection, { editor }) : null
+    generated ? /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(SkinMaterialSection, { editor }) : null
   ] });
 }
 function skinSwatch(material2) {
@@ -75014,11 +74975,11 @@ var swatchSize = (material2) => material2.pattern === "scales" ? "10px 10px, aut
 function SkinMaterialSection({ editor }) {
   const chosen = editor.recipe.colors.skinMaterial;
   const pick5 = (id2) => editor.change((current2) => ({ ...current2, colors: { ...current2.colors, skinMaterial: id2 } }));
-  return /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)("div", { className: "flex flex-col gap-2", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("p", { className: "text-[11px] font-bold text-ink/50", children: "Skin material" }),
-    /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("div", { className: "grid grid-cols-4 gap-2", children: SKIN_MATERIALS.map((material2) => {
+  return /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("div", { className: "flex flex-col gap-2", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("p", { className: "text-[11px] font-bold text-ink/50", children: "Skin material" }),
+    /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("div", { className: "grid grid-cols-4 gap-2", children: SKIN_MATERIALS.map((material2) => {
       const on = chosen === material2.id;
-      return /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)(
+      return /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(
         "button",
         {
           type: "button",
@@ -75026,14 +74987,14 @@ function SkinMaterialSection({ editor }) {
           onClick: () => pick5(on ? "" : material2.id),
           className: "flex flex-col items-center gap-1 text-[10px] font-bold text-ink/70 hover:text-ink",
           children: [
-            /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
+            /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
               "span",
               {
                 className: `size-10 rounded-full ring-1 ring-ink/15 transition active:scale-90 ${on ? "ring-2 ring-ink ring-offset-2 ring-offset-surface" : ""}`,
                 style: { background: skinSwatch(material2), backgroundSize: swatchSize(material2) }
               }
             ),
-            /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("span", { className: "line-clamp-1 text-center", children: material2.name })
+            /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("span", { className: "line-clamp-1 text-center", children: material2.name })
           ]
         },
         material2.id
@@ -75074,7 +75035,7 @@ function MovesSection({
   columns: columns2 = "grid-cols-3"
 }) {
   const host = useStudioHost();
-  const [category, setCategory] = (0, import_react16.useState)("All"), [query, setQuery] = (0, import_react16.useState)(""), [page, setPage] = (0, import_react16.useState)(0);
+  const [category, setCategory] = (0, import_react15.useState)("All"), [query, setQuery] = (0, import_react15.useState)(""), [page, setPage] = (0, import_react15.useState)(0);
   const emotes = new Set(CORE_EMOTES.map((animation) => animation.clip));
   const native = CORE_ANIMATIONS.map((animation) => ({
     id: animation.clip,
@@ -75087,8 +75048,8 @@ function MovesSection({
     const name2 = entry.name.replace(/^GENVR-[A-Z]+-\d+\s*·\s*/, "");
     const categories2 = motionCategories(name2, entry.category);
     const category2 = categories2[0];
-    const icons2 = { Idle: PersonStanding, Walking: Footprints, Running: Footprints, Jumping: ArrowUp, Swimming: WavesHorizontal, Traversal: Mountain, Combat: Swords, Dance: animationIcon("genvr.core.animation.dance"), Gestures: animationIcon("genvr.core.animation.wave") };
-    return { id: entry.id, name: name2, title: entry.name, categories: categories2, Icon: icons2[category2] ?? PersonStanding };
+    const icons = { Idle: PersonStanding, Walking: Footprints, Running: Footprints, Jumping: ArrowUp, Swimming: WavesHorizontal, Traversal: Mountain, Combat: Swords, Dance: animationIcon("genvr.core.animation.dance"), Gestures: animationIcon("genvr.core.animation.wave") };
+    return { id: entry.id, name: name2, title: entry.name, categories: categories2, Icon: icons[category2] ?? PersonStanding };
   });
   const faceIcons = { neutral: FaceNeutral, smile: FaceSlightlySmiling, angry: FaceAngry, sad: FaceSlightlyFrowning, surprised: CircleQuestionMark, thinking: Brain };
   const faces = EXPRESSIONS.map((expression2) => ({ id: `face:${expression2}`, name: expression2.charAt(0).toUpperCase() + expression2.slice(1), title: `Facial expression: ${expression2}`, categories: ["Facial expressions"], Icon: faceIcons[expression2] }));
@@ -75106,44 +75067,44 @@ function MovesSection({
   const matching = all2.filter((row) => `${row.name} ${row.title}`.toLowerCase().includes(query.toLowerCase()));
   const categories = ["All", "Facial expressions", ...MOTION_CATEGORIES.filter((value) => all2.some((row) => row.categories.includes(value)))];
   const filtered = matching.filter((row) => category === "All" || row.categories.includes(category));
-  return /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)("div", { className: "space-y-2", children: [
-    all2.length ? /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)(import_jsx_runtime14.Fragment, { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("div", { role: "tablist", "aria-label": "Motion categories", className: "grid grid-cols-2 gap-1.5 border-b border-ink/10 pb-2", children: categories.map((value) => /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)("button", { type: "button", role: "tab", "aria-selected": category === value, onClick: () => {
+  return /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("div", { className: "space-y-2", children: [
+    all2.length ? /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(import_jsx_runtime13.Fragment, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("div", { role: "tablist", "aria-label": "Motion categories", className: "grid grid-cols-2 gap-1.5 border-b border-ink/10 pb-2", children: categories.map((value) => /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("button", { type: "button", role: "tab", "aria-selected": category === value, onClick: () => {
         setCategory(value);
         setPage(0);
       }, className: `flex min-w-0 items-center justify-between gap-1 rounded-lg px-2 py-2 text-[11px] font-bold ${category === value ? "bg-ink text-on-brand" : "bg-paper hover:bg-ink/5"}`, children: [
-        /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("span", { className: "truncate", children: value === "Facial expressions" ? "Facial Expressions" : value }),
-        /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("span", { className: "text-[10px] opacity-60", children: value === "All" ? matching.length : matching.filter((row) => row.categories.includes(value)).length })
+        /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("span", { className: "truncate", children: value === "Facial expressions" ? "Facial Expressions" : value }),
+        /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("span", { className: "text-[10px] opacity-60", children: value === "All" ? matching.length : matching.filter((row) => row.categories.includes(value)).length })
       ] }, value)) }),
-      /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("input", { "aria-label": "Search moves", placeholder: "Search moves and expressions", value: query, onChange: (event2) => {
+      /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("input", { "aria-label": "Search moves", placeholder: "Search moves and expressions", value: query, onChange: (event2) => {
         setQuery(event2.target.value);
         setPage(0);
       }, className: "w-full rounded-lg bg-paper px-3 py-2 text-xs text-ink" }),
-      /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)("p", { className: "text-[11px] text-ink/60", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("p", { className: "text-[11px] text-ink/60", children: [
         filtered.length,
         " ",
         category === "Facial expressions" ? "expressions" : "items",
         " \xB7 Some moves match multiple categories."
       ] })
     ] }) : null,
-    /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("div", { role: "radiogroup", "aria-label": "Moves", className: `grid gap-1.5 ${columns2}`, children: filtered.slice(page * 60, (page + 1) * 60).map(({ id: id2, name: name2, title, Icon: Icon2 }) => /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)("button", { type: "button", role: "radio", "aria-label": title, title, "aria-checked": selected2(id2), onClick: () => play(id2), className: `flex flex-col items-center gap-1 rounded-xl px-1 py-2 text-[11px] font-bold transition active:scale-95 ${selected2(id2) ? "bg-ink text-on-brand" : "bg-paper text-ink hover:bg-ink/5"}`, children: [
-      /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(Icon2, { className: "size-5", strokeWidth: 1.8, "aria-hidden": true }),
-      /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("span", { className: "w-full truncate text-center leading-tight", children: name2 })
+    /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("div", { role: "radiogroup", "aria-label": "Moves", className: `grid gap-1.5 ${columns2}`, children: filtered.slice(page * 60, (page + 1) * 60).map(({ id: id2, name: name2, title, Icon: Icon2 }) => /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("button", { type: "button", role: "radio", "aria-label": title, title, "aria-checked": selected2(id2), onClick: () => play(id2), className: `flex flex-col items-center gap-1 rounded-xl px-1 py-2 text-[11px] font-bold transition active:scale-95 ${selected2(id2) ? "bg-ink text-on-brand" : "bg-paper text-ink hover:bg-ink/5"}`, children: [
+      /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(Icon2, { className: "size-5", strokeWidth: 1.8, "aria-hidden": true }),
+      /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("span", { className: "w-full truncate text-center leading-tight", children: name2 })
     ] }, id2)) }),
-    filtered.length > 60 ? /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)("div", { className: "flex items-center justify-between text-xs font-bold", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("button", { type: "button", disabled: page === 0, onClick: () => setPage((value) => value - 1), className: "rounded-lg p-2 hover:bg-ink/5 disabled:opacity-40", children: "Previous" }),
-      /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)("span", { children: [
+    filtered.length > 60 ? /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("div", { className: "flex items-center justify-between text-xs font-bold", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("button", { type: "button", disabled: page === 0, onClick: () => setPage((value) => value - 1), className: "rounded-lg p-2 hover:bg-ink/5 disabled:opacity-40", children: "Previous" }),
+      /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("span", { children: [
         page + 1,
         " / ",
         Math.ceil(filtered.length / 60)
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("button", { type: "button", disabled: (page + 1) * 60 >= filtered.length, onClick: () => setPage((value) => value + 1), className: "rounded-lg p-2 hover:bg-ink/5 disabled:opacity-40", children: "Next" })
+      /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("button", { type: "button", disabled: (page + 1) * 60 >= filtered.length, onClick: () => setPage((value) => value + 1), className: "rounded-lg p-2 hover:bg-ink/5 disabled:opacity-40", children: "Next" })
     ] }) : null
   ] });
 }
 function RecipeSection({ editor }) {
-  const file = (0, import_react16.useRef)(null);
-  const [message2, setMessage] = (0, import_react16.useState)(null);
+  const file = (0, import_react15.useRef)(null);
+  const [message2, setMessage] = (0, import_react15.useState)(null);
   const { recipe } = editor;
   const download2 = () => {
     const blob = new Blob([editor.exportJson()], { type: "application/json" });
@@ -75154,10 +75115,10 @@ function RecipeSection({ editor }) {
     link.click();
     URL.revokeObjectURL(url);
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)("div", { className: "flex flex-col gap-2", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)("label", { className: "flex flex-col gap-1 text-xs font-bold text-ink/75", children: [
+  return /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("div", { className: "flex flex-col gap-2", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("label", { className: "flex flex-col gap-1 text-xs font-bold text-ink/75", children: [
       "Name",
-      /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
+      /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
         "input",
         {
           value: recipe.name,
@@ -75170,8 +75131,8 @@ function RecipeSection({ editor }) {
         }
       )
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)("div", { className: "grid grid-cols-3 gap-1.5", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
+    /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("div", { className: "grid grid-cols-3 gap-1.5", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
         ActionButton,
         {
           Icon: Save,
@@ -75183,10 +75144,10 @@ function RecipeSection({ editor }) {
           }
         }
       ),
-      /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(ActionButton, { Icon: Download, label: "Export recipe", onClick: download2 }),
-      /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(ActionButton, { Icon: Upload, label: "Import recipe", onClick: () => file.current?.click() })
+      /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(ActionButton, { Icon: Download, label: "Export recipe", onClick: download2 }),
+      /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(ActionButton, { Icon: Upload, label: "Import recipe", onClick: () => file.current?.click() })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
+    /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
       "input",
       {
         ref: file,
@@ -75202,17 +75163,17 @@ function RecipeSection({ editor }) {
         }
       }
     ),
-    message2 ? /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("p", { role: "status", className: "text-xs font-semibold text-ink/60", children: message2 }) : null,
-    editor.saved.length > 0 ? /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("ul", { "aria-label": "Saved characters", className: "mt-1 flex flex-col gap-1", children: editor.saved.map((entry) => /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)("li", { className: "flex items-center gap-1", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)(
+    message2 ? /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("p", { role: "status", className: "text-xs font-semibold text-ink/60", children: message2 }) : null,
+    editor.saved.length > 0 ? /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("ul", { "aria-label": "Saved characters", className: "mt-1 flex flex-col gap-1", children: editor.saved.map((entry) => /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("li", { className: "flex items-center gap-1", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(
         "button",
         {
           type: "button",
           onClick: () => editor.load(entry.recipe),
           className: "min-w-0 flex-1 rounded-lg px-2 py-1.5 text-left text-xs font-bold text-ink hover:bg-ink/5",
           children: [
-            /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("span", { className: "block truncate", children: entry.recipe.name }),
-            /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)("span", { className: "block truncate text-[10px] font-semibold text-ink/50", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("span", { className: "block truncate", children: entry.recipe.name }),
+            /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("span", { className: "block truncate text-[10px] font-semibold text-ink/50", children: [
               entry.recipe.body.startsWith("user.") ? "Uploaded body" : findBody(entry.recipe.body).manifest.name,
               " ",
               "\xB7 ",
@@ -75222,7 +75183,7 @@ function RecipeSection({ editor }) {
           ]
         }
       ),
-      /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
+      /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
         "button",
         {
           type: "button",
@@ -75230,7 +75191,7 @@ function RecipeSection({ editor }) {
           title: "Delete",
           onClick: () => editor.remove(entry.id),
           className: "rounded-lg p-1.5 text-ink/50 hover:bg-ink/5 hover:text-ink",
-          children: /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(Trash, { className: "size-4", "aria-hidden": true })
+          children: /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(Trash, { className: "size-4", "aria-hidden": true })
         }
       )
     ] }, entry.id)) }) : null
@@ -75242,14 +75203,14 @@ function ActionButton({
   onClick,
   primary = false
 }) {
-  return /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)(
+  return /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(
     "button",
     {
       type: "button",
       onClick,
       className: `flex items-center justify-center gap-1.5 rounded-xl py-2 text-xs font-bold ${primary ? "bg-brand text-on-brand" : "bg-paper text-ink hover:bg-ink/5"}`,
       children: [
-        /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(Icon2, { className: "size-4", "aria-hidden": true }),
+        /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(Icon2, { className: "size-4", "aria-hidden": true }),
         label3
       ]
     }
@@ -75257,19 +75218,19 @@ function ActionButton({
 }
 function CharacterControls({ editor }) {
   const host = useStudioHost();
-  return /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)("div", { className: "min-h-0 flex-1 overflow-x-hidden overflow-y-auto px-3 pb-3 [scrollbar-width:none]", children: [
-    host.userAvatarControls ? /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(EditorSection, { title: "Characters", children: host.userAvatarControls("characters", "", (body) => editor.change((recipe) => ({ ...recipe, body }))) }) : null,
-    /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(EditorSection, { title: "Body", children: /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(BodySection, { editor }) }),
-    /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(EditorSection, { title: "Shape", children: /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(ShapeSection, { editor }) }),
-    /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(EditorSection, { title: "Face", children: /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(FaceSection, { editor }) }),
-    /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(EditorSection, { title: "Colours", children: /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(ColorSection, { editor }) }),
-    /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(EditorSection, { title: "Character recipe", children: /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(RecipeSection, { editor }) })
+  return /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("div", { className: "min-h-0 flex-1 overflow-x-hidden overflow-y-auto px-3 pb-3 [scrollbar-width:none]", children: [
+    host.userAvatarControls ? /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(EditorSection, { title: "Characters", children: host.userAvatarControls("characters", "", (body) => editor.change((recipe) => ({ ...recipe, body }))) }) : null,
+    /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(EditorSection, { title: "Body", children: /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(BodySection, { editor }) }),
+    /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(EditorSection, { title: "Shape", children: /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(ShapeSection, { editor }) }),
+    /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(EditorSection, { title: "Face", children: /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(FaceSection, { editor }) }),
+    /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(EditorSection, { title: "Colours", children: /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(ColorSection, { editor }) }),
+    /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(EditorSection, { title: "Character recipe", children: /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(RecipeSection, { editor }) })
   ] });
 }
 function CharacterMoves({ editor }) {
   const host = useStudioHost();
-  return /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)("div", { className: "min-h-0 flex-1 overflow-x-hidden overflow-y-auto px-3 pt-1 pb-3 [scrollbar-width:none]", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(MovesSection, { editor }),
+  return /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("div", { className: "min-h-0 flex-1 overflow-x-hidden overflow-y-auto px-3 pt-1 pb-3 [scrollbar-width:none]", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(MovesSection, { editor }),
     host.userAvatarControls?.("motions"),
     host.presentationControls?.("motions")
   ] });
@@ -75326,8 +75287,8 @@ function connectLiveStudio(options, project, capabilities, execute, status) {
 
 // studio/avatar-speech-player.tsx
 var import_react_dom2 = __toESM(require_react_dom(), 1);
-var import_react17 = __toESM(require_react(), 1);
-var import_jsx_runtime15 = __toESM(require_jsx_runtime(), 1);
+var import_react16 = __toESM(require_react(), 1);
+var import_jsx_runtime14 = __toESM(require_jsx_runtime(), 1);
 var stamp = (seconds2) => `${Math.floor(seconds2 / 60)}:${String(Math.floor(seconds2 % 60)).padStart(2, "0")}`;
 function AvatarSpeechPlayer({
   register,
@@ -75335,12 +75296,12 @@ function AvatarSpeechPlayer({
   recording,
   portal
 }) {
-  const canvas = (0, import_react17.useRef)(null), context3 = (0, import_react17.useRef)(null), analyser = (0, import_react17.useRef)(null), gain2 = (0, import_react17.useRef)(null), source = (0, import_react17.useRef)(null), clip = (0, import_react17.useRef)(null), controllerRef = (0, import_react17.useRef)(null);
-  const callbacks = (0, import_react17.useRef)({ mouth, recording });
+  const canvas = (0, import_react16.useRef)(null), context3 = (0, import_react16.useRef)(null), analyser = (0, import_react16.useRef)(null), gain2 = (0, import_react16.useRef)(null), source = (0, import_react16.useRef)(null), clip = (0, import_react16.useRef)(null), controllerRef = (0, import_react16.useRef)(null);
+  const callbacks = (0, import_react16.useRef)({ mouth, recording });
   callbacks.current = { mouth, recording };
-  const shape2 = (0, import_react17.useRef)("X"), level = (0, import_react17.useRef)(0), serial = (0, import_react17.useRef)(0);
-  const [visible2, setVisible] = (0, import_react17.useState)(false), [title, setTitle] = (0, import_react17.useState)(""), [error, setError] = (0, import_react17.useState)(""), [rate, setRate] = (0, import_react17.useState)("1"), [volume, setVolume] = (0, import_react17.useState)(1), [display, setDisplay] = (0, import_react17.useState)({ time: 0, duration: 0, playing: false });
-  (0, import_react17.useEffect)(() => {
+  const shape2 = (0, import_react16.useRef)("X"), level = (0, import_react16.useRef)(0), serial = (0, import_react16.useRef)(0);
+  const [visible2, setVisible] = (0, import_react16.useState)(false), [title, setTitle] = (0, import_react16.useState)(""), [error, setError] = (0, import_react16.useState)(""), [rate, setRate] = (0, import_react16.useState)("1"), [volume, setVolume] = (0, import_react16.useState)(1), [display, setDisplay] = (0, import_react16.useState)({ time: 0, duration: 0, playing: false });
+  (0, import_react16.useEffect)(() => {
     let mouthActive = false;
     let alive = true, lastPaint = 0;
     const position = () => {
@@ -75403,12 +75364,12 @@ function AvatarSpeechPlayer({
       setVisible(true);
     };
     const controller = {
-      async load(input5) {
+      async load(input4) {
         const request = ++serial.current;
         context3.current ??= new AudioContext();
         await context3.current.resume();
         const bytes3 = Uint8Array.from(
-          atob(input5.data),
+          atob(input4.data),
           (char) => char.charCodeAt(0)
         ), buffer2 = await context3.current.decodeAudioData(bytes3.buffer);
         if (!alive || request !== serial.current)
@@ -75435,7 +75396,7 @@ function AvatarSpeechPlayer({
         }
         clip.current = {
           buffer: buffer2,
-          target: input5.target,
+          target: input4.target,
           url: URL.createObjectURL(new Blob([bytes3], { type: "audio/wav" })),
           peaks: peaks2,
           shape: new SpeechMouth(),
@@ -75444,7 +75405,7 @@ function AvatarSpeechPlayer({
           playing: false,
           rate: Number(rateRef.current)
         };
-        setTitle(input5.text ?? "Avatar speech");
+        setTitle(input4.text ?? "Avatar speech");
         setError("");
         setVisible(true);
         await play();
@@ -75545,20 +75506,20 @@ function AvatarSpeechPlayer({
       void context3.current?.close();
     };
   }, [register]);
-  const rateRef = (0, import_react17.useRef)(rate);
+  const rateRef = (0, import_react16.useRef)(rate);
   rateRef.current = rate;
   const control = (command, value) => void controllerRef.current?.control(command, value).catch((error2) => setError(error2.message));
-  const panel = /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)(
+  const panel = /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)(
     "section",
     {
       "aria-label": "Avatar speech player",
       hidden: !visible2,
       className: portal ? "rounded-lg border border-ink/10 bg-surface p-2 text-ink" : "pointer-events-auto absolute bottom-3 left-1/2 z-30 w-[min(420px,90%)] -translate-x-1/2 rounded-xl border border-ink/15 bg-surface/95 p-3 text-ink shadow-xl",
       children: [
-        /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("div", { className: "flex items-center gap-2", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(Volume2, { className: "size-4 shrink-0" }),
-          /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("p", { dir: "auto", className: "min-w-0 flex-1 truncate text-xs", children: title }),
-          /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)("div", { className: "flex items-center gap-2", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(Volume2, { className: "size-4 shrink-0" }),
+          /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("p", { dir: "auto", className: "min-w-0 flex-1 truncate text-xs", children: title }),
+          /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
             "button",
             {
               "aria-label": "Close speech player",
@@ -75566,11 +75527,11 @@ function AvatarSpeechPlayer({
                 control("pause");
                 setVisible(false);
               },
-              children: /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(X, { className: "size-4" })
+              children: /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(X, { className: "size-4" })
             }
           )
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
           "canvas",
           {
             ref: canvas,
@@ -75580,22 +75541,22 @@ function AvatarSpeechPlayer({
             className: "my-2 h-10 w-full"
           }
         ),
-        /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("div", { className: "flex items-center gap-2", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)("div", { className: "flex items-center gap-2", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
             "button",
             {
               "aria-label": display.playing ? "Pause avatar speech" : "Play avatar speech",
               onClick: () => control(display.playing ? "pause" : "play"),
-              children: display.playing ? /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(Pause, { className: "size-4" }) : /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(Play, { className: "size-4" })
+              children: display.playing ? /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(Pause, { className: "size-4" }) : /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(Play, { className: "size-4" })
             }
           ),
-          /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("button", { "aria-label": "Stop avatar speech", onClick: () => control("stop"), children: /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(Square, { className: "size-3" }) }),
-          /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("span", { className: "whitespace-nowrap text-[10px] tabular-nums", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("button", { "aria-label": "Stop avatar speech", onClick: () => control("stop"), children: /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(Square, { className: "size-3" }) }),
+          /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)("span", { className: "whitespace-nowrap text-[10px] tabular-nums", children: [
             stamp(display.time),
             " / ",
             stamp(display.duration)
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
             "input",
             {
               "aria-label": "Speech position",
@@ -75609,26 +75570,26 @@ function AvatarSpeechPlayer({
             }
           )
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("div", { className: "mt-2 flex items-center gap-2 text-xs", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("label", { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)("div", { className: "mt-2 flex items-center gap-2 text-xs", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)("label", { children: [
             "Speed",
             " ",
-            /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
+            /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
               "select",
               {
                 "aria-label": "Speech playback speed",
                 className: "rounded border border-ink/15 bg-paper",
                 value: rate,
                 onChange: (e2) => control("rate", Number(e2.target.value)),
-                children: ["0.5", "0.75", "1", "1.25", "1.5", "2"].map((value) => /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("option", { value, children: [
+                children: ["0.5", "0.75", "1", "1.25", "1.5", "2"].map((value) => /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)("option", { value, children: [
                   value,
                   "\xD7"
                 ] }, value))
               }
             )
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(Volume2, { className: "size-3" }),
-          /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(Volume2, { className: "size-3" }),
+          /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
             "input",
             {
               "aria-label": "Speech volume",
@@ -75641,7 +75602,7 @@ function AvatarSpeechPlayer({
               onChange: (e2) => control("volume", Number(e2.target.value))
             }
           ),
-          /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)(
+          /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)(
             "button",
             {
               className: "ml-auto flex items-center gap-1",
@@ -75653,13 +75614,13 @@ function AvatarSpeechPlayer({
                 link.click();
               },
               children: [
-                /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(Download, { className: "size-3" }),
+                /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(Download, { className: "size-3" }),
                 "WAV"
               ]
             }
           )
         ] }),
-        error ? /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("p", { role: "alert", className: "mt-1 text-xs text-coral", children: error }) : null
+        error ? /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("p", { role: "alert", className: "mt-1 text-xs text-coral", children: error }) : null
       ]
     }
   );
@@ -75667,7 +75628,7 @@ function AvatarSpeechPlayer({
 }
 
 // studio/voice-panel.tsx
-var import_react18 = __toESM(require_react(), 1);
+var import_react17 = __toESM(require_react(), 1);
 
 // ../../apps/web/lib/video-studio/dubbing.ts
 var VOICES = {
@@ -75758,7 +75719,7 @@ async function speak(lines, lang, report, signal) {
 }
 
 // studio/voice-panel.tsx
-var import_jsx_runtime16 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime15 = __toESM(require_jsx_runtime(), 1);
 var languageName = (code2) => new Intl.DisplayNames(["en"], { type: "language" }).of(code2) ?? code2;
 var nativeName = (code2) => new Intl.DisplayNames([code2], { type: "language" }).of(code2) ?? code2;
 function VoicePanel({
@@ -75768,17 +75729,17 @@ function VoicePanel({
   close,
   playerHost
 }) {
-  const [models, setModels] = (0, import_react18.useState)([]), [voices, setVoices] = (0, import_react18.useState)([]), [demos, setDemos] = (0, import_react18.useState)([]), [recordings, setRecordings] = (0, import_react18.useState)([]), [model, setModel] = (0, import_react18.useState)("chatterbox-multilingual-v3"), [voice, setVoice2] = (0, import_react18.useState)(""), [target2, setTarget] = (0, import_react18.useState)("self"), [language, setLanguage] = (0, import_react18.useState)("ar");
-  const [removeModel, setRemoveModel] = (0, import_react18.useState)(null);
-  const [tab, setTab] = (0, import_react18.useState)("generate"), [filter2, setFilter] = (0, import_react18.useState)(""), [name2, setName2] = (0, import_react18.useState)("My voice"), [consent, setConsent] = (0, import_react18.useState)(false), [file, setFile] = (0, import_react18.useState)(null), [text4, setText] = (0, import_react18.useState)("\u0645\u0631\u062D\u0628\u0627\u064B \u0628\u0643\u0645 \u0641\u064A \u0639\u0627\u0644\u0645\u0646\u0627. \u0647\u064A\u0627 \u0646\u0643\u062A\u0634\u0641 \u0634\u064A\u0626\u0627\u064B \u062C\u062F\u064A\u062F\u0627\u064B \u0648\u0646\u0635\u0646\u0639 \u062D\u0643\u0627\u064A\u0629 \u062C\u0645\u064A\u0644\u0629 \u0645\u0639\u0627\u064B."), [busy, setBusy] = (0, import_react18.useState)(false), [status, setStatus] = (0, import_react18.useState)(""), [error, setError] = (0, import_react18.useState)("");
-  const [voiceType, setVoiceType] = (0, import_react18.useState)("female");
-  const [description, setDescription] = (0, import_react18.useState)("Warm, clear and friendly, with natural pacing.");
-  const [draft, setDraft] = (0, import_react18.useState)(null);
-  (0, import_react18.useEffect)(() => {
+  const [models, setModels] = (0, import_react17.useState)([]), [voices, setVoices] = (0, import_react17.useState)([]), [demos, setDemos] = (0, import_react17.useState)([]), [recordings, setRecordings] = (0, import_react17.useState)([]), [model, setModel] = (0, import_react17.useState)("chatterbox-multilingual-v3"), [voice, setVoice2] = (0, import_react17.useState)(""), [target2, setTarget] = (0, import_react17.useState)("self"), [language, setLanguage] = (0, import_react17.useState)("ar");
+  const [removeModel, setRemoveModel] = (0, import_react17.useState)(null);
+  const [tab, setTab] = (0, import_react17.useState)("generate"), [filter2, setFilter] = (0, import_react17.useState)(""), [name2, setName2] = (0, import_react17.useState)("My voice"), [consent, setConsent] = (0, import_react17.useState)(false), [file, setFile] = (0, import_react17.useState)(null), [text4, setText] = (0, import_react17.useState)("\u0645\u0631\u062D\u0628\u0627\u064B \u0628\u0643\u0645 \u0641\u064A \u0639\u0627\u0644\u0645\u0646\u0627. \u0647\u064A\u0627 \u0646\u0643\u062A\u0634\u0641 \u0634\u064A\u0626\u0627\u064B \u062C\u062F\u064A\u062F\u0627\u064B \u0648\u0646\u0635\u0646\u0639 \u062D\u0643\u0627\u064A\u0629 \u062C\u0645\u064A\u0644\u0629 \u0645\u0639\u0627\u064B."), [busy, setBusy] = (0, import_react17.useState)(false), [status, setStatus] = (0, import_react17.useState)(""), [error, setError] = (0, import_react17.useState)("");
+  const [voiceType, setVoiceType] = (0, import_react17.useState)("female");
+  const [description, setDescription] = (0, import_react17.useState)("Warm, clear and friendly, with natural pacing.");
+  const [draft, setDraft] = (0, import_react17.useState)(null);
+  (0, import_react17.useEffect)(() => {
     setDraft(null);
   }, [voiceType, language, description, text4]);
-  const input5 = (0, import_react18.useRef)(null), alive = (0, import_react18.useRef)(true), abort = (0, import_react18.useRef)(new AbortController());
-  (0, import_react18.useEffect)(() => {
+  const input4 = (0, import_react17.useRef)(null), alive = (0, import_react17.useRef)(true), abort = (0, import_react17.useRef)(new AbortController());
+  (0, import_react17.useEffect)(() => {
     alive.current = true;
     abort.current = new AbortController();
     return () => {
@@ -75822,7 +75783,7 @@ function VoicePanel({
     setRecordings(clips.recordings);
     setVoice2(library.assignments[projectId + ":" + target2] || "");
   };
-  (0, import_react18.useEffect)(() => {
+  (0, import_react17.useEffect)(() => {
     void refresh().catch((error2) => setError(error2.message));
     const timer = setInterval(() => void refresh().catch(() => {
     }), 3e3);
@@ -75915,29 +75876,29 @@ function VoicePanel({
     setModel(row.model);
     setStatus(`${row.name} is assigned to this speaker.`);
   });
-  const field5 = "w-full rounded-lg border border-ink/15 bg-paper px-3 py-2 text-sm outline-none focus:border-ink/40";
+  const field6 = "w-full rounded-lg border border-ink/15 bg-paper px-3 py-2 text-sm outline-none focus:border-ink/40";
   const button15 = "inline-flex items-center justify-center gap-2 rounded-lg border border-ink/15 px-3 py-2 text-xs font-semibold hover:bg-ink/5 disabled:opacity-40";
   const selected2 = voices.find((row) => row.id === voice), visibleDemos = demos.filter(
     (row) => `${row.name} ${nativeName(row.language)} ${row.language}`.toLowerCase().includes(filter2.toLowerCase())
   );
-  return /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)(
+  return /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)(
     "section",
     {
       role: "dialog",
       "aria-label": "Avatar voice",
       className: "fixed inset-x-4 bottom-4 top-16 z-[130] mx-auto flex max-w-[1040px] flex-col overflow-hidden rounded-xl border border-ink/15 bg-surface text-ink shadow-2xl",
       children: [
-        /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("header", { className: "flex h-14 shrink-0 items-center gap-3 border-b border-ink/10 px-4", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(Mic, { className: "size-5" }),
-          /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("div", { className: "flex-1", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("h2", { className: "text-sm font-bold", children: "Avatar voice" }),
-            /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("p", { className: "text-[10px] text-ink/50", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("header", { className: "flex h-14 shrink-0 items-center gap-3 border-b border-ink/10 px-4", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(Mic, { className: "size-5" }),
+          /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("div", { className: "flex-1", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("h2", { className: "text-sm font-bold", children: "Avatar voice" }),
+            /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("p", { className: "text-[10px] text-ink/50", children: [
               "Local voice library \xB7 ",
               voices.length,
               " saved voices"
             ] })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)(
+          /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)(
             "select",
             {
               "aria-label": "Voice speaker",
@@ -75946,23 +75907,23 @@ function VoicePanel({
               disabled: busy,
               onChange: (e2) => setTarget(e2.target.value),
               children: [
-                /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("option", { value: "self", children: "My avatar" }),
-                agents.map((row) => /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("option", { value: row.id, children: row.name }, row.id))
+                /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("option", { value: "self", children: "My avatar" }),
+                agents.map((row) => /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("option", { value: row.id, children: row.name }, row.id))
               ]
             }
           ),
-          /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
             "button",
             {
               "aria-label": "Close avatar voice",
               className: "rounded p-1 hover:bg-ink/10",
               onClick: close,
-              children: /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(X, { className: "size-5" })
+              children: /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(X, { className: "size-5" })
             }
           )
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("div", { className: "flex min-h-0 flex-1", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)(
+        /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("div", { className: "flex min-h-0 flex-1", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)(
             "nav",
             {
               "aria-label": "Voice workspace",
@@ -75973,7 +75934,7 @@ function VoicePanel({
                   { id: "library", label: "Voice library", Icon: Earth },
                   { id: "clone", label: "Clone my voice", Icon: UserRound },
                   { id: "models", label: "Models", Icon: Cpu }
-                ].map(({ id: id2, label: label3, Icon: Icon2 }) => /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)(
+                ].map(({ id: id2, label: label3, Icon: Icon2 }) => /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)(
                   "button",
                   {
                     "aria-pressed": tab === id2,
@@ -75981,24 +75942,24 @@ function VoicePanel({
                     onClick: () => setTab(id2),
                     className: `flex items-center gap-2 rounded-lg px-3 py-2.5 text-left text-xs ${tab === id2 ? "bg-ink/10 font-bold" : "text-ink/60 hover:bg-ink/5"}`,
                     children: [
-                      /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(Icon2, { className: "size-4 shrink-0" }),
-                      /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("span", { className: "max-sm:hidden", children: label3 })
+                      /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(Icon2, { className: "size-4 shrink-0" }),
+                      /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("span", { className: "max-sm:hidden", children: label3 })
                     ]
                   },
                   id2
                 )),
-                /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("p", { className: "mt-auto p-2 text-[10px] leading-relaxed text-ink/40 max-sm:hidden", children: "Voice recordings and models stay on this computer." })
+                /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("p", { className: "mt-auto p-2 text-[10px] leading-relaxed text-ink/40 max-sm:hidden", children: "Voice recordings and models stay on this computer." })
               ]
             }
           ),
-          /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("div", { className: "flex min-w-0 flex-1 flex-col", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("div", { className: "min-h-0 flex-1 overflow-y-auto p-4", children: [
-              tab === "generate" ? /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("div", { className: "mx-auto max-w-xl", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("h3", { className: "text-base font-bold", children: "Create a new voice" }),
-                /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("p", { className: "mb-5 mt-1 text-xs text-ink/50", children: "Design a voice, listen, then save it. Assign it to an avatar from your library." }),
-                draft ? /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("div", { className: "mt-5 rounded-xl border border-cyan-500/30 bg-cyan-500/5 p-4", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("div", { className: "flex items-center gap-2", children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("span", { className: "flex-1 text-xs font-semibold", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("div", { className: "flex min-w-0 flex-1 flex-col", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("div", { className: "min-h-0 flex-1 overflow-y-auto p-4", children: [
+              tab === "generate" ? /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("div", { className: "mx-auto max-w-xl", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("h3", { className: "text-base font-bold", children: "Create a new voice" }),
+                /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("p", { className: "mb-5 mt-1 text-xs text-ink/50", children: "Design a voice, listen, then save it. Assign it to an avatar from your library." }),
+                draft ? /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("div", { className: "mt-5 rounded-xl border border-cyan-500/30 bg-cyan-500/5 p-4", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("div", { className: "flex items-center gap-2", children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("span", { className: "flex-1 text-xs font-semibold", children: [
                       languageName(draft.language),
                       " \xB7 ",
                       draft.voiceType === "child" ? "Child-style" : draft.voiceType,
@@ -76006,75 +75967,75 @@ function VoicePanel({
                       draft.duration.toFixed(1),
                       " s"
                     ] }),
-                    /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("button", { className: button15, disabled: busy, onClick: () => void run(async () => {
+                    /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("button", { className: button15, disabled: busy, onClick: () => void run(async () => {
                       await call5({ action: "replay", audioId: draft.id, target: target2, projectId });
                     }), children: [
-                      /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(Play, { className: "size-3" }),
+                      /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(Play, { className: "size-3" }),
                       " Listen"
                     ] })
                   ] }),
-                  /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("label", { className: "mt-3 block text-xs font-semibold", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("label", { className: "mt-3 block text-xs font-semibold", children: [
                     "Save voice as",
-                    /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("input", { "aria-label": "Designed voice name", className: field5 + " mt-2", maxLength: 80, value: name2, onChange: (e2) => setName2(e2.target.value) })
+                    /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("input", { "aria-label": "Designed voice name", className: field6 + " mt-2", maxLength: 80, value: name2, onChange: (e2) => setName2(e2.target.value) })
                   ] }),
-                  /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("button", { className: button15 + " mt-3 w-full", disabled: busy || !name2.trim(), onClick: () => void run(async () => {
+                  /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("button", { className: button15 + " mt-3 w-full", disabled: busy || !name2.trim(), onClick: () => void run(async () => {
                     const saved = await call5({ action: "save_design", audioId: draft.id, name: name2 });
                     setDraft(null);
                     setTab("library");
                     setStatus(`${saved.name} saved. Choose Use to assign it to an avatar.`);
                   }), children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(Check, { className: "size-4" }),
+                    /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(Check, { className: "size-4" }),
                     " Save to voice library"
                   ] })
                 ] }) : null,
-                /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("div", { className: "grid grid-cols-2 gap-3", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("label", { className: "text-xs font-semibold", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("div", { className: "grid grid-cols-2 gap-3", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("label", { className: "text-xs font-semibold", children: [
                     "Language",
-                    /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("select", { "aria-label": "Generator language", className: field5 + " mt-2", value: language, disabled: busy, onChange: (e2) => {
+                    /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("select", { "aria-label": "Generator language", className: field6 + " mt-2", value: language, disabled: busy, onChange: (e2) => {
                       setLanguage(e2.target.value);
                       const demo = demos.find((row) => row.language === e2.target.value);
                       if (demo) setText(demo.referenceText);
-                    }, children: models.find((row) => row.id === "chatterbox-multilingual-v3")?.languages.map((code2) => /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("option", { value: code2, children: [
+                    }, children: models.find((row) => row.id === "chatterbox-multilingual-v3")?.languages.map((code2) => /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("option", { value: code2, children: [
                       nativeName(code2),
                       " \xB7 ",
                       languageName(code2)
                     ] }, code2)) })
                   ] }),
-                  /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("label", { className: "text-xs font-semibold", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("label", { className: "text-xs font-semibold", children: [
                     "Voice type",
-                    /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("select", { "aria-label": "Generator voice type", className: field5 + " mt-2", value: voiceType, disabled: busy, onChange: (e2) => setVoiceType(e2.target.value), children: [
-                      /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("option", { value: "male", children: "Male" }),
-                      /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("option", { value: "female", children: "Female" }),
-                      /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("option", { value: "child", children: "Child-style" })
+                    /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("select", { "aria-label": "Generator voice type", className: field6 + " mt-2", value: voiceType, disabled: busy, onChange: (e2) => setVoiceType(e2.target.value), children: [
+                      /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("option", { value: "male", children: "Male" }),
+                      /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("option", { value: "female", children: "Female" }),
+                      /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("option", { value: "child", children: "Child-style" })
                     ] })
                   ] })
                 ] }),
-                /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("label", { className: "mt-4 block text-xs font-semibold", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("label", { className: "mt-4 block text-xs font-semibold", children: [
                   "Voice character",
-                  /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("textarea", { "aria-label": "Voice character", className: field5 + " mt-2 h-20 resize-none", value: description, maxLength: 400, disabled: busy, onChange: (e2) => setDescription(e2.target.value) })
+                  /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("textarea", { "aria-label": "Voice character", className: field6 + " mt-2 h-20 resize-none", value: description, maxLength: 400, disabled: busy, onChange: (e2) => setDescription(e2.target.value) })
                 ] }),
-                /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("label", { className: "mt-4 block text-xs font-semibold", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("label", { className: "mt-4 block text-xs font-semibold", children: [
                   "Preview text",
-                  /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("textarea", { "aria-label": "Generator preview text", dir: "auto", className: field5 + " mt-2 h-24 resize-none", value: text4, maxLength: 600, disabled: busy, onChange: (e2) => setText(e2.target.value) })
+                  /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("textarea", { "aria-label": "Generator preview text", dir: "auto", className: field6 + " mt-2 h-24 resize-none", value: text4, maxLength: 600, disabled: busy, onChange: (e2) => setText(e2.target.value) })
                 ] }),
-                /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("p", { className: "my-3 text-[11px] text-ink/50", children: "Each generation creates a new synthetic voice. Listen before saving; timbre and accent can vary." }),
-                !models.find((row) => row.id === "voice-design-4bit")?.installed ? /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("button", { className: button15 + " mb-3 w-full", onClick: () => setTab("models"), children: "Download Voice Designer \xB7 2.3 GB" }) : null,
-                /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("button", { className: button15 + " w-full bg-ink text-paper", disabled: busy || !text4.trim() || !models.find((row) => row.id === "voice-design-4bit")?.installed || !models.find((row) => row.id === "chatterbox-multilingual-v3")?.installed, onClick: () => void run(async () => {
+                /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("p", { className: "my-3 text-[11px] text-ink/50", children: "Each generation creates a new synthetic voice. Listen before saving; timbre and accent can vary." }),
+                !models.find((row) => row.id === "voice-design-4bit")?.installed ? /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("button", { className: button15 + " mb-3 w-full", onClick: () => setTab("models"), children: "Download Voice Designer \xB7 2.3 GB" }) : null,
+                /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("button", { className: button15 + " w-full bg-ink text-paper", disabled: busy || !text4.trim() || !models.find((row) => row.id === "voice-design-4bit")?.installed || !models.find((row) => row.id === "chatterbox-multilingual-v3")?.installed, onClick: () => void run(async () => {
                   setDraft(null);
                   const result = await wait(await call5({ action: "design", language, voiceType, description, text: text4, target: target2, projectId }));
                   if (result) setDraft(result);
                 }), children: [
-                  busy ? /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(LoaderCircle, { className: "size-4 animate-spin" }) : /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(Mic, { className: "size-4" }),
+                  busy ? /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(LoaderCircle, { className: "size-4 animate-spin" }) : /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(Mic, { className: "size-4" }),
                   " Generate preview"
                 ] })
               ] }) : null,
-              tab === "library" ? /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)(import_jsx_runtime16.Fragment, { children: [
-                /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("div", { className: "mb-4 flex flex-wrap items-center gap-3", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("div", { className: "min-w-0 flex-1", children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("h3", { className: "text-base font-bold", children: "Choose a saved voice" }),
-                    /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("p", { className: "mt-1 text-xs text-ink/50", children: "Choose a ready voice for this avatar. Preview it first, or generate a new voice." })
+              tab === "library" ? /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)(import_jsx_runtime15.Fragment, { children: [
+                /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("div", { className: "mb-4 flex flex-wrap items-center gap-3", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("div", { className: "min-w-0 flex-1", children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("h3", { className: "text-base font-bold", children: "Choose a saved voice" }),
+                    /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("p", { className: "mt-1 text-xs text-ink/50", children: "Choose a ready voice for this avatar. Preview it first, or generate a new voice." })
                   ] }),
-                  /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)(
+                  /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)(
                     "button",
                     {
                       disabled: busy,
@@ -76085,15 +76046,15 @@ function VoicePanel({
                         );
                       }),
                       children: [
-                        /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(Download, { className: "size-3.5" }),
+                        /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(Download, { className: "size-3.5" }),
                         "Get language examples"
                       ]
                     }
                   )
                 ] }),
-                /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("label", { className: "mb-4 flex items-center gap-2 rounded-lg border border-ink/15 bg-paper px-3", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(Search, { className: "size-4 text-ink/40" }),
-                  /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
+                /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("label", { className: "mb-4 flex items-center gap-2 rounded-lg border border-ink/15 bg-paper px-3", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(Search, { className: "size-4 text-ink/40" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
                     "input",
                     {
                       "aria-label": "Search voice languages",
@@ -76104,21 +76065,21 @@ function VoicePanel({
                     }
                   )
                 ] }),
-                /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("button", { className: button15 + " mb-3", onClick: () => setTab("generate"), children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(Mic, { className: "size-3.5" }),
+                /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("button", { className: button15 + " mb-3", onClick: () => setTab("generate"), children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(Mic, { className: "size-3.5" }),
                   " Create a new voice"
                 ] }),
-                voices.some((row) => !row.demoId) ? /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("div", { className: "mt-5", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("h3", { className: "mb-2 text-xs font-bold", children: "Saved voices" }),
-                  voices.filter((row) => !row.demoId && `${row.name} ${row.language ?? ""} ${row.language ? languageName(row.language) : ""} ${row.voiceType ?? ""}`.toLowerCase().includes(filter2.toLowerCase())).map((row) => /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)(
+                voices.some((row) => !row.demoId) ? /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("div", { className: "mt-5", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("h3", { className: "mb-2 text-xs font-bold", children: "Saved voices" }),
+                  voices.filter((row) => !row.demoId && `${row.name} ${row.language ?? ""} ${row.language ? languageName(row.language) : ""} ${row.voiceType ?? ""}`.toLowerCase().includes(filter2.toLowerCase())).map((row) => /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)(
                     "div",
                     {
                       className: "mb-2 flex items-center gap-2 rounded-lg border border-ink/10 p-2",
                       children: [
-                        /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(UserRound, { className: "size-4" }),
-                        /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("div", { className: "min-w-0 flex-1", children: [
-                          /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("strong", { className: "block text-xs", children: row.name }),
-                          /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("span", { className: "text-[10px] text-ink/50", children: [
+                        /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(UserRound, { className: "size-4" }),
+                        /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("div", { className: "min-w-0 flex-1", children: [
+                          /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("strong", { className: "block text-xs", children: row.name }),
+                          /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("span", { className: "text-[10px] text-ink/50", children: [
                             row.language ? languageName(row.language) : "Language unspecified",
                             " \xB7 ",
                             row.voiceType === "child" ? "Child-style" : row.voiceType ?? "Reference voice",
@@ -76127,7 +76088,7 @@ function VoicePanel({
                             row.sourceModel ? " \xB7 Designed" : ""
                           ] })
                         ] }),
-                        /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("button", { "aria-label": `Download ${row.name}`, title: "Download WAV with voice information", className: button15, disabled: busy, onClick: () => void run(async () => {
+                        /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("button", { "aria-label": `Download ${row.name}`, title: "Download WAV with voice information", className: button15, disabled: busy, onClick: () => void run(async () => {
                           const exported = await call5({ action: "export_voice", voiceId: row.id });
                           const bytes3 = Uint8Array.from(atob(exported.data), (c2) => c2.charCodeAt(0));
                           const url = URL.createObjectURL(new Blob([bytes3], { type: "audio/wav" }));
@@ -76137,8 +76098,8 @@ function VoicePanel({
                           anchor.click();
                           setTimeout(() => URL.revokeObjectURL(url), 1e4);
                           setStatus(`Downloaded ${row.name} with language, voice type and model information embedded in the WAV.`);
-                        }), children: /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(Download, { className: "size-3" }) }),
-                        /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
+                        }), children: /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(Download, { className: "size-3" }) }),
+                        /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
                           "button",
                           {
                             "aria-label": `Preview ${row.name}`,
@@ -76152,10 +76113,10 @@ function VoicePanel({
                                 projectId
                               });
                             }),
-                            children: /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(Play, { className: "size-3" })
+                            children: /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(Play, { className: "size-3" })
                           }
                         ),
-                        /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
+                        /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
                           "button",
                           {
                             className: button15,
@@ -76169,35 +76130,35 @@ function VoicePanel({
                     row.id
                   ))
                 ] }) : null,
-                /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("section", { className: "mt-5", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("h3", { className: "mb-3 text-sm font-bold", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("section", { className: "mt-5", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("h3", { className: "mb-3 text-sm font-bold", children: [
                     "Language voices \xB7 ",
                     demos.length,
                     " languages"
                   ] }),
-                  /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
+                  /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
                     "div",
                     {
                       className: "grid grid-cols-2 gap-3 lg:grid-cols-3",
                       "aria-label": "Language voice samples",
                       children: visibleDemos.map((demo) => {
                         const saved = voices.find((row) => row.demoId === demo.id), active = saved?.id === voice;
-                        return /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)(
+                        return /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)(
                           "article",
                           {
                             className: `flex min-h-36 flex-col rounded-xl border p-3 ${active ? "border-cyan-500 bg-cyan-500/5" : "border-ink/10 bg-paper/40"}`,
                             children: [
-                              /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("div", { className: "flex items-start gap-2", children: [
-                                /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("div", { className: "flex-1", children: [
-                                  /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("h4", { dir: "auto", className: "text-sm font-bold", children: nativeName(demo.language) }),
-                                  /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("p", { className: "mt-0.5 text-[10px] text-ink/40", children: [
+                              /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("div", { className: "flex items-start gap-2", children: [
+                                /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("div", { className: "flex-1", children: [
+                                  /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("h4", { dir: "auto", className: "text-sm font-bold", children: nativeName(demo.language) }),
+                                  /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("p", { className: "mt-0.5 text-[10px] text-ink/40", children: [
                                     languageName(demo.language),
                                     saved ? " \xB7 On device" : ""
                                   ] })
                                 ] }),
-                                active ? /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(Check, { className: "size-4 text-cyan-500" }) : null
+                                active ? /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(Check, { className: "size-4 text-cyan-500" }) : null
                               ] }),
-                              /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
+                              /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
                                 "p",
                                 {
                                   dir: "auto",
@@ -76205,8 +76166,8 @@ function VoicePanel({
                                   children: demo.referenceText
                                 }
                               ),
-                              /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("div", { className: "mt-auto flex items-center gap-2", children: [
-                                /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)(
+                              /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("div", { className: "mt-auto flex items-center gap-2", children: [
+                                /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)(
                                   "button",
                                   {
                                     "aria-label": `Preview ${languageName(demo.language)} voice`,
@@ -76214,12 +76175,12 @@ function VoicePanel({
                                     className: button15 + " flex-1",
                                     onClick: () => preview(demo),
                                     children: [
-                                      /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(Play, { className: "size-3" }),
+                                      /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(Play, { className: "size-3" }),
                                       "Listen"
                                     ]
                                   }
                                 ),
-                                saved ? /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
+                                saved ? /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
                                   "button",
                                   {
                                     "aria-label": `Use ${languageName(demo.language)} voice`,
@@ -76238,40 +76199,40 @@ function VoicePanel({
                     }
                   )
                 ] }),
-                /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("div", { className: "mt-5 rounded-xl border border-ink/10 bg-paper/40 p-4", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("div", { className: "flex items-center gap-2", children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(UserRound, { className: "size-4" }),
-                    /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("h3", { className: "text-sm font-bold", children: "Create your own voice" })
+                /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("div", { className: "mt-5 rounded-xl border border-ink/10 bg-paper/40 p-4", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("div", { className: "flex items-center gap-2", children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(UserRound, { className: "size-4" }),
+                    /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("h3", { className: "text-sm font-bold", children: "Create your own voice" })
                   ] }),
-                  /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("div", { className: "mt-3 flex flex-wrap items-center gap-2", children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
+                  /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("div", { className: "mt-3 flex flex-wrap items-center gap-2", children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
                       "select",
                       {
                         "aria-label": "New voice language",
                         className: "min-w-40 flex-1 rounded-lg border border-ink/15 bg-paper p-2 text-xs",
                         value: language,
                         onChange: (e2) => setLanguage(e2.target.value),
-                        children: models.find((row) => row.id === model)?.languages.map((code2) => /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("option", { value: code2, children: [
+                        children: models.find((row) => row.id === model)?.languages.map((code2) => /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("option", { value: code2, children: [
                           nativeName(code2),
                           " \xB7 ",
                           languageName(code2)
                         ] }, code2))
                       }
                     ),
-                    /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("button", { className: button15, onClick: () => setTab("clone"), children: [
-                      /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(Upload, { className: "size-3.5" }),
+                    /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("button", { className: button15, onClick: () => setTab("clone"), children: [
+                      /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(Upload, { className: "size-3.5" }),
                       "Clone my voice"
                     ] })
                   ] })
                 ] })
               ] }) : null,
-              tab === "clone" ? /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("div", { className: "mx-auto max-w-lg", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("h3", { className: "text-base font-bold", children: "Clone my voice" }),
-                /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("p", { className: "mb-5 mt-1 text-xs text-ink/50", children: "Add a clear recording. Your agent reuses its voice locally." }),
-                /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
+              tab === "clone" ? /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("div", { className: "mx-auto max-w-lg", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("h3", { className: "text-base font-bold", children: "Clone my voice" }),
+                /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("p", { className: "mb-5 mt-1 text-xs text-ink/50", children: "Add a clear recording. Your agent reuses its voice locally." }),
+                /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
                   "input",
                   {
-                    ref: input5,
+                    ref: input4,
                     type: "file",
                     hidden: true,
                     accept: "audio/*",
@@ -76281,41 +76242,41 @@ function VoicePanel({
                     }
                   }
                 ),
-                /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)(
+                /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)(
                   "button",
                   {
                     className: "flex w-full flex-col items-center gap-3 rounded-xl border-2 border-dashed border-ink/20 bg-paper/40 p-8 hover:border-ink/40",
-                    onClick: () => input5.current?.click(),
+                    onClick: () => input4.current?.click(),
                     children: [
-                      /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(Upload, { className: "size-7 text-ink/50" }),
-                      /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("strong", { className: "text-sm", children: file ? file.name : "Choose a voice recording" }),
-                      /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("span", { className: "text-xs text-ink/40", children: "3\u201330 seconds \xB7 one speaker \xB7 up to 20 MB" })
+                      /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(Upload, { className: "size-7 text-ink/50" }),
+                      /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("strong", { className: "text-sm", children: file ? file.name : "Choose a voice recording" }),
+                      /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("span", { className: "text-xs text-ink/40", children: "3\u201330 seconds \xB7 one speaker \xB7 up to 20 MB" })
                     ]
                   }
                 ),
-                /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("label", { className: "mt-5 block text-xs font-semibold", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("label", { className: "mt-5 block text-xs font-semibold", children: [
                   "Voice name",
-                  /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
+                  /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
                     "input",
                     {
                       "aria-label": "Voice name",
-                      className: field5 + " mt-2",
+                      className: field6 + " mt-2",
                       value: name2,
                       maxLength: 80,
                       onChange: (e2) => setName2(e2.target.value)
                     }
                   )
                 ] }),
-                /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("label", { className: "mt-4 block text-xs font-semibold", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("label", { className: "mt-4 block text-xs font-semibold", children: [
                   "Recording language",
-                  /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
+                  /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
                     "select",
                     {
                       "aria-label": "Recording language",
-                      className: field5 + " mt-2",
+                      className: field6 + " mt-2",
                       value: language,
                       onChange: (e2) => setLanguage(e2.target.value),
-                      children: models.find((row) => row.id === model)?.languages.map((code2) => /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("option", { value: code2, children: [
+                      children: models.find((row) => row.id === model)?.languages.map((code2) => /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("option", { value: code2, children: [
                         nativeName(code2),
                         " \xB7 ",
                         languageName(code2)
@@ -76323,8 +76284,8 @@ function VoicePanel({
                     }
                   )
                 ] }),
-                /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("label", { className: "my-5 flex items-start gap-2 text-xs text-ink/60", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
+                /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("label", { className: "my-5 flex items-start gap-2 text-xs text-ink/60", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
                     "input",
                     {
                       type: "checkbox",
@@ -76334,31 +76295,31 @@ function VoicePanel({
                   ),
                   "I own this voice or have the speaker\u2019s permission to use it."
                 ] }),
-                /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)(
+                /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)(
                   "button",
                   {
                     className: button15 + " w-full bg-ink text-paper hover:bg-ink/90",
                     disabled: busy || !file || !consent || !name2.trim(),
                     onClick: () => void run(upload),
                     children: [
-                      /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(Mic, { className: "size-4" }),
+                      /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(Mic, { className: "size-4" }),
                       "Save to voice library"
                     ]
                   }
                 )
               ] }) : null,
-              tab === "models" ? /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)(import_jsx_runtime16.Fragment, { children: [
-                /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("h3", { className: "text-base font-bold", children: "Local models" }),
-                /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("p", { className: "mb-5 mt-1 text-xs text-ink/50", children: "Install only what you need. Voice samples are separate from model weights." }),
-                models.map((row) => /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
+              tab === "models" ? /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)(import_jsx_runtime15.Fragment, { children: [
+                /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("h3", { className: "text-base font-bold", children: "Local models" }),
+                /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("p", { className: "mb-5 mt-1 text-xs text-ink/50", children: "Install only what you need. Voice samples are separate from model weights." }),
+                models.map((row) => /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
                   "article",
                   {
                     className: "rounded-xl border border-ink/10 p-4",
-                    children: /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("div", { className: "flex items-center gap-3", children: [
-                      /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(Cpu, { className: "size-6 text-ink/50" }),
-                      /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("div", { className: "flex-1", children: [
-                        /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("h4", { className: "text-sm font-bold", children: row.name }),
-                        /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("p", { className: "mt-1 text-xs text-ink/40", children: [
+                    children: /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("div", { className: "flex items-center gap-3", children: [
+                      /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(Cpu, { className: "size-6 text-ink/50" }),
+                      /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("div", { className: "flex-1", children: [
+                        /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("h4", { className: "text-sm font-bold", children: row.name }),
+                        /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("p", { className: "mt-1 text-xs text-ink/40", children: [
                           "Apple Silicon \xB7 ",
                           row.languages.length,
                           " languages \xB7",
@@ -76370,13 +76331,13 @@ function VoicePanel({
                           row.voiceDesign ? " \xB7 Voice design \xB7 requires Multilingual Voice" : " \xB7 Speech and cloning"
                         ] })
                       ] }),
-                      row.installed ? /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("div", { className: "flex flex-col items-end gap-2", children: [
-                        /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("span", { className: "flex items-center gap-1 text-xs text-cyan-500", children: [
-                          /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(Check, { className: "size-4" }),
+                      row.installed ? /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("div", { className: "flex flex-col items-end gap-2", children: [
+                        /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("span", { className: "flex items-center gap-1 text-xs text-cyan-500", children: [
+                          /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(Check, { className: "size-4" }),
                           "Installed"
                         ] }),
-                        removeModel === row.id ? /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("div", { className: "flex gap-2", children: [
-                          /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
+                        removeModel === row.id ? /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("div", { className: "flex gap-2", children: [
+                          /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
                             "button",
                             {
                               disabled: busy,
@@ -76397,7 +76358,7 @@ function VoicePanel({
                               children: "Confirm removal"
                             }
                           ),
-                          /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
+                          /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
                             "button",
                             {
                               className: button15,
@@ -76405,7 +76366,7 @@ function VoicePanel({
                               children: "Cancel"
                             }
                           )
-                        ] }) : /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
+                        ] }) : /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
                           "button",
                           {
                             disabled: busy,
@@ -76414,7 +76375,7 @@ function VoicePanel({
                             children: "Remove model"
                           }
                         )
-                      ] }) : /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)(
+                      ] }) : /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)(
                         "button",
                         {
                           className: button15,
@@ -76428,7 +76389,7 @@ function VoicePanel({
                             );
                           }),
                           children: [
-                            /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(Download, { className: "size-4" }),
+                            /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(Download, { className: "size-4" }),
                             "Download"
                           ]
                         }
@@ -76439,11 +76400,11 @@ function VoicePanel({
                 ))
               ] }) : null
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("footer", { className: "shrink-0 border-t border-ink/10 bg-paper/20 p-3", children: [
-              tab !== "generate" ? /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)(import_jsx_runtime16.Fragment, { children: [
-                /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("div", { className: "mb-2 flex items-center gap-2", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("span", { className: "min-w-0 flex-1 truncate text-xs font-semibold", children: selected2 ? `${selected2.name} \xB7 ${selected2.language ? languageName(selected2.language) : "Reference"} \xB7 ${selected2.voiceType === "child" ? "Child-style" : selected2.voiceType ?? "Reference voice"} \xB7 ${models.find((row) => row.id === selected2.model)?.name ?? selected2.model}` : "Choose a saved voice for this avatar" }),
-                  /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
+            /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("footer", { className: "shrink-0 border-t border-ink/10 bg-paper/20 p-3", children: [
+              tab !== "generate" ? /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)(import_jsx_runtime15.Fragment, { children: [
+                /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("div", { className: "mb-2 flex items-center gap-2", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("span", { className: "min-w-0 flex-1 truncate text-xs font-semibold", children: selected2 ? `${selected2.name} \xB7 ${selected2.language ? languageName(selected2.language) : "Reference"} \xB7 ${selected2.voiceType === "child" ? "Child-style" : selected2.voiceType ?? "Reference voice"} \xB7 ${models.find((row) => row.id === selected2.model)?.name ?? selected2.model}` : "Choose a saved voice for this avatar" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
                     "select",
                     {
                       "aria-label": "Speech language",
@@ -76451,24 +76412,24 @@ function VoicePanel({
                       className: "max-w-36 rounded border border-ink/15 bg-paper p-1 text-xs",
                       value: language,
                       onChange: (e2) => setLanguage(e2.target.value),
-                      children: models.find((row) => row.id === model)?.languages.map((code2) => /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("option", { value: code2, children: languageName(code2) }, code2))
+                      children: models.find((row) => row.id === model)?.languages.map((code2) => /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("option", { value: code2, children: languageName(code2) }, code2))
                     }
                   )
                 ] }),
-                /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("div", { className: "flex gap-2", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
+                /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("div", { className: "flex gap-2", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
                     "textarea",
                     {
                       "aria-label": "Speech text",
                       disabled: busy,
                       dir: "auto",
-                      className: field5 + " h-12 resize-none py-2 text-xs",
+                      className: field6 + " h-12 resize-none py-2 text-xs",
                       maxLength: 1200,
                       value: text4,
                       onChange: (e2) => setText(e2.target.value)
                     }
                   ),
-                  /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)(
+                  /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)(
                     "button",
                     {
                       className: button15 + " shrink-0 bg-ink text-paper hover:bg-ink/90",
@@ -76487,15 +76448,15 @@ function VoicePanel({
                         );
                       }),
                       children: [
-                        busy ? /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(LoaderCircle, { className: "size-4 animate-spin" }) : /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(Play, { className: "size-4" }),
+                        busy ? /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(LoaderCircle, { className: "size-4 animate-spin" }) : /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(Play, { className: "size-4" }),
                         "Speak"
                       ]
                     }
                   )
                 ] })
               ] }) : null,
-              /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("div", { ref: playerHost, className: "mt-2" }),
-              tab !== "generate" && recordings.length ? /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("div", { className: "mt-2 flex flex-wrap gap-2", children: recordings.slice(-2).reverse().map((clip) => /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("div", { ref: playerHost, className: "mt-2" }),
+              tab !== "generate" && recordings.length ? /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("div", { className: "mt-2 flex flex-wrap gap-2", children: recordings.slice(-2).reverse().map((clip) => /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
                 "button",
                 {
                   className: "max-w-60 truncate rounded border border-ink/10 px-2 py-1 text-[10px] text-ink/50 hover:bg-ink/5",
@@ -76512,8 +76473,8 @@ function VoicePanel({
                 },
                 clip.id
               )) }) : null,
-              /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("p", { role: "status", className: "mt-1 text-[10px] text-ink/50", children: status }),
-              error ? /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("p", { role: "alert", className: "mt-1 text-xs text-coral", children: error }) : null
+              /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("p", { role: "status", className: "mt-1 text-[10px] text-ink/50", children: status }),
+              error ? /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("p", { role: "alert", className: "mt-1 text-xs text-coral", children: error }) : null
             ] })
           ] })
         ] })
@@ -76691,7 +76652,7 @@ var UserAvatarSession = class {
 };
 
 // studio/user-avatar-panel.tsx
-var import_react19 = __toESM(require_react(), 1);
+var import_react18 = __toESM(require_react(), 1);
 
 // studio/user-avatar-thumbnail.ts
 var renderer;
@@ -80183,15 +80144,15 @@ async function importUserAvatar(file, mode, companions = [], includeMotions = tr
 }
 
 // studio/user-avatar-panel.tsx
-var import_jsx_runtime17 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime16 = __toESM(require_jsx_runtime(), 1);
 function UserAvatarPanel({ storage: storage7, section, search = "", agents, assign: assign2, play }) {
-  const [rows2, setRows] = (0, import_react19.useState)([]), [target2, setTarget] = (0, import_react19.useState)("self");
-  const [filter2, setFilter] = (0, import_react19.useState)(""), [importOpen, setImportOpen] = (0, import_react19.useState)(false), [selected2, setSelected] = (0, import_react19.useState)(null), [progress, setProgress] = (0, import_react19.useState)({ current: 0, total: 0 });
-  const filesInput = (0, import_react19.useRef)(null), folderInput = (0, import_react19.useRef)(null);
-  const [status, setStatus] = (0, import_react19.useState)(""), [error, setError] = (0, import_react19.useState)(""), [busy, setBusy] = (0, import_react19.useState)(false), [report, setReport] = (0, import_react19.useState)([]);
-  const thumbnailWork = (0, import_react19.useRef)(false), thumbnailAttempts = (0, import_react19.useRef)(/* @__PURE__ */ new Set()), thumbnailQueue = (0, import_react19.useRef)([]), cardGrid = (0, import_react19.useRef)(null);
-  const alive = (0, import_react19.useRef)(true), serial = (0, import_react19.useRef)(0);
-  (0, import_react19.useEffect)(() => {
+  const [rows2, setRows] = (0, import_react18.useState)([]), [target2, setTarget] = (0, import_react18.useState)("self");
+  const [filter2, setFilter] = (0, import_react18.useState)(""), [importOpen, setImportOpen] = (0, import_react18.useState)(false), [selected2, setSelected] = (0, import_react18.useState)(null), [progress, setProgress] = (0, import_react18.useState)({ current: 0, total: 0 });
+  const filesInput = (0, import_react18.useRef)(null), folderInput = (0, import_react18.useRef)(null);
+  const [status, setStatus] = (0, import_react18.useState)(""), [error, setError] = (0, import_react18.useState)(""), [busy, setBusy] = (0, import_react18.useState)(false), [report, setReport] = (0, import_react18.useState)([]);
+  const thumbnailWork = (0, import_react18.useRef)(false), thumbnailAttempts = (0, import_react18.useRef)(/* @__PURE__ */ new Set()), thumbnailQueue = (0, import_react18.useRef)([]), cardGrid = (0, import_react18.useRef)(null);
+  const alive = (0, import_react18.useRef)(true), serial = (0, import_react18.useRef)(0);
+  (0, import_react18.useEffect)(() => {
     alive.current = true;
     const refresh = () => {
       void storage7.list().then((rows3) => {
@@ -80208,7 +80169,7 @@ function UserAvatarPanel({ storage: storage7, section, search = "", agents, assi
       stop?.();
     };
   }, [storage7]);
-  (0, import_react19.useEffect)(() => {
+  (0, import_react18.useEffect)(() => {
     const grid = cardGrid.current;
     if (busy || section !== "characters" || !grid) return;
     const drain = async () => {
@@ -80246,7 +80207,7 @@ function UserAvatarPanel({ storage: storage7, section, search = "", agents, assi
     void drain();
     return () => observer.disconnect();
   }, [rows2, busy, storage7, section, filter2, search]);
-  (0, import_react19.useEffect)(() => {
+  (0, import_react18.useEffect)(() => {
     if (target2 !== "self" && !agents.some((row) => row.id === target2)) setTarget("self");
   }, [agents, target2]);
   const run = async (action) => {
@@ -80307,81 +80268,81 @@ function UserAvatarPanel({ storage: storage7, section, search = "", agents, assi
   const libraryCount = new Set(rows2.filter((row) => row.kind === kind).map((row) => `${row.originalFile}:${row.name}`)).size;
   const unique = visible2.filter((row, index) => visible2.findIndex((other) => other.kind === row.kind && other.originalFile === row.originalFile && other.name === row.name) === index);
   const Icon2 = kind === "character" ? PersonStanding : Play;
-  return /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)("section", { "aria-label": `User ${section} library`, className: "space-y-3 border-t border-ink/10 pt-3 text-ink", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)("div", { className: "flex items-center justify-between gap-2", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)("div", { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)("h3", { className: "flex items-center gap-1.5 text-xs font-bold", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime17.jsx)(Icon2, { size: 15 }),
+  return /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("section", { "aria-label": `User ${section} library`, className: "space-y-3 border-t border-ink/10 pt-3 text-ink", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("div", { className: "flex items-center justify-between gap-2", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("div", { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("h3", { className: "flex items-center gap-1.5 text-xs font-bold", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(Icon2, { size: 15 }),
           "My ",
           section,
-          /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("span", { className: "text-ink/50", children: libraryCount })
+          /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("span", { className: "text-ink/50", children: libraryCount })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)("p", { className: "mt-1 flex items-center gap-1 text-[10px] text-ink/50", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime17.jsx)(LockKeyhole, { size: 11 }),
+        /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("p", { className: "mt-1 flex items-center gap-1 text-[10px] text-ink/50", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(LockKeyhole, { size: 11 }),
           "Private on this device"
         ] })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)("button", { type: "button", "aria-label": `Import ${section}`, "aria-expanded": importOpen, onClick: () => setImportOpen((open2) => !open2), className: "flex items-center gap-1.5 rounded-lg bg-ink px-2.5 py-2 text-xs font-bold text-paper", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime17.jsx)(Upload, { size: 13 }),
+      /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("button", { type: "button", "aria-label": `Import ${section}`, "aria-expanded": importOpen, onClick: () => setImportOpen((open2) => !open2), className: "flex items-center gap-1.5 rounded-lg bg-ink px-2.5 py-2 text-xs font-bold text-paper", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(Upload, { size: 13 }),
         "Import"
       ] })
     ] }),
-    importOpen || busy ? /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)("div", { className: "space-y-2 rounded-lg border border-ink/15 bg-paper/50 p-3", "aria-label": `Import ${section} options`, children: [
-      /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)("div", { className: "flex items-center justify-between", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)("span", { className: "text-xs font-bold", children: [
+    importOpen || busy ? /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("div", { className: "space-y-2 rounded-lg border border-ink/15 bg-paper/50 p-3", "aria-label": `Import ${section} options`, children: [
+      /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("div", { className: "flex items-center justify-between", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("span", { className: "text-xs font-bold", children: [
           "Add ",
           section
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("button", { type: "button", "aria-label": "Close import options", onClick: () => setImportOpen(false), children: /* @__PURE__ */ (0, import_jsx_runtime17.jsx)(X, { size: 14 }) })
+        /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("button", { type: "button", "aria-label": "Close import options", onClick: () => setImportOpen(false), children: /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(X, { size: 14 }) })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("p", { className: "text-[11px] leading-relaxed text-ink/60", children: "Choose FBX or GLB files, or a folder with textures. Extract ZIP files first." }),
-      /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)("div", { className: "grid grid-cols-2 gap-2", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)("button", { type: "button", disabled: busy, onClick: () => filesInput.current?.click(), className: "flex items-center justify-center gap-1.5 rounded-lg border border-ink/15 px-2 py-2 text-xs hover:bg-ink/5 disabled:opacity-40", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime17.jsx)(FileUp, { size: 14 }),
+      /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("p", { className: "text-[11px] leading-relaxed text-ink/60", children: "Choose FBX or GLB files, or a folder with textures. Extract ZIP files first." }),
+      /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("div", { className: "grid grid-cols-2 gap-2", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("button", { type: "button", disabled: busy, onClick: () => filesInput.current?.click(), className: "flex items-center justify-center gap-1.5 rounded-lg border border-ink/15 px-2 py-2 text-xs hover:bg-ink/5 disabled:opacity-40", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(FileUp, { size: 14 }),
           "Choose files"
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)("button", { type: "button", disabled: busy, onClick: () => folderInput.current?.click(), className: "flex items-center justify-center gap-1.5 rounded-lg border border-ink/15 px-2 py-2 text-xs hover:bg-ink/5 disabled:opacity-40", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime17.jsx)(FolderOpen, { size: 14 }),
+        /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("button", { type: "button", disabled: busy, onClick: () => folderInput.current?.click(), className: "flex items-center justify-center gap-1.5 rounded-lg border border-ink/15 px-2 py-2 text-xs hover:bg-ink/5 disabled:opacity-40", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(FolderOpen, { size: 14 }),
           "Choose folder"
         ] })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("input", { ref: filesInput, "aria-label": `Import user ${section}`, className: "hidden", type: "file", accept: ".fbx,.glb,.png,.jpg,.jpeg,.webp,.tga", multiple: true, disabled: busy, onChange: (event2) => {
+      /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("input", { ref: filesInput, "aria-label": `Import user ${section}`, className: "hidden", type: "file", accept: ".fbx,.glb,.png,.jpg,.jpeg,.webp,.tga", multiple: true, disabled: busy, onChange: (event2) => {
         const files = Array.from(event2.target.files ?? []);
         event2.target.value = "";
         if (files.length) void run(() => ingest(files));
       } }),
-      /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("input", { ref: folderInput, "aria-label": `Import user ${section} folder`, ...{ webkitdirectory: "" }, className: "hidden", type: "file", multiple: true, disabled: busy, onChange: (event2) => {
+      /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("input", { ref: folderInput, "aria-label": `Import user ${section} folder`, ...{ webkitdirectory: "" }, className: "hidden", type: "file", multiple: true, disabled: busy, onChange: (event2) => {
         const files = Array.from(event2.target.files ?? []);
         event2.target.value = "";
         if (files.length) void run(() => ingest(files));
       } }),
-      busy ? /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)("div", { className: "space-y-1.5", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)("div", { className: "flex items-center gap-1.5 text-[11px]", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime17.jsx)(LoaderCircle, { size: 12, className: "animate-spin" }),
+      busy ? /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("div", { className: "space-y-1.5", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("div", { className: "flex items-center gap-1.5 text-[11px]", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(LoaderCircle, { size: 12, className: "animate-spin" }),
           "Importing ",
           progress.current,
           " of ",
           progress.total
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("progress", { "aria-label": "Import progress", className: "h-1.5 w-full accent-current", value: progress.current, max: progress.total || 1 })
+        /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("progress", { "aria-label": "Import progress", className: "h-1.5 w-full accent-current", value: progress.current, max: progress.total || 1 })
       ] }) : null
     ] }) : null,
-    rows2.some((row) => row.kind === kind) ? /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)(import_jsx_runtime17.Fragment, { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)("label", { className: "flex items-center gap-2 rounded-lg border border-ink/10 px-2.5 py-2", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime17.jsx)(Search, { size: 13, className: "shrink-0 text-ink/50" }),
-        /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("input", { "aria-label": `Search my ${section}`, placeholder: `Search ${section}`, value: filter2, onChange: (event2) => setFilter(event2.target.value), className: "min-w-0 w-full bg-transparent text-xs outline-none" })
+    rows2.some((row) => row.kind === kind) ? /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)(import_jsx_runtime16.Fragment, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("label", { className: "flex items-center gap-2 rounded-lg border border-ink/10 px-2.5 py-2", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(Search, { size: 13, className: "shrink-0 text-ink/50" }),
+        /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("input", { "aria-label": `Search my ${section}`, placeholder: `Search ${section}`, value: filter2, onChange: (event2) => setFilter(event2.target.value), className: "min-w-0 w-full bg-transparent text-xs outline-none" })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)("label", { className: "block text-[11px] text-ink/60", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("label", { className: "block text-[11px] text-ink/60", children: [
         "Use for",
-        /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)("select", { "aria-label": `User ${section} target`, className: "mt-1 w-full rounded-lg border border-ink/10 bg-paper p-2 text-xs text-ink", value: target2, disabled: busy, onChange: (event2) => setTarget(event2.target.value), children: [
-          /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("option", { value: "self", children: "My avatar" }),
-          agents.map((agent) => /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("option", { value: agent.id, children: agent.name }, agent.id))
+        /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("select", { "aria-label": `User ${section} target`, className: "mt-1 w-full rounded-lg border border-ink/10 bg-paper p-2 text-xs text-ink", value: target2, disabled: busy, onChange: (event2) => setTarget(event2.target.value), children: [
+          /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("option", { value: "self", children: "My avatar" }),
+          agents.map((agent) => /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("option", { value: agent.id, children: agent.name }, agent.id))
         ] })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("div", { ref: cardGrid, className: "grid max-h-80 grid-cols-2 gap-2 overflow-y-auto pr-1", "aria-label": `Private ${section}`, children: unique.map((row) => {
+      /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("div", { ref: cardGrid, className: "grid max-h-80 grid-cols-2 gap-2 overflow-y-auto pr-1", "aria-label": `Private ${section}`, children: unique.map((row) => {
         const active = selected2 === row.id;
         const name2 = row.name.split("__")[0].replace(/_/g, " ");
-        return /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)("button", { type: "button", "data-avatar-id": row.id, disabled: busy, "aria-label": `${kind === "character" ? "Use" : "Play"} ${row.name}`, "aria-pressed": active, className: `group relative overflow-hidden rounded-lg border text-left transition-colors disabled:opacity-40 ${active ? "border-ink bg-ink/10" : "border-ink/10 hover:border-ink/40"}`, title: row.name, onClick: () => void run(async () => {
+        return /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("button", { type: "button", "data-avatar-id": row.id, disabled: busy, "aria-label": `${kind === "character" ? "Use" : "Play"} ${row.name}`, "aria-pressed": active, className: `group relative overflow-hidden rounded-lg border text-left transition-colors disabled:opacity-40 ${active ? "border-ink bg-ink/10" : "border-ink/10 hover:border-ink/40"}`, title: row.name, onClick: () => void run(async () => {
           if (kind === "character") await assign2(target2, row.id);
           else await play(target2, row.id);
           if (alive.current) {
@@ -80389,39 +80350,354 @@ function UserAvatarPanel({ storage: storage7, section, search = "", agents, assi
             setStatus(`${kind === "character" ? "Using" : "Playing"} ${name2}`);
           }
         }), children: [
-          /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("div", { className: "flex h-20 items-center justify-center bg-ink/5", children: row.thumbnail ? /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("img", { src: row.thumbnail, alt: name2, className: "h-full w-full object-contain" }) : /* @__PURE__ */ (0, import_jsx_runtime17.jsx)(Icon2, { size: kind === "character" ? 38 : 24, strokeWidth: 1.25, className: "text-ink/50" }) }),
-          active ? /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("span", { className: "absolute right-1.5 top-1.5 rounded-full bg-ink p-1 text-paper", children: /* @__PURE__ */ (0, import_jsx_runtime17.jsx)(Check, { size: 10 }) }) : null,
-          /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)("div", { className: "px-2 py-2", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("span", { className: "block truncate text-[11px] font-bold", children: kind === "character" ? name2 : row.name }),
-            /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("span", { className: "mt-0.5 block text-[10px] text-ink/50", children: kind === "character" ? "Use character" : `${row.duration?.toFixed(1) ?? "\u2014"} seconds` })
+          /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("div", { className: "flex h-20 items-center justify-center bg-ink/5", children: row.thumbnail ? /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("img", { src: row.thumbnail, alt: name2, className: "h-full w-full object-contain" }) : /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(Icon2, { size: kind === "character" ? 38 : 24, strokeWidth: 1.25, className: "text-ink/50" }) }),
+          active ? /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("span", { className: "absolute right-1.5 top-1.5 rounded-full bg-ink p-1 text-paper", children: /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(Check, { size: 10 }) }) : null,
+          /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("div", { className: "px-2 py-2", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("span", { className: "block truncate text-[11px] font-bold", children: kind === "character" ? name2 : row.name }),
+            /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("span", { className: "mt-0.5 block text-[10px] text-ink/50", children: kind === "character" ? "Use character" : `${row.duration?.toFixed(1) ?? "\u2014"} seconds` })
           ] })
         ] }, row.id);
       }) }),
-      !unique.length ? /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("p", { className: "py-3 text-center text-xs text-ink/50", children: "No matches. Try another name." }) : null
-    ] }) : /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)("div", { className: "rounded-lg border border-dashed border-ink/20 p-5 text-center", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime17.jsx)(Icon2, { size: 30, strokeWidth: 1.2, className: "mx-auto mb-2 text-ink/40" }),
-      /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)("p", { className: "text-xs font-bold", children: [
+      !unique.length ? /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("p", { className: "py-3 text-center text-xs text-ink/50", children: "No matches. Try another name." }) : null
+    ] }) : /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("div", { className: "rounded-lg border border-dashed border-ink/20 p-5 text-center", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(Icon2, { size: 30, strokeWidth: 1.2, className: "mx-auto mb-2 text-ink/40" }),
+      /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("p", { className: "text-xs font-bold", children: [
         "Your ",
         section,
         ", ready to use"
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("p", { className: "mt-1 text-[11px] leading-relaxed text-ink/50", children: "Import your files, then choose one for your avatar or agent." })
+      /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("p", { className: "mt-1 text-[11px] leading-relaxed text-ink/50", children: "Import your files, then choose one for your avatar or agent." })
     ] }),
-    status ? /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("p", { role: "status", className: "break-words text-[11px] leading-relaxed text-ink/60", children: status }) : null,
-    error ? /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("p", { role: "alert", className: "text-xs text-red-600", children: error }) : null,
-    /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)("details", { className: "border-t border-ink/10 pt-2", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)("summary", { className: "cursor-pointer text-[11px] text-ink/50", children: [
+    status ? /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("p", { role: "status", className: "break-words text-[11px] leading-relaxed text-ink/60", children: status }) : null,
+    error ? /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("p", { role: "alert", className: "text-xs text-red-600", children: error }) : null,
+    /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("details", { className: "border-t border-ink/10 pt-2", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("summary", { className: "cursor-pointer text-[11px] text-ink/50", children: [
         "Library details",
         report.length ? ` (${report.length} import issues)` : ""
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("p", { className: "mt-2 text-[11px] leading-relaxed text-ink/50", children: "Files stay in this browser profile. They are excluded from public packages and world exports." }),
-      section === "characters" ? /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("button", { type: "button", disabled: busy, className: "mt-2 text-[11px] underline", onClick: () => void run(async () => {
+      /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("p", { className: "mt-2 text-[11px] leading-relaxed text-ink/50", children: "Files stay in this browser profile. They are excluded from public packages and world exports." }),
+      section === "characters" ? /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("button", { type: "button", disabled: busy, className: "mt-2 text-[11px] underline", onClick: () => void run(async () => {
         await assign2(target2, null);
         setSelected(null);
         setStatus("Default character restored.");
       }), children: "Restore default character" }) : null,
-      report.length ? /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("ul", { className: "mt-2 max-h-40 space-y-2 overflow-y-auto text-[11px] text-red-600", children: report.map((row, i3) => /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("li", { children: row }, i3)) }) : null
+      report.length ? /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("ul", { className: "mt-2 max-h-40 space-y-2 overflow-y-auto text-[11px] text-red-600", children: report.map((row, i3) => /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("li", { children: row }, i3)) }) : null
     ] })
+  ] });
+}
+
+// studio/presentation/controls.tsx
+var import_react19 = __toESM(require_react(), 1);
+
+// src/avatar-presentation.ts
+var PRESENTATION_ANIMATIONS = CORE_ANIMATIONS.map((row) => ({ id: row.manifest.id, label: row.manifest.name, clip: row.clip }));
+var aliases = { expr_wave: "Wave", expr_think: "Think", expr_happy: "Cheer", expr_confident: "Salute", expr_wonder: "Cheer", expr_nod: "Clap", expr_shrug: "Stretch", talk: "Point", talk_explain: "Point", talk_calm: "Think", talk_excited: "Cheer", dance_hype: "Dance", dance: "Dance", run: "Run", walk: "Walk" };
+function resolvePresentationAnimation(id2) {
+  if (id2 === "idle") return id2;
+  if (avatarMotionEntry(id2)) return id2;
+  return PRESENTATION_ANIMATIONS.find((row) => row.id === id2 || row.clip === id2 || row.clip === aliases[id2])?.id ?? null;
+}
+var AvatarPresentation = class {
+  constructor(runtime, options = {}) {
+    this.runtime = runtime;
+    this.options = options;
+  }
+  runtime;
+  options;
+  #state = { display: AvatarLiveDisplay.parse({}), notifications: [], cards: [], effects: {}, lastAction: "", motions: [] };
+  #listeners = /* @__PURE__ */ new Set();
+  #timers = /* @__PURE__ */ new Map();
+  #disposed = false;
+  #serial = 0;
+  #media = /* @__PURE__ */ new Set();
+  snapshot = () => this.#state;
+  describe = () => "Shared library: " + avatarMotionEntries().map((row) => `${row.id} (${row.name}, ${motionCategories(row.name, row.category).join("/")})`).join("; ") + "; Imported motion IDs: " + this.#state.motions.map((row) => `${row.id} (${row.label}, target ${row.target})`).join("; ");
+  subscribe = (listener) => {
+    this.#listeners.add(listener);
+    return () => {
+      this.#listeners.delete(listener);
+    };
+  };
+  #publish(next3) {
+    this.#state = { ...this.#state, ...next3 };
+    for (const listener of this.#listeners) listener();
+  }
+  #later(key2, duration, task) {
+    this.#cancel(key2);
+    this.#timers.set(key2, setTimeout(() => {
+      this.#timers.delete(key2);
+      if (!this.#disposed) task();
+    }, duration));
+  }
+  #cancel(key2) {
+    const timer = this.#timers.get(key2);
+    if (timer) clearTimeout(timer);
+    this.#timers.delete(key2);
+  }
+  execute = (input4) => {
+    if (this.#disposed || this.options.enabled === false) return "Avatar presentation is disabled.";
+    const parsed = AvatarPresentationEvent.safeParse(input4);
+    if (!parsed.success) return "Invalid avatar presentation event.";
+    const event2 = parsed.data, rt = this.runtime();
+    if (event2.kind === "animation" || event2.kind === "expression") {
+      const target2 = event2.target === "self" ? "self" : `host-agent:${event2.target}`;
+      if (!rt) return "Avatar is not ready.";
+      if (event2.kind === "animation") {
+        const custom = this.#state.motions.find((row) => row.target === event2.target && row.id === event2.animation);
+        const id2 = custom?.id ?? resolvePresentationAnimation(event2.animation);
+        if (!id2 || !rt.presentAnimation(target2, id2)) return "Animation or target is unavailable.";
+        this.#later(`animation:${target2}`, event2.duration, () => {
+          rt.presentAnimation(target2, "idle");
+        });
+      } else {
+        if (!rt.presentExpression(target2, event2.expression)) return "The selected avatar has no supported facial controls, or the target is unavailable.";
+        this.#later(`expression:${target2}`, event2.duration, () => {
+          rt.presentExpression(target2, "neutral");
+        });
+      }
+    } else if (event2.kind === "display") {
+      const { kind: _kind, ...patch } = event2;
+      const display = AvatarLiveDisplay.parse({ ...this.#state.display, ...patch });
+      if (["image", "video"].includes(display.background) && !display.media) return "Choose background media first.";
+      this.#publish({ display });
+    } else if (event2.kind === "effect") {
+      const effects = { ...this.#state.effects };
+      this.#cancel(`effect:${event2.effect}`);
+      if (event2.enabled) {
+        effects[event2.effect] = event2.intensity;
+        this.#later(`effect:${event2.effect}`, event2.duration, () => {
+          const next3 = { ...this.#state.effects };
+          delete next3[event2.effect];
+          this.#publish({ effects: next3 });
+        });
+      } else delete effects[event2.effect];
+      this.#publish({ effects });
+    } else if (event2.kind === "notification") {
+      const id2 = `notice-${++this.#serial}`;
+      const notification = { ...event2.notification, id: id2 };
+      notification.canReply = !!notification.canReply && !!this.options.actions?.reply;
+      this.#publish({ notifications: [...this.#state.notifications.slice(-4), notification] });
+      if (!notification.needsApproval) this.#later(id2, event2.duration, () => this.dismiss(id2));
+    } else if (event2.kind === "card") {
+      const id2 = `card-${++this.#serial}`;
+      this.#publish({ cards: [...this.#state.cards.slice(-2), { ...event2, id: id2 }] });
+      this.#later(id2, event2.duration, () => this.dismiss(id2));
+    } else this.clear();
+    this.#publish({ lastAction: event2.kind });
+    return null;
+  };
+  localMedia(file) {
+    if (this.#disposed || this.options.enabled === false) throw new Error("Avatar presentation is disabled.");
+    if (file.size > 20 * 1024 * 1024 || !/^(image|video)\//.test(file.type)) throw new Error("Choose image/video media smaller than 20 MB.");
+    for (const url2 of this.#media) URL.revokeObjectURL(url2);
+    this.#media.clear();
+    const url = URL.createObjectURL(file);
+    this.#media.add(url);
+    return url;
+  }
+  async importMotion(target2, label3, data, slot) {
+    if (this.#disposed || this.options.enabled === false) throw new Error("Avatar presentation is disabled.");
+    const replacing = slot && this.#state.motions.some((row) => row.target === target2 && row.id === `motion:${slot}`);
+    if (!replacing && this.#state.motions.length >= 32) throw new Error("At most 32 imported motions per viewport.");
+    if (!/^[A-Za-z0-9_-]{1,100}$/.test(target2) || data.byteLength > 16 * 1024 * 1024) throw new Error("Invalid motion input.");
+    const rt = this.runtime();
+    if (!rt?.importAvatarMotion) throw new Error("Motion import is unavailable in this viewport.");
+    const id2 = slot ? `motion:${slot}` : `motion:${++this.#serial}`;
+    if (!await rt.importAvatarMotion(target2 === "self" ? target2 : `host-agent:${target2}`, id2, data)) throw new Error("Avatar target is unavailable.");
+    if (!this.#disposed) this.#publish({ motions: [...this.#state.motions.filter((row) => row.target !== target2 || row.id !== id2), { target: target2, id: id2, label: label3.slice(0, 150) }], lastAction: "motion imported" });
+  }
+  dismiss = (id2) => {
+    this.#cancel(id2);
+    this.#publish({ notifications: this.#state.notifications.filter((row) => row.id !== id2), cards: this.#state.cards.filter((row) => row.id !== id2) });
+  };
+  async approve(id2) {
+    const notice = this.#state.notifications.find((row) => row.id === id2);
+    if (!notice?.needsApproval || !this.options.actions?.approve) throw new Error("No approval action is connected.");
+    await this.options.actions.approve(notice);
+    if (!this.#disposed) this.dismiss(id2);
+  }
+  async reply(id2, text4) {
+    const notice = this.#state.notifications.find((row) => row.id === id2);
+    if (!notice?.canReply || !text4.trim() || !this.options.actions?.reply) throw new Error("Reply is unavailable.");
+    await this.options.actions.reply(notice, text4.trim());
+    if (!this.#disposed) this.#publish({ notifications: this.#state.notifications.map((row) => row.id === id2 ? { ...row, repliedWith: text4.trim() } : row) });
+  }
+  clear() {
+    for (const [key2, timer] of this.#timers) {
+      clearTimeout(timer);
+      if (key2.startsWith("animation:")) this.runtime()?.presentAnimation(key2.slice(10), "idle");
+      if (key2.startsWith("expression:")) this.runtime()?.presentExpression(key2.slice(11), "neutral");
+    }
+    this.#timers.clear();
+    this.#publish({ notifications: [], cards: [], effects: {} });
+  }
+  dispose() {
+    for (const url of this.#media) URL.revokeObjectURL(url);
+    this.#media.clear();
+    this.clear();
+    this.#disposed = true;
+    this.#listeners.clear();
+  }
+};
+
+// studio/presentation/catalog.ts
+function singleSpec(type, props) {
+  return { root: "r", elements: { r: { type, props, children: [] } } };
+}
+var ALL_UI_COMPONENTS = [
+  // ── Pre-built multi-component demos ──────────────────────────────────────
+  { id: "stock_aapl", name: "AAPL Stock Today", category: "Demo", duration: 1e4, spec: { root: "r", elements: { r: { type: "Stack", props: { gap: "sm", direction: "vertical" }, children: ["m", "c"] }, m: { type: "Metric", props: { label: "AAPL \u2014 Apple Inc.", value: "$189.30", detail: "+$2.45 (+1.31%) today", trend: "up" }, children: [] }, c: { type: "LineChart", props: { title: null, data: [{ time: "9:30", price: 184.2 }, { time: "10:00", price: 185.8 }, { time: "10:30", price: 184.9 }, { time: "11:00", price: 186.2 }, { time: "11:30", price: 187.5 }, { time: "12:00", price: 186.8 }, { time: "12:30", price: 188.1 }, { time: "13:00", price: 189.3 }], xKey: "time", yKey: "price", color: "#22c55e", height: 110 }, children: [] } } } },
+  { id: "stock_tsla_down", name: "TSLA Stock Alert", category: "Demo", duration: 1e4, spec: { root: "r", elements: { r: { type: "Stack", props: { gap: "sm", direction: "vertical" }, children: ["m", "c"] }, m: { type: "Metric", props: { label: "TSLA \u2014 Tesla Inc.", value: "$218.50", detail: "-$8.20 (-3.62%) today", trend: "down" }, children: [] }, c: { type: "LineChart", props: { title: null, data: [{ time: "9:30", price: 227.1 }, { time: "10:00", price: 225.3 }, { time: "10:30", price: 224 }, { time: "11:00", price: 222.8 }, { time: "11:30", price: 221.4 }, { time: "12:00", price: 220.1 }, { time: "12:30", price: 219.3 }, { time: "13:00", price: 218.5 }], xKey: "time", yKey: "price", color: "#ef4444", height: 110 }, children: [] } } } },
+  { id: "calendar_today", name: "Today's Schedule", category: "Demo", duration: 9e3, spec: { root: "r", elements: { r: { type: "Stack", props: { gap: "sm", direction: "vertical" }, children: ["cv", "tl"] }, cv: { type: "CalendarView", props: { title: null, selectedDates: ["2026-02-18", "2026-02-20", "2026-02-25"] }, children: [] }, tl: { type: "Timeline", props: { items: [{ title: "Team Sync", description: "10:00 AM \u2014 Zoom", date: null, status: "completed" }, { title: "Design Review", description: "2:00 PM \u2014 Conference Room", date: null, status: "current" }, { title: "Client Call", description: "4:30 PM \u2014 Google Meet", date: null, status: "upcoming" }] }, children: [] } } } },
+  { id: "task_checklist", name: "Daily Tasks", category: "Demo", duration: 9e3, spec: { root: "r", elements: { r: { type: "Stack", props: { gap: "sm", direction: "vertical" }, children: ["h", "cl", "pb"] }, h: { type: "Heading", props: { text: "Today's Goals", level: "h3" }, children: [] }, cl: { type: "CheckboxList", props: { items: [{ id: "1", label: "Review pull requests", checked: true, disabled: null }, { id: "2", label: "Deploy v2.1 to staging", checked: true, disabled: null }, { id: "3", label: "Write release notes", checked: false, disabled: null }, { id: "4", label: "Update team on progress", checked: false, disabled: null }] }, children: [] }, pb: { type: "ProgressBar", props: { label: "Completion", value: 50, max: null, color: "success", showPercent: true }, children: [] } } } },
+  { id: "approval_choice", name: "Quick Decision", category: "Demo", duration: 12e3, spec: { root: "r", elements: { r: { type: "Stack", props: { gap: "md", direction: "vertical" }, children: ["al", "rg"] }, al: { type: "Alert", props: { title: "Deploy to Production?", description: "v2.1.0 has passed all staging checks. Estimated downtime: 2 minutes.", variant: "default" }, children: [] }, rg: { type: "RadioGroup", props: { label: "Your decision:", options: [{ value: "yes", label: "Yes \u2014 Deploy now" }, { value: "later", label: "Schedule for tonight" }, { value: "no", label: "No \u2014 Need more review" }], value: null, description: null }, children: [] } } } },
+  { id: "portfolio_summary", name: "Portfolio Overview", category: "Demo", duration: 1e4, spec: { root: "r", elements: { r: { type: "Stack", props: { gap: "sm", direction: "vertical" }, children: ["g", "pc"] }, g: { type: "Grid", props: { columns: 2, gap: "sm" }, children: ["m1", "m2"] }, m1: { type: "Metric", props: { label: "Total Value", value: "$24,830", detail: null, trend: "up" }, children: [] }, m2: { type: "Metric", props: { label: "Day P&L", value: "+$312", detail: "+1.27%", trend: "up" }, children: [] }, pc: { type: "PieChart", props: { title: "Allocation", data: [{ name: "Tech", value: 45 }, { name: "Finance", value: 20 }, { name: "Health", value: 15 }, { name: "Energy", value: 12 }, { name: "Other", value: 8 }], nameKey: "name", valueKey: "value", height: 140 }, children: [] } } } },
+  { id: "weather_report", name: "Weather Now", category: "Demo", duration: 8e3, spec: { root: "r", elements: { r: { type: "Stack", props: { gap: "sm", direction: "vertical" }, children: ["wc", "bc"] }, wc: { type: "WeatherCard", props: { location: "Berlin", temperature: 8, condition: "cloudy", humidity: 72, wind: 18, unit: "C", feelsLike: null, size: "md", forecast: null }, children: [] }, bc: { type: "BarChart", props: { title: "7-Day Forecast", data: [{ day: "Mon", temp: 8 }, { day: "Tue", temp: 10 }, { day: "Wed", temp: 7 }, { day: "Thu", temp: 12 }, { day: "Fri", temp: 15 }, { day: "Sat", temp: 14 }, { day: "Sun", temp: 11 }], xKey: "day", yKey: "temp", color: "#60a5fa", height: 80 }, children: [] } } } },
+  { id: "team_standup", name: "Team Standup", category: "Demo", duration: 1e4, spec: { root: "r", elements: { r: { type: "Stack", props: { gap: "sm", direction: "vertical" }, children: ["h", "t"] }, h: { type: "Heading", props: { text: "Daily Standup \u2014 Status", level: "h3" }, children: [] }, t: { type: "Table", props: { data: [{ name: "Ahmad", status: "Done", task: "API integration" }, { name: "Sarah", status: "In Progress", task: "UI redesign" }, { name: "Omar", status: "Blocked", task: "DB migration" }, { name: "Leila", status: "Done", task: "Tests" }], columns: [{ key: "name", label: "Name" }, { key: "status", label: "Status" }, { key: "task", label: "Task" }], emptyMessage: null }, children: [] } } } },
+  // ── Layout ───────────────────────────────────────────────────────────────
+  { id: "c_card", name: "Card", category: "Layout", duration: 6e3, spec: { root: "r", elements: { r: { type: "Card", props: { title: "Summary Card", description: "A container for grouping related content." }, children: ["c"] }, c: { type: "Metric", props: { label: "Total Items", value: "42", detail: null, trend: "neutral" }, children: [] } } } },
+  { id: "c_stack", name: "Stack", category: "Layout", duration: 7e3, spec: { root: "r", elements: { r: { type: "Stack", props: { gap: "md", direction: "vertical" }, children: ["m1", "m2", "m3"] }, m1: { type: "Metric", props: { label: "Revenue", value: "$12,450", detail: "+8.2%", trend: "up" }, children: [] }, m2: { type: "Metric", props: { label: "Users", value: "3,842", detail: "+124", trend: "up" }, children: [] }, m3: { type: "Metric", props: { label: "Errors", value: "12", detail: "-3", trend: "down" }, children: [] } } } },
+  { id: "c_grid", name: "Grid", category: "Layout", duration: 7e3, spec: { root: "r", elements: { r: { type: "Grid", props: { columns: 2, gap: "md" }, children: ["m1", "m2", "m3", "m4"] }, m1: { type: "Metric", props: { label: "Revenue", value: "$12,450", detail: null, trend: "up" }, children: [] }, m2: { type: "Metric", props: { label: "Users", value: "3,842", detail: null, trend: "up" }, children: [] }, m3: { type: "Metric", props: { label: "Churn", value: "1.2%", detail: null, trend: "down" }, children: [] }, m4: { type: "Metric", props: { label: "NPS", value: "72", detail: null, trend: "neutral" }, children: [] } } } },
+  { id: "c_separator", name: "Separator", category: "Layout", duration: 5e3, spec: { root: "r", elements: { r: { type: "Stack", props: { gap: "sm", direction: "vertical" }, children: ["t1", "s", "t2"] }, t1: { type: "Text", props: { content: "Section A \u2014 above the separator", muted: null, size: "sm" }, children: [] }, s: { type: "Separator", props: {}, children: [] }, t2: { type: "Text", props: { content: "Section B \u2014 below the separator", muted: true, size: "sm" }, children: [] } } } },
+  // ── Typography ───────────────────────────────────────────────────────────
+  { id: "c_heading", name: "Heading", category: "Typography", duration: 6e3, spec: { root: "r", elements: { r: { type: "Stack", props: { gap: "sm", direction: "vertical" }, children: ["h1", "h2", "h3", "h4"] }, h1: { type: "Heading", props: { text: "H1 \u2014 Main Title", level: "h1" }, children: [] }, h2: { type: "Heading", props: { text: "H2 \u2014 Section Title", level: "h2" }, children: [] }, h3: { type: "Heading", props: { text: "H3 \u2014 Subsection", level: "h3" }, children: [] }, h4: { type: "Heading", props: { text: "H4 \u2014 Label", level: "h4" }, children: [] } } } },
+  { id: "c_text", name: "Text", category: "Typography", duration: 6e3, spec: { root: "r", elements: { r: { type: "Stack", props: { gap: "sm", direction: "vertical" }, children: ["t1", "t2", "t3"] }, t1: { type: "Text", props: { content: "Normal text \u2014 the default paragraph style for body copy.", muted: null, size: "base" }, children: [] }, t2: { type: "Text", props: { content: "Muted text \u2014 used for secondary or supporting information.", muted: true, size: "sm" }, children: [] }, t3: { type: "Text", props: { content: "Large text \u2014 for introductory or featured paragraphs.", muted: null, size: "lg" }, children: [] } } } },
+  { id: "c_link", name: "Link", category: "Typography", duration: 5e3, spec: singleSpec("Link", { text: "Visit our documentation", href: "https://example.com" }) },
+  // ── Data Display ─────────────────────────────────────────────────────────
+  { id: "c_metric", name: "Metric", category: "Data", duration: 6e3, spec: { root: "r", elements: { r: { type: "Grid", props: { columns: 2, gap: "sm" }, children: ["m1", "m2", "m3", "m4"] }, m1: { type: "Metric", props: { label: "Revenue", value: "$48,200", detail: "+12% this month", trend: "up" }, children: [] }, m2: { type: "Metric", props: { label: "Expenses", value: "$18,750", detail: "-3% vs last month", trend: "down" }, children: [] }, m3: { type: "Metric", props: { label: "Active Users", value: "9,241", detail: null, trend: "neutral" }, children: [] }, m4: { type: "Metric", props: { label: "Retention", value: "94.2%", detail: "+1.1%", trend: "up" }, children: [] } } } },
+  { id: "c_badge", name: "Badge", category: "Data", duration: 6e3, spec: { root: "r", elements: { r: { type: "Stack", props: { gap: "sm", direction: "horizontal" }, children: ["b1", "b2", "b3", "b4", "b5", "b6"] }, b1: { type: "Badge", props: { text: "Default", variant: "default" }, children: [] }, b2: { type: "Badge", props: { text: "Active", variant: "success" }, children: [] }, b3: { type: "Badge", props: { text: "Warning", variant: "warning" }, children: [] }, b4: { type: "Badge", props: { text: "Error", variant: "destructive" }, children: [] }, b5: { type: "Badge", props: { text: "Secondary", variant: "secondary" }, children: [] }, b6: { type: "Badge", props: { text: "Outline", variant: "outline" }, children: [] } } } },
+  { id: "c_table", name: "Table", category: "Data", duration: 8e3, spec: singleSpec("Table", { data: [{ name: "Alice Smith", role: "Engineer", status: "Active", score: "98%" }, { name: "Bob Jones", role: "Designer", status: "Active", score: "94%" }, { name: "Carol Wu", role: "PM", status: "Inactive", score: "87%" }, { name: "David Kim", role: "DevOps", status: "Active", score: "92%" }], columns: [{ key: "name", label: "Name" }, { key: "role", label: "Role" }, { key: "status", label: "Status" }, { key: "score", label: "Score" }], emptyMessage: null }) },
+  { id: "c_callout", name: "Callout", category: "Data", duration: 7e3, spec: { root: "r", elements: { r: { type: "Stack", props: { gap: "sm", direction: "vertical" }, children: ["c1", "c2", "c3", "c4"] }, c1: { type: "Callout", props: { type: "info", title: "Info", content: "This is informational content about the system." }, children: [] }, c2: { type: "Callout", props: { type: "tip", title: "Tip", content: "Pro tip: use keyboard shortcuts to speed up your workflow." }, children: [] }, c3: { type: "Callout", props: { type: "warning", title: "Warning", content: "This action will affect all users in the organization." }, children: [] }, c4: { type: "Callout", props: { type: "important", title: "Important", content: "Please back up your data before proceeding." }, children: [] } } } },
+  { id: "c_timeline", name: "Timeline", category: "Data", duration: 8e3, spec: singleSpec("Timeline", { items: [{ title: "Project Kickoff", description: "Initial planning and team assembly", date: "2026-01-01", status: "completed" }, { title: "Design Phase", description: "UI/UX wireframes and prototyping", date: "2026-01-15", status: "completed" }, { title: "Development", description: "Core feature implementation", date: "2026-02-01", status: "current" }, { title: "Testing", description: "QA and bug fixes", date: "2026-03-01", status: "upcoming" }, { title: "Launch", description: "Production deployment", date: "2026-04-01", status: "upcoming" }] }) },
+  { id: "c_accordion", name: "Accordion", category: "Data", duration: 7e3, spec: singleSpec("Accordion", { items: [{ title: "What is Agent Player?", content: "An AI agent platform for deploying and managing conversational AI assistants with avatar support." }, { title: "How does voice work?", content: "Uses Edge TTS for synthesis and faster-whisper for transcription, running locally on your machine." }, { title: "Is my data private?", content: "Fully local: frontend, backend, and database all run on localhost. Only your message text reaches the Anthropic API." }] }) },
+  // ── Charts ────────────────────────────────────────────────────────────────
+  { id: "c_barchart", name: "BarChart", category: "Charts", duration: 8e3, spec: singleSpec("BarChart", { title: "Monthly Sales Q1 2026", data: [{ month: "Jan", sales: 12400 }, { month: "Feb", sales: 15800 }, { month: "Mar", sales: 14200 }, { month: "Apr", sales: 18900 }, { month: "May", sales: 17300 }, { month: "Jun", sales: 21100 }], xKey: "month", yKey: "sales", color: "#6366f1", height: 160 }) },
+  { id: "c_linechart", name: "LineChart", category: "Charts", duration: 8e3, spec: singleSpec("LineChart", { title: "Server Response Time (ms)", data: [{ time: "00:00", ms: 120 }, { time: "04:00", ms: 98 }, { time: "08:00", ms: 185 }, { time: "12:00", ms: 240 }, { time: "16:00", ms: 210 }, { time: "20:00", ms: 145 }, { time: "24:00", ms: 118 }], xKey: "time", yKey: "ms", color: "#22c55e", height: 160 }) },
+  { id: "c_piechart", name: "PieChart", category: "Charts", duration: 8e3, spec: singleSpec("PieChart", { title: "Traffic Sources", data: [{ source: "Organic", value: 42 }, { source: "Direct", value: 28 }, { source: "Social", value: 18 }, { source: "Email", value: 8 }, { source: "Other", value: 4 }], nameKey: "source", valueKey: "value", height: 180 }) },
+  { id: "c_areachart", name: "AreaChart", category: "Charts", duration: 8e3, spec: singleSpec("AreaChart", { title: "Active Users Over Time", data: [{ week: "W1", users: 1200 }, { week: "W2", users: 1450 }, { week: "W3", users: 1380 }, { week: "W4", users: 1820 }, { week: "W5", users: 2100 }, { week: "W6", users: 1950 }, { week: "W7", users: 2340 }], xKey: "week", yKey: "users", color: "#f59e0b", height: 160, gradient: true }) },
+  // ── Interactive ───────────────────────────────────────────────────────────
+  { id: "c_button", name: "Button", category: "Interactive", duration: 6e3, spec: { root: "r", elements: { r: { type: "Stack", props: { gap: "sm", direction: "horizontal" }, children: ["b1", "b2", "b3", "b4", "b5"] }, b1: { type: "Button", props: { label: "Default", variant: "default", size: null }, children: [] }, b2: { type: "Button", props: { label: "Secondary", variant: "secondary", size: null }, children: [] }, b3: { type: "Button", props: { label: "Outline", variant: "outline", size: null }, children: [] }, b4: { type: "Button", props: { label: "Ghost", variant: "ghost", size: null }, children: [] }, b5: { type: "Button", props: { label: "Destructive", variant: "destructive", size: null }, children: [] } } } },
+  { id: "c_checklist", name: "CheckboxList", category: "Interactive", duration: 7e3, spec: singleSpec("CheckboxList", { items: [{ id: "1", label: "Enable two-factor authentication", checked: true, disabled: null }, { id: "2", label: "Subscribe to product updates", checked: true, disabled: null }, { id: "3", label: "Allow anonymous analytics", checked: false, disabled: null }, { id: "4", label: "Enable beta features", checked: false, disabled: null }, { id: "5", label: "Legacy API (deprecated)", checked: false, disabled: true }] }) },
+  { id: "c_radiogrp", name: "RadioGroup", category: "Interactive", duration: 6e3, spec: singleSpec("RadioGroup", { label: "Select subscription plan", options: [{ value: "free", label: "Free \u2014 5 agents, 100 messages/day" }, { value: "pro", label: "Pro \u2014 25 agents, unlimited messages" }, { value: "enterprise", label: "Enterprise \u2014 unlimited everything" }], value: "free", description: "You can change your plan at any time." }) },
+  { id: "c_switchrow", name: "SwitchRow", category: "Interactive", duration: 6e3, spec: { root: "r", elements: { r: { type: "Stack", props: { gap: "sm", direction: "vertical" }, children: ["s1", "s2", "s3"] }, s1: { type: "SwitchRow", props: { label: "Dark Mode", description: "Use dark theme across the app", checked: true }, children: [] }, s2: { type: "SwitchRow", props: { label: "Email Notifications", description: "Receive alerts via email", checked: false }, children: [] }, s3: { type: "SwitchRow", props: { label: "Auto-save", description: "Save drafts automatically every 30 seconds", checked: true }, children: [] } } } },
+  { id: "c_sliderrow", name: "SliderRow", category: "Interactive", duration: 6e3, spec: { root: "r", elements: { r: { type: "Stack", props: { gap: "sm", direction: "vertical" }, children: ["s1", "s2", "s3"] }, s1: { type: "SliderRow", props: { label: "Volume", value: 70, min: 0, max: 100, step: null, showValue: true }, children: [] }, s2: { type: "SliderRow", props: { label: "Brightness", value: 85, min: 0, max: 100, step: null, showValue: true }, children: [] }, s3: { type: "SliderRow", props: { label: "Zoom Level", value: 4, min: 1, max: 10, step: 1, showValue: true }, children: [] } } } },
+  { id: "c_togglebtn", name: "ToggleButton", category: "Interactive", duration: 5e3, spec: { root: "r", elements: { r: { type: "Stack", props: { gap: "sm", direction: "horizontal" }, children: ["t1", "t2", "t3", "t4"] }, t1: { type: "ToggleButton", props: { label: "Bold", pressed: true, variant: "outline", size: null }, children: [] }, t2: { type: "ToggleButton", props: { label: "Italic", pressed: false, variant: "outline", size: null }, children: [] }, t3: { type: "ToggleButton", props: { label: "Underline", pressed: true, variant: "outline", size: null }, children: [] }, t4: { type: "ToggleButton", props: { label: "Strike", pressed: false, variant: "outline", size: null }, children: [] } } } },
+  { id: "c_togglegrp", name: "ToggleGroup", category: "Interactive", duration: 5e3, spec: singleSpec("ToggleGroup", { label: "View Mode", options: [{ value: "day", label: "Day" }, { value: "week", label: "Week" }, { value: "month", label: "Month" }, { value: "year", label: "Year" }], value: "week", variant: "outline" }) },
+  { id: "c_tabs", name: "Tabs", category: "Interactive", duration: 7e3, spec: { root: "r", elements: { r: { type: "Tabs", props: { defaultValue: "overview", tabs: [{ value: "overview", label: "Overview" }, { value: "metrics", label: "Metrics" }, { value: "settings", label: "Settings" }] }, children: ["tc1", "tc2", "tc3"] }, tc1: { type: "TabContent", props: { value: "overview" }, children: ["t1"] }, tc2: { type: "TabContent", props: { value: "metrics" }, children: ["t2"] }, tc3: { type: "TabContent", props: { value: "settings" }, children: ["t3"] }, t1: { type: "Text", props: { content: "Overview tab \u2014 general summary information.", muted: null, size: null }, children: [] }, t2: { type: "Metric", props: { label: "Key Metric", value: "98.7%", detail: "uptime this month", trend: "up" }, children: [] }, t3: { type: "Text", props: { content: "Settings tab \u2014 configuration options.", muted: true, size: "sm" }, children: [] } } } },
+  // ── Status / Feedback ─────────────────────────────────────────────────────
+  { id: "c_progress", name: "ProgressBar", category: "Status", duration: 6e3, spec: { root: "r", elements: { r: { type: "Stack", props: { gap: "sm", direction: "vertical" }, children: ["p1", "p2", "p3", "p4"] }, p1: { type: "ProgressBar", props: { label: "Upload Progress", value: 72, max: null, color: "default", showPercent: true }, children: [] }, p2: { type: "ProgressBar", props: { label: "Build Success Rate", value: 94, max: null, color: "success", showPercent: true }, children: [] }, p3: { type: "ProgressBar", props: { label: "Memory Usage", value: 68, max: null, color: "warning", showPercent: true }, children: [] }, p4: { type: "ProgressBar", props: { label: "Disk Usage", value: 89, max: null, color: "destructive", showPercent: true }, children: [] } } } },
+  { id: "c_alert", name: "Alert", category: "Status", duration: 6e3, spec: { root: "r", elements: { r: { type: "Stack", props: { gap: "sm", direction: "vertical" }, children: ["a1", "a2"] }, a1: { type: "Alert", props: { title: "Deployment Successful", description: "Version 2.1.0 has been deployed to production. All health checks passing.", variant: "default" }, children: [] }, a2: { type: "Alert", props: { title: "Critical Error", description: "Database connection failed. Service is degraded. Check your connection settings.", variant: "destructive" }, children: [] } } } },
+  { id: "c_skeleton", name: "SkeletonBlock", category: "Status", duration: 5e3, spec: { root: "r", elements: { r: { type: "Stack", props: { gap: "md", direction: "vertical" }, children: ["s1", "s2", "s3"] }, s1: { type: "SkeletonBlock", props: { lines: null, type: "avatar-row" }, children: [] }, s2: { type: "SkeletonBlock", props: { lines: 3, type: "text" }, children: [] }, s3: { type: "SkeletonBlock", props: { lines: null, type: "card" }, children: [] } } } },
+  { id: "c_usercard", name: "UserCard", category: "Status", duration: 6e3, spec: { root: "r", elements: { r: { type: "Stack", props: { gap: "sm", direction: "vertical" }, children: ["u1", "u2", "u3"] }, u1: { type: "UserCard", props: { name: "Ahmad Hassan", role: "Lead Engineer", email: "ahmad@example.com", src: null, size: "md" }, children: [] }, u2: { type: "UserCard", props: { name: "Sarah Chen", role: "Product Designer", email: "sarah@example.com", src: null, size: "md" }, children: [] }, u3: { type: "UserCard", props: { name: "Omar Al-Rashid", role: "DevOps", email: "omar@example.com", src: null, size: "md" }, children: [] } } } },
+  // ── Calendar ──────────────────────────────────────────────────────────────
+  { id: "c_calendar", name: "CalendarView", category: "Calendar", duration: 8e3, spec: singleSpec("CalendarView", { title: "February 2026", selectedDates: ["2026-02-18", "2026-02-19", "2026-02-20", "2026-02-25", "2026-02-26"] }) },
+  // ── Navigation ────────────────────────────────────────────────────────────
+  { id: "c_breadcrumb", name: "Breadcrumb", category: "Navigation", duration: 5e3, spec: singleSpec("Breadcrumb", { items: [{ label: "Dashboard", href: "/" }, { label: "Agents", href: "/agents" }, { label: "Configuration", href: "/agents/config" }, { label: "Max", href: null }] }) },
+  { id: "c_pagination", name: "PaginationBar", category: "Navigation", duration: 5e3, spec: singleSpec("PaginationBar", { currentPage: 4, totalPages: 12, showLabel: true }) },
+  { id: "c_carousel", name: "Carousel", category: "Navigation", duration: 8e3, spec: singleSpec("Carousel", { items: [{ title: "Feature 1", description: "Multi-agent orchestration with task pipelines", imageUrl: null }, { title: "Feature 2", description: "Real-time voice conversation with 3D avatar", imageUrl: null }, { title: "Feature 3", description: "Full agentic loop with 18 built-in tools", imageUrl: null }, { title: "Feature 4", description: "Generative UI with 53 components", imageUrl: null }], autoPlay: null }) },
+  // ── Advanced UI ───────────────────────────────────────────────────────────
+  { id: "c_tooltip", name: "TooltipText", category: "Advanced", duration: 6e3, spec: { root: "r", elements: { r: { type: "Stack", props: { gap: "sm", direction: "vertical" }, children: ["t1", "t2", "t3"] }, t1: { type: "TooltipText", props: { text: "P99 Latency", tooltip: "99th percentile response time \u2014 99% of requests complete within this time", muted: null }, children: [] }, t2: { type: "TooltipText", props: { text: "TTFB", tooltip: "Time To First Byte \u2014 measures server response speed", muted: true }, children: [] }, t3: { type: "TooltipText", props: { text: "Apdex Score", tooltip: "Application Performance Index \u2014 0.0 (worst) to 1.0 (perfect)", muted: null }, children: [] } } } },
+  { id: "c_collapsible", name: "CollapsibleSection", category: "Advanced", duration: 7e3, spec: { root: "r", elements: { r: { type: "CollapsibleSection", props: { title: "Advanced Configuration", defaultOpen: true }, children: ["c"] }, c: { type: "Stack", props: { gap: "sm", direction: "vertical" }, children: ["s1", "s2"] }, s1: { type: "SwitchRow", props: { label: "Debug Mode", description: "Log verbose output to console", checked: false }, children: [] }, s2: { type: "SwitchRow", props: { label: "Experimental Features", description: "Enable unstable features in development", checked: true }, children: [] } } } },
+  { id: "c_scrollbox", name: "ScrollBox", category: "Advanced", duration: 7e3, spec: { root: "r", elements: { r: { type: "ScrollBox", props: { maxHeight: 160 }, children: ["s"] }, s: { type: "Stack", props: { gap: "sm", direction: "vertical" }, children: ["i1", "i2", "i3", "i4", "i5", "i6", "i7", "i8"] }, i1: { type: "Text", props: { content: "\u2022 Log 001 \u2014 Server started on port 41522", muted: null, size: "sm" }, children: [] }, i2: { type: "Text", props: { content: "\u2022 Log 002 \u2014 Database connected successfully", muted: null, size: "sm" }, children: [] }, i3: { type: "Text", props: { content: "\u2022 Log 003 \u2014 3 agents loaded from config", muted: null, size: "sm" }, children: [] }, i4: { type: "Text", props: { content: "\u2022 Log 004 \u2014 WebSocket server listening", muted: null, size: "sm" }, children: [] }, i5: { type: "Text", props: { content: "\u2022 Log 005 \u2014 Cron scheduler initialized", muted: null, size: "sm" }, children: [] }, i6: { type: "Text", props: { content: "\u2022 Log 006 \u2014 Storage manager ready", muted: null, size: "sm" }, children: [] }, i7: { type: "Text", props: { content: "\u2022 Log 007 \u2014 TTS engine warm", muted: null, size: "sm" }, children: [] }, i8: { type: "Text", props: { content: "\u2022 Log 008 \u2014 Ready to accept connections", muted: true, size: "sm" }, children: [] } } } },
+  { id: "c_hovercard", name: "HoverCard", category: "Advanced", duration: 6e3, spec: singleSpec("HoverCard", { triggerText: "@ahmad.hassan", title: "Ahmad Hassan", description: "Lead Engineer \u2014 ahmad@example.com \u2014 Joined 2024" }) },
+  { id: "c_otp", name: "OTPDisplay", category: "Advanced", duration: 6e3, spec: singleSpec("OTPDisplay", { length: 6, label: "Verification Code", placeholder: null }) },
+  { id: "c_sidepanel", name: "SidePanel", category: "Advanced", duration: 7e3, spec: { root: "r", elements: { r: { type: "SidePanel", props: { title: "Agent Details", description: "Configuration and stats for this agent", side: "right" }, children: ["c"] }, c: { type: "Stack", props: { gap: "sm", direction: "vertical" }, children: ["u", "m"] }, u: { type: "UserCard", props: { name: "Max", role: "Primary Agent", email: null, src: null, size: "sm" }, children: [] }, m: { type: "Metric", props: { label: "Tasks Completed", value: "142", detail: "this week", trend: "up" }, children: [] } } } },
+  { id: "c_drawercard", name: "DrawerCard", category: "Advanced", duration: 7e3, spec: { root: "r", elements: { r: { type: "DrawerCard", props: { title: "Quick Actions", description: null }, children: ["c"] }, c: { type: "Stack", props: { gap: "sm", direction: "vertical" }, children: ["b1", "b2", "b3"] }, b1: { type: "Button", props: { label: "Create New Task", variant: "default", size: null }, children: [] }, b2: { type: "Button", props: { label: "View Analytics", variant: "outline", size: null }, children: [] }, b3: { type: "Button", props: { label: "Export Data", variant: "ghost", size: null }, children: [] } } } },
+  { id: "c_alertdlg", name: "AlertDialogCard", category: "Advanced", duration: 7e3, spec: singleSpec("AlertDialogCard", { title: "Delete Agent?", description: "This will permanently delete the agent and all associated data, including chat history, memory, and configuration. This action cannot be undone.", confirmLabel: "Delete Agent", cancelLabel: "Cancel", variant: "destructive" }) },
+  { id: "c_dialogcard", name: "DialogCard", category: "Advanced", duration: 6e3, spec: { root: "r", elements: { r: { type: "DialogCard", props: { title: "Edit Agent Profile", description: "Update agent name, emoji, and system prompt." }, children: ["c"] }, c: { type: "Stack", props: { gap: "sm", direction: "vertical" }, children: ["t", "b"] }, t: { type: "Text", props: { content: "Agent Name: Max\nRole: Primary assistant\nModel: Host model", muted: null, size: "sm" }, children: [] }, b: { type: "Button", props: { label: "Save Changes", variant: "default", size: null }, children: [] } } } },
+  { id: "c_dropdown", name: "DropdownList", category: "Advanced", duration: 7e3, spec: singleSpec("DropdownList", { label: "File", items: [{ label: "New Chat", shortcut: "Ctrl+N", disabled: null, separator: null }, { label: "Import Session", shortcut: "Ctrl+I", disabled: null, separator: null }, { label: "Export History", shortcut: null, disabled: null, separator: true }, { label: "Clear All", shortcut: null, disabled: false, separator: null }] }) },
+  { id: "c_command", name: "CommandSearch", category: "Advanced", duration: 8e3, spec: singleSpec("CommandSearch", { placeholder: "Search commands...", groups: [{ heading: "Navigation", items: [{ label: "Go to Dashboard", shortcut: "G D" }, { label: "Open Agent Chat", shortcut: "G C" }, { label: "View Tasks", shortcut: "G T" }] }, { heading: "Actions", items: [{ label: "New Task", shortcut: "Ctrl+K" }, { label: "Start Voice Chat", shortcut: "Space" }, { label: "Toggle Dark Mode", shortcut: null }] }] }) },
+  { id: "c_resizable", name: "ResizablePanel", category: "Advanced", duration: 6e3, spec: singleSpec("ResizablePanel", { direction: "horizontal", leftLabel: "Code Editor", rightLabel: "Preview", defaultSplit: 60 }) },
+  { id: "c_aspectbox", name: "AspectBox", category: "Advanced", duration: 6e3, spec: { root: "r", elements: { r: { type: "Stack", props: { gap: "sm", direction: "vertical" }, children: ["a1", "a2"] }, a1: { type: "AspectBox", props: { ratio: 1.78, label: "16:9 Video Frame", bg: null }, children: [] }, a2: { type: "AspectBox", props: { ratio: 1, label: "1:1 Square", bg: null }, children: [] } } } },
+  // ── File Formats ──────────────────────────────────────────────────────────
+  { id: "c_jsonview", name: "JsonViewer", category: "Format", duration: 9e3, spec: singleSpec("JsonViewer", { title: "API Response", data: { status: "success", user: { id: 42, name: "Ahmad Hassan", email: "ahmad@example.com", roles: ["admin", "editor"] }, meta: { timestamp: "2026-02-18T14:30:00Z", version: "2.1.0", requestId: "req_abc123" } }, maxHeight: 220, defaultExpanded: true }) },
+  { id: "c_markdown", name: "MarkdownBlock", category: "Format", duration: 9e3, spec: singleSpec("MarkdownBlock", { content: '## Agent Player v2.1\n\nKey features:\n\n- **18 agentic tools** \u2014 browser, desktop, storage\n- **Multi-agent pipelines** with task dependencies\n- **53 UI components** rendered from JSON spec\n- Voice chat with real-time lip sync\n\n> "The goal is a fully autonomous AI agent."\n\n```typescript\nconst agent = createAgent({ tools });\nawait agent.run("analyze the codebase");\n```', prose: true }) },
+  { id: "c_mdc", name: "MDCBlock", category: "Format", duration: 1e4, spec: singleSpec("MDCBlock", { content: '## System Status\n\nAll services are operational.\n\n::Metric{label="Uptime" value="99.97%" trend="up"}\n\nCurrent alerts:\n\n::Badge{text="3 warnings" variant="warning"}\n::Badge{text="0 errors" variant="success"}\n\nServer performance:\n\n::ProgressBar{label="CPU" value=42 color="default" showPercent=true}\n::ProgressBar{label="Memory" value=67 color="warning" showPercent=true}' }) },
+  // ── AI Components ─────────────────────────────────────────────────────────
+  { id: "c_avatarcard", name: "AvatarCard", category: "AI", duration: 1e4, spec: singleSpec("AvatarCard", { title: "Interactive Avatar", size: "md", removable: false }) },
+  { id: "c_supportchat", name: "SupportChatBlock", category: "AI", duration: 1e4, spec: singleSpec("SupportChatBlock", { agentName: "Max", height: 340, removable: false, bgColor: null }) },
+  { id: "c_agentportal", name: "AgentSupportPortal", category: "AI", duration: 1e4, spec: singleSpec("AgentSupportPortal", { height: 380, bgColor: null, title: "Choose your AI assistant" }) },
+  // ── Weather ───────────────────────────────────────────────────────────────
+  { id: "c_weather_sm", name: "WeatherCard sm", category: "Weather", duration: 7e3, spec: singleSpec("WeatherCard", { location: "Dubai", temperature: 32, condition: "sunny", humidity: 55, wind: 12, unit: "C", feelsLike: 36, size: "sm", forecast: null }) },
+  { id: "c_weather_md", name: "WeatherCard md", category: "Weather", duration: 7e3, spec: singleSpec("WeatherCard", { location: "London", temperature: 12, condition: "rainy", humidity: 85, wind: 24, unit: "C", feelsLike: 8, size: "md", forecast: null }) },
+  { id: "c_weather_lg", name: "WeatherCard lg", category: "Weather", duration: 1e4, spec: singleSpec("WeatherCard", { location: "New York", temperature: 18, condition: "partly-cloudy", humidity: 65, wind: 15, unit: "C", feelsLike: 16, size: "lg", forecast: [{ day: "Mon", condition: "sunny", high: 22, low: 14 }, { day: "Tue", condition: "cloudy", high: 19, low: 11 }, { day: "Wed", condition: "rainy", high: 15, low: 9 }, { day: "Thu", condition: "stormy", high: 13, low: 8 }, { day: "Fri", condition: "partly-cloudy", high: 17, low: 12 }] }) }
+];
+
+// studio/presentation/controls.tsx
+var import_jsx_runtime17 = __toESM(require_jsx_runtime(), 1);
+function PresentationControls({ controller, section, agents, search = "", includeAvailableMotions = false }) {
+  const state = (0, import_react19.useSyncExternalStore)(controller.subscribe, controller.snapshot);
+  const [category, setCategory] = (0, import_react19.useState)("all");
+  const available = [...PRESENTATION_ANIMATIONS.map((row) => ({ id: row.id, label: row.label, categories: motionCategories(row.clip) })), ...avatarMotionEntries().map((row) => ({ id: row.id, label: row.name, categories: motionCategories(row.name, row.category) }))];
+  const filtered = available.filter((row) => row.label.toLowerCase().includes(search.toLowerCase()) && (category === "all" || row.categories.some((value) => value === category)));
+  const [target2, setTarget] = (0, import_react19.useState)("self"), [error, setError] = (0, import_react19.useState)("");
+  const execute = (event2) => setError(controller.execute(event2) ?? "");
+  const matches2 = (value) => value.toLowerCase().includes(search.toLowerCase());
+  const control = (label3, onClick, active = false) => /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("button", { type: "button", onClick, "aria-pressed": active, className: `rounded-xl px-2 py-2 text-left text-xs font-bold ${active ? "bg-ink text-on-brand" : "bg-paper text-ink hover:bg-ink/10"}`, children: label3 }, label3);
+  return /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)("section", { "aria-label": `Avatar ${section}`, className: "space-y-2 text-ink", children: [
+    section === "motions" || section === "expressions" ? /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)("label", { className: "block text-xs font-bold", children: [
+      "Avatar",
+      /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)("select", { "aria-label": `${section} target`, value: target2, onChange: (e2) => setTarget(e2.target.value), className: "mt-1 block w-full rounded-lg bg-paper p-2", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("option", { value: "self", children: "Current avatar" }),
+        agents.map((row) => /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("option", { value: row.id, children: row.name }, row.id))
+      ] })
+    ] }) : null,
+    section === "motions" ? /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)(import_jsx_runtime17.Fragment, { children: [
+      includeAvailableMotions ? /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)(import_jsx_runtime17.Fragment, { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)("label", { className: "block text-xs", children: [
+          "Category",
+          /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)("select", { "aria-label": "Live motion category", value: category, onChange: (e2) => setCategory(e2.target.value), className: "mt-1 w-full rounded bg-paper p-2", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("option", { value: "all", children: "All motions" }),
+            [...new Set(available.flatMap((row) => row.categories))].sort().map((row) => /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("option", { value: row, children: row }, row))
+          ] })
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)("p", { className: "text-xs text-ink/60", children: [
+          filtered.length,
+          " motions"
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("div", { className: "grid grid-cols-2 gap-1.5", children: filtered.slice(0, 60).map((row) => control(row.label, () => execute({ kind: "animation", target: target2, animation: row.id }))) }),
+        filtered.length > 60 ? /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("p", { className: "text-xs text-ink/60", children: "Search to narrow these results." }) : null
+      ] }) : null,
+      /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)("label", { className: "block rounded-xl border border-ink/10 p-2 text-xs font-bold", children: [
+        "Import GLB motion",
+        /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("input", { "aria-label": "Import avatar motion", type: "file", accept: ".glb", className: "mt-2 w-full text-[11px]", onChange: async (event2) => {
+          const file = event2.target.files?.[0];
+          event2.target.value = "";
+          if (!file) return;
+          try {
+            if (file.size > 16 * 1024 * 1024) throw new Error("Motion exceeds 16 MB.");
+            await controller.importMotion(target2, file.name, await file.arrayBuffer());
+            setError("");
+          } catch (e2) {
+            setError(String(e2));
+          }
+        } })
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("div", { className: "grid grid-cols-2 gap-1.5", children: state.motions.filter((row) => row.target === target2 && matches2(row.label)).map((row) => control(row.label, () => execute({ kind: "animation", target: target2, animation: row.id }))) })
+    ] }) : null,
+    section === "expressions" ? /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)(import_jsx_runtime17.Fragment, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("h3", { className: "text-xs font-black", children: "Expressions" }),
+      /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("div", { className: "grid grid-cols-2 gap-1.5", children: EXPRESSIONS.filter(matches2).map((expression2) => control(expression2, () => execute({ kind: "expression", target: target2, expression: expression2 }))) })
+    ] }) : null,
+    section === "effects" ? /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)(import_jsx_runtime17.Fragment, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("h3", { className: "text-xs font-black", children: "Screen effects" }),
+      /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("div", { className: "grid grid-cols-2 gap-1.5", children: EFFECTS.filter(matches2).map((effect) => /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)("div", { children: [
+        control(effect, () => execute({ kind: "effect", effect, enabled: state.effects[effect] === void 0, duration: 6e4 }), state.effects[effect] !== void 0),
+        state.effects[effect] !== void 0 ? /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("input", { "aria-label": `${effect} intensity`, className: "w-full", type: "range", min: "0", max: "1", step: ".05", value: state.effects[effect], onChange: (e2) => execute({ kind: "effect", effect, enabled: true, intensity: Number(e2.target.value), duration: 6e4 }) }) : null
+      ] }, effect)) }),
+      control("Clear screen effects", () => {
+        for (const effect of EFFECTS) execute({ kind: "effect", effect, enabled: false });
+      })
+    ] }) : null,
+    section === "notifications" ? /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)(import_jsx_runtime17.Fragment, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("p", { className: "text-xs text-ink/60", children: "Preview cards. Your application supplies live events." }),
+      /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("div", { className: "grid grid-cols-2 gap-1.5", children: NOTIFICATION_TYPES.filter(matches2).map((type) => control(type, () => execute({ kind: "notification", notification: { type, title: `${type} preview`, body: "Example notification \u2014 connect your application for live events." } }))) })
+    ] }) : null,
+    section === "cards" ? /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)(import_jsx_runtime17.Fragment, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("p", { className: "text-xs text-ink/60", children: "Card previews use example data." }),
+      /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("div", { className: "grid grid-cols-2 gap-1.5", children: ALL_UI_COMPONENTS.filter((row) => matches2(row.name)).map((row) => control(row.name, () => execute({ kind: "card", title: row.name, spec: row.spec, duration: row.duration }))) })
+    ] }) : null,
+    error ? /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("p", { role: "alert", className: "text-xs text-red-600", children: error }) : null
   ] });
 }
 
@@ -80439,7 +80715,7 @@ var ORIENTATIONS = [
   { id: "portrait", label: "Portrait", Icon: RectangleVertical },
   { id: "any", label: "Either way", Icon: RotateCw }
 ];
-var VIEWS = [
+var VIEWS2 = [
   { id: "free", label: "3D", Icon: Box },
   { id: "side", label: "2D side view", Icon: PanelsTopLeft }
 ];
@@ -80490,7 +80766,7 @@ function PlaySettingsPicker({
     ] }),
     /* @__PURE__ */ (0, import_jsx_runtime18.jsxs)("fieldset", { disabled, className: "flex flex-col gap-2", children: [
       /* @__PURE__ */ (0, import_jsx_runtime18.jsx)("legend", { className: `mb-2 font-bold text-ink/60 ${compact ? "text-xs" : "text-sm"}`, children: "Players see it" }),
-      /* @__PURE__ */ (0, import_jsx_runtime18.jsx)("div", { className: "flex flex-wrap gap-2", children: VIEWS.map((entry) => /* @__PURE__ */ (0, import_jsx_runtime18.jsxs)(
+      /* @__PURE__ */ (0, import_jsx_runtime18.jsx)("div", { className: "flex flex-wrap gap-2", children: VIEWS2.map((entry) => /* @__PURE__ */ (0, import_jsx_runtime18.jsxs)(
         "button",
         {
           type: "button",
@@ -81317,7 +81593,7 @@ function setPlatformEnabled(enabled) {
 var api = createGenvrClient({
   baseUrl: API_URL,
   credentials: "include",
-  fetch: (input5, init) => platformEnabled ? globalThis.fetch(input5, init) : Promise.resolve(new Response(JSON.stringify({
+  fetch: (input4, init) => platformEnabled ? globalThis.fetch(input4, init) : Promise.resolve(new Response(JSON.stringify({
     message: "This operation requires a configured Genvr host. Local projects remain available."
   }), { status: 503, headers: { "content-type": "application/json" } }))
 });
@@ -82107,17 +82383,17 @@ function workerScriptEngine(makeWorker2, deadlines = ENGINE_DEADLINES) {
     made.onerror = () => stop(() => new Error("The script engine stopped. Try again."));
     return made;
   };
-  const call5 = (op, input5) => new Promise((resolve, reject) => {
+  const call5 = (op, input4) => new Promise((resolve, reject) => {
     worker3 ??= start2();
     const id2 = next3;
     next3 += 1;
     const timer = setTimeout(() => notLoaded(id2), deadlines.loadMs ?? ENGINE_DEADLINES.loadMs);
     pending.set(id2, { op, resolve, reject, timer });
-    worker3.postMessage({ id: id2, op, input: input5 });
+    worker3.postMessage({ id: id2, op, input: input4 });
   });
   return {
     compileCheck: (source) => call5("compile", source),
-    dryRun: (input5) => call5("dryRun", input5)
+    dryRun: (input4) => call5("dryRun", input4)
   };
 }
 var inBrowser = typeof window !== "undefined" && typeof Worker !== "undefined";
@@ -82128,7 +82404,7 @@ var scriptEngine = inBrowser ? workerScriptEngine(
   })
 ) : {
   compileCheck: async (source) => (await load()).compileCheck(source),
-  dryRun: async (input5) => (await load()).dryRun(input5)
+  dryRun: async (input4) => (await load()).dryRun(input4)
 };
 function studioScriptHost(placeId) {
   return {
@@ -86770,7 +87046,7 @@ function ExplorerPanel({
   const runtimeNow = rt();
   const anchored = runtimeNow && selection ? selectionAnchored(runtimeNow, selection) : true;
   const floats = runtimeNow && selection ? selectionFloats(runtimeNow, selection) : false;
-  const tools2 = [
+  const tools = [
     {
       label: "Group",
       Icon: Group2,
@@ -86889,7 +87165,7 @@ function ExplorerPanel({
         }
       )
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime40.jsx)("div", { className: "flex gap-1", role: "toolbar", "aria-label": "Selection", children: tools2.map((tool2) => /* @__PURE__ */ (0, import_jsx_runtime40.jsx)(
+    /* @__PURE__ */ (0, import_jsx_runtime40.jsx)("div", { className: "flex gap-1", role: "toolbar", "aria-label": "Selection", children: tools.map((tool2) => /* @__PURE__ */ (0, import_jsx_runtime40.jsx)(
       "button",
       {
         type: "button",
@@ -87125,8 +87401,8 @@ function choicePatch(choice, current2, itemDefault) {
 }
 function numberPatch(key2, value) {
   if (!Number.isFinite(value)) return {};
-  const field5 = FIELDS[key2];
-  const clamped = Math.min(field5.max, Math.max(field5.min, value));
+  const field6 = FIELDS[key2];
+  const clamped = Math.min(field6.max, Math.max(field6.min, value));
   return { [RIDE_PARAMS[key2]]: key2 === "seats" ? Math.round(clamped) : round7(clamped, 3) };
 }
 function flagPatch(key2, value) {
@@ -87142,7 +87418,7 @@ var import_jsx_runtime41 = __toESM(require_jsx_runtime(), 1);
 var heading = "text-[11px] font-black tracking-wide text-ink/50 uppercase";
 var choiceButton = (on) => `min-h-11 rounded-md px-1 text-[11px] font-bold md:min-h-8 ${on ? "bg-ink text-on-brand" : "bg-paper text-ink hover:bg-ink/10"}`;
 function Slider({
-  field: field5,
+  field: field6,
   value,
   onCommit
 }) {
@@ -87154,18 +87430,18 @@ function Slider({
   const now = draft ?? value;
   return /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("label", { className: "flex flex-col text-xs font-bold text-ink/70", children: [
     /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("span", { className: "flex justify-between gap-3", children: [
-      field5.label,
-      /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-ink tabular-nums", children: field5.shown(now) })
+      field6.label,
+      /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-ink tabular-nums", children: field6.shown(now) })
     ] }),
     /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
       "input",
       {
         type: "range",
-        min: field5.min,
-        max: field5.max,
-        step: field5.step,
+        min: field6.min,
+        max: field6.max,
+        step: field6.step,
         value: now,
-        "aria-label": field5.label,
+        "aria-label": field6.label,
         onChange: (event2) => setDraft(Number(event2.target.value)),
         onPointerUp: done,
         onKeyUp: done,
@@ -87200,14 +87476,14 @@ function RideSection({
     const patch = tagPatch2(tagDraft);
     if ((patch.rideTag ?? void 0) !== ride?.tag) onPatch(patch);
   };
-  const number2 = (field5) => ride ? /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+  const number2 = (field6) => ride ? /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
     Slider,
     {
-      field: field5,
-      value: ride[field5.key],
-      onCommit: (value) => onPatch(numberPatch(field5.key, value))
+      field: field6,
+      value: ride[field6.key],
+      onCommit: (value) => onPatch(numberPatch(field6.key, value))
     },
-    `${field5.key}-${ride[field5.key]}`
+    `${field6.key}-${ride[field6.key]}`
   ) : null;
   return /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("section", { className: "flex flex-col gap-1.5", children: [
     /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("p", { className: heading, children: "Ride" }),
@@ -87518,7 +87794,7 @@ function GeneratedControls({ itemId, params, onPatch, disabled = false }) {
 // ../../apps/web/components/studio/save-builder-item.tsx
 var import_react44 = __toESM(require_react(), 1);
 var import_jsx_runtime44 = __toESM(require_jsx_runtime(), 1);
-var field = "w-full rounded-xl bg-paper p-3 ring-1 ring-ink/20";
+var field2 = "w-full rounded-xl bg-paper p-3 ring-1 ring-ink/20";
 var button3 = "pointer-events-auto rounded-xl bg-ink px-4 py-3 font-bold text-paper disabled:opacity-40";
 var modes = [
   ["assembly", "One assembled design", "One listing, one price. Place all parts together."],
@@ -87766,7 +88042,7 @@ function SaveItemDialog({
                         min: "0",
                         max: "1000000",
                         step: "1",
-                        className: field,
+                        className: field2,
                         value: prices[index],
                         onChange: (e2) => setPrices(prices.map((p2, i3) => i3 === index ? e2.target.value : p2))
                       }
@@ -87781,7 +88057,7 @@ function SaveItemDialog({
                     /* @__PURE__ */ (0, import_jsx_runtime44.jsx)(
                       "input",
                       {
-                        className: `${field} mt-2`,
+                        className: `${field2} mt-2`,
                         value: name2,
                         maxLength: 60,
                         onChange: (e2) => setName2(e2.target.value)
@@ -87841,7 +88117,7 @@ function SaveItemDialog({
                       /* @__PURE__ */ (0, import_jsx_runtime44.jsx)(
                         "select",
                         {
-                          className: `${field} mt-1`,
+                          className: `${field2} mt-1`,
                           value: kind,
                           onChange: (e2) => setKind(e2.target.value),
                           children: BuilderModelKind.options.map((k2) => /* @__PURE__ */ (0, import_jsx_runtime44.jsx)("option", { value: k2, children: k2.replaceAll("-", " ") }, k2))
@@ -87853,7 +88129,7 @@ function SaveItemDialog({
                       /* @__PURE__ */ (0, import_jsx_runtime44.jsx)(
                         "select",
                         {
-                          className: `${field} mt-1`,
+                          className: `${field2} mt-1`,
                           value: style,
                           onChange: (e2) => setStyle(e2.target.value),
                           children: ["realistic", "anime", "blocky", "voxel"].map((s2) => /* @__PURE__ */ (0, import_jsx_runtime44.jsx)("option", { children: s2 }, s2))
@@ -87867,7 +88143,7 @@ function SaveItemDialog({
                     /* @__PURE__ */ (0, import_jsx_runtime44.jsx)(
                       "input",
                       {
-                        className: `${field} mt-2`,
+                        className: `${field2} mt-2`,
                         type: "number",
                         min: "0",
                         max: "1000000",
@@ -88935,7 +89211,7 @@ function effectParams(effect, values = {}) {
   return out;
 }
 var BLEND_MODES = ["normal", "add", "multiply", "screen"];
-var LOOKS = {
+var LOOKS2 = {
   warm_afternoon: { label: "Warm afternoon", params: { temperature: 0.5, saturation: 1.1, contrast: 1.05, highlights: -0.1 } },
   cool_night: { label: "Cool night", params: { temperature: -0.6, exposure: -0.4, saturation: 0.85, tint: 0.1, vignette: 0.4 } },
   faded: { label: "Faded", params: { contrast: 0.8, saturation: 0.7, shadows: 0.3, exposure: 0.1 } },
@@ -90332,7 +90608,7 @@ function removeTransition(project, clipId2) {
 }
 function applyLook(project, args, ctx) {
   const clip = mediaClip(project, args.clip);
-  const settings2 = LOOKS[args.look]?.params ?? project.looks?.[args.look] ?? refuse(`Unknown look ${args.look}. Looks: ${[...Object.keys(LOOKS), ...Object.keys(project.looks ?? {})].join(", ")}.`);
+  const settings2 = LOOKS2[args.look]?.params ?? project.looks?.[args.look] ?? refuse(`Unknown look ${args.look}. Looks: ${[...Object.keys(LOOKS2), ...Object.keys(project.looks ?? {})].join(", ")}.`);
   const params = checked("colour", settings2);
   const existing = clip.effects?.find((e2) => e2.effect === "colour");
   if (existing) {
@@ -90347,7 +90623,7 @@ function applyLook(project, args, ctx) {
 function saveLook(project, args) {
   const clip = mediaClip(project, args.clip);
   const colour = clip.effects?.find((e2) => e2.effect === "colour") ?? refuse("This clip has no Colour effect to save.");
-  if (Object.hasOwn(LOOKS, args.name))
+  if (Object.hasOwn(LOOKS2, args.name))
     refuse(`${args.name} is a built-in look; choose another name.`);
   if (Object.keys(project.looks ?? {}).length >= 50 && !project.looks?.[args.name])
     refuse("A film holds at most 50 saved looks.");
@@ -90900,7 +91176,7 @@ var COMMANDS = [
   },
   {
     id: "look.apply",
-    label: (a2) => `Look: ${a2.look && LOOKS[a2.look] ? LOOKS[a2.look].label : a2.look ?? ""}`,
+    label: (a2) => `Look: ${a2.look && LOOKS2[a2.look] ? LOOKS2[a2.look].label : a2.look ?? ""}`,
     group: "Clip",
     journal: true,
     args: external_exports.object({ clip: clipId.optional(), look: external_exports.string().min(1).max(60) }).strict(),
@@ -91847,8 +92123,8 @@ function useJob(make, key2) {
 var import_react47 = __toESM(require_react(), 1);
 
 // ../../apps/web/lib/video-studio/sound-edit.ts
-function soundEditSteps(clip, input5, sourceSeconds) {
-  const { sourceIn, sourceOut, start: start2 } = input5;
+function soundEditSteps(clip, input4, sourceSeconds) {
+  const { sourceIn, sourceOut, start: start2 } = input4;
   if (![sourceIn, sourceOut, start2].every(Number.isFinite) || sourceIn < 0 || sourceOut <= sourceIn || sourceOut > sourceSeconds || start2 < 0) throw new Error("Choose a valid source range and timeline start.");
   const oldIn = toSeconds(clip.in), oldOut = oldIn + toSeconds(clip.duration);
   if (toSeconds(clip.start) + sourceIn - oldIn < 0) throw new Error("Move the clip later before extending its source start.");
@@ -91863,7 +92139,7 @@ function soundEditSteps(clip, input5, sourceSeconds) {
 // ../../apps/web/components/studio/film/sound-editor.tsx
 var import_jsx_runtime48 = __toESM(require_jsx_runtime(), 1);
 var button4 = "inline-flex items-center justify-center gap-1.5 rounded-md border border-ink/15 bg-paper px-2.5 py-2 text-xs font-semibold hover:bg-ink/10 disabled:opacity-35";
-var input2 = "w-24 rounded border border-ink/15 bg-paper px-2 py-1.5 text-xs";
+var input = "w-24 rounded border border-ink/15 bg-paper px-2 py-1.5 text-xs";
 function SoundEditor({ filming }) {
   const s2 = filming.studio, off = s2.rendering || filming.busy;
   const sounds = s2.project.tracks.filter((t8) => t8.kind === "sound").flatMap((track3) => track3.clips.flatMap((clip) => clip.type === "media" ? [{ track: track3, clip, media: s2.project.media.find((m2) => m2.id === clip.media) }] : []));
@@ -91916,15 +92192,15 @@ function ClipEditor({ filming, clip, track: track3, media }) {
       ] }),
       /* @__PURE__ */ (0, import_jsx_runtime48.jsxs)("label", { className: "flex items-center justify-between text-xs", children: [
         "Source in (s)",
-        /* @__PURE__ */ (0, import_jsx_runtime48.jsx)("input", { "aria-label": "Audio source in", className: input2, type: "number", min: 0, step: 0.01, value: sourceIn, onChange: (e2) => setIn(Number(e2.target.value)) })
+        /* @__PURE__ */ (0, import_jsx_runtime48.jsx)("input", { "aria-label": "Audio source in", className: input, type: "number", min: 0, step: 0.01, value: sourceIn, onChange: (e2) => setIn(Number(e2.target.value)) })
       ] }),
       /* @__PURE__ */ (0, import_jsx_runtime48.jsxs)("label", { className: "flex items-center justify-between text-xs", children: [
         "Source out (s)",
-        /* @__PURE__ */ (0, import_jsx_runtime48.jsx)("input", { "aria-label": "Audio source out", className: input2, type: "number", min: 0, max: toSeconds(media.duration), step: 0.01, value: sourceOut, onChange: (e2) => setOut(Number(e2.target.value)) })
+        /* @__PURE__ */ (0, import_jsx_runtime48.jsx)("input", { "aria-label": "Audio source out", className: input, type: "number", min: 0, max: toSeconds(media.duration), step: 0.01, value: sourceOut, onChange: (e2) => setOut(Number(e2.target.value)) })
       ] }),
       /* @__PURE__ */ (0, import_jsx_runtime48.jsxs)("label", { className: "flex items-center justify-between text-xs", children: [
         "Timeline start (s)",
-        /* @__PURE__ */ (0, import_jsx_runtime48.jsx)("input", { "aria-label": "Audio timeline start", className: input2, type: "number", min: 0, step: 0.01, value: start2, onChange: (e2) => setStart(Number(e2.target.value)) })
+        /* @__PURE__ */ (0, import_jsx_runtime48.jsx)("input", { "aria-label": "Audio timeline start", className: input, type: "number", min: 0, step: 0.01, value: start2, onChange: (e2) => setStart(Number(e2.target.value)) })
       ] }),
       /* @__PURE__ */ (0, import_jsx_runtime48.jsx)("button", { className: `${button4} w-full`, onClick: () => {
         try {
@@ -91957,11 +92233,11 @@ function ClipEditor({ filming, clip, track: track3, media }) {
     /* @__PURE__ */ (0, import_jsx_runtime48.jsxs)("div", { className: "flex gap-2 text-xs", children: [
       /* @__PURE__ */ (0, import_jsx_runtime48.jsxs)("label", { children: [
         "Fade in (s)",
-        /* @__PURE__ */ (0, import_jsx_runtime48.jsx)("input", { "aria-label": "Audio fade in seconds", className: `${input2} mt-1`, type: "number", min: 0, max: 10, step: 0.1, defaultValue: toSeconds(clip.fade?.in ?? 0), onBlur: (e2) => fade("in", Number(e2.target.value)) })
+        /* @__PURE__ */ (0, import_jsx_runtime48.jsx)("input", { "aria-label": "Audio fade in seconds", className: `${input} mt-1`, type: "number", min: 0, max: 10, step: 0.1, defaultValue: toSeconds(clip.fade?.in ?? 0), onBlur: (e2) => fade("in", Number(e2.target.value)) })
       ] }),
       /* @__PURE__ */ (0, import_jsx_runtime48.jsxs)("label", { children: [
         "Fade out (s)",
-        /* @__PURE__ */ (0, import_jsx_runtime48.jsx)("input", { "aria-label": "Audio fade out seconds", className: `${input2} mt-1`, type: "number", min: 0, max: 10, step: 0.1, defaultValue: toSeconds(clip.fade?.out ?? 0), onBlur: (e2) => fade("out", Number(e2.target.value)) })
+        /* @__PURE__ */ (0, import_jsx_runtime48.jsx)("input", { "aria-label": "Audio fade out seconds", className: `${input} mt-1`, type: "number", min: 0, max: 10, step: 0.1, defaultValue: toSeconds(clip.fade?.out ?? 0), onBlur: (e2) => fade("out", Number(e2.target.value)) })
       ] })
     ] }),
     track3.lang && track3.muted ? /* @__PURE__ */ (0, import_jsx_runtime48.jsxs)("button", { className: button4, onClick: () => s2.run("subtitles.show", { lang: track3.lang }), children: [
@@ -92387,7 +92663,7 @@ function SubtitleLook({ filming }) {
 // ../../apps/web/components/studio/film/panels.tsx
 var import_jsx_runtime50 = __toESM(require_jsx_runtime(), 1);
 var button6 = "inline-flex items-center justify-center gap-1.5 rounded-md border border-ink/10 bg-paper px-2.5 py-1.5 text-xs font-semibold hover:bg-ink/10 disabled:opacity-35";
-var input3 = "w-full rounded-md border border-ink/10 bg-paper px-2 py-1.5 text-xs";
+var input2 = "w-full rounded-md border border-ink/10 bg-paper px-2 py-1.5 text-xs";
 var heading3 = "flex items-center gap-1.5 px-1 pb-1 text-[11px] font-bold tracking-wide text-ink/60 uppercase";
 var WORKSPACES = [
   { id: "shoot", label: "Shoot", icon: Clapperboard, hint: "Camera, live world, scene cues" },
@@ -92459,7 +92735,7 @@ function ShotsPanel({ filming }) {
               {
                 autoFocus: true,
                 "aria-label": "Recording name",
-                className: input3,
+                className: input2,
                 value: naming.name,
                 maxLength: 120,
                 onChange: (e2) => setNaming({ id: media.id, name: e2.target.value }),
@@ -92650,7 +92926,7 @@ function CaptionsPanel({ filming }) {
             "textarea",
             {
               "aria-label": `Caption ${clip.id}`,
-              className: input3,
+              className: input2,
               rows: 2,
               maxLength: 500,
               disabled: off,
@@ -92940,15 +93216,15 @@ function CameraPanel({ filming }) {
       }
     )
   ] });
-  const axis = (field5) => /* @__PURE__ */ (0, import_jsx_runtime51.jsxs)("fieldset", { className: "space-y-1", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime51.jsx)("legend", { className: "text-xs font-bold", children: field5 === "position" ? "Camera position (world metres)" : "Look at (world metres)" }),
+  const axis = (field6) => /* @__PURE__ */ (0, import_jsx_runtime51.jsxs)("fieldset", { className: "space-y-1", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime51.jsx)("legend", { className: "text-xs font-bold", children: field6 === "position" ? "Camera position (world metres)" : "Look at (world metres)" }),
     /* @__PURE__ */ (0, import_jsx_runtime51.jsx)("div", { className: "grid grid-cols-3 gap-2", children: ["X", "Y", "Z"].map((label3, index) => /* @__PURE__ */ (0, import_jsx_runtime51.jsx)("div", { children: number2(
-      `${field5} ${label3}`,
-      draft[field5][index],
+      `${field6} ${label3}`,
+      draft[field6][index],
       (value) => {
-        const point2 = [...draft[field5]];
+        const point2 = [...draft[field6]];
         point2[index] = value;
-        setDraft({ ...draft, [field5]: point2 });
+        setDraft({ ...draft, [field6]: point2 });
       },
       -6e4,
       6e4
@@ -95373,7 +95649,7 @@ function AdjustmentMenu({ filming }) {
 var import_react55 = __toESM(require_react(), 1);
 var import_jsx_runtime56 = __toESM(require_jsx_runtime(), 1);
 var button9 = "inline-flex items-center justify-center gap-1 rounded-md border border-ink/10 bg-paper px-2 py-1 text-[11px] font-semibold hover:bg-ink/10 disabled:opacity-35";
-var field2 = "w-full rounded-md border border-ink/10 bg-paper px-2 py-1.5 text-xs";
+var field3 = "w-full rounded-md border border-ink/10 bg-paper px-2 py-1.5 text-xs";
 var legend2 = "flex items-center gap-1 px-1 text-xs font-semibold";
 var FONT_LABEL = { nunito: "Nunito", serif: "Merriweather (serif)", mono: "JetBrains Mono", display: "Bebas Neue (display)" };
 function TitlePanel({ filming, clip, locked }) {
@@ -95397,7 +95673,7 @@ function TitlePanel({ filming, clip, locked }) {
           "textarea",
           {
             "aria-label": "Title text",
-            className: field2,
+            className: field3,
             rows: 2,
             maxLength: 2e3,
             value: text4,
@@ -95415,7 +95691,7 @@ function TitlePanel({ filming, clip, locked }) {
             "textarea",
             {
               "aria-label": "Subtitle",
-              className: field2,
+              className: field3,
               rows: clip.template === "credits" ? 4 : 1,
               maxLength: 500,
               value: subtitle,
@@ -95427,8 +95703,8 @@ function TitlePanel({ filming, clip, locked }) {
           )
         ] }),
         /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)("div", { className: "grid grid-cols-2 gap-2", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("select", { "aria-label": "Font", className: field2, value: style.font, onChange: (e2) => set({ font: e2.target.value }), children: Object.keys(FONT_LABEL).map((f2) => /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("option", { value: f2, children: FONT_LABEL[f2] }, f2)) }),
-          /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)("select", { "aria-label": "Weight", className: field2, value: style.weight, onChange: (e2) => set({ weight: Number(e2.target.value) }), children: [
+          /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("select", { "aria-label": "Font", className: field3, value: style.font, onChange: (e2) => set({ font: e2.target.value }), children: Object.keys(FONT_LABEL).map((f2) => /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("option", { value: f2, children: FONT_LABEL[f2] }, f2)) }),
+          /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)("select", { "aria-label": "Weight", className: field3, value: style.weight, onChange: (e2) => set({ weight: Number(e2.target.value) }), children: [
             /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("option", { value: 400, children: "Regular" }),
             /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("option", { value: 700, children: "Bold" }),
             /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("option", { value: 900, children: "Black" })
@@ -95470,7 +95746,7 @@ function TitlePanel({ filming, clip, locked }) {
           "Animation presets"
         ] }),
         /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)("div", { className: "flex gap-1", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("select", { "aria-label": "Title preset", className: field2, value: preset, onChange: (e2) => setPreset(e2.target.value), children: TITLE_PRESET_IDS.map((id2) => /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("option", { value: id2, children: TITLE_PRESETS[id2].label }, id2)) }),
+          /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("select", { "aria-label": "Title preset", className: field3, value: preset, onChange: (e2) => setPreset(e2.target.value), children: TITLE_PRESET_IDS.map((id2) => /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("option", { value: id2, children: TITLE_PRESETS[id2].label }, id2)) }),
           /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("button", { className: button9, "data-film-id": "film.title.preset.in", onClick: () => studio.run("title.animate", { clip: clip.id, preset, edge: "in" }), children: "In" }),
           /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("button", { className: button9, "data-film-id": "film.title.preset.out", onClick: () => studio.run("title.animate", { clip: clip.id, preset, edge: "out" }), children: "Out" })
         ] }),
@@ -95484,12 +95760,12 @@ function TitlePanel({ filming, clip, locked }) {
             /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("button", { className: button9, "aria-label": "Remove animator", onClick: () => studio.run("animator.remove", { clip: clip.id, animator: a2.id }), children: /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(Trash, { className: "size-3" }) })
           ] }),
           /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)("div", { className: "grid grid-cols-2 gap-1", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)("select", { "aria-label": "Based on", className: field2, value: a2.selector.based, onChange: (e2) => studio.run("animator.set", { clip: clip.id, animator: a2.id, selector: { based: e2.target.value } }), children: [
+            /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)("select", { "aria-label": "Based on", className: field3, value: a2.selector.based, onChange: (e2) => studio.run("animator.set", { clip: clip.id, animator: a2.id, selector: { based: e2.target.value } }), children: [
               /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("option", { value: "chars", children: "Letters" }),
               /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("option", { value: "words", children: "Words" }),
               /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("option", { value: "lines", children: "Lines" })
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("select", { "aria-label": "Shape", className: field2, value: a2.selector.shape, onChange: (e2) => studio.run("animator.set", { clip: clip.id, animator: a2.id, selector: { shape: e2.target.value } }), children: SELECTOR_SHAPES.map((sh) => /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("option", { value: sh, children: sh }, sh)) })
+            /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("select", { "aria-label": "Shape", className: field3, value: a2.selector.shape, onChange: (e2) => studio.run("animator.set", { clip: clip.id, animator: a2.id, selector: { shape: e2.target.value } }), children: SELECTOR_SHAPES.map((sh) => /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("option", { value: sh, children: sh }, sh)) })
           ] }),
           /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)("label", { className: "flex items-center gap-1 text-ink/60", children: [
             /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(
@@ -95528,11 +95804,11 @@ function TransitionPanel({ filming, clip, locked }) {
     ] }),
     t8 ? /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)(import_jsx_runtime56.Fragment, { children: [
       /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)("div", { className: "flex gap-1", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("select", { "aria-label": "Transition kind", className: field2, value: t8.kind, onChange: (e2) => studio.run("transition.set", { clip: clip.id, kind: e2.target.value }), children: TRANSITION_KINDS.map((k2) => /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("option", { value: k2, children: TRANSITIONS[k2].label }, k2)) }),
+        /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("select", { "aria-label": "Transition kind", className: field3, value: t8.kind, onChange: (e2) => studio.run("transition.set", { clip: clip.id, kind: e2.target.value }), children: TRANSITION_KINDS.map((k2) => /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("option", { value: k2, children: TRANSITIONS[k2].label }, k2)) }),
         /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("button", { className: button9, "aria-label": "Remove transition", onClick: () => studio.run("transition.remove", { clip: clip.id }), children: /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(Trash, { className: "size-3" }) })
       ] }),
       /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(CommitSlider, { id: "film.transition.duration", label: "Length (s)", value: toSeconds(t8.duration), min: 0.1, max: 4, step: 0.05, commit: (duration) => studio.run("transition.set", { clip: clip.id, duration }) }),
-      /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)("select", { "aria-label": "Transition alignment", className: field2, value: t8.align, onChange: (e2) => studio.run("transition.set", { clip: clip.id, align: e2.target.value }), children: [
+      /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)("select", { "aria-label": "Transition alignment", className: field3, value: t8.align, onChange: (e2) => studio.run("transition.set", { clip: clip.id, align: e2.target.value }), children: [
         /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("option", { value: "centre", children: "Centred on the cut" }),
         /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("option", { value: "start", children: "Starts at the cut" }),
         /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("option", { value: "end", children: "Ends at the cut" })
@@ -95552,7 +95828,7 @@ function TransitionPanel({ filming, clip, locked }) {
         "select",
         {
           "aria-label": spec.label,
-          className: field2,
+          className: field3,
           value: String(t8.params[key2] ?? spec.default),
           onChange: (e2) => studio.run("transition.set", { clip: clip.id, params: { [key2]: e2.target.value } }),
           children: spec.options.map((o2) => /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("option", { value: o2, children: o2 }, o2))
@@ -95560,7 +95836,7 @@ function TransitionPanel({ filming, clip, locked }) {
         key2
       ))
     ] }) : /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)("div", { className: "flex gap-1", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("select", { "aria-label": "New transition kind", className: field2, value: kind, onChange: (e2) => setKind(e2.target.value), children: TRANSITION_KINDS.map((k2) => /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("option", { value: k2, children: TRANSITIONS[k2].label }, k2)) }),
+      /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("select", { "aria-label": "New transition kind", className: field3, value: kind, onChange: (e2) => setKind(e2.target.value), children: TRANSITION_KINDS.map((k2) => /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("option", { value: k2, children: TRANSITIONS[k2].label }, k2)) }),
       /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(
         "button",
         {
@@ -95707,7 +95983,7 @@ function TransitionsWorkspace({ filming }) {
 var import_react57 = __toESM(require_react(), 1);
 var import_jsx_runtime58 = __toESM(require_jsx_runtime(), 1);
 var button11 = "inline-flex items-center justify-center gap-1 rounded-md border border-ink/10 bg-paper px-2 py-1 text-[11px] font-semibold hover:bg-ink/10 disabled:opacity-35";
-var field3 = "w-full rounded-md border border-ink/10 bg-paper px-2 py-1.5 text-xs";
+var field4 = "w-full rounded-md border border-ink/10 bg-paper px-2 py-1.5 text-xs";
 function ColourPanel({ filming }) {
   const studio = filming.studio, off = studio.rendering || filming.busy;
   const located = studio.selected ? studio.project.tracks.map((t8) => ({ track: t8, clip: t8.clips.find((c2) => c2.id === studio.selected) })).find((x3) => x3.clip) : void 0;
@@ -95724,15 +96000,15 @@ function ColourPanel({ filming }) {
         "Look"
       ] }),
       /* @__PURE__ */ (0, import_jsx_runtime58.jsxs)("div", { className: "flex gap-1", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime58.jsxs)("select", { "aria-label": "Look", className: field3, value: look, onChange: (e2) => setLook(e2.target.value), children: [
+        /* @__PURE__ */ (0, import_jsx_runtime58.jsxs)("select", { "aria-label": "Look", className: field4, value: look, onChange: (e2) => setLook(e2.target.value), children: [
           /* @__PURE__ */ (0, import_jsx_runtime58.jsx)("option", { value: "", children: "Choose a look\u2026" }),
-          Object.entries(LOOKS).map(([id2, l2]) => /* @__PURE__ */ (0, import_jsx_runtime58.jsx)("option", { value: id2, children: l2.label }, id2)),
+          Object.entries(LOOKS2).map(([id2, l2]) => /* @__PURE__ */ (0, import_jsx_runtime58.jsx)("option", { value: id2, children: l2.label }, id2)),
           saved.length ? /* @__PURE__ */ (0, import_jsx_runtime58.jsx)("optgroup", { label: "Saved in this film", children: saved.map((n2) => /* @__PURE__ */ (0, import_jsx_runtime58.jsx)("option", { value: n2, children: n2 }, n2)) }) : null
         ] }),
         /* @__PURE__ */ (0, import_jsx_runtime58.jsx)("button", { className: button11, "data-film-id": "film.colour.apply", disabled: !look, onClick: () => studio.run("look.apply", { clip: clip.id, look }), children: "Apply" })
       ] }),
       colour ? /* @__PURE__ */ (0, import_jsx_runtime58.jsxs)("div", { className: "flex gap-1", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime58.jsx)("input", { "aria-label": "Look name", className: field3, placeholder: "Name this look", maxLength: 60, value: name2, onChange: (e2) => setName2(e2.target.value) }),
+        /* @__PURE__ */ (0, import_jsx_runtime58.jsx)("input", { "aria-label": "Look name", className: field4, placeholder: "Name this look", maxLength: 60, value: name2, onChange: (e2) => setName2(e2.target.value) }),
         /* @__PURE__ */ (0, import_jsx_runtime58.jsxs)("button", { className: button11, "data-film-id": "film.colour.save", disabled: !name2.trim(), onClick: () => {
           if (studio.run("look.save", { clip: clip.id, name: name2.trim() }).ok) setName2("");
         }, children: [
@@ -95765,7 +96041,7 @@ function ColourPanel({ filming }) {
 var import_react58 = __toESM(require_react(), 1);
 var import_jsx_runtime59 = __toESM(require_jsx_runtime(), 1);
 var button12 = "inline-flex items-center justify-center gap-1.5 rounded-md border border-ink/10 bg-paper px-2 py-1.5 text-xs font-semibold hover:bg-ink/10 disabled:opacity-35";
-var field4 = "mt-1 w-full rounded-md border border-ink/10 bg-paper px-2 py-1.5 text-xs";
+var field5 = "mt-1 w-full rounded-md border border-ink/10 bg-paper px-2 py-1.5 text-xs";
 function SceneVoice({ filming, cue, disabled }) {
   const [voices, setVoices] = (0, import_react58.useState)([]), [models, setModels] = (0, import_react58.useState)([]);
   const [selected2, setSelected] = (0, import_react58.useState)(cue.voice?.id ?? ""), [language, setLanguage] = (0, import_react58.useState)(cue.voice?.language ?? "ar");
@@ -95823,7 +96099,7 @@ function SceneVoice({ filming, cue, disabled }) {
     ] }),
     /* @__PURE__ */ (0, import_jsx_runtime59.jsxs)("label", { className: "block text-xs", children: [
       "Saved voice",
-      /* @__PURE__ */ (0, import_jsx_runtime59.jsxs)("select", { "aria-label": `Voice for ${cue.id}`, className: field4, value: selected2, disabled: working || disabled, onChange: (event2) => {
+      /* @__PURE__ */ (0, import_jsx_runtime59.jsxs)("select", { "aria-label": `Voice for ${cue.id}`, className: field5, value: selected2, disabled: working || disabled, onChange: (event2) => {
         setSelected(event2.target.value);
         const voice = voices.find((row) => row.id === event2.target.value);
         if (voice?.language) setLanguage(voice.language);
@@ -95839,7 +96115,7 @@ function SceneVoice({ filming, cue, disabled }) {
     ] }),
     /* @__PURE__ */ (0, import_jsx_runtime59.jsxs)("label", { className: "block text-xs", children: [
       "Dialogue language",
-      /* @__PURE__ */ (0, import_jsx_runtime59.jsx)("select", { "aria-label": `Dialogue language for ${cue.id}`, className: field4, value: language, disabled: working || disabled, onChange: (event2) => setLanguage(event2.target.value), children: languages.map((code2) => /* @__PURE__ */ (0, import_jsx_runtime59.jsx)("option", { value: code2, children: new Intl.DisplayNames([code2], { type: "language" }).of(code2) }, code2)) })
+      /* @__PURE__ */ (0, import_jsx_runtime59.jsx)("select", { "aria-label": `Dialogue language for ${cue.id}`, className: field5, value: language, disabled: working || disabled, onChange: (event2) => setLanguage(event2.target.value), children: languages.map((code2) => /* @__PURE__ */ (0, import_jsx_runtime59.jsx)("option", { value: code2, children: new Intl.DisplayNames([code2], { type: "language" }).of(code2) }, code2)) })
     ] }),
     profile2 ? /* @__PURE__ */ (0, import_jsx_runtime59.jsxs)("p", { className: "text-[10px] text-ink/50", children: [
       profile2.name,
@@ -95903,19 +96179,19 @@ var WAVE = "#79c0f9";
 function ClipStrip({ clip, media, blob, zoom, height, head }) {
   const strip2 = useJob(blob && media.kind === "video" ? () => stripOf(media.asset, blob, toSeconds(media.duration)) : null, `${media.asset}:${!!blob}`);
   if (!strip2 || height < 12) return null;
-  const tile = Math.max(8, Math.round(strip2.width * (height / strip2.height))), from = toSeconds(clip.in), width = toSeconds(clip.duration) * zoom;
-  const tiles = head ? 1 : Math.min(400, Math.ceil(width / tile));
+  const tile3 = Math.max(8, Math.round(strip2.width * (height / strip2.height))), from = toSeconds(clip.in), width = toSeconds(clip.duration) * zoom;
+  const tiles = head ? 1 : Math.min(400, Math.ceil(width / tile3));
   return /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("div", { "aria-hidden": true, className: "pointer-events-none absolute inset-x-px overflow-hidden", style: { height }, children: Array.from({ length: tiles }, (_2, k2) => /* @__PURE__ */ (0, import_jsx_runtime60.jsx)(
     "span",
     {
       className: "absolute top-0",
       style: {
-        left: k2 * tile,
-        width: tile,
+        left: k2 * tile3,
+        width: tile3,
         height,
         backgroundImage: `url(${strip2.url})`,
-        backgroundSize: `${strip2.count * tile}px ${height}px`,
-        backgroundPosition: `${-frameIndex(head ? from : from + (k2 * tile + tile / 2) / zoom, strip2.step, strip2.count) * tile}px 0`
+        backgroundSize: `${strip2.count * tile3}px ${height}px`,
+        backgroundPosition: `${-frameIndex(head ? from : from + (k2 * tile3 + tile3 / 2) / zoom, strip2.step, strip2.count) * tile3}px 0`
       }
     },
     k2
@@ -96214,7 +96490,7 @@ function ZoomBar({ left, view, content, head, zoom, onScroll, onZoom }) {
 // ../../apps/web/components/studio/video-editor.tsx
 var import_jsx_runtime62 = __toESM(require_jsx_runtime(), 1);
 var button13 = "inline-flex items-center justify-center gap-1.5 rounded-md border border-ink/10 bg-paper px-2.5 py-1.5 text-xs font-semibold hover:bg-ink/10 disabled:opacity-35";
-var input4 = "mt-1 w-full rounded-md border border-ink/10 bg-paper px-2 py-1.5 text-xs";
+var input3 = "mt-1 w-full rounded-md border border-ink/10 bg-paper px-2 py-1.5 text-xs";
 var HEAD2 = 176;
 var VIEW_KEY = "genvr.film.timeline-view";
 function loadView() {
@@ -96999,7 +97275,7 @@ function InspectorBody({ filming, mode }) {
   const disabled = running || filming.busy;
   const number2 = (label3, value, update, max22 = 180) => /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)("label", { className: "text-xs text-ink/60", children: [
     label3,
-    /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("input", { "aria-label": label3, className: input4, type: "number", min: 0, max: max22, step: "0.01", value: Math.round(value * 100) / 100, onChange: (e2) => update(Number(e2.target.value)) })
+    /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("input", { "aria-label": label3, className: input3, type: "number", min: 0, max: max22, step: "0.01", value: Math.round(value * 100) / 100, onChange: (e2) => update(Number(e2.target.value)) })
   ] });
   const applyTrim = () => {
     if (clip?.type !== "media") return;
@@ -97030,7 +97306,7 @@ function InspectorBody({ filming, mode }) {
           "aria-label": "Filming mode",
           value: studio.mode,
           disabled,
-          className: input4,
+          className: input3,
           onChange: (e2) => studio.setMode(e2.target.value),
           children: [
             /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("option", { value: "production", children: "Film / series" }),
@@ -97121,11 +97397,11 @@ function InspectorBody({ filming, mode }) {
             /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("summary", { className: "cursor-pointer text-xs font-semibold", children: "Add dialogue line" }),
             /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)("label", { className: "block text-xs", children: [
               "Character",
-              /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("select", { "aria-label": "Dialogue character", className: input4, value: actor === SCENE_ACTOR ? "self" : actor, disabled, onChange: (event2) => setActor(event2.target.value), children: actors.filter((a2) => a2.id !== SCENE_ACTOR).map((a2) => /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("option", { value: a2.id, children: a2.label }, a2.id)) })
+              /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("select", { "aria-label": "Dialogue character", className: input3, value: actor === SCENE_ACTOR ? "self" : actor, disabled, onChange: (event2) => setActor(event2.target.value), children: actors.filter((a2) => a2.id !== SCENE_ACTOR).map((a2) => /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("option", { value: a2.id, children: a2.label }, a2.id)) })
             ] }),
             /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)("label", { className: "block text-xs", children: [
               "New dialogue",
-              /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("textarea", { "aria-label": "New scene dialogue", className: input4, rows: 3, value: dialogue, maxLength: 500, disabled, placeholder: "Write what this character says\u2026", onChange: (event2) => setDialogue(event2.target.value) })
+              /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("textarea", { "aria-label": "New scene dialogue", className: input3, rows: 3, value: dialogue, maxLength: 500, disabled, placeholder: "Write what this character says\u2026", onChange: (event2) => setDialogue(event2.target.value) })
             ] }),
             /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)("button", { className: `${button13} w-full`, disabled: disabled || !dialogue.trim() || studio.plan.length >= 30, onClick: () => attempt(filming, () => {
               const speaker = actor === SCENE_ACTOR ? "self" : actor;
@@ -97150,7 +97426,7 @@ function InspectorBody({ filming, mode }) {
               {
                 "aria-label": "Shot length (seconds)",
                 "data-film-id": "film.scene.length",
-                className: input4,
+                className: input3,
                 type: "number",
                 min: 1,
                 max: 30,
@@ -97165,7 +97441,7 @@ function InspectorBody({ filming, mode }) {
           ] }),
           /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)("label", { className: "block text-xs text-ink/60", children: [
             "Character",
-            /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("select", { "aria-label": "Scene character", value: actor, className: input4, onChange: (e2) => {
+            /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("select", { "aria-label": "Scene character", value: actor, className: input3, onChange: (e2) => {
               setActor(e2.target.value);
               setAction("none");
             }, children: actors.map((a2) => /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)("option", { value: a2.id, children: [
@@ -97180,7 +97456,7 @@ function InspectorBody({ filming, mode }) {
           ] }) : null,
           /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)("label", { className: "block text-xs text-ink/60", children: [
             "Action",
-            /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)("select", { "aria-label": "Scene action", value: action, className: input4, onChange: (e2) => setAction(e2.target.value), children: [
+            /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)("select", { "aria-label": "Scene action", value: action, className: input3, onChange: (e2) => setAction(e2.target.value), children: [
               /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("option", { value: "none", children: "No movement" }),
               (actor === "self" ? filming.actions : actor === SCENE_ACTOR ? [...SCENE_FX_ACTIONS] : ["dance", "bob", "spin", "sway", "run"].map((id2) => ({ id: id2, label: id2 === "run" ? "run (walk its spots faster)" : id2 }))).map((a2) => /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("option", { value: a2.id, children: a2.label }, a2.id))
             ] })
@@ -97220,7 +97496,7 @@ function InspectorBody({ filming, mode }) {
           ] }) : null,
           /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)("label", { className: "block text-xs text-ink/60", children: [
             "Dialogue text",
-            /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("textarea", { "aria-label": "Dialogue text", className: input4, rows: 3, maxLength: 500, value: dialogue, onChange: (e2) => setDialogue(e2.target.value) })
+            /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("textarea", { "aria-label": "Dialogue text", className: input3, rows: 3, maxLength: 500, value: dialogue, onChange: (e2) => setDialogue(e2.target.value) })
           ] }),
           /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)("button", { className: `${button13} w-full`, onClick: () => attempt(filming, () => {
             if (!Number.isFinite(cueStart) || !Number.isFinite(cueEnd) || cueStart < 0 || cueEnd <= cueStart || cueEnd > 30 || studio.plan.length >= 30)
@@ -97279,7 +97555,7 @@ function InspectorBody({ filming, mode }) {
           ] }) : null,
           inspectorTab === "voices" ? /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)("label", { className: "block", children: [
             "Dialogue",
-            /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("textarea", { "aria-label": `Dialogue for ${cue.id}`, className: input4, rows: 2, maxLength: 500, value: cue.text, disabled, onChange: (event2) => studio.setPlan((previous) => previous.map((c2) => c2.id === cue.id ? { ...c2, text: event2.target.value, audio: void 0, voice: void 0 } : c2)) })
+            /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("textarea", { "aria-label": `Dialogue for ${cue.id}`, className: input3, rows: 2, maxLength: 500, value: cue.text, disabled, onChange: (event2) => studio.setPlan((previous) => previous.map((c2) => c2.id === cue.id ? { ...c2, text: event2.target.value, audio: void 0, voice: void 0 } : c2)) })
           ] }) : null,
           inspectorTab === "voices" && cue.actor !== SCENE_ACTOR ? /* @__PURE__ */ (0, import_jsx_runtime62.jsx)(SceneVoice, { filming, cue, disabled }) : null,
           inspectorTab === "voices" ? /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)("details", { className: "border-t border-ink/10 pt-2", children: [
@@ -97310,7 +97586,7 @@ function InspectorBody({ filming, mode }) {
                 "input",
                 {
                   "aria-label": `Volume for ${cue.id}`,
-                  className: input4,
+                  className: input3,
                   type: "number",
                   min: 0,
                   max: 2,
@@ -99980,8 +100256,8 @@ function useStudioFilming(place3, runtime, container, log3, editing, storageKey,
 
 // src/session.ts
 var PACKAGE_WORK_BUDGET = 5e6;
-function readWorldPackage(input5) {
-  const text4 = typeof input5 === "string" ? input5 : JSON.stringify(input5);
+function readWorldPackage(input4) {
+  const text4 = typeof input4 === "string" ? input4 : JSON.stringify(input4);
   if (new TextEncoder().encode(text4).length > WORLD_PACKAGE_BYTES) throw new Error("World package exceeds 8 MB.");
   const record2 = WorldPackage.parse(JSON.parse(text4));
   const ids2 = /* @__PURE__ */ new Set();
@@ -99992,8 +100268,8 @@ function readWorldPackage(input5) {
   }
   return record2;
 }
-function replayWorldPackage(input5) {
-  const record2 = readWorldPackage(input5);
+function replayWorldPackage(input4) {
+  const record2 = readWorldPackage(input4);
   const base = record2.base;
   let work = 0;
   const half = SIZE_TIERS[base.sizeTier].sideMeters / 2;
@@ -100063,8 +100339,8 @@ var StudioProject = external_exports.object({
   terrainChunks: external_exports.array(external_exports.string().max(16 * 1024 * 1024)).max(4096),
   assets: WorldPackage.shape.assets
 }).strict();
-function readStudioProject(input5) {
-  const text4 = typeof input5 === "string" ? input5 : JSON.stringify(input5);
+function readStudioProject(input4) {
+  const text4 = typeof input4 === "string" ? input4 : JSON.stringify(input4);
   if (new TextEncoder().encode(text4).length > STUDIO_PROJECT_BYTES) throw new Error("Studio project exceeds 64 MB.");
   const project = StudioProject.parse(JSON.parse(text4));
   if (project.world.instances.length > 1e4) throw new Error("Studio project exceeds 10000 items.");
@@ -100074,12 +100350,12 @@ function readStudioProject(input5) {
   for (const encoded of project.terrainChunks) {
     const row = JSON.parse(encoded);
     const size = row.kind === "voxel-edits" ? VOXEL_CHUNK : project.world.terrain.chunkSizeMeters;
-    const field5 = row.kind === "terrain-fields-v1";
-    if (!field5 && (!Number.isInteger(row.cx) || !Number.isInteger(row.cz) || row.cx < Math.floor(-half / size) || row.cx >= Math.ceil(half / size) || row.cz < Math.floor(-half / size) || row.cz >= Math.ceil(half / size))) throw new Error("Terrain chunk lies outside the world.");
-    const key2 = field5 ? `f:${row.setId}:${row.tx},${row.tz}` : `${row.kind ?? "height"}:${row.cx},${row.cz}`;
+    const field6 = row.kind === "terrain-fields-v1";
+    if (!field6 && (!Number.isInteger(row.cx) || !Number.isInteger(row.cz) || row.cx < Math.floor(-half / size) || row.cx >= Math.ceil(half / size) || row.cz < Math.floor(-half / size) || row.cz >= Math.ceil(half / size))) throw new Error("Terrain chunk lies outside the world.");
+    const key2 = field6 ? `f:${row.setId}:${row.tx},${row.tz}` : `${row.kind ?? "height"}:${row.cx},${row.cz}`;
     if (seen.has(key2)) throw new Error("Duplicate terrain chunk.");
     seen.add(key2);
-    if (field5) continue;
+    if (field6) continue;
     if (row.kind === "voxel-edits") {
       if (!project.world.voxels || row.v !== 1 || typeof row.e !== "string" || !/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(row.e)) throw new Error("Invalid voxel chunk.");
       const bytes3 = Uint8Array.from(atob(row.e), (c2) => c2.charCodeAt(0));
@@ -100210,8 +100486,8 @@ function studioAgentLook(preset) {
   return AvatarLook.parse({ ...DEFAULT_AVATAR_LOOK, body: "classic", shirt: colors[preset % 4], wear });
 }
 var prefix = "host-agent:";
-function syncStudioAgents(runtime, input5, localLooks = /* @__PURE__ */ new Map()) {
-  const rows2 = StudioAgents.parse(input5).sort((a2, b2) => a2.id.localeCompare(b2.id));
+function syncStudioAgents(runtime, input4, localLooks = /* @__PURE__ */ new Map()) {
+  const rows2 = StudioAgents.parse(input4).sort((a2, b2) => a2.id.localeCompare(b2.id));
   const wanted = new Set(rows2.map((row) => prefix + row.id));
   const placed = rows2.map((row, index) => {
     const x3 = runtime.localPlayer.x + (index % 5 - Math.min(rows2.length - 1, 4) / 2) * 2;
@@ -100461,9 +100737,9 @@ function Editor({ initial, storage: storage7, options, leave, beforeClose }) {
     water: null
   });
   const log3 = (text4) => setLogs((list2) => [...list2.slice(-99), { id: Date.now(), at: Date.now(), level: "info", text: text4 }]);
-  const avatarVoice = async (input5) => {
+  const avatarVoice = async (input4) => {
     if (!options.liveBridge) throw new Error("Local voice service is not configured.");
-    const response = await fetch(new URL("/studio-bridge/voice", options.liveBridge.url), { method: "POST", headers: { Authorization: `Bearer ${options.liveBridge.token}`, "Content-Type": "application/json" }, body: JSON.stringify({ ...input5, projectId: input5.projectId ?? initial.id }) });
+    const response = await fetch(new URL("/studio-bridge/voice", options.liveBridge.url), { method: "POST", headers: { Authorization: `Bearer ${options.liveBridge.token}`, "Content-Type": "application/json" }, body: JSON.stringify({ ...input4, projectId: input4.projectId ?? initial.id }) });
     const body = await response.json();
     if (!response.ok || body.error) throw new Error(body.error ?? "Voice operation failed.");
     return body.result;
@@ -100645,19 +100921,19 @@ function Editor({ initial, storage: storage7, options, leave, beforeClose }) {
     if (!current2) setError("Project changed or is busy. Finish your work and try leaving again.");
     return current2;
   };
-  const userAvatarLibrary = async (input5) => {
-    if (input5.action === "list") {
-      const rows2 = [...await library?.list() ?? [], ...[{ id: "builtin:robot", name: "Standard robot", kind: "character" }, { id: "builtin:human", name: "Our human", kind: "character" }]].filter((row) => `${row.name} ${row.kind}`.toLowerCase().includes(input5.query.toLowerCase()));
-      return { private: true, bundled: false, total: rows2.length, entries: rows2.slice(input5.offset, input5.offset + input5.limit).map((row) => ({ id: row.id, kind: row.kind, name: row.name, ..."duration" in row ? { duration: row.duration } : {}, bundled: row.id.startsWith("builtin:") })) };
+  const userAvatarLibrary = async (input4) => {
+    if (input4.action === "list") {
+      const rows2 = [...await library?.list() ?? [], ...[{ id: "builtin:robot", name: "Standard robot", kind: "character" }, { id: "builtin:human", name: "Our human", kind: "character" }]].filter((row) => `${row.name} ${row.kind}`.toLowerCase().includes(input4.query.toLowerCase()));
+      return { private: true, bundled: false, total: rows2.length, entries: rows2.slice(input4.offset, input4.offset + input4.limit).map((row) => ({ id: row.id, kind: row.kind, name: row.name, ..."duration" in row ? { duration: row.duration } : {}, bundled: row.id.startsWith("builtin:") })) };
     }
-    if (input5.action === "assign") {
-      if (input5.id === void 0) throw new Error("Choose a character ID, or null to reset.");
-      await assignUserAvatar(input5.target, input5.id);
+    if (input4.action === "assign") {
+      if (input4.id === void 0) throw new Error("Choose a character ID, or null to reset.");
+      await assignUserAvatar(input4.target, input4.id);
     } else {
-      if (!input5.id) throw new Error("Choose a motion ID.");
-      await playUserMotion(input5.target, input5.id);
+      if (!input4.id) throw new Error("Choose a motion ID.");
+      await playUserMotion(input4.target, input4.id);
     }
-    return { action: input5.action, target: input5.target, id: input5.id, private: true };
+    return { action: input4.action, target: input4.target, id: input4.id, private: true };
   };
   const [voicePlayerHost, setVoicePlayerHost] = (0, import_react70.useState)(null);
   const [voiceOpen, setVoiceOpen] = (0, import_react70.useState)(false);
@@ -100725,15 +101001,15 @@ function Editor({ initial, storage: storage7, options, leave, beforeClose }) {
     if (!ready2 || !options.liveBridge) return;
     return connectLiveStudio(options.liveBridge, initial, { avatar: true, privateLibrary: Boolean(library), filming: true, voice: true, avatarLive: true, sharing: Boolean(options.sharing) }, (tool2, args, signal) => liveExecutor.current(tool2, args, signal), setLiveConnected);
   }, [ready2, initial.id, options.liveBridge]);
-  const shareStudio = async (input5) => {
-    if (input5.action === "inspect") return { available: Boolean(options.sharing), localOnly: !options.sharing, projectId: initial.id, layouts: AVATAR_LIVE_LAYOUTS };
-    if (input5.action === "open") {
+  const shareStudio = async (input4) => {
+    if (input4.action === "inspect") return { available: Boolean(options.sharing), localOnly: !options.sharing, projectId: initial.id, layouts: AVATAR_LIVE_LAYOUTS };
+    if (input4.action === "open") {
       openShare();
       return { opened: true };
     }
     if (!options.sharing) throw new Error("Connect your hosting sharing service to create access-controlled links.");
-    if (!input5.request || input5.request.projectId !== initial.id) throw new Error("Choose this project and explicit access settings.");
-    return options.sharing.create(input5.request);
+    if (!input4.request || input4.request.projectId !== initial.id) throw new Error("Choose this project and explicit access settings.");
+    return options.sharing.create(input4.request);
   };
   beforeClose.current = flush;
   const goHome = async () => {
@@ -101075,14 +101351,14 @@ function LiveCharacters({ editor }) {
   ] });
 }
 function mountAvatarLive(container, options = {}) {
-  let stage = null, speech = null, recipe = options.recipe ?? DEFAULT_CHARACTER_RECIPE;
+  let stage = null, speech = null, recipe = options.recipe ?? DEFAULT_CHARACTER_RECIPE, agent = options.agent, host = options.host ? { ...options.host } : void 0, settingsRequest = 0;
   const controller = new AvatarPresentation(() => stage ? { presentAnimation: (target2, id2) => target2 === "self" && (stage?.presentAnimation(id2) ?? false), presentExpression: (target2, expression2) => target2 === "self" && (stage?.presentExpression(expression2) ?? false), importAvatarMotion: async (target2, id2, data) => target2 === "self" && Boolean(await stage?.importAvatarMotion(id2, data)) } : null, options);
   controller.execute({ kind: "display", ...options.display, open: true });
   const root = (0, import_client.createRoot)(container);
   const draw = () => root.render(/* @__PURE__ */ (0, import_jsx_runtime68.jsxs)(import_jsx_runtime68.Fragment, { children: [
     /* @__PURE__ */ (0, import_jsx_runtime68.jsx)(AvatarLive, { controller, recipe, onStage: (value) => {
       stage = value;
-    }, projectId: options.projectId ?? "avatar", embedded: true }),
+    }, projectId: options.projectId ?? "avatar", embedded: true, agent, host: host ? { ...host, settingsRequest } : void 0 }),
     /* @__PURE__ */ (0, import_jsx_runtime68.jsx)(AvatarSpeechPlayer, { register: (value) => {
       speech = value;
     }, mouth: (_target, shape2) => stage?.setMouth(shape2), recording: () => {
@@ -101090,20 +101366,40 @@ function mountAvatarLive(container, options = {}) {
   ] }));
   draw();
   const unsubscribe = options.subscribe?.(options.projectId ?? "", controller.execute);
-  return { execute: controller.execute, controller, setRecipe(next3) {
-    recipe = next3;
-    draw();
-  }, speak(input5) {
-    if (!speech) throw new Error("Avatar speech player is loading.");
-    return speech.load(input5);
-  }, speechControl(command, value) {
-    if (!speech) throw new Error("Avatar speech player is loading.");
-    return speech.control(command, value);
-  }, snapshot: () => ({ display: controller.snapshot().display, avatar: stage?.info, speech: speech?.snapshot() }), dispose() {
-    unsubscribe?.();
-    root.unmount();
-    controller.dispose();
-  } };
+  return {
+    execute: controller.execute,
+    controller,
+    setRecipe(next3) {
+      recipe = next3;
+      draw();
+    },
+    /** Update the agent or the host hooks (for example a new voice list or the chosen voice). */
+    setHost(next3) {
+      if (next3.agent) agent = next3.agent;
+      if (next3.host) host = { ...host, ...next3.host };
+      draw();
+    },
+    /** Open the Settings window (needs `host`). */
+    openSettings() {
+      if (!host) throw new Error("Settings need the host option.");
+      settingsRequest++;
+      draw();
+    },
+    speak(input4) {
+      if (!speech) throw new Error("Avatar speech player is loading.");
+      return speech.load(input4);
+    },
+    speechControl(command, value) {
+      if (!speech) throw new Error("Avatar speech player is loading.");
+      return speech.control(command, value);
+    },
+    snapshot: () => ({ display: controller.snapshot().display, avatar: stage?.info, speech: speech?.snapshot() }),
+    dispose() {
+      unsubscribe?.();
+      root.unmount();
+      controller.dispose();
+    }
+  };
 }
 
 export {
@@ -101270,10 +101566,10 @@ lucide-react/dist/esm/icons/hand-heart.mjs:
 lucide-react/dist/esm/icons/hand.mjs:
 lucide-react/dist/esm/icons/heart-pulse.mjs:
 lucide-react/dist/esm/icons/house.mjs:
+lucide-react/dist/esm/icons/image.mjs:
 lucide-react/dist/esm/icons/lamp-floor.mjs:
 lucide-react/dist/esm/icons/languages.mjs:
 lucide-react/dist/esm/icons/layers.mjs:
-lucide-react/dist/esm/icons/layout-template.mjs:
 lucide-react/dist/esm/icons/leaf.mjs:
 lucide-react/dist/esm/icons/library.mjs:
 lucide-react/dist/esm/icons/lightbulb.mjs:
@@ -101285,10 +101581,13 @@ lucide-react/dist/esm/icons/lock.mjs:
 lucide-react/dist/esm/icons/log-in.mjs:
 lucide-react/dist/esm/icons/log-out.mjs:
 lucide-react/dist/esm/icons/magnet.mjs:
+lucide-react/dist/esm/icons/mail.mjs:
 lucide-react/dist/esm/icons/map-pin.mjs:
 lucide-react/dist/esm/icons/map.mjs:
 lucide-react/dist/esm/icons/maximize-2.mjs:
 lucide-react/dist/esm/icons/medal.mjs:
+lucide-react/dist/esm/icons/message-circle.mjs:
+lucide-react/dist/esm/icons/message-square.mjs:
 lucide-react/dist/esm/icons/mic.mjs:
 lucide-react/dist/esm/icons/minus.mjs:
 lucide-react/dist/esm/icons/monitor.mjs:
@@ -101328,6 +101627,7 @@ lucide-react/dist/esm/icons/scan-face.mjs:
 lucide-react/dist/esm/icons/scissors.mjs:
 lucide-react/dist/esm/icons/search.mjs:
 lucide-react/dist/esm/icons/settings-2.mjs:
+lucide-react/dist/esm/icons/settings.mjs:
 lucide-react/dist/esm/icons/shapes.mjs:
 lucide-react/dist/esm/icons/share-2.mjs:
 lucide-react/dist/esm/icons/shield-check.mjs:
@@ -101371,7 +101671,6 @@ lucide-react/dist/esm/icons/users.mjs:
 lucide-react/dist/esm/icons/volume-2.mjs:
 lucide-react/dist/esm/icons/volume-x.mjs:
 lucide-react/dist/esm/icons/wand-sparkles.mjs:
-lucide-react/dist/esm/icons/watch.mjs:
 lucide-react/dist/esm/icons/waves-horizontal.mjs:
 lucide-react/dist/esm/icons/wind.mjs:
 lucide-react/dist/esm/icons/wrench.mjs:
@@ -101400,4 +101699,4 @@ three/examples/jsm/libs/fflate.module.js:
   version 0.8.2
   *)
 */
-//# sourceMappingURL=chunk-AYOSKXOO.js.map
+//# sourceMappingURL=chunk-J4KUJPCY.js.map

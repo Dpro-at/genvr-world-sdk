@@ -4,7 +4,7 @@ import {
   mountAvatarLive,
   mountAvatarPresentation,
   mountStudio
-} from "./chunk-AYOSKXOO.js";
+} from "./chunk-J4KUJPCY.js";
 import "./chunk-7V6ZMJK5.js";
 import "./chunk-DGPEIZEL.js";
 import "./chunk-OOWEURE5.js";

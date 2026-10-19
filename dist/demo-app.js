@@ -36229,7 +36229,7 @@ var WorldPoint = external_exports.object({ x: external_exports.number().finite()
 var AvatarLiveDisplay = external_exports.object({
   open: external_exports.boolean().default(false),
   layout: external_exports.enum(["large", "desktop", "browser", "compact", "banner", "circle", "watch"]).default("large"),
-  background: external_exports.enum(["world", "color", "transparent", "office", "living_room", "conference", "stage", "studio", "classroom", "image", "video"]).default("office"),
+  background: external_exports.enum(["world", "color", "transparent", "office", "living_room", "conference", "stage", "studio", "classroom", "image", "video"]).default("color"),
   color: external_exports.string().regex(/^#[0-9a-fA-F]{6}$/).default("#101827"),
   media: Url.optional(),
   worldId: external_exports.string().min(1).max(200).nullable().optional(),
@@ -40965,7 +40965,7 @@ async function readChatStream(body, onText, onQueue) {
 var CORRECTION_WINDOW_MS = 10 * 60 * 1e3;
 
 // src/session.ts
-var SDK_VERSION = "0.3.0-preview.12";
+var SDK_VERSION = "0.3.0-preview.13";
 var PACKAGE_WORK_BUDGET = 5e6;
 function readWorldPackage(input2) {
   const text2 = typeof input2 === "string" ? input2 : JSON.stringify(input2);

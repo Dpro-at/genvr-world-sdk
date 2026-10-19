@@ -23,7 +23,7 @@ import {
   starterGroundMaterials,
   starterWorldCommands,
   supportsWorldStarter
-} from "./chunk-YCFPFEVX.js";
+} from "./chunk-L6ZVLN4D.js";
 
 // src/studio-project.ts
 var STUDIO_PROJECT_BYTES = 64 * 1024 * 1024;
