@@ -32,13 +32,17 @@ export const LAB_GROUND_MOVES: Record<string, { speed: number; stride: number; c
   Sneak: { speed: 0.8, stride: 0.55, clip: 'Sneak' },
   'Crouch Walk': { speed: 0.9, stride: 0.55, clip: 'Crouch Walk' },
 };
+/** The ground move for a name (own keys only); unknown names use Walk. */
+export function labGroundMove(name: string): { speed: number; stride: number; clip: string } {
+  return Object.hasOwn(LAB_GROUND_MOVES, name) ? LAB_GROUND_MOVES[name]! : LAB_GROUND_MOVES.Walk!;
+}
 const MAX_TIME = 120;
 const HIP = 0.95;
 const FOOT_X = 0.12;
 
 export function simulateLabRun(course: LabCourse, input: Partial<LabRunSettings> = {}, seed = course.seed): LabRunResult {
   const s = LabRunSettings.parse(input);
-  const move = LAB_GROUND_MOVES[s.motion] ?? LAB_GROUND_MOVES.Walk!;
+  const move = labGroundMove(s.motion);
   const rnd = labRandom(seed ^ 0x5bd1e995);
   const boxes = courseBoxes(course);
   const ground = (x: number, z: number) => groundAt(course, x, z, boxes);

@@ -104,6 +104,21 @@ at once instead of building on it.
 | Blocks way: place and break blocks | `fill_blocks`, `block_line`, `block_floor`, `dig_blocks` |
 | Moves, faces, screen effects, notifications, UI cards | `present_avatar`, `list_avatar_motions`, `user_avatar_library` |
 
+## World tab parity
+
+| World tab | Your tool |
+|---|---|
+| Lighting: lights, presets (key, fill, back, three-point), colour, brightness, beam, soft edge, reach, follows, where | `set_lights` (list, add, update, remove, three_point; at most 4) |
+| Sky look, time of day, sun path, wind, day and night cycle | `set_sky` (preset, time_of_day, sun_azimuth, wind_direction, wind_speed, cycle_minutes); a preset keeps the others |
+| Weather and its strength | `set_weather` (preset, strength 0.2–2); a preset keeps the strength |
+| Ground rules (Realistic) | `paint_ground_rule`, `set_style` |
+| Sea, waves, ocean look; water clarity and waves look | `set_sea`, `get_resource_controls`; `set_water_look` (clarity, waves) |
+| Style, start point, new land | `set_style`, `set_spawn` (x, z, turn), `make_world` |
+| Size, play settings (phone screen, view, moves, devices) | the owner only, in Place settings |
+
+`get_world_summary` reports the sky settings (hour, sun path, wind), the weather strength, the lights and the start
+point.
+
 Never buy, sign in to a store or import files for the person: paid items are placed only after the owner bought them,
 and imports come from the owner's own files.
 

@@ -4,7 +4,6 @@ import { avatarStudioBridge } from '../../lib/avatar-studio';
 import type { CharacterEditor } from './character-editor/use-character-editor';
 import { QuickVoice } from './film/quick-voice';
 import { BodySection } from './character-editor/character-controls';
-import { LightingPanel } from './lighting-panel';
 
 
 import { recipeLook } from '@genvr/contracts';
@@ -14,7 +13,6 @@ import type { GenvrRuntime, ToolStatus } from '@genvr/runtime';
 import { Share2, Mic, Camera, Users, Focus, Lightbulb, Circle, Globe, Play, Redo2, Square, Undo2, type LucideIcon, Settings2, Volume2, VolumeX } from 'lucide-react';
 import { useEffect, type ReactNode, type RefObject, useRef } from 'react';
 import { toolsFor } from '../build-panel';
-import { EnvironmentPicker } from '../environment-picker';
 import { ThemeToggle } from '../theme-toggle';
 import { ConsolePanel, type LogEntry } from './console-panel';
 import { DeviceBar, type PreviewState } from './device-bar';
@@ -28,6 +26,7 @@ import { ExplorerPanel } from './explorer-panel';
 import { PropertiesPanel } from './properties-panel';
 import { OPTION_TOOLS, ToolOptionsPanel } from './tool-options-panel';
 import { ItemsSidePanel } from './items-side-panel';
+import { WorldPartsList, WorldSidePanel } from './world-panel';
 import { setStructureFocus } from '../../lib/structure-focus';
 import { SnapBar } from './snap-bar';
 import { GenvrMark } from '../genvr-mark';
@@ -45,14 +44,19 @@ import {
   CharacterStageView,
   useCharacterEditor,
 } from './character-editor/character-editor';
+import { LabLeft, LabRight, LabRunBar, LabRunStrip } from './lab/lab-panels';
+import { LabStage } from './lab/lab-stage';
+import { motionLabBridge, type LabController } from '../../lib/motion-lab';
 
-export type StudioTab = 'build' | 'items' | 'world' | 'avatar' | 'filming';
+export type StudioTab = 'build' | 'items' | 'world' | 'avatar' | 'filming' | 'lab';
 const TABS: Array<{ id: StudioTab; label: string }> = [
   { id: 'build', label: 'Build' },
   { id: 'items', label: 'Items' },
   { id: 'world', label: 'World' },
   { id: 'avatar', label: 'Avatar' },
   { id: 'filming', label: 'Filming' },
+  // MOTION-LAB: only in a motion lab project.
+  { id: 'lab', label: 'Lab' },
 ];
 
 /**
@@ -85,7 +89,7 @@ const TOOL_KEYS = new Map(DOCK_GROUPS.flatMap((group) => group.tools.map((one) =
 /** Panel titles; the tab panel is named after the open tab. */
 const PANEL_TITLES: Record<DockPanel, (tab: StudioTab) => string> = {
   tab: (tab) =>
-    ({ build: 'Build tools', items: 'Library', world: 'World', avatar: 'Avatar', filming: 'Filming' })[tab],
+    ({ build: 'Build tools', items: 'Library', world: 'World', avatar: 'Avatar', filming: 'Filming', lab: 'Course' })[tab],
   outline: () => 'Explorer',
   properties: (tab) => (tab === 'filming' ? 'Scene inspector' : tab === 'avatar' ? 'Moves' : 'Properties'),
   assistant: () => 'Assistant',
@@ -163,9 +167,12 @@ export function StudioChrome({
   onClearLogs,
   onStyle,
   filming,
+  lab,
 }: {
   runtime: RefObject<GenvrRuntime | null>;
   filming: StudioFilming;
+  /** The motion lab of a lab project (MOTION-LAB); absent in other projects, which then have no Lab tab. */
+  lab?: LabController;
   /** The place being built (the assistant works on it). */
   placeId: string;
   /** Devices the place is made for (P9-15); the device preview marks the others. */
@@ -197,6 +204,7 @@ export function StudioChrome({
   // The Avatar tab is the character editor (CHAR-01): its own stage over the viewport, the world rests meanwhile.
   const character = useCharacterEditor();
   useEffect(() => avatarStudioBridge.register(character), [character]);
+  useEffect(() => motionLabBridge.register(lab ?? null), [lab]);
   // A road or wall picked in the Explorer stays only while selecting in the same tab (BUILD-B7).
   useEffect(() => {
     if (status.tool !== 'select' && status.tool !== null) setStructureFocus(null);
@@ -209,7 +217,8 @@ export function StudioChrome({
   useEffect(() => {
     if (lastTab.current === tab) return;
     lastTab.current = tab;
-    if (toolNow.current && toolNow.current !== 'select') runtime.current?.setTool(tab === 'build' || tab === 'items' ? 'select' : null);
+    // World has no tools in the view (WORLD-W9): Select does not follow into it either.
+    if (toolNow.current && (toolNow.current !== 'select' || tab === 'world' || tab === 'avatar' || tab === 'filming')) runtime.current?.setTool(tab === 'build' || tab === 'items' ? 'select' : null);
   }, [tab, runtime]);
   // Build keys (BUILD-B1): a letter picks a tool; Ctrl/Cmd+Z undoes, Ctrl+Y or Shift+Ctrl/Cmd+Z redoes.
   useEffect(() => {
@@ -240,11 +249,13 @@ export function StudioChrome({
   useEffect(() => { host.characterRecipe?.(character.recipe); }, [character.recipe, host.characterRecipe]);
   useEffect(() => { host.characterLook?.(recipeLook(character.recipe)); }, [character.recipe, host.characterLook]);
   const characterWorkspace = tab === 'avatar' && !testing;
+  // The Lab draws its own stage too (MOTION-LAB): the world rests meanwhile.
+  const labWorkspace = tab === 'lab' && Boolean(lab) && !testing;
   useEffect(() => {
-    if (!characterWorkspace) return;
+    if (!characterWorkspace && !labWorkspace) return;
     runtime.current?.setPaused(true);
     return () => runtime.current?.setPaused(false);
-  }, [characterWorkspace, runtime]);
+  }, [characterWorkspace, labWorkspace, runtime]);
   useEffect(() => {
     filming.studio.setOpen(filmWorkspace);
   }, [filmWorkspace]);
@@ -257,6 +268,7 @@ export function StudioChrome({
     if (id === 'timeline') return <DockedTimeline filming={filming} />;
     if (filmWorkspace && id === 'properties') return <VideoSceneInspector filming={filming} />;
     if (tab === 'avatar' && id === 'properties') return <CharacterMoves editor={character} />;
+    if (tab === 'lab' && lab) { if (id === 'properties') return <LabRight lab={lab} />; if (id === 'tab') return <LabLeft lab={lab} />; }
     // The scroll story is a Filming workspace (SCROLL-03): it is camera work, like filming.
     if (id === 'tab' && tab === 'filming' && filming.studio.workspace === 'story')
       return <StoryPanel runtime={runtime} status={status} placeId={placeId} filming={filming} />;
@@ -284,6 +296,20 @@ export function StudioChrome({
     if (id === 'assistant') return <AssistantPanel runtime={runtime} placeId={placeId} />;
     if (id === 'properties' && tab === 'build' && status.tool && OPTION_TOOLS.has(status.tool))
       return <ToolOptionsPanel runtime={runtime} status={status} placeId={placeId} />;
+    if (id === 'properties' && tab === 'world')
+      return (
+        <WorldSidePanel
+          runtime={runtime}
+          placeId={placeId}
+          busy={filming.busy || filming.studio.rendering}
+          actors={filming.sceneActors()}
+          message={filming.studio.setMessage}
+          onStyle={() => onStyle?.(runtime.current?.world.style.base ?? 'blocky')}
+          fallback={status.selected || status.water ? (
+            <PropertiesPanel placeId={isOwner && host.platform ? placeId : undefined} runtime={runtime} status={status} grid={layout.snapGrid} angle={layout.snapAngle} />
+          ) : undefined}
+        />
+      );
     if (id === 'properties' && tab === 'items')
       return (
         <ItemsSidePanel
@@ -317,7 +343,7 @@ export function StudioChrome({
     if (tab === 'world')
       return (
         <div className="px-2 pb-2">
-          <LightingPanel filming={filming} /><EnvironmentPicker runtime={runtime} variant="panel" onStyle={onStyle} />
+          <WorldPartsList runtime={runtime} />
         </div>
       );
     if (tab === 'avatar') return <CharacterTabs editor={character} />;
@@ -382,7 +408,7 @@ export function StudioChrome({
             aria-label="Workspace mode"
             className="flex shrink-0 gap-1 rounded-xl bg-paper p-1"
           >
-            {TABS.map((entry) => (
+            {TABS.filter((entry) => entry.id !== 'lab' || lab).map((entry) => (
               <button
                 key={entry.id}
                 type="button"
@@ -556,6 +582,7 @@ export function StudioChrome({
             type="button"
             onClick={(event) => {
               if (tab === 'avatar' && host.avatarLive) { host.avatarLive(); return; }
+              if (labWorkspace && lab) { try { lab.run(); } catch { /* the run bar shows problems */ } return; }
               if (filmWorkspace) { if(filming.studio.filmPlaying)filming.studio.transport.current?.stop();else filming.studio.transport.current?.play(); return; }
               rt()?.setTool(null);
               onTesting(!testing);
@@ -564,7 +591,7 @@ export function StudioChrome({
             className="ml-1 inline-flex items-center gap-1.5 rounded-lg bg-brand px-3 py-1.5 text-xs font-bold text-on-brand"
           >
             {testing ? <Square className="size-4" aria-hidden /> : <Play className="size-4" aria-hidden />}
-            {filmWorkspace ? (filming.studio.filmPlaying ? 'Pause film' : 'Play film') : tab === 'avatar' && host.avatarLive ? 'Preview avatar' : testing ? 'Stop test' : 'Test world'}
+            {filmWorkspace ? (filming.studio.filmPlaying ? 'Pause film' : 'Play film') : labWorkspace ? 'Run lab' : tab === 'avatar' && host.avatarLive ? 'Preview avatar' : testing ? 'Stop test' : 'Test world'}
           </button>
         </div>
       </header>
@@ -587,6 +614,13 @@ export function StudioChrome({
         {host.userAvatarControls ? null : <ToolbarMenu label="Characters" icon={Users}><p className="text-xs font-semibold">Choose the live character</p><BodySection editor={character}/></ToolbarMenu>}
         <RecordingBar filming={filming}/>
       </div></div> : null}
+
+      {labWorkspace && lab ? (
+        <div style={{ gridArea: 'viewport' }} className="relative z-20 flex min-h-0 min-w-0 flex-col bg-surface">
+          <div className="relative min-h-0 flex-1"><LabStage lab={lab} /><LabRunBar lab={lab} /></div>
+          <div className="h-48 shrink-0 border-t border-ink/10"><LabRunStrip lab={lab} /></div>
+        </div>
+      ) : null}
 
       {characterWorkspace ? (
         <div style={{ gridArea: 'viewport' }} className="relative z-20 min-h-0 min-w-0">

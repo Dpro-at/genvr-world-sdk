@@ -17,6 +17,7 @@ import {
   type CommandPayload,
   type SideMove,
   type WorldDocument,
+  SceneLight,
 } from '@genvr/contracts';
 import {
   getCoreItem,
@@ -87,6 +88,13 @@ export type ChatModel = (
 ) => Promise<{ content: string; tool_calls: ToolCall[] }>;
 
 /** What the assistant can see and change: the editor's world (the studio runtime). */
+/** A key, fill and back light on the avatar (WORLD-W2): the usual three-point setup. */
+const THREE_POINT_LIGHTS = [
+  { id: 'light-key', name: 'Key light', enabled: true, color: '#fff4e0', intensity: 24, angle: 35, softness: 0.5, distance: 30, actor: 'self', position: [2, 3, 3] as [number, number, number], target: [0, 1.5, 0] as [number, number, number] },
+  { id: 'light-fill', name: 'Fill light', enabled: true, color: '#dfe8ff', intensity: 9, angle: 50, softness: 0.9, distance: 30, actor: 'self', position: [-3, 2, 2.5] as [number, number, number], target: [0, 1.4, 0] as [number, number, number] },
+  { id: 'light-back', name: 'Back light', enabled: true, color: '#ffffff', intensity: 16, angle: 30, softness: 0.4, distance: 30, actor: 'self', position: [0, 3.2, -3] as [number, number, number], target: [0, 1.6, 0] as [number, number, number] },
+];
+
 export interface AssistantHost {
   shareStudio?(input: ToolArgs<'share_studio'>): Promise<unknown>;
   presentAvatar?(event: AvatarPresentationEvent): string | null;
@@ -1455,9 +1463,12 @@ export function executeTool(
         ...(a.wind_direction !== undefined ? { windDirection: a.wind_direction } : {}),
         ...(a.wind_speed !== undefined ? { windSpeed: a.wind_speed } : {}),
       };
+      // WORLD-W8: a preset keeps the hour, sun path and wind already set (the page does the same).
+      const kept = { ...world.environment.sky.params };
+      if (minutes === 0) delete kept.cycle;
       if (Object.keys(settings).length > 0 && !(minutes && minutes >= 1))
         return done(
-          host.apply([{ type: 'set_sky', params: { preset, params: settings } }]),
+          host.apply([{ type: 'set_sky', params: { preset, params: { ...kept, ...settings } } }]),
           `Sky is now ${preset}` +
             (a.time_of_day !== undefined ? ` at ${a.time_of_day} h` : '') +
             (a.wind_speed !== undefined ? `, wind ${a.wind_speed} m/s` : '') +
@@ -1466,13 +1477,65 @@ export function executeTool(
       // A day-night cycle (P2-02) starts from day; a storm sky keeps its clouds.
       if (minutes && minutes >= 1) {
         const cycle = Math.round(minutes);
-        const base = preset === 'storm' ? 'storm' : 'day';
+        // The cycle keeps the chosen look (WORLD-W0: it used to force day).
         return done(
-          host.apply([{ type: 'set_sky', params: { preset: base, params: { cycle, ...settings } } }]),
+          host.apply([{ type: 'set_sky', params: { preset, params: { ...kept, cycle, ...settings } } }]),
           `Day and night now follow each other, ${cycle} minutes per day.`,
         );
       }
-      return done(host.apply([{ type: 'set_sky', params: { preset } }]), `Sky is now ${preset}.`);
+      return done(host.apply([{ type: 'set_sky', params: { preset, ...(Object.keys(kept).length ? { params: kept } : {}) } }]), `Sky is now ${preset}.`);
+    }
+    case 'set_lights': {
+      const a = args as ToolArgs<'set_lights'>;
+      const lights = [...(world.environment.lighting ?? [])];
+      const describe = () => JSON.stringify(lights.map((l) => ({ id: l.id, name: l.name, enabled: l.enabled, color: l.color, intensity: l.intensity, angle: l.angle, softness: l.softness, distance: l.distance, follows: l.actor, position: l.position, aim: l.target })));
+      if (a.action === 'list') return { ok: true, result: describe() };
+      const fields = {
+        ...(a.name !== undefined ? { name: a.name } : {}),
+        ...(a.enabled !== undefined ? { enabled: a.enabled } : {}),
+        ...(a.color !== undefined ? { color: a.color } : {}),
+        ...(a.intensity !== undefined ? { intensity: a.intensity } : {}),
+        ...(a.angle !== undefined ? { angle: a.angle } : {}),
+        ...(a.softness !== undefined ? { softness: a.softness } : {}),
+        ...(a.distance !== undefined ? { distance: a.distance } : {}),
+        ...(a.follows !== undefined ? { actor: a.follows } : {}),
+        ...(a.position !== undefined ? { position: a.position } : {}),
+        ...(a.aim !== undefined ? { target: a.aim } : {}),
+      };
+      let next = lights;
+      if (a.action === 'three_point') next = THREE_POINT_LIGHTS.map((light) => ({ ...light }));
+      else if (a.action === 'add') {
+        if (lights.length >= 4) return { ok: false, result: 'Error: a place has at most 4 lights; remove one first.' };
+        next = [...lights, SceneLight.parse({ id: newId('light', random), name: a.name ?? `Light ${lights.length + 1}`, ...fields })];
+      } else {
+        const index = lights.findIndex((l) => l.id === a.id);
+        if (index < 0) return { ok: false, result: `Error: no light "${a.id ?? ''}". Use action list for ids.` };
+        if (a.action === 'remove') next = lights.filter((_, i) => i !== index);
+        else {
+          const parsed = SceneLight.safeParse({ ...lights[index], ...fields });
+          if (!parsed.success) return { ok: false, result: `Error: ${parsed.error.issues[0]?.message ?? 'check the light values'}` };
+          next = lights.map((l, i) => (i === index ? parsed.data : l));
+        }
+      }
+      const error = host.apply([{ type: 'set_lighting', params: { lights: next } }]);
+      lights.splice(0, lights.length, ...next);
+      return done(error, `Lights now: ${describe()}`);
+    }
+    case 'set_spawn': {
+      const a = args as ToolArgs<'set_spawn'>;
+      if (!inside(a.x, a.z)) return { ok: false, result: `Error: (${a.x}, ${a.z}) is outside the place.` };
+      const y = round(host.heightAt(a.x, a.z) + 1);
+      return done(
+        host.apply([{ type: 'set_spawn', params: { spawn: { position: [round(a.x), y, round(a.z)], rotation: yawQuat(a.turn ?? 0), scale: [1, 1, 1] } } }]),
+        `Players now start at (${round(a.x)}, ${round(a.z)}).`,
+      );
+    }
+    case 'set_water_look': {
+      const a = args as ToolArgs<'set_water_look'>;
+      if (world.style.base !== 'realistic') return { ok: false, result: 'Water looks are for Realistic places.' };
+      if (a.clarity === undefined && a.waves === undefined) return { ok: false, result: 'Error: give clarity and/or waves.' };
+      const water = { clarity: 9, waves: 'normal' as const, ...world.style.water, ...(a.clarity !== undefined ? { clarity: a.clarity } : {}), ...(a.waves ? { waves: a.waves } : {}) };
+      return done(host.apply([{ type: 'set_style', params: { ...world.style, water } }]), `Water: see through ${water.clarity} m, ${water.waves} waves.`);
     }
     case 'set_story': {
       const a = args as ToolArgs<'set_story'>;
@@ -1497,8 +1560,13 @@ export function executeTool(
       );
     }
     case 'set_weather': {
-      const { preset } = args as ToolArgs<'set_weather'>;
-      return done(host.apply([{ type: 'set_weather', params: { preset } }]), `Weather is now ${preset}.`);
+      const { preset, strength } = args as ToolArgs<'set_weather'>;
+      // WORLD-W8: the preset changes, its other settings (strength) stay unless given.
+      const params = { ...world.environment.weather.params, ...(strength !== undefined ? { strength } : {}) };
+      return done(
+        host.apply([{ type: 'set_weather', params: { preset, ...(Object.keys(params).length ? { params } : {}) } }]),
+        `Weather is now ${preset}${strength !== undefined ? ` at ${Math.round(strength * 100)}%` : ''}.`,
+      );
     }
     case 'set_style': {
       const { base } = args as ToolArgs<'set_style'>;

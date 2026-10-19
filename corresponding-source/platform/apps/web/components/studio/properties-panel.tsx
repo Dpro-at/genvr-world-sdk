@@ -1,5 +1,6 @@
 'use client';
 
+import { PlaceSummary } from './place-summary';
 import { useStructureFocus } from '../../lib/structure-focus';
 import { StructureProperties } from './structure-properties';
 import {
@@ -305,21 +306,7 @@ export function PropertiesPanel({
 
   if (!status.selected && structure) return <StructureProperties runtime={runtime} focus={structure} />;
 
-  if (!status.selected || !instance) {
-    return (
-      <div className="flex flex-col items-start gap-2 text-sm text-ink/60">
-        <p>Nothing selected.</p>
-        <button
-          type="button"
-          onClick={() => rt()?.setTool('select')}
-          className="inline-flex items-center gap-1.5 rounded-lg bg-paper px-2.5 py-1.5 font-bold text-ink hover:bg-ink/10"
-        >
-          <MousePointer2 className="size-4" aria-hidden />
-          Select tool
-        </button>
-      </div>
-    );
-  }
+  if (!status.selected || !instance) return <PlaceSummary runtime={runtime} />;
 
   const runtimeNow = rt()!;
   const selection = status.selected;

@@ -277,7 +277,8 @@ describe('runAssistant', () => {
     ]);
     await runAssistant({ model, host, history: [], prompt: 'day and night', onEvent: () => {} });
     expect(applied.flat()).toEqual([
-      { type: 'set_sky', params: { preset: 'day', params: { cycle: 30 } } },
+      // WORLD-W0: the cycle keeps the chosen look (it used to force day).
+      { type: 'set_sky', params: { preset: 'night', params: { cycle: 30 } } },
       { type: 'set_sky', params: { preset: 'sunset' } },
     ]);
   });

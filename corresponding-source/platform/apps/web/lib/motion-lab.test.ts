@@ -45,6 +45,14 @@ describe('motion lab controller (MOTION-LAB L1 + L2)', () => {
     await runMotionLab(lab, { kind: 'traffic_set', cars: [{ id: 'car-1', lane: 0, speed: 12, runs_red: true }] }, agent);
     expect(lab.data.course.cars[0]).toMatchObject({ speed: 12, runs_red: true });
     await expect(runMotionLab(lab, { kind: 'version_delete', version: 'x' }, agent)).rejects.toThrow();
+    lab.run();
+    const mine = lab.saveVersion(undefined, 'by a person');
+    await expect(runMotionLab(lab, { kind: 'version_delete', version: mine.id, confirm: true }, agent)).rejects.toThrow(/owner/);
+    const theirs = (await runMotionLab(lab, { kind: 'save_version' }, agent)) as { id: string };
+    lab.saveBest(theirs.id);
+    await expect(runMotionLab(lab, { kind: 'version_delete', version: theirs.id, confirm: true }, agent)).rejects.toThrow(/best/);
+    lab.saveBest(mine.id);
+    expect(await runMotionLab(lab, { kind: 'version_delete', version: theirs.id, confirm: true }, agent)).toEqual({ deleted: theirs.id });
   });
   it('gives the same scores to a person and an agent for the same run', async () => {
     const a = new LabController(newLabData()), b = new LabController(newLabData());

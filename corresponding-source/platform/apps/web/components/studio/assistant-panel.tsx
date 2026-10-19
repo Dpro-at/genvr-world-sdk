@@ -1,7 +1,7 @@
 'use client';
 
 import { runAvatarStudio } from '../../lib/avatar-studio';
-import { runAssistant, streamingChatModel, type AssistantHost, type ChatMessage } from '@genvr/assistant';
+import { runAssistant, streamingChatModel, type AssistantHost, type ChatMessage , executeTool } from '@genvr/assistant';
 import type { GenvrRuntime } from '@genvr/runtime';
 import { ArrowUp, Check, ShieldCheck, Sparkles, Square, X } from 'lucide-react';
 import { useEffect, useRef, useState, type RefObject } from 'react';
@@ -100,6 +100,14 @@ function checkReply(rt: GenvrRuntime, before: ReadonlySet<string>): string[] {
  * undo. A different size means the person changed the place since, so their work is never taken back.
  */
 const agentSteps = new WeakMap<GenvrRuntime, { done: number | null; undone: number | null }>();
+
+/**
+ * Runs one assistant tool on the studio as a person's click would (WORLD-W6: New land uses make_world, so the start
+ * ring and the starter ground stay the same as for an agent). Returns the tool's answer.
+ */
+export function runStudioTool(runtime: GenvrRuntime, placeId: string, name: Parameters<typeof executeTool>[0], args: unknown) {
+  return executeTool(name, args, hostFor(runtime, placeId));
+}
 
 function hostFor(runtime: GenvrRuntime, placeId: string): AssistantHost {
   const steps = agentSteps.get(runtime) ?? { done: null, undone: null };

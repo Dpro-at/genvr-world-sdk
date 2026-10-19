@@ -511,8 +511,34 @@ export const TOOL_ARGS = {
       .optional()
       .describe('Only where the ground lies this many metres below the sea'),
   }),
-  set_weather: z.object({ preset: WeatherPreset }),
+  set_weather: z.object({
+    preset: WeatherPreset,
+    strength: z.number().min(0.2).max(2).optional().describe('How much rain, snow or sand falls: 1 is the preset (WORLD-W4); kept when only the preset changes'),
+  }),
   /** The place's scroll story (SCROLL-02): every call replaces all stops. */
+  set_lights: z.object({
+    action: z.enum(['list', 'add', 'update', 'remove', 'three_point']).describe('three_point replaces every light with a key, a fill and a back light on the avatar'),
+    id: z.string().max(80).optional().describe('Light id from list (update, remove)'),
+    name: z.string().min(1).max(80).optional(),
+    enabled: z.boolean().optional(),
+    color: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional(),
+    intensity: z.number().min(0).max(200).optional().describe('Brightness (20 by default)'),
+    angle: z.number().min(5).max(85).optional().describe('Beam width in degrees'),
+    softness: z.number().min(0).max(1).optional().describe('Soft edge, 0 hard .. 1 soft'),
+    distance: z.number().min(1).max(200).optional().describe('Reach in metres'),
+    follows: z.string().max(120).nullable().optional().describe('"self" follows the avatar, an actor id follows it, null stays at a world position'),
+    position: z.tuple([Coordinate, z.number().min(-500).max(500), Coordinate]).optional().describe('[x, y, z]; an offset from the actor when it follows one'),
+    aim: z.tuple([Coordinate, z.number().min(-500).max(500), Coordinate]).optional().describe('Where it points, [x, y, z]'),
+  }),
+  set_spawn: z.object({
+    x: Coordinate,
+    z: Coordinate,
+    turn: z.number().min(-360).max(360).optional().describe('Facing in degrees (0 = +z)'),
+  }),
+  set_water_look: z.object({
+    clarity: z.number().min(1).max(20).optional().describe('How far you see through the water, metres'),
+    waves: z.enum(['calm', 'normal', 'rough']).optional(),
+  }),
   set_story: z.strictObject({
     title: z.string().max(120).optional().describe('Name of the story page'),
     stops: z
@@ -856,6 +882,9 @@ const DESCRIPTIONS: Record<ToolName, string> = {
   add_water: 'Make a pond or lake at x, z (the ground is dug when needed).',
   draw_river:
     'Draw a river through points. It carves its own bed, always runs downhill, turns steep drops into waterfalls, and stops by itself when it reaches a lake or the sea. From 11 m wide players can swim in it and the current carries them.',
+  set_lights: 'The place\'s lights (World › Lighting, also used by Filming): list them, add (up to 4), update or remove one by id, or three_point for a key, fill and back light on the avatar.',
+  set_spawn: 'Move the start point, where players appear.',
+  set_water_look: 'How the water looks in Realistic places: clarity (see through, metres) and waves (calm, normal, rough).',
   set_story:
     'Tell the place as a scroll page (/showcase?place=<place id>): the camera flies from stop to stop as visitors scroll, with words at each stop. Replaces all stops at once (get_world_summary lists the current ones); stops: null removes the story. Creators can also add stops from the studio camera in the Story panel.',
   set_sea:

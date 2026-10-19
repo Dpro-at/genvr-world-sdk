@@ -179,8 +179,10 @@ export class LabController {
   confirmPendingBest() { const pending = this.#data.best_pending; if (pending) this.saveBest(pending.version, PERSON); }
   rejectPendingBest() { this.#set({ best_pending: null }); }
   rollback(id: string) { const v = this.#versionById(id); this.setSettings(v.settings); return v; }
-  deleteVersion(id: string) {
-    this.#versionById(id);
+  /** An agent may delete only versions an agent made, never the best one; a person may delete any. */
+  deleteVersion(id: string, by: LabActor = PERSON) {
+    const version = this.#versionById(id);
+    if (by.kind === 'agent' && (version.best || version.by !== 'agent')) throw new Error(version.best ? 'Only the owner can delete the best version.' : 'Only the owner can delete a version a person made.');
     this.#set({ versions: this.#data.versions.filter((v) => v.id !== id), best_pending: this.#data.best_pending?.version === id ? null : this.#data.best_pending });
     this.#view = { ...this.#view, ghost: this.#ghost() };
     this.#emit(false);
@@ -252,7 +254,7 @@ const HELP: Record<string, string> = {
   save_version: 'Keep a run as a new version of its motion: { run?, note? }.',
   save_best: 'Ask to make a version the best: the owner confirms it in the Lab.',
   rollback: 'Use a version\'s settings again: { version }.',
-  version_delete: 'Delete a version: { version, confirm: true }.',
+  version_delete: 'Delete a version an agent made: { version, confirm: true }. The best version and versions a person made are the owner\'s.',
 };
 
 export async function runMotionLab(lab: LabController | null, input: unknown, by: LabActor): Promise<unknown> {
@@ -290,7 +292,7 @@ export async function runMotionLab(lab: LabController | null, input: unknown, by
       return by.kind === 'agent' ? { ...result, note: 'The owner confirms the best version in the Lab (Versions).' } : result;
     }
     case 'rollback': return lab.rollback(op.version);
-    case 'version_delete': lab.deleteVersion(op.version); return { deleted: op.version };
+    case 'version_delete': lab.deleteVersion(op.version, by); return { deleted: op.version };
   }
 }
 

@@ -122,6 +122,8 @@ export class EnvironmentView {
   #signature = '';
   #environment: WorldDocument['environment'] | null = null;
   #weather: WeatherLook | null = null;
+  /** How much rain, snow or sand falls (WORLD-W4): `weather.params.strength`, 0.2–2 of the preset's own. */
+  #strength = 1;
   #particles: InstancedMesh | null = null;
   #offsets = new Float32Array(0);
   #baseLight = { hemisphere: 1, sun: 1 };
@@ -327,9 +329,11 @@ export class EnvironmentView {
     this.#environment = environment;
     const cycle = Number(environment.sky.params.cycle ?? 0);
     this.#cycle = Number.isFinite(cycle) && cycle > 0 ? cycle : 0;
-    const signature = `${environment.sky.preset}/${environment.weather.preset}/${JSON.stringify(environment.sky.params)}`;
+    const signature = `${environment.sky.preset}/${environment.weather.preset}/${JSON.stringify(environment.sky.params)}/${JSON.stringify(environment.weather.params ?? {})}`;
     if (signature === this.#signature) return;
     this.#signature = signature;
+    const strength = Number(environment.weather.params?.strength ?? 1);
+    this.#strength = Number.isFinite(strength) ? Math.min(2, Math.max(0.2, strength)) : 1;
     this.#weather = getWeather(environment.weather.preset).look;
     this.#showSky(this.#skyNow());
     this.#setWeather(this.#weather);
@@ -490,7 +494,7 @@ export class EnvironmentView {
       (this.#particles.material as MeshBasicMaterial).dispose();
       this.#particles = null;
     }
-    const count = Math.round(weather.count * this.quality);
+    const count = Math.round(weather.count * this.quality * this.#strength);
     if (weather.particles === 'none' || count === 0) return;
     // Pixel drops (Voxel): short square raindrops and cube snowflakes instead of thin streaks.
     const pixel = this.#shapes.drops === 'pixel';

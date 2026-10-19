@@ -17,6 +17,8 @@ import {
   SunMoon,
   Sunset,
   Wind,
+  Palmtree,
+  Zap,
   type LucideIcon,
 } from 'lucide-react';
 import { useEffect, useState, type RefObject } from 'react';
@@ -28,11 +30,12 @@ export const ENVIRONMENT_ICONS: Record<string, LucideIcon> = {
   'genvr.core.sky.sunset': Sunset,
   'genvr.core.sky.night': Moon,
   'genvr.core.sky.storm': CloudLightning,
+  'genvr.core.sky.tropical': Palmtree,
   'sky.cycle': SunMoon,
   'genvr.core.weather.clear': SunMedium,
   'genvr.core.weather.rain': CloudRain,
   'genvr.core.weather.snow': Snowflake,
-  'genvr.core.weather.storm': CloudLightning,
+  'genvr.core.weather.storm': Zap,
   'genvr.core.weather.fog': CloudFog,
   'genvr.core.weather.sandstorm': Wind,
   'genvr.core.style.blocky': Box,
@@ -42,10 +45,10 @@ export const ENVIRONMENT_ICONS: Record<string, LucideIcon> = {
 };
 
 /** Minutes per day of the day-night cycle: the first is used when the cycle is turned on. */
-const DAY_LENGTHS = [20, 10, 40, 60] as const;
+export const DAY_LENGTHS = [20, 10, 40, 60] as const;
 
 /** Styles the engine draws well today (the others follow, STYLE_CARDS `ready`). */
-const READY_STYLES = STYLE_PACKS.filter((pack) => STYLE_CARDS.find((card) => card.id === pack.style)?.ready);
+export const READY_STYLES = STYLE_PACKS.filter((pack) => STYLE_CARDS.find((card) => card.id === pack.style)?.ready);
 
 /**
  * Sky and weather of the place (tasks P2-02, P2-06): each choice is a `set_sky` or `set_weather`
@@ -70,10 +73,17 @@ export function EnvironmentPicker({
     choose({
       type: 'set_sky',
       params: {
-        preset: current?.sky.preset === 'storm' ? 'storm' : 'day',
-        params: { cycle: minutes },
+        // The cycle keeps the chosen look and the hour, sun and wind already set (WORLD-W0).
+        preset: current?.sky.preset ?? 'day',
+        params: { ...current?.sky.params, cycle: minutes },
       },
     });
+  /** A sky preset keeps the hour, sun path and wind; choosing one stops the cycle (WORLD-W0). */
+  const keptSky = () => {
+    const params = { ...current?.sky.params };
+    delete params.cycle;
+    return Object.keys(params).length ? params : null;
+  };
   const [, redraw] = useState(0);
   // Undo, redo, the assistant, and other builders change the world too: follow them (cheap check).
   useEffect(() => {
@@ -138,7 +148,7 @@ export function EnvironmentPicker({
       buttons: [
         ...CORE_SKIES.map((sky) =>
           button(sky.manifest.id, sky.manifest.name, !cycling && current?.sky.preset === sky.preset, () =>
-            choose({ type: 'set_sky', params: { preset: sky.preset } }),
+            choose({ type: 'set_sky', params: { preset: sky.preset, params: keptSky() ?? {} } }),
           ),
         ),
         // Day and night (P2-02): the sun crosses the sky once a day; a storm sky stays stormy and
@@ -150,7 +160,7 @@ export function EnvironmentPicker({
       title: 'Weather',
       buttons: CORE_WEATHER.map((weather) =>
         button(weather.manifest.id, weather.manifest.name, current?.weather.preset === weather.preset, () =>
-          choose({ type: 'set_weather', params: { preset: weather.preset } }),
+          choose({ type: 'set_weather', params: { preset: weather.preset, params: { ...current?.weather.params } } }),
         ),
       ),
     },
@@ -230,7 +240,7 @@ export function EnvironmentPicker({
 const DEFAULT_SNOW_LINE = 80;
 
 /** Water settings a Realistic place gets before anyone changes them (P2-39). */
-const DEFAULT_WATER = { clarity: 9, waves: 'normal' as const };
+export const DEFAULT_WATER = { clarity: 9, waves: 'normal' as const };
 /** Sea level offered the first time it is switched on: just under the flat starting ground. */
 const FIRST_SEA_LEVEL = -1;
 /**
@@ -256,7 +266,7 @@ const MIRRORS = 2;
  * slopes. Each change is one `set_style` command (undo, saving, co-building); the slider applies
  * when it is let go, so dragging makes one undo step.
  */
-function GroundRules({
+export function GroundRules({
   snowLine,
   autoRock,
   grass,
@@ -403,7 +413,7 @@ function GroundRules({
  * both undo and save with the world. Only two bodies can mirror the world, so the panel says which
  * ones do rather than letting a builder wonder.
  */
-function WaterRules({
+export function WaterRules({
   water,
   sea,
   lakes,

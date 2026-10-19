@@ -73,10 +73,21 @@ function describeZone(zone: Zone, instance: ItemInstance): string {
  * starts it later (a page), and a cut list ends with `more_items_from: N`, the next page's start.
  * A page also ends early when it would pass `WORLD_SUMMARY_CHARS` (its first item is always shown).
  */
+/** The hour, sun path and wind set on the sky (WORLD-W8), when any. */
+function skyDetails(world: WorldDocument): string {
+  const p = world.environment.sky.params;
+  const parts = [
+    typeof p.timeOfDay === 'number' ? `${p.timeOfDay} h` : '',
+    typeof p.sunAzimuth === 'number' ? `sun path ${p.sunAzimuth}°` : '',
+    typeof p.windSpeed === 'number' ? `wind ${p.windSpeed} m/s from ${Number(p.windDirection ?? 0)}°` : '',
+  ].filter(Boolean);
+  return parts.length ? ` Sky settings: ${parts.join(', ')}.` : '';
+}
+
 export function worldSummary(world: WorldDocument, maxItems: number, fromItem = 0): string {
   const side = SIZE_TIERS[world.sizeTier].sideMeters;
   const lines = [
-    `Size: ${side} x ${side} m. Style: ${world.style.base}. Sky: ${world.environment.sky.preset}${Number(world.environment.sky.params.cycle) > 0 ? ` (day and night cycle, ${Number(world.environment.sky.params.cycle)} minutes per day)` : ''}. Weather: ${world.environment.weather.preset}.`,
+    `Size: ${side} x ${side} m. Style: ${world.style.base}. Sky: ${world.environment.sky.preset}${Number(world.environment.sky.params.cycle) > 0 ? ` (day and night cycle, ${Number(world.environment.sky.params.cycle)} minutes per day)` : ''}. Weather: ${world.environment.weather.preset}${world.environment.weather.params?.strength !== undefined ? ` at ${Math.round(Number(world.environment.weather.params.strength) * 100)}%` : ''}.${skyDetails(world)} Start point: (${r(world.spawn.position[0])}, ${r(world.spawn.position[2])}).${(world.environment.lighting ?? []).length ? ` Lights: ${(world.environment.lighting ?? []).map((l) => `${l.id} "${l.name}"${l.enabled ? '' : ' off'}`).join(', ')}.` : ''}`,
     groundLine(world),
     `Game: ${world.game ? describeGame(world.game) : 'none'}.`,
     `Items: ${world.instances.length}${fromItem > 0 ? ` (listed from ${fromItem})` : ''}.`,
