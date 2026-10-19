@@ -71,7 +71,14 @@ export interface CharacterEditor {
   exportJson: () => string;
   /** The creator's own uploaded bodies (signed in), shown after Genvr's bodies. */
   myBodies: Array<{ id: `user.${string}`; name: string }>;
+  /** Character edits step back and forward (AV-UNDO): a slider drag is one step. */
+  undo: () => boolean;
+  redo: () => boolean;
 }
+
+/** Changes closer together than this (a slider drag, typing a name) are one undo step. */
+const STEP_GAP_MS = 700;
+const MAX_STEPS = 100;
 
 export function useCharacterEditor(): CharacterEditor {
   const [recipe, setRecipe] = useState<CharacterRecipe>(DEFAULT_CHARACTER_RECIPE);
@@ -125,13 +132,38 @@ export function useCharacterEditor(): CharacterEditor {
     };
   }, []);
 
+  const latest = useRef(recipe);
+  latest.current = recipe;
+  const past = useRef<CharacterRecipe[]>([]);
+  const future = useRef<CharacterRecipe[]>([]);
+  const lastStep = useRef(0);
   const change = useCallback((update: (current: CharacterRecipe) => CharacterRecipe) => {
     setRecipe((current) => {
       const next = readCharacterRecipe(update(current));
+      if (JSON.stringify(next) === JSON.stringify(current)) return current;
+      const now = Date.now();
+      if (now - lastStep.current > STEP_GAP_MS) {
+        past.current = [...past.current, current].slice(-MAX_STEPS);
+        future.current = [];
+      }
+      lastStep.current = now;
       writeStorage(DRAFT_KEY, next);
       return next;
     });
   }, []);
+  const step = useCallback((from: RefObject<CharacterRecipe[]>, to: RefObject<CharacterRecipe[]>) => {
+    const target = from.current.at(-1);
+    if (!target) return false;
+    from.current = from.current.slice(0, -1);
+    // Read outside the state updater, which React may run twice.
+    to.current = [...to.current, latest.current].slice(-MAX_STEPS);
+    writeStorage(DRAFT_KEY, target);
+    setRecipe(target);
+    lastStep.current = 0;
+    return true;
+  }, []);
+  const undo = useCallback(() => step(past, future), [step]);
+  const redo = useCallback(() => step(future, past), [step]);
   const load = useCallback((next: CharacterRecipe) => change(() => next), [change]);
 
   const play = useCallback((name: string) => {
@@ -198,6 +230,8 @@ export function useCharacterEditor(): CharacterEditor {
     remove,
     importText,
     exportJson,
+    undo,
+    redo,
     myBodies,
   };
 }

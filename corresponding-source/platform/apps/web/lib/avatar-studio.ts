@@ -9,7 +9,7 @@ export const avatarStudioBridge = {
 };
 
 type Input = {
-  action: 'inspect' | 'set' | 'view' | 'expression' | 'play' | 'save' | 'export' | 'reset_shape';
+  action: 'inspect' | 'set' | 'view' | 'expression' | 'play' | 'save' | 'export' | 'reset_shape' | 'undo' | 'redo';
   recipe?: Record<string, unknown> | undefined; view?: CharacterEditor['view'] | undefined; shading?: CharacterEditor['shading'] | undefined;
   expression?: 'neutral' | 'smile' | 'angry' | 'sad' | 'surprised' | 'thinking' | undefined; clip?: string | undefined;
 };
@@ -57,5 +57,7 @@ export function runAvatarStudio(input: Input): unknown {
     case 'play': { if (!input.clip) throw new Error('Send clip (a move id from list_avatar_motions).'); editor.play(input.clip); return { playing: input.clip }; }
     case 'save': { editor.save(); return { saved: editor.recipe.name }; }
     case 'export': return { recipe: JSON.parse(editor.exportJson()) as unknown };
+    case 'undo': if (!editor.undo()) throw new Error('Nothing to undo on the character.'); return { undone: true };
+    case 'redo': if (!editor.redo()) throw new Error('Nothing to redo on the character.'); return { redone: true };
   }
 }

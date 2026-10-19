@@ -222,15 +222,16 @@ export function StudioChrome({
   }, [tab, runtime]);
   // Build keys (BUILD-B1): a letter picks a tool; Ctrl/Cmd+Z undoes, Ctrl+Y or Shift+Ctrl/Cmd+Z redoes.
   useEffect(() => {
-    if (testing || (tab !== 'build' && tab !== 'items' && tab !== 'world')) return;
+    if (testing || (tab !== 'build' && tab !== 'items' && tab !== 'world' && tab !== 'avatar')) return;
     const onKey = (event: KeyboardEvent) => {
       const target = event.target as HTMLElement | null;
       if (target?.closest('input, textarea, select, [contenteditable="true"]')) return;
       const key = event.key.toLowerCase();
       if (event.ctrlKey || event.metaKey) {
         if (event.altKey) return;
-        if (key === 'z' && !event.shiftKey) { event.preventDefault(); runtime.current?.undo(); }
-        else if (key === 'y' || (key === 'z' && event.shiftKey)) { event.preventDefault(); runtime.current?.redo(); }
+        // The Avatar tab steps through the character's edits (AV-UNDO), the other tabs through the world's.
+        if (key === 'z' && !event.shiftKey) { event.preventDefault(); if (tab === 'avatar') character.undo(); else runtime.current?.undo(); }
+        else if (key === 'y' || (key === 'z' && event.shiftKey)) { event.preventDefault(); if (tab === 'avatar') character.redo(); else runtime.current?.redo(); }
         return;
       }
       if (tab !== 'build' || event.altKey || event.shiftKey || event.repeat) return;
@@ -242,7 +243,7 @@ export function StudioChrome({
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [tab, testing, runtime]);
+  }, [tab, testing, runtime, character]);
   const workflowOpen = useWorkflowOpen();
   useEffect(()=>{onCharacter?.(character);},[character]);
   useEffect(() => host.characterBody?.(body => character.change(recipe => ({ ...recipe, body }))), [host.characterBody]);
@@ -430,7 +431,7 @@ export function StudioChrome({
               </ToolbarMenu>
               <button
                 type="button"
-                onClick={() => rt()?.undo()}
+                onClick={() => (tab === 'avatar' ? character.undo() : rt()?.undo())}
                 aria-label="Undo (Ctrl+Z)"
                 title="Undo (Ctrl+Z)"
                 className="rounded-lg p-2 hover:bg-ink/5"
@@ -439,7 +440,7 @@ export function StudioChrome({
               </button>
               <button
                 type="button"
-                onClick={() => rt()?.redo()}
+                onClick={() => (tab === 'avatar' ? character.redo() : rt()?.redo())}
                 aria-label="Redo (Ctrl+Y)"
                 title="Redo (Ctrl+Y)"
                 className="rounded-lg p-2 hover:bg-ink/5"

@@ -1,5 +1,5 @@
 import type { CommandPayload, ItemInstance, Wall, WorldDocument } from '@genvr/contracts';
-import { DEFAULT_ROAD_TYPE, getRoadType } from '@genvr/core-library';
+import { DEFAULT_ROAD_TYPE, getCoreItem, getRoadType } from '@genvr/core-library';
 import {
   type TerrainData,
   roadProfile,
@@ -15,7 +15,12 @@ import {
   type WallSurface,
 } from '@genvr/world';
 import {
+  Box3,
+  BoxGeometry,
+  EdgesGeometry,
   Group,
+  LineBasicMaterial,
+  LineSegments,
   Mesh,
   MeshBasicMaterial,
   MeshStandardMaterial,
@@ -200,6 +205,8 @@ const snap = (v: number) => Math.round(v / SNAP) * SNAP;
 export class BuildTools {
   #tool: BuildTool | null = null;
   #eraseTarget: NonNullable<ToolStatus["eraseTarget"]> | null = null;
+  /** Red box round what the eraser would remove (BUILD-B8). */
+  #eraseBox: LineSegments | null = null;
   #wall: WallToolSettings = { ...DEFAULT_WALL, door: { ...DEFAULT_WALL.door }, window: { ...DEFAULT_WALL.window } };
   #points: Array<[number, number]> = [];
   #hover: [number, number] | null = null;
@@ -487,6 +494,10 @@ export class BuildTools {
 
   setTool(tool: BuildTool | null): void {
     if (tool !== this.#tool) this.#items.reset();
+    if (tool !== 'eraser') {
+      this.#eraseTarget = null;
+      this.#showEraseBox(null);
+    }
     if (!BRUSH_TOOLS.has(tool)) this.#terrain.hideRing();
     // The two brush tools keep their own mode, so picking Terrain again does not leave the creator
     // painting cover, and picking Cover again does not start raising the ground.
@@ -658,6 +669,9 @@ export class BuildTools {
       return;
     }
     if (tool === 'eraser') {
+      // The red box belongs to what is being removed now.
+      this.#eraseTarget = null;
+      this.#showEraseBox(null);
       const item = this.#items.pickItem(clientX, clientY);
       if (item) {
         this.options.apply({ type: 'remove_item', params: { instanceId: item } });
@@ -734,6 +748,7 @@ export class BuildTools {
       const next = this.#eraseTargetAt(clientX, clientY);
       if (next?.kind !== this.#eraseTarget?.kind || next?.id !== this.#eraseTarget?.id) {
         this.#eraseTarget = next;
+        this.#showEraseBox(next ? this.#eraseBounds(next, clientX, clientY) : null);
         this.#emit();
       }
       return;
@@ -755,13 +770,66 @@ export class BuildTools {
     this.#refreshPreview();
   }
 
+  /** The space the eraser's target takes, from the world (items, roads, walls) or its mesh (water, rivers). */
+  #eraseBounds(target: NonNullable<ToolStatus['eraseTarget']>, clientX: number, clientY: number): Box3 | null {
+    const world = this.options.world();
+    const box = new Box3();
+    const span = (points: ReadonlyArray<readonly [number, number]>, pad: number, low: number, high: number) => {
+      for (const [x, z] of points) {
+        const y = this.options.heightAt(x, z);
+        box.expandByPoint(new Vector3(x - pad, y + low, z - pad));
+        box.expandByPoint(new Vector3(x + pad, y + high, z + pad));
+      }
+      return box;
+    };
+    if (target.kind === 'item') {
+      const instance = world.instances.find((i) => i.instanceId === target.id);
+      if (!instance) return null;
+      const { min, max } = this.options.items.model(instance.itemId).bounds;
+      const [sx, sy, sz] = instance.transform.scale;
+      const [x, y, z] = instance.transform.position;
+      // A turned item still fits in the box of its widest side.
+      const reach = Math.max(Math.abs(min[0]) * sx, Math.abs(max[0]) * sx, Math.abs(min[2]) * sz, Math.abs(max[2]) * sz);
+      return box.set(new Vector3(x - reach, y + min[1] * sy, z - reach), new Vector3(x + reach, y + max[1] * sy, z + reach));
+    }
+    if (target.kind === 'road') {
+      const road = world.roads.find((r) => r.id === target.id);
+      return road ? span(road.points, road.width / 2, -0.2, 0.6) : null;
+    }
+    if (target.kind === 'wall') {
+      const wall = world.walls.find((w) => w.id === target.id);
+      return wall ? span(wall.points, 0.3, 0, wall.height) : null;
+    }
+    const hit = this.#cast(clientX, clientY, [this.options.water, this.options.rivers])[0];
+    return hit ? box.setFromObject(hit.object) : null;
+  }
+
+  #showEraseBox(box: Box3 | null): void {
+    if (this.#eraseBox) {
+      this.options.scene.remove(this.#eraseBox);
+      this.#eraseBox.geometry.dispose();
+      this.#eraseBox = null;
+    }
+    if (!box || box.isEmpty()) return;
+    const size = box.getSize(new Vector3());
+    const geometry = new EdgesGeometry(new BoxGeometry(Math.max(size.x, 0.2), Math.max(size.y, 0.2), Math.max(size.z, 0.2)));
+    const lines = new LineSegments(geometry, this.#eraseMaterial);
+    lines.position.copy(box.getCenter(new Vector3()));
+    lines.renderOrder = 1000;
+    lines.userData.helper = true;
+    this.options.scene.add(lines);
+    this.#eraseBox = lines;
+  }
+
+  readonly #eraseMaterial = new LineBasicMaterial({ color: 0xef4444, depthTest: false, transparent: true, opacity: 0.95 });
+
   /** What a click of the eraser would remove at this point, in the same order as the click itself. */
   #eraseTargetAt(clientX: number, clientY: number): NonNullable<ToolStatus['eraseTarget']> | null {
     const world = this.options.world();
     const item = this.#items.pickItem(clientX, clientY);
     if (item) {
       const instance = world.instances.find((i) => i.instanceId === item);
-      return { kind: 'item', id: item, name: instance?.name ?? instance?.itemId.split('.').pop() ?? 'Item' };
+      return { kind: 'item', id: item, name: instance?.name ?? (instance ? (getCoreItem(instance.itemId)?.manifest.name ?? this.options.items.model(instance.itemId).name) : 'Item') };
     }
     const hit = this.#cast(clientX, clientY, [this.options.structures, this.options.water, this.options.rivers])[0];
     const [kind, id] = (hit?.object.name ?? '').split(':') as [string, string | undefined];
