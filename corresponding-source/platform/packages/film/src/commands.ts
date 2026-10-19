@@ -726,6 +726,8 @@ export const COMMANDS: CommandSpec[] = [
     run: (d, a, x) => {
       const run = d.director!, last = run.steps.length >= 99;
       const existing = a.step ? run.steps.find((s) => s.id === a.step) : undefined;
+      // A step that waits for the owner or that the owner approved is the owner's; report a new step instead.
+      if (existing && (existing.state === 'waiting' || existing.approved)) throw new EditError('That step waits for or has the owner\'s approval; report a new step.');
       // Autonomy: 'each' waits after every finished step; 'end' waits only when the agent says it is the last one (op 'finish').
       const wait = a.state === 'done' && (run.autonomy === 'each' || (run.autonomy === 'end' && a.op === 'finish'));
       const state = wait ? 'waiting' as const : a.state;
@@ -740,7 +742,7 @@ export const COMMANDS: CommandSpec[] = [
     id: 'director.approve', label: 'Approve director step', group: 'Project', journal: true, hostOnly: true,
     args: z.object({ step: clipId }).strict(),
     run: (d, a) => { const run = d.director, step = run?.steps.find((s) => s.id === a.step); if (!run || !step || step.state !== 'waiting') throw new EditError('That step is not waiting for you.');
-      step.state = 'done'; run.status = step.op === 'finish' ? 'done' : 'running'; },
+      step.state = 'done'; step.approved = true; run.status = step.op === 'finish' ? 'done' : 'running'; },
   },
   {
     id: 'director.pause', label: (a: { resume?: boolean }) => a.resume ? 'Resume AI director' : 'Pause AI director', group: 'Project', journal: true,

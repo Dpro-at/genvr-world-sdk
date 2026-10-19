@@ -605,3 +605,17 @@ describe('episodes and the AI director (FILM-E1/E3)', () => {
     expect(session.project.director!.status).toBe('stopped');
   });
 });
+
+describe('director approvals stay the owner’s', () => {
+  it('agents cannot edit a waiting or approved step, and history cannot undo an approval', () => {
+    const session = new FilmSession(emptyFilm(), counter());
+    ok(session.run('director.start', { idea: 'x', kind: 'film', episodes: 1, minutes: 1, autonomy: 'each' }));
+    ok(session.run('director.claim', { agent: 'A' }));
+    const step = (session.run('director.step', { label: 'Story', op: 'project.settings', state: 'done' }) as { ok: true; result: string }).result;
+    expect(session.run('director.step', { step, label: 'Story', op: 'x', state: 'done' })).toMatchObject({ ok: false });
+    ok(session.run('director.approve', { step }));
+    expect(session.project.director!.steps[0]!.approved).toBe(true);
+    expect(session.run('director.step', { step, label: 'Story', op: 'x', state: 'failed' })).toMatchObject({ ok: false });
+    expect(ownerStateChanged(session.project, session.historyTarget('edit.undo')!)).toBe(true);
+  });
+});

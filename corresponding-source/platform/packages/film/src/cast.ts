@@ -37,9 +37,11 @@ export function ownerStateChanged(now: FilmProject, next: FilmProject): boolean 
     decided: (p.suggestions ?? []).filter((x) => decided.has(x.id)).map((x) => `${x.id}:${x.status}`).sort(),
     takes: (p.takes ?? []).map((t) => JSON.stringify(t)).sort(),
     // FILM-E3: a director step the owner approved (waiting → done) stays the owner's decision.
-    director: (p.director?.steps ?? []).filter((x) => waited.has(x.id)).map((x) => `${x.id}:${x.state}`).sort(),
+    director: (p.director?.steps ?? []).filter((x) => owned.has(x.id)).map((x) => JSON.stringify(x)).sort(),
+    // Which run the owner's approvals belong to, and whether its steps still exist.
+    run: owned.size ? `${p.director?.id ?? 'none'}:${(p.director?.steps ?? []).filter((x) => owned.has(x.id)).length}` : '',
   });
-  const waited = new Set([...(now.director?.steps ?? []), ...(next.director?.steps ?? [])].filter((x) => x.state === 'waiting').map((x) => x.id));
+  const owned = new Set([...(now.director?.steps ?? []), ...(next.director?.steps ?? [])].filter((x) => x.state === 'waiting' || x.approved).map((x) => x.id));
   const decided = new Set([...(now.suggestions ?? []), ...(next.suggestions ?? [])].filter((x) => x.status !== 'pending').map((x) => x.id));
   // Guarded: every line the owner ever approved, and every line of a character the owner writes (in either film).
   const ownerCast = new Set([...(now.cast ?? []), ...(next.cast ?? [])].filter((c) => c.linesBy.kind === 'owner').map((c) => c.id));

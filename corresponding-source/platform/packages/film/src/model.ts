@@ -259,7 +259,9 @@ export type Episode = z.infer<typeof Episode>;
  * waits for the owner, who alone approves it. The director never publishes or shares.
  */
 export const DirectorStep = z.object({ id, label: z.string().min(1).max(120), op: z.string().max(60),
-  state: z.enum(['todo', 'running', 'waiting', 'done', 'failed']), note: z.string().max(500).optional() }).strict();
+  state: z.enum(['todo', 'running', 'waiting', 'done', 'failed']), note: z.string().max(500).optional(),
+  /** Set only by the owner's approval; such a step is never changed again by an agent. */
+  approved: z.boolean().optional() }).strict();
 export const DirectorRun = z.object({
   id, idea: z.string().min(1).max(2000), kind: z.enum(['film', 'series']),
   episodes: z.number().int().min(1).max(50), minutes: z.number().int().min(1).max(60),
