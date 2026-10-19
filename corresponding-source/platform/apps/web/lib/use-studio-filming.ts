@@ -55,6 +55,8 @@ export function useStudioFilming(place: string, runtime: RefObject<GenvrRuntime 
   const storyPreview = useRef<{ path: FilmWaypoint[]; time: number; cut: boolean } | null>(null);
   const manualFinish=useRef<AbortController|null>(null), manualBegan=useRef(0);
   const [manualRecording,setManualRecording]=useState(false);
+  /** A timed take (Record shot) is recording now: when it began (ms) and how long it runs (s); board 1b. */
+  const [shotRecording, setShotRecording] = useState<{ began: number; seconds: number } | null>(null);
   const localBusy = useRef(false), remoteBusy = useRef(false), connecting = useRef(false);
   const epoch = useRef(0), abort = useRef(new AbortController());
   const logger = useRef(log); logger.current = log;
@@ -548,6 +550,7 @@ export function useStudioFilming(place: string, runtime: RefObject<GenvrRuntime 
             if (rig.current.settings?.path) rig.current.set(rig.current.settings);
             live?.start(); sceneSpeech.current?.start();
             directing.current = { cues: [...cues].sort((a, b) => a.start - b.start), start: performance.now(), started: new Set(), activeSelf: null };
+            setShotRecording({ began: performance.now(), seconds: operation.settings.seconds });
           }, (seconds) => { if (current === epoch.current) report(`Recording ${seconds.toFixed(1)} / ${operation.settings.seconds} s…`); }, sound);
           const stopped = live?.stop();
           if (!blob.size) throw new Error(EMPTY_TAKE);
@@ -558,7 +561,7 @@ export function useStudioFilming(place: string, runtime: RefObject<GenvrRuntime 
           stopped?.place(() => shotStart(operation.shot_id));
           if (!operation.shot_id) addSceneFx(cues);
         } catch (error) { live?.cancel(); throw error; }
-        finally { restoreSound(); releaseViewport(); if (current === epoch.current) { sceneSpeech.current?.stop(); directing.current = null; runtime.current?.clearSceneMotions(); runtime.current?.stopSceneAnimation(); runtime.current?.presentExpression('self', 'neutral'); runtime.current?.sceneWalk(null); } }
+        finally { setShotRecording(null); restoreSound(); releaseViewport(); if (current === epoch.current) { sceneSpeech.current?.stop(); directing.current = null; runtime.current?.clearSceneMotions(); runtime.current?.stopSceneAnimation(); runtime.current?.presentExpression('self', 'neutral'); runtime.current?.sceneWalk(null); } }
         return reply();
       }
       case 'export': {
@@ -600,6 +603,7 @@ export function useStudioFilming(place: string, runtime: RefObject<GenvrRuntime 
       if(manual)manualFinish.current=new AbortController();
       const blob = await captureFilm(canvas, command, abort.current.signal, subscribe, () => {
         if(manual){manualBegan.current=performance.now();setManualRecording(true);}
+        else if (kind === 'video') setShotRecording({ began: performance.now(), seconds });
         live?.start();
         if (timeline) sceneSpeech.current?.start();
         if (timeline) directing.current = { cues: [...cues].sort((a, b) => a.start - b.start), start: performance.now(), started: new Set(), activeSelf: null };
@@ -628,7 +632,7 @@ export function useStudioFilming(place: string, runtime: RefObject<GenvrRuntime 
       document.body.append(link); link.click(); link.remove(); setTimeout(() => URL.revokeObjectURL(url), 60000);
       report(fallbackMessage ?? `${kind === 'photo' ? 'Photo' : 'Silent video'} downloaded.`);
     } catch (error) { live?.cancel(); if (current === epoch.current) report(error instanceof Error ? error.message : 'Capture failed.'); }
-    finally { restoreSceneSound(); if(manual){manualFinish.current?.abort();manualFinish.current=null;manualBegan.current=0;setManualRecording(false);} releaseViewport(); if (current === epoch.current) {
+    finally { setShotRecording(null); restoreSceneSound(); if(manual){manualFinish.current?.abort();manualFinish.current=null;manualBegan.current=0;setManualRecording(false);} releaseViewport(); if (current === epoch.current) {
       localBusy.current = false;
       sceneSpeech.current?.stop(); directing.current = null; runtime.current?.clearSceneMotions(); runtime.current?.stopSceneAnimation(); runtime.current?.presentExpression('self', 'neutral'); runtime.current?.sceneWalk(null);
       setBusy(remoteBusy.current); if (!rig.current.settings) runtime.current?.setMarkersVisible(isEditing.current());
@@ -655,7 +659,7 @@ export function useStudioFilming(place: string, runtime: RefObject<GenvrRuntime 
     const canvas = container.current?.querySelector('canvas'); if (!canvas) throw new Error('World canvas unavailable.');
     prepare(); return captureFilm(canvas, { kind: 'photo', settings: FilmPhoto.parse(raw) }, signal, subscribe, () => {}, () => {});
   };
-  return { startManual, endManual, manualRecording, assignSavedVoice: async (voiceId: string, target = 'self') => { if (!voice.current) throw new Error('Voice service unavailable.'); return voice.current({ action: 'assign', voiceId, target, projectId: place }); },
+  return { startManual, endManual, manualRecording, shotRecording, assignSavedVoice: async (voiceId: string, target = 'self') => { if (!voice.current) throw new Error('Voice service unavailable.'); return voice.current({ action: 'assign', voiceId, target, projectId: place }); },
     selectedVoice: async (target = 'self') => { if(!voice.current)return ''; const library = await voice.current({action:'voices',target:'self'}) as {assignments?:Record<string,string>}; return library.assignments?.[place+':'+target] ?? ''; },
     previewSavedVoice: async (voiceId: string) => { if (!voice.current) throw new Error('Voice service unavailable.'); return voice.current({ action: 'preview', voiceId, target: 'self' }); }, voiceAvailable: Boolean(voiceService), voiceLibrary: async () => { if (!voice.current) return { voices: [], models: [] }; const [library, catalog] = await Promise.all([voice.current({ action: 'voices', target: 'self' }), voice.current({ action: 'models', target: 'self' })]); return { ...(library as { voices: Array<{ id: string; name: string; language?: string; voiceType?: string; model: string }> }), ...(catalog as { models: Array<{ id: string; languages: string[] }> }) }; }, handleStudio: runLocalStudioOperation, sceneActors: () => actors().filter((a) => a.id !== SCENE_ACTOR), capturePhoto, camera, studio, output, setOutput, busy, connected, message, onFilmFrame, onRendered, releaseRuntime, apply, preset, reset, connect, take,
     previewStory, cameraView,

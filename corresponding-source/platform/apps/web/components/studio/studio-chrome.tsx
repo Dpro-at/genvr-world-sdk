@@ -27,7 +27,7 @@ import { PropertiesPanel } from './properties-panel';
 import { SnapBar } from './snap-bar';
 import { GenvrMark } from '../genvr-mark';
 import { FilmingPanel } from './filming-panel';
-import { RecordingBar } from './film/recording-bar';
+import { RecordingBar, RecordingFrame } from './film/recording-bar';
 import { WorkflowView } from './film/workflow-view';
 import { useWorkflowOpen } from '../../lib/video-studio/scene-selection';
 import { StoryPanel } from './story-panel';
@@ -493,6 +493,7 @@ export function StudioChrome({
         />
       ) : null}
 
+      {filmWorkspace && !testing ? <div style={{ gridArea: 'viewport' }} className="pointer-events-none relative z-30 min-h-0 min-w-0"><RecordingFrame filming={filming} /></div> : null}
       {/* Workflow (board 7) takes the whole centre column: the recording bar, the world and the timeline go behind it. */}
       {filmWorkspace && !testing && workflowOpen ? <div style={{ gridColumn: '3 / 4', gridRow: '3 / -1' }} className="relative z-[45] min-h-0 min-w-0"><WorkflowView filming={filming} /></div> : null}
 
