@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { ArrowRight, Bot, Camera, ChevronDown, Clapperboard, FolderInput, Info, LayoutGrid, Link2, MapPin, Minus, PanelRight, Plus, Undo2, Users, Workflow, X } from 'lucide-react';
+import { ArrowRight, Camera, ChevronDown, Clapperboard, FolderInput, Info, LayoutGrid, Link2, MapPin, Minus, PanelRight, Plus, Undo2, Users, Workflow, X } from 'lucide-react';
 import { toSeconds, type FilmProject, type Media, type ShotLink } from '@genvr/film';
 import type { StudioFilming } from '../../../lib/use-studio-filming';
 import { sceneSelection, useWorkflowShot } from '../../../lib/video-studio/scene-selection';
@@ -96,7 +96,6 @@ export function WorkflowView({ filming }: { filming: StudioFilming }) {
       <Workflow className="size-4" /><h2 className="text-sm font-bold">Workflow</h2><span className="rounded-full bg-cyan-700 px-1.5 text-[9px] font-bold uppercase text-cyan-50">New</span>
       <span title="Scenes and their shots in story order, joined by timed threads. Click a shot for its details; links say where the film leaves a shot and enters another." className="text-ink/45"><Info className="size-3.5" /></span>
       <span className="flex-1" />
-      <button type="button" className={`${button} !border-cyan-500/50 !bg-cyan-500/10`} aria-disabled title="The AI director that makes a whole film comes in the next phase" onClick={() => studio.setMessage('The AI director comes in the next phase.')}><Bot className="size-3.5" />Make with AI</button>
       <div className="relative"><button type="button" className={button} disabled={off} aria-expanded={menu} onClick={() => setMenu(!menu)}><Plus className="size-3.5" />Add<ChevronDown className="size-3" /></button>
         {menu ? <div role="menu" className="absolute right-0 top-full z-40 mt-1 w-44 rounded-lg border border-ink/10 bg-surface p-1 shadow-xl">
           <button role="menuitem" type="button" className="flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-xs hover:bg-ink/10" onClick={() => { setMenu(false); const r = studio.run('scene.add', { name: `Scene ${(project.scenes?.length ?? 0) + 1}` }); if (!r.ok) studio.setMessage(r.reason); }}><Clapperboard className="size-3.5" />Scene</button>

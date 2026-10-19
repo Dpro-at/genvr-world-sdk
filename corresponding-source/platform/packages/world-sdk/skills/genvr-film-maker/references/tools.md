@@ -66,6 +66,20 @@ AI suggestions (the owner asks in the shot panel: read `film.requests` with `ins
 - Voice takes of a person (`film.takes`, without audio) are recorded, kept and deleted only in the Studio.
 - Camera and lights of a shot: `set_camera` and `lighting` as before; "Camera of this shot" = `media[].camera`.
 
+Series and episodes (`film.episodes`; scenes have `episode` = the episode's place, from 1):
+- `episode.add { title, outline?, cast? }`, `episode.set { episode, ... }`, `episode.remove { episode, confirm }` (its scenes move to episode 1).
+  Read the series story (`film.settings.story`) and the episode outline before writing lines.
+
+AI director (`film.director`) — you direct with the same commands as everything above, and report each step:
+1. The owner starts a run in the Studio (or you `director.start { idea, kind, episodes, minutes, autonomy }`).
+2. `director.claim { agent: '<your name>' }` while it is `waiting_for_agent`.
+3. For every step: `director.step { label, op, state: running|done|failed, note?, step? }` (`op` = the command or kind you used,
+   e.g. `cast.add`, `line.write`, `scene.add`, `studio_action · record`). Send `op: 'finish', state: 'done'` at the end.
+4. With autonomy `each` every done step waits for the owner's Approve (with `end` only the finish); the run is `paused`
+   until then — check `film.director.status` before the next step. Approving is owner-only.
+5. `director.pause {}` / `director.pause { resume: true }` / `director.stop {}` work for you too.
+Never publish, share or upload during a run; the owner does that.
+
 Editor commands used often: `clip.trim`, `clip.move`, `clip.split`, `clip.set` (volume), `clip.fade`,
 `clip.remove`, `clip.soundType`, `track.set`, `transition.add/set/remove`.
 

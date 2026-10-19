@@ -4,7 +4,7 @@ import { EditError, findClip, transact, type EditContext } from './edits.js';
 import { History } from './history.js';
 import { languageStatus } from './cast.js';
 import { filmLength } from './invariants.js';
-import { CAST_LIMITS, REVIEW_LIMITS, Suggestion, SuggestionKind, VoiceTake, CastMember, CastVoice, DEFAULT_SCENE_SOUND, DEFAULT_SUBTITLE_STYLE, NamedSpot, SCENE_LIMITS, Scene, SceneSound, ShotLink, FilmSettings, LIMITS, ScriptLine, LanguageTag, Media, SceneCue, SubtitleStyle, TrackKind, filmSettings, type FilmProject } from './model.js';
+import { CAST_LIMITS, DirectorRun, DirectorStep, Episode, REVIEW_LIMITS, Suggestion, SuggestionKind, VoiceTake, CastMember, CastVoice, DEFAULT_SCENE_SOUND, DEFAULT_SUBTITLE_STYLE, NamedSpot, SCENE_LIMITS, Scene, SceneSound, ShotLink, FilmSettings, LIMITS, ScriptLine, LanguageTag, Media, SceneCue, SubtitleStyle, TrackKind, filmSettings, type FilmProject } from './model.js';
 import { BLEND_MODES, EFFECTS, EFFECT_IDS, LOOKS, isEffect, type EffectId } from './effects.js';
 import { EASE_PRESETS } from './animate.js';
 import { SELECTOR_SHAPES, TITLE_PRESET_IDS } from './titles.js';
@@ -76,6 +76,7 @@ export function describe(project: FilmProject) {
     settings: filmSettings(project),
     cast: project.cast ?? [], lines: project.lines ?? [], languageStatus: languageStatus(project),
     scenes: project.scenes ?? [], links: project.links ?? [],
+    episodes: project.episodes ?? [], director: project.director ?? null,
     requests: project.requests ?? [], suggestions: project.suggestions ?? [], takes: (project.takes ?? []).map(({ asset: _asset, ...t }) => t),
     ...(project.ducking ? { ducking: project.ducking } : {}),
     ...(project.range ? { range: { in: s(project.range.in), out: s(project.range.out) } } : {}),
@@ -88,6 +89,9 @@ export function describe(project: FilmProject) {
     draft: project.draft.map((c) => ({ ...c, start: s(c.start), end: s(c.end) })),
   };
 }
+
+/** Characters named by an episode must be in the cast. */
+function checkCast(d: FilmProject, cast: string[]) { for (const c of cast) if (!d.cast?.some((m) => m.id === c)) throw new EditError('Add the character to the cast first.'); }
 
 /** Editing commands a suggestion may carry (FILM-D1): looks, transitions and effects of one shot, nothing else. */
 const SUGGESTION_STEPS = new Set(['transition.add', 'transition.set', 'transition.remove', 'look.apply', 'effect.add', 'effect.set', 'effect.remove', 'property.set', 'property.clear', 'clip.blend']);
@@ -679,6 +683,77 @@ export const COMMANDS: CommandSpec[] = [
       d.takes = d.takes!.filter((t) => t.id !== a.take);
       for (const cue of d.draft) if (cue.audio === take.asset) delete cue.audio; },
   },
+  // Episodes (FILM-E1). Scenes carry their episode number (scene.episode = place in this list, from 1).
+  {
+    id: 'episode.add', label: (a: { title?: string }) => `Add episode ${a.title ?? ''}`.trim(), group: 'Project', journal: true,
+    args: Episode.omit({ id: true }).partial({ outline: true, cast: true }).strict(),
+    enabled: (st) => (st.project.episodes?.length ?? 0) >= 200 ? 'A series has at most 200 episodes.' : null,
+    run: (d, a, x) => { const ep = Episode.parse({ outline: '', cast: [], ...a, id: x.id() }); checkCast(d, ep.cast); d.episodes = [...(d.episodes ?? []), ep]; return ep.id; },
+  },
+  {
+    id: 'episode.set', label: 'Episode settings', group: 'Project', journal: true,
+    args: Episode.omit({ id: true }).partial().extend({ episode: clipId }).strict(),
+    run: (d, a) => { const { episode, ...patch } = a, ep = d.episodes?.find((e) => e.id === episode); if (!ep) throw new EditError('Episode not found.');
+      const next = Episode.parse({ ...ep, ...patch }); checkCast(d, next.cast); Object.assign(ep, next); },
+  },
+  {
+    id: 'episode.remove', label: 'Delete episode', group: 'Project', journal: true,
+    args: z.object({ episode: clipId, confirm: z.boolean().default(false) }).strict(),
+    enabled: (st, a) => { const at = st.project.episodes?.findIndex((e) => e.id === a.episode) ?? -1;
+      return at < 0 ? 'Episode not found.' : !a.confirm && st.project.scenes?.some((s) => s.episode === at + 1) ? 'This episode has scenes; send confirm: true (its scenes move to episode 1).' : null; },
+    run: (d, a) => { const at = d.episodes!.findIndex((e) => e.id === a.episode) + 1;
+      d.episodes = d.episodes!.filter((e) => e.id !== a.episode);
+      for (const s of d.scenes ?? []) s.episode = s.episode === at ? 1 : s.episode > at ? s.episode - 1 : s.episode; },
+  },
+  // AI director (FILM-E3). The owner starts a run in the Studio or an agent starts it through MCP; an agent claims
+  // it and reports its steps. Approving a waiting step is the owner's (host-only); pause and stop are for both.
+  {
+    id: 'director.start', label: 'Start AI director', group: 'Project', journal: true,
+    args: DirectorRun.pick({ idea: true, kind: true, episodes: true, minutes: true, autonomy: true }).strict(),
+    enabled: (st) => st.project.director && ['running', 'waiting_for_agent', 'paused'].includes(st.project.director.status) ? 'A director run is already going; stop it first.' : null,
+    run: (d, a, x) => { d.director = DirectorRun.parse({ ...a, id: x.id(), status: 'waiting_for_agent', steps: [], started: Date.now() }); return d.director.id; },
+  },
+  {
+    id: 'director.claim', label: (a: { agent?: string }) => `${a.agent ?? 'An agent'} directs`, group: 'Project', journal: true,
+    args: z.object({ agent: z.string().min(1).max(80) }).strict(),
+    enabled: (st) => st.project.director?.status === 'waiting_for_agent' ? null : 'No director run is waiting for an agent.',
+    run: (d, a) => { d.director!.by = a.agent; d.director!.status = 'running'; },
+  },
+  {
+    id: 'director.step', label: (a: { label?: string }) => `Director: ${a.label ?? 'step'}`, group: 'Project', journal: true,
+    args: z.object({ label: z.string().min(1).max(120), op: z.string().max(60), state: z.enum(['running', 'done', 'failed']), note: z.string().max(500).optional(), step: clipId.optional() }).strict(),
+    enabled: (st) => st.project.director?.status === 'running' ? null : st.project.director?.status === 'paused' ? 'The director is paused by the owner.' : 'No director run is going.',
+    run: (d, a, x) => {
+      const run = d.director!, last = run.steps.length >= 99;
+      const existing = a.step ? run.steps.find((s) => s.id === a.step) : undefined;
+      // Autonomy: 'each' waits after every finished step; 'end' waits only when the agent says it is the last one (op 'finish').
+      const wait = a.state === 'done' && (run.autonomy === 'each' || (run.autonomy === 'end' && a.op === 'finish'));
+      const state = wait ? 'waiting' as const : a.state;
+      if (existing) Object.assign(existing, DirectorStep.parse({ ...existing, label: a.label, op: a.op, state, ...(a.note ? { note: a.note } : {}) }));
+      else { if (last) throw new EditError('A director run has at most 100 steps.'); run.steps.push(DirectorStep.parse({ id: x.id(), label: a.label, op: a.op, state, ...(a.note ? { note: a.note } : {}) })); }
+      if (wait) run.status = 'paused';
+      if (a.op === 'finish' && !wait && a.state === 'done') run.status = 'done';
+      return existing?.id ?? run.steps.at(-1)!.id;
+    },
+  },
+  {
+    id: 'director.approve', label: 'Approve director step', group: 'Project', journal: true, hostOnly: true,
+    args: z.object({ step: clipId }).strict(),
+    run: (d, a) => { const run = d.director, step = run?.steps.find((s) => s.id === a.step); if (!run || !step || step.state !== 'waiting') throw new EditError('That step is not waiting for you.');
+      step.state = 'done'; run.status = step.op === 'finish' ? 'done' : 'running'; },
+  },
+  {
+    id: 'director.pause', label: (a: { resume?: boolean }) => a.resume ? 'Resume AI director' : 'Pause AI director', group: 'Project', journal: true,
+    args: z.object({ resume: z.boolean().default(false) }).strict(),
+    run: (d, a) => { const run = d.director; if (!run || run.status === 'stopped' || run.status === 'done') throw new EditError('No director run is going.');
+      if (a.resume && run.steps.some((s) => s.state === 'waiting')) throw new EditError('A step waits for the owner\'s approval.');
+      run.status = a.resume ? (run.by ? 'running' : 'waiting_for_agent') : 'paused'; },
+  },
+  {
+    id: 'director.stop', label: 'Stop AI director', group: 'Project', journal: true,
+    args: z.object({}).strict(),
+    run: (d) => { if (!d.director || d.director.status === 'stopped' || d.director.status === 'done') throw new EditError('No director run is going.'); d.director.status = 'stopped'; },
+  },
   {
     // Film settings window (FILM-A2): any part; caption, titles and director merge field by field.
     id: 'project.settings', label: 'Film settings', group: 'Project', journal: true,
@@ -794,6 +869,11 @@ export class FilmSession {
   private author = 'you';
   /** Runs `work` with changes recorded as made by `by` (e.g. 'agent' for MCP). */
   withAuthor<T>(by: string, work: () => T): T { const before = this.author; this.author = by; try { return work(); } finally { this.author = before; } }
+  /**
+   * For async work (an MCP operation with awaits): every change until the returned function runs counts as `by`'s.
+   * Edits the person makes meanwhile also count as `by` — the safe side for an audit trail.
+   */
+  beginAuthor(by: string): () => void { const before = this.author; this.author = by; return () => { this.author = before; }; }
   run(id: string, rawArgs: unknown = {}): RunResult {
     try {
       const { state, result, label } = this.apply(this.state, id, rawArgs);

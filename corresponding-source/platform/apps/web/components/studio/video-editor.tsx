@@ -25,7 +25,8 @@ import { LiveTakePanel } from './film/live-take-panel';
 import { CastInspector } from './film/cast-panel';
 import { useCastSelection } from './film/cast-selection';
 import { SceneInspector } from './film/scenes-panel';
-import { sceneSelection, useChosenCue, useChosenLink, useSceneSelection, useWorkflowOpen, useWorkflowShot } from '../../lib/video-studio/scene-selection';
+import { EpisodePanel } from './film/series-director';
+import { sceneSelection, useChosenEpisode, useChosenCue, useChosenLink, useSceneSelection, useWorkflowOpen, useWorkflowShot } from '../../lib/video-studio/scene-selection';
 import { LinePanel } from './film/line-panel';
 import { LinkPanel } from './film/link-panel';
 import { SoundClipPanel } from './film/sound-clip-panel';
@@ -455,7 +456,8 @@ export function VideoSceneInspector({ filming }: { filming: StudioFilming }) {
   const workspace = filming.studio.workspace;
   const [settings, setSettings] = useState(false);
   const chosenCast = useCastSelection(), castOpen = Boolean(chosenCast && filming.studio.project.cast?.some((c) => c.id === chosenCast));
-  const chosenScene = useSceneSelection(), sceneOpen = !castOpen && Boolean(chosenScene && filming.studio.project.scenes?.some((x) => x.id === chosenScene));
+  const chosenEpisode = useChosenEpisode(), episodeOpen = !castOpen && Boolean(chosenEpisode && filming.studio.project.episodes?.some((e) => e.id === chosenEpisode));
+  const chosenScene = useSceneSelection(), sceneOpen = !castOpen && !episodeOpen && Boolean(chosenScene && filming.studio.project.scenes?.some((x) => x.id === chosenScene));
   const flowShot = useWorkflowShot(), flowOpen = useWorkflowOpen() && !castOpen && !sceneOpen && Boolean(flowShot && filming.studio.project.media.some((m) => m.id === flowShot));
   const shotChosen = filming.studio.project.tracks.some((t) => t.kind === 'picture' && t.clips.some((c) => c.id === filming.studio.selected && c.type === 'media'));
   // Clicking a clip on the timeline replaces a chosen cue or link on the right.
@@ -465,8 +467,8 @@ export function VideoSceneInspector({ filming }: { filming: StudioFilming }) {
   const chosenLink = useChosenLink(), linkOpen = !castOpen && !sceneOpen && Boolean(chosenLink && filming.studio.project.links?.some((l) => l.id === chosenLink));
   const chosenCue = useChosenCue(), cueOpen = !castOpen && !sceneOpen && !linkOpen && Boolean(chosenCue);
   const soundClip = filming.studio.project.tracks.find((t) => t.kind === 'sound' && t.clips.some((c) => c.id === filming.studio.selected)) ? filming.studio.selected : null;
-  const head = castOpen ? { title: 'Character', icon: Users } : linkOpen ? { title: 'Link', icon: ArrowLeftRight } : cueOpen ? { title: 'Line', icon: Mic } : soundClip && !sceneOpen && !flowOpen ? { title: 'Sound', icon: Volume2 } : sceneOpen ? { title: 'Scene sheet', icon: Clapperboard } : flowOpen ? { title: 'Shot', icon: Camera } : INSPECTOR_TITLE[workspace] ?? INSPECTOR_TITLE.shoot!, HeadIcon = head.icon;
-  const body = castOpen ? <CastInspector filming={filming} /> : sceneOpen ? <SceneInspector filming={filming} />
+  const head = castOpen ? { title: 'Character', icon: Users } : episodeOpen ? { title: 'Episode', icon: Film } : linkOpen ? { title: 'Link', icon: ArrowLeftRight } : cueOpen ? { title: 'Line', icon: Mic } : soundClip && !sceneOpen && !flowOpen ? { title: 'Sound', icon: Volume2 } : sceneOpen ? { title: 'Scene sheet', icon: Clapperboard } : flowOpen ? { title: 'Shot', icon: Camera } : INSPECTOR_TITLE[workspace] ?? INSPECTOR_TITLE.shoot!, HeadIcon = head.icon;
+  const body = castOpen ? <CastInspector filming={filming} /> : episodeOpen ? <EpisodePanel filming={filming} /> : sceneOpen ? <SceneInspector filming={filming} />
     : linkOpen ? <LinkPanel filming={filming} linkId={chosenLink!} onClose={() => sceneSelection.setLink(null)} />
     : cueOpen ? <LinePanel filming={filming} cueId={chosenCue!.id} {...(chosenCue!.media ? { shotMedia: chosenCue!.media } : {})} onClose={() => sceneSelection.setCue(null)} />
     : flowOpen ? <WorkflowShotInspector filming={filming} />

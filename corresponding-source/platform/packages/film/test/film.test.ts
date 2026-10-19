@@ -576,3 +576,32 @@ describe('owner decisions on suggestions and takes are protected from agent hist
     expect(ownerStateChanged(session.project, session.historyTarget('edit.undo')!)).toBe(true);
   });
 });
+
+describe('episodes and the AI director (FILM-E1/E3)', () => {
+  it('episodes hold scenes by number; deleting one moves its scenes to episode 1', () => {
+    const session = new FilmSession(emptyFilm(), counter());
+    const e1 = (session.run('episode.add', { title: 'Arrival' }) as { ok: true; result: string }).result;
+    const e2 = (session.run('episode.add', { title: 'The storm', outline: 'Rain comes' }) as { ok: true; result: string }).result;
+    expect(session.run('episode.set', { episode: e1, cast: ['nobody'] })).toMatchObject({ ok: false });
+    ok(session.run('scene.add', { name: 'Hut', episode: 2 }));
+    expect(session.run('episode.remove', { episode: e2 })).toMatchObject({ ok: false });
+    ok(session.run('episode.remove', { episode: e2, confirm: true }));
+    expect(session.project.scenes![0]!.episode).toBe(1);
+  });
+  it('a run waits for an agent, records its steps, pauses for the owner with autonomy each, and never runs twice', () => {
+    const session = new FilmSession(emptyFilm(), counter());
+    ok(session.run('director.start', { idea: 'Three friends on an island', kind: 'series', episodes: 3, minutes: 2, autonomy: 'each' }));
+    expect(session.run('director.start', { idea: 'again', kind: 'film', episodes: 1, minutes: 1, autonomy: 'auto' })).toMatchObject({ ok: false });
+    expect(session.run('director.step', { label: 'Story', op: 'project.settings', state: 'done' })).toMatchObject({ ok: false });
+    ok(session.run('director.claim', { agent: 'Dpro · Main agent' }));
+    const step = (session.run('director.step', { label: 'Write the story', op: 'project.settings', state: 'done' }) as { ok: true; result: string }).result;
+    expect(session.project.director).toMatchObject({ status: 'paused', by: 'Dpro · Main agent' });
+    expect(session.run('director.step', { label: 'Cast', op: 'cast.add', state: 'running' })).toMatchObject({ ok: false });
+    expect(session.run('director.pause', { resume: true })).toMatchObject({ ok: false });
+    expect(isHostOnly('director.approve')).toBe(true);
+    ok(session.run('director.approve', { step }));
+    expect(session.project.director!.status).toBe('running');
+    ok(session.run('director.stop'));
+    expect(session.project.director!.status).toBe('stopped');
+  });
+});

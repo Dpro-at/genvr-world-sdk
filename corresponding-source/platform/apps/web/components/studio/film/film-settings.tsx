@@ -7,6 +7,7 @@ import { filmSettings, languageStatus, type FilmSettings as Settings } from '@ge
 import type { StudioFilming } from '../../../lib/use-studio-filming';
 import { SUBTITLE_LANGUAGES } from '../../../lib/video-studio/subtitles';
 import { DragNumber } from './drag-number';
+import { DirectorWindow } from './series-director';
 
 const button = 'inline-flex items-center justify-center gap-1.5 rounded-md border border-ink/10 bg-paper px-2.5 py-1.5 text-xs font-semibold hover:bg-ink/10 disabled:opacity-35';
 const input = 'mt-1 w-full rounded-md border border-ink/10 bg-paper px-2 py-1.5 text-xs';
@@ -15,7 +16,7 @@ const SIZES = [['1920x1080', 'Full HD', '1920×1080'], ['1280x720', 'HD', '1280�
 type SectionKey = 'film' | 'languages' | 'story' | 'director' | 'video' | 'sound' | 'caption' | 'titles';
 const SECTIONS: Array<{ key: SectionKey; label: string; icon: typeof Film; soon?: boolean }> = [
   { key: 'film', label: 'Film or series', icon: Clapperboard }, { key: 'languages', label: 'Languages', icon: Languages },
-  { key: 'story', label: 'Story', icon: BookOpen }, { key: 'director', label: 'AI director', icon: Bot, soon: true },
+  { key: 'story', label: 'Story', icon: BookOpen }, { key: 'director', label: 'AI director', icon: Bot },
   { key: 'video', label: 'Video', icon: Film }, { key: 'sound', label: 'Sound', icon: Volume2 },
   { key: 'caption', label: 'Caption look', icon: Captions }, { key: 'titles', label: 'Titles & credits', icon: Type, soon: true },
 ];
@@ -57,7 +58,7 @@ function summary(key: SectionKey, s: Settings, size: string) {
  */
 export function FilmSettings({ filming, close }: { filming: StudioFilming; close: () => void }) {
   const dialog = useRef<HTMLDialogElement>(null), studio = filming.studio, disabled = filming.busy || studio.rendering;
-  const [open, setOpen] = useState<SectionKey>('languages'), [find, setFind] = useState('');
+  const [open, setOpen] = useState<SectionKey>('languages'), [find, setFind] = useState(''), [director, setDirector] = useState(false);
   const [error, setError] = useState(''), [making, setMaking] = useState(false), [how, setHow] = useState<'ai' | 'hand'>('ai');
   useEffect(() => { dialog.current?.showModal(); }, []);
   const s = filmSettings(studio.project);
@@ -125,7 +126,8 @@ export function FilmSettings({ filming, close }: { filming: StudioFilming; close
     story: <label className="block text-xs text-ink/60"><span className="flex items-center gap-1.5">Story of the {s.kind}<Help text="Agents read this story before they write any line." /></span>
       <textarea aria-label="Story" rows={8} maxLength={4000} className={input} value={s.story} disabled={disabled} onChange={(e) => set({ story: e.target.value })} /></label>,
     director: <div className="space-y-3 text-xs">
-      <p className="rounded-md bg-ink/5 p-2 text-ink/70">The AI director comes in a later step. You can already choose how much it may decide alone; agents read this through MCP.</p>
+      <div className="flex items-center gap-2 rounded-md border border-ink/10 p-2"><Bot className="size-3.5" /><span className="flex-1">{studio.project.director ? <>Run: <b>{studio.project.director.status.replace(/_/g, ' ')}</b>{studio.project.director.by ? ` · directed by ${studio.project.director.by} via MCP` : ''}</> : 'No run yet'}</span>
+        <button type="button" className={button} onClick={() => setDirector(true)}>Open AI director</button></div>
       <Segment label="Decides alone" value={s.director.autonomy} disabled={disabled} options={[['auto', 'Fully automatic'], ['end', 'Check at the end'], ['each', 'Each step']]} onChange={(autonomy) => set({ director: { autonomy } })} />
       <p className="flex items-center gap-1.5 text-ink/60"><Lock className="size-3.5" />Never publishes or shares alone.</p>
     </div>,
@@ -189,5 +191,6 @@ export function FilmSettings({ filming, close }: { filming: StudioFilming; close
       <div className="flex items-center justify-between border-t border-ink/10 px-4 py-3"><span className="flex items-center gap-1.5 text-xs text-ink/60"><span className="size-2 rounded-full bg-green-500" />Saved as you change · Undo works</span>
         <button className={button} onClick={() => dialog.current?.close()}>Done</button></div>
     </div>
+    {director ? <DirectorWindow filming={filming} close={() => setDirector(false)} /> : null}
   </dialog>, document.body);
 }

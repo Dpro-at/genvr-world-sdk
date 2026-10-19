@@ -646,8 +646,10 @@ export function useStudioFilming(place: string, runtime: RefObject<GenvrRuntime 
     if(operation.kind==='manual_record'){if(operation.action==='start')startManual(operation.seconds);else endManual();return new Blob([JSON.stringify({result:{state:operation.action==='start'?'starting':'finishing'}})],{type:'application/json'});}
     if (localBusy.current || remoteBusy.current || latestStudio.current.isRendering()) throw new Error('Wait for the current capture or render.');
     remoteBusy.current = true; setBusy(true);
+    // Every change during an MCP operation — also through the studio helpers (setPlan, addSound, addVoice) — is the agent's in History.
+    const endAuthor = latestStudio.current.film.beginAuthor('agent');
     try { return await handleStudio(operation, signal); }
-    finally { remoteBusy.current = false; setBusy(localBusy.current); }
+    finally { endAuthor(); remoteBusy.current = false; setBusy(localBusy.current); }
   };
   const capturePhoto = async (raw: unknown, signal: AbortSignal) => {
     const canvas = container.current?.querySelector('canvas'); if (!canvas) throw new Error('World canvas unavailable.');

@@ -2,11 +2,12 @@
 
 import { useEffect, useRef, useState, useSyncExternalStore, type KeyboardEvent } from 'react';
 import { ArrowDown, ArrowRight, ArrowUp, Camera, Clapperboard, Copy, Info, MapPin, MoreHorizontal, Plus, TextCursorInput, Trash2, Users, Volume2, Workflow, X } from 'lucide-react';
-import { toSeconds, type FilmProject, type Scene } from '@genvr/film';
+import { filmSettings, toSeconds, type FilmProject, type Scene } from '@genvr/film';
 import type { StudioFilming } from '../../../lib/use-studio-filming';
 import { sceneSelection, useSceneSelection, useWorkflowOpen } from '../../../lib/video-studio/scene-selection';
 import { atPointer, belowButton, copyName, lineMenuItems, openCharacter, type OpenMenu } from './cast-panel';
 import { DragNumber } from './drag-number';
+import { EpisodesList } from './series-director';
 import { castSelection } from './cast-selection';
 import { ContextMenu, type MenuItem } from './context-menu';
 
@@ -94,6 +95,7 @@ export function ScenesList({ filming }: { filming: StudioFilming }) {
       {([[false, 'Timeline', Clapperboard], [true, 'Workflow', Workflow]] as const).map(([value, label, Icon]) => <button key={label} type="button" role="radio" aria-checked={workflow === value}
         onClick={() => sceneSelection.setWorkflow(value)} className={`flex flex-1 items-center justify-center gap-1.5 rounded py-1 text-xs font-bold ${workflow === value ? 'bg-ink text-paper' : 'hover:bg-ink/10'}`}><Icon className="size-3.5" />{label}</button>)}
     </div></div>
+    {filmSettings(project).kind === 'series' ? <EpisodesList filming={filming} /> : null}
     <section aria-label="Scenes" className="px-2 pb-2">
       <div className="flex items-center gap-1 px-1 pb-1"><span className="flex-1 text-xs font-bold uppercase tracking-wide text-ink/60">Scenes · {scenes.length} <span className="ml-1 rounded-full bg-cyan-700 px-1.5 text-[9px] text-cyan-50">New</span></span>
         <button type="button" className={icon} aria-label="Add a scene" title="Add a scene" disabled={off} onClick={() => setOpen(!open)}><Plus className="size-4" /></button>
@@ -154,6 +156,8 @@ export function SceneInspector({ filming }: { filming: StudioFilming }) {
         <label className="text-xs text-ink/60">Place<input aria-label="Scene place" className={input} maxLength={120} defaultValue={scene.place} key={scene.id + 'pl'} onBlur={(e) => { if (e.target.value !== scene.place) set({ place: e.target.value }); }} /></label>
         <label className="text-xs text-ink/60">When<input aria-label="Scene time" className={input} maxLength={60} placeholder="night · light rain" defaultValue={scene.when} key={scene.id + 'wh'} onBlur={(e) => { if (e.target.value !== scene.when) set({ when: e.target.value }); }} /></label>
       </div>
+      {filmSettings(project).kind === 'series' ? <div className="flex items-center gap-2 text-xs text-ink/60"><DragNumber label="Episode" value={scene.episode} min={1} max={Math.max(1, project.episodes?.length ?? 1)} step={1} width="w-28" disabled={off} commit={(episode) => set({ episode })} />
+        <span>{project.episodes?.[scene.episode - 1]?.title ?? ''}</span></div> : null}
       <label className="block text-xs text-ink/60"><span className="flex items-center gap-1.5">Director's instructions<Help text="Agents read these before they write lines or set moves for this scene." /></span>
         <textarea aria-label="Director's instructions" rows={2} maxLength={2000} className={input} defaultValue={scene.instructions} key={scene.id + 'in'} onBlur={(e) => { if (e.target.value !== scene.instructions) set({ instructions: e.target.value }); }} /></label>
     </div>

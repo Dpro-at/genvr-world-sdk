@@ -248,6 +248,27 @@ export const VoiceTake = z.object({ id, line: id, lang: LanguageTag, asset: id, 
 export type VoiceTake = z.infer<typeof VoiceTake>;
 export const REVIEW_LIMITS = { requests: 100, suggestions: 200, takes: 300 } as const;
 
+/** An episode of a series (FILM-E1, board 12): its number is its place in the list; scenes say which episode they are in. */
+export const Episode = z.object({ id, title: z.string().min(1).max(80), outline: z.string().max(4000),
+  /** Characters in this episode (empty = everyone in the cast). */
+  cast: z.array(id).max(40) }).strict();
+export type Episode = z.infer<typeof Episode>;
+/**
+ * A run of the AI director (FILM-E3, boards 10 and 11c). An agent connected through MCP does the work with the
+ * same commands as everyone; it reports each step here. With autonomy 'each' (or 'end' for the last step) a step
+ * waits for the owner, who alone approves it. The director never publishes or shares.
+ */
+export const DirectorStep = z.object({ id, label: z.string().min(1).max(120), op: z.string().max(60),
+  state: z.enum(['todo', 'running', 'waiting', 'done', 'failed']), note: z.string().max(500).optional() }).strict();
+export const DirectorRun = z.object({
+  id, idea: z.string().min(1).max(2000), kind: z.enum(['film', 'series']),
+  episodes: z.number().int().min(1).max(50), minutes: z.number().int().min(1).max(60),
+  autonomy: z.enum(['auto', 'end', 'each']),
+  status: z.enum(['waiting_for_agent', 'running', 'paused', 'stopped', 'done']),
+  by: z.string().max(80).optional(), steps: z.array(DirectorStep).max(100), started: z.number().int().min(0),
+}).strict();
+export type DirectorRun = z.infer<typeof DirectorRun>;
+
 export const FilmProject = z.object({
   version: z.literal(2),
   rate: z.object({ num: z.number().int().positive(), den: z.number().int().positive() }).strict(),
@@ -277,6 +298,9 @@ export const FilmProject = z.object({
   requests: z.array(SuggestionRequest).max(REVIEW_LIMITS.requests).optional(),
   suggestions: z.array(Suggestion).max(REVIEW_LIMITS.suggestions).optional(),
   takes: z.array(VoiceTake).max(REVIEW_LIMITS.takes).optional(),
+  /** Episodes of a series (FILM-E1) and the AI director's run (FILM-E3). */
+  episodes: z.array(Episode).max(200).optional(),
+  director: DirectorRun.optional(),
 }).strict();
 export type FilmProject = z.infer<typeof FilmProject>;
 
