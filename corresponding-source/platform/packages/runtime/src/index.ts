@@ -127,3 +127,5 @@ export { registerAvatarMotionLibrary, avatarMotionEntry as findAvatarMotion, ava
 export { MOTION_CATEGORIES, motionCategories, type MotionCategory } from './avatar-motion-categories.js';
 /** The wall looks the Wall tool offers (BUILD-B6), the same textures as the draw_wall material names. */
 export { WALL_SURFACES, type WallSurface } from '@genvr/world';
+
+export * from './lab/index.js';
