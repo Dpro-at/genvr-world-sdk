@@ -17,6 +17,8 @@ import { ColourPanel } from './film/colour-panel';
 import { FilmSettings } from './film/film-settings';
 import { record } from './film/record';
 import { AddMenu, ExportMenu } from './film/add-menu';
+import { CastInspector } from './film/cast-panel';
+import { useCastSelection } from './film/cast-selection';
 import { useStudioHost } from '../../lib/studio-host';
 import { SceneVoice } from './film/scene-voice';
 import { ClipFace, KIND, Meters, Ruler, SoundCrossfade, TL, Toggle, TrackHeader, ZoomBar, clipBox } from './film/timeline-parts';
@@ -441,8 +443,10 @@ const INSPECTOR_TITLE: Record<string, { title: string; icon: typeof Film }> = {
 export function VideoSceneInspector({ filming }: { filming: StudioFilming }) {
   const workspace = filming.studio.workspace;
   const [settings, setSettings] = useState(false);
-  const head = INSPECTOR_TITLE[workspace] ?? INSPECTOR_TITLE.shoot!, HeadIcon = head.icon;
-  const body = workspace === 'captions' ? <CaptionsPanel filming={filming} />
+  const chosenCast = useCastSelection(), castOpen = Boolean(chosenCast && filming.studio.project.cast?.some((c) => c.id === chosenCast));
+  const head = castOpen ? { title: 'Character', icon: Users } : INSPECTOR_TITLE[workspace] ?? INSPECTOR_TITLE.shoot!, HeadIcon = head.icon;
+  const body = castOpen ? <CastInspector filming={filming} />
+    : workspace === 'captions' ? <CaptionsPanel filming={filming} />
     : workspace === 'transitions' ? <TransitionsWorkspace filming={filming} />
     : workspace === 'sound' ? <SoundPanel filming={filming} />
     : workspace === 'colour' ? <ColourPanel filming={filming} />

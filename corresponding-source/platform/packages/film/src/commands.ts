@@ -2,8 +2,9 @@ import { z } from 'zod';
 import * as edit from './edits.js';
 import { EditError, findClip, transact, type EditContext } from './edits.js';
 import { History } from './history.js';
+import { languageStatus } from './cast.js';
 import { filmLength } from './invariants.js';
-import { DEFAULT_SUBTITLE_STYLE, FilmSettings, LIMITS, LanguageTag, Media, SceneCue, SubtitleStyle, TrackKind, filmSettings, type FilmProject } from './model.js';
+import { CAST_LIMITS, CastMember, CastVoice, DEFAULT_SUBTITLE_STYLE, FilmSettings, LIMITS, ScriptLine, LanguageTag, Media, SceneCue, SubtitleStyle, TrackKind, filmSettings, type FilmProject } from './model.js';
 import { BLEND_MODES, EFFECTS, EFFECT_IDS, LOOKS, isEffect, type EffectId } from './effects.js';
 import { EASE_PRESETS } from './animate.js';
 import { SELECTOR_SHAPES, TITLE_PRESET_IDS } from './titles.js';
@@ -73,6 +74,7 @@ export function describe(project: FilmProject) {
     shownLanguage: project.tracks.find((t) => t.kind === 'caption' && t.lang && !t.hidden)?.lang ?? null,
     subtitleStyle: { ...DEFAULT_SUBTITLE_STYLE, ...project.subtitleStyle },
     settings: filmSettings(project),
+    cast: project.cast ?? [], lines: project.lines ?? [], languageStatus: languageStatus(project),
     ...(project.ducking ? { ducking: project.ducking } : {}),
     ...(project.range ? { range: { in: s(project.range.in), out: s(project.range.out) } } : {}),
     ...(project.looks ? { looks: Object.keys(project.looks) } : {}),
@@ -422,6 +424,95 @@ export const COMMANDS: CommandSpec[] = [
     run: (d, a) => edit.setMarker(d, { marker: a.marker, ...(a.at !== undefined ? { at: at(d, a.at) } : {}), ...(a.label !== undefined ? { label: a.label } : {}), ...(a.color ? { color: a.color } : {}) }),
   },
   { id: 'marker.remove', label: 'Remove marker', group: 'Marker', journal: true, args: z.object({ marker: clipId }).strict(), run: (d, a) => edit.removeMarker(d, a.marker) },
+  // Cast and script (FILM-B1/B2). Agents add and change characters and write lines; only the owner approves a
+  // line (line.approve is host-only, so MCP refuses it), and an agent's change sends a line back to draft.
+  {
+    id: 'cast.add', label: (a: { name?: string }) => `Add ${a.name ?? 'character'}`, group: 'Project', journal: true,
+    args: CastMember.omit({ id: true }).partial({ voices: true, linesBy: true, role: true, personality: true, arc: true }).strict(),
+    enabled: (st) => (st.project.cast?.length ?? 0) >= CAST_LIMITS.cast ? `A film has at most ${CAST_LIMITS.cast} characters.` : null,
+    run: (d, a, x) => {
+      const member = CastMember.parse({ voices: {}, linesBy: { kind: 'owner' }, role: 'support', personality: '', arc: '', ...a, id: x.id() });
+      if (d.cast?.some((c) => c.name.toLowerCase() === member.name.toLowerCase())) throw new EditError(`There is already a character called ${member.name}.`);
+      d.cast = [...(d.cast ?? []), member]; return member.id;
+    },
+  },
+  {
+    id: 'cast.set', label: (a: { name?: string }) => a.name ? `Rename to ${a.name}` : 'Character settings', group: 'Project', journal: true,
+    args: CastMember.omit({ id: true, voices: true }).partial().extend({ cast: clipId }).strict(),
+    run: (d, a) => {
+      const { cast, ...patch } = a, member = d.cast?.find((c) => c.id === cast);
+      if (!member) throw new EditError('Character not found.');
+      if (patch.name && d.cast!.some((c) => c.id !== cast && c.name.toLowerCase() === patch.name!.toLowerCase())) throw new EditError(`There is already a character called ${patch.name}.`);
+      Object.assign(member, CastMember.parse({ ...member, ...patch }));
+    },
+  },
+  {
+    id: 'cast.voice', label: (a: { lang?: string }) => `Voice ${a.lang?.toUpperCase() ?? ''}`, group: 'Project', journal: true,
+    args: z.object({ cast: clipId, lang: LanguageTag, voice: CastVoice.nullable() }).strict(),
+    run: (d, a) => {
+      const member = d.cast?.find((c) => c.id === a.cast);
+      if (!member) throw new EditError('Character not found.');
+      if (a.voice) member.voices[a.lang] = a.voice; else delete member.voices[a.lang];
+    },
+  },
+  {
+    id: 'cast.remove', label: 'Remove character', group: 'Project', journal: true,
+    // Removing a character with lines needs confirm: true (the UI asks first); its lines go too.
+    args: z.object({ cast: clipId, confirm: z.boolean().default(false) }).strict(),
+    enabled: (st, a) => !st.project.cast?.some((c) => c.id === a.cast) ? 'Character not found.'
+      : !a.confirm && st.project.lines?.some((l) => l.cast === a.cast) ? 'This character has lines; send confirm: true to remove it and its lines.' : null,
+    run: (d, a) => { d.cast = d.cast!.filter((c) => c.id !== a.cast); d.lines = (d.lines ?? []).filter((l) => l.cast !== a.cast); },
+  },
+  {
+    id: 'line.write', label: 'Write line', group: 'Caption', journal: true,
+    args: z.object({ cast: clipId, text: z.record(LanguageTag, z.string().max(500)), episode: z.number().int().min(1).max(200).default(1), by: z.enum(['owner', 'agent']).default('owner') }).strict(),
+    enabled: (st, a) => !st.project.cast?.some((c) => c.id === a.cast) ? 'Character not found.'
+      : (st.project.lines?.length ?? 0) >= CAST_LIMITS.lines ? `A film has at most ${CAST_LIMITS.lines} lines.` : null,
+    run: (d, a, x) => {
+      const member = d.cast!.find((c) => c.id === a.cast)!;
+      if (a.by === 'agent' && member.linesBy.kind !== 'agent') throw new EditError(`${member.name}'s lines are written by the owner.`);
+      const line = ScriptLine.parse({ id: x.id(), cast: a.cast, episode: a.episode, text: a.text, status: 'draft', by: a.by });
+      d.lines = [...(d.lines ?? []), line]; return line.id;
+    },
+  },
+  {
+    id: 'line.set', label: 'Change line', group: 'Caption', journal: true,
+    args: z.object({ line: clipId, text: z.record(LanguageTag, z.string().max(500)).optional(), episode: z.number().int().min(1).max(200).optional(), by: z.enum(['owner', 'agent']).default('owner') }).strict(),
+    run: (d, a) => {
+      const line = d.lines?.find((l) => l.id === a.line);
+      if (!line) throw new EditError('Line not found.');
+      const member = d.cast?.find((c) => c.id === line.cast);
+      if (a.by === 'agent' && member?.linesBy.kind !== 'agent') throw new EditError(`${member?.name ?? 'This character'}'s lines are written by the owner.`);
+      if (a.text) line.text = { ...line.text, ...a.text };
+      if (a.episode) line.episode = a.episode;
+      // An agent's change needs the owner's approval again; the owner's own edit keeps the status.
+      if (a.by === 'agent') { line.status = 'draft'; line.by = 'agent'; }
+    },
+  },
+  {
+    id: 'line.approve', label: (a: { approved?: boolean }) => a.approved === false ? 'Back to draft' : 'Approve line', group: 'Caption', journal: true, hostOnly: true,
+    args: z.object({ line: clipId, approved: z.boolean().default(true) }).strict(),
+    run: (d, a) => { const line = d.lines?.find((l) => l.id === a.line); if (!line) throw new EditError('Line not found.'); line.status = a.approved ? 'approved' : 'draft'; },
+  },
+  {
+    id: 'line.remove', label: 'Delete line', group: 'Caption', journal: true,
+    args: z.object({ line: clipId }).strict(),
+    run: (d, a) => { if (!d.lines?.some((l) => l.id === a.line)) throw new EditError('Line not found.'); d.lines = d.lines.filter((l) => l.id !== a.line); },
+  },
+  {
+    // An approved line becomes a draft cue of the next take: its character's actor says it in `lang`.
+    id: 'line.place', label: 'Use line in the next take', group: 'Caption', journal: true,
+    args: z.object({ line: clipId, lang: LanguageTag, start: seconds.default(0), seconds: z.number().finite().min(0.5).max(30).default(3) }).strict(),
+    enabled: (st, a) => { const line = st.project.lines?.find((l) => l.id === a.line);
+      return !line ? 'Line not found.' : line.status !== 'approved' ? 'Approve the line first.' : !line.text[a.lang]?.trim() ? `The line has no words in ${a.lang.toUpperCase()}.`
+        : st.project.draft.length >= LIMITS.cues ? `A take has at most ${LIMITS.cues} cues.` : null; },
+    run: (d, a, x) => {
+      const line = d.lines!.find((l) => l.id === a.line)!, member = d.cast?.find((c) => c.id === line.cast);
+      if (!member) throw new EditError('Character not found.');
+      const cue = { id: x.id(), actor: member.actor, label: member.name, action: 'none', start: at(d, a.start), end: at(d, a.start + a.seconds), text: line.text[a.lang]!, volume: 1 };
+      d.draft = [...d.draft, SceneCue.parse(cue)]; line.cue = cue.id; return cue.id;
+    },
+  },
   {
     // Film settings window (FILM-A2): any part; caption, titles and director merge field by field.
     id: 'project.settings', label: 'Film settings', group: 'Project', journal: true,

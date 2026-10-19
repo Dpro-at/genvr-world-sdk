@@ -15,3 +15,4 @@ export * from './sound.js';
 export * from './scene-fx.js';
 export * from './subtitles.js';
 export * from './export.js';
+export * from './cast.js';

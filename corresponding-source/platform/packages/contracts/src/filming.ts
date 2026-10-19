@@ -113,6 +113,12 @@ export const FilmStudioOperation = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('export'), shot_id: studioId.optional(), range: z.enum(['film', 'marked']).optional(),
     width: z.number().int().min(320).max(3840).default(1280), height: z.number().int().min(240).max(2160).default(720),
     language: z.string().regex(/^[a-z]{2,3}(-[A-Za-z0-9]{2,8})?$/).optional(), captions: z.enum(['picture', 'none']).default('picture') }).strict(),
+  /**
+   * Languages (FILM-B3): make what Film settings asks for but the film lacks — captions (from the film's voice) and,
+   * for languages set to text + voice, the dubbed voice. `languages` limits it; absent: every language with a gap.
+   */
+  z.object({ kind: z.literal('language'), action: z.literal('make_missing'), what: z.enum(['captions', 'voices', 'both']).default('both'),
+    languages: z.array(z.string().regex(/^[a-z]{2,3}$/)).min(1).max(12).optional() }).strict(),
   z.object({ kind: z.literal('undo') }).strict(), z.object({ kind: z.literal('redo') }).strict(),
 ]);
 export type FilmStudioOperation = z.infer<typeof FilmStudioOperation>;

@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { BookOpen, Bot, Captions, Clapperboard, Film, Info, Languages, Lock, Mic, Search, Settings2, Trash2, Type, Volume2, X } from 'lucide-react';
-import { filmSettings, type FilmSettings as Settings } from '@genvr/film';
+import { filmSettings, languageStatus, type FilmSettings as Settings } from '@genvr/film';
 import type { StudioFilming } from '../../../lib/use-studio-filming';
 import { SUBTITLE_LANGUAGES } from '../../../lib/video-studio/subtitles';
 
@@ -57,12 +57,26 @@ function summary(key: SectionKey, s: Settings, size: string) {
 export function FilmSettings({ filming, close }: { filming: StudioFilming; close: () => void }) {
   const dialog = useRef<HTMLDialogElement>(null), studio = filming.studio, disabled = filming.busy || studio.rendering;
   const [open, setOpen] = useState<SectionKey>('languages'), [find, setFind] = useState('');
-  const [error, setError] = useState('');
+  const [error, setError] = useState(''), [making, setMaking] = useState(false), [how, setHow] = useState<'ai' | 'hand'>('ai');
   useEffect(() => { dialog.current?.showModal(); }, []);
   const s = filmSettings(studio.project);
   const set = (patch: Record<string, unknown>) => {
     const result = studio.run('project.settings', patch);
     setError(result.ok ? '' : result.reason);
+  };
+  const status = languageStatus(studio.project), gaps = status.filter((row) => row.missing.length);
+  const MISSING: Record<string, string> = { captions: 'captions', voice: 'voice', words: 'script words' };
+  /** FILM-B3: the same job agents run through MCP (studio_action kind "language"). */
+  const makeMissing = async () => {
+    if (how === 'hand') { studio.setWorkspace('captions'); dialog.current?.close(); return; }
+    setMaking(true); setError('');
+    try {
+      const blob = await filming.handleStudio({ kind: 'language', action: 'make_missing', what: 'both' }, new AbortController().signal);
+      const reply = JSON.parse(await blob.text()) as { result?: { done: Array<{ lang: string; made: string }>; skipped: Array<{ lang: string; reason: string }> } };
+      const done = reply.result?.done ?? [], skipped = reply.result?.skipped ?? [];
+      setError([done.length ? `Made: ${done.map((d) => `${d.lang.toUpperCase()} ${d.made}`).join(', ')}.` : '', ...skipped.map((x) => `${x.lang.toUpperCase()}: ${x.reason}`)].filter(Boolean).join(' '));
+    } catch (e) { setError(e instanceof Error ? e.message : 'Could not make the missing parts.'); }
+    finally { setMaking(false); }
   };
   const languageCounts = (lang: string) => {
     const captions = studio.project.tracks.find((t) => t.kind === 'caption' && t.lang === lang)?.clips.length ?? 0;
@@ -84,13 +98,20 @@ export function FilmSettings({ filming, close }: { filming: StudioFilming; close
         {s.languages.map((row, i) => { const info = SUBTITLE_LANGUAGES.find((l) => l.code === row.lang), count = languageCounts(row.lang);
           return <div key={row.lang} className="contents">
             <span className="flex items-center gap-2"><b className="rounded bg-ink/10 px-1.5 py-0.5 text-[10px]">{row.lang.toUpperCase()}</b>{info?.label ?? row.lang}{i === 0 ? <span className="text-ink/50">main</span> : null}
-              <span className="text-ink/50" title={`${count.captions} captions${count.voice ? ', voice track' : ''}`}>· {count.captions} <Captions className="inline size-3" />{count.voice ? <Mic className="ml-1 inline size-3" /> : null}</span></span>
+              <span className="text-ink/50" title={`${count.captions} captions${count.voice ? ', voice track' : ''}`}>· {count.captions} <Captions className="inline size-3" />{count.voice ? <Mic className="ml-1 inline size-3" /> : null}</span>
+              {(() => { const gap = status.find((x) => x.lang === row.lang)?.missing ?? []; return <span title={gap.length ? `Missing: ${gap.map((g) => MISSING[g]).join(', ')}` : 'Complete'}
+                className={`inline-block size-1.5 rounded-full ${gap.length ? 'bg-amber-400' : 'bg-green-500'}`} aria-label={gap.length ? `Missing: ${gap.map((g) => MISSING[g]).join(', ')}` : 'Complete'} />; })()}</span>
             <Segment label={`${row.lang} level`} value={row.level} disabled={disabled} options={[['text', 'Text'], ['text_voice', 'Text + voice']]}
               onChange={(level) => set({ languages: s.languages.map((x) => x.lang === row.lang ? { ...x, level } : x) })} />
             <button type="button" className={button} aria-label={`Remove ${info?.label ?? row.lang}`} title="Remove from the film settings (captions and voices stay on the timeline)" disabled={disabled}
               onClick={() => set({ languages: s.languages.filter((x) => x.lang !== row.lang) })}><Trash2 className="size-3.5" /></button>
           </div>; })}
       </div>
+      {gaps.length ? <div className="flex flex-wrap items-center gap-2 rounded-md border border-amber-400/40 p-2 text-xs">
+        <span className="flex-1">{gaps.map((g) => `${g.lang.toUpperCase()}: ${g.missing.map((m) => MISSING[m]).join(', ')}`).join(' · ')}</span>
+        <Segment label="Make them" value={how} disabled={disabled || making} options={[['ai', 'AI'], ['hand', 'By hand']]} onChange={setHow} />
+        <button type="button" className={button} disabled={disabled || making} onClick={() => void makeMissing()}>{making ? 'Making…' : 'Make the missing parts'}</button>
+      </div> : null}
       {!s.languages.length ? <p className="text-xs text-ink/60">Add the languages of this film. The first one is the main language, the one you record in.</p> : null}
       <div className="flex items-center gap-2">
         <select aria-label="Add a language" className={`${input} mt-0 flex-1`} disabled={disabled || !unused.length || s.languages.length >= 12} value=""
@@ -162,7 +183,7 @@ export function FilmSettings({ filming, close }: { filming: StudioFilming; close
         <section aria-label={current.label} className="min-w-0 flex-1 overflow-y-auto p-4">
           <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold"><CurrentIcon className="size-4" />{current.label}</h3>
           {body[open]}
-          {error ? <p role="alert" className="mt-3 text-xs text-red-600">{error}</p> : null}
+          {error ? <p role="status" className="mt-3 text-xs text-ink/70">{error}</p> : null}
         </section>
       </div>
       <div className="flex items-center justify-between border-t border-ink/10 px-4 py-3"><span className="flex items-center gap-1.5 text-xs text-ink/60"><span className="size-2 rounded-full bg-green-500" />Saved as you change · Undo works</span>

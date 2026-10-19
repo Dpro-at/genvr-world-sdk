@@ -393,3 +393,45 @@ describe('export per language (FILM-A3)', () => {
     expect(tracks(forExport(withLanguages()))).toEqual(tracks(withLanguages()));
   });
 });
+
+describe('cast and script (FILM-B1/B2/B3)', () => {
+  const setup = () => {
+    const session = new FilmSession(emptyFilm(), counter());
+    ok(session.run('project.settings', { languages: [{ lang: 'ar', level: 'text_voice' }, { lang: 'en', level: 'text' }] }));
+    const luna = (session.run('cast.add', { name: 'Luna', actor: 'self', linesBy: { kind: 'agent', name: 'Main agent' } }) as { ok: true; result: string }).result;
+    const atlas = (session.run('cast.add', { name: 'Atlas', actor: 'self' }) as { ok: true; result: string }).result;
+    return { session, luna, atlas };
+  };
+  it('adds characters with voices per language and refuses duplicates', () => {
+    const { session, luna } = setup();
+    expect(session.run('cast.add', { name: 'luna', actor: 'self' })).toMatchObject({ ok: false });
+    ok(session.run('cast.voice', { cast: luna, lang: 'ar', voice: { kind: 'person', name: 'Sara K.' } }));
+    ok(session.run('cast.voice', { cast: luna, lang: 'en', voice: { kind: 'ai', voiceId: '6f1c2c1e-0b8a-4a8e-9a43-3c3a3b0a7d11', name: 'Luna EN' } }));
+    ok(session.run('cast.set', { cast: luna, role: 'lead', personality: 'Brave guide' }));
+    expect(session.project.cast![0]).toMatchObject({ name: 'Luna', role: 'lead', voices: { ar: { kind: 'person' }, en: { kind: 'ai' } } });
+  });
+  it('agents write only their own characters; approval is owner only; an agent edit goes back to draft', () => {
+    const { session, luna, atlas } = setup();
+    expect(session.run('line.write', { cast: atlas, text: { ar: 'هنا' }, by: 'agent' })).toMatchObject({ ok: false });
+    const line = (session.run('line.write', { cast: luna, text: { ar: 'أهلاً' }, by: 'agent' }) as { ok: true; result: string }).result;
+    expect(isHostOnly('line.approve')).toBe(true);
+    ok(session.run('line.approve', { line }));
+    expect(session.project.lines![0]!.status).toBe('approved');
+    ok(session.run('line.set', { line, text: { en: 'Welcome' }, by: 'agent' }));
+    expect(session.project.lines![0]).toMatchObject({ status: 'draft', text: { ar: 'أهلاً', en: 'Welcome' } });
+    expect(session.run('line.place', { line, lang: 'en' })).toMatchObject({ ok: false });
+    ok(session.run('line.approve', { line }));
+    ok(session.run('line.place', { line, lang: 'en', seconds: 2 }));
+    expect(session.project.draft[0]).toMatchObject({ actor: 'self', label: 'Luna', text: 'Welcome' });
+  });
+  it('removing a character with lines needs confirm; language status lists what is missing', () => {
+    const { session, luna } = setup();
+    ok(session.run('line.write', { cast: luna, text: { ar: 'أهلاً' } }));
+    expect(session.run('cast.remove', { cast: luna })).toMatchObject({ ok: false });
+    const status = (session.run('project.inspect') as { ok: true; result: { languageStatus: Array<{ lang: string; missing: string[] }> } }).result.languageStatus;
+    expect(status).toEqual([expect.objectContaining({ lang: 'ar', missing: ['captions', 'voice'] }), expect.objectContaining({ lang: 'en', missing: ['words', 'captions'] })]);
+    ok(session.run('cast.remove', { cast: luna, confirm: true }));
+    expect(session.project.lines).toEqual([]);
+    expect(readFilmFile(writeFilmFile(session.project, [])).project.cast?.map((c) => c.name)).toEqual(['Atlas']);
+  });
+});

@@ -33,6 +33,7 @@ Jobs live in the MCP client process that started them: keep one client open for 
 | `sound_import` | `name`, audio MIME, base64 `data` (≤ 8 MB decoded) | imports at the playhead; returns `media` and `clip` |
 | `lighting` | optional `lights[]` | read or replace up to four spotlights |
 | `export` | optional `shot_id` (**clip id**) or `range: 'marked'`, `width` 320–3840, `height` 240–2160, optional `language`, `captions: 'picture' / 'none'` | full film, one shot or the marked In/Out; `language` keeps only that language's captions and voice (call once per language for one file each); WebM ≤ 40 MB |
+| `language` | `action: 'make_missing'`, `what: captions / voices / both`, optional `languages[]` | fills what Film settings asks for: captions from the film's voice, dubbed voice for text + voice languages; returns `done`, `skipped` (with the reason) and `status` |
 | `undo` / `redo` | — | one editor step each |
 
 Film settings (set once for the whole film; read them first with `inspect` → `film.settings`):
@@ -40,6 +41,14 @@ Film settings (set once for the whole film; read them first with `inspect` → `
 (first = main language), story, shotSeconds 1–30, worldSound, roomVoices, caption: { size, place, inExport },
 titles: { intro, episodeCard, credits, creditsText }, director: { autonomy: 'auto'|'end'|'each' } }`. Parts merge; it is one
 undo step. Video size is `project.size`. Titles and the AI director are stored now and used in a later release.
+
+Cast and script (`command`; read `film.cast`, `film.lines`, `film.languageStatus` with `inspect`):
+- `cast.add { name, actor ('self' = my avatar, or a scene actor id), linesBy?: { kind: 'agent', name } | { kind: 'owner' }, role?, personality?, arc? }` → character id.
+- `cast.set { cast, ...same fields }`, `cast.voice { cast, lang, voice: { kind: 'ai', voiceId, name } | { kind: 'person', name } | null }`,
+  `cast.remove { cast, confirm: true }` (confirm is needed when it has lines; its lines go too).
+- `line.write { cast, text: { ar: '…', en: '…' }, episode? }` and `line.set { line, text?, episode? }`: an agent may write **only**
+  for characters whose `linesBy` is an agent; every agent write is a draft. `line.approve` is owner-only (MCP refuses it).
+- `line.place { line, lang, start?, seconds? }`: an **approved** line becomes a draft cue of the next take (then `dialogue_voice`, `record`).
 
 Editor commands used often: `clip.trim`, `clip.move`, `clip.split`, `clip.set` (volume), `clip.fade`,
 `clip.remove`, `clip.soundType`, `track.set`, `transition.add/set/remove`.

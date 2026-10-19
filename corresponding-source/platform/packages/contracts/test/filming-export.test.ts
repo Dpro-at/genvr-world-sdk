@@ -14,3 +14,11 @@ describe('export and live take operations (FILM-A3)', () => {
     expect(() => FilmStudioOperation.parse({ kind: 'manual_record', action: 'start', seconds: 31 })).toThrow();
   });
 });
+
+describe('language operation (FILM-B3)', () => {
+  it('makes missing parts for chosen languages', () => {
+    expect(FilmStudioOperation.parse({ kind: 'language', action: 'make_missing' })).toMatchObject({ what: 'both' });
+    expect(FilmStudioOperation.parse({ kind: 'language', action: 'make_missing', what: 'voices', languages: ['ar'] })).toMatchObject({ languages: ['ar'] });
+    expect(() => FilmStudioOperation.parse({ kind: 'language', action: 'translate' })).toThrow();
+  });
+});

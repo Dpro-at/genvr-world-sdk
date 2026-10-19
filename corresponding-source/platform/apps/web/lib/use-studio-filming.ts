@@ -15,7 +15,7 @@ import { EXPRESSIONS, type AssistantHost } from '@genvr/assistant';
 import { fitCaptureViewport } from './video-studio/capture-viewport';
 import { SceneSpeech } from './video-studio/scene-speech';
 import { CORE_ANIMATIONS } from '@genvr/core-library';
-import { SCENE_ACTOR, SCENE_FX_ACTIONS, describe as describeFilm, filmSettings, forExport, isHostOnly, sceneFxSteps, shakeOffset, subtitleLines, toSeconds, toSrt, toVtt, type FilmProject } from '@genvr/film';
+import { SCENE_ACTOR, SCENE_FX_ACTIONS, describe as describeFilm, filmSettings, forExport, isHostOnly, languageStatus, sceneFxSteps, shakeOffset, subtitleLines, toSeconds, toSrt, toVtt, type FilmProject } from '@genvr/film';
 import { checkTakeLength, cueToSeconds, validateCues, type SceneCue } from './video-studio/model';
 
 /** One rig and frame stream shared by the studio panel and its optional MCP connection. */
@@ -323,6 +323,8 @@ export function useStudioFilming(place: string, runtime: RefObject<GenvrRuntime 
     const result = s.film.batch(steps, { label: 'Scene effects' });
     if (!result.ok) s.setMessage(`The take was added, but its scene effects were not: ${result.failed?.reason ?? 'they could not be placed'}.`);
   };
+  /** Script lines changed through MCP always count as an agent's (FILM-B2): they need the owner's approval again. */
+  const byAgent = (id: string, args: unknown) => id === 'line.write' || id === 'line.set' ? { ...(args as Record<string, unknown>), by: 'agent' } : args;
   /** MCP studio operations: the same command session as the editor's buttons and keys. */
   const handleStudio = async (operation: FilmStudioOperation, signal: AbortSignal): Promise<Blob> => {
     const s = latestStudio.current, current = epoch.current, identity = s.identity;
@@ -427,12 +429,27 @@ export function useStudioFilming(place: string, runtime: RefObject<GenvrRuntime 
       }
       case 'command': {
         if (isHostOnly(operation.id)) throw new Error(`${operation.id} runs only inside the Studio.`);
-        return reply({ result: must(operation.id, operation.args) });
+        return reply({ result: must(operation.id, byAgent(operation.id, operation.args)) });
+      }
+      case 'language': {
+        // FILM-B3: fill the gaps Film settings asks for, with the same subtitle and voice jobs as the Captions panel.
+        const gaps = languageStatus(project).filter((row) => !operation.languages || operation.languages.includes(row.lang));
+        const captions = operation.what === 'voices' ? [] : gaps.filter((row) => row.missing.includes('captions')).map((row) => row.lang);
+        const voices = operation.what === 'captions' ? [] : gaps.filter((row) => row.missing.includes('voice')).map((row) => row.lang);
+        const done: Array<{ lang: string; made: string }> = [], skipped: Array<{ lang: string; reason: string }> = [];
+        if (captions.length) { await handleStudio({ kind: 'subtitles', languages: captions }, signal); fresh(); captions.forEach((lang) => done.push({ lang, made: 'captions' })); }
+        for (const lang of voices) {
+          if (!VOICES[lang]) { skipped.push({ lang, reason: `No free voice for ${lang} yet; give the characters a saved voice and use dialogue_voice.` }); continue; }
+          if (!subtitleLines(latestStudio.current.snapshot().project, lang).length) { skipped.push({ lang, reason: 'Make the captions of this language first.' }); continue; }
+          await handleStudio({ kind: 'voice', language: lang }, signal); fresh(); done.push({ lang, made: 'voice' });
+        }
+        for (const row of gaps) if (row.missing.includes('words')) skipped.push({ lang: row.lang, reason: `${row.lines - row.words} script lines have no words in this language; write them with line.set.` });
+        return reply({ result: { done, skipped, status: languageStatus(latestStudio.current.snapshot().project) } });
       }
       case 'batch': {
         const blocked = operation.steps.find((step) => isHostOnly(step.id));
         if (blocked) throw new Error(`${blocked.id} runs only inside the Studio.`);
-        const result = s.film.batch(operation.steps, { atomic: operation.atomic, ...(operation.label ? { label: operation.label } : {}) });
+        const result = s.film.batch(operation.steps.map((step) => ({ ...step, args: byAgent(step.id, step.args) })), { atomic: operation.atomic, ...(operation.label ? { label: operation.label } : {}) });
         return reply({ result: result.results, ...(result.ok ? {} : { failed: result.failed }) });
       }
       case 'frame': {
@@ -606,7 +623,7 @@ export function useStudioFilming(place: string, runtime: RefObject<GenvrRuntime 
   };
   return { startManual, endManual, manualRecording, assignSavedVoice: async (voiceId: string, target = 'self') => { if (!voice.current) throw new Error('Voice service unavailable.'); return voice.current({ action: 'assign', voiceId, target, projectId: place }); },
     selectedVoice: async (target = 'self') => { if(!voice.current)return ''; const library = await voice.current({action:'voices',target:'self'}) as {assignments?:Record<string,string>}; return library.assignments?.[place+':'+target] ?? ''; },
-    previewSavedVoice: async (voiceId: string) => { if (!voice.current) throw new Error('Voice service unavailable.'); return voice.current({ action: 'preview', voiceId, target: 'self' }); }, voiceAvailable: Boolean(voiceService), voiceLibrary: async () => { if (!voice.current) return { voices: [], models: [] }; const [library, catalog] = await Promise.all([voice.current({ action: 'voices', target: 'self' }), voice.current({ action: 'models', target: 'self' })]); return { ...(library as { voices: Array<{ id: string; name: string; language?: string; voiceType?: string; model: string }> }), ...(catalog as { models: Array<{ id: string; languages: string[] }> }) }; }, handleStudio: runLocalStudioOperation, capturePhoto, camera, studio, output, setOutput, busy, connected, message, onFilmFrame, onRendered, releaseRuntime, apply, preset, reset, connect, take,
+    previewSavedVoice: async (voiceId: string) => { if (!voice.current) throw new Error('Voice service unavailable.'); return voice.current({ action: 'preview', voiceId, target: 'self' }); }, voiceAvailable: Boolean(voiceService), voiceLibrary: async () => { if (!voice.current) return { voices: [], models: [] }; const [library, catalog] = await Promise.all([voice.current({ action: 'voices', target: 'self' }), voice.current({ action: 'models', target: 'self' })]); return { ...(library as { voices: Array<{ id: string; name: string; language?: string; voiceType?: string; model: string }> }), ...(catalog as { models: Array<{ id: string; languages: string[] }> }) }; }, handleStudio: runLocalStudioOperation, sceneActors: () => actors().filter((a) => a.id !== SCENE_ACTOR), capturePhoto, camera, studio, output, setOutput, busy, connected, message, onFilmFrame, onRendered, releaseRuntime, apply, preset, reset, connect, take,
     previewStory, cameraView,
     actors, actions, pauseForPlayback,
     sceneLights: () => runtime.current?.world.environment.lighting ?? [],

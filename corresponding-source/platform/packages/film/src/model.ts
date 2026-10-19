@@ -163,6 +163,39 @@ export const DEFAULT_FILM_SETTINGS: FilmSettings = {
 /** The film's settings with the defaults filled in. */
 export const filmSettings = (project: { settings?: FilmSettings | undefined }): FilmSettings => ({ ...DEFAULT_FILM_SETTINGS, ...project.settings });
 
+/**
+ * Who speaks one language for a character (FILM-B1): a saved AI voice from the voice library, or a person who
+ * records it (a voice actor invited into the project).
+ */
+export const CastVoice = z.discriminatedUnion('kind', [
+  z.object({ kind: z.literal('ai'), voiceId: z.string().uuid(), name: z.string().min(1).max(80) }).strict(),
+  z.object({ kind: z.literal('person'), name: z.string().min(1).max(80) }).strict(),
+]);
+export type CastVoice = z.infer<typeof CastVoice>;
+
+/** A character of the film or series (FILM-B1, boards 2 and 3). `actor` is the scene actor that plays it ('self' = my avatar). */
+export const CastMember = z.object({
+  id, name: z.string().min(1).max(60), actor: id,
+  voices: z.record(LanguageTag, CastVoice),
+  /** Who writes this character's lines: the owner, or a named agent (the owner still approves each line). */
+  linesBy: z.discriminatedUnion('kind', [z.object({ kind: z.literal('owner') }).strict(), z.object({ kind: z.literal('agent'), name: z.string().min(1).max(80) }).strict()]),
+  role: z.enum(['lead', 'support', 'extra']),
+  personality: z.string().max(1000), arc: z.string().max(1000),
+}).strict();
+export type CastMember = z.infer<typeof CastMember>;
+
+/** One line of the script (FILM-B2): words per language, written by the owner or an agent, approved only by the owner. */
+export const ScriptLine = z.object({
+  id, cast: id, episode: z.number().int().min(1).max(200).default(1),
+  text: z.record(LanguageTag, z.string().max(500)),
+  status: z.enum(['draft', 'approved']), by: z.enum(['owner', 'agent']),
+  /** The draft cue made from this line, once it is placed for a take. */
+  cue: id.optional(),
+}).strict();
+export type ScriptLine = z.infer<typeof ScriptLine>;
+
+export const CAST_LIMITS = { cast: 40, lines: 500 } as const;
+
 export const FilmProject = z.object({
   version: z.literal(2),
   rate: z.object({ num: z.number().int().positive(), den: z.number().int().positive() }).strict(),
@@ -182,6 +215,9 @@ export const FilmProject = z.object({
   range: z.object({ in: tick, out: tick }).strict().optional(),
   /** Set once for the whole film (FILM-A2); absent: DEFAULT_FILM_SETTINGS. */
   settings: FilmSettings.optional(),
+  /** Characters (FILM-B1) and the script (FILM-B2). */
+  cast: z.array(CastMember).max(CAST_LIMITS.cast).optional(),
+  lines: z.array(ScriptLine).max(CAST_LIMITS.lines).optional(),
 }).strict();
 export type FilmProject = z.infer<typeof FilmProject>;
 
