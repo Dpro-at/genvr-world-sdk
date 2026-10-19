@@ -27,6 +27,7 @@ import { CaptureButton } from './capture-button';
 import { ExplorerPanel } from './explorer-panel';
 import { PropertiesPanel } from './properties-panel';
 import { OPTION_TOOLS, ToolOptionsPanel } from './tool-options-panel';
+import { setStructureFocus } from '../../lib/structure-focus';
 import { SnapBar } from './snap-bar';
 import { GenvrMark } from '../genvr-mark';
 import { FilmingPanel } from './filming-panel';
@@ -195,6 +196,11 @@ export function StudioChrome({
   // The Avatar tab is the character editor (CHAR-01): its own stage over the viewport, the world rests meanwhile.
   const character = useCharacterEditor();
   useEffect(() => avatarStudioBridge.register(character), [character]);
+  // A road or wall picked in the Explorer stays only while selecting in the same tab (BUILD-B7).
+  useEffect(() => {
+    if (status.tool !== 'select' && status.tool !== null) setStructureFocus(null);
+  }, [status.tool]);
+  useEffect(() => setStructureFocus(null), [tab]);
   // Build keys (BUILD-B1): a letter picks a tool; Ctrl/Cmd+Z undoes, Ctrl+Y or Shift+Ctrl/Cmd+Z redoes.
   useEffect(() => {
     if (testing || (tab !== 'build' && tab !== 'items' && tab !== 'world')) return;
