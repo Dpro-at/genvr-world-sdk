@@ -16,3 +16,9 @@ export function languageStatus(project: FilmProject) {
     return { lang: row.lang, main: index === 0, level: row.level, captions, voice, words, lines: lines.length, missing, speakers };
   });
 }
+
+/** Lines approved in `next` that are not approved in `now` — an approval only the owner may give (FILM-B2). */
+export function approvalsGained(now: FilmProject, next: FilmProject): string[] {
+  const approved = new Set((now.lines ?? []).filter((l) => l.status === 'approved').map((l) => l.id));
+  return (next.lines ?? []).filter((l) => l.status === 'approved' && !approved.has(l.id)).map((l) => l.id);
+}

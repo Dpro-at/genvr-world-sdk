@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   FilmSession, HISTORY_STEPS, TICKS_PER_SECOND, check, emptyFilm, frame, fromSeconds, isHostOnly, migrate, readFilmFile,
-  secondsOnFrame, snap, timecode, toSeconds, validRate, writeFilmFile, forExport, type FilmProject, type Media, type MediaClip,
+  secondsOnFrame, snap, timecode, toSeconds, validRate, writeFilmFile, forExport, approvalsGained, type FilmProject, type Media, type MediaClip,
 } from '../src/index.js';
 
 const s = fromSeconds;
@@ -433,5 +433,32 @@ describe('cast and script (FILM-B1/B2/B3)', () => {
     ok(session.run('cast.remove', { cast: luna, confirm: true }));
     expect(session.project.lines).toEqual([]);
     expect(readFilmFile(writeFilmFile(session.project, [])).project.cast?.map((c) => c.name)).toEqual(['Atlas']);
+  });
+});
+
+describe('owner-only rules hold for agents (FILM-B2 security)', () => {
+  it('agents cannot take over writing, delete approved lines, or remove owner characters', () => {
+    const session = new FilmSession(emptyFilm(), counter());
+    const luna = (session.run('cast.add', { name: 'Luna', actor: 'self', linesBy: { kind: 'agent', name: 'Main agent' } }) as { ok: true; result: string }).result;
+    const atlas = (session.run('cast.add', { name: 'Atlas', actor: 'self' }) as { ok: true; result: string }).result;
+    expect(session.run('cast.set', { cast: atlas, linesBy: { kind: 'agent', name: 'Main agent' }, by: 'agent' })).toMatchObject({ ok: false });
+    ok(session.run('cast.set', { cast: atlas, personality: 'Calm', by: 'agent' }));
+    expect(session.run('cast.remove', { cast: atlas, by: 'agent' })).toMatchObject({ ok: false });
+    const line = (session.run('line.write', { cast: luna, text: { en: 'Hi' }, by: 'agent' }) as { ok: true; result: string }).result;
+    ok(session.run('line.approve', { line }));
+    expect(session.run('line.remove', { line, by: 'agent' })).toMatchObject({ ok: false });
+    expect(session.run('cast.remove', { cast: luna, confirm: true, by: 'agent' })).toMatchObject({ ok: false });
+  });
+  it('history targets show an approval an undo or redo would bring back', () => {
+    const session = new FilmSession(emptyFilm(), counter());
+    const luna = (session.run('cast.add', { name: 'Luna', actor: 'self' }) as { ok: true; result: string }).result;
+    const line = (session.run('line.write', { cast: luna, text: { en: 'Hi' } }) as { ok: true; result: string }).result;
+    ok(session.run('line.approve', { line }));
+    ok(session.run('line.approve', { line, approved: false }));
+    expect(approvalsGained(session.project, session.historyTarget('edit.undo')!)).toEqual([line]);
+    ok(session.run('edit.undo')); ok(session.run('edit.undo'));
+    expect(approvalsGained(session.project, session.historyTarget('edit.redo')!)).toEqual([line]);
+    expect(approvalsGained(session.project, session.historyTarget('history.goto', { done: 4 })!)).toEqual([]);
+    expect(session.historyTarget('clip.split')).toBeNull();
   });
 });

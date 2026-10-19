@@ -15,7 +15,7 @@ import { EXPRESSIONS, type AssistantHost } from '@genvr/assistant';
 import { fitCaptureViewport } from './video-studio/capture-viewport';
 import { SceneSpeech } from './video-studio/scene-speech';
 import { CORE_ANIMATIONS } from '@genvr/core-library';
-import { SCENE_ACTOR, SCENE_FX_ACTIONS, describe as describeFilm, filmSettings, forExport, isHostOnly, languageStatus, sceneFxSteps, shakeOffset, subtitleLines, toSeconds, toSrt, toVtt, type FilmProject } from '@genvr/film';
+import { SCENE_ACTOR, SCENE_FX_ACTIONS, approvalsGained, describe as describeFilm, filmSettings, forExport, isHostOnly, languageStatus, sceneFxSteps, shakeOffset, subtitleLines, toSeconds, toSrt, toVtt, type FilmProject } from '@genvr/film';
 import { checkTakeLength, cueToSeconds, validateCues, type SceneCue } from './video-studio/model';
 
 /** One rig and frame stream shared by the studio panel and its optional MCP connection. */
@@ -324,7 +324,13 @@ export function useStudioFilming(place: string, runtime: RefObject<GenvrRuntime 
     if (!result.ok) s.setMessage(`The take was added, but its scene effects were not: ${result.failed?.reason ?? 'they could not be placed'}.`);
   };
   /** Script lines changed through MCP always count as an agent's (FILM-B2): they need the owner's approval again. */
-  const byAgent = (id: string, args: unknown) => id === 'line.write' || id === 'line.set' ? { ...(args as Record<string, unknown>), by: 'agent' } : args;
+  const AGENT_STAMPED = new Set(['line.write', 'line.set', 'line.remove', 'cast.set', 'cast.remove']);
+  const byAgent = (id: string, args: unknown) => AGENT_STAMPED.has(id) ? { ...(args as Record<string, unknown>), by: 'agent' } : args;
+  /** Undo, redo or a history jump through MCP may not bring back a line approval (only the owner approves). */
+  const guardHistory = (id: string, args: unknown = {}) => {
+    const film = latestStudio.current.film, target = film.historyTarget(id, args);
+    if (target && approvalsGained(film.project, target).length) throw new Error('That step would bring back a line approval; only the owner approves lines. Ask the owner to undo it in the Studio.');
+  };
   /** MCP studio operations: the same command session as the editor's buttons and keys. */
   const handleStudio = async (operation: FilmStudioOperation, signal: AbortSignal): Promise<Blob> => {
     const s = latestStudio.current, current = epoch.current, identity = s.identity;
@@ -429,6 +435,7 @@ export function useStudioFilming(place: string, runtime: RefObject<GenvrRuntime 
       }
       case 'command': {
         if (isHostOnly(operation.id)) throw new Error(`${operation.id} runs only inside the Studio.`);
+        guardHistory(operation.id, operation.args);
         return reply({ result: must(operation.id, byAgent(operation.id, operation.args)) });
       }
       case 'language': {
@@ -474,8 +481,8 @@ export function useStudioFilming(place: string, runtime: RefObject<GenvrRuntime 
         return reply();
       }
       case 'move': throw new Error('Move a clip with {kind:"command", id:"clip.move", args:{clip, start, track?, mode?}}.');
-      case 'undo': return reply({ result: must('edit.undo') });
-      case 'redo': return reply({ result: must('edit.redo') });
+      case 'undo': guardHistory('edit.undo'); return reply({ result: must('edit.undo') });
+      case 'redo': guardHistory('edit.redo'); return reply({ result: must('edit.redo') });
       case 'cues': {
         const shot = operation.shot_id ? clipShot(project, operation.shot_id) : undefined;
         validateCues(operation.cues, shot ? toSeconds(shot.media.duration) : 30);

@@ -438,10 +438,12 @@ export const COMMANDS: CommandSpec[] = [
   },
   {
     id: 'cast.set', label: (a: { name?: string }) => a.name ? `Rename to ${a.name}` : 'Character settings', group: 'Project', journal: true,
-    args: CastMember.omit({ id: true, voices: true }).partial().extend({ cast: clipId }).strict(),
+    args: CastMember.omit({ id: true, voices: true }).partial().extend({ cast: clipId, by: z.enum(['owner', 'agent']).default('owner') }).strict(),
     run: (d, a) => {
-      const { cast, ...patch } = a, member = d.cast?.find((c) => c.id === cast);
+      const { cast, by, ...patch } = a, member = d.cast?.find((c) => c.id === cast);
       if (!member) throw new EditError('Character not found.');
+      // Who writes a character's lines is the owner's choice: an agent cannot give itself that right.
+      if (by === 'agent' && patch.linesBy && JSON.stringify(patch.linesBy) !== JSON.stringify(member.linesBy)) throw new EditError('Only the owner chooses who writes a character\'s lines.');
       if (patch.name && d.cast!.some((c) => c.id !== cast && c.name.toLowerCase() === patch.name!.toLowerCase())) throw new EditError(`There is already a character called ${patch.name}.`);
       Object.assign(member, CastMember.parse({ ...member, ...patch }));
     },
@@ -458,10 +460,15 @@ export const COMMANDS: CommandSpec[] = [
   {
     id: 'cast.remove', label: 'Remove character', group: 'Project', journal: true,
     // Removing a character with lines needs confirm: true (the UI asks first); its lines go too.
-    args: z.object({ cast: clipId, confirm: z.boolean().default(false) }).strict(),
+    args: z.object({ cast: clipId, confirm: z.boolean().default(false), by: z.enum(['owner', 'agent']).default('owner') }).strict(),
     enabled: (st, a) => !st.project.cast?.some((c) => c.id === a.cast) ? 'Character not found.'
       : !a.confirm && st.project.lines?.some((l) => l.cast === a.cast) ? 'This character has lines; send confirm: true to remove it and its lines.' : null,
-    run: (d, a) => { d.cast = d.cast!.filter((c) => c.id !== a.cast); d.lines = (d.lines ?? []).filter((l) => l.cast !== a.cast); },
+    run: (d, a) => {
+      const member = d.cast!.find((c) => c.id === a.cast)!;
+      if (a.by === 'agent' && (member.linesBy.kind !== 'agent' || d.lines?.some((l) => l.cast === a.cast && l.status === 'approved')))
+        throw new EditError(`Only the owner can remove ${member.name}.`);
+      d.cast = d.cast!.filter((c) => c.id !== a.cast); d.lines = (d.lines ?? []).filter((l) => l.cast !== a.cast);
+    },
   },
   {
     id: 'line.write', label: 'Write line', group: 'Caption', journal: true,
@@ -496,8 +503,15 @@ export const COMMANDS: CommandSpec[] = [
   },
   {
     id: 'line.remove', label: 'Delete line', group: 'Caption', journal: true,
-    args: z.object({ line: clipId }).strict(),
-    run: (d, a) => { if (!d.lines?.some((l) => l.id === a.line)) throw new EditError('Line not found.'); d.lines = d.lines.filter((l) => l.id !== a.line); },
+    args: z.object({ line: clipId, by: z.enum(['owner', 'agent']).default('owner') }).strict(),
+    run: (d, a) => {
+      const line = d.lines?.find((l) => l.id === a.line);
+      if (!line) throw new EditError('Line not found.');
+      const member = d.cast?.find((c) => c.id === line.cast);
+      // Agents delete only drafts of characters they write; approved lines and the owner's characters stay.
+      if (a.by === 'agent' && (line.status === 'approved' || member?.linesBy.kind !== 'agent')) throw new EditError('Only the owner can delete this line.');
+      d.lines = d.lines!.filter((l) => l.id !== a.line);
+    },
   },
   {
     // An approved line becomes a draft cue of the next take: its character's actor says it in `lang`.
@@ -655,6 +669,23 @@ export class FilmSession {
     return { ok: true, results };
   }
 
+  /**
+   * The film that undo, redo or a history jump would bring back (null for other commands or when it cannot run).
+   * Agents may not use history to bring back an approval only the owner can give (FILM-B2).
+   */
+  historyTarget(id: string, rawArgs: unknown = {}): FilmProject | null {
+    if (id === 'edit.undo') return this.history.past.at(-1)?.before ?? null;
+    if (id === 'edit.redo') return this.history.future.at(-1)?.after ?? null;
+    if (id === 'history.goto') {
+      const done = (rawArgs as { done?: unknown } | null)?.done;
+      if (!Number.isInteger(done)) return null;
+      const all = [...this.history.past, ...[...this.history.future].reverse()];
+      const n = done as number;
+      if (n < 0 || n > all.length) return null;
+      return n === 0 ? (all[0]?.before ?? this.project) : all[n - 1]!.after;
+    }
+    return null;
+  }
   /** Runs one command on a state and returns the next state; throws with the reason on refusal. */
   private apply(state: FilmState, id: string, rawArgs: unknown): { state: FilmState; result?: unknown; label: string } {
     const spec = this.specs.get(id);
