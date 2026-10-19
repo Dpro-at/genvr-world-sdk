@@ -13,3 +13,5 @@ export * from './user-avatar-library.js';
 
 export * from './avatar-live-embed.js';
 export * from './studio-sharing.js';
+
+export * from './publication-tools.js';

@@ -1,4 +1,4 @@
-export const ACCOUNT_LINK_SCOPES = ['worlds:read', 'worlds:write', 'worlds:publish', 'items:submit'] as const;
+export const ACCOUNT_LINK_SCOPES = ['worlds:read', 'worlds:write', 'worlds:publish', 'worlds:join', 'items:submit'] as const;
 export type AccountLinkScope = typeof ACCOUNT_LINK_SCOPES[number];
 export interface AccountLinkRequest {
   deviceCode: string; userCode: string; verificationUri: string; expiresIn: number; interval: number;

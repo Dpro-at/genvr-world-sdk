@@ -1,3 +1,4 @@
+import { GenvrPublicationTools, PUBLICATION_TOOLS } from './publication-tools.js';
 import { callLiveStudio } from './live-studio.js';
 import { LiveStudioClient, LIVE_TOOLS } from './mcp-live.js';
 import { FILMING_TOOLS, isFilmingTool, callFilmingTool } from './mcp-filming.js';
@@ -17,6 +18,7 @@ await mkdir(root, { recursive: true });
 const realRoot = await realpath(root);
 const live = process.env.GENVR_STUDIO_CONNECTION ? new LiveStudioClient(process.env.GENVR_STUDIO_CONNECTION, realRoot) : undefined;
 let session: WorldSession | undefined;
+const publication = new GenvrPublicationTools({ ...(process.env.GENVR_API_URL ? { apiUrl: process.env.GENVR_API_URL } : {}), ...(process.env.GENVR_WEB_URL ? { webUrl: process.env.GENVR_WEB_URL } : {}), ...(process.env.GENVR_ACCOUNT_TOKEN ? { accessToken: process.env.GENVR_ACCOUNT_TOKEN } : {}) });
 const server = new Server({ name: '3d-world-sdk', version: SDK_VERSION }, { capabilities: { tools: {} } });
 const GUIDE_PARTS = ['workflow', 'tools', 'sizes', 'games', 'scripts', 'mistakes'] as const;
 const localTools = [
@@ -28,13 +30,14 @@ const localTools = [
   { name: 'save_world_local', description: 'Save the current world in the configured local folder.', inputSchema: { type: 'object' as const, properties: {}, additionalProperties: false } },
   { name: 'open_world_local', description: 'Open a saved world by ID in the configured local folder.', inputSchema: { type: 'object' as const, properties: { id: { type: 'string' } }, required: ['id'], additionalProperties: false } },
 ];
-server.setRequestHandler(ListToolsRequestSchema, async () => ({ tools: [ ...localTools, ...LIVE_TOOLS, ...FILMING_TOOLS,
+server.setRequestHandler(ListToolsRequestSchema, async () => ({ tools: [ ...PUBLICATION_TOOLS, ...localTools, ...LIVE_TOOLS, ...FILMING_TOOLS,
   ...TOOL_DEFINITIONS.map(tool => ({ name: tool.function.name, description: tool.function.description,
     inputSchema: tool.function.parameters as { type: 'object' } })),
 ] }));
 server.setRequestHandler(CallToolRequestSchema, async request => {
   try {
     const args = request.params.arguments ?? {};
+    if (publication.handles(request.params.name)) return { content: [{ type: 'text', text: JSON.stringify(await publication.call(request.params.name, args, session)) }] };
     if (request.params.name === 'get_design_guide') {
       const part = args.part ?? 'workflow';
       if (!GUIDE_PARTS.includes(part as typeof GUIDE_PARTS[number]) || Object.keys(args).some(key => key !== 'part')) throw new Error('Choose a supported design guide part.');
@@ -51,9 +54,9 @@ server.setRequestHandler(CallToolRequestSchema, async request => {
       text = typeof result === 'string' ? result : JSON.stringify(result);
     } else if (request.params.name === 'get_studio_capabilities' && live) {
       const sessions = await live.sessions();
-      text = JSON.stringify({ mode: 'live-studio', liveViewport: sessions.length > 0, sessions, avatarPresentation: { executable: sessions.length > 0 }, privateLibrary: sessions.some(row => row.capabilities.privateLibrary), filmingAndVideoEditing: { tools: FILMING_TOOLS.map(tool => tool.name), hostConfigured: true, connectionVerified: sessions.length > 0 }, localFileWorldEditing: true, accountUploads: false, worldPublishing: false });
+      text = JSON.stringify({ mode: 'live-studio', liveViewport: sessions.length > 0, sessions, avatarPresentation: { executable: sessions.length > 0 }, privateLibrary: sessions.some(row => row.capabilities.privateLibrary), filmingAndVideoEditing: { tools: FILMING_TOOLS.map(tool => tool.name), hostConfigured: true, connectionVerified: sessions.length > 0 }, localFileWorldEditing: true, accountUploads: publication.capabilities().linked, worldPublishing: publication.capabilities().linked, publication: publication.capabilities() });
     } else if (request.params.name === 'get_studio_capabilities') {
-      text = JSON.stringify({ mode: 'local-file-session', worldEditing: true, localSave: true, liveViewport: false, avatarPresentation: { schemaAvailable: true, executable: false, reason: 'No live viewport is attached to this standalone process.' }, characterRecipeEditing: false, filmingAndVideoEditing: { availableInStudioUI: true, tools: FILMING_TOOLS.map(tool => tool.name), hostConfigured: Boolean(process.env.GENVR_HOST_MCP_URL && process.env.GENVR_HOST_MCP_TOKEN), connectionVerified: false, reason: 'Uses the established platform filming connection. Configure the host and connect an authorized Studio session.' }, accountUploads: false, worldPublishing: false, motionCatalogConfigured: Boolean(process.env.GENVR_MOTION_CATALOG) });
+      text = JSON.stringify({ mode: 'local-file-session', worldEditing: true, localSave: true, liveViewport: false, avatarPresentation: { schemaAvailable: true, executable: false, reason: 'No live viewport is attached to this standalone process.' }, characterRecipeEditing: false, filmingAndVideoEditing: { availableInStudioUI: true, tools: FILMING_TOOLS.map(tool => tool.name), hostConfigured: Boolean(process.env.GENVR_HOST_MCP_URL && process.env.GENVR_HOST_MCP_TOKEN), connectionVerified: false, reason: 'Uses the established platform filming connection. Configure the host and connect an authorized Studio session.' }, accountUploads: publication.capabilities().linked, worldPublishing: publication.capabilities().linked, publication: publication.capabilities(), motionCatalogConfigured: Boolean(process.env.GENVR_MOTION_CATALOG) });
     } else if (request.params.name === 'list_avatar_motions') {
       text = JSON.stringify(live ? await live.call('list_avatar_motions', args) : await listAvatarMotions(args, process.env.GENVR_MOTION_CATALOG));
     } else if (request.params.name === 'get_avatar_guide') {

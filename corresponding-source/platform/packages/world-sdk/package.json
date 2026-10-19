@@ -1,6 +1,6 @@
 {
   "name": "@genvr/world-sdk",
-  "version": "0.3.0-preview.11",
+  "version": "0.3.0-preview.12",
   "license": "AGPL-3.0-only",
   "description": "Standalone Genvr world authoring, local persistence and explicit platform publication adapters.",
   "type": "module",
@@ -48,7 +48,7 @@
     "studio": "node serve-studio.mjs",
     "pack:standalone": "node pack.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "vitest run",
+    "test": "vitest run --dir test",
     "demo": "node serve.mjs"
   },
   "dependencies": {

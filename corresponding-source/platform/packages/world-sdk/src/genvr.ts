@@ -8,6 +8,16 @@ export interface PublishWorldOptions {
   access: { mode: 'friends' | 'invite' | 'public' } | { mode: 'password'; password: string };
   content: ContentAnswers;
 }
+export type WorldAccess = { mode: 'private' | 'friends' | 'invite' | 'public' } | { mode: 'password'; password: string };
+export interface WorldInvite { id: string; token: string; expiresAt: string; role: 'player' | 'builder'; }
+/** A link never grants access by itself. The Genvr server checks the signed-in visitor. */
+export function worldShareUrl(webUrl: string, id: string, invite?: string): string {
+  const base = new URL(webUrl);
+  if ((base.protocol !== 'https:' && !(base.protocol === 'http:' && ['localhost', '127.0.0.1'].includes(base.hostname))) || base.username || base.password || base.search || base.hash) throw new Error('Unsafe Genvr web URL.');
+  const url = new URL(`${base.pathname.replace(/\/$/, '')}/places/${encodeURIComponent(id)}`, base.origin);
+  if (invite) url.searchParams.set('invite', invite);
+  return url.href;
+}
 export interface SubmitItemOptions {
   name: string; kind: 'props-and-decor' | 'nature' | 'structures' | 'vehicles' | 'characters' | 'building-blocks';
   styles: Style[]; model: string; walkThrough?: boolean; floats?: boolean;
@@ -76,6 +86,36 @@ export class GenvrClient {
   async publishWorld(id: string, options: PublishWorldOptions): Promise<Record<string, unknown>> {
     ContentAnswers.parse(options.content);
     return this.#request(`/v1/experiences/${encodeURIComponent(id)}/publish`, options);
+  }
+  /** Server-owned metadata, including isOwner/status/accessMode; no ownership is accepted from the host. */
+  async experience(id: string): Promise<Record<string, unknown>> {
+    return this.#request(`/v1/experiences/${encodeURIComponent(id)}`, undefined, 'GET');
+  }
+  async setAccess(id: string, access: WorldAccess): Promise<Record<string, unknown>> {
+    return this.#request(`/v1/experiences/${encodeURIComponent(id)}/access`, access, 'PUT');
+  }
+  /** Return to draft; access mode is retained. Set access to private separately before importing. */
+  async unpublishWorld(id: string): Promise<Record<string, unknown>> {
+    return this.#request(`/v1/experiences/${encodeURIComponent(id)}/unpublish`);
+  }
+  async createInvite(id: string, options: { role?: 'player' | 'builder'; expiresInHours?: number } = {}): Promise<WorldInvite> {
+    const value = await this.#request(`/v1/experiences/${encodeURIComponent(id)}/invites`, options);
+    if (typeof value.id !== 'string' || typeof value.token !== 'string' || typeof value.expiresAt !== 'string' || !['player', 'builder'].includes(String(value.role))) throw new Error('Invalid world invitation response.');
+    return value as unknown as WorldInvite;
+  }
+  /** Revoking an invite stops new acceptance; existing members retain their server-assigned role. */
+  async revokeInvite(id: string, inviteId: string): Promise<void> {
+    await this.#request(`/v1/experiences/${encodeURIComponent(id)}/invites/${encodeURIComponent(inviteId)}`, undefined, 'DELETE');
+  }
+  async joinWorld(id: string, options: { password?: string; invite?: string } = {}): Promise<{ allowed: boolean; reason?: string }> {
+    const value = await this.#request(`/v1/experiences/${encodeURIComponent(id)}/join`, options);
+    if (typeof value.allowed !== 'boolean' || (value.reason !== undefined && typeof value.reason !== 'string')) throw new Error('Invalid join response.');
+    return value as { allowed: boolean; reason?: string };
+  }
+  async joinTicket(id: string): Promise<{ ticket: string; url: string; expiresIn: number }> {
+    const value = await this.#request(`/v1/experiences/${encodeURIComponent(id)}/join-ticket`);
+    if (typeof value.ticket !== 'string' || typeof value.url !== 'string' || typeof value.expiresIn !== 'number' || value.expiresIn <= 0) throw new Error('Invalid join ticket response.');
+    return value as { ticket: string; url: string; expiresIn: number };
   }
   /** Submit to the existing moderated store; this does not approve or list the item. */
   async submitItem(options: SubmitItemOptions): Promise<{ id: string }> {
