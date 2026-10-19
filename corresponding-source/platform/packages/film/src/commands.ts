@@ -465,7 +465,7 @@ export const COMMANDS: CommandSpec[] = [
       : !a.confirm && st.project.lines?.some((l) => l.cast === a.cast) ? 'This character has lines; send confirm: true to remove it and its lines.' : null,
     run: (d, a) => {
       const member = d.cast!.find((c) => c.id === a.cast)!;
-      if (a.by === 'agent' && (member.linesBy.kind !== 'agent' || d.lines?.some((l) => l.cast === a.cast && l.status === 'approved')))
+      if (a.by === 'agent' && (member.linesBy.kind !== 'agent' || d.lines?.some((l) => l.cast === a.cast && (l.status === 'approved' || l.approvedOnce))))
         throw new EditError(`Only the owner can remove ${member.name}.`);
       d.cast = d.cast!.filter((c) => c.id !== a.cast); d.lines = (d.lines ?? []).filter((l) => l.cast !== a.cast);
     },
@@ -499,7 +499,7 @@ export const COMMANDS: CommandSpec[] = [
   {
     id: 'line.approve', label: (a: { approved?: boolean }) => a.approved === false ? 'Back to draft' : 'Approve line', group: 'Caption', journal: true, hostOnly: true,
     args: z.object({ line: clipId, approved: z.boolean().default(true) }).strict(),
-    run: (d, a) => { const line = d.lines?.find((l) => l.id === a.line); if (!line) throw new EditError('Line not found.'); line.status = a.approved ? 'approved' : 'draft'; },
+    run: (d, a) => { const line = d.lines?.find((l) => l.id === a.line); if (!line) throw new EditError('Line not found.'); line.status = a.approved ? 'approved' : 'draft'; if (a.approved) line.approvedOnce = true; },
   },
   {
     id: 'line.remove', label: 'Delete line', group: 'Caption', journal: true,
@@ -509,7 +509,7 @@ export const COMMANDS: CommandSpec[] = [
       if (!line) throw new EditError('Line not found.');
       const member = d.cast?.find((c) => c.id === line.cast);
       // Agents delete only drafts of characters they write; approved lines and the owner's characters stay.
-      if (a.by === 'agent' && (line.status === 'approved' || member?.linesBy.kind !== 'agent')) throw new EditError('Only the owner can delete this line.');
+      if (a.by === 'agent' && (line.status === 'approved' || line.approvedOnce || member?.linesBy.kind !== 'agent')) throw new EditError('Only the owner can delete this line.');
       d.lines = d.lines!.filter((l) => l.id !== a.line);
     },
   },

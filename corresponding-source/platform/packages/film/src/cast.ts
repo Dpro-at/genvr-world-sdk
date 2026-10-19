@@ -22,3 +22,18 @@ export function approvalsGained(now: FilmProject, next: FilmProject): string[] {
   const approved = new Set((now.lines ?? []).filter((l) => l.status === 'approved').map((l) => l.id));
   return (next.lines ?? []).filter((l) => l.status === 'approved' && !approved.has(l.id)).map((l) => l.id);
 }
+
+/**
+ * True when going from `now` to `next` changes something only the owner may change (FILM-B2): who writes a
+ * character, the owner's own characters, or any line the owner has ever approved (its words, its approval, or
+ * whether it exists). Agents may not reach such a change through undo, redo or history jumps.
+ */
+export function ownerStateChanged(now: FilmProject, next: FilmProject): boolean {
+  const view = (p: FilmProject, guarded: Set<string>) => JSON.stringify({
+    writers: (p.cast ?? []).map((c) => [c.id, c.linesBy]).sort(),
+    owners: (p.cast ?? []).filter((c) => c.linesBy.kind === 'owner').map((c) => c).sort((a, b) => a.id.localeCompare(b.id)),
+    lines: (p.lines ?? []).filter((l) => guarded.has(l.id)).map((l) => [l.id, l.text, l.status, l.approvedOnce ?? false]).sort(),
+  });
+  const guarded = new Set([...(now.lines ?? []), ...(next.lines ?? [])].filter((l) => l.status === 'approved' || l.approvedOnce).map((l) => l.id));
+  return view(now, guarded) !== view(next, guarded);
+}

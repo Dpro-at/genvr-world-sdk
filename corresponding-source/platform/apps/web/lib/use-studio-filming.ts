@@ -15,7 +15,7 @@ import { EXPRESSIONS, type AssistantHost } from '@genvr/assistant';
 import { fitCaptureViewport } from './video-studio/capture-viewport';
 import { SceneSpeech } from './video-studio/scene-speech';
 import { CORE_ANIMATIONS } from '@genvr/core-library';
-import { SCENE_ACTOR, SCENE_FX_ACTIONS, approvalsGained, describe as describeFilm, filmSettings, forExport, isHostOnly, languageStatus, sceneFxSteps, shakeOffset, subtitleLines, toSeconds, toSrt, toVtt, type FilmProject } from '@genvr/film';
+import { SCENE_ACTOR, SCENE_FX_ACTIONS, ownerStateChanged, describe as describeFilm, filmSettings, forExport, isHostOnly, languageStatus, sceneFxSteps, shakeOffset, subtitleLines, toSeconds, toSrt, toVtt, type FilmProject } from '@genvr/film';
 import { checkTakeLength, cueToSeconds, validateCues, type SceneCue } from './video-studio/model';
 
 /** One rig and frame stream shared by the studio panel and its optional MCP connection. */
@@ -326,10 +326,10 @@ export function useStudioFilming(place: string, runtime: RefObject<GenvrRuntime 
   /** Script lines changed through MCP always count as an agent's (FILM-B2): they need the owner's approval again. */
   const AGENT_STAMPED = new Set(['line.write', 'line.set', 'line.remove', 'cast.set', 'cast.remove']);
   const byAgent = (id: string, args: unknown) => AGENT_STAMPED.has(id) ? { ...(args as Record<string, unknown>), by: 'agent' } : args;
-  /** Undo, redo or a history jump through MCP may not bring back a line approval (only the owner approves). */
+  /** Undo, redo or a history jump through MCP may not change what only the owner decides (approvals, who writes, the owner's characters). */
   const guardHistory = (id: string, args: unknown = {}) => {
     const film = latestStudio.current.film, target = film.historyTarget(id, args);
-    if (target && approvalsGained(film.project, target).length) throw new Error('That step would bring back a line approval; only the owner approves lines. Ask the owner to undo it in the Studio.');
+    if (target && ownerStateChanged(film.project, target)) throw new Error('That step changes something only the owner decides (a line approval, who writes a character, or the owner\'s characters). Ask the owner to undo it in the Studio.');
   };
   /** MCP studio operations: the same command session as the editor's buttons and keys. */
   const handleStudio = async (operation: FilmStudioOperation, signal: AbortSignal): Promise<Blob> => {

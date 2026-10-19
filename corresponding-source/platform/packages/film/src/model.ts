@@ -189,6 +189,8 @@ export const ScriptLine = z.object({
   id, cast: id, episode: z.number().int().min(1).max(200).default(1),
   text: z.record(LanguageTag, z.string().max(500)),
   status: z.enum(['draft', 'approved']), by: z.enum(['owner', 'agent']),
+  /** Set by the owner's approval and never cleared by an agent: a once-approved line stays the owner's to delete. */
+  approvedOnce: z.boolean().optional(),
   /** The draft cue made from this line, once it is placed for a take. */
   cue: id.optional(),
 }).strict();

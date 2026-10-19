@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   FilmSession, HISTORY_STEPS, TICKS_PER_SECOND, check, emptyFilm, frame, fromSeconds, isHostOnly, migrate, readFilmFile,
-  secondsOnFrame, snap, timecode, toSeconds, validRate, writeFilmFile, forExport, approvalsGained, type FilmProject, type Media, type MediaClip,
+  secondsOnFrame, snap, timecode, toSeconds, validRate, writeFilmFile, forExport, approvalsGained, ownerStateChanged, type FilmProject, type Media, type MediaClip,
 } from '../src/index.js';
 
 const s = fromSeconds;
@@ -460,5 +460,26 @@ describe('owner-only rules hold for agents (FILM-B2 security)', () => {
     expect(approvalsGained(session.project, session.historyTarget('edit.redo')!)).toEqual([line]);
     expect(approvalsGained(session.project, session.historyTarget('history.goto', { done: 4 })!)).toEqual([]);
     expect(session.historyTarget('clip.split')).toBeNull();
+  });
+});
+
+describe('agents cannot route around owner-only rules (FILM-B2 security, round 2)', () => {
+  it('a once-approved line stays the owner’s to delete, even after an agent edit', () => {
+    const session = new FilmSession(emptyFilm(), counter());
+    const luna = (session.run('cast.add', { name: 'Luna', actor: 'self', linesBy: { kind: 'agent', name: 'A' } }) as { ok: true; result: string }).result;
+    const line = (session.run('line.write', { cast: luna, text: { en: 'Hi' }, by: 'agent' }) as { ok: true; result: string }).result;
+    ok(session.run('line.approve', { line }));
+    ok(session.run('line.set', { line, text: { en: 'Hey' }, by: 'agent' }));
+    expect(session.project.lines![0]!.status).toBe('draft');
+    expect(session.run('line.remove', { line, by: 'agent' })).toMatchObject({ ok: false });
+    expect(session.run('cast.remove', { cast: luna, confirm: true, by: 'agent' })).toMatchObject({ ok: false });
+  });
+  it('history steps that change owner-only state are detected', () => {
+    const session = new FilmSession(emptyFilm(), counter());
+    const atlas = (session.run('cast.add', { name: 'Atlas', actor: 'self' }) as { ok: true; result: string }).result;
+    ok(session.run('cast.set', { cast: atlas, linesBy: { kind: 'agent', name: 'A' } }));
+    expect(ownerStateChanged(session.project, session.historyTarget('edit.undo')!)).toBe(true);
+    ok(session.run('cast.set', { cast: atlas, personality: 'Calm' }));
+    expect(ownerStateChanged(session.project, session.historyTarget('edit.undo')!)).toBe(false);
   });
 });
