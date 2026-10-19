@@ -2,7 +2,8 @@
 import { useEffect, useId, useLayoutEffect, useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { Scissors, Undo2, Redo2, Download, Circle, Type, Camera, Plus, Trash2, Magnet, SlidersHorizontal,
-  Users, Mic, Film, Languages, Bookmark, FolderOpen, Save, MousePointer2, ChevronsRight, Columns2, ArrowLeftRight, MoveHorizontal } from 'lucide-react';
+  Users, Mic, Film, Languages, Bookmark, FolderOpen, Save, MousePointer2, ChevronsRight, Columns2, ArrowLeftRight, MoveHorizontal,
+  Clapperboard, Volume2, Palette, BookOpen, Settings2, X } from 'lucide-react';
 import { filmLength, fromSeconds, timecode, toSeconds, type Clip, type Track } from '@genvr/film';
 import type { StudioFilming } from '../../lib/use-studio-filming';
 import { drawAt, mediaDuration, render } from '../../lib/video-studio/render';
@@ -440,14 +441,61 @@ export function VideoEditor({ filming }: { filming: StudioFilming }) {
   </section>;
 }
 
-/** Scene tools replace world-building properties only in the filming workspace. */
+const INSPECTOR_TITLE: Record<string, { title: string; icon: typeof Film }> = {
+  shoot: { title: 'Scene', icon: Clapperboard }, edit: { title: 'Clip', icon: Scissors }, captions: { title: 'Captions', icon: Languages },
+  sound: { title: 'Sound', icon: Volume2 }, transitions: { title: 'Transitions', icon: ArrowLeftRight }, colour: { title: 'Colour', icon: Palette }, story: { title: 'Story', icon: BookOpen },
+};
+/** Scene tools replace world-building properties only in the filming workspace. Settings made once for the whole film live in the Film settings window. */
 export function VideoSceneInspector({ filming }: { filming: StudioFilming }) {
   const workspace = filming.studio.workspace;
-  if (workspace === 'captions') return <CaptionsPanel filming={filming} />;
-  if (workspace === 'transitions') return <TransitionsWorkspace filming={filming} />;
-  if (workspace === 'sound') return <SoundPanel filming={filming} />;
-  if (workspace === 'colour') return <ColourPanel filming={filming} />;
-  return <InspectorBody filming={filming} mode={workspace === 'edit' ? 'clip' : 'scene'} />;
+  const [settings, setSettings] = useState(false);
+  const head = INSPECTOR_TITLE[workspace] ?? INSPECTOR_TITLE.shoot!, HeadIcon = head.icon;
+  const body = workspace === 'captions' ? <CaptionsPanel filming={filming} />
+    : workspace === 'transitions' ? <TransitionsWorkspace filming={filming} />
+    : workspace === 'sound' ? <SoundPanel filming={filming} />
+    : workspace === 'colour' ? <ColourPanel filming={filming} />
+    : <InspectorBody filming={filming} mode={workspace === 'edit' ? 'clip' : 'scene'} />;
+  return <div className="text-ink">
+    <div className="sticky top-0 z-20 flex items-center gap-2 border-b border-ink/10 bg-surface px-3 py-2">
+      <HeadIcon className="size-4" /><strong className="flex-1 text-sm">{head.title}</strong>
+      <button type="button" className={button} aria-haspopup="dialog" onClick={() => setSettings(true)}><Settings2 className="size-3.5" />Film settings</button>
+    </div>
+    <div className="pt-3">{body}</div>
+    {settings ? <FilmSettings filming={filming} close={() => setSettings(false)} /> : null}
+  </div>;
+}
+
+/** Things set once for the whole film: video size and what is recorded. Opens only when asked, so the sidebars stay for work. */
+function FilmSettings({ filming, close }: { filming: StudioFilming; close: () => void }) {
+  const dialog = useRef<HTMLDialogElement>(null), studio = filming.studio, disabled = filming.busy || studio.rendering;
+  useEffect(() => { dialog.current?.showModal(); }, []);
+  const section = 'space-y-2 rounded-lg border border-ink/10 p-3';
+  return createPortal(<dialog ref={dialog} aria-label="Film settings" onClose={close} onCancel={close}
+    className="m-auto max-h-[85vh] w-[min(36rem,calc(100vw-2rem))] overflow-hidden rounded-lg border border-ink/20 bg-paper p-0 text-ink shadow-xl backdrop:bg-black/60">
+    <div className="flex items-center gap-2 border-b border-ink/10 px-4 py-3"><Settings2 className="size-4" /><div className="flex-1"><h2 className="text-sm font-semibold">Film settings</h2><p className="text-xs text-ink/60">Set these once. They apply to the whole film.</p></div>
+      <button className={button} aria-label="Close film settings" onClick={() => dialog.current?.close()}><X className="size-3.5" /></button></div>
+    <div className="max-h-[65vh] space-y-3 overflow-y-auto p-4">
+      {studio.mode === 'gameplay' ? <section className={section} aria-label="Film or recording">
+        <p className="text-xs text-ink/70">This project was made as a gameplay recording. Filming is now for films and series only.</p>
+        <button className={button} disabled={disabled} onClick={() => studio.setMode('production')}><Film className="size-3.5" />Make it a film</button>
+      </section> : null}
+      <section className={section} aria-label="Video"><h3 className="flex items-center gap-2 text-xs font-semibold"><Film className="size-3.5" />Video</h3>
+        <label className="block text-xs text-ink/60">Size<select aria-label="Output size" className={input} value={filming.output.size} disabled={disabled}
+          onChange={(e) => filming.setOutput({ ...filming.output, size: e.target.value })}>
+          <option value="1280x720">HD · 1280×720</option><option value="1920x1080">Full HD · 1920×1080</option><option value="3840x2160">4K · 3840×2160</option><option value="1080x1920">Portrait · 1080×1920</option>
+        </select></label></section>
+      <section className={section} aria-label="Sound"><h3 className="flex items-center gap-2 text-xs font-semibold"><Volume2 className="size-3.5" />Sound</h3>
+        <label className="flex items-center justify-between gap-2 text-xs" data-film-id="film.record.sound">Record the world's sound
+          <input type="checkbox" checked={filming.output.worldSound} disabled={disabled} onChange={(e) => filming.setOutput({ ...filming.output, worldSound: e.target.checked })} /></label>
+        <label className="flex items-center justify-between gap-2 text-xs" data-film-id="film.record.actors"
+          title="People in this place's room are asked if their microphone may be recorded; their voices come back under the shot, one track each.">Record the voices of people in the room
+          <input type="checkbox" checked={filming.output.liveActors} disabled={disabled} onChange={(e) => filming.setOutput({ ...filming.output, liveActors: e.target.checked })} /></label></section>
+      <section className={section} aria-label="Languages"><h3 className="flex items-center gap-2 text-xs font-semibold"><Languages className="size-3.5" />Languages</h3>
+        <p className="text-xs text-ink/60">Captions and dubbing for each language are made in Captions.</p>
+        <button className={button} onClick={() => { studio.setWorkspace('captions'); dialog.current?.close(); }}><Languages className="size-3.5" />Open Captions</button></section>
+    </div>
+    <div className="flex justify-end border-t border-ink/10 px-4 py-3"><button className={button} onClick={() => dialog.current?.close()}>Done</button></div>
+  </dialog>, document.body);
 }
 
 /** Shoot shows the Scene panel (cues for the next take, shot workflow); Edit shows the Clip panel. */
@@ -492,10 +540,6 @@ function InspectorBody({ filming, mode }: { filming: StudioFilming; mode: 'scene
       <p className="px-4 pt-3 text-xs text-ink/60">Choose from your available character library. The chosen character replaces My avatar in the live world. Record a new take to use it in the film; existing recordings keep their original character.</p>
       <div className="max-h-[65vh] overflow-y-auto p-4">{choosingAvatar ? host.userAvatarControls('characters') : null}</div>
     </dialog>, document.body) : null}
-    <label className="block text-xs font-semibold">Production mode<select aria-label="Filming mode" value={studio.mode} disabled={disabled} className={input}
-      onChange={(e) => studio.setMode(e.target.value as 'gameplay' | 'production')}>
-      <option value="production">Film / series</option><option value="gameplay">Gameplay recording</option>
-    </select></label>
     {mode === 'clip' ? <fieldset disabled={disabled} data-film-id="film.clip" className="space-y-3 rounded-lg border border-ink/10 p-3">
       <legend className="flex items-center gap-1 px-1 text-xs font-semibold"><Scissors className="size-3.5" />{clip ? `${located!.track.name} · ${clip.type === 'media' ? clip.name ?? media?.name : clip.type}` : 'Clip properties'}</legend>
       {clip ? <>

@@ -192,7 +192,8 @@ export function useIsDesktop(): boolean {
   }, []);
   return desktop;
 }
-export function studioGrid(layout: StudioLayout, testing: boolean): CSSProperties {
+/** `sceneBar`: Filming keeps its scene tools in a fixed row above the world view, so they never cover the picture. */
+export function studioGrid(layout: StudioLayout, testing: boolean, sceneBar = false): CSSProperties {
   const size = (side: DockEdge) =>
     !testing && layout[`${side}Open`] && dockPanels(layout, side).length ? layout[side] : 0;
   const left = size('left'),
@@ -204,10 +205,11 @@ export function studioGrid(layout: StudioLayout, testing: boolean): CSSPropertie
   return {
     display: 'grid',
     gridTemplateColumns: `${column(left)} ${split(left)} minmax(0, 1fr) ${split(right)} ${column(right)}`,
-    gridTemplateRows: `auto ${testing ? '0px' : 'auto'} minmax(0, 1fr) ${split(bottom)} ${bottom ? `min(${bottom}px, 55dvh)` : '0px'}`,
+    gridTemplateRows: `auto ${testing ? '0px' : 'auto'} ${sceneBar && !testing ? 'auto' : '0px'} minmax(0, 1fr) ${split(bottom)} ${bottom ? `min(${bottom}px, 55dvh)` : '0px'}`,
     gridTemplateAreas: [
       '"top top top top top"',
       '"ribbon ribbon ribbon ribbon ribbon"',
+      '"left lsplit scenebar rsplit right"',
       '"left lsplit viewport rsplit right"',
       '"left lsplit bsplit rsplit right"',
       '"left lsplit console rsplit right"',

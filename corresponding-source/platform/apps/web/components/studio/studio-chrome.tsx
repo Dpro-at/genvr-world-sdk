@@ -489,7 +489,8 @@ export function StudioChrome({
         />
       ) : null}
 
-      {filmWorkspace && !testing ? <div style={{gridArea:'viewport'}} className="pointer-events-none relative z-40 min-h-0 min-w-0"><div role="toolbar" aria-label="Filming quick tools" className="pointer-events-auto absolute inset-x-2 top-2 flex flex-wrap items-center justify-center gap-1 rounded-lg border border-ink/15 bg-surface/95 p-1 shadow-md">
+      {/* Scene tools sit in their own fixed row above the world view (grid area "scenebar"), never over the picture. */}
+      {filmWorkspace && !testing ? <div style={{gridArea:'scenebar'}} className="relative z-40 min-w-0 border-b border-ink/15 bg-surface"><div role="toolbar" aria-label="Filming quick tools" className="flex flex-wrap items-center justify-center gap-1 px-2 py-1">
         <ToolbarMenu label="Characters" icon={Users}><p className="text-xs font-semibold">Choose the live character</p><BodySection editor={character}/>{host.userAvatarControls?.('characters','',body=>character.change(recipe=>({...recipe,body})))}</ToolbarMenu>
         {filming.voiceAvailable ? <ToolbarMenu label="Voice" icon={Mic}><QuickVoice filming={filming}/></ToolbarMenu> : null}
         <ToolbarMenu label="Camera" icon={Camera} closeOnAction>{([{id:'static',label:'Static'},{id:'handheld',label:'Handheld'},{id:'running',label:'Running camera'},{id:'drone',label:'Drone'},{id:'follow',label:'Follow character'},{id:'side',label:'Side tracking'},{id:'orbit',label:'Orbit'}] as const).map(preset=><button key={preset.id} className="rounded px-2 py-2 text-left text-xs hover:bg-ink/10" disabled={filming.busy||filming.studio.rendering} onClick={()=>{filming.studio.setPreviewing(false);filming.preset(preset.id);}}>{preset.label}</button>)}</ToolbarMenu>

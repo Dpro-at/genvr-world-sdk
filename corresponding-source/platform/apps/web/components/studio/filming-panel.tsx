@@ -3,18 +3,60 @@ import { LightingPanel } from './lighting-panel';
 
 
 import { useStudioHost } from '../../lib/studio-host';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { FilmCamera } from '@genvr/contracts';
 import { FILM_PRESETS } from '@genvr/runtime';
 import type { StudioFilming } from '../../lib/use-studio-filming';
 import { HistoryPanel, ShotsPanel } from './film/panels';
+import { Anchor, Camera, Circle, Clock, Drone, Film, Focus, Footprints, Hand, MoveHorizontal, Orbit, SlidersHorizontal, Users, Video, type LucideIcon } from 'lucide-react';
 
 const BUTTON = 'rounded-lg bg-paper px-3 py-2 text-sm font-bold hover:bg-ink/10 disabled:opacity-40';
-/** Left dock of Filming: the camera while shooting; the shots and history in the other workspaces (FILM-04). */
+const TOOL = 'inline-flex items-center justify-center gap-1.5 rounded-lg bg-paper px-2.5 py-2 text-xs font-bold hover:bg-ink/10 disabled:opacity-40';
+type LeftTab = 'camera' | 'cast' | 'shots' | 'history';
+const TABS: ReadonlyArray<{ id: LeftTab; label: string; icon: LucideIcon }> = [
+  { id: 'camera', label: 'Camera', icon: Video },
+  { id: 'cast', label: 'Cast', icon: Users },
+  { id: 'shots', label: 'Shots', icon: Film },
+  { id: 'history', label: 'History', icon: Clock },
+];
+const MOVES: Record<string, { label: string; icon: LucideIcon }> = {
+  static: { label: 'Static', icon: Anchor },
+  handheld: { label: 'Handheld', icon: Hand },
+  running: { label: 'Running', icon: Footprints },
+  drone: { label: 'Drone', icon: Drone },
+  follow: { label: 'Follow', icon: Focus },
+  side: { label: 'Side', icon: MoveHorizontal },
+  orbit: { label: 'Orbit', icon: Orbit },
+};
+
+/** A titled block of the left dock, with an icon like a video editor's panel header. */
+function Section({ icon: Icon, title, children }: { icon: LucideIcon; title: string; children: ReactNode }) {
+  return <section aria-label={title} className="space-y-2 border-b border-ink/10 px-3 py-3 last:border-b-0">
+    <h3 className="flex items-center gap-2 text-sm font-bold"><Icon className="size-4" />{title}</h3>
+    {children}
+  </section>;
+}
+
+/** Left dock of Filming: Camera first, then Cast, Shots and History as tabs. Shooting opens on Camera; editing opens on Shots. */
 export function FilmingPanel({ filming }: { filming: StudioFilming }) {
   const host = useStudioHost();
-  if (filming.studio.workspace !== 'shoot') return <div className="space-y-2 pt-1"><ShotsPanel filming={filming} /><HistoryPanel filming={filming} /></div>;
-  return <div className="space-y-4">{host.userAvatarControls ? <details className="rounded-xl border border-ink/10 p-3"><summary className="cursor-pointer text-sm font-bold">Cast character</summary><p className="mt-2 text-xs text-ink/60">Choose the character for My avatar. Direct its movement and facial cues in Scene inspector.</p>{host.userAvatarControls('characters')}</details> : null}<LightingPanel filming={filming} /><CameraPanel filming={filming} /></div>;
+  const shooting = filming.studio.workspace === 'shoot';
+  const [tab, setTab] = useState<LeftTab>(shooting ? 'camera' : 'shots');
+  useEffect(() => { setTab(shooting ? 'camera' : 'shots'); }, [shooting]);
+  return <div className="text-ink">
+    <div role="tablist" aria-label="Filming tools" className="sticky top-0 z-10 grid grid-cols-4 gap-0.5 border-b border-ink/10 bg-surface p-1">
+      {TABS.map(({ id, label, icon: Icon }) => <button key={id} type="button" role="tab" aria-selected={tab === id} onClick={() => setTab(id)}
+        className={`flex flex-col items-center gap-1 rounded-md px-1 py-1.5 text-[11px] font-bold ${tab === id ? 'bg-ink text-paper' : 'text-ink/60 hover:bg-ink/5 hover:text-ink'}`}><Icon className="size-4" />{label}</button>)}
+    </div>
+    <div role="tabpanel" aria-label={TABS.find(t => t.id === tab)!.label}>
+      {tab === 'camera' ? <CameraPanel filming={filming} /> : null}
+      {tab === 'cast' ? <div className="space-y-2 p-3">{host.userAvatarControls
+        ? <><p className="text-xs text-ink/60">Choose the character for My avatar. Direct its movement and facial cues on the right.</p>{host.userAvatarControls('characters')}</>
+        : <p className="text-xs text-ink/60">Characters come from the host's character library. Choose the live character from Characters above the scene.</p>}</div> : null}
+      {tab === 'shots' ? <div className="pt-1"><ShotsPanel filming={filming} /></div> : null}
+      {tab === 'history' ? <div className="pt-1"><HistoryPanel filming={filming} /></div> : null}
+    </div>
+  </div>;
 }
 
 function CameraPanel({ filming }: { filming: StudioFilming }) {
@@ -71,84 +113,67 @@ function CameraPanel({ filming }: { filming: StudioFilming }) {
   );
   const defaults = FILM_PRESETS[draft.preset];
   return (
-    <div className="space-y-4 px-3 pb-3 text-ink">
-      <p className="text-xs text-ink/60">
-        Film this world with its avatars. Photos are PNG; videos are WebM, with the world's sound when "Record the world's sound" is on.
-      </p>
-      <button className={BUTTON} onClick={() => filming.studio.setOpen(true)}>
-        Open video editor
-      </button>
-      <div className="grid grid-cols-2 gap-2">
-        {Object.keys(FILM_PRESETS).map((name) => (
-          <button
-            key={name}
+    <div className="text-ink">
+      <Section icon={Video} title="Camera move">
+        <div className="grid grid-cols-4 gap-1.5">
+          {Object.keys(FILM_PRESETS).map((name) => {
+            const move = MOVES[name] ?? { label: name, icon: Camera }, Icon = move.icon;
+            return <button
+              key={name}
+              type="button"
+              disabled={filming.busy}
+              aria-pressed={filming.camera?.preset === name}
+              title={name}
+              className="flex flex-col items-center gap-1 rounded-lg border border-ink/10 bg-paper px-1 py-2 text-[11px] font-bold hover:bg-ink/10 disabled:opacity-40 aria-pressed:border-ink aria-pressed:bg-ink aria-pressed:text-paper"
+              onClick={() => filming.preset(name as FilmCamera['preset'])}
+            ><Icon className="size-4" />{move.label}</button>;
+          })}
+        </div>
+        <label className="flex items-center gap-2 text-xs font-bold">
+          <input
+            type="checkbox"
+            checked={draft.follow_player}
             disabled={filming.busy}
-            aria-pressed={filming.camera?.preset === name}
-            className={BUTTON}
-            onClick={() => filming.preset(name as FilmCamera['preset'])}
-          >
-            {name}
-          </button>
-        ))}
-      </div>
-      {axis('position')}
-      {axis('target')}
-      <div className="grid grid-cols-2 gap-2">
-        {number('Lens FOV (degrees)', draft.fov, (fov) => setDraft({ ...draft, fov }), 10, 120)}
-        {number('Roll (degrees)', draft.roll, (roll) => setDraft({ ...draft, roll }), -45, 45)}
-        {number(
-          'Response (lower = heavier)',
-          draft.responsiveness ?? defaults.responsiveness,
-          (responsiveness) => setDraft({ ...draft, responsiveness }),
-          0.1,
-          30,
-        )}
-        {number(
-          'Shake (metres)',
-          draft.shake ?? defaults.shake,
-          (shake) => setDraft({ ...draft, shake }),
-          0,
-          1,
-        )}
-        {number('Orbit speed (degrees/sec)', draft.speed, (speed) => setDraft({ ...draft, speed }), -30, 30)}
-        {number('Shake seed', draft.seed, (seed) => setDraft({ ...draft, seed }), 0, 65535)}
-      </div>
-      <label className="flex gap-2 text-xs font-bold">
-        <input
-          type="checkbox"
-          checked={draft.follow_player}
-          disabled={filming.busy}
-          onChange={(event) => setDraft({ ...draft, follow_player: event.target.checked })}
-        />
-        Follow my avatar
-      </label>
-      <div className="flex flex-wrap gap-2">
-        <button className={BUTTON} disabled={filming.busy} onClick={() => filming.apply(draft)}>
-          Apply and save camera
-        </button>
-        <button className={BUTTON} disabled={filming.busy} onClick={filming.load}>
-          Load saved camera
-        </button>
-        <button className={BUTTON} disabled={filming.busy} onClick={filming.reset}>
-          Gameplay camera
-        </button>
-      </div>
-      <div className="space-y-2 border-t border-ink/10 pt-3">
-        <label className="flex flex-col gap-1 text-xs font-bold">
-          Output size
-          <select
-            aria-label="Output size"
-            value={size}
-            disabled={filming.busy}
-            onChange={(event) => filming.setOutput({ ...filming.output, size: event.target.value })}
-            className="rounded bg-paper p-2"
-          >
-            <option value="1280x720">HD · 1280×720</option>
-            <option value="1920x1080">Full HD · 1920×1080</option>
-            <option value="3840x2160">4K · 3840×2160</option>
-            <option value="1080x1920">Portrait · 1080×1920</option>
-          </select>
+            onChange={(event) => setDraft({ ...draft, follow_player: event.target.checked })}
+          />
+          Follow my avatar
         </label>
+        <details className="rounded-lg border border-ink/10 p-2">
+          <summary className="flex cursor-pointer items-center gap-2 text-xs font-bold"><SlidersHorizontal className="size-3.5" />Fine camera <span className="font-normal text-ink/55">position, lens, shake</span></summary>
+          <div className="mt-2 space-y-3">
+            {axis('position')}
+            {axis('target')}
+            <div className="grid grid-cols-2 gap-2">
+              {number('Lens FOV (degrees)', draft.fov, (fov) => setDraft({ ...draft, fov }), 10, 120)}
+              {number('Roll (degrees)', draft.roll, (roll) => setDraft({ ...draft, roll }), -45, 45)}
+              {number(
+                'Response (lower = heavier)',
+                draft.responsiveness ?? defaults.responsiveness,
+                (responsiveness) => setDraft({ ...draft, responsiveness }),
+                0.1,
+                30,
+              )}
+              {number(
+                'Shake (metres)',
+                draft.shake ?? defaults.shake,
+                (shake) => setDraft({ ...draft, shake }),
+                0,
+                1,
+              )}
+              {number('Orbit speed (degrees/sec)', draft.speed, (speed) => setDraft({ ...draft, speed }), -30, 30)}
+              {number('Shake seed', draft.seed, (seed) => setDraft({ ...draft, seed }), 0, 65535)}
+            </div>
+          </div>
+        </details>
+        <div className="grid grid-cols-3 gap-1.5">
+          <button className={TOOL} disabled={filming.busy} onClick={() => filming.apply(draft)} title="Apply and save camera">Save camera</button>
+          <button className={TOOL} disabled={filming.busy} onClick={filming.load} title="Load saved camera">Load</button>
+          <button className={TOOL} disabled={filming.busy} onClick={filming.reset} title="Back to the player's own camera">Player view</button>
+        </div>
+      </Section>
+      {/* The lighting panel brings its own titled header (shared with Build), so it is not wrapped in a second one. */}
+      <div className="border-b border-ink/10 px-3 py-3"><LightingPanel filming={filming} /></div>
+      <Section icon={Circle} title="Record">
         {number(
           'Video duration (seconds)',
           seconds,
@@ -156,37 +181,30 @@ function CameraPanel({ filming }: { filming: StudioFilming }) {
           1,
           30,
         )}
-        <label className="flex items-center gap-2 text-xs font-bold" data-film-id="film.record.sound">
-          <input type="checkbox" checked={filming.output.worldSound} disabled={filming.busy}
-            onChange={(event) => filming.setOutput({ ...filming.output, worldSound: event.target.checked })} />
-          Record the world's sound
-        </label>
-        <label className="flex items-center gap-2 text-xs font-bold" data-film-id="film.record.actors"
-          title="People in this place's room are asked if their microphone may be recorded; their voices come back under the shot, one track each.">
-          <input type="checkbox" checked={filming.output.liveActors} disabled={filming.busy}
-            onChange={(event) => filming.setOutput({ ...filming.output, liveActors: event.target.checked })} />
-          Record the actors' voices (people in the room)
-        </label>
-        <div className="flex flex-wrap gap-2">
+        <p className="text-xs text-ink/60">{size.replace('x', '×')} · {filming.output.worldSound ? "world sound on" : 'world sound off'} · change in Film settings</p>
+        <div className="grid grid-cols-2 gap-1.5">
           {(['photo', 'video'] as const).map((kind) => (
             <button
               key={kind}
-              className={BUTTON}
+              className={kind === 'video' ? `${TOOL} bg-red-600 text-white hover:bg-red-700` : TOOL}
               disabled={filming.busy}
               onClick={() => {
                 const [width, height] = size.split('x').map(Number);
                 void filming.take(kind, seconds, width!, height!);
               }}
             >
-              {kind === 'photo' ? 'Download photo' : 'Record video'}
+              {kind === 'photo' ? <><Camera className="size-3.5" />Download photo</> : <><Circle className="size-3 fill-current" />Record video</>}
             </button>
           ))}
         </div>
+        <button className={`${BUTTON} w-full`} onClick={() => filming.studio.setOpen(true)}>
+          Open video editor
+        </button>
         <p className="text-xs text-ink/60">
-          Encoding size may exceed the rendered detail. Movement can continue during recording.
+          Photos are PNG; videos are WebM. Encoding size may exceed the rendered detail. Movement can continue during recording.
         </p>
-      </div>
-      <p role="status" className="break-words text-xs font-bold text-ink/70">
+      </Section>
+      <p role="status" className="break-words px-3 pb-3 text-xs font-bold text-ink/70">
         {filming.message}
       </p>
     </div>
