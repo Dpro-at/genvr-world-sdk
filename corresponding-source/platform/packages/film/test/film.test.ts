@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   FilmSession, HISTORY_STEPS, TICKS_PER_SECOND, check, emptyFilm, frame, fromSeconds, isHostOnly, migrate, readFilmFile,
-  secondsOnFrame, snap, timecode, toSeconds, validRate, writeFilmFile, type FilmProject, type Media, type MediaClip,
+  secondsOnFrame, snap, timecode, toSeconds, validRate, writeFilmFile, forExport, type FilmProject, type Media, type MediaClip,
 } from '../src/index.js';
 
 const s = fromSeconds;
@@ -351,4 +351,45 @@ it('preserves a saved character voice and its dialogue audio through portable fi
   const restored = readFilmFile(file);
   expect(restored.project.media[0]!.cues[0]!.voice).toEqual(voice);
   expect(restored.assets.some(asset => asset.id === 'speech')).toBe(true);
+});
+
+describe('film settings (FILM-A2)', () => {
+  it('fills defaults, merges parts, undoes, and is visible to agents', () => {
+    const session = new FilmSession(emptyFilm(), counter());
+    const shown = () => (session.run('project.inspect') as { ok: true; result: { settings: Record<string, unknown> } }).result.settings;
+    expect(shown()).toMatchObject({ kind: 'film', shotSeconds: 5, worldSound: true, caption: { size: 'medium', place: 'bottom' } });
+    ok(session.run('project.settings', { kind: 'series', name: 'The Island', languages: [{ lang: 'ar', level: 'text_voice' }, { lang: 'de', level: 'text' }] }));
+    ok(session.run('project.settings', { caption: { place: 'top' }, director: { autonomy: 'each' } }));
+    expect(shown()).toMatchObject({ kind: 'series', name: 'The Island', caption: { size: 'medium', place: 'top', inExport: true }, director: { autonomy: 'each' } });
+    expect(session.run('project.settings', { languages: [{ lang: 'ar', level: 'text' }, { lang: 'ar', level: 'text' }] })).toMatchObject({ ok: false });
+    expect(session.run('project.settings', { shotSeconds: 31 })).toMatchObject({ ok: false });
+    ok(session.run('edit.undo'));
+    expect(shown()).toMatchObject({ caption: { place: 'bottom' }, director: { autonomy: 'end' } });
+    expect(session.list().some((c) => c.id === 'project.settings' && c.enabled)).toBe(true);
+    // Saved films keep their settings.
+    expect(readFilmFile(writeFilmFile(session.project, [])).project.settings?.name).toBe('The Island');
+  });
+});
+
+describe('export per language (FILM-A3)', () => {
+  const tracks = (project: FilmProject) => Object.fromEntries(project.tracks.filter((t) => t.lang).map((t) => [`${t.kind}:${t.lang}`, { hidden: t.hidden, muted: t.muted }]));
+  const withLanguages = () => {
+    const base = emptyFilm();
+    const extra = (['ar', 'en'] as const).flatMap((lang, i) => [
+      { id: `T${i + 2}`, kind: 'caption' as const, name: `T${i + 2}`, lang, locked: false, muted: false, solo: false, hidden: lang !== 'ar', clips: [] },
+      { id: `A${i + 5}`, kind: 'sound' as const, name: `A${i + 5}`, lang, locked: false, muted: false, solo: false, hidden: false, clips: [] },
+    ]);
+    return { ...base, tracks: [...base.tracks, ...extra] };
+  };
+  it('keeps only the chosen language', () => {
+    expect(tracks(forExport(withLanguages(), { language: 'en' }))).toEqual({
+      'caption:ar': { hidden: true, muted: false }, 'sound:ar': { hidden: false, muted: true },
+      'caption:en': { hidden: false, muted: false }, 'sound:en': { hidden: false, muted: false } });
+  });
+  it('hides captions on request and refuses a missing language', () => {
+    expect(Object.values(tracks(forExport(withLanguages(), { captions: 'none' }))).filter((t) => t.hidden).length).toBe(2);
+    expect(() => forExport(withLanguages(), { language: 'de' })).toThrow(/no captions or voice in de/);
+    // Without options the film is unchanged.
+    expect(tracks(forExport(withLanguages()))).toEqual(tracks(withLanguages()));
+  });
 });

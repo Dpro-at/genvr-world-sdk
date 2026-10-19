@@ -28,12 +28,18 @@ Jobs live in the MCP client process that started them: keep one client open for 
 | `dialogue_voice` | `cue_id`, `voice_id`, `language`, optional `shot_id` | generates the line with a saved voice; line length sets the cue end |
 | `dialogue_preview` | `cue_id`, optional `shot_id` | listen with mouth motion |
 | `record` | optional `shot_id`, `settings`, `world_sound`, `live_actors` | timed take with the draft cues |
-| `manual_record` | `action: start / stop` | free take; 30 s safety limit; wait for stop's job before editing |
+| `manual_record` | `action: start / stop`, optional `seconds` 1–30 (default 30) | live take: the person moves the character; `seconds` is the longest it runs; wait for stop's job before editing |
 | `dialogue_track` | `cue_id`, `shot_id` (**clip id**), `language`, `start`, `append` | promotes a cue's audio + text to that language's voice + caption tracks |
 | `sound_import` | `name`, audio MIME, base64 `data` (≤ 8 MB decoded) | imports at the playhead; returns `media` and `clip` |
 | `lighting` | optional `lights[]` | read or replace up to four spotlights |
-| `export` | optional `shot_id` (**clip id**), `width` 320–1920, `height` 240–1920 | shot window or full film; WebM |
+| `export` | optional `shot_id` (**clip id**) or `range: 'marked'`, `width` 320–3840, `height` 240–2160, optional `language`, `captions: 'picture' / 'none'` | full film, one shot or the marked In/Out; `language` keeps only that language's captions and voice (call once per language for one file each); WebM ≤ 40 MB |
 | `undo` / `redo` | — | one editor step each |
+
+Film settings (set once for the whole film; read them first with `inspect` → `film.settings`):
+`command` `project.settings` with any part of `{ kind: 'film'|'series', name, languages: [{ lang, level: 'text'|'text_voice' }]
+(first = main language), story, shotSeconds 1–30, worldSound, roomVoices, caption: { size, place, inExport },
+titles: { intro, episodeCard, credits, creditsText }, director: { autonomy: 'auto'|'end'|'each' } }`. Parts merge; it is one
+undo step. Video size is `project.size`. Titles and the AI director are stored now and used in a later release.
 
 Editor commands used often: `clip.trim`, `clip.move`, `clip.split`, `clip.set` (volume), `clip.fade`,
 `clip.remove`, `clip.soundType`, `track.set`, `transition.add/set/remove`.

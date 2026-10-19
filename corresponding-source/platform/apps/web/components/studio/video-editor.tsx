@@ -4,7 +4,7 @@ import { createPortal } from 'react-dom';
 import { Scissors, Undo2, Redo2, Download, Circle, Type, Camera, Plus, Trash2, Magnet, SlidersHorizontal,
   Users, Mic, Film, Languages, Bookmark, FolderOpen, Save, MousePointer2, ChevronsRight, Columns2, ArrowLeftRight, MoveHorizontal,
   Clapperboard, Volume2, Palette, BookOpen, Settings2, X } from 'lucide-react';
-import { filmLength, fromSeconds, timecode, toSeconds, type Clip, type Track } from '@genvr/film';
+import { filmLength, filmSettings, forExport, fromSeconds, timecode, toSeconds, type Clip, type Track } from '@genvr/film';
 import type { StudioFilming } from '../../lib/use-studio-filming';
 import { drawAt, mediaDuration, render } from '../../lib/video-studio/render';
 import { CaptionsPanel, SoundPanel, WorkspaceSwitch } from './film/panels';
@@ -14,6 +14,9 @@ import { KeyLane } from './film/keyframes';
 import { TitleMenu, TitlePanel, TransitionPanel } from './film/titles-panel';
 import { TransitionsWorkspace } from './film/transitions-panel';
 import { ColourPanel } from './film/colour-panel';
+import { FilmSettings } from './film/film-settings';
+import { record } from './film/record';
+import { AddMenu, ExportMenu } from './film/add-menu';
 import { useStudioHost } from '../../lib/studio-host';
 import { SceneVoice } from './film/scene-voice';
 import { ClipFace, KIND, Meters, Ruler, SoundCrossfade, TL, Toggle, TrackHeader, ZoomBar, clipBox } from './film/timeline-parts';
@@ -35,12 +38,6 @@ function loadView(): TimelineView {
 
 function attempt(filming: StudioFilming, action: () => void) {
   try { action(); } catch (error) { filming.studio.setMessage(error instanceof Error ? error.message : 'Edit failed.'); }
-}
-function record(filming: StudioFilming, replace?: string) {
-  if (!replace && filming.studio.mode === 'gameplay') filming.reset();
-  filming.studio.setPreviewing(false);
-  const [width, height] = filming.output.size.split('x').map(Number);
-  void filming.take('video', filming.output.seconds, width!, height!, true, replace, filming.studio.plan);
 }
 
 /** A button that runs one editor command; when it cannot run, it is disabled and says why. */
@@ -72,7 +69,7 @@ export function VideoEditor({ filming }: { filming: StudioFilming }) {
   const lanes = useRef<HTMLDivElement>(null), scroller = useRef<HTMLDivElement>(null);
   const [stage, setStage] = useState<HTMLElement | null>(null), [time, setTime] = useState(0), [zoom, setZoom] = useState(48);
   const [drag, setDrag] = useState<Drag | null>(null), [tool, setTool] = useState<Tool>('select');
-  const [exportScope,setExportScope] = useState<'film'|'clip'|'range'>('film');
+  const [exportLanguage, setExportLanguage] = useState('');
   const [scroll, setScroll] = useState({ left: 0, view: 800 });
   const anchor = useRef<{ time: number; offset: number } | null>(null);
   const [view, setViewState] = useState<TimelineView>(loadView);
@@ -125,10 +122,12 @@ export function VideoEditor({ filming }: { filming: StudioFilming }) {
     const resume = filming.pauseForPlayback();
     let reached = from;
     try {
-      const blob = await render(project, studio.assets, canvas.current, controller.signal, (seconds) => { reached = seconds; setTime(seconds); }, exporting, from,
+      // Export (FILM-A3): one language per file when chosen; captions on the picture as Film settings says.
+      const filmToRender = exporting ? forExport(project, { language: exportLanguage || undefined, captions: filmSettings(project).caption.inExport ? 'picture' : 'none' }) : project;
+      const blob = await render(filmToRender, studio.assets, canvas.current, controller.signal, (seconds) => { reached = seconds; setTime(seconds); }, exporting, from,
         exporting ? undefined : studio.setLevels, range);
       if (blob) {
-        const url = URL.createObjectURL(blob), link = document.createElement('a'); link.href = url; link.download = `genvr-episode-${project.tracks.find(t => t.kind === 'caption' && t.lang && !t.hidden)?.lang ?? 'original'}.webm`;
+        const url = URL.createObjectURL(blob), link = document.createElement('a'); link.href = url; link.download = `genvr-episode-${exportLanguage || (filmToRender.tracks.find(t => t.kind === 'caption' && t.lang && !t.hidden)?.lang ?? 'original')}.webm`;
         link.click(); setTimeout(() => URL.revokeObjectURL(url), 60000); studio.setMessage('Sequence exported with its captions and attached dialogue audio.');
       }
     } catch (error) { if (!controller.signal.aborted) studio.setMessage(error instanceof Error ? error.message : 'Preview failed.'); }
@@ -335,20 +334,15 @@ export function VideoEditor({ filming }: { filming: StudioFilming }) {
     {/* One toolbar row; on narrow screens it scrolls sideways so the tracks keep their room. */}
     <div className="flex shrink-0 items-center gap-2 overflow-x-auto border-b border-ink/10 px-3 py-1.5 [&>*]:shrink-0 [scrollbar-width:thin]">
       <WorkspaceSwitch filming={filming} />
-      <button className={`${button} !border-red-500/50`} data-film-id="film.record" disabled={!studio.ready || filming.busy || running} onClick={() => { studio.setWorkspace('shoot'); record(filming); }}><Circle className="size-3 fill-red-500 text-red-500" />Record shot</button>
       <div className={group} aria-label="Edit">
         <Command filming={filming} id="clip.split" title="Split at the playhead (Ctrl+K)"><Scissors className="size-3.5" />Split</Command>
         <Command filming={filming} id="clip.remove" args={{ ripple: view.ripple }} title={view.ripple ? 'Delete and close the gap (Delete; Shift+Delete leaves a gap)' : 'Delete and leave a gap (Delete; Shift+Delete closes it)'}><Trash2 className="size-3.5" /></Command>
         <button type="button" aria-pressed={view.ripple} data-film-id="film.timeline.ripple" className={`${button} ${view.ripple ? '!bg-ink !text-paper' : ''}`}
           title={view.ripple ? 'Ripple on: cutting or deleting moves everything after it on every track (Shift: not this time)' : 'Ripple off: cuts leave gaps (Shift: ripple this time)'}
-          onClick={() => setView({ ripple: !view.ripple })}><ChevronsRight className="size-3.5" />Ripple</button>
+          aria-label="Ripple" onClick={() => setView({ ripple: !view.ripple })}><ChevronsRight className="size-3.5" /></button>
         <Command filming={filming} id="marker.add" title="Add a marker (M)"><Bookmark className="size-3.5" /></Command>
       </div>
-      <div className={group} aria-label="Add">
-        <Command filming={filming} id="caption.add" args={{ text: 'New caption' }}><Type className="size-3.5" />Caption</Command>
-        <TitleMenu filming={filming} />
-        <AdjustmentMenu filming={filming} />
-      </div>
+      <AddMenu filming={filming} />
       <div className="ml-auto flex items-center gap-2">
         <div className={group} aria-label="History">
           <Command filming={filming} id="edit.undo" name="Undo" title={studio.undoLabel ? `Undo ${studio.undoLabel}` : 'Nothing to undo.'}><Undo2 className="size-3.5" /></Command>
@@ -367,10 +361,8 @@ export function VideoEditor({ filming }: { filming: StudioFilming }) {
           {studio.previous ? <button className={button} title="Bring back the film that was open before the last Open" data-film-id="film.file.restore" disabled={running || filming.busy || !studio.ready}
             onClick={() => { if (window.confirm('Bring back the previous film in place of this one?')) void studio.restorePrevious().catch((e) => studio.setMessage(e instanceof Error ? e.message : 'Restore failed.')); }}>Restore</button> : null}
         </div>
-        <select aria-label="Export scope" className="rounded border border-ink/15 bg-paper px-2 py-1 text-xs" value={exportScope} onChange={e=>setExportScope(e.target.value as typeof exportScope)} disabled={running||filming.busy}><option value="film">Full film</option><option value="clip">Selected shot</option><option value="range" disabled={!project.range}>Marked range</option></select>
-        <button className="inline-flex items-center justify-center gap-1.5 rounded-md bg-brand px-3 py-1.5 text-xs font-bold text-on-brand hover:opacity-90 disabled:opacity-35" data-film-id="film.export" disabled={!studio.length || running || filming.busy}
-          onClick={() => { if (!flashes.length || window.confirm(`${flashes.join('\n')}\n\nFlashing can hurt people with photosensitive epilepsy. Export anyway?`)) void play(true,exportScope); }}>
-          <Download className="size-3.5" />Export</button>
+        <ExportMenu filming={filming} language={exportLanguage} setLanguage={setExportLanguage}
+          run={(scope) => { if (!flashes.length || window.confirm(`${flashes.join('\n')}\n\nFlashing can hurt people with photosensitive epilepsy. Export anyway?`)) void play(true, scope); }} />
       </div>
     </div>
     <div className="flex min-h-0 flex-1" style={{ background: TL.panel, color: TL.text }}>
@@ -463,39 +455,6 @@ export function VideoSceneInspector({ filming }: { filming: StudioFilming }) {
     <div className="pt-3">{body}</div>
     {settings ? <FilmSettings filming={filming} close={() => setSettings(false)} /> : null}
   </div>;
-}
-
-/** Things set once for the whole film: video size and what is recorded. Opens only when asked, so the sidebars stay for work. */
-function FilmSettings({ filming, close }: { filming: StudioFilming; close: () => void }) {
-  const dialog = useRef<HTMLDialogElement>(null), studio = filming.studio, disabled = filming.busy || studio.rendering;
-  useEffect(() => { dialog.current?.showModal(); }, []);
-  const section = 'space-y-2 rounded-lg border border-ink/10 p-3';
-  return createPortal(<dialog ref={dialog} aria-label="Film settings" onClose={close} onCancel={close}
-    className="m-auto max-h-[85vh] w-[min(36rem,calc(100vw-2rem))] overflow-hidden rounded-lg border border-ink/20 bg-paper p-0 text-ink shadow-xl backdrop:bg-black/60">
-    <div className="flex items-center gap-2 border-b border-ink/10 px-4 py-3"><Settings2 className="size-4" /><div className="flex-1"><h2 className="text-sm font-semibold">Film settings</h2><p className="text-xs text-ink/60">Set these once. They apply to the whole film.</p></div>
-      <button className={button} aria-label="Close film settings" onClick={() => dialog.current?.close()}><X className="size-3.5" /></button></div>
-    <div className="max-h-[65vh] space-y-3 overflow-y-auto p-4">
-      {studio.mode === 'gameplay' ? <section className={section} aria-label="Film or recording">
-        <p className="text-xs text-ink/70">This project was made as a gameplay recording. Filming is now for films and series only.</p>
-        <button className={button} disabled={disabled} onClick={() => studio.setMode('production')}><Film className="size-3.5" />Make it a film</button>
-      </section> : null}
-      <section className={section} aria-label="Video"><h3 className="flex items-center gap-2 text-xs font-semibold"><Film className="size-3.5" />Video</h3>
-        <label className="block text-xs text-ink/60">Size<select aria-label="Output size" className={input} value={filming.output.size} disabled={disabled}
-          onChange={(e) => filming.setOutput({ ...filming.output, size: e.target.value })}>
-          <option value="1280x720">HD · 1280×720</option><option value="1920x1080">Full HD · 1920×1080</option><option value="3840x2160">4K · 3840×2160</option><option value="1080x1920">Portrait · 1080×1920</option>
-        </select></label></section>
-      <section className={section} aria-label="Sound"><h3 className="flex items-center gap-2 text-xs font-semibold"><Volume2 className="size-3.5" />Sound</h3>
-        <label className="flex items-center justify-between gap-2 text-xs" data-film-id="film.record.sound">Record the world's sound
-          <input type="checkbox" checked={filming.output.worldSound} disabled={disabled} onChange={(e) => filming.setOutput({ ...filming.output, worldSound: e.target.checked })} /></label>
-        <label className="flex items-center justify-between gap-2 text-xs" data-film-id="film.record.actors"
-          title="People in this place's room are asked if their microphone may be recorded; their voices come back under the shot, one track each.">Record the voices of people in the room
-          <input type="checkbox" checked={filming.output.liveActors} disabled={disabled} onChange={(e) => filming.setOutput({ ...filming.output, liveActors: e.target.checked })} /></label></section>
-      <section className={section} aria-label="Languages"><h3 className="flex items-center gap-2 text-xs font-semibold"><Languages className="size-3.5" />Languages</h3>
-        <p className="text-xs text-ink/60">Captions and dubbing for each language are made in Captions.</p>
-        <button className={button} onClick={() => { studio.setWorkspace('captions'); dialog.current?.close(); }}><Languages className="size-3.5" />Open Captions</button></section>
-    </div>
-    <div className="flex justify-end border-t border-ink/10 px-4 py-3"><button className={button} onClick={() => dialog.current?.close()}>Done</button></div>
-  </dialog>, document.body);
 }
 
 /** Shoot shows the Scene panel (cues for the next take, shot workflow); Edit shows the Clip panel. */

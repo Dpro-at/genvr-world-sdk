@@ -8,10 +8,10 @@ import { FilmCamera } from '@genvr/contracts';
 import { FILM_PRESETS } from '@genvr/runtime';
 import type { StudioFilming } from '../../lib/use-studio-filming';
 import { HistoryPanel, ShotsPanel } from './film/panels';
-import { Anchor, Camera, Circle, Clock, Drone, Film, Focus, Footprints, Hand, MoveHorizontal, Orbit, SlidersHorizontal, Users, Video, type LucideIcon } from 'lucide-react';
+import { QuickVoice } from './film/quick-voice';
+import { Anchor, Camera, Clock, Crosshair, Drone, Film, Focus, Footprints, FolderOpen, Hand, Info, Mic, MoveHorizontal, Orbit, Save, SlidersHorizontal, UserRound, Users, Video, type LucideIcon } from 'lucide-react';
 
-const BUTTON = 'rounded-lg bg-paper px-3 py-2 text-sm font-bold hover:bg-ink/10 disabled:opacity-40';
-const TOOL = 'inline-flex items-center justify-center gap-1.5 rounded-lg bg-paper px-2.5 py-2 text-xs font-bold hover:bg-ink/10 disabled:opacity-40';
+const ICON = 'inline-flex size-8 items-center justify-center rounded-md hover:bg-ink/10 disabled:opacity-40 aria-pressed:bg-ink/15 aria-pressed:ring-1 aria-pressed:ring-ink/30';
 type LeftTab = 'camera' | 'cast' | 'shots' | 'history';
 const TABS: ReadonlyArray<{ id: LeftTab; label: string; icon: LucideIcon }> = [
   { id: 'camera', label: 'Camera', icon: Video },
@@ -30,9 +30,11 @@ const MOVES: Record<string, { label: string; icon: LucideIcon }> = {
 };
 
 /** A titled block of the left dock, with an icon like a video editor's panel header. */
-function Section({ icon: Icon, title, children }: { icon: LucideIcon; title: string; children: ReactNode }) {
+function Section({ icon: Icon, title, children, value, help }: { icon: LucideIcon; title: string; children: ReactNode; value?: string; help?: string }) {
   return <section aria-label={title} className="space-y-2 border-b border-ink/10 px-3 py-3 last:border-b-0">
-    <h3 className="flex items-center gap-2 text-sm font-bold"><Icon className="size-4" />{title}</h3>
+    <h3 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-ink/60"><Icon className="size-4" />{title}
+      {help ? <span title={help} aria-label={help} className="text-ink/45"><Info className="size-3.5" /></span> : null}
+      {value ? <span className="ml-auto text-xs font-bold normal-case tracking-normal text-ink">{value}</span> : null}</h3>
     {children}
   </section>;
 }
@@ -44,15 +46,19 @@ export function FilmingPanel({ filming }: { filming: StudioFilming }) {
   const [tab, setTab] = useState<LeftTab>(shooting ? 'camera' : 'shots');
   useEffect(() => { setTab(shooting ? 'camera' : 'shots'); }, [shooting]);
   return <div className="text-ink">
-    <div role="tablist" aria-label="Filming tools" className="sticky top-0 z-10 grid grid-cols-4 gap-0.5 border-b border-ink/10 bg-surface p-1">
-      {TABS.map(({ id, label, icon: Icon }) => <button key={id} type="button" role="tab" aria-selected={tab === id} onClick={() => setTab(id)}
-        className={`flex flex-col items-center gap-1 rounded-md px-1 py-1.5 text-[11px] font-bold ${tab === id ? 'bg-ink text-paper' : 'text-ink/60 hover:bg-ink/5 hover:text-ink'}`}><Icon className="size-4" />{label}</button>)}
+    {/* Design v11: only the open tab shows its name; the others are icons with a tooltip. */}
+    <div role="tablist" aria-label="Filming tools" className="sticky top-0 z-10 flex gap-0.5 border-b border-ink/10 bg-surface p-1">
+      {TABS.map(({ id, label, icon: Icon }) => <button key={id} type="button" role="tab" aria-selected={tab === id} aria-label={label} title={label} onClick={() => setTab(id)}
+        className={`flex h-8 items-center justify-center gap-1.5 rounded-md px-2 text-xs font-bold ${tab === id ? 'flex-1 bg-ink text-paper' : 'min-w-8 text-ink/60 hover:bg-ink/5 hover:text-ink'}`}><Icon className="size-4" />{tab === id ? label : null}</button>)}
     </div>
     <div role="tabpanel" aria-label={TABS.find(t => t.id === tab)!.label}>
       {tab === 'camera' ? <CameraPanel filming={filming} /> : null}
-      {tab === 'cast' ? <div className="space-y-2 p-3">{host.userAvatarControls
-        ? <><p className="text-xs text-ink/60">Choose the character for My avatar. Direct its movement and facial cues on the right.</p>{host.userAvatarControls('characters')}</>
-        : <p className="text-xs text-ink/60">Characters come from the host's character library. Choose the live character from Characters above the scene.</p>}</div> : null}
+      {tab === 'cast' ? <div>
+        <Section icon={Users} title="Character" help="Choose the character for My avatar. Direct its movement and face on the right.">
+          {host.userAvatarControls ? host.userAvatarControls('characters') : <p className="text-xs text-ink/60">Characters come from the host's character library: choose one from Characters above the scene.</p>}
+        </Section>
+        {filming.voiceAvailable ? <Section icon={Mic} title="Voice"><QuickVoice filming={filming} /></Section> : null}
+      </div> : null}
       {tab === 'shots' ? <div className="pt-1"><ShotsPanel filming={filming} /></div> : null}
       {tab === 'history' ? <div className="pt-1"><HistoryPanel filming={filming} /></div> : null}
     </div>
@@ -61,7 +67,6 @@ export function FilmingPanel({ filming }: { filming: StudioFilming }) {
 
 function CameraPanel({ filming }: { filming: StudioFilming }) {
   const [draft, setDraft] = useState(() => FilmCamera.parse({}));
-  const { seconds, size } = filming.output;
   useEffect(() => {
     if (filming.camera) setDraft(filming.camera);
   }, [filming.camera]);
@@ -114,8 +119,8 @@ function CameraPanel({ filming }: { filming: StudioFilming }) {
   const defaults = FILM_PRESETS[draft.preset];
   return (
     <div className="text-ink">
-      <Section icon={Video} title="Camera move">
-        <div className="grid grid-cols-4 gap-1.5">
+      <Section icon={Video} title="Camera move" value={MOVES[filming.camera?.preset ?? '']?.label ?? 'Player view'}>
+        <div className="flex flex-wrap gap-1">
           {Object.keys(FILM_PRESETS).map((name) => {
             const move = MOVES[name] ?? { label: name, icon: Camera }, Icon = move.icon;
             return <button
@@ -123,23 +128,23 @@ function CameraPanel({ filming }: { filming: StudioFilming }) {
               type="button"
               disabled={filming.busy}
               aria-pressed={filming.camera?.preset === name}
-              title={name}
-              className="flex flex-col items-center gap-1 rounded-lg border border-ink/10 bg-paper px-1 py-2 text-[11px] font-bold hover:bg-ink/10 disabled:opacity-40 aria-pressed:border-ink aria-pressed:bg-ink aria-pressed:text-paper"
+              title={move.label}
+              aria-label={move.label}
+              className="inline-flex size-9 items-center justify-center rounded-md border border-ink/10 bg-paper hover:bg-ink/10 disabled:opacity-40 aria-pressed:border-ink aria-pressed:bg-ink aria-pressed:text-paper"
               onClick={() => filming.preset(name as FilmCamera['preset'])}
-            ><Icon className="size-4" />{move.label}</button>;
+            ><Icon className="size-4" /></button>;
           })}
         </div>
-        <label className="flex items-center gap-2 text-xs font-bold">
-          <input
-            type="checkbox"
-            checked={draft.follow_player}
-            disabled={filming.busy}
-            onChange={(event) => setDraft({ ...draft, follow_player: event.target.checked })}
-          />
-          Follow my avatar
-        </label>
+        <div className="flex items-center gap-1">
+          <button type="button" className={ICON} aria-label="Follow my avatar" title="Follow my avatar (on / off)" aria-pressed={draft.follow_player} disabled={filming.busy}
+            onClick={() => { const next = { ...draft, follow_player: !draft.follow_player }; setDraft(next); filming.apply(next); }}><Crosshair className="size-4" /></button>
+          <span className="mx-1 h-5 w-px bg-ink/15" />
+          <button type="button" className={ICON} disabled={filming.busy} onClick={() => filming.apply(draft)} aria-label="Save camera" title="Apply and save camera"><Save className="size-4" /></button>
+          <button type="button" className={ICON} disabled={filming.busy} onClick={filming.load} aria-label="Load camera" title="Load saved camera"><FolderOpen className="size-4" /></button>
+          <button type="button" className={ICON} disabled={filming.busy} onClick={filming.reset} aria-label="Player view" title="Back to the player's own camera"><UserRound className="size-4" /></button>
+        </div>
         <details className="rounded-lg border border-ink/10 p-2">
-          <summary className="flex cursor-pointer items-center gap-2 text-xs font-bold"><SlidersHorizontal className="size-3.5" />Fine camera <span className="font-normal text-ink/55">position, lens, shake</span></summary>
+          <summary className="flex cursor-pointer items-center gap-2 text-xs font-bold"><SlidersHorizontal className="size-3.5" />Fine camera <span className="ml-auto font-normal text-ink/55">{draft.position.join(', ')} · {draft.fov}°</span></summary>
           <div className="mt-2 space-y-3">
             {axis('position')}
             {axis('target')}
@@ -165,45 +170,10 @@ function CameraPanel({ filming }: { filming: StudioFilming }) {
             </div>
           </div>
         </details>
-        <div className="grid grid-cols-3 gap-1.5">
-          <button className={TOOL} disabled={filming.busy} onClick={() => filming.apply(draft)} title="Apply and save camera">Save camera</button>
-          <button className={TOOL} disabled={filming.busy} onClick={filming.load} title="Load saved camera">Load</button>
-          <button className={TOOL} disabled={filming.busy} onClick={filming.reset} title="Back to the player's own camera">Player view</button>
-        </div>
       </Section>
       {/* The lighting panel brings its own titled header (shared with Build), so it is not wrapped in a second one. */}
       <div className="border-b border-ink/10 px-3 py-3"><LightingPanel filming={filming} /></div>
-      <Section icon={Circle} title="Record">
-        {number(
-          'Video duration (seconds)',
-          seconds,
-          (value) => filming.setOutput({ ...filming.output, seconds: value }),
-          1,
-          30,
-        )}
-        <p className="text-xs text-ink/60">{size.replace('x', '×')} · {filming.output.worldSound ? "world sound on" : 'world sound off'} · change in Film settings</p>
-        <div className="grid grid-cols-2 gap-1.5">
-          {(['photo', 'video'] as const).map((kind) => (
-            <button
-              key={kind}
-              className={kind === 'video' ? `${TOOL} bg-red-600 text-white hover:bg-red-700` : TOOL}
-              disabled={filming.busy}
-              onClick={() => {
-                const [width, height] = size.split('x').map(Number);
-                void filming.take(kind, seconds, width!, height!);
-              }}
-            >
-              {kind === 'photo' ? <><Camera className="size-3.5" />Download photo</> : <><Circle className="size-3 fill-current" />Record video</>}
-            </button>
-          ))}
-        </div>
-        <button className={`${BUTTON} w-full`} onClick={() => filming.studio.setOpen(true)}>
-          Open video editor
-        </button>
-        <p className="text-xs text-ink/60">
-          Photos are PNG; videos are WebM. Encoding size may exceed the rendered detail. Movement can continue during recording.
-        </p>
-      </Section>
+      <p className="px-3 pt-3 text-xs text-ink/55">Record shot, Live take, Photo and the take length are in the bar above the scene. Video size and sound are in Film settings.</p>
       <p role="status" className="break-words px-3 pb-3 text-xs font-bold text-ink/70">
         {filming.message}
       </p>

@@ -27,6 +27,7 @@ import { PropertiesPanel } from './properties-panel';
 import { SnapBar } from './snap-bar';
 import { GenvrMark } from '../genvr-mark';
 import { FilmingPanel } from './filming-panel';
+import { RecordingBar } from './film/recording-bar';
 import { StoryPanel } from './story-panel';
 import type { StudioFilming } from '../../lib/use-studio-filming';
 import { VideoEditor, VideoSceneInspector } from './video-editor';
@@ -490,15 +491,9 @@ export function StudioChrome({
       ) : null}
 
       {/* Scene tools sit in their own fixed row above the world view (grid area "scenebar"), never over the picture. */}
-      {filmWorkspace && !testing ? <div style={{gridArea:'scenebar'}} className="relative z-40 min-w-0 border-b border-ink/15 bg-surface"><div role="toolbar" aria-label="Filming quick tools" className="flex flex-wrap items-center justify-center gap-1 px-2 py-1">
-        <ToolbarMenu label="Characters" icon={Users}><p className="text-xs font-semibold">Choose the live character</p><BodySection editor={character}/>{host.userAvatarControls?.('characters','',body=>character.change(recipe=>({...recipe,body})))}</ToolbarMenu>
-        {filming.voiceAvailable ? <ToolbarMenu label="Voice" icon={Mic}><QuickVoice filming={filming}/></ToolbarMenu> : null}
-        <ToolbarMenu label="Camera" icon={Camera} closeOnAction>{([{id:'static',label:'Static'},{id:'handheld',label:'Handheld'},{id:'running',label:'Running camera'},{id:'drone',label:'Drone'},{id:'follow',label:'Follow character'},{id:'side',label:'Side tracking'},{id:'orbit',label:'Orbit'}] as const).map(preset=><button key={preset.id} className="rounded px-2 py-2 text-left text-xs hover:bg-ink/10" disabled={filming.busy||filming.studio.rendering} onClick={()=>{filming.studio.setPreviewing(false);filming.preset(preset.id);}}>{preset.label}</button>)}</ToolbarMenu>
-        <button type="button" aria-label="Follow character" aria-pressed={filming.camera?.follow_player??false} disabled={filming.busy||filming.studio.rendering} className="flex items-center gap-1 rounded px-2 py-1.5 text-xs font-bold hover:bg-ink/10 aria-pressed:bg-brand/20" onClick={()=>{filming.studio.setPreviewing(false);if(filming.camera)filming.apply({...filming.camera,follow_player:!filming.camera.follow_player});else filming.preset('follow');}}><Focus className="size-4"/>Follow</button>
-        <ToolbarMenu label="Lighting" icon={Lightbulb}><LightingPanel filming={filming}/></ToolbarMenu>
-        <button type="button" aria-label="Start scene" disabled={!filming.studio.ready||filming.busy||filming.studio.rendering} className="flex items-center gap-1 rounded border border-red-500/40 px-2 py-1.5 text-xs font-bold disabled:opacity-40" title="Manual recording · WASD/arrows move, Shift runs, mouse controls the live camera · up to 30 seconds" onClick={event=>{event.currentTarget.blur();filming.startManual();}}><Circle className="size-3 fill-red-500 text-red-500"/>Start scene</button>
-        <button type="button" aria-label="End scene" disabled={!filming.manualRecording} className="flex items-center gap-1 rounded border border-ink/20 px-2 py-1.5 text-xs font-bold disabled:opacity-40" onClick={()=>filming.endManual()}><Square className="size-3 fill-current"/>End scene</button>
-        {filming.manualRecording?<span role="status" className="text-[10px] text-red-500">Recording · move with keyboard and mouse · auto ends at 30s</span>:null}
+      {filmWorkspace && !testing ? <div style={{gridArea:'scenebar'}} className="relative z-40 min-w-0 border-b border-ink/15 bg-surface"><div className="flex flex-wrap items-center justify-center">
+        {host.userAvatarControls ? null : <ToolbarMenu label="Characters" icon={Users}><p className="text-xs font-semibold">Choose the live character</p><BodySection editor={character}/></ToolbarMenu>}
+        <RecordingBar filming={filming}/>
       </div></div> : null}
 
       {characterWorkspace ? (
@@ -513,6 +508,7 @@ export function StudioChrome({
           className="absolute top-20 right-3 z-30 max-h-[calc(100dvh-6rem)] w-80 overflow-y-auto rounded-xl bg-surface shadow-xl"
         >
           <PanelTitle>Filming</PanelTitle>
+          <div className="border-b border-ink/10"><RecordingBar filming={filming} /></div>
           <FilmingPanel filming={filming} />
         </aside>
       ) : null}

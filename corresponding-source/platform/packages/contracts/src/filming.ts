@@ -71,7 +71,8 @@ export const FilmStudioStep = z.object({ id: commandId, args: z.record(z.string(
  * `split`, `remove`, `trim`, `cues`, `undo`, `redo` kinds are kept for existing agents.
  */
 export const FilmStudioOperation = z.discriminatedUnion('kind', [
-  z.object({ kind: z.literal('manual_record'), action:z.enum(['start','stop']) }).strict(),
+  /** Live take (FILM-A3): the person moves the character; `seconds` is the longest the take may run (default 30). */
+  z.object({ kind: z.literal('manual_record'), action:z.enum(['start','stop']), seconds: z.number().int().min(1).max(30).optional() }).strict(),
   z.object({ kind: z.literal('lighting'), lights: SceneLights.optional() }).strict(),
   z.object({ kind: z.literal('inspect') }).strict(),
   z.object({ kind: z.literal('commands') }).strict(),
@@ -104,7 +105,14 @@ export const FilmStudioOperation = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('voice'), language: z.string().regex(/^[a-z]{2,3}$/) }).strict(),
   /** One language's subtitles as .srt or .vtt text (FILM-12). */
   z.object({ kind: z.literal('subtitle_file'), language: z.string().regex(/^[a-z]{2,3}$/), format: z.enum(['srt', 'vtt']).default('srt') }).strict(),
-  z.object({ kind: z.literal('export'), shot_id: studioId.optional(), width: z.number().int().min(320).max(1920).default(1280), height: z.number().int().min(240).max(1920).default(720) }).strict(),
+  /**
+   * Export (FILM-A3): the whole film, one shot, or the marked In/Out range; up to 4K. `language` keeps only that
+   * language's captions and voice track (one file per language: call once per language); `captions` none hides
+   * every caption track.
+   */
+  z.object({ kind: z.literal('export'), shot_id: studioId.optional(), range: z.enum(['film', 'marked']).optional(),
+    width: z.number().int().min(320).max(3840).default(1280), height: z.number().int().min(240).max(2160).default(720),
+    language: z.string().regex(/^[a-z]{2,3}(-[A-Za-z0-9]{2,8})?$/).optional(), captions: z.enum(['picture', 'none']).default('picture') }).strict(),
   z.object({ kind: z.literal('undo') }).strict(), z.object({ kind: z.literal('redo') }).strict(),
 ]);
 export type FilmStudioOperation = z.infer<typeof FilmStudioOperation>;

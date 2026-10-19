@@ -1,4 +1,4 @@
-import { DEFAULT_SUBTITLE_STYLE, type SubtitleStyle, duckGain, fadeGain, filmLength, particlesAt, type ParticleKind, fromSeconds, missingAssets, previousClip, resolveAt, toSeconds, transitionWindow, type CaptionClip, type EffectClip, type TransitionSpec, type FilmProject, type Media, type MediaClip, type Track } from '@genvr/film';
+import { DEFAULT_SUBTITLE_STYLE, type SubtitleStyle, duckGain, filmSettings, fadeGain, filmLength, particlesAt, type ParticleKind, fromSeconds, missingAssets, previousClip, resolveAt, toSeconds, transitionWindow, type CaptionClip, type EffectClip, type TransitionSpec, type FilmProject, type Media, type MediaClip, type Track } from '@genvr/film';
 import { compositorFor, type FilmCompositor, type Layer, type MediaLayer } from './compositor';
 import { drawTitle } from './titles-draw';
 import type { Asset } from './model';
@@ -145,7 +145,11 @@ const topSegment = (layers: PlanLayer[], at: number): Segment | undefined => {
 /** A colour with an opacity, for canvas fills. */
 const rgba = (hex: string, opacity: number) => `rgba(${parseInt(hex.slice(1, 3), 16)},${parseInt(hex.slice(3, 5), 16)},${parseInt(hex.slice(5, 7), 16)},${opacity})`;
 
-function drawFrame(ctx: CanvasRenderingContext2D, picture: HTMLCanvasElement | HTMLVideoElement | undefined, lines: string[], style: SubtitleStyle = DEFAULT_SUBTITLE_STYLE) {
+/** Caption size and place from Film settings › Caption look (FILM-A2). */
+type CaptionLook = { size: 'small' | 'medium' | 'large'; place: 'bottom' | 'top' };
+const CAPTION_SCALE = { small: 0.75, medium: 1, large: 1.35 } as const;
+function drawFrame(ctx: CanvasRenderingContext2D, picture: HTMLCanvasElement | HTMLVideoElement | undefined, lines: string[], style: SubtitleStyle = DEFAULT_SUBTITLE_STYLE,
+  look: CaptionLook = { size: 'medium', place: 'bottom' }) {
   const canvas = ctx.canvas;
   ctx.fillStyle = '#000'; ctx.fillRect(0, 0, canvas.width, canvas.height);
   const w0 = picture instanceof HTMLVideoElement ? picture.videoWidth : picture?.width ?? 0;
@@ -155,12 +159,12 @@ function drawFrame(ctx: CanvasRenderingContext2D, picture: HTMLCanvasElement | H
     const w = w0 * ratio, h = h0 * ratio;
     ctx.drawImage(picture, (canvas.width - w) / 2, (canvas.height - h) / 2, w, h);
   }
-  const size = Math.max(14, Math.round(canvas.height / 24));
+  const size = Math.max(11, Math.round(canvas.height / 24 * CAPTION_SCALE[look.size]));
   ctx.font = `bold ${size}px sans-serif`; ctx.textAlign = 'center';
   // The subtitle look (FILM-12d): a band across the picture, a box around each line, or text with an outline.
   const widest = canvas.width - size * 2.6;
   lines.forEach((text, index) => {
-    const y = canvas.height - size - (lines.length - index - 1) * size * 1.45;
+    const y = look.place === 'top' ? size * 1.9 + index * size * 1.45 : canvas.height - size - (lines.length - index - 1) * size * 1.45;
     if (style.box !== 'none' && style.boxOpacity > 0) {
       ctx.fillStyle = rgba(style.boxColor, style.boxOpacity);
       if (style.box === 'band') ctx.fillRect(size, y - size * 1.05, canvas.width - size * 2, size * 1.4);
@@ -403,7 +407,7 @@ export async function render(project: FilmProject, assets: Asset[], canvas: HTML
       const playing = new Set([...live].map((id) => videos.get(id)));
       for (const [id, video] of videos) if (!live.has(id)) { stalled.delete(id); if (!playing.has(video) && !video.paused) video.pause(); }
       if (clipGain.size) { const level = soundOf(layers, at); for (const [id, gain] of clipGain) gain.gain.setTargetAtTime(level.get(id) ?? 0, audio!.currentTime, 0.02); }
-      drawFrame(ctx, await picture(compositor, layers, videos, sizeOf(canvas)), captionsAt(project, topSegment(layers, at), at), project.subtitleStyle); progress(at);
+      drawFrame(ctx, await picture(compositor, layers, videos, sizeOf(canvas)), captionsAt(project, topSegment(layers, at), at), project.subtitleStyle, filmSettings(project).caption); progress(at);
       if (levels && meters.size) {
         const data = new Float32Array(1024), out: Record<string, number> = {};
         for (const [lane, node] of meters) { node.getFloatTimeDomainData(data); let peak = 0; for (const v of data) peak = Math.max(peak, Math.abs(v)); out[lane] = 20 * Math.log10(peak || 1e-6); }
@@ -483,7 +487,7 @@ async function drawOnce(project: FilmProject, assets: Asset[], canvas: HTMLCanva
   const live = new Set(project.tracks.flatMap((t) => t.clips.map((c) => c.id)));
   for (const id of [...still.keys()]) if (!live.has(id)) dropStill(id, compositor);
   for (const id of [...still.keys()]) if (still.size > STILL_VIDEOS && !videos.has(id)) dropStill(id, compositor);
-  drawFrame(ctx, await picture(compositor, layers, videos, sizeOf(canvas)), captionsAt(project, topSegment(layers, at), at), project.subtitleStyle);
+  drawFrame(ctx, await picture(compositor, layers, videos, sizeOf(canvas)), captionsAt(project, topSegment(layers, at), at), project.subtitleStyle, filmSettings(project).caption);
 }
 
 /** A PNG of the film at one moment (MCP `frame`). */

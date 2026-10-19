@@ -10,12 +10,15 @@ export function ToolbarMenu({
   compact = false,
   icon: Icon,
   closeOnAction = false,
+  up = false,
 }: {
   label: string;
   icon?: LucideIcon;
   children: ReactNode;
   compact?: boolean;
   closeOnAction?: boolean;
+  /** Opens above the button (for bars at the bottom of the screen, like the timeline). */
+  up?: boolean;
 }) {
   const ref = useRef<HTMLDetailsElement>(null);
   useEffect(() => {
@@ -58,7 +61,7 @@ export function ToolbarMenu({
             ref.current?.querySelector('summary')?.focus();
           }
         }}
-        className={`absolute top-full right-0 z-50 mt-2 flex max-h-[70dvh] ${compact ? 'w-48' : 'w-72'} flex-col gap-2 overflow-y-auto rounded-xl border border-ink/10 bg-surface p-3 text-sm text-ink shadow-xl`}
+        className={`absolute ${up ? 'bottom-full mb-2' : 'top-full mt-2'} right-0 z-50 flex max-h-[70dvh] ${compact ? 'w-48' : 'w-72'} flex-col gap-2 overflow-y-auto rounded-xl border border-ink/10 bg-surface p-3 text-sm text-ink shadow-xl`}
       >
         {children}
       </div>

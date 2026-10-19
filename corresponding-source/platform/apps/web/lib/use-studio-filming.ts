@@ -15,7 +15,7 @@ import { EXPRESSIONS, type AssistantHost } from '@genvr/assistant';
 import { fitCaptureViewport } from './video-studio/capture-viewport';
 import { SceneSpeech } from './video-studio/scene-speech';
 import { CORE_ANIMATIONS } from '@genvr/core-library';
-import { SCENE_ACTOR, SCENE_FX_ACTIONS, describe as describeFilm, isHostOnly, sceneFxSteps, shakeOffset, subtitleLines, toSeconds, toSrt, toVtt, type FilmProject } from '@genvr/film';
+import { SCENE_ACTOR, SCENE_FX_ACTIONS, describe as describeFilm, filmSettings, forExport, isHostOnly, sceneFxSteps, shakeOffset, subtitleLines, toSeconds, toSrt, toVtt, type FilmProject } from '@genvr/film';
 import { checkTakeLength, cueToSeconds, validateCues, type SceneCue } from './video-studio/model';
 
 /** One rig and frame stream shared by the studio panel and its optional MCP connection. */
@@ -61,6 +61,12 @@ export function useStudioFilming(place: string, runtime: RefObject<GenvrRuntime 
   const [camera, setCamera] = useState<FilmCamera | null>(null);
   const [output, setOutput] = useState({ seconds: 5, size: '1920x1080', worldSound: true, liveActors: false });
   const outputRef = useRef(output); outputRef.current = output;
+  /** Film settings (FILM-A2) drive what is recorded: a change by the person or an agent reaches the next take. */
+  const saved = filmSettings(studio.project);
+  useEffect(() => {
+    setOutput((old) => old.worldSound === saved.worldSound && old.liveActors === saved.roomVoices ? old : { ...old, worldSound: saved.worldSound, liveActors: saved.roomVoices });
+  }, [saved.worldSound, saved.roomVoices]);
+  useEffect(() => { setOutput((old) => old.seconds === saved.shotSeconds ? old : { ...old, seconds: saved.shotSeconds }); }, [saved.shotSeconds]);
   /**
    * Live actors (FILM-11): when on and in a room, a take tells the room when it starts and stops; each actor's voice
    * that comes back is put under the shot on the actor's own track. `where` gives the shot's film start once it is placed.
@@ -509,9 +515,12 @@ export function useStudioFilming(place: string, runtime: RefObject<GenvrRuntime 
         return reply();
       }
       case 'export': {
-        const chosen = project;
+        // FILM-A3: one language per file, captions on the picture or none, the shot or the marked In/Out.
+        if (operation.range === 'marked' && !project.range) throw new Error('Mark In and Out first, or export the full film.');
+        const chosen = forExport(project, { language: operation.language, captions: operation.captions });
         const clip = operation.shot_id ? clipShot(project, operation.shot_id).clip : null;
-        const range = clip ? {from:toSeconds(clip.start),to:toSeconds(clip.start+clip.duration)} : undefined;
+        const range = clip ? {from:toSeconds(clip.start),to:toSeconds(clip.start+clip.duration)}
+          : operation.range === 'marked' && project.range ? { from: toSeconds(project.range.in), to: toSeconds(project.range.out) } : undefined;
         const canvas = document.createElement('canvas'); canvas.width = operation.width; canvas.height = operation.height;
         s.setRendering(true);
         const resume = pauseForPlayback();
@@ -576,16 +585,16 @@ export function useStudioFilming(place: string, runtime: RefObject<GenvrRuntime 
       setBusy(remoteBusy.current); if (!rig.current.settings) runtime.current?.setMarkersVisible(isEditing.current());
     } }
   };
-  const startManual = () => {
+  const startManual = (limit = 30) => {
     if(!latestStudio.current.ready)throw new Error('Wait for the film project to load.');
     if(localBusy.current||remoteBusy.current||latestStudio.current.isRendering())throw new Error('Wait for the current capture or render.');
     reset();latestStudio.current.setWorkspace('shoot');latestStudio.current.setPreviewing(false);
     const [width,height]=outputRef.current.size.split('x').map(Number);
-    void take('video',30,width!,height!,true,undefined,[],true);
+    void take('video',Math.max(1,Math.min(30,limit)),width!,height!,true,undefined,[],true);
   };
   const endManual = () => {if(!manualFinish.current||!manualBegan.current)throw new Error('Wait for Start scene to begin recording.');manualFinish.current.abort();};
   const runLocalStudioOperation = async (operation: FilmStudioOperation, signal: AbortSignal) => {
-    if(operation.kind==='manual_record'){if(operation.action==='start')startManual();else endManual();return new Blob([JSON.stringify({result:{state:operation.action==='start'?'starting':'finishing'}})],{type:'application/json'});}
+    if(operation.kind==='manual_record'){if(operation.action==='start')startManual(operation.seconds);else endManual();return new Blob([JSON.stringify({result:{state:operation.action==='start'?'starting':'finishing'}})],{type:'application/json'});}
     if (localBusy.current || remoteBusy.current || latestStudio.current.isRendering()) throw new Error('Wait for the current capture or render.');
     remoteBusy.current = true; setBusy(true);
     try { return await handleStudio(operation, signal); }

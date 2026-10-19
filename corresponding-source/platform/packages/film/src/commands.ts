@@ -3,7 +3,7 @@ import * as edit from './edits.js';
 import { EditError, findClip, transact, type EditContext } from './edits.js';
 import { History } from './history.js';
 import { filmLength } from './invariants.js';
-import { DEFAULT_SUBTITLE_STYLE, LIMITS, LanguageTag, Media, SceneCue, SubtitleStyle, TrackKind, type FilmProject } from './model.js';
+import { DEFAULT_SUBTITLE_STYLE, FilmSettings, LIMITS, LanguageTag, Media, SceneCue, SubtitleStyle, TrackKind, filmSettings, type FilmProject } from './model.js';
 import { BLEND_MODES, EFFECTS, EFFECT_IDS, LOOKS, isEffect, type EffectId } from './effects.js';
 import { EASE_PRESETS } from './animate.js';
 import { SELECTOR_SHAPES, TITLE_PRESET_IDS } from './titles.js';
@@ -72,6 +72,7 @@ export function describe(project: FilmProject) {
       voice: project.tracks.find((v) => v.kind === 'sound' && v.lang === t.lang)?.id ?? null })),
     shownLanguage: project.tracks.find((t) => t.kind === 'caption' && t.lang && !t.hidden)?.lang ?? null,
     subtitleStyle: { ...DEFAULT_SUBTITLE_STYLE, ...project.subtitleStyle },
+    settings: filmSettings(project),
     ...(project.ducking ? { ducking: project.ducking } : {}),
     ...(project.range ? { range: { in: s(project.range.in), out: s(project.range.out) } } : {}),
     ...(project.looks ? { looks: Object.keys(project.looks) } : {}),
@@ -421,6 +422,19 @@ export const COMMANDS: CommandSpec[] = [
     run: (d, a) => edit.setMarker(d, { marker: a.marker, ...(a.at !== undefined ? { at: at(d, a.at) } : {}), ...(a.label !== undefined ? { label: a.label } : {}), ...(a.color ? { color: a.color } : {}) }),
   },
   { id: 'marker.remove', label: 'Remove marker', group: 'Marker', journal: true, args: z.object({ marker: clipId }).strict(), run: (d, a) => edit.removeMarker(d, a.marker) },
+  {
+    // Film settings window (FILM-A2): any part; caption, titles and director merge field by field.
+    id: 'project.settings', label: 'Film settings', group: 'Project', journal: true,
+    args: FilmSettings.partial().extend({
+      caption: FilmSettings.shape.caption.partial().strict().optional(),
+      titles: FilmSettings.shape.titles.partial().strict().optional(),
+      director: FilmSettings.shape.director.partial().strict().optional(),
+    }).strict(),
+    run: (d, a) => {
+      const old = filmSettings(d);
+      d.settings = FilmSettings.parse({ ...old, ...a, caption: { ...old.caption, ...a.caption }, titles: { ...old.titles, ...a.titles }, director: { ...old.director, ...a.director } });
+    },
+  },
   {
     id: 'project.size', label: 'Film size', group: 'Project', journal: true,
     args: z.object({ width: z.number().int().min(320).max(3840), height: z.number().int().min(240).max(2160) }).strict(),

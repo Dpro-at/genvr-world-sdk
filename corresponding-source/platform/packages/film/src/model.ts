@@ -125,6 +125,44 @@ export const SubtitleStyle = z.object({ box: z.enum(['none', 'line', 'band']), b
 export type SubtitleStyle = z.infer<typeof SubtitleStyle>;
 export const DEFAULT_SUBTITLE_STYLE: SubtitleStyle = { box: 'line', boxColor: '#000000', boxOpacity: 0.7, textColor: '#ffffff' };
 
+/**
+ * Things set once for the whole film or series (FILM-A2, Film settings window). The video size stays in
+ * `size` and the subtitle colours in `subtitleStyle`; everything else a person sets once lives here.
+ * Agents read it through `project.inspect` and change it with `project.settings`.
+ */
+export const FilmLanguage = z.object({
+  lang: LanguageTag,
+  /** What the film gives in this language: captions only, or captions and dubbed voices. */
+  level: z.enum(['text', 'text_voice']),
+}).strict();
+export type FilmLanguage = z.infer<typeof FilmLanguage>;
+export const FilmSettings = z.object({
+  kind: z.enum(['film', 'series']),
+  name: z.string().max(80),
+  /** The first language is the main one (the one the film is recorded in). */
+  languages: z.array(FilmLanguage).max(12).refine((rows) => new Set(rows.map((r) => r.lang)).size === rows.length, 'Each language only once.'),
+  /** The series story that agents read before they write lines. */
+  story: z.string().max(4000),
+  /** Length of a new shot, seconds. */
+  shotSeconds: z.number().int().min(1).max(30),
+  worldSound: z.boolean(),
+  /** Voices of people in the same room (live actors). */
+  roomVoices: z.boolean(),
+  caption: z.object({ size: z.enum(['small', 'medium', 'large']), place: z.enum(['bottom', 'top']), inExport: z.boolean() }).strict(),
+  titles: z.object({ intro: z.boolean(), episodeCard: z.boolean(), credits: z.boolean(), creditsText: z.string().max(2000) }).strict(),
+  /** How much the AI director decides alone. */
+  director: z.object({ autonomy: z.enum(['auto', 'end', 'each']) }).strict(),
+}).strict();
+export type FilmSettings = z.infer<typeof FilmSettings>;
+export const DEFAULT_FILM_SETTINGS: FilmSettings = {
+  kind: 'film', name: '', languages: [], story: '', shotSeconds: 5, worldSound: true, roomVoices: false,
+  caption: { size: 'medium', place: 'bottom', inExport: true },
+  titles: { intro: false, episodeCard: false, credits: false, creditsText: '' },
+  director: { autonomy: 'end' },
+};
+/** The film's settings with the defaults filled in. */
+export const filmSettings = (project: { settings?: FilmSettings | undefined }): FilmSettings => ({ ...DEFAULT_FILM_SETTINGS, ...project.settings });
+
 export const FilmProject = z.object({
   version: z.literal(2),
   rate: z.object({ num: z.number().int().positive(), den: z.number().int().positive() }).strict(),
@@ -142,6 +180,8 @@ export const FilmProject = z.object({
   subtitleStyle: SubtitleStyle.optional(),
   /** The part of the film marked In / Out (FILM-09): playback and export use it when set. */
   range: z.object({ in: tick, out: tick }).strict().optional(),
+  /** Set once for the whole film (FILM-A2); absent: DEFAULT_FILM_SETTINGS. */
+  settings: FilmSettings.optional(),
 }).strict();
 export type FilmProject = z.infer<typeof FilmProject>;
 

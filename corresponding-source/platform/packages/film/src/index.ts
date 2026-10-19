@@ -14,3 +14,4 @@ export * from './transitions.js';
 export * from './sound.js';
 export * from './scene-fx.js';
 export * from './subtitles.js';
+export * from './export.js';
