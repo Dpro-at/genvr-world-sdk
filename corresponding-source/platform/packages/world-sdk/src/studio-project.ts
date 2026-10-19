@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { LabProjectData, PlaySettings, WorldDocument, WorldPackage, SIZE_TIERS, WORLD_GENERATOR, supportsWorldStarter, defaultPlaySettings, type Style, type WorldSeed } from '@genvr/contracts';
+import { PlaySettings, WorldDocument, WorldPackage, SIZE_TIERS, WORLD_GENERATOR, supportsWorldStarter, defaultPlaySettings, type Style, type WorldSeed } from '@genvr/contracts';
 import { getCoreItem, getGround, groundRef, itemBoundsForStyle, itemFootprint, starterGroundMaterials } from '@genvr/core-library';
 import { applyCommand, createWorldState, decodeChunk, encodeTerrain, smallStarterCommands, starterWorldCommands, BLOCKS, VOXEL_CHUNK, VOXEL_LAYERS, type WorldState } from '@genvr/world';
 import { replayWorldPackage } from './session.js';
@@ -12,8 +12,6 @@ export const StudioProject = z.object({
   avatarBodies: z.record(z.string().min(1).max(120), z.enum(['robot', 'human', 'classic', 'simple', 'starter'])).optional(),
   terrainChunks: z.array(z.string().max(16 * 1024 * 1024)).max(4096),
   assets: WorldPackage.shape.assets,
-  /** A motion lab project (MOTION-LAB): its course, run settings, last runs and motion versions. */
-  lab: LabProjectData.optional(),
 }).strict();
 export type StudioProject = z.infer<typeof StudioProject>;
 
@@ -96,12 +94,6 @@ export function createStudioProject(style: Style, kind: WorldSeed['kind'] | 'emp
     for (const command of starterWorldCommands(doc, world, (x, z) => state.terrain.heightAt(x, z), id => { const item = getCoreItem(id); return item ? itemFootprint(item, style) : null; })) applyCommand(state, command);
   }
   return fromState(state, 'My place', play);
-}
-
-/** A motion lab is its own project (Q-LAB-1): an empty flat world and the lab part; it never changes a real world. */
-export function createLabProject(lab: LabProjectData, play = defaultPlaySettings()): StudioProject {
-  const project = createStudioProject('blocky', 'empty', play);
-  return readStudioProject({ ...project, title: 'Motion lab', lab });
 }
 
 export function importStudioProject(text: string): StudioProject {

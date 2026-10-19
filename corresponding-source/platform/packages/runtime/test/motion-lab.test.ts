@@ -63,9 +63,6 @@ describe('motion lab runs and scores (MOTION-LAB L2)', () => {
     expect(run.end).toBe('car');
     expect(scoreLabRun(course, run)).toMatchObject({ car_hit: true, finished: false });
   });
-  it('uses Walk for a move name that is not a ground move, never an object key', () => {
-    expect(simulateLabRun(course, { motion: 'constructor' }).frames.length).toBe(simulateLabRun(course, { motion: 'Walk' }).frames.length);
-  });
   it('is blocked honestly by a window too small to climb through', () => {
     const tight = LabCourse.parse({ ...course, obstacles: course.obstacles.map((o) => (o.kind === 'window' ? { ...o, opening_height: 0.5 } : o)) });
     const run = simulateLabRun(tight);

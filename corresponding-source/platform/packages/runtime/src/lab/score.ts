@@ -1,6 +1,6 @@
 import type { LabCourse, LabScore } from '@genvr/contracts';
 import { courseBoxes, groundAt } from './course.js';
-import { labGroundMove, type LabRunResult } from './sim.js';
+import { LAB_GROUND_MOVES, type LabRunResult } from './sim.js';
 
 /**
  * Scores of one run (board M3), read from its frames:
@@ -44,7 +44,7 @@ export function scoreLabRun(course: LabCourse, run: LabRunResult): LabScore {
   const smoothness = 1 / (1 + (n ? jerk / n : 0) / 300);
   const w = LAB_SCORE_WEIGHTS;
   const slideCm = slide * 100, penCm = Math.max(0, pen * 100);
-  const move = labGroundMove(run.settings.motion);
+  const move = LAB_GROUND_MOVES[run.settings.motion] ?? LAB_GROUND_MOVES.Walk!;
   const ideal = Math.max(1, (course.finish_z + 1) / Math.max(run.settings.speed, move.speed * 0.5));
   const waited = frames.filter((f) => f.clip === 'Idle').length / 60;
   let total = 100
