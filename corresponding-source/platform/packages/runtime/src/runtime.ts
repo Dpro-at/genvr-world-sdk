@@ -496,6 +496,8 @@ export interface GenvrRuntime {
   setSpeechMouth(id: string, shape: import('@genvr/contracts').MouthShape): boolean;
   setVoiceRecordingStream(stream: MediaStream | null): void;
   setAudioVolumes(volumes: { effects: number; ambience: number }): void;
+  /** The loudness now set for effects and ambience. */
+  audioVolumes(): { effects: number; ambience: number };
   /** The player's own avatar: colors and worn clothing and accessories (P2-20). */
   setPresentationBackdrop(on: boolean, navigation?: boolean): void;
   setAvatarLook(look: AvatarLook): void;
@@ -3611,6 +3613,7 @@ export async function createRuntime({
     setSpeechMouth: (id, shape) => { const speaker=id==='self'?avatar:remotePlayers.avatarOf(id); if(!speaker)return false; speaker.setMouth(shape);return true; },
     setVoiceRecordingStream: stream => audio.setVoiceRecordingStream(stream),
     setAudioVolumes: (volumes) => audio.setVolumes(volumes),
+    audioVolumes: () => audio.volumes(),
     setPresentationBackdrop: (on, navigation=false) => {presentationBackdrop=on;presentationNavigation=navigation;},
     setAvatarLook: (look) => {
       // Another body type brings another skeleton: the animator binds to its clips.

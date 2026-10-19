@@ -17,6 +17,7 @@ import { SceneSpeech } from './video-studio/scene-speech';
 import { CORE_ANIMATIONS } from '@genvr/core-library';
 import { SCENE_ACTOR, SCENE_FX_ACTIONS, ownerStateChanged, describe as describeFilm, filmSettings, forExport, isHostOnly, languageStatus, sceneFxSteps, shakeOffset, subtitleLines, toSeconds, toSrt, toVtt, type FilmProject } from '@genvr/film';
 import { checkTakeLength, cueToSeconds, validateCues, type SceneCue } from './video-studio/model';
+import { sceneSelection } from './video-studio/scene-selection';
 
 /** One rig and frame stream shared by the studio panel and its optional MCP connection. */
 /** Avatar actions that move it (FILM-10b): plain walk and run by the walk itself, crouch walk and sneak with their own clip. */
@@ -106,6 +107,24 @@ export function useStudioFilming(place: string, runtime: RefObject<GenvrRuntime 
     const clip = replace ? clips.find((c) => c.id === replace)
       : clips.find((c) => c.type === 'media' && c.media === [...project.media].reverse().find((m) => m.kind === 'video')?.id);
     return clip ? toSeconds(clip.start) : null;
+  };
+  /**
+   * FILM-C3: a scene with its own sound sets the loudness of nature/weather and footsteps for the take; the
+   * returned function puts the world's loudness back. Scenes that sound like the world change nothing.
+   */
+  const applySceneSound = (sceneId: string | null | undefined) => {
+    const scene = sceneId ? latestStudio.current.snapshot().project.scenes?.find((x) => x.id === sceneId) : undefined;
+    const rt = runtime.current;
+    if (!scene || scene.sound.mode !== 'own' || !rt) return () => {};
+    const before = rt.audioVolumes();
+    rt.setAudioVolumes({ effects: scene.sound.steps / 100, ambience: scene.sound.ambience / 100 });
+    return () => { runtime.current?.setAudioVolumes(before); };
+  };
+  /** FILM-C1: a new take joins the scene it was recorded for. */
+  const joinScene = (sceneId: string | null | undefined, media: string | null) => {
+    if (!sceneId || !media) return;
+    const result = latestStudio.current.run('scene.shot', { scene: sceneId, media });
+    if (!result.ok) report(`The shot was added, but not to the scene: ${result.reason}`);
   };
   /** The world's sound for a take (FILM-08), when the switch is on and the world has started its sound. */
   const worldSound = () => output.worldSound ? runtime.current?.worldSoundStream() ?? null : null;
@@ -514,6 +533,8 @@ export function useStudioFilming(place: string, runtime: RefObject<GenvrRuntime 
           outputRef.current = next; setOutput(next);
         }
         const shot = operation.shot_id ? clipShot(project, operation.shot_id) : undefined;
+        if (operation.scene_id && !project.scenes?.some((x) => x.id === operation.scene_id)) throw new Error('Scene not found; make it with scene.add first.');
+        const restoreSound = applySceneSound(operation.scene_id);
         if (operation.gameplay) { rig.current.reset(); setCamera(null); }
         else if (shot) { if (shot.media.camera) rig.current.set(shot.media.camera); else rig.current.reset(); setCamera(shot.media.camera); }
         const releaseViewport = fitCaptureViewport(container.current, operation.settings.width, operation.settings.height);
@@ -531,11 +552,12 @@ export function useStudioFilming(place: string, runtime: RefObject<GenvrRuntime 
           if (!blob.size) throw new Error(EMPTY_TAKE);
           const duration = await mediaDuration(blob, signal); fresh();
           checkTakeLength(duration, operation.settings.seconds);
-          latestStudio.current.addRecording(blob, duration, rig.current.settings, operation.shot_id, cues, !!sound?.getAudioTracks().length);
+          const media = latestStudio.current.addRecording(blob, duration, rig.current.settings, operation.shot_id, cues, !!sound?.getAudioTracks().length);
+          if (!operation.shot_id) joinScene(operation.scene_id, media);
           stopped?.place(() => shotStart(operation.shot_id));
           if (!operation.shot_id) addSceneFx(cues);
         } catch (error) { live?.cancel(); throw error; }
-        finally { releaseViewport(); if (current === epoch.current) { sceneSpeech.current?.stop(); directing.current = null; runtime.current?.clearSceneMotions(); runtime.current?.stopSceneAnimation(); runtime.current?.presentExpression('self', 'neutral'); runtime.current?.sceneWalk(null); } }
+        finally { restoreSound(); releaseViewport(); if (current === epoch.current) { sceneSpeech.current?.stop(); directing.current = null; runtime.current?.clearSceneMotions(); runtime.current?.stopSceneAnimation(); runtime.current?.presentExpression('self', 'neutral'); runtime.current?.sceneWalk(null); } }
         return reply();
       }
       case 'export': {
@@ -561,7 +583,7 @@ export function useStudioFilming(place: string, runtime: RefObject<GenvrRuntime 
     const canvas = container.current?.querySelector('canvas'); if (!canvas) return;
     localBusy.current = true; setBusy(true); prepare(); const current = epoch.current;
     let fallbackMessage: string | undefined;
-    let live: ReturnType<typeof liveTake> = null;
+    let live: ReturnType<typeof liveTake> = null, restoreSceneSound = () => {};
     const releaseViewport = fitCaptureViewport(container.current, width, height);
     try {
       await new Promise<void>(resolve => requestAnimationFrame(() => resolve()));
@@ -571,6 +593,8 @@ export function useStudioFilming(place: string, runtime: RefObject<GenvrRuntime 
         : { kind: 'photo' as const, settings: FilmPhoto.parse({ width, height }) };
       const sound = kind === 'video' ? worldSound() : null;
       if (timeline) { await prepareCast(cues); placeCast(cues); }
+      const sceneId = kind === 'video' && timeline && !replace ? sceneSelection.get() : null;
+      restoreSceneSound = applySceneSound(sceneId);
       live = kind === 'video' && timeline ? liveTake() : null;
       if(manual)manualFinish.current=new AbortController();
       const blob = await captureFilm(canvas, command, abort.current.signal, subscribe, () => {
@@ -589,7 +613,7 @@ export function useStudioFilming(place: string, runtime: RefObject<GenvrRuntime 
           const duration = await mediaDuration(blob, abort.current.signal);
           if (current !== epoch.current) return;
           checkTakeLength(duration, elapsed);
-          studio.addRecording(blob, duration, rig.current.settings, replace, cues, !!sound?.getAudioTracks().length);
+          joinScene(sceneId, studio.addRecording(blob, duration, rig.current.settings, replace, cues, !!sound?.getAudioTracks().length));
           stopped?.place(() => shotStart(replace));
           if (!replace) addSceneFx(cues);
           report('Recording added to video editor.'); return;
@@ -603,7 +627,7 @@ export function useStudioFilming(place: string, runtime: RefObject<GenvrRuntime 
       document.body.append(link); link.click(); link.remove(); setTimeout(() => URL.revokeObjectURL(url), 60000);
       report(fallbackMessage ?? `${kind === 'photo' ? 'Photo' : 'Silent video'} downloaded.`);
     } catch (error) { live?.cancel(); if (current === epoch.current) report(error instanceof Error ? error.message : 'Capture failed.'); }
-    finally { if(manual){manualFinish.current?.abort();manualFinish.current=null;manualBegan.current=0;setManualRecording(false);} releaseViewport(); if (current === epoch.current) {
+    finally { restoreSceneSound(); if(manual){manualFinish.current?.abort();manualFinish.current=null;manualBegan.current=0;setManualRecording(false);} releaseViewport(); if (current === epoch.current) {
       localBusy.current = false;
       sceneSpeech.current?.stop(); directing.current = null; runtime.current?.clearSceneMotions(); runtime.current?.stopSceneAnimation(); runtime.current?.presentExpression('self', 'neutral'); runtime.current?.sceneWalk(null);
       setBusy(remoteBusy.current); if (!rig.current.settings) runtime.current?.setMarkersVisible(isEditing.current());

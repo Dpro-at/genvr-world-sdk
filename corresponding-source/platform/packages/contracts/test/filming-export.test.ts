@@ -22,3 +22,9 @@ describe('language operation (FILM-B3)', () => {
     expect(() => FilmStudioOperation.parse({ kind: 'language', action: 'translate' })).toThrow();
   });
 });
+
+describe('record into a scene (FILM-C1)', () => {
+  it('accepts a scene id', () => {
+    expect(FilmStudioOperation.parse({ kind: 'record', scene_id: 'scene-1' })).toMatchObject({ scene_id: 'scene-1' });
+  });
+});

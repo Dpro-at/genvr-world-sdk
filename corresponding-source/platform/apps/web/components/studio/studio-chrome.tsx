@@ -28,6 +28,8 @@ import { SnapBar } from './snap-bar';
 import { GenvrMark } from '../genvr-mark';
 import { FilmingPanel } from './filming-panel';
 import { RecordingBar } from './film/recording-bar';
+import { WorkflowView } from './film/scenes-panel';
+import { useWorkflowOpen } from '../../lib/video-studio/scene-selection';
 import { StoryPanel } from './story-panel';
 import type { StudioFilming } from '../../lib/use-studio-filming';
 import { VideoEditor, VideoSceneInspector } from './video-editor';
@@ -176,6 +178,7 @@ export function StudioChrome({
   const filmWorkspace = tab === 'filming';
   // The Avatar tab is the character editor (CHAR-01): its own stage over the viewport, the world rests meanwhile.
   const character = useCharacterEditor();
+  const workflowOpen = useWorkflowOpen();
   useEffect(()=>{onCharacter?.(character);},[character]);
   useEffect(() => host.characterBody?.(body => character.change(recipe => ({ ...recipe, body }))), [host.characterBody]);
   useEffect(() => { host.characterRecipe?.(character.recipe); }, [character.recipe, host.characterRecipe]);
@@ -489,6 +492,8 @@ export function StudioChrome({
           className={`relative min-h-0 min-w-0 ${filming.studio.previewing ? 'z-20 bg-black' : 'pointer-events-none opacity-0'}`}
         />
       ) : null}
+
+      {filmWorkspace && !testing && workflowOpen ? <div style={{ gridArea: 'viewport' }} className="relative z-30 min-h-0 min-w-0"><WorkflowView filming={filming} /></div> : null}
 
       {/* Scene tools sit in their own fixed row above the world view (grid area "scenebar"), never over the picture. */}
       {filmWorkspace && !testing ? <div style={{gridArea:'scenebar'}} className="relative z-40 min-w-0 border-b border-ink/15 bg-surface"><div className="flex flex-wrap items-center justify-center">

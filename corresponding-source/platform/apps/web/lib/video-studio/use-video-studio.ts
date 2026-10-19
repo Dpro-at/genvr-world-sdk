@@ -147,7 +147,8 @@ export function useVideoStudio(place: string, key: string | null, filmExample?: 
     return result.result;
   };
 
-  const addRecording = (blob: Blob, seconds: number, camera: FilmCamera | null, replaceClip?: string, cues: SceneCue[] = [], hasSound = false) => {
+  /** Adds or replaces a recording; returns its media id (FILM-C1: the shot then joins the recording scene). */
+  const addRecording = (blob: Blob, seconds: number, camera: FilmCamera | null, replaceClip?: string, cues: SceneCue[] = [], hasSound = false): string | null => {
     if (!loaded()) throw new Error('Wait for your project to load before adding a shot.');
     const total = currentAssets.current.reduce((n, a) => n + a.blob.size, blob.size);
     if (total > LIMITS.mediaBytes) throw new Error('Project media limit is 128 MB; download this recording separately.');
@@ -159,13 +160,15 @@ export function useVideoStudio(place: string, key: string | null, filmExample?: 
     if (clip?.type === 'media') {
       must('media.replace', { media: clip.media, asset, duration, camera, cues: kept, hasSound });
       setMessage('Selected shot re-recorded. Other clips kept their place.');
+      setOpen(true); return clip.media;
     } else {
       const media: Media = { id: crypto.randomUUID(), kind: 'video', asset, name: `Shot ${project.media.length + 1}`, duration, camera, cues: kept, ...(hasSound ? { hasSound } : {}) };
       const placed = must('media.add', { media }) as string;
       must('select.set', { clips: [placed] });
       setMessage('Recording added to the timeline.');
+      setOpen(true); return media.id;
     }
-    setOpen(true);
+    setOpen(true); return null;
   };
   const addAudio = (blob: Blob): string => {
     if (!loaded() || blob.size > 20 * 1024 * 1024 || !blob.type.startsWith('audio/')) throw new Error('Choose an audio file up to 20 MB.');

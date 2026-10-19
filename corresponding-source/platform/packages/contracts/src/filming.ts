@@ -96,7 +96,9 @@ export const FilmStudioOperation = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('cues'), shot_id: studioId.optional(), cues: z.array(FilmSceneCue).max(30) }).strict(),
   z.object({ kind: z.literal('record'), shot_id: studioId.optional(), gameplay: z.boolean().default(false), settings: FilmVideo.default(() => FilmVideo.parse({})),
     /** The Studio's recording options for this take and after (absent: as set in the Studio): world sound, live actors' voices (FILM-11). */
-    world_sound: z.boolean().optional(), live_actors: z.boolean().optional() }).strict(),
+    world_sound: z.boolean().optional(), live_actors: z.boolean().optional(),
+    /** FILM-C1/C3: the scene this take belongs to; the new shot joins it and the scene's own sound is used. */
+    scene_id: studioId.optional() }).strict(),
   /** Speak one language's subtitles with its free voice onto its voice track (FILM-12b). */
   z.object({ kind: z.literal('sound_import'), name: z.string().min(1).max(120), mime: z.enum(['audio/wav', 'audio/mpeg', 'audio/ogg', 'audio/mp4', 'audio/webm', 'audio/flac', 'audio/aac']), data: z.string().min(4).max(11184812).regex(/^[A-Za-z0-9+/]+={0,2}$/) }).strict(),
   z.object({ kind: z.literal('dialogue_voice'), cue_id: studioId, voice_id: z.string().uuid(), language: z.string().max(8), shot_id: studioId.optional() }).strict(),

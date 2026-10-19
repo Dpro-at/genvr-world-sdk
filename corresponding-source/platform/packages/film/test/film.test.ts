@@ -492,3 +492,41 @@ describe('owner drafts are protected from agent history steps', () => {
     expect(ownerStateChanged(session.project, session.historyTarget('edit.undo')!)).toBe(true);
   });
 });
+
+describe('scenes, links and scene sound (FILM-C1/C2/C3)', () => {
+  const setup = () => {
+    const session = film();
+    const luna = (session.run('cast.add', { name: 'Luna', actor: 'self' }) as { ok: true; result: string }).result;
+    const scene = (session.run('scene.add', { name: 'The hut', place: 'Forest', who: [{ cast: luna, job: 'opens the door' }], spots: [{ name: 'Hut door', x: 4, z: -2 }] }) as { ok: true; result: string }).result;
+    return { session, luna, scene };
+  };
+  it('scenes hold shots (one scene per shot), check names and spots, and sound merges', () => {
+    const { session, scene } = setup();
+    const other = (session.run('scene.add', { name: 'Arrival' }) as { ok: true; result: string }).result;
+    ok(session.run('scene.shot', { scene, media: 'a' }));
+    ok(session.run('scene.shot', { scene: other, media: 'a' }));
+    expect(session.project.scenes!.map((s) => s.shots)).toEqual([[], ['a']]);
+    expect(session.run('scene.set', { scene, who: [{ cast: 'nobody', job: 'x' }] })).toMatchObject({ ok: false });
+    expect(session.run('scene.set', { scene, spots: [{ name: 'A', x: 0, z: 0 }, { name: 'a', x: 1, z: 1 }] })).toMatchObject({ ok: false });
+    ok(session.run('scene.set', { scene, sound: { mode: 'own', ambience: 70 } }));
+    expect(session.project.scenes![0]!.sound).toEqual({ mode: 'own', ambience: 70, steps: 80 });
+    expect(session.run('scene.remove', { scene: other })).toMatchObject({ ok: false });
+    ok(session.run('scene.remove', { scene: other, confirm: true }));
+    ok(session.run('scene.move', { scene, index: 0 }));
+  });
+  it('links join shots at times inside them; a flashback needs its return; removing a recording cleans up', () => {
+    const { session, scene } = setup();
+    ok(session.run('scene.shot', { scene, media: 'b' }));
+    expect(session.run('link.add', { from: { media: 'a', at: 5 }, to: { media: 'b', at: 9 }, kind: 'continue' })).toMatchObject({ ok: false });
+    expect(session.run('link.add', { from: { media: 'a', at: 5 }, to: { media: 'b', at: 2 }, kind: 'flashback' })).toMatchObject({ ok: false });
+    const link = (session.run('link.add', { from: { media: 'a', at: 5 }, to: { media: 'b', at: 2 }, kind: 'flashback', returnAt: 5.5, look: 'blur' }) as { ok: true; result: string }).result;
+    ok(session.run('link.set', { link, kind: 'jump', returnAt: null }));
+    expect(session.project.links![0]).toMatchObject({ kind: 'jump', look: 'blur' });
+    expect(session.project.links![0]!.returnAt).toBeUndefined();
+    const clipB = session.project.tracks.flatMap((t) => t.clips).find((c) => c.type === 'media' && c.media === 'b')!.id;
+    ok(session.run('clip.remove', { clips: [clipB] }));
+    ok(session.run('media.remove', { media: 'b' }));
+    expect(session.project.links).toEqual([]);
+    expect(session.project.scenes![0]!.shots).toEqual([]);
+  });
+});

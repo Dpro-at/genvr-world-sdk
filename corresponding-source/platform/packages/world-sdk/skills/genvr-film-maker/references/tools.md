@@ -27,7 +27,7 @@ Jobs live in the MCP client process that started them: keep one client open for 
 | `cues` | `cues[]`, optional `shot_id` | draft cues; each: `id`, `actor`, `label`, `action`, `start`, `end` (> start, ≤ 180 s), `text`, `volume` 0–2, optional `audio`, `voice`, `at`, `to[]` |
 | `dialogue_voice` | `cue_id`, `voice_id`, `language`, optional `shot_id` | generates the line with a saved voice; line length sets the cue end |
 | `dialogue_preview` | `cue_id`, optional `shot_id` | listen with mouth motion |
-| `record` | optional `shot_id`, `settings`, `world_sound`, `live_actors` | timed take with the draft cues |
+| `record` | optional `shot_id`, `settings`, `world_sound`, `live_actors`, `scene_id` | timed take with the draft cues; with `scene_id` the new shot joins that scene and the scene's own sound is used |
 | `manual_record` | `action: start / stop`, optional `seconds` 1–30 (default 30) | live take: the person moves the character; `seconds` is the longest it runs; wait for stop's job before editing |
 | `dialogue_track` | `cue_id`, `shot_id` (**clip id**), `language`, `start`, `append` | promotes a cue's audio + text to that language's voice + caption tracks |
 | `sound_import` | `name`, audio MIME, base64 `data` (≤ 8 MB decoded) | imports at the playhead; returns `media` and `clip` |
@@ -49,6 +49,14 @@ Cast and script (`command`; read `film.cast`, `film.lines`, `film.languageStatus
 - `line.write { cast, text: { ar: '…', en: '…' }, episode? }` and `line.set { line, text?, episode? }`: an agent may write **only**
   for characters whose `linesBy` is an agent; every agent write is a draft. `line.approve` is owner-only (MCP refuses it).
 - `line.place { line, lang, start?, seconds? }`: an **approved** line becomes a draft cue of the next take (then `dialogue_voice`, `record`).
+
+Scenes and links (`command`; read `film.scenes`, `film.links` with `inspect`):
+- `scene.add { name, place?, when?, instructions?, who?: [{ cast, job }], spots?: [{ name, x, z }], sound?: { mode: 'world'|'own', ambience 0–100, steps 0–100 }, episode? }` → scene id;
+  `scene.set { scene, ...any of those }` (sound merges), `scene.move { scene, index }`, `scene.remove { scene, confirm }`.
+- `scene.shot { scene, media, remove?, index? }`: a recording (media id) belongs to one scene; record with `scene_id` to do it at once.
+- Write exact cues with the scene's named spots: put `at` / `to` on the spot's x/z so the sheet shows the spot name.
+- `link.add { from: { media, at }, to: { media, at }, kind: continue|flashback|back|jump|loop, returnAt? (flashback: required), look: cut|blur|fade|old_film }`,
+  `link.set { link, ... , returnAt: null to clear }`, `link.remove { link }`. Links are stored and shown in Workflow; playback through links comes later.
 
 Editor commands used often: `clip.trim`, `clip.move`, `clip.split`, `clip.set` (volume), `clip.fade`,
 `clip.remove`, `clip.soundType`, `track.set`, `transition.add/set/remove`.

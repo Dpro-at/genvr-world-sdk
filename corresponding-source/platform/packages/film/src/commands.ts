@@ -4,7 +4,7 @@ import { EditError, findClip, transact, type EditContext } from './edits.js';
 import { History } from './history.js';
 import { languageStatus } from './cast.js';
 import { filmLength } from './invariants.js';
-import { CAST_LIMITS, CastMember, CastVoice, DEFAULT_SUBTITLE_STYLE, FilmSettings, LIMITS, ScriptLine, LanguageTag, Media, SceneCue, SubtitleStyle, TrackKind, filmSettings, type FilmProject } from './model.js';
+import { CAST_LIMITS, CastMember, CastVoice, DEFAULT_SCENE_SOUND, DEFAULT_SUBTITLE_STYLE, NamedSpot, SCENE_LIMITS, Scene, SceneSound, ShotLink, FilmSettings, LIMITS, ScriptLine, LanguageTag, Media, SceneCue, SubtitleStyle, TrackKind, filmSettings, type FilmProject } from './model.js';
 import { BLEND_MODES, EFFECTS, EFFECT_IDS, LOOKS, isEffect, type EffectId } from './effects.js';
 import { EASE_PRESETS } from './animate.js';
 import { SELECTOR_SHAPES, TITLE_PRESET_IDS } from './titles.js';
@@ -75,6 +75,7 @@ export function describe(project: FilmProject) {
     subtitleStyle: { ...DEFAULT_SUBTITLE_STYLE, ...project.subtitleStyle },
     settings: filmSettings(project),
     cast: project.cast ?? [], lines: project.lines ?? [], languageStatus: languageStatus(project),
+    scenes: project.scenes ?? [], links: project.links ?? [],
     ...(project.ducking ? { ducking: project.ducking } : {}),
     ...(project.range ? { range: { in: s(project.range.in), out: s(project.range.out) } } : {}),
     ...(project.looks ? { looks: Object.keys(project.looks) } : {}),
@@ -85,6 +86,22 @@ export function describe(project: FilmProject) {
     markers: project.markers.map((m) => ({ ...m, seconds: s(m.at) })),
     draft: project.draft.map((c) => ({ ...c, start: s(c.start), end: s(c.end) })),
   };
+}
+
+/** A scene may name only characters and recordings of this film; spots have different names. */
+function checkSceneRefs(d: FilmProject, scene: z.infer<typeof Scene>) {
+  for (const w of scene.who) if (!d.cast?.some((c) => c.id === w.cast)) throw new EditError('Add the character to the cast first.');
+  for (const m of scene.shots) if (!d.media.some((x) => x.id === m)) throw new EditError('That recording is not in this film.');
+  if (new Set(scene.spots.map((s) => s.name.toLowerCase())).size !== scene.spots.length) throw new EditError('Each spot of a scene needs its own name.');
+  NamedSpot.array().parse(scene.spots);
+}
+/** Links join two recordings of this film at times inside them; a flashback returns inside the first shot. */
+function checkLink(d: FilmProject, link: z.infer<typeof ShotLink>) {
+  const from = d.media.find((m) => m.id === link.from.media), to = d.media.find((m) => m.id === link.to.media);
+  if (!from || !to) throw new EditError('Both ends of a link must be recordings of this film.');
+  if (link.from.at > toSeconds(from.duration) + 0.001 || link.to.at > toSeconds(to.duration) + 0.001) throw new EditError('A link time must be inside its shot.');
+  if (link.kind === 'flashback' && link.returnAt === undefined) throw new EditError('A flashback needs the time it returns to (returnAt).');
+  if (link.returnAt !== undefined && link.returnAt > toSeconds(from.duration) + 0.001) throw new EditError('The return time must be inside the first shot.');
 }
 
 export const COMMANDS: CommandSpec[] = [
@@ -527,6 +544,74 @@ export const COMMANDS: CommandSpec[] = [
       d.draft = [...d.draft, SceneCue.parse(cue)]; line.cue = cue.id; return cue.id;
     },
   },
+  // Scenes, spots, scene sound and timed links (FILM-C1/C2/C3). Agents may make and change them all; deleting a
+  // scene that holds shots needs confirm (its recordings stay in Shots).
+  {
+    id: 'scene.add', label: (a: { name?: string }) => `Add scene ${a.name ?? ''}`.trim(), group: 'Project', journal: true,
+    args: Scene.omit({ id: true }).partial({ place: true, when: true, instructions: true, who: true, shots: true, spots: true, sound: true, episode: true }).strict(),
+    enabled: (st) => (st.project.scenes?.length ?? 0) >= SCENE_LIMITS.scenes ? `A film has at most ${SCENE_LIMITS.scenes} scenes.` : null,
+    run: (d, a, x) => {
+      const scene = Scene.parse({ place: '', when: '', instructions: '', who: [], shots: [], spots: [], sound: DEFAULT_SCENE_SOUND, ...a, id: x.id() });
+      checkSceneRefs(d, scene); d.scenes = [...(d.scenes ?? []), scene]; return scene.id;
+    },
+  },
+  {
+    id: 'scene.set', label: 'Scene settings', group: 'Project', journal: true,
+    args: Scene.omit({ id: true, sound: true }).partial().extend({ scene: clipId, sound: SceneSound.partial().strict().optional() }).strict(),
+    run: (d, a) => {
+      const { scene: sceneId, sound, ...patch } = a, scene = d.scenes?.find((s) => s.id === sceneId);
+      if (!scene) throw new EditError('Scene not found.');
+      const next = Scene.parse({ ...scene, ...patch, sound: { ...scene.sound, ...sound } });
+      checkSceneRefs(d, next); Object.assign(scene, next);
+    },
+  },
+  {
+    id: 'scene.move', label: 'Reorder scene', group: 'Project', journal: true,
+    args: z.object({ scene: clipId, index: z.number().int().min(0).max(SCENE_LIMITS.scenes) }).strict(),
+    run: (d, a) => { const list = d.scenes ?? [], at = list.findIndex((s) => s.id === a.scene); if (at < 0) throw new EditError('Scene not found.');
+      const [scene] = list.splice(at, 1); list.splice(Math.min(a.index, list.length), 0, scene!); },
+  },
+  {
+    id: 'scene.remove', label: 'Delete scene', group: 'Project', journal: true,
+    args: z.object({ scene: clipId, confirm: z.boolean().default(false) }).strict(),
+    enabled: (st, a) => { const scene = st.project.scenes?.find((s) => s.id === a.scene);
+      return !scene ? 'Scene not found.' : scene.shots.length && !a.confirm ? 'This scene holds shots; send confirm: true (the recordings stay in Shots).' : null; },
+    run: (d, a) => { d.scenes = d.scenes!.filter((s) => s.id !== a.scene); },
+  },
+  {
+    // One recording belongs to one scene: adding it here takes it out of any other scene.
+    id: 'scene.shot', label: (a: { remove?: boolean }) => a.remove ? 'Take shot out of scene' : 'Put shot in scene', group: 'Project', journal: true,
+    args: z.object({ scene: clipId, media: clipId, remove: z.boolean().default(false), index: z.number().int().min(0).max(50).optional() }).strict(),
+    run: (d, a) => {
+      const scene = d.scenes?.find((s) => s.id === a.scene);
+      if (!scene) throw new EditError('Scene not found.');
+      if (!d.media.some((m) => m.id === a.media && m.kind === 'video')) throw new EditError('That recording is not in this film.');
+      for (const other of d.scenes!) other.shots = other.shots.filter((m) => m !== a.media);
+      if (!a.remove) { if (scene.shots.length >= 50) throw new EditError('A scene holds at most 50 shots.'); scene.shots.splice(a.index ?? scene.shots.length, 0, a.media); }
+    },
+  },
+  {
+    id: 'link.add', label: (a: { kind?: string }) => `Add ${a.kind ?? 'link'}`, group: 'Project', journal: true,
+    args: ShotLink.omit({ id: true }).partial({ look: true }).strict(),
+    enabled: (st) => (st.project.links?.length ?? 0) >= SCENE_LIMITS.links ? `A film has at most ${SCENE_LIMITS.links} links.` : null,
+    run: (d, a, x) => { const link = ShotLink.parse({ look: 'cut', ...a, id: x.id() }); checkLink(d, link); d.links = [...(d.links ?? []), link]; return link.id; },
+  },
+  {
+    id: 'link.set', label: 'Change link', group: 'Project', journal: true,
+    args: ShotLink.omit({ id: true }).partial().extend({ link: clipId, returnAt: z.number().finite().min(0).max(180).nullable().optional() }).strict(),
+    run: (d, a) => {
+      const { link: linkId, returnAt, ...patch } = a, link = d.links?.find((l) => l.id === linkId);
+      if (!link) throw new EditError('Link not found.');
+      const next = ShotLink.parse({ ...link, ...patch, ...(returnAt === null ? { returnAt: undefined } : returnAt !== undefined ? { returnAt } : {}) });
+      if (returnAt === null) delete (next as { returnAt?: number }).returnAt;
+      checkLink(d, next); Object.assign(link, next); if (returnAt === null) delete link.returnAt;
+    },
+  },
+  {
+    id: 'link.remove', label: 'Delete link', group: 'Project', journal: true,
+    args: z.object({ link: clipId }).strict(),
+    run: (d, a) => { if (!d.links?.some((l) => l.id === a.link)) throw new EditError('Link not found.'); d.links = d.links.filter((l) => l.id !== a.link); },
+  },
   {
     // Film settings window (FILM-A2): any part; caption, titles and director merge field by field.
     id: 'project.settings', label: 'Film settings', group: 'Project', journal: true,
@@ -561,7 +646,12 @@ export const COMMANDS: CommandSpec[] = [
   {
     id: 'media.remove', label: 'Remove recording', group: 'Project', journal: true,
     args: z.object({ media: clipId }).strict(),
-    run: (d, a) => edit.removeMedia(d, a.media),
+    run: (d, a) => {
+      edit.removeMedia(d, a.media);
+      // The recording leaves its scene and its links too (FILM-C1/C2).
+      for (const scene of d.scenes ?? []) scene.shots = scene.shots.filter((m) => m !== a.media);
+      if (d.links) d.links = d.links.filter((l) => l.from.media !== a.media && l.to.media !== a.media);
+    },
   },
   {
     id: 'media.set', label: 'Rename recording', group: 'Project', journal: true,

@@ -198,6 +198,38 @@ export type ScriptLine = z.infer<typeof ScriptLine>;
 
 export const CAST_LIMITS = { cast: 40, lines: 500 } as const;
 
+/** A named spot of a scene (FILM-C1): cues can start at or walk to it, so an agent can use exact places. */
+export const NamedSpot = z.object({ name: z.string().min(1).max(40), x: z.number().finite().min(-100000).max(100000), z: z.number().finite().min(-100000).max(100000) }).strict();
+/** How a scene sounds (FILM-C3): like the world, or its own loudness of nature/weather and of footsteps (0-100). */
+export const SceneSound = z.object({ mode: z.enum(['world', 'own']), ambience: z.number().int().min(0).max(100), steps: z.number().int().min(0).max(100) }).strict();
+export type SceneSound = z.infer<typeof SceneSound>;
+export const DEFAULT_SCENE_SOUND: SceneSound = { mode: 'world', ambience: 56, steps: 80 };
+/** A scene (FILM-C1, boards 7 and 8): its shots, who is in it and their job, the director's instructions, spots, sound. */
+export const Scene = z.object({
+  id, name: z.string().min(1).max(60), place: z.string().max(120), when: z.string().max(60),
+  instructions: z.string().max(2000),
+  who: z.array(z.object({ cast: id, job: z.string().max(200) }).strict()).max(20),
+  /** Recordings (media ids) that belong to this scene, in story order. */
+  shots: z.array(id).max(50),
+  spots: z.array(NamedSpot).max(20),
+  sound: SceneSound,
+  episode: z.number().int().min(1).max(200).default(1),
+}).strict();
+export type Scene = z.infer<typeof Scene>;
+/**
+ * A timed link between two shots (FILM-C2, boards 7 and 9): leave `from` at a time and play `to` from a time;
+ * a flashback returns to `from` at `returnAt` seconds of the first shot.
+ */
+export const ShotLink = z.object({
+  id, from: z.object({ media: id, at: z.number().finite().min(0).max(180) }).strict(),
+  to: z.object({ media: id, at: z.number().finite().min(0).max(180) }).strict(),
+  kind: z.enum(['continue', 'flashback', 'back', 'jump', 'loop']),
+  returnAt: z.number().finite().min(0).max(180).optional(),
+  look: z.enum(['cut', 'blur', 'fade', 'old_film']),
+}).strict();
+export type ShotLink = z.infer<typeof ShotLink>;
+export const SCENE_LIMITS = { scenes: 60, links: 200 } as const;
+
 export const FilmProject = z.object({
   version: z.literal(2),
   rate: z.object({ num: z.number().int().positive(), den: z.number().int().positive() }).strict(),
@@ -220,6 +252,9 @@ export const FilmProject = z.object({
   /** Characters (FILM-B1) and the script (FILM-B2). */
   cast: z.array(CastMember).max(CAST_LIMITS.cast).optional(),
   lines: z.array(ScriptLine).max(CAST_LIMITS.lines).optional(),
+  /** Scenes (FILM-C1) and timed links between shots (FILM-C2). */
+  scenes: z.array(Scene).max(SCENE_LIMITS.scenes).optional(),
+  links: z.array(ShotLink).max(SCENE_LIMITS.links).optional(),
 }).strict();
 export type FilmProject = z.infer<typeof FilmProject>;
 

@@ -19,6 +19,8 @@ import { record } from './film/record';
 import { AddMenu, ExportMenu } from './film/add-menu';
 import { CastInspector } from './film/cast-panel';
 import { useCastSelection } from './film/cast-selection';
+import { SceneInspector } from './film/scenes-panel';
+import { useSceneSelection } from '../../lib/video-studio/scene-selection';
 import { useStudioHost } from '../../lib/studio-host';
 import { SceneVoice } from './film/scene-voice';
 import { ClipFace, KIND, Meters, Ruler, SoundCrossfade, TL, Toggle, TrackHeader, ZoomBar, clipBox } from './film/timeline-parts';
@@ -444,8 +446,9 @@ export function VideoSceneInspector({ filming }: { filming: StudioFilming }) {
   const workspace = filming.studio.workspace;
   const [settings, setSettings] = useState(false);
   const chosenCast = useCastSelection(), castOpen = Boolean(chosenCast && filming.studio.project.cast?.some((c) => c.id === chosenCast));
-  const head = castOpen ? { title: 'Character', icon: Users } : INSPECTOR_TITLE[workspace] ?? INSPECTOR_TITLE.shoot!, HeadIcon = head.icon;
-  const body = castOpen ? <CastInspector filming={filming} />
+  const chosenScene = useSceneSelection(), sceneOpen = !castOpen && Boolean(chosenScene && filming.studio.project.scenes?.some((x) => x.id === chosenScene));
+  const head = castOpen ? { title: 'Character', icon: Users } : sceneOpen ? { title: 'Scene sheet', icon: Clapperboard } : INSPECTOR_TITLE[workspace] ?? INSPECTOR_TITLE.shoot!, HeadIcon = head.icon;
+  const body = castOpen ? <CastInspector filming={filming} /> : sceneOpen ? <SceneInspector filming={filming} />
     : workspace === 'captions' ? <CaptionsPanel filming={filming} />
     : workspace === 'transitions' ? <TransitionsWorkspace filming={filming} />
     : workspace === 'sound' ? <SoundPanel filming={filming} />

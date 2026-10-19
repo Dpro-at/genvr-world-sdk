@@ -10,13 +10,15 @@ import type { StudioFilming } from '../../lib/use-studio-filming';
 import { HistoryPanel, ShotsPanel } from './film/panels';
 import { QuickVoice } from './film/quick-voice';
 import { CastList } from './film/cast-panel';
-import { Anchor, Camera, Clock, Crosshair, Drone, Film, Focus, Footprints, FolderOpen, Hand, Info, Mic, MoveHorizontal, Orbit, Save, SlidersHorizontal, UserRound, Users, Video, type LucideIcon } from 'lucide-react';
+import { ScenesList } from './film/scenes-panel';
+import { Anchor, Camera, Clapperboard, Clock, Crosshair, Drone, Film, Focus, Footprints, FolderOpen, Hand, Info, Mic, MoveHorizontal, Orbit, Save, SlidersHorizontal, UserRound, Users, Video, type LucideIcon } from 'lucide-react';
 
 const ICON = 'inline-flex size-8 items-center justify-center rounded-md hover:bg-ink/10 disabled:opacity-40 aria-pressed:bg-ink/15 aria-pressed:ring-1 aria-pressed:ring-ink/30';
-type LeftTab = 'camera' | 'cast' | 'shots' | 'history';
+type LeftTab = 'camera' | 'cast' | 'scenes' | 'shots' | 'history';
 const TABS: ReadonlyArray<{ id: LeftTab; label: string; icon: LucideIcon }> = [
   { id: 'camera', label: 'Camera', icon: Video },
   { id: 'cast', label: 'Cast', icon: Users },
+  { id: 'scenes', label: 'Scenes', icon: Clapperboard },
   { id: 'shots', label: 'Shots', icon: Film },
   { id: 'history', label: 'History', icon: Clock },
 ];
@@ -61,6 +63,7 @@ export function FilmingPanel({ filming }: { filming: StudioFilming }) {
         </Section>
         {filming.voiceAvailable ? <Section icon={Mic} title="My avatar's voice"><QuickVoice filming={filming} /></Section> : null}
       </div> : null}
+      {tab === 'scenes' ? <ScenesList filming={filming} /> : null}
       {tab === 'shots' ? <div className="pt-1"><ShotsPanel filming={filming} /></div> : null}
       {tab === 'history' ? <div className="pt-1"><HistoryPanel filming={filming} /></div> : null}
     </div>

@@ -105,6 +105,8 @@ export class WorldAudio {
     target.addEventListener('keydown', this.#start, { once: false });
   }
 
+  /** The loudness now set (FILM-C3: a scene's own sound is applied for a take, then this is restored). */
+  volumes(): AudioVolumes { return { ...this.#volumes }; }
   setVolumes(volumes: AudioVolumes): void {
     this.#volumes = volumes;
     const now = this.#context?.currentTime ?? 0;
