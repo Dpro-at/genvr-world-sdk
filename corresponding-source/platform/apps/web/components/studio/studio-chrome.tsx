@@ -1,4 +1,6 @@
 'use client';
+import { CharacterTabs } from './character-editor/character-tabs';
+import { avatarStudioBridge } from '../../lib/avatar-studio';
 import type { CharacterEditor } from './character-editor/use-character-editor';
 import { QuickVoice } from './film/quick-voice';
 import { BodySection } from './character-editor/character-controls';
@@ -178,6 +180,7 @@ export function StudioChrome({
   const filmWorkspace = tab === 'filming';
   // The Avatar tab is the character editor (CHAR-01): its own stage over the viewport, the world rests meanwhile.
   const character = useCharacterEditor();
+  useEffect(() => avatarStudioBridge.register(character), [character]);
   const workflowOpen = useWorkflowOpen();
   useEffect(()=>{onCharacter?.(character);},[character]);
   useEffect(() => host.characterBody?.(body => character.change(recipe => ({ ...recipe, body }))), [host.characterBody]);
@@ -250,7 +253,7 @@ export function StudioChrome({
           <LightingPanel filming={filming} /><EnvironmentPicker runtime={runtime} variant="panel" onStyle={onStyle} />
         </div>
       );
-    if (tab === 'avatar') return <CharacterControls editor={character} />;
+    if (tab === 'avatar') return <CharacterTabs editor={character} />;
     return (
       <div className="grid grid-cols-3 gap-1.5 px-2 pb-2">
         {toolsFor(rt())

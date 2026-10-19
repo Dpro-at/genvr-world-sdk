@@ -2,7 +2,7 @@
 
 import { MOTION_CATEGORIES, motionCategories, avatarMotionEntries } from '@genvr/runtime';
 import { EXPRESSIONS } from '@genvr/assistant';
-import { Smile, Angry, Frown, Brain, CircleHelp, Meh, Ruler, Palette, ScanFace, ChevronDown } from 'lucide-react';
+import { Smile, Angry, Frown, Brain, CircleHelp, Meh, Ruler, Palette, ScanFace, ChevronDown, Star } from 'lucide-react';
 import { useStudioHost } from '../../../lib/studio-host';
 
 import {
@@ -563,7 +563,7 @@ function BuildControls({ editor }: { editor: CharacterEditor }) {
               onShow={show('fat', 0, 0)}
               onChange={(fatPattern) => set({ fatPattern })}
             />
-            {process.env.NODE_ENV === 'development' ? <MusclePaintPanel editor={editor} /> : null}
+            <MusclePaintPanel editor={editor} />
             <button
               type="button"
               onClick={() => set(NORMAL_BUILD)}
@@ -1095,21 +1095,34 @@ export function MovesSection({
     if (host.presentAvatar) host.presentAvatar({ kind: 'expression', target: 'self', expression, duration: 60000 });
     else editor.stage.current?.presentExpression(expression);
   };
+  const favourites = new Set(editor.recipe.animations.emotes), idle = editor.recipe.animations.idle;
+  const chosen = all.find(row => !row.id.startsWith('face:') && row.id === (editor.info?.clip ?? editor.clip));
+  /** ★ keeps a move on the character (recipe.animations.emotes); agents use avatar_studio set the same way. */
+  const toggleFavourite = (id: string) => editor.change(r => ({ ...r, animations: { ...r.animations, emotes: r.animations.emotes.includes(id) ? r.animations.emotes.filter(one => one !== id) : [...r.animations.emotes, id].slice(-16) } }));
+  const useAsIdle = (id: string) => editor.change(r => ({ ...r, animations: { ...r.animations, idle: id } }));
+  const savable = (id: string) => /^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$/.test(id);
   const matching = all.filter(row => `${row.name} ${row.title}`.toLowerCase().includes(query.toLowerCase()));
-  const categories = ['All', 'Facial expressions', ...MOTION_CATEGORIES.filter(value => all.some(row => row.categories.includes(value)))];
-  const filtered = matching.filter(row => category === 'All' || row.categories.includes(category as typeof MOTION_CATEGORIES[number]));
+  const categories = ['All', 'Favourites', 'Facial expressions', ...MOTION_CATEGORIES.filter(value => all.some(row => row.categories.includes(value)))];
+  const inCategory = (row: (typeof all)[number], value: string) => value === 'All' || (value === 'Favourites' ? favourites.has(row.id) : row.categories.includes(value as typeof MOTION_CATEGORIES[number]));
+  const filtered = matching.filter(row => inCategory(row, category));
   return <div className="space-y-2">
     {all.length ? <>
-      <div role="tablist" aria-label="Motion categories" className="grid grid-cols-2 gap-1.5 border-b border-ink/10 pb-2">
-        {categories.map(value => <button key={value} type="button" role="tab" aria-selected={category === value} onClick={() => { setCategory(value); setPage(0); }} className={`flex min-w-0 items-center justify-between gap-1 rounded-lg px-2 py-2 text-[11px] font-bold ${category === value ? 'bg-ink text-on-brand' : 'bg-paper hover:bg-ink/5'}`}><span className="truncate">{value === 'Facial expressions' ? 'Facial Expressions' : value}</span><span className="text-[10px] opacity-60">{value === 'All' ? matching.length : matching.filter(row => row.categories.includes(value as typeof MOTION_CATEGORIES[number])).length}</span></button>)}
+      <input aria-label="Search moves" placeholder="Search moves and expressions" value={query} onChange={event => { setQuery(event.target.value); setPage(0); }} className="w-full rounded-lg bg-paper px-3 py-2 text-xs text-ink ring-1 ring-ink/10" />
+      <div role="tablist" aria-label="Motion categories" className="flex flex-wrap gap-1 border-b border-ink/10 pb-2">
+        {categories.map(value => <button key={value} type="button" role="tab" aria-selected={category === value} onClick={() => { setCategory(value); setPage(0); }} className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-bold ${category === value ? 'bg-ink text-on-brand' : 'bg-paper hover:bg-ink/5'}`}>{value === 'Favourites' ? <Star className="size-3" aria-hidden /> : null}<span>{value === 'Facial expressions' ? 'Faces' : value}</span><span className="text-[10px] opacity-60">{matching.filter(row => inCategory(row, value)).length}</span></button>)}
       </div>
-      <input aria-label="Search moves" placeholder="Search moves and expressions" value={query} onChange={event => { setQuery(event.target.value); setPage(0); }} className="w-full rounded-lg bg-paper px-3 py-2 text-xs text-ink" />
-      <p className="text-[11px] text-ink/60">{filtered.length} {category === 'Facial expressions' ? 'expressions' : 'items'} · Some moves match multiple categories.</p>
+      {chosen ? <div aria-label="Chosen move" className="flex items-center gap-1.5 rounded-xl bg-paper p-2 text-xs">
+        <chosen.Icon className="size-4 shrink-0" aria-hidden />
+        <span className="min-w-0 flex-1"><b className="block truncate">{chosen.name}</b><span className="text-[10px] text-ink/55">{chosen.id === idle ? 'Idle of this character' : 'Playing'}</span></span>
+        <button type="button" disabled={!savable(chosen.id)} aria-pressed={favourites.has(chosen.id)} aria-label={favourites.has(chosen.id) ? 'Remove from favourites' : 'Add to favourites'} title="Favourite" onClick={() => toggleFavourite(chosen.id)} className="rounded-md p-1.5 hover:bg-ink/10 disabled:opacity-35"><Star className={`size-4 ${favourites.has(chosen.id) ? 'fill-current' : ''}`} /></button>
+        <button type="button" disabled={!savable(chosen.id) || chosen.id === idle} onClick={() => useAsIdle(chosen.id)} className="rounded-md border border-ink/10 px-2 py-1 font-semibold hover:bg-ink/10 disabled:opacity-35">Use as idle</button>
+      </div> : null}
+      <p className="text-[11px] text-ink/60">{filtered.length} {category === 'Facial expressions' ? 'expressions' : 'items'}{category === 'Favourites' && !filtered.length ? ' · Play a move, then ★ it.' : ''}</p>
     </> : null}
     <div role="radiogroup" aria-label="Moves" className={`grid gap-1.5 ${columns}`}>
       {filtered.slice(page * 60, (page + 1) * 60).map(({ id, name, title, Icon }) => <button key={id} type="button" role="radio" aria-label={title} title={title} aria-checked={selected(id)} onClick={() => play(id)} className={`flex flex-col items-center gap-1 rounded-xl px-1 py-2 text-[11px] font-bold transition active:scale-95 ${selected(id) ? 'bg-ink text-on-brand' : 'bg-paper text-ink hover:bg-ink/5'}`}>
         <Icon className="size-5" strokeWidth={1.8} aria-hidden />
-        <span className="w-full truncate text-center leading-tight">{name}</span>
+        <span className="w-full truncate text-center leading-tight">{favourites.has(id) ? '★ ' : ''}{name}</span>
       </button>)}
     </div>
     {filtered.length > 60 ? <div className="flex items-center justify-between text-xs font-bold"><button type="button" disabled={page === 0} onClick={() => setPage(value => value - 1)} className="rounded-lg p-2 hover:bg-ink/5 disabled:opacity-40">Previous</button><span>{page + 1} / {Math.ceil(filtered.length / 60)}</span><button type="button" disabled={(page + 1) * 60 >= filtered.length} onClick={() => setPage(value => value + 1)} className="rounded-lg p-2 hover:bg-ink/5 disabled:opacity-40">Next</button></div> : null}

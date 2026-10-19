@@ -68,6 +68,19 @@ export const TOOL_ARGS = {
   avatar_voice: z.object({ action: z.enum(['models','install','voices','clone','assign','speak','job','recordings','audio','replay','demo','playback','demo_all','preview','preview_demo','prepare_previews','remove','design','save_design','export_voice']), preview:z.boolean().optional(), voiceType:z.enum(['male','female','child']).optional(), description:z.string().max(400).optional(), confirm:z.boolean().optional(), command:z.enum(['play','pause','stop','seek','rate','volume']).optional(), value:z.number().finite().optional(), demoId:z.string().max(80).optional(), audioId:z.string().uuid().optional(), model:z.string().max(80).optional(), jobId:z.string().uuid().optional(), voiceId:z.string().uuid().optional(), name:z.string().max(80).optional(), audio:z.string().max(12*1024*1024).optional(), consent:z.boolean().optional(), projectId:z.string().max(120).optional(), target:z.string().regex(/^(self|[A-Za-z0-9_-]{1,100})$/).default('self'), text:z.string().max(1200).optional(), language:z.string().max(8).optional() }).strict(),
   user_avatar_library: z.object({ action: z.enum(['list', 'assign', 'play']), target: z.string().regex(/^(self|[A-Za-z0-9_-]{1,100})$/).default('self'), id: z.string().max(150).nullable().optional(), query: z.string().max(200).default(''), offset: z.number().int().min(0).default(0), limit: z.number().int().min(1).max(100).default(30) }).strict(),
   present_avatar: z.object({ event: AvatarPresentationEvent }).strict(),
+  /**
+   * The Avatar tab (AV-01, Avatar design A0–A9): read and change the character itself — body, shape, muscle, fat,
+   * face controls, colours, hair — the view mode (skeleton, muscles, fat…), a held facial expression, a move, and
+   * save / export the recipe. `recipe` parts merge into the current recipe and are checked by the recipe schema.
+   */
+  avatar_studio: z.object({
+    action: z.enum(['inspect', 'set', 'view', 'expression', 'play', 'save', 'export', 'reset_shape']),
+    recipe: z.record(z.string(), z.unknown()).optional(),
+    view: z.enum(['normal', 'first-person', 'skeleton', 'skeleton-mesh', 'wireframe', 'clay', 'normals', 'muscles', 'fat']).optional(),
+    shading: z.enum(['smooth', 'flat']).optional(),
+    expression: z.enum(['neutral', 'smile', 'angry', 'sad', 'surprised', 'thinking']).optional(),
+    clip: z.string().max(150).optional(),
+  }).strict(),
   get_resource_controls: z.object({
     item_id: z
       .string()
@@ -720,6 +733,7 @@ const DESCRIPTIONS: Record<ToolName, string> = {
   avatar_voice: 'Manage local avatar voices: design a synthetic voice using language/voiceType/text/description, audition its draft, save_design with audioId/name, then assign separately. Models and installation, authorized reference voice profiles (clone), assign a voice, generate speech (speak), and poll job status. Call models/voices first; install and speak return job IDs. Audio stays local. Arabic support depends on the selected model.',
   user_avatar_library: 'List private user characters and motions, assign an available character ID to self or a host agent, or play an available private motion ID. No asset publishing or redistribution. List before choosing IDs.',
   share_studio: 'Inspect sharing capability, open the separate Share dialog, or create a host-authorized world/Avatar Live link. Creating requires explicit user authorization and an attached platform sharing service; local SDK cannot publish private data. Password enforcement belongs to the host server.',
+  avatar_studio: 'Avatar tab: inspect the character (recipe, view, bones, height, whether the face can move); set merges recipe parts (name, body, shape {height, weight, scale, anime, muscle, fat, fatPattern, definition, muscles {group: -1..1}, fatRegions {region: -1..1}, face {feature: -1..1}}, colors {skin, hair, top, bottom, shoes}, hair); view sets the view mode (skeleton, muscles, fat…) and shading; expression holds a facial expression; play a move by id; save the character to My characters; export the recipe JSON; reset_shape back to the normal shape. Works on the live Studio only.',
   present_avatar: 'Use kind display to open/configure Avatar Live layouts (large, desktop, browser, compact, banner, circle, watch), background and framing. For saved world backgrounds, use worldId from inspect_studio.availableWorlds and optional worldSpot {position,target,player} XYZ coordinates; set worldId/worldSpot to null for the current live world view. Optionally show a gesture, facial expression, visual effect, notification or rich card when useful. Transient, never saves the world. target is self or a host agent ID. Use only available Core animation IDs. Never invent live app or stock data. No action permissions are granted by a card.',
   get_resource_controls:
     'Read supported controls, scope, source defaults and documentation for a Core model or ocean resource. Models use instance-scoped set_resource_params; oceans use world-scoped set_sea. Empty model controls means no generated settings; creator package controls are not described.',

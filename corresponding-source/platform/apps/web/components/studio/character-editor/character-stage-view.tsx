@@ -6,6 +6,7 @@ import type { CharacterStage } from '@genvr/runtime/character';
 import {
   Bone,
   Box,
+  ChevronDown,
   Circle,
   Droplet,
   Eye,
@@ -22,6 +23,7 @@ import {
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import type { CharacterEditor } from './use-character-editor';
+import { openAvatarTab } from './character-tabs';
 
 /**
  * Stage backdrops (owner, CHAR-02: pick a background the character stands out on). `theme` follows the site's
@@ -49,16 +51,16 @@ function readBackdrop(): BackdropId {
 
 type ViewMode = CharacterEditor['view'];
 
-const MODES: Array<{ id: ViewMode; label: string; Icon: LucideIcon }> = [
-  { id: 'normal', label: 'Normal view', Icon: User },
-  { id: 'first-person', label: 'First person (hands only)', Icon: Eye },
-  { id: 'skeleton', label: 'Skeleton only', Icon: Bone },
-  { id: 'skeleton-mesh', label: 'Skeleton and mesh', Icon: ScanEye },
-  { id: 'wireframe', label: 'Wireframe (mesh topology)', Icon: Box },
-  { id: 'clay', label: 'Clay (no texture)', Icon: Circle },
-  { id: 'normals', label: 'Surface normals', Icon: Orbit },
-  { id: 'muscles', label: 'Muscles (red)', Icon: HeartPulse },
-  { id: 'fat', label: 'Body fat (yellow)', Icon: Droplet },
+const MODES: Array<{ id: ViewMode; label: string; short: string; group: 'look' | 'body' | 'surface'; Icon: LucideIcon }> = [
+  { id: 'normal', label: 'Normal view', short: 'Normal', group: 'look', Icon: User },
+  { id: 'first-person', label: 'First person (hands only)', short: 'First person', group: 'look', Icon: Eye },
+  { id: 'skeleton', label: 'Skeleton only', short: 'Skeleton', group: 'body', Icon: Bone },
+  { id: 'skeleton-mesh', label: 'Skeleton and mesh', short: 'Skeleton + mesh', group: 'body', Icon: ScanEye },
+  { id: 'muscles', label: 'Muscles (red)', short: 'Muscles', group: 'body', Icon: HeartPulse },
+  { id: 'fat', label: 'Body fat (yellow)', short: 'Body fat', group: 'body', Icon: Droplet },
+  { id: 'wireframe', label: 'Wireframe (mesh topology)', short: 'Wireframe', group: 'surface', Icon: Box },
+  { id: 'clay', label: 'Clay (no texture)', short: 'Clay', group: 'surface', Icon: Circle },
+  { id: 'normals', label: 'Surface normals', short: 'Normals', group: 'surface', Icon: Orbit },
 ];
 
 /** The page's ink and a soft grid colour from the theme tokens. */
@@ -86,6 +88,9 @@ export function CharacterStageView({
   const container = useRef<HTMLDivElement>(null);
   const [failed, setFailed] = useState(false);
   const [settings, setSettings] = useState(false);
+  const [viewMenu, setViewMenu] = useState(false);
+  /** Right-click on the avatar (board A1): quick jumps to its tabs and the camera. */
+  const [menu, setMenu] = useState<{ x: number; y: number } | null>(null);
   const [backdrop, setBackdrop] = useState<BackdropId>('theme');
   // Read after mount: the server render has no saved choice.
   useEffect(() => setBackdrop(readBackdrop()), []);
@@ -163,7 +168,41 @@ export function CharacterStageView({
     <div
       className="relative h-full min-h-0 w-full overflow-hidden"
       style={{ background: BACKDROPS.find((one) => one.id === backdrop)!.css }}
+      onContextMenu={compact ? undefined : (event) => {
+        event.preventDefault();
+        const box = event.currentTarget.getBoundingClientRect();
+        setMenu({ x: event.clientX - box.left, y: event.clientY - box.top });
+      }}
+      onPointerDown={(event) => { if (menu && event.button === 0 && !(event.target as HTMLElement).closest('[data-avatar-menu]')) setMenu(null); }}
     >
+      {menu ? (
+        <div
+          data-avatar-menu
+          role="menu"
+          aria-label="Avatar"
+          style={{ left: Math.max(8, menu.x), top: Math.max(8, menu.y) }}
+          className="absolute z-20 w-52 rounded-xl bg-surface p-1 text-xs font-semibold text-ink shadow-xl ring-1 ring-ink/10"
+          onKeyDown={(event) => { if (event.key === 'Escape') setMenu(null); }}
+        >
+          {([
+            ['Colours…', () => openAvatarTab('colours')],
+            ['Shape and body…', () => openAvatarTab('shape')],
+            ['Face and expression…', () => openAvatarTab('face')],
+            ['Face close-up', () => stage.current?.focusFace()],
+            ['Show muscles', () => editor.setView('muscles')],
+            ['Show skeleton', () => editor.setView('skeleton-mesh')],
+            ['Normal view', () => editor.setView('normal')],
+            ['Reset camera', () => stage.current?.resetView()],
+          ] as const).map(([label, run], index) => (
+            <div key={label}>
+              {index === 3 || index === 7 ? <div className="my-1 h-px bg-ink/10" /> : null}
+              <button type="button" role="menuitem" autoFocus={index === 0} onClick={() => { run(); setMenu(null); }} className="flex w-full rounded-lg px-2 py-1.5 text-left hover:bg-ink/10">
+                {label}
+              </button>
+            </div>
+          ))}
+        </div>
+      ) : null}
       <div ref={container} data-character-stage className="absolute inset-0" />
       {host.presentationOverlay?.()}
       {failed ? (
@@ -211,23 +250,38 @@ export function CharacterStageView({
           aria-label="View"
           className="relative flex max-w-full items-center gap-0.5 rounded-full bg-surface/90 p-1 shadow-lg ring-1 ring-ink/10 backdrop-blur"
         >
-          <div role="radiogroup" aria-label="View mode" className="flex items-center gap-0.5">
-            {MODES.map(({ id, label, Icon }) => (
-              <button
-                key={id}
-                type="button"
-                role="radio"
-                aria-checked={view === id}
-                aria-label={label}
-                title={label}
-                onClick={() => editor.setView(id)}
-                className={`flex size-9 items-center justify-center rounded-full transition ${
-                  view === id ? 'bg-ink text-on-brand' : 'text-ink/70 hover:bg-ink/10 hover:text-ink'
-                }`}
-              >
-                <Icon className="size-[18px]" strokeWidth={2} aria-hidden />
-              </button>
-            ))}
+          <div className="relative">
+            <button
+              type="button"
+              aria-haspopup="menu"
+              aria-expanded={viewMenu}
+              aria-label={`View: ${(MODES.find((m) => m.id === view) ?? MODES[0]!).label}`}
+              title="View mode"
+              onClick={() => { setViewMenu(!viewMenu); setSettings(false); }}
+              className="flex h-9 items-center gap-1.5 rounded-full bg-ink px-3 text-xs font-bold text-on-brand"
+            >
+              {(() => { const Current = (MODES.find((m) => m.id === view) ?? MODES[0]!).Icon; return <Current className="size-4" aria-hidden />; })()}
+              <span className="max-w-32 truncate">{(MODES.find((m) => m.id === view) ?? MODES[0]!).short}</span>
+              <ChevronDown className="size-3.5" aria-hidden />
+            </button>
+            {viewMenu ? (
+              <div role="menu" aria-label="View mode" className="absolute bottom-12 left-0 w-60 rounded-2xl bg-surface p-1.5 text-xs font-semibold text-ink shadow-xl ring-1 ring-ink/10">
+                {MODES.map(({ id, label, Icon, group }, index) => (
+                  <div key={id}>
+                    {index > 0 && MODES[index - 1]!.group !== group ? <div className="my-1 h-px bg-ink/10" /> : null}
+                    <button
+                      type="button"
+                      role="menuitemradio"
+                      aria-checked={view === id}
+                      onClick={() => { editor.setView(id); setViewMenu(false); }}
+                      className={`flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left ${view === id ? 'bg-ink text-on-brand' : 'hover:bg-ink/10'}`}
+                    >
+                      <Icon className="size-4" aria-hidden />{label}
+                    </button>
+                  </div>
+                ))}
+              </div>
+            ) : null}
           </div>
           <span aria-hidden className="mx-1 h-5 w-px bg-ink/15" />
           <button
@@ -235,7 +289,7 @@ export function CharacterStageView({
             aria-label="View settings"
             title="View settings"
             aria-expanded={settings}
-            onClick={() => setSettings(!settings)}
+            onClick={() => { setSettings(!settings); setViewMenu(false); }}
             className={`flex size-9 items-center justify-center rounded-full ${settings ? 'bg-ink/10 text-ink' : 'text-ink/70 hover:bg-ink/10 hover:text-ink'}`}
           >
             <SlidersHorizontal className="size-[18px]" aria-hidden />

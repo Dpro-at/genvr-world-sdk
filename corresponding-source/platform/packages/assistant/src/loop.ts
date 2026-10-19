@@ -89,6 +89,8 @@ export interface AssistantHost {
   presentationInfo?(): string;
   avatarVoice?(input: ToolArgs<'avatar_voice'>): Promise<unknown>;
   userAvatarLibrary?(input: ToolArgs<'user_avatar_library'>): Promise<unknown>;
+  /** The Avatar tab's character editor (AV-01). */
+  avatarStudio?(input: ToolArgs<'avatar_studio'>): Promise<unknown>;
   world(): WorldDocument;
   heightAt(x: number, z: number): number;
   /**
@@ -481,6 +483,7 @@ export function executeTool(
     case 'share_studio': return {ok:false,result:'Use the asynchronous tool runner for sharing.'};
     case 'avatar_voice': return { ok:false, result:'Use the asynchronous tool runner for voice operations.' };
     case 'user_avatar_library': return { ok: false, result: 'Use the asynchronous tool runner for private library operations.' };
+    case 'avatar_studio': return { ok: false, result: 'Use the asynchronous tool runner for the Avatar tab.' };
     case 'present_avatar': {
       if (!host.presentAvatar) return { ok: false, result: 'Avatar presentation is not enabled in this host.' };
       const error = host.presentAvatar((args as ToolArgs<'present_avatar'>).event);
@@ -1650,6 +1653,11 @@ async function callTool(
     if (!host.avatarVoice) return {outcome:{ok:false,result:'Local voice service is not connected in this host.'},args:parsed.args};
     try {return {outcome:{ok:true,result:JSON.stringify(await host.avatarVoice(parsed.args as ToolArgs<'avatar_voice'>))},args:parsed.args};}
     catch(error) {return {outcome:{ok:false,result:error instanceof Error?error.message:String(error)},args:parsed.args};}
+  }
+  if (name === 'avatar_studio') {
+    if (!host.avatarStudio) return { outcome: { ok: false, result: 'The Avatar tab is not open in this host.' }, args: parsed.args };
+    try { return { outcome: { ok: true, result: JSON.stringify(await host.avatarStudio(parsed.args as ToolArgs<'avatar_studio'>)) }, args: parsed.args }; }
+    catch (error) { return { outcome: { ok: false, result: error instanceof Error ? error.message : String(error) }, args: parsed.args }; }
   }
   if (name === 'user_avatar_library') {
     if (!host.userAvatarLibrary) return { outcome: { ok: false, result: 'Private user library is not connected in this host.' }, args: parsed.args };

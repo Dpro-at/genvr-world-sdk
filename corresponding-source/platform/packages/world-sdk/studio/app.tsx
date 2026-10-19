@@ -1,4 +1,5 @@
 import { ShareDialog } from './share-dialog';
+import { runAvatarStudio } from '../../../apps/web/lib/avatar-studio';
 import type { StudioSharing } from '../src/studio-sharing';
 import { AvatarLive, AVATAR_LIVE_LAYOUTS, avatarLiveEmbed, type AvatarLiveHost } from './presentation/avatar-live';
 import { QuickVoice } from '../../../apps/web/components/studio/film/quick-voice';
@@ -261,6 +262,8 @@ function Editor({ initial, storage, options, leave, beforeClose }: { initial: St
     if(tool==='share_studio')return shareStudio(TOOL_ARGS.share_studio.parse(raw));
     if (tool === 'inspect_studio') return { availableWorlds:await storage.list(), projectId: initial.id, world: { style: runtime.current.world.style.base, kind: runtime.current.world.terrain.world?.kind ?? 'empty', seed: runtime.current.world.terrain.world?.seed, spawn: runtime.current.world.spawn, itemCount: runtime.current.world.instances.length }, ...(args.include_checks === true ? { checks: runtime.current.checkWorld() } : {}), workspace: tab, lighting: runtime.current.world.environment.lighting ?? [], speech:speechPlayback.current?.snapshot(), avatar: liveStage.current?.info ?? presentationStage.current?.info ?? runtime.current.avatarState, camera: latestFilm.current.camera, spot: latestFilm.current.avatarSpot(), actorPosition: runtime.current.localPlayer, expressionSupported: liveStage.current?.info.expressionSupported ?? runtime.current.supportsAvatarExpression('self'), plan: latestFilm.current.studio.plan, avatarLive: presentation.snapshot().display, presentation: presentation.snapshot().lastAction };
     if (tool === 'present_avatar') { const { event } = TOOL_ARGS.present_avatar.parse(raw); if(event.kind==='display'&&event.worldId&&event.worldId!==initial.id)await storage.read(event.worldId); const error = presentation.execute(event); if (error) throw new Error(error); return { executed: true, event: event.kind }; }
+    // AV-01: the Avatar tab's character (body, shape, muscle, fat, face, colours, view mode, expression, save).
+    if (tool === 'avatar_studio') { setTab('avatar'); await new Promise(resolve => setTimeout(resolve, 0)); return runAvatarStudio(TOOL_ARGS.avatar_studio.parse(raw)); }
     if (tool === 'user_avatar_library') {
       const result = await runTool(tool, raw, { userAvatarLibrary, presentAvatar: presentation.execute } as AssistantHost);
       if (!result.ok) throw new Error(result.result); return result.result;
@@ -304,6 +307,7 @@ function Editor({ initial, storage, options, leave, beforeClose }: { initial: St
     presentationOverlay: () => options.presentation?.enabled === false ? null : <PresentationViewport controller={presentation} />,
     shareStudio, share: openShare,
     avatarLive: () => { presentation.execute({kind:'display',open:true}); },
+    ...(options.liveBridge ? { openVoice: () => setVoiceOpen(true) } : {}),
     characterRecipe: recipe => { const key=JSON.stringify(recipe); if(key!==liveRecipeKey.current){liveRecipeKey.current=key;setLiveRecipe(recipe);} },
     characterLook: look => { const key = JSON.stringify(look); if (runtime.current && key !== characterFingerprint.current) { runtime.current.setAvatarLook(look); characterFingerprint.current = key; } },
     userAvatarLibrary, avatarVoice,

@@ -18,6 +18,8 @@ export interface StudioHost {
   shareStudio?: import('@genvr/assistant').AssistantHost['shareStudio'];
   share?: () => void;
   avatarLive?: () => void;
+  /** Opens the Avatar voice window (voice library, clone, models); the Avatar tab's Voice tab uses it. */
+  openVoice?: () => void;
   characterRecipe?: (recipe: import('@genvr/contracts').CharacterRecipe) => void;
   characterLook?: (look: AvatarLook) => void;
   presentationStage?: (stage: CharacterStage | null) => void;
