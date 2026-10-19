@@ -8,7 +8,7 @@ describe('Avatar Live and sharing',()=>{
   const controller=new AvatarPresentation(()=>null), session=WorldSession.create();
   const before=session.serialize();session.attachPresentation(controller.execute);
   const result=await session.tool('present_avatar',{event:{kind:'display',open:true,layout:'watch',framing:'bust'}});
-  expect(result.ok).toBe(true);expect(controller.snapshot().display).toMatchObject({open:true,layout:'watch',framing:'bust',background:'office'});
+  expect(result.ok).toBe(true);expect(controller.snapshot().display).toMatchObject({open:true,layout:'watch',framing:'bust',background:'color'});
   controller.execute({kind:'display',background:'studio'});expect(controller.snapshot().display).toMatchObject({open:true,layout:'watch',framing:'bust',background:'studio'});
   expect(session.serialize()).toBe(before);
   expect(controller.execute({kind:'display',layout:'unknown'})).toMatch(/Invalid/);

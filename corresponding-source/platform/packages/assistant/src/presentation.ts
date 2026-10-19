@@ -35,7 +35,7 @@ const WorldPoint = z.object({ x:z.number().finite(), y:z.number().finite(), z:z.
 export const AvatarLiveDisplay = z.object({
   open: z.boolean().default(false),
   layout: z.enum(['large', 'desktop', 'browser', 'compact', 'banner', 'circle', 'watch']).default('large'),
-  background: z.enum(['world', 'color', 'transparent', 'office', 'living_room', 'conference', 'stage', 'studio', 'classroom', 'image', 'video']).default('office'),
+  background: z.enum(['world', 'color', 'transparent', 'office', 'living_room', 'conference', 'stage', 'studio', 'classroom', 'image', 'video']).default('color'),
   color: z.string().regex(/^#[0-9a-fA-F]{6}$/).default('#101827'),
   media: Url.optional(),
   worldId: z.string().min(1).max(200).nullable().optional(),

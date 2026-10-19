@@ -1,23 +1,71 @@
 import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
-import { Monitor, X, Share2, Users, Mic, Activity, Smile, Sparkles, Bell, PanelsTopLeft, LayoutTemplate, AppWindow, RectangleHorizontal, Circle, Watch } from 'lucide-react';
+import { Monitor, X, Share2, Settings, User, Mic, Image, Globe, ShieldCheck, Bell, MapPin, MessageSquare, Activity } from 'lucide-react';
 import { type CharacterRecipe } from '@genvr/contracts';
 import type { CharacterStage } from '@genvr/runtime/character';
 import { AvatarPresentation } from '../../src/avatar-presentation';
-import { AVATAR_LIVE_LAYOUTS, avatarLiveEmbed } from '../../src/avatar-live-embed';
+import { AVATAR_LIVE_LAYOUTS } from '../../src/avatar-live-embed';
 import { PresentationViewport } from './viewport';
-import { PresentationControls } from './controls';
 import { WorldBackground } from './world-background';
 import type { StudioStorage, StudioProject } from '../../src/studio-project';
 import { createLiveRoom, disposeLiveRoom } from './rooms';
 export { AVATAR_LIVE_LAYOUTS, avatarLiveEmbed } from '../../src/avatar-live-embed';
-const backgrounds = [['world','My worlds'],['color','Color'],['transparent','Transparent'],['office','Office'],['living_room','Living Room'],['conference','Conference Room'],['stage','Stage'],['studio','Studio'],['classroom','Classroom'],['image','Image / GIF'],['video','Video']] as const;
-const tools = [{id:'display',label:'Display',Icon:Monitor},{id:'characters',label:'Character',Icon:Users},{id:'voice',label:'Voice',Icon:Mic},{id:'motions',label:'Motions',Icon:Activity},{id:'expressions',label:'Expressions',Icon:Smile},{id:'effects',label:'Effects',Icon:Sparkles},{id:'notifications',label:'Notifications',Icon:Bell},{id:'cards',label:'UI cards',Icon:PanelsTopLeft}];
-const layoutIcons=[Monitor,AppWindow,PanelsTopLeft,LayoutTemplate,RectangleHorizontal,Circle,Watch];
-const input = 'w-full rounded-lg border border-ink/20 bg-paper p-2 text-xs';
-export function AvatarLive({ controller, recipe, onStage, projectId, characters, voice, embedded = false, onShare, playerHost, worldViewport, worldStorage, currentProject, onWorldRendered }: {
+
+/** How the page shows the agent. Each view uses one of the stable display layouts. */
+const VIEWS = [
+  { id: 'chat', label: 'Chat + avatar', hint: 'Face and messages', layout: 'desktop' },
+  { id: 'call', label: 'Video call', hint: 'Face and microphone only', layout: 'large' },
+  { id: 'compact', label: 'Compact', hint: 'Small face, messages below', layout: 'compact' },
+  { id: 'watch', label: 'Watch', hint: 'Small circle, voice only', layout: 'watch' },
+] as const;
+type ViewId = typeof VIEWS[number]['id'];
+const viewOf = (layout: string): ViewId => layout === 'large' ? 'call' : layout === 'compact' ? 'compact' : layout === 'watch' || layout === 'circle' ? 'watch' : 'chat';
+const SIZES = [{ id: 's', label: 'Small', scale: .75 }, { id: 'm', label: 'Medium', scale: 1 }, { id: 'l', label: 'Large', scale: 1.25 }] as const;
+const FRAMINGS = [{ id: 'full', label: 'Full body' }, { id: 'bust', label: 'Upper body' }, { id: 'face', label: 'Face' }] as const;
+/** Notification groups the owner can switch on or off. */
+const NOTICE_GROUPS = [
+  { id: 'approvals', label: 'Approvals waiting', hint: 'A card when your agent needs your OK', types: ['approval'] },
+  { id: 'tasks', label: 'Task finished', hint: 'Short card when work is done', types: ['task'] },
+  { id: 'messages', label: 'New messages', hint: 'Messages from your channels', types: ['msg', 'email', 'whatsapp', 'facebook', 'instagram', 'telegram', 'discord', 'twitter', 'tiktok', 'linkedin', 'snapchat', 'youtube', 'reddit', 'twitch'] },
+  { id: 'calendar', label: 'Calendar reminders', hint: 'Before a meeting starts', types: ['calendar'] },
+  { id: 'other', label: 'Other alerts', hint: 'Payments, stocks, codes, terminal', types: [] as string[] },
+] as const;
+type NoticeGroup = typeof NOTICE_GROUPS[number]['id'];
+type Prefs = { size: 's' | 'm' | 'l'; speak: boolean; notifications: boolean; effects: boolean; sidePanel: boolean; notice: Record<NoticeGroup, boolean>; mode: 'me' | 'customers' };
+const DEFAULT_PREFS: Prefs = { size: 'm', speak: true, notifications: true, effects: true, sidePanel: true, notice: { approvals: true, tasks: true, messages: true, calendar: true, other: true }, mode: 'me' };
+const PREFS_KEY = 'genvr-avatar-live-page';
+function readPrefs(): Prefs { try { const raw = JSON.parse(localStorage.getItem(PREFS_KEY) ?? 'null'); return raw && typeof raw === 'object' ? { ...DEFAULT_PREFS, ...raw, notice: { ...DEFAULT_PREFS.notice, ...(raw.notice ?? {}) } } : DEFAULT_PREFS; } catch { return DEFAULT_PREFS; } }
+const SECTIONS = [
+  { id: 'agent', label: 'Agent', Icon: User },
+  { id: 'look', label: 'Look & voice', Icon: Mic },
+  { id: 'background', label: 'Background', Icon: Image },
+  { id: 'display', label: 'Display', Icon: Monitor },
+  { id: 'where', label: 'Where it shows', Icon: Globe },
+  { id: 'allowed', label: 'What it may do', Icon: ShieldCheck },
+  { id: 'notifications', label: 'Notifications', Icon: Bell },
+] as const;
+type SectionId = typeof SECTIONS[number]['id'];
+const tile = (on: boolean) => `flex min-h-14 flex-col items-start justify-center gap-1 rounded-xl border-2 px-3 py-2 text-left text-xs ${on ? 'border-ink bg-ink/5 font-bold' : 'border-ink/15 hover:bg-ink/5'}`;
+const pill = (on: boolean) => `min-h-9 rounded-lg px-3 text-xs font-bold ${on ? 'bg-ink text-on-brand' : 'hover:bg-ink/5'}`;
+function Switch({ label, hint, checked, onChange }: { label: string; hint?: string; checked: boolean; onChange: (value: boolean) => void }) {
+  return <label className="flex min-h-12 items-center justify-between gap-3 rounded-lg border border-ink/15 px-3 py-2 text-xs"><span><span className="block font-bold">{label}</span>{hint ? <span className="block text-ink/60">{hint}</span> : null}</span><input type="checkbox" className="size-5" checked={checked} onChange={e => onChange(e.target.checked)}/></label>;
+}
+/** Small drawing of each view, so the shape is clear at a glance. */
+function ViewDrawing({ view }: { view: ViewId }) {
+  const face = 'rounded bg-ink/60', line = 'h-1 rounded bg-ink/25';
+  return <span aria-hidden="true" className="mb-1 flex h-11 w-full rounded-md border border-ink/15 bg-paper p-1.5">
+    {view === 'chat' ? <span className="flex w-full gap-1"><span className={`${face} flex-1`}/><span className="flex flex-1 flex-col justify-center gap-1"><span className={line}/><span className={`${line} w-2/3`}/><span className={line}/></span></span> : null}
+    {view === 'call' ? <span className="flex w-full flex-col items-center gap-1"><span className={`${face} w-full flex-1`}/><span className="size-2 rounded-full bg-ink/70"/></span> : null}
+    {view === 'compact' ? <span className="flex w-full flex-col items-center gap-1"><span className={`${face} h-4 w-1/2`}/><span className={`${line} w-11/12`}/><span className={`${line} w-2/3`}/></span> : null}
+    {view === 'watch' ? <span className="flex w-full items-center justify-center"><span className="size-7 rounded-full border-2 border-ink/40 bg-ink/60"/></span> : null}
+  </span>;
+}
+
+export function AvatarLive({ controller, recipe, onStage, projectId, characters, voice, embedded = false, onShare, playerHost, worldViewport, worldStorage, currentProject, onWorldRendered, agent, conversation, activity, permissions }: {
   controller: AvatarPresentation; recipe: CharacterRecipe; onStage: (stage: CharacterStage | null) => void; projectId: string;
   onWorldRendered?:(canvas:HTMLCanvasElement)=>void; worldStorage?: StudioStorage; currentProject?: ()=>StudioProject;
   characters?: ReactNode; voice?: ReactNode; embedded?: boolean; onShare?: () => void; playerHost?: (element:HTMLDivElement|null)=>void; worldViewport?: HTMLElement|null;
+  /** Host app (for example an agent app) supplies the agent, its conversation, its live activity and its visitor permissions. */
+  agent?: { name: string; detail?: string }; conversation?: ReactNode; activity?: ReactNode; permissions?: ReactNode;
 }) {
   const { display } = useSyncExternalStore(controller.subscribe, controller.snapshot);
   const dialog=useRef<HTMLElement>(null);
@@ -25,14 +73,21 @@ export function AvatarLive({ controller, recipe, onStage, projectId, characters,
   useEffect(()=>{if(display.background!=='world'||display.worldId||!worldViewport||!worldBackground.current)return;const parent=worldViewport.parentNode,next=worldViewport.nextSibling;worldBackground.current.appendChild(worldViewport);return()=>{if(parent)parent.insertBefore(worldViewport,next?.parentNode===parent?next:null);};},[display.background,display.worldId,worldViewport]);
   const container = useRef<HTMLDivElement>(null), stage = useRef<CharacterStage | null>(null);
   const [faceSupported,setFaceSupported]=useState<boolean|null>(null);
-  const [ready,setReady]=useState(false), [error,setError]=useState(''), [section,setSection]=useState('display'),[search,setSearch]=useState('');
-  const [mediaUrl,setMediaUrl]=useState('');
+  const [ready,setReady]=useState(false), [error,setError]=useState('');
   const [exploring,setExploring]=useState(false);
-  const [worldControls,setWorldControls]=useState<HTMLDivElement|null>(null);
+  const [settingsOpen,setSettingsOpen]=useState(false),[section,setSection]=useState<SectionId>('agent');
+  const [bgHost,setBgHost]=useState<HTMLDivElement|null>(null),[spotHost,setSpotHost]=useState<HTMLDivElement|null>(null);
+  const [prefs,setPrefsState]=useState<Prefs>(readPrefs);
+  const setPrefs=(patch:Partial<Prefs>)=>setPrefsState(current=>{const next={...current,...patch};try{localStorage.setItem(PREFS_KEY,JSON.stringify(next));}catch{/* preferences stay for this session */}return next;});
+  const player=useRef<HTMLDivElement|null>(null);
   const current = useRef({ recipe, onStage, framing:display.framing, round:display.layout==='circle'||display.layout==='watch' }); current.current={recipe,onStage,framing:display.framing,round:display.layout==='circle'||display.layout==='watch'};
   const change = (patch: Record<string,unknown>) => setError(controller.execute({kind:'display',...patch})??'');
   const preset=AVATAR_LIVE_LAYOUTS.find(row=>row.id===display.layout)!;
   const round=display.layout==='circle'||display.layout==='watch';
+  const view=viewOf(display.layout), scale=SIZES.find(s=>s.id===prefs.size)?.scale??1;
+  // Choosing a spot closes Settings; the world fills the stage until "Use this spot" or "Cancel".
+  useEffect(()=>{if(exploring)setSettingsOpen(false);},[exploring]);
+  useEffect(()=>{const host=player.current;if(!host)return;const apply=()=>host.querySelectorAll('audio,video').forEach(media=>{(media as HTMLMediaElement).muted=!prefs.speak;});apply();const watch=new MutationObserver(apply);watch.observe(host,{childList:true,subtree:true});return()=>watch.disconnect();},[prefs.speak,display.open]);
   useEffect(()=>{
     let cancelled=false, made:CharacterStage|null=null, stop=()=>{};
     if(!display.open)return;
@@ -55,33 +110,84 @@ export function AvatarLive({ controller, recipe, onStage, projectId, characters,
   useEffect(()=>{
     if(!display.open||embedded)return;
     const previous=document.activeElement as HTMLElement|null;dialog.current?.querySelector<HTMLButtonElement>('button')?.focus();
-    const escape=(e:KeyboardEvent)=>{if(e.key==='Escape')change({open:false});if(e.key==='Tab'){const nodes=Array.from(dialog.current?.querySelectorAll<HTMLElement>('button:not(:disabled),input,select,textarea,a[href]')??[]);const first=nodes[0],last=nodes[nodes.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last?.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first?.focus();}}};
+    const escape=(e:KeyboardEvent)=>{if(e.key==='Escape'){if(settingsOpen){setSettingsOpen(false);return;}if(exploring)return;change({open:false});}if(e.key==='Tab'){const nodes=Array.from(dialog.current?.querySelectorAll<HTMLElement>('button:not(:disabled),input,select,textarea,a[href]')??[]);const first=nodes[0],last=nodes[nodes.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last?.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first?.focus();}}};
     window.addEventListener('keydown',escape);return()=>{window.removeEventListener('keydown',escape);if(previous?.isConnected)previous.focus();};
-  },[display.open,embedded]);
+  },[display.open,embedded,settingsOpen,exploring]);
   if(!display.open)return null;
+  const allowedNotice=(type:string)=>{const group=NOTICE_GROUPS.find(g=>(g.types as readonly string[]).includes(type))?.id??'other';return prefs.notice[group];};
   const style={background: display.background==='transparent'?'transparent':display.color};
-  const frame=<div data-avatar-live-frame data-layout={display.layout} className="relative flex shrink-0 overflow-hidden" style={{...style,width:'100%',maxWidth:preset.width,height:embedded?'100%':`min(${preset.height}px,65vh)`,minHeight:180}}>
-    {display.background==='world'?<><div ref={worldBackground} className="absolute inset-0" aria-label="Current world background"/>{worldStorage&&currentProject?<WorldBackground storage={worldStorage} current={currentProject} display={display} change={change} embedded={embedded} onExploring={setExploring} onRendered={onWorldRendered} controlsHost={worldControls}/>:null}</>:null}
+  const width=Math.round(preset.width*(embedded?1:scale)), height=Math.round(preset.height*(embedded?1:scale));
+  const frame=<div data-avatar-live-frame data-layout={display.layout} className={`relative flex shrink-0 overflow-hidden ${exploring?'outline-dashed outline-[3px] outline-white':''} ${!embedded&&view!=='watch'?'rounded-2xl':''}`} style={{...style,width:'100%',maxWidth:width,height:embedded?'100%':`min(${height}px,65vh)`,minHeight:180,boxShadow:exploring?'0 0 0 9999px rgba(5,6,9,.35)':undefined}}>
+    {display.background==='world'?<><div ref={worldBackground} className="absolute inset-0" aria-label="Current world background"/>{worldStorage&&currentProject?<WorldBackground storage={worldStorage} current={currentProject} display={display} change={change} embedded={embedded} onExploring={setExploring} onRendered={onWorldRendered} controlsHost={exploring?spotHost:bgHost}/>:null}</>:null}
     {display.media&&display.background==='image'?<img alt="Avatar background" src={display.media} className="absolute inset-0 h-full w-full object-cover"/>:null}
     {display.media&&display.background==='video'?<video key={display.media} src={display.media} muted autoPlay loop playsInline className="absolute inset-0 h-full w-full object-cover"/>:null}
     <div className="relative flex h-full items-center justify-center" style={{width:round?'55%':'100%',minWidth:0,pointerEvents:exploring?'none':undefined,visibility:exploring?'hidden':undefined}}>
       <div ref={container} aria-label="Live avatar viewport" className="relative overflow-hidden" style={{height:round?'auto':'100%',maxHeight:'100%',width:'100%',maxWidth:round?210:undefined,aspectRatio:round?'1':undefined,borderRadius:round?'50%':undefined,background:round?'radial-gradient(ellipse at 50% 30%, #1e293b, #0c1120)':undefined,border:round?'2px solid #6366f166':undefined}}/>
       {!ready?<span role="status" className="absolute text-xs text-white">Loading avatar…</span>:null}
     </div>
-    <div className="absolute right-0 top-0 h-full min-w-0" style={{width:'45%'}} aria-label="Live notifications"><PresentationViewport controller={controller} compact/></div>
+    {exploring?<div aria-hidden="true" className="pointer-events-none absolute inset-0 flex items-end justify-center"><svg viewBox="0 0 200 400" className="h-[88%] opacity-40"><g fill="#ffffff"><rect x="62" y="122" width="76" height="150" rx="30"/><rect x="34" y="132" width="26" height="110" rx="13"/><rect x="140" y="132" width="26" height="110" rx="13"/><rect x="70" y="262" width="26" height="118" rx="12"/><rect x="104" y="262" width="26" height="118" rx="12"/><circle cx="100" cy="72" r="44"/></g></svg><span className="absolute left-3 top-3 rounded-full bg-black/70 px-3 py-1 text-xs font-bold text-white">{VIEWS.find(v=>v.id===view)!.label} frame</span></div>:null}
+    <div className="absolute right-0 top-0 h-full min-w-0" style={{width:'45%'}} aria-label="Live notifications"><PresentationViewport controller={controller} compact showEffects={prefs.effects} showNotifications={prefs.notifications} notificationFilter={allowedNotice}/></div>
   </div>;
-  return <section ref={dialog} role={embedded?'region':'dialog'} aria-modal={embedded?undefined:true} aria-label="Avatar Live" className={embedded?'relative min-h-0 flex-1 h-full w-full':'fixed inset-0 z-[100] flex flex-col bg-paper text-ink'}>
+  if(embedded)return <section ref={dialog} role="region" aria-label="Avatar Live" className="relative min-h-0 flex-1 h-full w-full"><style>{`[data-avatar-live-frame] [aria-label="View directions"]{display:none}`}</style><div className="h-full w-full">{frame}</div><div ref={element=>{player.current=element;playerHost?.(element);}} className="shrink-0 empty:hidden"/></section>;
+  const talking=view==='chat'||view==='compact', side=prefs.sidePanel&&talking;
+  const backgroundLabel=display.background==='world'?'My worlds':display.background==='color'?'Color':display.background==='transparent'?'Transparent':`${display.background.replace('_',' ')} (older option)`;
+  return <section ref={dialog} role="dialog" aria-modal="true" aria-label="Avatar Live" className="fixed inset-0 z-[100] flex flex-col bg-paper text-ink">
     <style>{`[data-avatar-live-frame] [aria-label="View directions"]{display:none}`}</style>
-    {!embedded?<header className="flex h-12 shrink-0 items-center gap-2 border-b border-ink/15 bg-surface px-3"><Monitor className="size-4"/><strong className="flex-1 text-sm">Avatar Live</strong><span className="mr-3 text-xs text-ink/60">{preset.name}</span>{onShare?<button onClick={onShare} className="mr-2 inline-flex items-center gap-2 rounded-lg border border-ink/15 px-3 py-1.5 text-xs font-bold"><Share2 className="size-3.5"/>Share</button>:null}<button aria-label="Close Avatar Live" onClick={()=>change({open:false})} className="rounded p-2"><X className="size-4"/></button></header>:null}
-    <div className={embedded?'h-full w-full':'flex min-h-0 flex-1 flex-col md:flex-row'}>
-      {!embedded?<aside className="w-full shrink-0 overflow-auto border-r border-ink/15 p-3 md:w-72"><nav aria-label="Avatar Live tools" className="sticky top-0 z-10 mb-4 grid bg-paper pb-2 grid-cols-2 gap-1">{tools.map(({id,label,Icon})=><button key={id} onClick={()=>setSection(id)} aria-pressed={section===id} className={`flex items-center gap-2 rounded-lg px-2 py-2.5 text-xs font-bold ${section===id?'bg-ink text-on-brand':'hover:bg-ink/5'}`}><Icon className="size-4 shrink-0"/>{label}</button>)}</nav>
-        {section==='display'?<div className="space-y-3"><fieldset><legend className="mb-2 text-xs font-bold">Display layout</legend><div className="grid grid-cols-2 gap-2">{AVATAR_LIVE_LAYOUTS.map((row,index)=>{const Icon=layoutIcons[index]!;return <button key={row.id} aria-label={`Layout ${row.name}`} aria-pressed={display.layout===row.id} className={`flex min-h-16 flex-col items-start justify-center gap-2 rounded-lg border px-3 py-2 text-left text-xs ${display.layout===row.id?'border-ink bg-ink/5 font-bold':'border-ink/15 hover:bg-ink/5'}`} onClick={()=>change({layout:row.id,framing:['circle','watch','banner'].includes(row.id)?'bust':'full'})}><Icon className="size-5"/>{row.name}</button>})}</div></fieldset><label className="block text-xs font-bold">Background<select aria-label="Avatar Live background" className={input} value={display.background} onChange={e=>{if(['image','video'].includes(e.target.value)&&!display.media){setMediaUrl('');setSection('media');}else change({background:e.target.value});}}>{backgrounds.map(([id,label])=><option key={id} value={id} disabled={id==='world'&&!worldViewport&&!worldStorage}>{label}</option>)}</select></label>{display.background==='world'?<div ref={setWorldControls}/>:null}<label className="block text-xs font-bold">Background color<input aria-label="Avatar Live color" type="color" value={display.color} onChange={e=>change({color:e.target.value})}/></label><label className="block text-xs font-bold">Camera framing<select aria-label="Avatar Live framing" className={input} value={display.framing} onChange={e=>change({framing:e.target.value})}><option value="full">Full body</option><option value="bust">Upper body</option><option value="face">Face</option></select></label><p className="text-xs text-ink/60">{display.background==='world'?'Your Build world is live behind the avatar. ':''}Drag to orbit. Scroll to zoom. Notifications have their own space on the right.</p></div>:null}
-        {section==='media'?<div className="space-y-2"><label className="block text-xs font-bold">Upload background<input aria-label="Upload live background" type="file" accept="image/*,video/*" className={`${input} mt-2`} onChange={event=>{const file=event.target.files?.[0];event.target.value='';if(!file)return;if(file.size>20*1024*1024){setError('Choose media smaller than 20 MB.');return;}if(!/^(image|video)\//.test(file.type)){setError('Choose an image or video.');return;}const media=controller.localMedia(file);change({background:file.type.startsWith('video/')?'video':'image',media});setSection('display');}}/></label><label className="text-xs">Image, GIF or video URL<input className={input} aria-label="Avatar Live media URL" value={mediaUrl} onChange={e=>setMediaUrl(e.target.value)}/></label>{['image','video'].map(background=><button key={background} className={input} onClick={()=>{const result=controller.execute({kind:'display',background,media:mediaUrl});setError(result??'');if(!result)setSection('display');}}>Use {background}</button>)}<p className="text-xs">Use a hosted media URL for sharing.</p></div>:null}
-        {section==='characters'?characters:null}{section==='voice'?<>{voice}{faceSupported===false?<p className="mt-3 text-xs text-ink/60">This avatar has no facial rig. Audio plays, but its mouth cannot animate.</p>:null}</>:null}{section==='expressions'&&faceSupported===false?<p role="status" className="mb-3 text-xs text-ink/60">This avatar has no facial controls. Choose a compatible character such as Standard robot to preview expressions.</p>:null}
-        {['motions','expressions','effects','notifications','cards'].includes(section)?<><input aria-label="Search live controls" className={`${input} mb-3`} placeholder="Search" value={search} onChange={e=>setSearch(e.target.value)}/><PresentationControls controller={controller} section={section as 'motions'} agents={[]} search={search} includeAvailableMotions/></>:null}
-
+    <header className="flex min-h-14 shrink-0 flex-wrap items-center gap-3 border-b border-ink/15 bg-surface px-4 py-2">
+      <Monitor className="size-4"/><strong className="text-sm">Avatar Live</strong>
+      {agent?<span className="rounded-full border border-ink/15 px-3 py-1 text-xs font-bold">{agent.name}</span>:null}
+      <div role="group" aria-label="Who it talks to" className="flex gap-1 rounded-xl border border-ink/15 p-1">{([['me','For me'],['customers','For my customers']] as const).map(([id,label])=><button key={id} aria-pressed={prefs.mode===id} className={pill(prefs.mode===id)} onClick={()=>setPrefs({mode:id})}>{label}</button>)}</div>
+      <span className="flex-1"/>
+      <button onClick={()=>setSettingsOpen(true)} aria-haspopup="dialog" className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-ink/15 px-3 text-xs font-bold"><Settings className="size-4"/>Settings</button>
+      {onShare?<button onClick={onShare} className="inline-flex min-h-10 items-center gap-2 rounded-lg bg-ink px-4 text-xs font-bold text-on-brand"><Share2 className="size-4"/>Share</button>:null}
+      <button aria-label="Close Avatar Live" onClick={()=>change({open:false})} className="rounded p-2"><X className="size-4"/></button>
+    </header>
+    <div className="flex min-h-0 flex-1 flex-col md:flex-row">
+      <main className="flex min-h-0 min-w-0 flex-1 flex-col items-center gap-4 overflow-auto bg-ink/5 p-4">
+        {exploring?<div className="w-full max-w-4xl rounded-xl border border-ink/15 bg-surface p-3 text-xs"><strong className="flex items-center gap-2 text-sm"><MapPin className="size-4"/>Choosing the background spot</strong><p className="mt-1 text-ink/70">Walk to the view you want behind your agent: <b>W A S D</b> or arrows to walk, drag to look, scroll for closer or farther. The dashed frame shows what will be behind your agent. Your world is not changed.</p></div>:null}
+        {frame}
+        {exploring?<div ref={setSpotHost} className="w-full max-w-4xl" aria-label="Spot controls"/>:null}
+        {!exploring&&talking?<div aria-label="Conversation" className="w-full max-w-3xl">{conversation??<p className="rounded-xl border border-dashed border-ink/20 p-4 text-center text-xs text-ink/60"><MessageSquare className="mx-auto mb-2 size-5"/>Connect an agent app to talk here. The agent answers with this face and voice.</p>}</div>:null}
+      </main>
+      {side&&!exploring?<aside className="w-full shrink-0 overflow-auto border-l border-ink/15 p-4 md:w-80">
+        {prefs.mode==='me'?<><h2 className="mb-3 flex items-center gap-2 text-sm font-bold"><Activity className="size-4"/>What it's doing</h2>{activity??<p className="text-xs text-ink/60">Your agent's live work and approvals appear here when an agent app is connected.</p>}</>
+        :<><h2 className="mb-2 text-sm font-bold">For your customers</h2><p className="mb-3 text-xs text-ink/70">Put this agent on your website. Visitors talk to it; it answers with its own voice and face.</p>{permissions??<p className="rounded-lg border border-ink/15 p-3 text-xs text-ink/60">What it may do for visitors is set by your agent app.</p>}{onShare?<button onClick={onShare} className="mt-3 inline-flex min-h-10 items-center gap-2 rounded-lg bg-ink px-4 text-xs font-bold text-on-brand"><Share2 className="size-4"/>Get the link or website code</button>:null}</>}
       </aside>:null}
-      <div className={embedded?'h-full w-full':'flex min-h-0 min-w-0 flex-1 items-center justify-center overflow-auto bg-ink/5 p-4'}>{frame}</div>
-    </div><div ref={playerHost} className="shrink-0 border-t border-ink/10 bg-surface p-3 empty:hidden"/>{error?<p role="alert" className="bg-coral px-3 py-2 text-xs text-white">{error}</p>:null}
+    </div>
+    <div ref={element=>{player.current=element;playerHost?.(element);}} className="shrink-0 border-t border-ink/10 bg-surface p-3 empty:hidden"/>{error?<p role="alert" className="bg-coral px-3 py-2 text-xs text-white">{error}</p>:null}
+    {settingsOpen?<div className="absolute inset-0 z-10 flex items-start justify-center bg-black/60 p-4 pt-16" onClick={event=>{if(event.target===event.currentTarget)setSettingsOpen(false);}}>
+      <section role="dialog" aria-modal="true" aria-label="Avatar Live settings" className="flex max-h-[85vh] w-full max-w-3xl flex-col overflow-hidden rounded-2xl border border-ink/15 bg-surface shadow-2xl">
+        <header className="flex items-center justify-between border-b border-ink/10 px-5 py-3"><h2 className="text-base font-bold">Settings</h2><button aria-label="Close settings" onClick={()=>setSettingsOpen(false)} className="rounded-lg p-2 hover:bg-ink/10"><X className="size-4"/></button></header>
+        <div className="flex min-h-0 flex-1 flex-col md:flex-row">
+          <nav aria-label="Settings sections" className="flex shrink-0 gap-1 overflow-auto border-b border-ink/10 p-2 md:w-52 md:flex-col md:border-b-0 md:border-r">{SECTIONS.map(({id,label,Icon})=><button key={id} aria-pressed={section===id} onClick={()=>setSection(id)} className={`flex min-h-10 shrink-0 items-center gap-2 rounded-lg px-3 text-left text-xs font-bold ${section===id?'bg-ink text-on-brand':'hover:bg-ink/5'}`}><Icon className="size-4 shrink-0"/>{label}</button>)}</nav>
+          <div className="min-w-0 flex-1 space-y-4 overflow-auto p-5">
+            {section==='agent'?<div className="space-y-3">{agent?<div className="rounded-xl border border-ink/15 p-4"><span className="block text-xs text-ink/60">Linked agent</span><strong className="block text-base">{agent.name}</strong>{agent.detail?<span className="text-xs text-ink/70">{agent.detail}</span>:null}</div>:<p className="rounded-xl border border-ink/15 p-4 text-xs text-ink/70">No agent app is connected. This Studio shows the avatar on its own; an agent app (for example Dpro) links its agent, conversation and activity here.</p>}<p className="text-xs text-ink/60">The agent's memory, tools and permissions stay in its app. This page only gives it a face and a voice.</p></div>:null}
+            {section==='look'?<div className="space-y-4"><div><h3 className="mb-2 text-xs font-bold">Character</h3>{characters}</div><div><h3 className="mb-2 text-xs font-bold">Voice</h3>{voice}{faceSupported===false?<p className="mt-2 text-xs text-ink/60">This character has no face controls: the voice plays, but the mouth cannot move.</p>:null}</div></div>:null}
+            {section==='background'?<div className="space-y-4">
+              <p className="text-xs text-ink/70">Now: <b>{backgroundLabel}</b></p>
+              <div className="grid grid-cols-3 gap-2">{([['world','My worlds'],['color','Color'],['transparent','Transparent']] as const).map(([id,label])=><button key={id} aria-pressed={display.background===id} disabled={id==='world'&&!worldStorage&&!worldViewport} className={`${tile(display.background===id)} disabled:opacity-40`} onClick={()=>change({background:id})}>{label}</button>)}</div>
+              {display.background==='world'?<div className="space-y-2"><p className="text-xs text-ink/70">Pick one of your worlds, then <b>Choose a spot</b>: walk to the view you like and keep it behind your agent. Your world is not changed.</p><div ref={setBgHost}/></div>:null}
+              {display.background==='color'?<label className="flex items-center gap-3 text-xs font-bold">Color<input aria-label="Avatar Live color" type="color" value={display.color} onChange={e=>change({color:e.target.value})}/></label>:null}
+              {display.background==='transparent'?<p className="text-xs text-ink/60">No background: the avatar shows over your website or screen.</p>:null}
+            </div>:null}
+            {section==='display'?<div className="space-y-4">
+              <fieldset><legend className="mb-2 text-xs font-bold">Show as</legend><div className="grid grid-cols-2 gap-2">{VIEWS.map(row=><button key={row.id} aria-pressed={view===row.id} className={tile(view===row.id)} onClick={()=>change({layout:row.layout,framing:row.id==='watch'?'bust':display.framing})}><ViewDrawing view={row.id}/><span className="font-bold">{row.label}</span><span className="text-ink/60">{row.hint}</span></button>)}</div></fieldset>
+              <fieldset><legend className="mb-2 text-xs font-bold">Size</legend><div className="inline-flex gap-1 rounded-xl border border-ink/15 p-1">{SIZES.map(row=><button key={row.id} aria-pressed={prefs.size===row.id} className={pill(prefs.size===row.id)} onClick={()=>setPrefs({size:row.id})}>{row.label}</button>)}</div></fieldset>
+              <fieldset><legend className="mb-2 text-xs font-bold">Framing</legend><div className="inline-flex gap-1 rounded-xl border border-ink/15 p-1">{FRAMINGS.map(row=><button key={row.id} aria-pressed={display.framing===row.id} className={pill(display.framing===row.id)} onClick={()=>change({framing:row.id})}>{row.label}</button>)}</div></fieldset>
+              <fieldset className="space-y-2"><legend className="mb-2 text-xs font-bold">Switches</legend>
+                <Switch label="Speak replies" hint="The agent's voice plays aloud" checked={prefs.speak} onChange={v=>setPrefs({speak:v})}/>
+                <Switch label="Notifications" hint="Cards from your agent on the right" checked={prefs.notifications} onChange={v=>setPrefs({notifications:v})}/>
+                <Switch label="Effects" hint="Small screen effects your agent may show" checked={prefs.effects} onChange={v=>setPrefs({effects:v})}/>
+                <Switch label="Side panel" hint="What it's doing, beside the chat" checked={prefs.sidePanel} onChange={v=>setPrefs({sidePanel:v})}/>
+              </fieldset>
+            </div>:null}
+            {section==='where'?<div className="space-y-3"><p className="text-xs text-ink/70">Exact sizes for screens and websites. Use <b>Share</b> to get a link or the website code.</p><div className="grid grid-cols-2 gap-2">{AVATAR_LIVE_LAYOUTS.map(row=><button key={row.id} aria-label={`Layout ${row.name}`} aria-pressed={display.layout===row.id} className={tile(display.layout===row.id)} onClick={()=>change({layout:row.id,framing:['circle','watch','banner'].includes(row.id)?'bust':display.framing})}><span className="font-bold">{row.name}</span><span className="text-ink/60">{row.width} × {row.height}</span></button>)}</div></div>:null}
+            {section==='allowed'?<div className="space-y-3"><p className="text-xs text-ink/70">What the agent may do when other people talk to it.</p>{permissions??<p className="rounded-xl border border-ink/15 p-4 text-xs text-ink/60">Set by your agent app. Visitors never see your files, approvals or other chats.</p>}</div>:null}
+            {section==='notifications'?<div className="space-y-2"><p className="text-xs text-ink/70">What your agent shows on screen by itself.</p><Switch label="Show notifications" checked={prefs.notifications} onChange={v=>setPrefs({notifications:v})}/>{NOTICE_GROUPS.map(group=><Switch key={group.id} label={group.label} hint={group.hint} checked={prefs.notice[group.id]} onChange={v=>setPrefs({notice:{...prefs.notice,[group.id]:v}})}/>)}</div>:null}
+          </div>
+        </div>
+        <footer className="flex justify-end border-t border-ink/10 px-5 py-3"><button onClick={()=>setSettingsOpen(false)} className="min-h-10 rounded-lg bg-ink px-5 text-xs font-bold text-on-brand">Done</button></footer>
+      </section>
+    </div>:null}
   </section>;
 }
