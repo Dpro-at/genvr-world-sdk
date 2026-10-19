@@ -78,7 +78,13 @@ export class LabController {
   #setView(view: Partial<LabView>) { this.#view = { ...this.#view, ...view }; this.#emit(false); }
 
   // ---- course (board M2)
-  setCourse(input: unknown) { const course = LabCourse.parse(input); this.#set({ course }); return course; }
+  setCourse(input: unknown) {
+    const course = LabCourse.parse(input);
+    this.#data = LabProjectData.parse({ ...this.#data, course });
+    this.#view = { ...this.#view, ghost: this.#ghost() };
+    this.#emit(true);
+    return course;
+  }
   addObstacle(kind: LabObstacleKind, fields: Record<string, unknown> = {}) {
     if (!LAB_OBSTACLE_KINDS.includes(kind)) throw new Error(`"${kind}" is not built yet (later: ${LAB_LATER_KINDS.join(', ')}).`);
     const course = this.#data.course;
@@ -109,7 +115,7 @@ export class LabController {
     this.setCourse({ ...course, obstacles: course.obstacles.filter((o) => o.id !== id) });
     if (this.#view.selected === id) this.select(null);
   }
-  fromSeed(seed: number, count = 5, hardness = 2, street = true) { const course = courseFromSeed(seed, count, hardness, street); this.#set({ course }); this.select(null); return course; }
+  fromSeed(seed: number, count = 5, hardness = 2, street = true) { const course = this.setCourse(courseFromSeed(seed, count, hardness, street)); this.select(null); return course; }
   setTraffic(street?: unknown, cars?: unknown[]) {
     const course = this.#data.course;
     return this.setCourse({ ...course, ...(street !== undefined ? { street: street === null ? null : LabStreet.parse(street) } : {}), ...(cars ? { cars: cars.map((c) => LabCar.parse(c)) } : {}) });
@@ -179,8 +185,10 @@ export class LabController {
   confirmPendingBest() { const pending = this.#data.best_pending; if (pending) this.saveBest(pending.version, PERSON); }
   rejectPendingBest() { this.#set({ best_pending: null }); }
   rollback(id: string) { const v = this.#versionById(id); this.setSettings(v.settings); return v; }
-  deleteVersion(id: string) {
-    this.#versionById(id);
+  /** An agent may delete only versions an agent made, never the best one; a person may delete any. */
+  deleteVersion(id: string, by: LabActor = PERSON) {
+    const version = this.#versionById(id);
+    if (by.kind === 'agent' && (version.best || version.by !== 'agent')) throw new Error(version.best ? 'Only the owner can delete the best version.' : 'Only the owner can delete a version a person made.');
     this.#set({ versions: this.#data.versions.filter((v) => v.id !== id), best_pending: this.#data.best_pending?.version === id ? null : this.#data.best_pending });
     this.#view = { ...this.#view, ghost: this.#ghost() };
     this.#emit(false);
@@ -190,9 +198,9 @@ export class LabController {
   #ghost(): LabRunResult | null {
     const best = this.best();
     if (!best) return null;
-    const run = this.#data.runs.find((r) => r.id === best.run);
-    // The best version keeps its frames even when its run left the last 20: it is replayed from its own settings.
-    return simulateLabRun(run?.course ?? this.#data.course, best.settings, run?.seed ?? this.#data.course.seed);
+    // The best version's settings on the course as it is now, so the ghost runs beside the new run on the same course
+    // (it keeps working when the best run has left the last 20: a run is replayed from settings + course + seed).
+    return simulateLabRun(this.#data.course, best.settings, this.#data.course.seed);
   }
 
   // ---- view
@@ -252,7 +260,7 @@ const HELP: Record<string, string> = {
   save_version: 'Keep a run as a new version of its motion: { run?, note? }.',
   save_best: 'Ask to make a version the best: the owner confirms it in the Lab.',
   rollback: 'Use a version\'s settings again: { version }.',
-  version_delete: 'Delete a version: { version, confirm: true }.',
+  version_delete: 'Delete a version an agent made: { version, confirm: true }. The best version and versions a person made are the owner\'s.',
 };
 
 export async function runMotionLab(lab: LabController | null, input: unknown, by: LabActor): Promise<unknown> {
@@ -290,7 +298,7 @@ export async function runMotionLab(lab: LabController | null, input: unknown, by
       return by.kind === 'agent' ? { ...result, note: 'The owner confirms the best version in the Lab (Versions).' } : result;
     }
     case 'rollback': return lab.rollback(op.version);
-    case 'version_delete': lab.deleteVersion(op.version); return { deleted: op.version };
+    case 'version_delete': lab.deleteVersion(op.version, by); return { deleted: op.version };
   }
 }
 

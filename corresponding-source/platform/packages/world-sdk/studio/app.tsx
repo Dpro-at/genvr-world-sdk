@@ -21,7 +21,8 @@ import { AvatarPresentation, type AvatarPresentationOptions } from '../src/avata
 import { PresentationViewport } from './presentation/viewport';
 import { createRoot } from 'react-dom/client';
 import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
-import { Monitor, Share2, Clapperboard, Download, FolderOpen, House, Save, Settings2, Mic, X, ChevronUp } from 'lucide-react';
+import { Monitor, Share2, Clapperboard, Download, FolderOpen, FlaskConical, House, Save, Settings2, Mic, X, ChevronUp } from 'lucide-react';
+import { LabController, newLabData, runMotionLab } from '../../../apps/web/lib/motion-lab';
 import { createRuntime, DEFAULT_BRUSH, DEFAULT_RIVER, type GenvrRuntime, type ToolStatus } from '@genvr/runtime';
 import { runTool, TOOL_ARGS, EXPRESSIONS, type AssistantHost, type ChatModel } from '@genvr/assistant';
 import { CreateFlow, type CreationOptions } from '../../../apps/web/components/create-flow';
@@ -37,7 +38,7 @@ import type { LogEntry } from '../../../apps/web/components/studio/console-panel
 import { StudioHostProvider, useStudioHost } from '../../../apps/web/lib/studio-host';
 import { setPlatformEnabled } from '../../../apps/web/lib/api';
 import { useStudioFilming } from '../../../apps/web/lib/use-studio-filming';
-import { browserStudioStorage, createStudioProject, importStudioProject, readStudioProject, STUDIO_PROJECT_BYTES, type StudioProject, type StudioStorage } from '../src/studio-project';
+import { browserStudioStorage, createLabProject, createStudioProject, importStudioProject, readStudioProject, STUDIO_PROJECT_BYTES, type StudioProject, type StudioStorage } from '../src/studio-project';
 import { syncStudioAgents, type StudioAgent } from '../src/studio-agents';
 import type { StoreEntry } from '../../../apps/web/lib/store-items';
 import { StudioSaveQueue, flushStudioClose } from '../src/studio-save';
@@ -143,7 +144,7 @@ function Editor({ initial, storage, options, leave, beforeClose }: { initial: St
   const [agentCount, setAgentCount] = useState<number | null>(null);
   const [ready, setReady] = useState(false), [error, setError] = useState<string | null>(null), [saved, setSaved] = useState('Loading');
   const [metadata, setMetadata] = useState(initial), [settings, setSettings] = useState(false), [testing, setTesting] = useState(false);
-  const [tab, setTab] = useState<StudioTab>('build'), [preview, setPreview] = useState(DEFAULT_PREVIEW);
+  const [tab, setTab] = useState<StudioTab>(initial.lab ? 'lab' : 'build'), [preview, setPreview] = useState(DEFAULT_PREVIEW);
   useEffect(()=>{const world=runtime.current;if(!world||!presentationState.display.open)return;const background=presentationState.display.background==='world'&&!presentationState.display.worldId;world.setPresentationBackdrop(background);world.setPaused(!background);return()=>{world.setPresentationBackdrop(false);world.setPaused(tab==='avatar'&&!testing);};},[presentationState.display.open,presentationState.display.background,presentationState.display.worldId,ready]);
   const [logs, setLogs] = useState<LogEntry[]>([]), desktop = useIsDesktop();
   const [layout, setLayout] = useStudioLayout(tab === 'filming' ? 'filming' : 'build');
@@ -173,6 +174,8 @@ function Editor({ initial, storage, options, leave, beforeClose }: { initial: St
     if (timer.current) clearTimeout(timer.current);
     timer.current = setTimeout(() => { void save(); }, 400);
   };
+  // MOTION-LAB: a lab project's course, runs and versions; every change is saved with the project.
+  const [lab] = useState(() => initial.lab ? new LabController(initial.lab, data => { project.current = { ...project.current, lab: data }; changed(); }) : undefined);
   useEffect(() => {
     mounted.current = true;
     const abort = new AbortController(); let current: GenvrRuntime | null = null;
@@ -273,6 +276,8 @@ function Editor({ initial, storage, options, leave, beforeClose }: { initial: St
       const matching = entries.filter(row => `${row.id} ${row.name}`.toLowerCase().includes(query.query.toLowerCase()) && (!query.category || row.categories.some(category => category.toLowerCase() === query.category!.toLowerCase())));
       return { total: entries.length, matched: matching.length, offset: query.offset, entries: matching.slice(query.offset, query.offset + query.limit), expressions: EXPRESSIONS, expressionSupported: liveStage.current?.info.expressionSupported ?? runtime.current.supportsAvatarExpression('self'), viewportConnected: true };
     }
+    // MOTION-LAB: the same controller as the Lab area; an agent's "make best" waits for the owner.
+    if (tool === 'motion_lab') { if (lab) { setTab('lab'); await new Promise(resolve => setTimeout(resolve, 0)); } return runMotionLab(lab ?? null, (args as { operation?: unknown }).operation, { kind: 'agent', name: 'MCP agent' }); }
     if (latestFilm.current.isBusy() && !(tool==='studio_action' && (args.operation as {kind?:string})?.kind==='manual_record')) throw new Error('Wait for the current recording.');
     if (tool === 'get_camera') return { camera: latestFilm.current.camera, view: latestFilm.current.cameraView() };
     if (tool === 'set_camera') { latestFilm.current.apply(FilmCamera.parse(args.camera)); return { camera: FilmCamera.parse(args.camera) }; }
@@ -288,7 +293,7 @@ function Editor({ initial, storage, options, leave, beforeClose }: { initial: St
   };
   useEffect(() => {
     if (!ready || !options.liveBridge) return;
-    return connectLiveStudio(options.liveBridge, initial, { avatar: true, privateLibrary: Boolean(library), filming: true, voice: true, avatarLive: true, sharing: Boolean(options.sharing) }, (tool, args, signal) => liveExecutor.current(tool, args, signal), setLiveConnected);
+    return connectLiveStudio(options.liveBridge, initial, { avatar: true, privateLibrary: Boolean(library), filming: true, voice: true, avatarLive: true, sharing: Boolean(options.sharing), motionLab: Boolean(lab) }, (tool, args, signal) => liveExecutor.current(tool, args, signal), setLiveConnected);
   }, [ready, initial.id, options.liveBridge]);
   const shareStudio: NonNullable<AssistantHost['shareStudio']> = async input => {
     if(input.action==='inspect')return {available:Boolean(options.sharing),localOnly:!options.sharing,projectId:initial.id,layouts:AVATAR_LIVE_LAYOUTS};
@@ -345,15 +350,15 @@ function Editor({ initial, storage, options, leave, beforeClose }: { initial: St
             if (next.model && options.storage) { setError('Device preview requires the default local project storage.'); return; }
             void save().then(ok => { if (ok) setPreview(next); });
           }}
-          testing={testing} onTesting={test} logs={logs} onClearLogs={() => setLogs([])} onStyle={() => changed()} /> : null}
+          testing={testing} onTesting={test} logs={logs} onClearLogs={() => setLogs([])} onStyle={() => changed()} lab={lab} /> : null}
         {preview.model && desktop ? <DeviceEmulator placeId={initial.id} model={preview.model} orientation={preview.orientation} zoom={preview.zoom} reloadKey={preview.reloadKey}
           source={`?studioPreview=${initial.id}&touch=${preview.model.kind === 'phone' || preview.model.kind === 'tablet' ? '1' : '0'}`} /> : null}
-        {ready && !testing && (desktop || tab !== 'filming') ? (desktop
+        {ready && !testing && tab !== 'lab' && (desktop || tab !== 'filming') ? (desktop
           // Inside the 3D view (BUILD-B1): hints and the drawing bar never cover the docks.
           ? <div style={{ gridArea: 'viewport' }} className="pointer-events-none relative z-30 min-h-0 min-w-0"><BuildPanel runtime={runtime} status={status} studio contextMenu={tab === 'build' || tab === 'items'} placeId={initial.id} onTest={() => test(true)} /></div>
           : <BuildPanel runtime={runtime} status={status} studio={false} placeId={initial.id} onTest={() => test(true)} />) : null}
         {!desktop && testing ? <button className="absolute right-3 top-3 rounded-lg bg-surface px-3 py-2 font-bold" onClick={() => setTesting(false)}>Stop test</button> : null}
-        {ready && !status.tool && (testing || (tab !== 'filming' && tab !== 'avatar')) && !preview.model ? <PlayControls runtime={runtime} raised={!desktop && !testing} forceTouch={!desktop} dash={testing && initial.play.view === 'side' && initial.play.moves.includes('dash')} /> : null}
+        {ready && !status.tool && (testing || (tab !== 'filming' && tab !== 'avatar' && tab !== 'lab')) && !preview.model ? <PlayControls runtime={runtime} raised={!desktop && !testing} forceTouch={!desktop} dash={testing && initial.play.view === 'side' && initial.play.moves.includes('dash')} /> : null}
         {!desktop && !testing && tab === 'filming' && ready ? <PhoneFilming filming={filming} onClose={() => setTab('build')} /> : null}
       </main>
       {desktop && !embedLayout ? (
@@ -405,6 +410,7 @@ function App({ options, beforeClose }: { options: StudioOptions; beforeClose: Be
       <strong>Genvr Studio</strong>
       {recent.length ? <select aria-label="Open project" className="min-w-0 max-w-full rounded border border-ink/20 bg-paper p-2 text-sm" value="" onChange={event => void open(event.target.value)}><option value="" disabled>My projects</option>{recent.map(p => <option key={p.id} value={p.id}>{p.title}</option>)}</select> : null}
       <IconButton label="Import project" onClick={() => picker.current?.click()}><FolderOpen className="size-4" /></IconButton>
+      <button type="button" className="inline-flex items-center gap-1.5 rounded-lg border border-ink/20 px-3 py-1.5 text-xs font-bold" title="A test world for making and training motion" onClick={async () => { try { const next = createLabProject(newLabData()); await storage.write(next); setProject(next); setError(null); } catch (error) { setError(message(error)); } }}><FlaskConical className="size-4" aria-hidden />New motion lab</button>
     </header>
     <input ref={picker} type="file" accept=".genvr-studio,.genvr-world,application/json" className="hidden" aria-label="Project file" onChange={async event => {
       const file = event.target.files?.[0]; event.target.value = ''; if (!file) return;

@@ -115,6 +115,11 @@ export interface CharacterStage {
   /** Close-up on the face from the front (face work: eyes, mouth, lines). */
   focusFace(): void;
   lookFrom(face: ViewFace): void;
+  /**
+   * Put the camera on an orbit round what it looks at (the motion lab shows the course ahead): `azimuth` degrees
+   * from +z toward +x, `elevation` degrees above the ground, `distance` metres.
+   */
+  setOrbit(azimuth: number, elevation: number, distance: number): void;
   onChange(listener: (info: CharacterStageInfo) => void): () => void;
   /**
    * The muscle paint tool (generated bodies): the character is replaced by the default boy, static, to paint
@@ -782,6 +787,19 @@ export async function createCharacterStage({
     resetView,
     focusFace,
     lookFrom,
+    setOrbit(azimuth, elevation, distance) {
+      const d = Math.max(controls.minDistance, distance);
+      controls.maxDistance = Math.max(controls.maxDistance, d * 1.5);
+      camera.far = Math.max(camera.far, d * 10);
+      camera.updateProjectionMatrix();
+      const a = (azimuth * Math.PI) / 180, e = (Math.max(-89, Math.min(89, elevation)) * Math.PI) / 180;
+      camera.position.set(
+        controls.target.x + Math.sin(a) * Math.cos(e) * d,
+        controls.target.y + Math.sin(e) * d,
+        controls.target.z + Math.cos(a) * Math.cos(e) * d,
+      );
+      controls.update();
+    },
     async startPaint(paint) {
       painting?.dispose();
       painting = await startMusclePaint({ scene, camera, controls, canvas: renderer.domElement, paint });

@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
+import { simulateLabRun } from '@genvr/runtime';
 import { LabController, newLabData, runMotionLab, PERSON } from './motion-lab';
+
+const simulateOn = (lab: LabController) => simulateLabRun(lab.data.course, lab.best()!.settings, lab.data.course.seed).frames.at(-1);
 
 const agent = { kind: 'agent' as const, name: 'Luna' };
 
@@ -22,6 +25,9 @@ describe('motion lab controller (MOTION-LAB L1 + L2)', () => {
     lab.saveBest(v.id, PERSON);
     expect(lab.best()?.id).toBe('walk-v1');
     expect(lab.view.ghost?.frames.length).toBeGreaterThan(100);
+    lab.fromSeed(77);
+    // On a new course the ghost is the best version's settings run on that course.
+    expect(lab.view.ghost?.frames.at(-1)).toEqual(simulateOn(lab));
   });
   it('lets an agent ask for the best version, and only the owner confirms it', async () => {
     const lab = new LabController(newLabData());
@@ -45,6 +51,14 @@ describe('motion lab controller (MOTION-LAB L1 + L2)', () => {
     await runMotionLab(lab, { kind: 'traffic_set', cars: [{ id: 'car-1', lane: 0, speed: 12, runs_red: true }] }, agent);
     expect(lab.data.course.cars[0]).toMatchObject({ speed: 12, runs_red: true });
     await expect(runMotionLab(lab, { kind: 'version_delete', version: 'x' }, agent)).rejects.toThrow();
+    lab.run();
+    const mine = lab.saveVersion(undefined, 'by a person');
+    await expect(runMotionLab(lab, { kind: 'version_delete', version: mine.id, confirm: true }, agent)).rejects.toThrow(/owner/);
+    const theirs = (await runMotionLab(lab, { kind: 'save_version' }, agent)) as { id: string };
+    lab.saveBest(theirs.id);
+    await expect(runMotionLab(lab, { kind: 'version_delete', version: theirs.id, confirm: true }, agent)).rejects.toThrow(/best/);
+    lab.saveBest(mine.id);
+    expect(await runMotionLab(lab, { kind: 'version_delete', version: theirs.id, confirm: true }, agent)).toEqual({ deleted: theirs.id });
   });
   it('gives the same scores to a person and an agent for the same run', async () => {
     const a = new LabController(newLabData()), b = new LabController(newLabData());
