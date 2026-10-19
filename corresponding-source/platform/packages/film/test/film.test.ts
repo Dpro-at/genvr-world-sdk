@@ -483,3 +483,12 @@ describe('agents cannot route around owner-only rules (FILM-B2 security, round 2
     expect(ownerStateChanged(session.project, session.historyTarget('edit.undo')!)).toBe(false);
   });
 });
+
+describe('owner drafts are protected from agent history steps', () => {
+  it('undoing the owner’s own draft line counts as an owner-only change', () => {
+    const session = new FilmSession(emptyFilm(), counter());
+    const atlas = (session.run('cast.add', { name: 'Atlas', actor: 'self' }) as { ok: true; result: string }).result;
+    ok(session.run('line.write', { cast: atlas, text: { en: 'Draft' } }));
+    expect(ownerStateChanged(session.project, session.historyTarget('edit.undo')!)).toBe(true);
+  });
+});
