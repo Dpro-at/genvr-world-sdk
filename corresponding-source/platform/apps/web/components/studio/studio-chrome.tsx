@@ -28,7 +28,7 @@ import { SnapBar } from './snap-bar';
 import { GenvrMark } from '../genvr-mark';
 import { FilmingPanel } from './filming-panel';
 import { RecordingBar } from './film/recording-bar';
-import { WorkflowView } from './film/scenes-panel';
+import { WorkflowView } from './film/workflow-view';
 import { useWorkflowOpen } from '../../lib/video-studio/scene-selection';
 import { StoryPanel } from './story-panel';
 import type { StudioFilming } from '../../lib/use-studio-filming';

@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { ArrowRight, Clapperboard, Info, Link2, MapPin, MoreHorizontal, Plus, Trash2, Users, Volume2, Workflow, X } from 'lucide-react';
-import { toSeconds, type FilmProject, type Scene, type ShotLink } from '@genvr/film';
+import { ArrowRight, Clapperboard, Info, MapPin, MoreHorizontal, Plus, Trash2, Users, Volume2, Workflow, X } from 'lucide-react';
+import { toSeconds, type FilmProject, type Scene } from '@genvr/film';
 import type { StudioFilming } from '../../../lib/use-studio-filming';
 import { sceneSelection, useSceneSelection, useWorkflowOpen } from '../../../lib/video-studio/scene-selection';
 import { castSelection } from './cast-selection';
@@ -12,8 +12,6 @@ const icon = 'inline-flex size-7 items-center justify-center rounded-md hover:bg
 const input = 'mt-1 w-full rounded-md border border-ink/10 bg-paper px-2 py-1.5 text-xs';
 const num = 'w-16 rounded-md border border-ink/10 bg-paper px-1.5 py-1 font-mono text-xs';
 const Help = ({ text }: { text: string }) => <span title={text} aria-label={text} className="inline-flex text-ink/45"><Info className="size-3.5" /></span>;
-const KINDS: Array<[ShotLink['kind'], string]> = [['continue', 'Continue'], ['flashback', 'Flashback'], ['back', 'Back to start'], ['jump', 'Jump to end'], ['loop', 'Loop']];
-const LOOKS: Array<[ShotLink['look'], string]> = [['cut', 'Cut'], ['blur', 'Dream blur'], ['fade', 'Fade'], ['old_film', 'Old film']];
 
 function attempt(filming: StudioFilming, id: string, args: unknown) {
   const result = filming.studio.run(id, args);
@@ -142,48 +140,5 @@ export function SceneInspector({ filming }: { filming: StudioFilming }) {
         <p className="text-ink/55">Used while takes of this scene record. Rain, wind and birds follow the world's weather; this sets how loud they are.</p>
       </> : <p className="text-ink/55">Takes of this scene use the world's own sound.</p>}
     </section> : null}
-  </div>;
-}
-
-/** Workflow (board 7, 9): scenes as lanes with their shots in order, and the timed links between shots. */
-export function WorkflowView({ filming }: { filming: StudioFilming }) {
-  const studio = filming.studio, project = studio.project, scenes = project.scenes ?? [], links = project.links ?? [], off = filming.busy || studio.rendering;
-  const videos = project.media.filter((m) => m.kind === 'video');
-  const [draft, setDraft] = useState<{ from: string; fromAt: number; to: string; toAt: number; kind: ShotLink['kind']; returnAt: number; look: ShotLink['look'] } | null>(null);
-  const goTo = (media: string) => { const clip = project.tracks.flatMap((t) => t.clips).find((c) => c.type === 'media' && c.media === media);
-    if (clip) { studio.select(clip.id); studio.setPlayhead(toSeconds(clip.start)); } sceneSelection.setWorkflow(false); };
-  const unplaced = videos.filter((m) => !scenes.some((s) => s.shots.includes(m.id)));
-  const lane = (title: string, shots: string[], key: string, sceneId?: string) => <div key={key} className="flex items-stretch gap-3 rounded-xl border border-ink/10 bg-surface/80 p-3">
-    <button type="button" className="w-28 shrink-0 text-left text-xs" onClick={() => { if (sceneId) { castSelection.set(null); sceneSelection.set(sceneId); } }}><b className="block">{title}</b>
-      <span className="text-ink/55">{shots.length} shot{shots.length === 1 ? '' : 's'}</span></button>
-    <div className="flex flex-wrap items-center gap-2">{shots.map((m, i) => <div key={m} className="flex items-center gap-2">
-      {i ? <ArrowRight className="size-3.5 text-ink/40" /> : null}
-      <button type="button" onClick={() => goTo(m)} title="Go to this shot" className="w-36 rounded-lg border border-ink/15 bg-paper p-2 text-left text-xs hover:ring-1 hover:ring-ink/40">
-        <b className="block truncate">{mediaName(project, m)}</b><span className="font-mono text-[10px] text-ink/55">{toSeconds(project.media.find((x) => x.id === m)?.duration ?? 0).toFixed(1)} s</span></button></div>)}
-      {!shots.length ? <span className="text-xs text-ink/50">not filmed yet</span> : null}</div>
-  </div>;
-  return <div className="absolute inset-0 z-30 overflow-auto bg-paper/95 p-4 text-ink" aria-label="Workflow">
-    <div className="mb-3 flex items-center gap-2"><Workflow className="size-4" /><h2 className="text-sm font-bold">Workflow</h2><Help text="Scenes and their shots in story order. Click a shot to go to it on the timeline; links say where the film leaves a shot and enters another." />
-      <span className="flex-1" /><button type="button" className={button} disabled={off || videos.length < 1} onClick={() => setDraft({ from: videos[0]!.id, fromAt: 0, to: (videos[1] ?? videos[0])!.id, toAt: 0, kind: 'continue', returnAt: 0, look: 'cut' })}><Link2 className="size-3.5" />Add link</button>
-      <button type="button" className={icon} aria-label="Close workflow" onClick={() => sceneSelection.setWorkflow(false)}><X className="size-4" /></button></div>
-    <div className="space-y-2">{scenes.map((s, i) => lane(`${i + 1} · ${s.name}`, s.shots, s.id, s.id))}{unplaced.length ? lane('Not in a scene', unplaced.map((m) => m.id), 'none') : null}</div>
-    <h3 className="mb-1 mt-4 flex items-center gap-2 text-xs font-bold"><Link2 className="size-3.5" />Links · {links.length}</h3>
-    {draft ? <div className="mb-2 flex flex-wrap items-end gap-2 rounded-lg border border-ink/15 p-2 text-xs">
-      <label>Leave<select aria-label="Leave shot" className={input} value={draft.from} onChange={(e) => setDraft({ ...draft, from: e.target.value })}>{videos.map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}</select></label>
-      <label>at s<input aria-label="Leave at" type="number" min={0} step="0.1" className={`${num} mt-1 block`} value={draft.fromAt} onChange={(e) => setDraft({ ...draft, fromAt: Number(e.target.value) })} /></label>
-      <label>Enter<select aria-label="Enter shot" className={input} value={draft.to} onChange={(e) => setDraft({ ...draft, to: e.target.value })}>{videos.map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}</select></label>
-      <label>from s<input aria-label="Enter from" type="number" min={0} step="0.1" className={`${num} mt-1 block`} value={draft.toAt} onChange={(e) => setDraft({ ...draft, toAt: Number(e.target.value) })} /></label>
-      <label>Kind<select aria-label="Link kind" className={input} value={draft.kind} onChange={(e) => setDraft({ ...draft, kind: e.target.value as ShotLink['kind'] })}>{KINDS.map(([v, t]) => <option key={v} value={v}>{t}</option>)}</select></label>
-      {draft.kind === 'flashback' ? <label>return at s<input aria-label="Return at" type="number" min={0} step="0.1" className={`${num} mt-1 block`} value={draft.returnAt} onChange={(e) => setDraft({ ...draft, returnAt: Number(e.target.value) })} /></label> : null}
-      <label>Look<select aria-label="Link look" className={input} value={draft.look} onChange={(e) => setDraft({ ...draft, look: e.target.value as ShotLink['look'] })}>{LOOKS.map(([v, t]) => <option key={v} value={v}>{t}</option>)}</select></label>
-      <button type="button" className={button} disabled={off} onClick={() => { if (attempt(filming, 'link.add', { from: { media: draft.from, at: draft.fromAt }, to: { media: draft.to, at: draft.toAt }, kind: draft.kind, look: draft.look, ...(draft.kind === 'flashback' ? { returnAt: draft.returnAt } : {}) })) setDraft(null); }}>Add</button>
-      <button type="button" className={icon} aria-label="Cancel link" onClick={() => setDraft(null)}><X className="size-3.5" /></button>
-    </div> : null}
-    {links.length ? <ul className="space-y-1">{links.map((l) => <li key={l.id} className="flex items-center gap-2 rounded-lg border border-ink/10 px-2 py-1.5 text-xs">
-      <span className={`rounded px-1.5 py-0.5 text-[10px] font-bold ${l.kind === 'flashback' ? 'bg-amber-400/20 text-amber-600' : 'bg-ink/10'}`}>{KINDS.find(([v]) => v === l.kind)?.[1]}</span>
-      <span className="flex-1 font-mono">{mediaName(project, l.from.media)} {l.from.at.toFixed(1)} s → {mediaName(project, l.to.media)} {l.to.at.toFixed(1)} s{l.returnAt !== undefined ? ` · returns at ${l.returnAt.toFixed(1)} s` : ''} · {LOOKS.find(([v]) => v === l.look)?.[1]}</span>
-      <button type="button" className={icon} aria-label="Delete link" disabled={off} onClick={() => attempt(filming, 'link.remove', { link: l.id })}><Trash2 className="size-3.5" /></button></li>)}</ul>
-      : <p className="text-xs text-ink/60">No links yet. A link says when the film leaves one shot and where it enters the next; a flashback also says when it comes back.</p>}
-    <p className="mt-3 text-[11px] text-ink/50">Links are saved in the film and read by agents; playing a film through its links comes in a later step.</p>
   </div>;
 }

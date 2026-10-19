@@ -39,7 +39,7 @@ export function WorkspaceSwitch({ filming }: { filming: StudioFilming }) {
  * A small still of a recording: the first picture of its timeline strip (FILM-TEST-01 D6). The strip is made once and
  * kept in this browser; a <video> per recording stayed black (no poster, too many decoders at once).
  */
-function Thumb({ media, blob }: { media: Media; blob: Blob | undefined }) {
+export function Thumb({ media, blob }: { media: Media; blob: Blob | undefined }) {
   const strip = useJob(blob && media.kind === 'video' ? () => stripOf(media.asset, blob, toSeconds(media.duration)) : null, `${media.asset}:${!!blob}`);
   return strip ? <span aria-hidden className="h-10 w-16 shrink-0 rounded bg-black bg-no-repeat"
     style={{ backgroundImage: `url(${strip.url})`, backgroundSize: `${strip.count * 64}px 40px`, backgroundPosition: '0 0' }} />

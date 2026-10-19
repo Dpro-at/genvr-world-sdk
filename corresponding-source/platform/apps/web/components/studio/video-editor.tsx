@@ -21,7 +21,8 @@ import { SuggestBlock } from './film/suggest-block';
 import { CastInspector } from './film/cast-panel';
 import { useCastSelection } from './film/cast-selection';
 import { SceneInspector } from './film/scenes-panel';
-import { useSceneSelection } from '../../lib/video-studio/scene-selection';
+import { useSceneSelection, useWorkflowOpen, useWorkflowShot } from '../../lib/video-studio/scene-selection';
+import { WorkflowShotInspector } from './film/workflow-view';
 import { useStudioHost } from '../../lib/studio-host';
 import { SceneVoice } from './film/scene-voice';
 import { ClipFace, KIND, Meters, Ruler, SoundCrossfade, TL, Toggle, TrackHeader, ZoomBar, clipBox } from './film/timeline-parts';
@@ -448,9 +449,10 @@ export function VideoSceneInspector({ filming }: { filming: StudioFilming }) {
   const [settings, setSettings] = useState(false);
   const chosenCast = useCastSelection(), castOpen = Boolean(chosenCast && filming.studio.project.cast?.some((c) => c.id === chosenCast));
   const chosenScene = useSceneSelection(), sceneOpen = !castOpen && Boolean(chosenScene && filming.studio.project.scenes?.some((x) => x.id === chosenScene));
+  const flowShot = useWorkflowShot(), flowOpen = useWorkflowOpen() && !castOpen && !sceneOpen && Boolean(flowShot && filming.studio.project.media.some((m) => m.id === flowShot));
   const shotChosen = filming.studio.project.tracks.some((t) => t.kind === 'picture' && t.clips.some((c) => c.id === filming.studio.selected && c.type === 'media'));
-  const head = castOpen ? { title: 'Character', icon: Users } : sceneOpen ? { title: 'Scene sheet', icon: Clapperboard } : INSPECTOR_TITLE[workspace] ?? INSPECTOR_TITLE.shoot!, HeadIcon = head.icon;
-  const body = castOpen ? <CastInspector filming={filming} /> : sceneOpen ? <SceneInspector filming={filming} />
+  const head = castOpen ? { title: 'Character', icon: Users } : sceneOpen ? { title: 'Scene sheet', icon: Clapperboard } : flowOpen ? { title: 'Shot', icon: Camera } : INSPECTOR_TITLE[workspace] ?? INSPECTOR_TITLE.shoot!, HeadIcon = head.icon;
+  const body = castOpen ? <CastInspector filming={filming} /> : sceneOpen ? <SceneInspector filming={filming} /> : flowOpen ? <WorkflowShotInspector filming={filming} />
     : workspace === 'captions' ? <CaptionsPanel filming={filming} />
     // Design v11: Transitions and Colour open that section of the selected shot; with no shot chosen they keep their list.
     : (workspace === 'transitions' || workspace === 'colour') && shotChosen ? <InspectorBody filming={filming} mode="clip" focus={workspace === 'transitions' ? 'transition' : 'colour'} />
