@@ -5,6 +5,7 @@ import { BookOpen, Bot, Check, Info, Mic, MoreHorizontal, PenLine, Play, Plus, T
 import { filmSettings, type CastMember, type CastVoice, type ScriptLine } from '@genvr/film';
 import type { StudioFilming } from '../../../lib/use-studio-filming';
 import { castSelection, useCastSelection } from './cast-selection';
+import { VoiceTakes } from './voice-takes';
 
 const button = 'inline-flex items-center justify-center gap-1.5 rounded-md border border-ink/10 bg-paper px-2.5 py-1.5 text-xs font-semibold hover:bg-ink/10 disabled:opacity-35';
 const icon = 'inline-flex size-7 items-center justify-center rounded-md hover:bg-ink/10 disabled:opacity-35';
@@ -151,7 +152,7 @@ function StoryTab({ filming, member, lines }: { filming: StudioFilming; member: 
       <div className="flex items-center gap-2"><h3 className="flex-1 text-xs font-bold">Lines · {lines.length}</h3>
         {languages.length > 1 ? <div role="radiogroup" aria-label="Line language" className="inline-flex gap-0.5">{languages.map((l) =>
           <button key={l.lang} type="button" role="radio" aria-checked={lang === l.lang} onClick={() => setLang(l.lang)} className={`rounded px-1.5 py-0.5 text-[10px] font-bold ${lang === l.lang ? 'bg-ink text-paper' : 'bg-ink/10'}`}>{l.lang.toUpperCase()}</button>)}</div> : null}</div>
-      {lines.map((line) => <LineRow key={line.id} filming={filming} line={line} lang={lang} languages={languages.map((l) => l.lang)} />)}
+      {lines.map((line) => <LineRow key={line.id} filming={filming} line={line} lang={lang} languages={languages.map((l) => l.lang)} person={member.voices[lang]?.kind === 'person' ? member.voices[lang]!.name : null} />)}
       {!lines.length ? <p className="text-xs text-ink/60">{member.linesBy.kind === 'agent' ? `${member.linesBy.name} writes ${member.name}'s lines through MCP; they appear here for your approval. You can also write one.` : `Write ${member.name}'s lines here.`}</p> : null}
       <div className="flex gap-1.5"><textarea aria-label="New line" rows={2} maxLength={500} className={`${input} mt-0 flex-1`} placeholder={`What ${member.name} says (${lang.toUpperCase()})`} value={draft} onChange={(e) => setDraft(e.target.value)} />
         <button type="button" className={button} disabled={off || !draft.trim()} onClick={() => { if (attempt(filming, 'line.write', { cast: member.id, text: { [lang]: draft.trim() } }) !== undefined) setDraft(''); }}><Plus className="size-3.5" />Line</button></div>
@@ -159,7 +160,7 @@ function StoryTab({ filming, member, lines }: { filming: StudioFilming; member: 
   </div>;
 }
 
-function LineRow({ filming, line, lang, languages }: { filming: StudioFilming; line: ScriptLine; lang: string; languages: string[] }) {
+function LineRow({ filming, line, lang, languages, person }: { filming: StudioFilming; line: ScriptLine; lang: string; languages: string[]; person: string | null }) {
   const studio = filming.studio, off = filming.busy || studio.rendering, approved = line.status === 'approved';
   return <div className={`space-y-1 rounded-lg border p-2 ${approved ? 'border-ink/10' : 'border-amber-400/50'}`}>
     <div className="flex items-center gap-1.5 text-[10px] text-ink/55">
@@ -177,6 +178,7 @@ function LineRow({ filming, line, lang, languages }: { filming: StudioFilming; l
       {approved ? <button type="button" className={icon} aria-label="Back to draft" title="Back to draft" disabled={off} onClick={() => attempt(filming, 'line.approve', { line: line.id, approved: false })}><PenLine className="size-3.5" /></button> : null}
       <button type="button" className={icon} aria-label="Delete line" title="Delete line" disabled={off} onClick={() => attempt(filming, 'line.remove', { line: line.id })}><Trash2 className="size-3.5" /></button>
     </div>
+    {person && approved && line.text[lang]?.trim() ? <VoiceTakes filming={filming} line={line} lang={lang} person={person} /> : null}
   </div>;
 }
 

@@ -3,7 +3,7 @@ import { useEffect, useId, useLayoutEffect, useRef, useState, type KeyboardEvent
 import { createPortal } from 'react-dom';
 import { Scissors, Undo2, Redo2, Download, Circle, Type, Camera, Plus, Trash2, Magnet, SlidersHorizontal,
   Users, Mic, Film, Languages, Bookmark, FolderOpen, Save, MousePointer2, ChevronsRight, Columns2, ArrowLeftRight, MoveHorizontal,
-  Clapperboard, Volume2, Palette, BookOpen, Settings2, X } from 'lucide-react';
+  Clapperboard, Volume2, Palette, BookOpen, Settings2, Sparkles, X } from 'lucide-react';
 import { filmLength, filmSettings, forExport, fromSeconds, timecode, toSeconds, type Clip, type Track } from '@genvr/film';
 import type { StudioFilming } from '../../lib/use-studio-filming';
 import { drawAt, mediaDuration, render } from '../../lib/video-studio/render';
@@ -17,6 +17,7 @@ import { ColourPanel } from './film/colour-panel';
 import { FilmSettings } from './film/film-settings';
 import { record } from './film/record';
 import { AddMenu, ExportMenu } from './film/add-menu';
+import { SuggestBlock } from './film/suggest-block';
 import { CastInspector } from './film/cast-panel';
 import { useCastSelection } from './film/cast-selection';
 import { SceneInspector } from './film/scenes-panel';
@@ -447,9 +448,12 @@ export function VideoSceneInspector({ filming }: { filming: StudioFilming }) {
   const [settings, setSettings] = useState(false);
   const chosenCast = useCastSelection(), castOpen = Boolean(chosenCast && filming.studio.project.cast?.some((c) => c.id === chosenCast));
   const chosenScene = useSceneSelection(), sceneOpen = !castOpen && Boolean(chosenScene && filming.studio.project.scenes?.some((x) => x.id === chosenScene));
+  const shotChosen = filming.studio.project.tracks.some((t) => t.kind === 'picture' && t.clips.some((c) => c.id === filming.studio.selected && c.type === 'media'));
   const head = castOpen ? { title: 'Character', icon: Users } : sceneOpen ? { title: 'Scene sheet', icon: Clapperboard } : INSPECTOR_TITLE[workspace] ?? INSPECTOR_TITLE.shoot!, HeadIcon = head.icon;
   const body = castOpen ? <CastInspector filming={filming} /> : sceneOpen ? <SceneInspector filming={filming} />
     : workspace === 'captions' ? <CaptionsPanel filming={filming} />
+    // Design v11: Transitions and Colour open that section of the selected shot; with no shot chosen they keep their list.
+    : (workspace === 'transitions' || workspace === 'colour') && shotChosen ? <InspectorBody filming={filming} mode="clip" focus={workspace === 'transitions' ? 'transition' : 'colour'} />
     : workspace === 'transitions' ? <TransitionsWorkspace filming={filming} />
     : workspace === 'sound' ? <SoundPanel filming={filming} />
     : workspace === 'colour' ? <ColourPanel filming={filming} />
@@ -465,7 +469,16 @@ export function VideoSceneInspector({ filming }: { filming: StudioFilming }) {
 }
 
 /** Shoot shows the Scene panel (cues for the next take, shot workflow); Edit shows the Clip panel. */
-function InspectorBody({ filming, mode }: { filming: StudioFilming; mode: 'scene' | 'clip' }) {
+type ShotSection = 'trim' | 'transition' | 'colour' | 'effects' | 'text' | 'camera';
+/** A folding section of the shot panel (design rule 10): closed, it still shows its value. */
+function Fold({ id, title, icon: Icon, value, open, children }: { id: ShotSection; title: string; icon: typeof Film; value?: string; open: boolean; children: ReactNode }) {
+  return <details open={open} data-film-id={`film.shot.${id}`} className="group border-b border-ink/10 pb-2 last:border-b-0">
+    <summary className="flex cursor-pointer list-none items-center gap-2 py-1.5 text-xs font-bold [&::-webkit-details-marker]:hidden">
+      <span className="text-ink/45 group-open:rotate-90">›</span><Icon className="size-3.5" />{title}{value ? <span className="ml-auto truncate font-normal text-ink/55">{value}</span> : null}</summary>
+    <div className="space-y-2 pt-1">{children}</div>
+  </details>;
+}
+function InspectorBody({ filming, mode, focus = 'trim' }: { filming: StudioFilming; mode: 'scene' | 'clip'; focus?: ShotSection }) {
   const studio = filming.studio, { project, selected, rendering: running } = studio;
   const host = useStudioHost();
   const [choosingAvatar, setChoosingAvatar] = useState(false), avatarDialog = useRef<HTMLDialogElement>(null);
@@ -512,13 +525,29 @@ function InspectorBody({ filming, mode }: { filming: StudioFilming; mode: 'scene
         <div className="flex items-end gap-2">{number('Clip start (film s)', start, setStart)}
           <button className={button} onClick={() => studio.run('clip.move', { clip: clip.id, start })}>Move</button></div>
         {clip.type === 'media' ? <>
-          <div className="grid grid-cols-2 gap-2">{number('Source in', sourceIn, setSourceIn, toSeconds(media?.duration ?? 0))}{number('Source out', sourceOut, setSourceOut, toSeconds(media?.duration ?? 0))}</div>
-          <label className="flex items-center gap-2 text-xs text-ink/60"><input type="checkbox" checked={ripple} onChange={(e) => setRipple(e.target.checked)} />Ripple (later clips follow)</label>
-          <button className={`${button} w-full`} onClick={applyTrim}>Apply trim</button>
+          <Fold id="trim" title="Trim" icon={Scissors} open={focus === 'trim'} value={`${toSeconds(clip.start).toFixed(1)} → ${toSeconds(clip.start + clip.duration).toFixed(1)} · ${toSeconds(clip.duration).toFixed(1)} s`}>
+            <div className="grid grid-cols-2 gap-2">{number('Source in', sourceIn, setSourceIn, toSeconds(media?.duration ?? 0))}{number('Source out', sourceOut, setSourceOut, toSeconds(media?.duration ?? 0))}</div>
+            <label className="flex items-center gap-2 text-xs text-ink/60"><input type="checkbox" checked={ripple} onChange={(e) => setRipple(e.target.checked)} />Ripple (later clips follow)</label>
+            <button className={`${button} w-full`} onClick={applyTrim}>Apply trim</button>
+          </Fold>
+          <Fold id="transition" title="Transition" icon={ArrowLeftRight} open={focus === 'transition'} value={clip.transition ? `${clip.transition.kind} ${toSeconds(clip.transition.duration).toFixed(1)} s` : 'cut'}>
+            <SuggestBlock filming={filming} kind="transition" clip={clip.id}><TransitionPanel filming={filming} clip={clip} locked={located!.track.locked} /></SuggestBlock>
+          </Fold>
+          <Fold id="colour" title="Colour" icon={Palette} open={focus === 'colour'} value={clip.effects?.some((e) => e.effect === 'colour') ? 'graded' : 'natural'}>
+            <SuggestBlock filming={filming} kind="colour" clip={clip.id}><ColourPanel filming={filming} /></SuggestBlock>
+          </Fold>
+          <Fold id="effects" title="Effects" icon={Sparkles} open={focus === 'effects'} value={(clip.effects ?? []).filter((e) => e.effect !== 'colour').map((e) => e.effect).join(', ') || 'none'}>
+            <SuggestBlock filming={filming} kind="effect" clip={clip.id}><LayerControls filming={filming} clip={clip} locked={located!.track.locked} /></SuggestBlock>
+          </Fold>
+          <Fold id="camera" title="Camera of this shot" icon={Camera} open={focus === 'camera'} value={media?.camera?.preset ?? 'player view'}>
+            <div className="grid grid-cols-2 gap-2">
+              <button className={button} disabled={!media?.camera} title="Put the live camera where this shot was filmed" onClick={() => { if (media?.camera) filming.apply(media.camera); }}><Camera className="size-3" />Use this camera</button>
+              <button className={`${button} !border-red-500/50`} disabled={!studio.ready || filming.busy || running} title="Record this shot again with its camera and cues" onClick={() => { studio.setWorkspace('shoot'); record(filming, clip.id); }}><Circle className="size-3 fill-red-500 text-red-500" />Re-record</button>
+            </div>
+          </Fold>
         </> : null}
         {clip.type === 'caption' ? <TitlePanel filming={filming} clip={clip} locked={located!.track.locked} /> : null}
-        {clip.type === 'media' ? <TransitionPanel filming={filming} clip={clip} locked={located!.track.locked} /> : null}
-        {clip.type === 'media' || clip.type === 'effect' ? <LayerControls filming={filming} clip={clip} locked={located!.track.locked} /> : null}
+        {clip.type === 'effect' ? <LayerControls filming={filming} clip={clip} locked={located!.track.locked} /> : null}
         <div className="grid grid-cols-2 gap-2">
           <Command filming={filming} id="clip.split" args={{ clips: [clip.id] }}><Scissors className="size-3" />Split at playhead</Command>
           <Command filming={filming} id="clip.remove" args={{ clips: [clip.id], ripple: true }}><Trash2 className="size-3" />Ripple delete</Command>

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   FilmSession, HISTORY_STEPS, TICKS_PER_SECOND, check, emptyFilm, frame, fromSeconds, isHostOnly, migrate, readFilmFile,
-  secondsOnFrame, snap, timecode, toSeconds, validRate, writeFilmFile, forExport, approvalsGained, ownerStateChanged, type FilmProject, type Media, type MediaClip,
+  secondsOnFrame, snap, timecode, toSeconds, validRate, writeFilmFile, forExport, approvalsGained, ownerStateChanged, neededAssets, type FilmProject, type Media, type MediaClip,
 } from '../src/index.js';
 
 const s = fromSeconds;
@@ -528,5 +528,51 @@ describe('scenes, links and scene sound (FILM-C1/C2/C3)', () => {
     ok(session.run('media.remove', { media: 'b' }));
     expect(session.project.links).toEqual([]);
     expect(session.project.scenes![0]!.shots).toEqual([]);
+  });
+});
+
+describe('AI suggestions and voice takes (FILM-D1/D3)', () => {
+  it('a suggestion only edits its own shot and changes nothing until the owner keeps it', () => {
+    const session = film();
+    const shot = session.project.tracks.find((t) => t.id === 'V1')!.clips[0]!.id;
+    const other = session.project.tracks.find((t) => t.id === 'V1')!.clips[1]!.id;
+    const request = (session.run('suggestion.ask', { kind: 'colour', clip: shot, prompt: 'late afternoon' }) as { ok: true; result: string }).result;
+    expect(session.run('suggestion.add', { kind: 'colour', clip: shot, label: 'Warm', steps: [{ id: 'cast.set', args: { clip: shot } }] })).toMatchObject({ ok: false });
+    expect(session.run('suggestion.add', { kind: 'colour', clip: shot, label: 'Warm', steps: [{ id: 'look.apply', args: { clip: other, look: 'warm' } }] })).toMatchObject({ ok: false });
+    const id = (session.run('suggestion.add', { kind: 'colour', clip: shot, label: 'Warm', request, steps: [{ id: 'look.apply', args: { clip: shot, look: 'warm_afternoon' } }] }) as { ok: true; result: string }).result;
+    expect(session.project.requests![0]!.status).toBe('answered');
+    const before = JSON.stringify(session.project.tracks);
+    expect(JSON.stringify(session.project.tracks)).toBe(before);
+    expect(isHostOnly('suggestion.mark')).toBe(true);
+    const s = session.project.suggestions![0]!;
+    expect(session.batch([...s.steps, { id: 'suggestion.mark', args: { suggestion: id, status: 'kept' } }])).toMatchObject({ ok: true });
+    expect(session.project.suggestions![0]!.status).toBe('kept');
+    expect(session.run('suggestion.mark', { suggestion: id, status: 'dropped' })).toMatchObject({ ok: false });
+  });
+  it('voice takes are host-only; keeping one makes it the cue voice and keeps its audio', () => {
+    const session = new FilmSession(emptyFilm(), counter());
+    const luna = (session.run('cast.add', { name: 'Luna', actor: 'self' }) as { ok: true; result: string }).result;
+    const line = (session.run('line.write', { cast: luna, text: { ar: 'أهلاً' } }) as { ok: true; result: string }).result;
+    ok(session.run('line.approve', { line })); ok(session.run('line.place', { line, lang: 'ar' }));
+    for (const id of ['take.add', 'take.keep', 'take.remove']) expect(isHostOnly(id)).toBe(true);
+    const t1 = (session.run('take.add', { line, lang: 'ar', asset: 'take-a', seconds: 2, by: 'Sara K.' }) as { ok: true; result: string }).result;
+    const t2 = (session.run('take.add', { line, lang: 'ar', asset: 'take-b', seconds: 2.2, by: 'Sara K.' }) as { ok: true; result: string }).result;
+    ok(session.run('take.keep', { take: t2 })); ok(session.run('take.keep', { take: t1 }));
+    expect(session.project.takes!.map((t) => t.kept)).toEqual([true, false]);
+    expect(session.project.draft[0]!.audio).toBe('take-a');
+    expect(neededAssets(session.project).has('take-b')).toBe(true);
+    ok(session.run('take.remove', { take: t1 }));
+    expect(session.project.draft[0]!.audio).toBeUndefined();
+  });
+});
+
+describe('owner decisions on suggestions and takes are protected from agent history steps', () => {
+  it('undoing a kept suggestion or a take counts as owner-only', () => {
+    const session = film();
+    const shot = session.project.tracks.find((t) => t.id === 'V1')!.clips[0]!.id;
+    const id = (session.run('suggestion.add', { kind: 'colour', clip: shot, label: 'Warm', steps: [{ id: 'look.apply', args: { clip: shot, look: 'warm_afternoon' } }] }) as { ok: true; result: string }).result;
+    expect(ownerStateChanged(session.project, session.historyTarget('edit.undo')!)).toBe(false);
+    ok(session.run('suggestion.mark', { suggestion: id, status: 'dropped' }));
+    expect(ownerStateChanged(session.project, session.historyTarget('edit.undo')!)).toBe(true);
   });
 });

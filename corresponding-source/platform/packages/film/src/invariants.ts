@@ -99,6 +99,8 @@ function trackRules(project: FilmProject, track: Track, add: (path: string, prob
 export const neededAssets = (project: FilmProject): Set<string> => new Set([
   ...project.media.map((m) => m.asset),
   ...[...project.media.flatMap((m) => m.cues), ...project.draft].flatMap((c) => c.audio ? [c.audio] : []),
+  // A person's recorded voice takes (FILM-D3) stay until they are deleted.
+  ...(project.takes ?? []).map((t) => t.asset),
 ]);
 export const missingAssets = (project: FilmProject, have: Iterable<string>): string[] => {
   const present = new Set(have);

@@ -58,6 +58,14 @@ Scenes and links (`command`; read `film.scenes`, `film.links` with `inspect`):
 - `link.add { from: { media, at }, to: { media, at }, kind: continue|flashback|back|jump|loop, returnAt? (flashback: required), look: cut|blur|fade|old_film }`,
   `link.set { link, ... , returnAt: null to clear }`, `link.remove { link }`. Links are stored and shown in Workflow; playback through links comes later.
 
+AI suggestions (the owner asks in the shot panel: read `film.requests` with `inspect`):
+- Answer with `suggestion.add { kind: transition|colour|effect, clip (clip id), label, request?, steps: [{ id, args }] }`.
+  Steps may only be transition.add/set/remove, look.apply, effect.add/set/remove, property.set/clear, clip.blend, and each
+  step's `args.clip` must be the same clip. Nothing changes until the owner keeps it; keep/drop (`suggestion.mark`) is
+  owner-only. `suggestion.ask` and `suggestion.forget` exist too.
+- Voice takes of a person (`film.takes`, without audio) are recorded, kept and deleted only in the Studio.
+- Camera and lights of a shot: `set_camera` and `lighting` as before; "Camera of this shot" = `media[].camera`.
+
 Editor commands used often: `clip.trim`, `clip.move`, `clip.split`, `clip.set` (volume), `clip.fade`,
 `clip.remove`, `clip.soundType`, `track.set`, `transition.add/set/remove`.
 

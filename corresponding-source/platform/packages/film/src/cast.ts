@@ -33,7 +33,11 @@ export function ownerStateChanged(now: FilmProject, next: FilmProject): boolean 
     writers: (p.cast ?? []).map((c) => [c.id, c.linesBy]).sort(),
     owners: (p.cast ?? []).filter((c) => c.linesBy.kind === 'owner').map((c) => c).sort((a, b) => a.id.localeCompare(b.id)),
     lines: (p.lines ?? []).filter((l) => guarded.has(l.id)).map((l) => JSON.stringify(l)).sort(),
+    // FILM-D: keeping or dropping a suggestion and the person's voice takes are the owner's too.
+    decided: (p.suggestions ?? []).filter((x) => decided.has(x.id)).map((x) => `${x.id}:${x.status}`).sort(),
+    takes: (p.takes ?? []).map((t) => JSON.stringify(t)).sort(),
   });
+  const decided = new Set([...(now.suggestions ?? []), ...(next.suggestions ?? [])].filter((x) => x.status !== 'pending').map((x) => x.id));
   // Guarded: every line the owner ever approved, and every line of a character the owner writes (in either film).
   const ownerCast = new Set([...(now.cast ?? []), ...(next.cast ?? [])].filter((c) => c.linesBy.kind === 'owner').map((c) => c.id));
   const guarded = new Set([...(now.lines ?? []), ...(next.lines ?? [])].filter((l) => l.status === 'approved' || l.approvedOnce || ownerCast.has(l.cast)).map((l) => l.id));

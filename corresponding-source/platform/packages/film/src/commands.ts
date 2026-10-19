@@ -4,7 +4,7 @@ import { EditError, findClip, transact, type EditContext } from './edits.js';
 import { History } from './history.js';
 import { languageStatus } from './cast.js';
 import { filmLength } from './invariants.js';
-import { CAST_LIMITS, CastMember, CastVoice, DEFAULT_SCENE_SOUND, DEFAULT_SUBTITLE_STYLE, NamedSpot, SCENE_LIMITS, Scene, SceneSound, ShotLink, FilmSettings, LIMITS, ScriptLine, LanguageTag, Media, SceneCue, SubtitleStyle, TrackKind, filmSettings, type FilmProject } from './model.js';
+import { CAST_LIMITS, REVIEW_LIMITS, Suggestion, SuggestionKind, VoiceTake, CastMember, CastVoice, DEFAULT_SCENE_SOUND, DEFAULT_SUBTITLE_STYLE, NamedSpot, SCENE_LIMITS, Scene, SceneSound, ShotLink, FilmSettings, LIMITS, ScriptLine, LanguageTag, Media, SceneCue, SubtitleStyle, TrackKind, filmSettings, type FilmProject } from './model.js';
 import { BLEND_MODES, EFFECTS, EFFECT_IDS, LOOKS, isEffect, type EffectId } from './effects.js';
 import { EASE_PRESETS } from './animate.js';
 import { SELECTOR_SHAPES, TITLE_PRESET_IDS } from './titles.js';
@@ -76,6 +76,7 @@ export function describe(project: FilmProject) {
     settings: filmSettings(project),
     cast: project.cast ?? [], lines: project.lines ?? [], languageStatus: languageStatus(project),
     scenes: project.scenes ?? [], links: project.links ?? [],
+    requests: project.requests ?? [], suggestions: project.suggestions ?? [], takes: (project.takes ?? []).map(({ asset: _asset, ...t }) => t),
     ...(project.ducking ? { ducking: project.ducking } : {}),
     ...(project.range ? { range: { in: s(project.range.in), out: s(project.range.out) } } : {}),
     ...(project.looks ? { looks: Object.keys(project.looks) } : {}),
@@ -87,6 +88,9 @@ export function describe(project: FilmProject) {
     draft: project.draft.map((c) => ({ ...c, start: s(c.start), end: s(c.end) })),
   };
 }
+
+/** Editing commands a suggestion may carry (FILM-D1): looks, transitions and effects of one shot, nothing else. */
+const SUGGESTION_STEPS = new Set(['transition.add', 'transition.set', 'transition.remove', 'look.apply', 'effect.add', 'effect.set', 'effect.remove', 'property.set', 'property.clear', 'clip.blend']);
 
 /** A scene may name only characters and recordings of this film; spots have different names. */
 function checkSceneRefs(d: FilmProject, scene: z.infer<typeof Scene>) {
@@ -611,6 +615,69 @@ export const COMMANDS: CommandSpec[] = [
     id: 'link.remove', label: 'Delete link', group: 'Project', journal: true,
     args: z.object({ link: clipId }).strict(),
     run: (d, a) => { if (!d.links?.some((l) => l.id === a.link)) throw new EditError('Link not found.'); d.links = d.links.filter((l) => l.id !== a.link); },
+  },
+  // AI suggests / by hand (FILM-D1). The owner asks; an agent answers with steps; only the owner keeps (the keep
+  // runs the steps and suggestion.mark in one batch) or drops it. Suggestions may only edit their own shot.
+  {
+    id: 'suggestion.ask', label: 'Ask for a suggestion', group: 'Clip', journal: true,
+    args: z.object({ kind: SuggestionKind, clip: clipId, prompt: z.string().min(1).max(300) }).strict(),
+    enabled: (st, a) => !st.project.tracks.some((t) => t.kind === 'picture' && t.clips.some((c) => c.id === a.clip && c.type === 'media')) ? 'Choose a shot on the picture track.'
+      : (st.project.requests?.length ?? 0) >= REVIEW_LIMITS.requests ? 'Too many open requests; answer or delete some first.' : null,
+    run: (d, a, x) => { const request = { id: x.id(), ...a, status: 'open' as const }; d.requests = [...(d.requests ?? []), request]; return request.id; },
+  },
+  {
+    id: 'suggestion.add', label: (a: { label?: string }) => `Suggestion: ${a.label ?? ''}`, group: 'Clip', journal: true,
+    args: Suggestion.omit({ id: true, status: true }).strict(),
+    enabled: (st, a) => {
+      if (!st.project.tracks.some((t) => t.clips.some((c) => c.id === a.clip && c.type === 'media'))) return 'Clip not found.';
+      if (a.request && !st.project.requests?.some((r) => r.id === a.request)) return 'Request not found.';
+      const bad = a.steps.find((step: { id: string; args: Record<string, unknown> }) => !SUGGESTION_STEPS.has(step.id) || (step.args as { clip?: unknown }).clip !== a.clip);
+      if (bad) return `A suggestion may only use ${[...SUGGESTION_STEPS].join(', ')} on its own shot (${bad.id}).`;
+      return (st.project.suggestions?.length ?? 0) >= REVIEW_LIMITS.suggestions ? 'Too many suggestions; keep or drop some first.' : null;
+    },
+    run: (d, a, x) => {
+      const suggestion = Suggestion.parse({ ...a, id: x.id(), status: 'pending' });
+      d.suggestions = [...(d.suggestions ?? []), suggestion];
+      const request = d.requests?.find((r) => r.id === a.request); if (request) request.status = 'answered';
+      return suggestion.id;
+    },
+  },
+  {
+    id: 'suggestion.mark', label: (a: { status?: string }) => a.status === 'kept' ? 'Keep suggestion' : 'Drop suggestion', group: 'Clip', journal: true, hostOnly: true,
+    args: z.object({ suggestion: clipId, status: z.enum(['kept', 'dropped']) }).strict(),
+    run: (d, a) => { const s = d.suggestions?.find((x) => x.id === a.suggestion); if (!s) throw new EditError('Suggestion not found.');
+      if (s.status !== 'pending') throw new EditError('This suggestion was already decided.'); s.status = a.status; },
+  },
+  {
+    id: 'suggestion.forget', label: 'Delete request', group: 'Clip', journal: true,
+    args: z.object({ request: clipId }).strict(),
+    run: (d, a) => { if (!d.requests?.some((r) => r.id === a.request)) throw new EditError('Request not found.'); d.requests = d.requests.filter((r) => r.id !== a.request); },
+  },
+  // A person's voice takes (FILM-D3). Recording carries audio, so adding, keeping and deleting is the Studio's
+  // (host-only); agents read the takes with project.inspect.
+  {
+    id: 'take.add', label: 'Voice take', group: 'Caption', journal: true, hostOnly: true,
+    args: VoiceTake.omit({ id: true, kept: true }).strict(),
+    enabled: (st, a) => !st.project.lines?.some((l) => l.id === a.line) ? 'Line not found.' : (st.project.takes?.length ?? 0) >= REVIEW_LIMITS.takes ? 'Too many takes; delete some first.' : null,
+    run: (d, a, x) => { const take = VoiceTake.parse({ ...a, id: x.id(), kept: false }); d.takes = [...(d.takes ?? []), take]; return take.id; },
+  },
+  {
+    id: 'take.keep', label: 'Keep take', group: 'Caption', journal: true, hostOnly: true,
+    args: z.object({ take: clipId }).strict(),
+    run: (d, a) => {
+      const take = d.takes?.find((t) => t.id === a.take); if (!take) throw new EditError('Take not found.');
+      for (const t of d.takes!) if (t.line === take.line && t.lang === take.lang) t.kept = t.id === take.id;
+      // The kept take becomes the voice of the line's cue in the next take, when the line is placed.
+      const line = d.lines?.find((l) => l.id === take.line), cue = line?.cue ? d.draft.find((c) => c.id === line.cue) : undefined;
+      if (cue) cue.audio = take.asset;
+    },
+  },
+  {
+    id: 'take.remove', label: 'Delete take', group: 'Caption', journal: true, hostOnly: true,
+    args: z.object({ take: clipId }).strict(),
+    run: (d, a) => { const take = d.takes?.find((t) => t.id === a.take); if (!take) throw new EditError('Take not found.');
+      d.takes = d.takes!.filter((t) => t.id !== a.take);
+      for (const cue of d.draft) if (cue.audio === take.asset) delete cue.audio; },
   },
   {
     // Film settings window (FILM-A2): any part; caption, titles and director merge field by field.

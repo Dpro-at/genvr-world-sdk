@@ -230,6 +230,24 @@ export const ShotLink = z.object({
 export type ShotLink = z.infer<typeof ShotLink>;
 export const SCENE_LIMITS = { scenes: 60, links: 200 } as const;
 
+/**
+ * AI suggests / by hand (FILM-D1, boards 17–19): the owner asks for a suggestion on a shot; an agent answers with
+ * editor steps; the steps change nothing until the owner keeps them. Only editing commands of the shot are allowed.
+ */
+export const SuggestionKind = z.enum(['transition', 'colour', 'effect']);
+export const SuggestionRequest = z.object({ id, kind: SuggestionKind, clip: id, prompt: z.string().min(1).max(300), status: z.enum(['open', 'answered']) }).strict();
+export type SuggestionRequest = z.infer<typeof SuggestionRequest>;
+export const Suggestion = z.object({
+  id, kind: SuggestionKind, clip: id, label: z.string().min(1).max(120), request: id.optional(),
+  steps: z.array(z.object({ id: z.string().min(1).max(60), args: z.record(z.string(), z.unknown()) }).strict()).min(1).max(20),
+  status: z.enum(['pending', 'kept', 'dropped']),
+}).strict();
+export type Suggestion = z.infer<typeof Suggestion>;
+/** A person's recorded voice for one line in one language (FILM-D3, board 23); the kept take is the line's voice. */
+export const VoiceTake = z.object({ id, line: id, lang: LanguageTag, asset: id, seconds: z.number().finite().min(0.1).max(60), kept: z.boolean(), by: z.string().max(80) }).strict();
+export type VoiceTake = z.infer<typeof VoiceTake>;
+export const REVIEW_LIMITS = { requests: 100, suggestions: 200, takes: 300 } as const;
+
 export const FilmProject = z.object({
   version: z.literal(2),
   rate: z.object({ num: z.number().int().positive(), den: z.number().int().positive() }).strict(),
@@ -255,6 +273,10 @@ export const FilmProject = z.object({
   /** Scenes (FILM-C1) and timed links between shots (FILM-C2). */
   scenes: z.array(Scene).max(SCENE_LIMITS.scenes).optional(),
   links: z.array(ShotLink).max(SCENE_LIMITS.links).optional(),
+  /** AI suggestions waiting for the owner (FILM-D1) and a person's voice takes (FILM-D3). */
+  requests: z.array(SuggestionRequest).max(REVIEW_LIMITS.requests).optional(),
+  suggestions: z.array(Suggestion).max(REVIEW_LIMITS.suggestions).optional(),
+  takes: z.array(VoiceTake).max(REVIEW_LIMITS.takes).optional(),
 }).strict();
 export type FilmProject = z.infer<typeof FilmProject>;
 
