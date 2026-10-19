@@ -60,12 +60,29 @@ function ViewDrawing({ view }: { view: ViewId }) {
   </span>;
 }
 
-export function AvatarLive({ controller, recipe, onStage, projectId, characters, voice, embedded = false, onShare, playerHost, worldViewport, worldStorage, currentProject, onWorldRendered, agent, conversation, activity, permissions }: {
+/** Page choices a host app can read back (for example to speak replies or size its frame). */
+export type AvatarLivePrefs = Prefs;
+/** What a host app (for example an agent app) supplies to an embedded Avatar Live, and how it hears the owner's choices. */
+export interface AvatarLiveHost {
+  /** Saved voices the agent may speak with; shown in Settings → Look & voice. */
+  voices?: readonly { id: string; name: string; language?: string | null }[];
+  voiceId?: string;
+  onVoice?: (voiceId: string) => void;
+  /** Called with the page choices on start and after every change. */
+  onPrefs?: (prefs: AvatarLivePrefs) => void;
+  /** Called when Settings opens or closes, so the host can give the frame room. */
+  onSettings?: (open: boolean) => void;
+  /** Bumped by the host to open Settings from its own button. */
+  settingsRequest?: number;
+}
+export function AvatarLive({ controller, recipe, onStage, projectId, characters, voice, embedded = false, onShare, playerHost, worldViewport, worldStorage, currentProject, onWorldRendered, agent, conversation, activity, permissions, host }: {
   controller: AvatarPresentation; recipe: CharacterRecipe; onStage: (stage: CharacterStage | null) => void; projectId: string;
   onWorldRendered?:(canvas:HTMLCanvasElement)=>void; worldStorage?: StudioStorage; currentProject?: ()=>StudioProject;
   characters?: ReactNode; voice?: ReactNode; embedded?: boolean; onShare?: () => void; playerHost?: (element:HTMLDivElement|null)=>void; worldViewport?: HTMLElement|null;
   /** Host app (for example an agent app) supplies the agent, its conversation, its live activity and its visitor permissions. */
   agent?: { name: string; detail?: string }; conversation?: ReactNode; activity?: ReactNode; permissions?: ReactNode;
+  /** Embedded hosts that pass this get the same Settings window as the full page. */
+  host?: AvatarLiveHost;
 }) {
   const { display } = useSyncExternalStore(controller.subscribe, controller.snapshot);
   const dialog=useRef<HTMLElement>(null);
@@ -80,6 +97,11 @@ export function AvatarLive({ controller, recipe, onStage, projectId, characters,
   const [prefs,setPrefsState]=useState<Prefs>(readPrefs);
   const setPrefs=(patch:Partial<Prefs>)=>setPrefsState(current=>{const next={...current,...patch};try{localStorage.setItem(PREFS_KEY,JSON.stringify(next));}catch{/* preferences stay for this session */}return next;});
   const player=useRef<HTMLDivElement|null>(null);
+  const hostRef=useRef(host);hostRef.current=host;
+  useEffect(()=>{hostRef.current?.onPrefs?.(prefs);},[prefs]);
+  useEffect(()=>{hostRef.current?.onSettings?.(settingsOpen);},[settingsOpen]);
+  useEffect(()=>{if(host?.settingsRequest)setSettingsOpen(true);},[host?.settingsRequest]);
+  useEffect(()=>{if(!embedded||!settingsOpen)return;const escape=(e:KeyboardEvent)=>{if(e.key==='Escape')setSettingsOpen(false);};window.addEventListener('keydown',escape);return()=>window.removeEventListener('keydown',escape);},[embedded,settingsOpen]);
   const current = useRef({ recipe, onStage, framing:display.framing, round:display.layout==='circle'||display.layout==='watch' }); current.current={recipe,onStage,framing:display.framing,round:display.layout==='circle'||display.layout==='watch'};
   const change = (patch: Record<string,unknown>) => setError(controller.execute({kind:'display',...patch})??'');
   const preset=AVATAR_LIVE_LAYOUTS.find(row=>row.id===display.layout)!;
@@ -128,41 +150,15 @@ export function AvatarLive({ controller, recipe, onStage, projectId, characters,
     {exploring?<div aria-hidden="true" className="pointer-events-none absolute inset-0 flex items-end justify-center"><svg viewBox="0 0 200 400" className="h-[88%] opacity-40"><g fill="#ffffff"><rect x="62" y="122" width="76" height="150" rx="30"/><rect x="34" y="132" width="26" height="110" rx="13"/><rect x="140" y="132" width="26" height="110" rx="13"/><rect x="70" y="262" width="26" height="118" rx="12"/><rect x="104" y="262" width="26" height="118" rx="12"/><circle cx="100" cy="72" r="44"/></g></svg><span className="absolute left-3 top-3 rounded-full bg-black/70 px-3 py-1 text-xs font-bold text-white">{VIEWS.find(v=>v.id===view)!.label} frame</span></div>:null}
     <div className="absolute right-0 top-0 h-full min-w-0" style={{width:'45%'}} aria-label="Live notifications"><PresentationViewport controller={controller} compact showEffects={prefs.effects} showNotifications={prefs.notifications} notificationFilter={allowedNotice}/></div>
   </div>;
-  if(embedded)return <section ref={dialog} role="region" aria-label="Avatar Live" className="relative min-h-0 flex-1 h-full w-full"><style>{`[data-avatar-live-frame] [aria-label="View directions"]{display:none}`}</style><div className="h-full w-full">{frame}</div><div ref={element=>{player.current=element;playerHost?.(element);}} className="shrink-0 empty:hidden"/></section>;
-  const talking=view==='chat'||view==='compact', side=prefs.sidePanel&&talking;
   const backgroundLabel=display.background==='world'?'My worlds':display.background==='color'?'Color':display.background==='transparent'?'Transparent':`${display.background.replace('_',' ')} (older option)`;
-  return <section ref={dialog} role="dialog" aria-modal="true" aria-label="Avatar Live" className="fixed inset-0 z-[100] flex flex-col bg-paper text-ink">
-    <style>{`[data-avatar-live-frame] [aria-label="View directions"]{display:none}`}</style>
-    <header className="flex min-h-14 shrink-0 flex-wrap items-center gap-3 border-b border-ink/15 bg-surface px-4 py-2">
-      <Monitor className="size-4"/><strong className="text-sm">Avatar Live</strong>
-      {agent?<span className="rounded-full border border-ink/15 px-3 py-1 text-xs font-bold">{agent.name}</span>:null}
-      <div role="group" aria-label="Who it talks to" className="flex gap-1 rounded-xl border border-ink/15 p-1">{([['me','For me'],['customers','For my customers']] as const).map(([id,label])=><button key={id} aria-pressed={prefs.mode===id} className={pill(prefs.mode===id)} onClick={()=>setPrefs({mode:id})}>{label}</button>)}</div>
-      <span className="flex-1"/>
-      <button onClick={()=>setSettingsOpen(true)} aria-haspopup="dialog" className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-ink/15 px-3 text-xs font-bold"><Settings className="size-4"/>Settings</button>
-      {onShare?<button onClick={onShare} className="inline-flex min-h-10 items-center gap-2 rounded-lg bg-ink px-4 text-xs font-bold text-on-brand"><Share2 className="size-4"/>Share</button>:null}
-      <button aria-label="Close Avatar Live" onClick={()=>change({open:false})} className="rounded p-2"><X className="size-4"/></button>
-    </header>
-    <div className="flex min-h-0 flex-1 flex-col md:flex-row">
-      <main className="flex min-h-0 min-w-0 flex-1 flex-col items-center gap-4 overflow-auto bg-ink/5 p-4">
-        {exploring?<div className="w-full max-w-4xl rounded-xl border border-ink/15 bg-surface p-3 text-xs"><strong className="flex items-center gap-2 text-sm"><MapPin className="size-4"/>Choosing the background spot</strong><p className="mt-1 text-ink/70">Walk to the view you want behind your agent: <b>W A S D</b> or arrows to walk, drag to look, scroll for closer or farther. The dashed frame shows what will be behind your agent. Your world is not changed.</p></div>:null}
-        {frame}
-        {exploring?<div ref={setSpotHost} className="w-full max-w-4xl" aria-label="Spot controls"/>:null}
-        {!exploring&&talking?<div aria-label="Conversation" className="w-full max-w-3xl">{conversation??<p className="rounded-xl border border-dashed border-ink/20 p-4 text-center text-xs text-ink/60"><MessageSquare className="mx-auto mb-2 size-5"/>Connect an agent app to talk here. The agent answers with this face and voice.</p>}</div>:null}
-      </main>
-      {side&&!exploring?<aside className="w-full shrink-0 overflow-auto border-l border-ink/15 p-4 md:w-80">
-        {prefs.mode==='me'?<><h2 className="mb-3 flex items-center gap-2 text-sm font-bold"><Activity className="size-4"/>What it's doing</h2>{activity??<p className="text-xs text-ink/60">Your agent's live work and approvals appear here when an agent app is connected.</p>}</>
-        :<><h2 className="mb-2 text-sm font-bold">For your customers</h2><p className="mb-3 text-xs text-ink/70">Put this agent on your website. Visitors talk to it; it answers with its own voice and face.</p>{permissions??<p className="rounded-lg border border-ink/15 p-3 text-xs text-ink/60">What it may do for visitors is set by your agent app.</p>}{onShare?<button onClick={onShare} className="mt-3 inline-flex min-h-10 items-center gap-2 rounded-lg bg-ink px-4 text-xs font-bold text-on-brand"><Share2 className="size-4"/>Get the link or website code</button>:null}</>}
-      </aside>:null}
-    </div>
-    <div ref={element=>{player.current=element;playerHost?.(element);}} className="shrink-0 border-t border-ink/10 bg-surface p-3 empty:hidden"/>{error?<p role="alert" className="bg-coral px-3 py-2 text-xs text-white">{error}</p>:null}
-    {settingsOpen?<div className="absolute inset-0 z-10 flex items-start justify-center bg-black/60 p-4 pt-16" onClick={event=>{if(event.target===event.currentTarget)setSettingsOpen(false);}}>
+  const settingsDialog=settingsOpen?<div className="absolute inset-0 z-10 flex items-start justify-center bg-black/60 p-4 pt-16" onClick={event=>{if(event.target===event.currentTarget)setSettingsOpen(false);}}>
       <section role="dialog" aria-modal="true" aria-label="Avatar Live settings" className="flex max-h-[85vh] w-full max-w-3xl flex-col overflow-hidden rounded-2xl border border-ink/15 bg-surface shadow-2xl">
         <header className="flex items-center justify-between border-b border-ink/10 px-5 py-3"><h2 className="text-base font-bold">Settings</h2><button aria-label="Close settings" onClick={()=>setSettingsOpen(false)} className="rounded-lg p-2 hover:bg-ink/10"><X className="size-4"/></button></header>
         <div className="flex min-h-0 flex-1 flex-col md:flex-row">
           <nav aria-label="Settings sections" className="flex shrink-0 gap-1 overflow-auto border-b border-ink/10 p-2 md:w-52 md:flex-col md:border-b-0 md:border-r">{SECTIONS.map(({id,label,Icon})=><button key={id} aria-pressed={section===id} onClick={()=>setSection(id)} className={`flex min-h-10 shrink-0 items-center gap-2 rounded-lg px-3 text-left text-xs font-bold ${section===id?'bg-ink text-on-brand':'hover:bg-ink/5'}`}><Icon className="size-4 shrink-0"/>{label}</button>)}</nav>
           <div className="min-w-0 flex-1 space-y-4 overflow-auto p-5">
             {section==='agent'?<div className="space-y-3">{agent?<div className="rounded-xl border border-ink/15 p-4"><span className="block text-xs text-ink/60">Linked agent</span><strong className="block text-base">{agent.name}</strong>{agent.detail?<span className="text-xs text-ink/70">{agent.detail}</span>:null}</div>:<p className="rounded-xl border border-ink/15 p-4 text-xs text-ink/70">No agent app is connected. This Studio shows the avatar on its own; an agent app (for example Dpro) links its agent, conversation and activity here.</p>}<p className="text-xs text-ink/60">The agent's memory, tools and permissions stay in its app. This page only gives it a face and a voice.</p></div>:null}
-            {section==='look'?<div className="space-y-4"><div><h3 className="mb-2 text-xs font-bold">Character</h3>{characters}</div><div><h3 className="mb-2 text-xs font-bold">Voice</h3>{voice}{faceSupported===false?<p className="mt-2 text-xs text-ink/60">This character has no face controls: the voice plays, but the mouth cannot move.</p>:null}</div></div>:null}
+            {section==='look'?<div className="space-y-4"><div><h3 className="mb-2 text-xs font-bold">Character</h3>{characters??<p className="text-xs text-ink/60">The agent's character is chosen in its app.</p>}</div><div><h3 className="mb-2 text-xs font-bold">Voice</h3>{voice??(host?.voices?<label className="block text-xs font-bold">Voice for {agent?.name??'the agent'}<select aria-label="Agent voice" className="mt-1 w-full rounded-lg border border-ink/20 bg-paper p-2 text-sm" value={host.voiceId??''} onChange={e=>host.onVoice?.(e.target.value)}><option value="">No voice</option>{host.voices.map(v=><option key={v.id} value={v.id}>{v.name}{v.language?` · ${v.language}`:''}</option>)}</select><span className="mt-1 block font-normal text-ink/60">Saved voices from your voice library. Speech is made on this device.</span></label>:null)}{faceSupported===false?<p className="mt-2 text-xs text-ink/60">This character has no face controls: the voice plays, but the mouth cannot move.</p>:null}</div></div>:null}
             {section==='background'?<div className="space-y-4">
               <p className="text-xs text-ink/70">Now: <b>{backgroundLabel}</b></p>
               <div className="grid grid-cols-3 gap-2">{([['world','My worlds'],['color','Color'],['transparent','Transparent']] as const).map(([id,label])=><button key={id} aria-pressed={display.background===id} disabled={id==='world'&&!worldStorage&&!worldViewport} className={`${tile(display.background===id)} disabled:opacity-40`} onClick={()=>change({background:id})}>{label}</button>)}</div>
@@ -188,6 +184,33 @@ export function AvatarLive({ controller, recipe, onStage, projectId, characters,
         </div>
         <footer className="flex justify-end border-t border-ink/10 px-5 py-3"><button onClick={()=>setSettingsOpen(false)} className="min-h-10 rounded-lg bg-ink px-5 text-xs font-bold text-on-brand">Done</button></footer>
       </section>
-    </div>:null}
+    </div>:null;
+  if(embedded)return <section ref={dialog} role="region" aria-label="Avatar Live" className="relative min-h-0 flex-1 h-full w-full"><style>{`[data-avatar-live-frame] [aria-label="View directions"]{display:none}`}</style><div className="h-full w-full">{frame}</div><div ref={element=>{player.current=element;playerHost?.(element);}} className="shrink-0 empty:hidden"/>{host?<button onClick={()=>setSettingsOpen(true)} aria-haspopup="dialog" aria-label="Avatar Live settings" className="absolute left-2 top-2 z-[5] inline-flex min-h-9 items-center gap-2 rounded-lg bg-black/60 px-3 text-xs font-bold text-white hover:bg-black/80"><Settings className="size-4"/>Settings</button>:null}{error&&host?<p role="alert" className="absolute inset-x-0 top-0 bg-coral px-3 py-2 text-xs text-white">{error}</p>:null}{host?settingsDialog:null}</section>;
+  const talking=view==='chat'||view==='compact', side=prefs.sidePanel&&talking;
+  return <section ref={dialog} role="dialog" aria-modal="true" aria-label="Avatar Live" className="fixed inset-0 z-[100] flex flex-col bg-paper text-ink">
+    <style>{`[data-avatar-live-frame] [aria-label="View directions"]{display:none}`}</style>
+    <header className="flex min-h-14 shrink-0 flex-wrap items-center gap-3 border-b border-ink/15 bg-surface px-4 py-2">
+      <Monitor className="size-4"/><strong className="text-sm">Avatar Live</strong>
+      {agent?<span className="rounded-full border border-ink/15 px-3 py-1 text-xs font-bold">{agent.name}</span>:null}
+      <div role="group" aria-label="Who it talks to" className="flex gap-1 rounded-xl border border-ink/15 p-1">{([['me','For me'],['customers','For my customers']] as const).map(([id,label])=><button key={id} aria-pressed={prefs.mode===id} className={pill(prefs.mode===id)} onClick={()=>setPrefs({mode:id})}>{label}</button>)}</div>
+      <span className="flex-1"/>
+      <button onClick={()=>setSettingsOpen(true)} aria-haspopup="dialog" className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-ink/15 px-3 text-xs font-bold"><Settings className="size-4"/>Settings</button>
+      {onShare?<button onClick={onShare} className="inline-flex min-h-10 items-center gap-2 rounded-lg bg-ink px-4 text-xs font-bold text-on-brand"><Share2 className="size-4"/>Share</button>:null}
+      <button aria-label="Close Avatar Live" onClick={()=>change({open:false})} className="rounded p-2"><X className="size-4"/></button>
+    </header>
+    <div className="flex min-h-0 flex-1 flex-col md:flex-row">
+      <main className="flex min-h-0 min-w-0 flex-1 flex-col items-center gap-4 overflow-auto bg-ink/5 p-4">
+        {exploring?<div className="w-full max-w-4xl rounded-xl border border-ink/15 bg-surface p-3 text-xs"><strong className="flex items-center gap-2 text-sm"><MapPin className="size-4"/>Choosing the background spot</strong><p className="mt-1 text-ink/70">Walk to the view you want behind your agent: <b>W A S D</b> or arrows to walk, drag to look, scroll for closer or farther. The dashed frame shows what will be behind your agent. Your world is not changed.</p></div>:null}
+        {frame}
+        {exploring?<div ref={setSpotHost} className="w-full max-w-4xl" aria-label="Spot controls"/>:null}
+        {!exploring&&talking?<div aria-label="Conversation" className="w-full max-w-3xl">{conversation??<p className="rounded-xl border border-dashed border-ink/20 p-4 text-center text-xs text-ink/60"><MessageSquare className="mx-auto mb-2 size-5"/>Connect an agent app to talk here. The agent answers with this face and voice.</p>}</div>:null}
+      </main>
+      {side&&!exploring?<aside className="w-full shrink-0 overflow-auto border-l border-ink/15 p-4 md:w-80">
+        {prefs.mode==='me'?<><h2 className="mb-3 flex items-center gap-2 text-sm font-bold"><Activity className="size-4"/>What it's doing</h2>{activity??<p className="text-xs text-ink/60">Your agent's live work and approvals appear here when an agent app is connected.</p>}</>
+        :<><h2 className="mb-2 text-sm font-bold">For your customers</h2><p className="mb-3 text-xs text-ink/70">Put this agent on your website. Visitors talk to it; it answers with its own voice and face.</p>{permissions??<p className="rounded-lg border border-ink/15 p-3 text-xs text-ink/60">What it may do for visitors is set by your agent app.</p>}{onShare?<button onClick={onShare} className="mt-3 inline-flex min-h-10 items-center gap-2 rounded-lg bg-ink px-4 text-xs font-bold text-on-brand"><Share2 className="size-4"/>Get the link or website code</button>:null}</>}
+      </aside>:null}
+    </div>
+    <div ref={element=>{player.current=element;playerHost?.(element);}} className="shrink-0 border-t border-ink/10 bg-surface p-3 empty:hidden"/>{error?<p role="alert" className="bg-coral px-3 py-2 text-xs text-white">{error}</p>:null}
+    {settingsDialog}
   </section>;
 }

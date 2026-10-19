@@ -16,5 +16,9 @@ export declare function mountAvatarPresentation(container: HTMLElement, runtime:
 
 export { AVATAR_LIVE_LAYOUTS, avatarLiveEmbed } from './types/avatar-live-embed.js';
 
-export interface AvatarLiveOptions extends AvatarPresentationOptions { recipe?: import('@genvr/contracts').CharacterRecipe; display?: Partial<import('@genvr/assistant').AvatarLiveDisplay>; projectId?: string; }
-export declare function mountAvatarLive(container: HTMLElement, options?: AvatarLiveOptions): { execute: AvatarPresentation['execute']; controller: AvatarPresentation; setRecipe(recipe: import('@genvr/contracts').CharacterRecipe): void; speak(input: {data:string;target:string;duration:number;text?:string}): Promise<void>; speechControl(command:string,value?:number): Promise<unknown>; snapshot(): unknown; dispose():void; };
+/** Choices the owner makes in Avatar Live Settings, reported to the host. */
+export interface AvatarLivePrefs { size: 's' | 'm' | 'l'; speak: boolean; notifications: boolean; effects: boolean; sidePanel: boolean; notice: Record<'approvals' | 'tasks' | 'messages' | 'calendar' | 'other', boolean>; mode: 'me' | 'customers'; }
+/** Host hooks for an embedded Avatar Live: with them it shows the same Settings window as the Avatar Live page. */
+export interface AvatarLiveHost { voices?: readonly { id: string; name: string; language?: string | null }[]; voiceId?: string; onVoice?(voiceId: string): void; onPrefs?(prefs: AvatarLivePrefs): void; onSettings?(open: boolean): void; }
+export interface AvatarLiveOptions extends AvatarPresentationOptions { recipe?: import('@genvr/contracts').CharacterRecipe; display?: Partial<import('@genvr/assistant').AvatarLiveDisplay>; projectId?: string; agent?: { name: string; detail?: string }; host?: AvatarLiveHost; }
+export declare function mountAvatarLive(container: HTMLElement, options?: AvatarLiveOptions): { execute: AvatarPresentation['execute']; controller: AvatarPresentation; setRecipe(recipe: import('@genvr/contracts').CharacterRecipe): void; setHost(next: { agent?: { name: string; detail?: string }; host?: Partial<AvatarLiveHost> }): void; openSettings(): void; speak(input: {data:string;target:string;duration:number;text?:string}): Promise<void>; speechControl(command:string,value?:number): Promise<unknown>; snapshot(): unknown; dispose():void; };

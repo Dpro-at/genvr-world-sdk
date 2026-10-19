@@ -1,6 +1,6 @@
 import { ShareDialog } from './share-dialog';
 import type { StudioSharing } from '../src/studio-sharing';
-import { AvatarLive, AVATAR_LIVE_LAYOUTS, avatarLiveEmbed } from './presentation/avatar-live';
+import { AvatarLive, AVATAR_LIVE_LAYOUTS, avatarLiveEmbed, type AvatarLiveHost } from './presentation/avatar-live';
 import { QuickVoice } from '../../../apps/web/components/studio/film/quick-voice';
 import { BodySection } from '../../../apps/web/components/studio/character-editor/character-controls';
 import type { CharacterEditor } from '../../../apps/web/components/studio/character-editor/use-character-editor';
@@ -437,15 +437,24 @@ function LiveCharacters({editor}:{editor:CharacterEditor|null}){
  return <><BodySection editor={editor}/>{host.userAvatarControls?.('characters','',body=>editor.change(recipe=>({...recipe,body})))}</>;
 }
 
-export interface AvatarLiveOptions extends AvatarPresentationOptions { recipe?: import('@genvr/contracts').CharacterRecipe; display?: Partial<import('@genvr/assistant').AvatarLiveDisplay>; projectId?: string; }
+export interface AvatarLiveOptions extends AvatarPresentationOptions { recipe?: import('@genvr/contracts').CharacterRecipe; display?: Partial<import('@genvr/assistant').AvatarLiveDisplay>; projectId?: string;
+ /** The agent this face belongs to (shown in Settings → Agent). */
+ agent?: { name: string; detail?: string };
+ /** Host hooks: when given, the embedded avatar shows the same Settings window as the Avatar Live page. */
+ host?: Omit<AvatarLiveHost,'settingsRequest'>;
+}
 /** Mount an independent direct avatar viewer, without loading the world editor. */
 export function mountAvatarLive(container: HTMLElement, options: AvatarLiveOptions = {}) {
- let stage: CharacterStage|null=null, speech:AvatarSpeechPlayback|null=null, recipe=options.recipe??DEFAULT_CHARACTER_RECIPE;
+ let stage: CharacterStage|null=null, speech:AvatarSpeechPlayback|null=null, recipe=options.recipe??DEFAULT_CHARACTER_RECIPE, agent=options.agent, host:AvatarLiveHost|undefined=options.host?{...options.host}:undefined, settingsRequest=0;
  const controller=new AvatarPresentation(()=>stage?{presentAnimation:(target,id)=>target==='self'&&(stage?.presentAnimation(id)??false),presentExpression:(target,expression)=>target==='self'&&(stage?.presentExpression(expression)??false),importAvatarMotion:async(target,id,data)=>target==='self'&&Boolean(await stage?.importAvatarMotion(id,data))}:null,options);
  controller.execute({kind:'display',...options.display,open:true});
  const root=createRoot(container);
- const draw=()=>root.render(<><AvatarLive controller={controller} recipe={recipe} onStage={value=>{stage=value;}} projectId={options.projectId??'avatar'} embedded/><AvatarSpeechPlayer register={value=>{speech=value;}} mouth={(_target,shape)=>stage?.setMouth(shape)} recording={()=>{}}/></>);
+ const draw=()=>root.render(<><AvatarLive controller={controller} recipe={recipe} onStage={value=>{stage=value;}} projectId={options.projectId??'avatar'} embedded agent={agent} host={host?{...host,settingsRequest}:undefined}/><AvatarSpeechPlayer register={value=>{speech=value;}} mouth={(_target,shape)=>stage?.setMouth(shape)} recording={()=>{}}/></>);
  draw();const unsubscribe=options.subscribe?.(options.projectId??'',controller.execute);
- return {execute:controller.execute,controller,setRecipe(next:import('@genvr/contracts').CharacterRecipe){recipe=next;draw();},speak(input:Parameters<AvatarSpeechPlayback['load']>[0]){if(!speech)throw new Error('Avatar speech player is loading.');return speech.load(input);},speechControl(command:string,value?:number){if(!speech)throw new Error('Avatar speech player is loading.');return speech.control(command,value);},snapshot:()=>({display:controller.snapshot().display,avatar:stage?.info,speech:speech?.snapshot()}),dispose(){unsubscribe?.();root.unmount();controller.dispose();}};
+ return {execute:controller.execute,controller,setRecipe(next:import('@genvr/contracts').CharacterRecipe){recipe=next;draw();},
+  /** Update the agent or the host hooks (for example a new voice list or the chosen voice). */
+  setHost(next:{agent?:{name:string;detail?:string};host?:Partial<Omit<AvatarLiveHost,'settingsRequest'>>}){if(next.agent)agent=next.agent;if(next.host)host={...host,...next.host};draw();},
+  /** Open the Settings window (needs `host`). */
+  openSettings(){if(!host)throw new Error('Settings need the host option.');settingsRequest++;draw();},speak(input:Parameters<AvatarSpeechPlayback['load']>[0]){if(!speech)throw new Error('Avatar speech player is loading.');return speech.load(input);},speechControl(command:string,value?:number){if(!speech)throw new Error('Avatar speech player is loading.');return speech.control(command,value);},snapshot:()=>({display:controller.snapshot().display,avatar:stage?.info,speech:speech?.snapshot()}),dispose(){unsubscribe?.();root.unmount();controller.dispose();}};
 }
 export { AVATAR_LIVE_LAYOUTS, avatarLiveEmbed } from '../src/avatar-live-embed';
