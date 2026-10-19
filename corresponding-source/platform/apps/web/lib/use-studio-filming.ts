@@ -356,7 +356,8 @@ export function useStudioFilming(place: string, runtime: RefObject<GenvrRuntime 
     if (!s.ready || !identity) throw new Error('Wait for the local video project to load.');
     const fresh = () => { if (signal.aborted || current !== epoch.current || identity !== latestStudio.current.identity) throw new Error('Studio operation cancelled.'); };
     const project = s.snapshot().project;
-    const must = (id: string, args: unknown = {}) => { const r = s.film.run(id, args); if (!r.ok) throw new Error(r.reason); return r.result; };
+    // Changes made through MCP show in History as the agent's (board 24).
+    const must = (id: string, args: unknown = {}) => { const r = s.film.withAuthor('agent', () => s.film.run(id, args)); if (!r.ok) throw new Error(r.reason); return r.result; };
     const reply = (extra: Record<string, unknown> = {}) => {
       const now = latestStudio.current, undo = now.film.history.undoLabel, redo = now.film.history.redoLabel;
       return new Blob([JSON.stringify(FilmStudioResult.parse({ film: describeFilm(now.film.project), ...extra,
@@ -431,7 +432,7 @@ export function useStudioFilming(place: string, runtime: RefObject<GenvrRuntime 
           : await fitMusicSteps(snap.project, snap.assets, operation.clip ?? s.selected ?? '');
         fresh();
         if (!steps.length) throw new Error('No imported sound to measure.');
-        const result = s.film.batch(steps, { label: operation.action === 'match_loudness' ? 'Match loudness' : 'Fit music' });
+        const result = s.film.withAuthor('agent', () => s.film.batch(steps, { label: operation.action === 'match_loudness' ? 'Match loudness' : 'Fit music' }));
         if (!result.ok) throw new Error(result.failed.reason);
         return reply({ result: result.results });
       }
@@ -439,7 +440,7 @@ export function useStudioFilming(place: string, runtime: RefObject<GenvrRuntime 
         const snap = s.snapshot();
         const made = await buildSubtitles(snap.project, snap.assets, { spoken: operation.spoken ?? null, languages: operation.languages }, report, signal);
         fresh();
-        const result = s.film.batch(made.map((one, i) => ({ id: 'subtitles.set', args: { ...one, show: i === 0 } })), { label: 'Make subtitles' });
+        const result = s.film.withAuthor('agent', () => s.film.batch(made.map((one, i) => ({ id: 'subtitles.set', args: { ...one, show: i === 0 } })), { label: 'Make subtitles' }));
         if (!result.ok) throw new Error(result.failed.reason);
         const voiced: string[] = [];
         if (operation.voice) for (const one of made) if (VOICES[one.lang] && one.lines.length) {
@@ -475,7 +476,7 @@ export function useStudioFilming(place: string, runtime: RefObject<GenvrRuntime 
       case 'batch': {
         const blocked = operation.steps.find((step) => isHostOnly(step.id));
         if (blocked) throw new Error(`${blocked.id} runs only inside the Studio.`);
-        const result = s.film.batch(operation.steps.map((step) => ({ ...step, args: byAgent(step.id, step.args) })), { atomic: operation.atomic, ...(operation.label ? { label: operation.label } : {}) });
+        const result = s.film.withAuthor('agent', () => s.film.batch(operation.steps.map((step) => ({ ...step, args: byAgent(step.id, step.args) })), { atomic: operation.atomic, ...(operation.label ? { label: operation.label } : {}) }));
         return reply({ result: result.results, ...(result.ok ? {} : { failed: result.failed }) });
       }
       case 'frame': {
@@ -495,7 +496,7 @@ export function useStudioFilming(place: string, runtime: RefObject<GenvrRuntime 
         const steps = [...(Math.abs(byStart) > 1e-6 ? [{ id: 'clip.trim', args: { clip: clip.id, edge: 'start', by: byStart, ripple: true } }] : []),
           ...(Math.abs(byEnd) > 1e-6 ? [{ id: 'clip.trim', args: { clip: clip.id, edge: 'end', by: byEnd, ripple: true } }] : [])];
         if (!steps.length) throw new Error('Nothing to trim.');
-        const result = s.film.batch(steps, { label: 'Trim' });
+        const result = s.film.withAuthor('agent', () => s.film.batch(steps, { label: 'Trim' }));
         if (!result.ok) throw new Error(result.failed.reason);
         return reply();
       }

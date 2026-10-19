@@ -790,11 +790,15 @@ export class FilmSession {
     return args.success ? spec.label(args.data) : spec.id;
   }
 
+  /** Who the next changes are recorded for in History (default the person at the Studio). */
+  private author = 'you';
+  /** Runs `work` with changes recorded as made by `by` (e.g. 'agent' for MCP). */
+  withAuthor<T>(by: string, work: () => T): T { const before = this.author; this.author = by; try { return work(); } finally { this.author = before; } }
   run(id: string, rawArgs: unknown = {}): RunResult {
     try {
       const { state, result, label } = this.apply(this.state, id, rawArgs);
       if (id === 'edit.undo' || id === 'edit.redo' || id === 'history.goto') { this.changed(this); return { ok: true, result: label }; }
-      if (state.project !== this.state.project) this.history.record({ label, before: this.state.project, after: state.project });
+      if (state.project !== this.state.project) this.history.record({ label, before: this.state.project, after: state.project, by: this.author, at: Date.now() });
       this.state = state; this.changed(this);
       return { ok: true, result };
     } catch (error) { return { ok: false, reason: reasonOf(error) }; }
@@ -808,7 +812,7 @@ export class FilmSession {
     const atomic = options.atomic ?? true, start = this.state, results: unknown[] = [];
     let state = this.state, kept = 0;
     const finish = (to: FilmState) => {
-      if (to.project !== start.project) this.history.record({ label: options.label ?? `Batch: ${kept} edits`, before: start.project, after: to.project });
+      if (to.project !== start.project) this.history.record({ label: options.label ?? `Batch: ${kept} edits`, before: start.project, after: to.project, by: this.author, at: Date.now() });
       this.state = to; this.changed(this);
     };
     for (const [index, step] of steps.entries()) {

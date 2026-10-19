@@ -1,7 +1,8 @@
 import type { FilmProject } from './model.js';
 
 export const HISTORY_STEPS = 200;
-export interface HistoryStep { label: string; before: FilmProject; after: FilmProject }
+/** One undo step; `by` says who made it (the person, or an agent through MCP) and `at` when (FILM history board 24). */
+export interface HistoryStep { label: string; before: FilmProject; after: FilmProject; by?: string; at?: number }
 
 /** Labelled undo and redo. Edits never change a project in place, so steps share nothing that changes later. */
 export class History {

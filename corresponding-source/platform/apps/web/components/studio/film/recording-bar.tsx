@@ -6,6 +6,7 @@ import type { StudioFilming } from '../../../lib/use-studio-filming';
 import { SUBTITLE_LANGUAGES } from '../../../lib/video-studio/subtitles';
 import { ToolbarMenu } from '../toolbar-menu';
 import { record } from './record';
+import { DragNumber } from './drag-number';
 
 const icon = 'inline-flex size-8 items-center justify-center rounded-md hover:bg-ink/10 disabled:opacity-35';
 const MOVE_LABEL: Record<string, string> = { static: 'Static', handheld: 'Handheld', running: 'Running', drone: 'Drone', follow: 'Follow', side: 'Side', orbit: 'Orbit' };
@@ -55,12 +56,10 @@ export function RecordingBar({ filming }: { filming: StudioFilming }) {
       className={`${icon} ${live ? 'bg-red-600 text-white' : 'text-red-500'}`} onClick={(event) => { event.currentTarget.blur(); if (!live) startLive(); }}><CircleDot className="size-4" /></button>
     <button type="button" aria-label="Stop" disabled={!live} title="Stop (Space)" className={`${icon} ${live ? 'text-red-500 ring-1 ring-red-500/60' : ''}`} onClick={stop}><Square className="size-3.5 fill-current" /></button>
     <button type="button" aria-label="Photo" disabled={blocked || live} title="Photo (P)" className={icon} onClick={photo}><Camera className="size-4" /></button>
-    <label className={`ml-1 inline-flex items-center gap-1 rounded-md border px-2 py-1 font-mono text-xs ${live ? 'border-red-500/60 text-red-500' : 'border-ink/10'}`} title="Take length in seconds">
-      {live ? <span className="size-1.5 rounded-full bg-red-500" /> : null}
-      {`00:${String(Math.floor(elapsed)).padStart(2, '0')}`} /
-      <input aria-label="Take length (seconds)" type="number" min={1} max={30} value={limit} disabled={live || filming.busy}
-        className="w-9 bg-transparent text-right outline-none" onChange={(e) => { const v = Math.round(Number(e.target.value)); if (v >= 1 && v <= 30) filming.setOutput({ ...filming.output, seconds: v }); }} />s
-    </label>
+    <span className={`ml-1 inline-flex items-center gap-1.5 font-mono text-xs ${live ? 'text-red-500' : ''}`} title="Time recorded / take length">
+      {live ? <span className="size-1.5 rounded-full bg-red-500" /> : null}{`00:${String(Math.floor(elapsed)).padStart(2, '0')}`} /
+      <DragNumber label="Take" value={limit} min={1} max={30} step={1} unit="s" width="w-24" disabled={live || filming.busy} commit={(v) => filming.setOutput({ ...filming.output, seconds: v })} />
+    </span>
     <span className="mx-1 h-5 w-px bg-ink/15" />
     <ToolbarMenu label={shown ? shown.toUpperCase() : 'Language'} icon={Globe} closeOnAction>
       <p className="text-xs font-semibold">Watch, record and edit in</p>

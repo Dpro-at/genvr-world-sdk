@@ -6,6 +6,7 @@ import { BookOpen, Bot, Captions, Clapperboard, Film, Info, Languages, Lock, Mic
 import { filmSettings, languageStatus, type FilmSettings as Settings } from '@genvr/film';
 import type { StudioFilming } from '../../../lib/use-studio-filming';
 import { SUBTITLE_LANGUAGES } from '../../../lib/video-studio/subtitles';
+import { DragNumber } from './drag-number';
 
 const button = 'inline-flex items-center justify-center gap-1.5 rounded-md border border-ink/10 bg-paper px-2.5 py-1.5 text-xs font-semibold hover:bg-ink/10 disabled:opacity-35';
 const input = 'mt-1 w-full rounded-md border border-ink/10 bg-paper px-2 py-1.5 text-xs';
@@ -136,9 +137,8 @@ export function FilmSettings({ filming, close }: { filming: StudioFilming; close
             onClick={() => { filming.setOutput({ ...filming.output, size: v }); studio.run('project.size', { width: w, height: h }); }}>
             <span className="rounded-sm border border-ink/40" style={{ width: w > h ? 34 : 18, height: w > h ? 19 : 32 }} /><b>{name}</b><span className="text-ink/50">{px}</span></button>; })}
       </div>
-      <label className="block text-xs text-ink/60"><span className="flex items-center gap-1.5">New shot length (seconds)<Help text="How long a new shot records; a shot can be up to 30 seconds." /></span>
-        <input aria-label="New shot length" type="number" min={1} max={30} className={input} value={s.shotSeconds} disabled={disabled}
-          onChange={(e) => { const v = Math.round(Number(e.target.value)); if (v >= 1 && v <= 30) set({ shotSeconds: v }); }} /></label>
+      <div className="flex items-center gap-2 text-xs text-ink/60"><DragNumber label="New shot" value={s.shotSeconds} min={1} max={30} step={1} unit="s" width="w-36" disabled={disabled} commit={(shotSeconds) => set({ shotSeconds })} />
+        <Help text="How long a new shot records; a shot can be up to 30 seconds." /></div>
     </div>,
     sound: <div className="divide-y divide-ink/10">
       <Switch id="film.record.sound" label="Record the world's sound" help="Rain, wind, steps and other sounds of the world go into each take." checked={s.worldSound} disabled={disabled} onChange={(worldSound) => set({ worldSound })} />

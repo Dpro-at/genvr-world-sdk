@@ -7,10 +7,11 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { FilmCamera } from '@genvr/contracts';
 import { FILM_PRESETS } from '@genvr/runtime';
 import type { StudioFilming } from '../../lib/use-studio-filming';
-import { HistoryPanel, ShotsPanel } from './film/panels';
+import { ShotsPanel } from './film/panels';
 import { QuickVoice } from './film/quick-voice';
 import { CastList } from './film/cast-panel';
 import { ScenesList } from './film/scenes-panel';
+import { HistoryTab } from './film/history-tab';
 import { Anchor, Camera, Clapperboard, Clock, Crosshair, Drone, Film, Focus, Footprints, FolderOpen, Hand, Info, Mic, MoveHorizontal, Orbit, Save, SlidersHorizontal, UserRound, Users, Video, type LucideIcon } from 'lucide-react';
 
 const ICON = 'inline-flex size-8 items-center justify-center rounded-md hover:bg-ink/10 disabled:opacity-40 aria-pressed:bg-ink/15 aria-pressed:ring-1 aria-pressed:ring-ink/30';
@@ -65,7 +66,7 @@ export function FilmingPanel({ filming }: { filming: StudioFilming }) {
       </div> : null}
       {tab === 'scenes' ? <ScenesList filming={filming} /> : null}
       {tab === 'shots' ? <div className="pt-1"><ShotsPanel filming={filming} /></div> : null}
-      {tab === 'history' ? <div className="pt-1"><HistoryPanel filming={filming} /></div> : null}
+      {tab === 'history' ? <div className="pt-1"><HistoryTab filming={filming} /></div> : null}
     </div>
   </div>;
 }

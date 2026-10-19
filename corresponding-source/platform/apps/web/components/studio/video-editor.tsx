@@ -18,10 +18,17 @@ import { FilmSettings } from './film/film-settings';
 import { record } from './film/record';
 import { AddMenu, ExportMenu } from './film/add-menu';
 import { SuggestBlock } from './film/suggest-block';
+import { DragNumber } from './film/drag-number';
+import { CaptionsTable } from './film/captions-table';
+import { FilmOverview } from './film/film-overview';
+import { LiveTakePanel } from './film/live-take-panel';
 import { CastInspector } from './film/cast-panel';
 import { useCastSelection } from './film/cast-selection';
 import { SceneInspector } from './film/scenes-panel';
-import { useSceneSelection, useWorkflowOpen, useWorkflowShot } from '../../lib/video-studio/scene-selection';
+import { sceneSelection, useChosenCue, useChosenLink, useSceneSelection, useWorkflowOpen, useWorkflowShot } from '../../lib/video-studio/scene-selection';
+import { LinePanel } from './film/line-panel';
+import { LinkPanel } from './film/link-panel';
+import { SoundClipPanel } from './film/sound-clip-panel';
 import { WorkflowShotInspector } from './film/workflow-view';
 import { useStudioHost } from '../../lib/studio-host';
 import { SceneVoice } from './film/scene-voice';
@@ -451,21 +458,39 @@ export function VideoSceneInspector({ filming }: { filming: StudioFilming }) {
   const chosenScene = useSceneSelection(), sceneOpen = !castOpen && Boolean(chosenScene && filming.studio.project.scenes?.some((x) => x.id === chosenScene));
   const flowShot = useWorkflowShot(), flowOpen = useWorkflowOpen() && !castOpen && !sceneOpen && Boolean(flowShot && filming.studio.project.media.some((m) => m.id === flowShot));
   const shotChosen = filming.studio.project.tracks.some((t) => t.kind === 'picture' && t.clips.some((c) => c.id === filming.studio.selected && c.type === 'media'));
-  const head = castOpen ? { title: 'Character', icon: Users } : sceneOpen ? { title: 'Scene sheet', icon: Clapperboard } : flowOpen ? { title: 'Shot', icon: Camera } : INSPECTOR_TITLE[workspace] ?? INSPECTOR_TITLE.shoot!, HeadIcon = head.icon;
-  const body = castOpen ? <CastInspector filming={filming} /> : sceneOpen ? <SceneInspector filming={filming} /> : flowOpen ? <WorkflowShotInspector filming={filming} />
-    : workspace === 'captions' ? <CaptionsPanel filming={filming} />
+  // Clicking a clip on the timeline replaces a chosen cue or link on the right.
+  useEffect(() => { if (filming.studio.selected) { sceneSelection.setCue(null); sceneSelection.setLink(null); } }, [filming.studio.selected]);
+  // Switching the timeline tool shows that tool's panel again.
+  useEffect(() => { sceneSelection.setCue(null); sceneSelection.setLink(null); }, [workspace]);
+  const chosenLink = useChosenLink(), linkOpen = !castOpen && !sceneOpen && Boolean(chosenLink && filming.studio.project.links?.some((l) => l.id === chosenLink));
+  const chosenCue = useChosenCue(), cueOpen = !castOpen && !sceneOpen && !linkOpen && Boolean(chosenCue);
+  const soundClip = filming.studio.project.tracks.find((t) => t.kind === 'sound' && t.clips.some((c) => c.id === filming.studio.selected)) ? filming.studio.selected : null;
+  const head = castOpen ? { title: 'Character', icon: Users } : linkOpen ? { title: 'Link', icon: ArrowLeftRight } : cueOpen ? { title: 'Line', icon: Mic } : soundClip && !sceneOpen && !flowOpen ? { title: 'Sound', icon: Volume2 } : sceneOpen ? { title: 'Scene sheet', icon: Clapperboard } : flowOpen ? { title: 'Shot', icon: Camera } : INSPECTOR_TITLE[workspace] ?? INSPECTOR_TITLE.shoot!, HeadIcon = head.icon;
+  const body = castOpen ? <CastInspector filming={filming} /> : sceneOpen ? <SceneInspector filming={filming} />
+    : linkOpen ? <LinkPanel filming={filming} linkId={chosenLink!} onClose={() => sceneSelection.setLink(null)} />
+    : cueOpen ? <LinePanel filming={filming} cueId={chosenCue!.id} {...(chosenCue!.media ? { shotMedia: chosenCue!.media } : {})} onClose={() => sceneSelection.setCue(null)} />
+    : flowOpen ? <WorkflowShotInspector filming={filming} />
+    : soundClip ? <SoundClipPanel filming={filming} clipId={soundClip} onClose={() => filming.studio.select(null)} />
+    : workspace === 'captions' ? <CaptionsTable filming={filming} />
     // Design v11: Transitions and Colour open that section of the selected shot; with no shot chosen they keep their list.
     : (workspace === 'transitions' || workspace === 'colour') && shotChosen ? <InspectorBody filming={filming} mode="clip" focus={workspace === 'transitions' ? 'transition' : 'colour'} />
     : workspace === 'transitions' ? <TransitionsWorkspace filming={filming} />
     : workspace === 'sound' ? <SoundPanel filming={filming} />
     : workspace === 'colour' ? <ColourPanel filming={filming} />
+    // Board 1: with nothing selected the right panel shows the film; the cues of the next take fold below it.
+    : workspace === 'shoot' && !filming.studio.selected ? <><FilmOverview filming={filming} openSettings={() => setSettings(true)} />
+      {filming.studio.plan.length ? <div className="mx-3 mb-2 space-y-1" aria-label="Cues of the next take"><div className="text-[10px] font-semibold uppercase tracking-wide text-ink/50">Next take · {filming.studio.plan.length} cues</div>
+        {filming.studio.plan.map((c) => <button key={c.id} type="button" onClick={() => sceneSelection.setCue({ id: c.id })} className="flex w-full items-center gap-2 rounded-md border border-ink/10 px-2 py-1.5 text-left text-xs hover:bg-ink/5">
+          <b>{c.label}</b><span className="min-w-0 flex-1 truncate text-ink/60">{c.text || c.action}</span><span className="font-mono text-[10px] text-ink/50">{c.start.toFixed(1)}→{c.end.toFixed(1)}</span></button>)}</div> : null}
+      <details className="mx-3 mb-3 rounded-lg border border-ink/10" data-film-id="film.next-take"><summary className="cursor-pointer px-3 py-2 text-xs font-bold">Next take · add characters, lines, moves</summary>
+        <InspectorBody filming={filming} mode="scene" /></details></>
     : <InspectorBody filming={filming} mode={workspace === 'edit' ? 'clip' : 'scene'} />;
   return <div className="text-ink">
     <div className="sticky top-0 z-20 flex items-center gap-2 border-b border-ink/10 bg-surface px-3 py-2">
       <HeadIcon className="size-4" /><strong className="flex-1 text-sm">{head.title}</strong>
       <button type="button" className={button} aria-haspopup="dialog" onClick={() => setSettings(true)}><Settings2 className="size-3.5" />Film settings</button>
     </div>
-    <div className="pt-3">{body}</div>
+    <div className="pt-3"><LiveTakePanel filming={filming} />{body}</div>
     {settings ? <FilmSettings filming={filming} close={() => setSettings(false)} /> : null}
   </div>;
 }
@@ -506,8 +531,9 @@ function InspectorBody({ filming, mode, focus = 'trim' }: { filming: StudioFilmi
     if (clip.type === 'media') { setSourceIn(toSeconds(clip.in)); setSourceOut(toSeconds(clip.in + clip.duration)); }
   }, [clip]);
   const disabled = running || filming.busy;
+  // Design rule 5: drag fields with the label inside (the value is applied with the button next to them).
   const number = (label: string, value: number, update: (n: number) => void, max = 180) =>
-    <label className="text-xs text-ink/60">{label}<input aria-label={label} className={input} type="number" min={0} max={max} step="0.01" value={Math.round(value * 100) / 100} onChange={(e) => update(Number(e.target.value))} /></label>;
+    <DragNumber label={label} value={value} commit={update} min={0} max={max} step={0.01} unit="s" width="w-full" />;
   const applyTrim = () => {
     if (clip?.type !== 'media') return;
     const byStart = sourceIn - toSeconds(clip.in), byEnd = (sourceOut - sourceIn) - (toSeconds(clip.duration) - byStart);

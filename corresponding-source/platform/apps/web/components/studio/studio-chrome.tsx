@@ -493,7 +493,8 @@ export function StudioChrome({
         />
       ) : null}
 
-      {filmWorkspace && !testing && workflowOpen ? <div style={{ gridArea: 'viewport' }} className="relative z-30 min-h-0 min-w-0"><WorkflowView filming={filming} /></div> : null}
+      {/* Workflow (board 7) takes the whole centre column: the recording bar, the world and the timeline go behind it. */}
+      {filmWorkspace && !testing && workflowOpen ? <div style={{ gridColumn: '3 / 4', gridRow: '3 / -1' }} className="relative z-[45] min-h-0 min-w-0"><WorkflowView filming={filming} /></div> : null}
 
       {/* Scene tools sit in their own fixed row above the world view (grid area "scenebar"), never over the picture. */}
       {filmWorkspace && !testing ? <div style={{gridArea:'scenebar'}} className="relative z-40 min-w-0 border-b border-ink/15 bg-surface"><div className="flex flex-wrap items-center justify-center">
