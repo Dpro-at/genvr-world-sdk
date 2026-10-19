@@ -94,11 +94,14 @@ export function FreeSourcesWindow({
   }, [tab, account, loadAccount]);
 
   useEffect(() => {
+    // The window owns Escape while it is open (ITEMS-I0): it closes the window and does not also cancel placing.
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') onClose();
+      if (event.key !== 'Escape') return;
+      event.stopImmediatePropagation();
+      onClose();
     };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
+    window.addEventListener('keydown', onKey, true);
+    return () => window.removeEventListener('keydown', onKey, true);
   }, [onClose]);
 
   useEffect(() => {

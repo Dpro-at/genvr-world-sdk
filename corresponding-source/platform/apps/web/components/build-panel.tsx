@@ -359,6 +359,88 @@ export function MapToolPanel({
   );
 }
 
+/**
+ * The ways of building on the desktop (ITEMS-I1–I3), at the bottom of the 3D view: the item being placed (Turn, Stop),
+ * the handles of a selected part (Move, Size, Turn, All), and the blocks slots 1–9 with Walk.
+ */
+function StudioWayBars({ runtime, status, onTest }: { runtime: RefObject<GenvrRuntime | null>; status: ToolStatus; onTest?: (() => void) | undefined }) {
+  const rt = () => runtime.current;
+  const slots = STACKABLE_BLOCKS.slice(0, 9);
+  useEffect(() => {
+    if (status.tool !== 'blocks' && status.tool !== 'place') return;
+    const onKey = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null;
+      if (target?.closest('input, textarea, select, [contenteditable="true"]') || event.ctrlKey || event.metaKey || event.altKey) return;
+      // Esc with no item left stops placing (ITEMS-I1); the runtime's Esc already dropped the item.
+      if (event.key === 'Escape' && status.tool === 'place' && !status.placeItemId) rt()?.setTool('select');
+      const slot = status.tool === 'blocks' && /^[1-9]$/.test(event.key) ? slots[Number(event.key) - 1] : undefined;
+      if (slot) {
+        event.preventDefault();
+        rt()?.setBlockTool({ mode: 'stack', block: slot });
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [status.tool, status.placeItemId]);
+  const bar = 'pointer-events-auto absolute bottom-3 left-1/2 z-10 flex max-w-[calc(100%-1.5rem)] -translate-x-1/2 flex-wrap items-center justify-center gap-1 rounded-2xl bg-surface/95 p-1.5 text-xs font-bold text-ink shadow-lg ring-1 ring-ink/10';
+  const button = (on: boolean) => `inline-flex items-center gap-1.5 rounded-xl px-2.5 py-1.5 ${on ? 'bg-ink text-on-brand' : 'hover:bg-ink/10'}`;
+  if (status.tool === 'place' && status.placeItemId) {
+    const place = status.place ?? { turn: 0 };
+    return (
+      <div role="toolbar" aria-label="Placing" className={bar}>
+        <span className="rounded-lg bg-paper px-2 py-1.5 tabular-nums">{rt()?.itemName(status.placeItemId)} · {place.turn}° · {Math.round((place.size ?? 1) * 100)}%</span>
+        <button type="button" onClick={() => rt()?.rotateItem()} className={button(false)}><RotateCw className="size-3.5" aria-hidden />Turn<kbd className="opacity-50">R</kbd></button>
+        <button type="button" onClick={() => rt()?.setTool('select')} className={button(false)}><X className="size-3.5" aria-hidden />Stop<kbd className="opacity-50">Esc</kbd></button>
+      </div>
+    );
+  }
+  if (status.tool === 'select' && status.selected && !status.moving) {
+    const modes = [
+      { id: 'all', label: 'All', Icon: Shapes },
+      { id: 'move', label: 'Move', Icon: Move },
+      { id: 'size', label: 'Size', Icon: Columns3 },
+      { id: 'turn', label: 'Turn', Icon: RotateCw },
+    ] as const;
+    return (
+      <div role="toolbar" aria-label="Handles" className={bar}>
+        {modes.map((mode) => (
+          <button key={mode.id} type="button" aria-pressed={(status.handles ?? 'all') === mode.id} onClick={() => rt()?.setHandleMode(mode.id)} className={button((status.handles ?? 'all') === mode.id)}
+            title={mode.id === 'all' ? 'Show every handle' : `Only the ${mode.label.toLowerCase()} handles`}>
+            <mode.Icon className="size-3.5" aria-hidden />{mode.label}
+          </button>
+        ))}
+      </div>
+    );
+  }
+  if (status.tool === 'blocks' && status.blocks) {
+    return (
+      <div role="toolbar" aria-label="Blocks" className={bar}>
+        {slots.map((block, index) => {
+          const on = status.blocks?.mode === 'stack' && status.blocks.block === block;
+          return (
+            <button key={block} type="button" aria-pressed={on} aria-label={`Slot ${index + 1}: ${getBlock(block)?.manifest.name ?? block}`} title={`${getBlock(block)?.manifest.name ?? block} (${index + 1})`}
+              onClick={() => rt()?.setBlockTool({ mode: 'stack', block })}
+              className={`relative size-9 rounded-lg ring-2 ${on ? 'ring-ink ring-offset-2 ring-offset-surface' : 'ring-ink/10'}`} style={{ backgroundColor: blockColor(block) }}>
+              <span className="absolute right-0.5 bottom-0 font-mono text-[9px] text-black/70">{index + 1}</span>
+            </button>
+          );
+        })}
+        <span className="mx-1 h-7 w-px bg-ink/15" />
+        <button type="button" aria-pressed={status.blocks.mode === 'dig'} onClick={() => rt()?.setBlockTool({ mode: status.blocks?.mode === 'dig' ? 'stack' : 'dig' })} className={button(status.blocks.mode === 'dig')} title="Dig (right-click digs too)">
+          <Pickaxe className="size-3.5" aria-hidden />Dig
+        </button>
+        {onTest ? (
+          <button type="button" onClick={() => { const block = status.blocks?.block; rt()?.setHands({ allowed: true, ...(block ? { block: block as never } : {}) }); onTest(); }} className={button(false)}
+            title="Walk among the blocks; left click digs, right click places">
+            <Footprints className="size-3.5" aria-hidden />Walk
+          </button>
+        ) : null}
+      </div>
+    );
+  }
+  return null;
+}
+
 export function BuildPanel({
   runtime,
   status,
@@ -403,6 +485,9 @@ export function BuildPanel({
   let hint: string | null = status.tool ? (HINTS[status.tool] ?? null) : null;
   if (status.tool === 'place')
     hint = status.placeItemId ? 'Tap the ground to place it.' : 'Choose an item to place.';
+  // A computer clicks (ITEMS-I1); a phone taps.
+  if (studio && hint) hint = hint.replace(/\bTap\b/g, 'Click').replace(/\btap\b/g, 'click');
+  if (studio && status.tool === 'place' && status.placeItemId) hint = 'Click the ground to place it · R turns · Esc stops';
   // The studio (mouse and keyboard) also has Shift for more items and a selection box.
   if (status.tool === 'select' && studio)
     hint = 'Click an item to select it. Shift-click adds more; Shift-drag draws a box.';
@@ -492,6 +577,7 @@ export function BuildPanel({
       ) : null}
 
       {studio && contextMenu ? <BuildContextMenu runtime={runtime} status={status} /> : null}
+      {studio ? <StudioWayBars runtime={runtime} status={status} onTest={onTest} /> : null}
       {studio && (status.message || hint) ? (
         <div className="pointer-events-none absolute top-3 left-3 z-10 max-w-[min(32rem,calc(100%-9rem))]">
           <div

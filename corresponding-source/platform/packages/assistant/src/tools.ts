@@ -138,6 +138,7 @@ export const TOOL_ARGS = {
       .regex(/^#[0-9a-fA-F]{6}$/)
       .optional()
       .describe('Tint color such as #e53935'),
+    material: z.enum(['plastic', 'wood', 'stone', 'metal', 'glass', 'neon']).optional().describe('Surface, as the Appearance tab: plastic (default), wood, stone, metal, glass, neon'),
   }),
   scatter_items: z.object({
     itemIds: z.array(z.string().max(128)).min(1).max(8).describe('Items to mix, e.g. trees and rocks'),
@@ -184,6 +185,39 @@ export const TOOL_ARGS = {
   }),
   remove_items: z.object({
     instanceIds: z.array(z.string().max(128)).min(1).max(100),
+  }),
+  list_library: z.object({
+    kind: z
+      .enum(['models', 'game', 'roads', 'ground', 'walls', 'water', 'sky', 'moves', 'effects'])
+      .describe('A kind of the Items tab: models (3D), game, roads, ground, walls, water, sky, moves, effects'),
+    group: z
+      .enum(['parts', 'nature', 'props-and-decor', 'structures', 'building-blocks'])
+      .optional()
+      .describe('3D only: Parts, Nature, Props, Buildings or Blocks'),
+    offset: z.number().int().min(0).max(5000).optional(),
+    limit: z.number().int().min(1).max(100).optional(),
+  }),
+  set_item_look: z.object({
+    instanceIds: z.array(z.string().max(128)).min(1).max(100),
+    color: z.string().regex(/^#[0-9a-fA-F]{6}$/).nullable().optional().describe('Tint such as #e53935; null gives back its own colour'),
+    material: z.enum(['plastic', 'wood', 'stone', 'metal', 'glass', 'neon']).nullable().optional().describe('Surface; null gives back plastic'),
+  }),
+  name_items: z.object({
+    instanceIds: z.array(z.string().max(128)).min(1).max(100),
+    name: z.string().max(64).nullable().describe('Shown in the Explorer; null takes the name away'),
+  }),
+  group_items: z.object({
+    instanceIds: z.array(z.string().max(128)).min(2).max(100),
+    name: z.string().min(1).max(64).optional(),
+  }),
+  ungroup_items: z.object({ groupId: z.string().max(128).describe('Group id from get_world_summary') }),
+  set_item_flags: z.object({
+    instanceIds: z.array(z.string().max(128)).min(1).max(100),
+    anchored: z.boolean().optional().describe('false lets physics move it while playing'),
+    floats: z.boolean().nullable().optional().describe('true keeps it in the air; null gives the choice back to the item'),
+  }),
+  settle_items: z.object({
+    instanceIds: z.array(z.string().max(128)).min(1).max(100).describe('Let them fall and come to rest, like in play'),
   }),
   edit_river: z.object({
     riverId: z.string().max(128).describe('River id from get_world_summary'),
@@ -793,6 +827,13 @@ const DESCRIPTIONS: Record<ToolName, string> = {
   build_platforms:
     "Side-view (2D) places only: build a course of platforms on the players' line at x positions and heights, for jumping from one to the next. It keeps every jump possible by itself (moves platforms closer or lowers them), so call it once per course.",
   move_item: 'Move, turn or resize a placed item by its instance id.',
+  list_library: 'Browse the Items tab library by kind (and 3D group), only items that fit this place\'s style: id, name, price. Use search_catalog for words.',
+  set_item_look: 'Change the colour and/or material of placed items (the Appearance tab). Locked items are refused.',
+  name_items: 'Name placed items as they show in the Explorer.',
+  group_items: 'Group placed items so they move, lock and copy together.',
+  ungroup_items: 'Take a group apart; its items stay where they are.',
+  set_item_flags: 'Anchor items (they stay put) or let physics move them while playing; mark items as meant to float.',
+  settle_items: 'Let items fall and come to rest, like in play (one undo step). Needs a live Studio.',
   edit_river: 'Change a river already drawn: its width, how much it widens, its current, or its course (the bed is carved again).',
   add_opening: 'Cut a door or a window into a wall (the same as the Door and Window tools). Doors start at the ground.',
   remove_parts: 'Remove roads, walls and rooms, ponds and lakes, rivers, paved areas, or one door or window (kind opening with its wallId), by their ids from get_world_summary.',

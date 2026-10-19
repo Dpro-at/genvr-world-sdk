@@ -21,7 +21,7 @@ import { AvatarPresentation, type AvatarPresentationOptions } from '../src/avata
 import { PresentationViewport } from './presentation/viewport';
 import { createRoot } from 'react-dom/client';
 import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
-import { Monitor, Share2, Clapperboard, Download, FolderOpen, House, Save, Settings2, Mic, X } from 'lucide-react';
+import { Monitor, Share2, Clapperboard, Download, FolderOpen, House, Save, Settings2, Mic, X, ChevronUp } from 'lucide-react';
 import { createRuntime, DEFAULT_BRUSH, DEFAULT_RIVER, type GenvrRuntime, type ToolStatus } from '@genvr/runtime';
 import { runTool, TOOL_ARGS, EXPRESSIONS, type AssistantHost, type ChatModel } from '@genvr/assistant';
 import { CreateFlow, type CreationOptions } from '../../../apps/web/components/create-flow';
@@ -302,8 +302,9 @@ function Editor({ initial, storage, options, leave, beforeClose }: { initial: St
   const test = (value: boolean) => { if (value) runtime.current?.setTool(null); setTesting(value); };
   const updateMetadata = (next: StudioProject) => { project.current = next; setMetadata(next); changed(); };
   return <StudioHostProvider value={{ platform: false,
-    userAvatarControls: library ? (section, search) => { return <UserAvatarPanel storage={library} section={section} search={search} agents={presentationAgents} assign={assignUserAvatar} play={playUserMotion} />; } : undefined,
-    presentationControls: options.presentation?.enabled === false ? undefined : (section, search) => <PresentationControls controller={presentation} section={section} search={search} agents={presentationAgents} />,
+    userAvatarControls: library ? (section, search, _onSelfBody, target) => { return <UserAvatarPanel storage={library} section={section} search={search} agents={presentationAgents} assign={assignUserAvatar} play={playUserMotion} target={target} />; } : undefined,
+    presentationControls: options.presentation?.enabled === false ? undefined : (section, search, target) => <PresentationControls controller={presentation} section={section} search={search} agents={presentationAgents} target={target} />,
+    presentationTargets: () => presentationAgents,
     presentationOverlay: () => options.presentation?.enabled === false ? null : <PresentationViewport controller={presentation} />,
     shareStudio, share: openShare,
     avatarLive: () => { presentation.execute({kind:'display',open:true}); },
@@ -315,7 +316,7 @@ function Editor({ initial, storage, options, leave, beforeClose }: { initial: St
     presentationStage: stage => { presentationStage.current = stage; },
     presentAvatar: presentation.execute, presentationInfo: () => presentation.describe() + "; Available targets: self, " + presentationAgents.map(row => `${row.id} (${row.name})`).join(", "), ...(options.catalog ? { catalog: options.catalog } : {}), ...(options.model ? { model: options.model } : {}), leave: () => { void goHome(); }, settings: () => setSettings(true) }}>
     <div className="flex h-dvh flex-col overflow-hidden bg-paper text-ink">
-      <div style={embedLayout?{display:'none'}:undefined} className="flex h-12 shrink-0 items-center gap-1 border-b border-ink/10 bg-surface px-2">
+      <div style={embedLayout || desktop ? { display: 'none' } : undefined} className="flex h-12 shrink-0 items-center gap-1 border-b border-ink/10 bg-surface px-2">
         <IconButton label="My projects" disabled={(!ready && !error) || filming.busy || filming.studio.rendering} onClick={() => void goHome()}><House className="size-4" /></IconButton>
         <span className="truncate text-xs font-bold">Local Studio</span>{options.liveBridge ? <span role="status" aria-label="Live MCP connection" className="rounded-full border border-ink/10 px-2 py-1 text-[10px]">{liveConnected ? 'MCP connected' : 'MCP connecting'}</span> : null}{agentCount !== null ? <span className="text-xs" role="status">{agentCount} agents</span> : null}
         <span className="min-w-0 flex-1 truncate text-xs text-ink/60" role="status">{saved}</span>
@@ -349,12 +350,30 @@ function Editor({ initial, storage, options, leave, beforeClose }: { initial: St
           source={`?studioPreview=${initial.id}&touch=${preview.model.kind === 'phone' || preview.model.kind === 'tablet' ? '1' : '0'}`} /> : null}
         {ready && !testing && (desktop || tab !== 'filming') ? (desktop
           // Inside the 3D view (BUILD-B1): hints and the drawing bar never cover the docks.
-          ? <div style={{ gridArea: 'viewport' }} className="pointer-events-none relative z-30 min-h-0 min-w-0"><BuildPanel runtime={runtime} status={status} studio contextMenu={tab === 'build'} placeId={initial.id} onTest={() => test(true)} /></div>
+          ? <div style={{ gridArea: 'viewport' }} className="pointer-events-none relative z-30 min-h-0 min-w-0"><BuildPanel runtime={runtime} status={status} studio contextMenu={tab === 'build' || tab === 'items'} placeId={initial.id} onTest={() => test(true)} /></div>
           : <BuildPanel runtime={runtime} status={status} studio={false} placeId={initial.id} onTest={() => test(true)} />) : null}
         {!desktop && testing ? <button className="absolute right-3 top-3 rounded-lg bg-surface px-3 py-2 font-bold" onClick={() => setTesting(false)}>Stop test</button> : null}
         {ready && !status.tool && (testing || (tab !== 'filming' && tab !== 'avatar')) && !preview.model ? <PlayControls runtime={runtime} raised={!desktop && !testing} forceTouch={!desktop} dash={testing && initial.play.view === 'side' && initial.play.moves.includes('dash')} /> : null}
         {!desktop && !testing && tab === 'filming' && ready ? <PhoneFilming filming={filming} onClose={() => setTab('build')} /> : null}
       </main>
+      {desktop && !embedLayout ? (
+        // ITEMS-I10: on the computer the top strip becomes a thin status bar at the bottom, like Dpro.
+        <footer aria-label="Status bar" className="flex h-6 shrink-0 items-center gap-0.5 border-t border-ink/10 bg-surface px-1.5 text-[11px] text-ink/60">
+          {options.liveBridge ? <span role="status" aria-label="Live MCP connection" className="inline-flex h-5 items-center gap-1.5 px-1.5"><span aria-hidden className={`size-1.5 rounded-full ${liveConnected ? 'bg-emerald-500' : 'bg-amber-500'}`} />{liveConnected ? 'MCP connected' : 'MCP connecting'}</span> : null}
+          <span className="inline-flex h-5 items-center px-1.5">Local Studio</span>
+          {agentCount !== null ? <span role="status" className="inline-flex h-5 items-center px-1.5">{agentCount} agents</span> : null}
+          <span role="status" className="inline-flex h-5 min-w-0 items-center truncate px-1.5">{saved}</span>
+          <button type="button" aria-pressed={layout.bottomOpen} onClick={() => setLayout({ ...layout, bottomOpen: !layout.bottomOpen })} title={layout.bottomOpen ? 'Fold the bottom panel' : 'Open the Debug panel'} className="inline-flex h-5 items-center gap-1 rounded px-1.5 hover:bg-ink/10 hover:text-ink">
+            <ChevronUp className={`size-3 transition-transform ${layout.bottomOpen ? 'rotate-180' : ''}`} aria-hidden />Debug{logs.length ? ` · ${logs.length}` : ' · no messages'}
+          </button>
+          <span className="flex-1" />
+          <button type="button" disabled={!ready} onClick={() => void save()} title="Save project (Ctrl+S)" className="inline-flex h-5 items-center gap-1 rounded px-1.5 hover:bg-ink/10 hover:text-ink disabled:opacity-40"><Save className="size-3" aria-hidden />Save</button>
+          <button type="button" disabled={!ready} onClick={() => { try { download(snapshot()); } catch (error) { setError(message(error)); } }} title="Export project" className="inline-flex h-5 items-center gap-1 rounded px-1.5 hover:bg-ink/10 hover:text-ink disabled:opacity-40"><Download className="size-3" aria-hidden />Export</button>
+          {options.liveBridge ? <button type="button" disabled={!ready} aria-pressed={voiceOpen} onClick={() => setVoiceOpen(value => !value)} title="Avatar voice" className="inline-flex h-5 items-center gap-1 rounded px-1.5 hover:bg-ink/10 hover:text-ink disabled:opacity-40"><Mic className="size-3" aria-hidden />Voice</button> : null}
+          <button type="button" disabled={!ready} onClick={() => setSettings(true)} title="Place settings" className="inline-flex h-5 items-center gap-1 rounded px-1.5 hover:bg-ink/10 hover:text-ink disabled:opacity-40"><Settings2 className="size-3" aria-hidden />Place settings</button>
+          <button type="button" disabled={(!ready && !error) || filming.busy || filming.studio.rendering} onClick={() => void goHome()} title="My projects" className="inline-flex h-5 items-center gap-1 rounded px-1.5 hover:bg-ink/10 hover:text-ink disabled:opacity-40"><House className="size-3" aria-hidden />My projects</button>
+        </footer>
+      ) : null}
       {settings ? <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={() => setSettings(false)}>
         <section role="dialog" aria-modal="true" aria-label="Place settings" className="max-h-[90dvh] w-full max-w-xl overflow-auto rounded-lg bg-surface p-5 shadow-xl" onClick={event => event.stopPropagation()}>
           <div className="mb-5 flex items-center justify-between"><h2 className="text-lg font-bold">Place settings</h2><IconButton label="Close settings" onClick={() => setSettings(false)}><X className="size-5" /></IconButton></div>

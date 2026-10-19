@@ -91,8 +91,24 @@ at once instead of building on it.
 | Eraser | `remove_items` (items); `remove_parts` (road, wall, water, river, paving, opening) |
 | Undo / redo | `world_history` |
 
-`get_world_summary` lists the ids: items (with `locked`), roads, walls with their openings, paved areas, water and
-rivers. The Map (real place) build has no tool: ask the owner to use Build → Map.
+## Items tab parity
+
+| Items tab | Your tool |
+|---|---|
+| Browse a kind (3D › Parts, Nature, Props, Buildings, Blocks; Game; Roads; Ground; Walls; Water; Sky; Moves; Effects) | `list_library` (kind, group, offset, limit); `search_catalog` for words |
+| Place with turn, size, colour, material | `place_item` (turn, size, color, material); `place_items`, `scatter_items` |
+| Change colour or material later (Appearance) | `set_item_look` (color, material; null gives back its own) |
+| Parts way: move, size, turn, stretch | `move_item` |
+| Name, group, ungroup | `name_items`, `group_items`, `ungroup_items` |
+| Anchor, float, let it fall | `set_item_flags` (anchored, floats), `settle_items` (live Studio only) |
+| Blocks way: place and break blocks | `fill_blocks`, `block_line`, `block_floor`, `dig_blocks` |
+| Moves, faces, screen effects, notifications, UI cards | `present_avatar`, `list_avatar_motions`, `user_avatar_library` |
+
+Never buy, sign in to a store or import files for the person: paid items are placed only after the owner bought them,
+and imports come from the owner's own files.
+
+`get_world_summary` lists the ids: items (with `locked`, group, material and colour), groups, roads, walls with their
+openings, paved areas, water and rivers. The Map (real place) build has no tool: ask the owner to use Build → Map.
 
 
 

@@ -26,7 +26,7 @@ import {
   type Camera,
   type Object3D,
 } from 'three/webgpu';
-import { ItemTools, type ItemSelection, type SnapSettings } from './item-tools.js';
+import { ItemTools, type ItemSelection, type PlaceOptions, type SnapSettings } from './item-tools.js';
 import type { ItemsView } from './items.js';
 import { buildRoad, type RoadMaterials } from './road-view.js';
 import { riverGeometry } from './river-view.js';
@@ -116,6 +116,10 @@ export interface ToolStatus {
   message: string | null;
   /** Item the place tool puts down. */
   placeItemId: string | null;
+  /** Turn, size, colour and material of the next placed item (ITEMS-I1). */
+  place?: PlaceOptions & { turn: number };
+  /** Which handles a selected item shows (ITEMS-I2, the parts way). */
+  handles?: 'all' | 'move' | 'size' | 'turn';
   /** Item selected by the select tool. */
   selected: ItemSelection | null;
   /** True while the selected item follows the pointer (next tap drops it). */
@@ -408,6 +412,18 @@ export class BuildTools {
   }
 
   /** Chooses an item from the library and switches to the place tool. */
+  /** Show all handles on the selection, or only move, size or turn (ITEMS-I2). */
+  setHandleMode(mode: 'all' | 'move' | 'size' | 'turn'): void {
+    this.#items.setHandleMode(mode);
+    this.#emit();
+  }
+
+  /** Turn, size, colour and material of the next placed items (ITEMS-I1). */
+  setPlaceOptions(options: Parameters<ItemTools['setPlaceOptions']>[0]): void {
+    this.#items.setPlaceOptions(options);
+    this.#emit();
+  }
+
   setPlaceItem(itemId: string): void {
     this.setTool('place');
     this.#items.setPlaceItem(itemId);
@@ -427,6 +443,7 @@ export class BuildTools {
   /** One turn step of the item being placed or moved, or of the selected item. */
   rotateItem(): void {
     this.#items.rotate();
+    this.#emit();
   }
 
   moveItem(): void {
@@ -556,7 +573,8 @@ export class BuildTools {
   }
 
   /** A tap or click (no drag) at a screen position. */
-  tap(clientX: number, clientY: number, add = false): void {
+  /** A tap with the tool; `secondary` is the right mouse button (the blocks way digs with it, ITEMS-I3). */
+  tap(clientX: number, clientY: number, add = false, secondary = false): void {
     const tool = this.#tool;
     if (!tool) return;
     if (tool === 'place') {
@@ -584,7 +602,13 @@ export class BuildTools {
     // BRUSH_TOOLS, because what is left after it has to narrow to the door and window tools below.
     if (tool === 'terrain' || tool === 'cover') return;
     if (tool === 'blocks') {
-      const problem = this.#blocks ? this.#blocks.tap(clientX, clientY) : 'This place has no blocks.';
+      let problem: string | null = 'This place has no blocks.';
+      if (this.#blocks) {
+        const mode = this.#blocks.settings.mode;
+        if (secondary) this.#blocks.set({ mode: 'dig' });
+        problem = this.#blocks.tap(clientX, clientY);
+        if (secondary) this.#blocks.set({ mode });
+      }
       if (problem) this.#fail(problem);
       else if (this.#message) {
         this.#message = null;
@@ -834,6 +858,8 @@ export class BuildTools {
       canFinish: this.#points.length >= needed,
       message: this.#message,
       placeItemId: this.#items.placeItemId,
+      place: this.#items.placeOptions,
+      handles: this.#items.handleMode,
       selected: this.#items.selection,
       moving: this.#items.moving,
       brush: { ...this.#terrain.settings },

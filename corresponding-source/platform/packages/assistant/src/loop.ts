@@ -30,6 +30,7 @@ import {
   getRoadType,
   groundRef,
   queryLibrary,
+  type LibraryFilter,
   starterGroundMaterials,
   zoneShapeOfItem,
 } from '@genvr/core-library';
@@ -113,6 +114,8 @@ export interface AssistantHost {
    * done. The host refuses when the person changed the place after that step. Without it, the tool is unavailable.
    */
   history?(action: 'undo' | 'redo'): string | null;
+  /** settle_items (ITEMS-I8): let items fall and rest with physics; returns how many moved, or an error. */
+  settle?(instanceIds: readonly string[]): number | string;
   /** Digs and fills a pond at x, z; returns an error message or null. */
   addWater(x: number, z: number): string | null;
   /** Where the builder stands and the way they face (radians, 0 = +z), for "here" and "in front". */
@@ -630,7 +633,7 @@ export function executeTool(
               position: [x, y, z],
               rotation: yawQuat(a.turn ?? 0),
               ...(plain ? {} : { scale: sized.scale }),
-              ...(a.color ? { itemParams: { color: a.color } } : {}),
+              ...(a.color || a.material ? { itemParams: { ...(a.color ? { color: a.color } : {}), ...(a.material && a.material !== 'plastic' ? { material: a.material } : {}) } } : {}),
               // The spot above is the hint; the rest law sets the height and lean (P2-43).
               rest: true,
             },
@@ -922,6 +925,82 @@ export function executeTool(
         ]),
         `Moved ${instance.instanceId} to (${x}, ${z}).`,
       );
+    }
+    case 'list_library': {
+      const a = args as ToolArgs<'list_library'>;
+      const filters: Record<string, LibraryFilter> = {
+        models: { category: '3d-models', subcategory: a.group ?? ['parts', 'nature', 'props-and-decor', 'structures', 'building-blocks'] },
+        game: { category: '3d-models', subcategory: 'gameplay' },
+        roads: { category: 'environment', subcategory: 'roads' },
+        ground: { category: 'environment', subcategory: 'ground' },
+        walls: { category: '3d-models', subcategory: ['walls', 'openings'] },
+        water: { category: 'environment', subcategory: 'water' },
+        sky: { category: 'environment', subcategory: ['sky', 'weather'] },
+        moves: { category: 'avatar-appearance', subcategory: 'emotes' },
+        effects: { type: 'vfx' },
+      };
+      const all = queryLibrary({ ...filters[a.kind]!, style: world.style.base, text: '' });
+      const offset = a.offset ?? 0, limit = a.limit ?? 50;
+      const page = all.slice(offset, offset + limit);
+      return {
+        ok: true,
+        result: JSON.stringify({
+          kind: a.kind, total: all.length, offset,
+          items: page.map((entry) => ({ id: entry.manifest.id, name: entry.manifest.name, group: entry.manifest.subcategory, price: entry.manifest.price.type })),
+          ...(offset + limit < all.length ? { next: offset + limit } : {}),
+          ...(a.kind === 'effects' ? { screenEffects: 'Screen effects (snow, rain, confetti…) are present_avatar kind "effect".' } : {}),
+        }),
+      };
+    }
+    case 'set_item_look':
+    case 'name_items':
+    case 'set_item_flags':
+    case 'settle_items':
+    case 'group_items': {
+      const a = args as { instanceIds: string[] };
+      const found = a.instanceIds.map((id) => world.instances.find((i) => i.instanceId === id));
+      const missing = a.instanceIds.filter((_, index) => !found[index]);
+      if (missing.length) return { ok: false, result: `Error: no items with ids ${missing.join(', ')}.` };
+      const locked = found.filter((i) => i!.locked).map((i) => i!.instanceId);
+      if (locked.length && name !== 'name_items')
+        return { ok: false, result: `Error: ${locked.join(', ')} locked. Only the owner unlocks items in the Studio.` };
+      if (name === 'set_item_look') {
+        const b = args as ToolArgs<'set_item_look'>;
+        if (b.color === undefined && b.material === undefined) return { ok: false, result: 'Error: give a color and/or a material.' };
+        const params: Record<string, string | null> = {
+          ...(b.color !== undefined ? { color: b.color } : {}),
+          ...(b.material !== undefined ? { material: b.material === 'plastic' ? null : b.material } : {}),
+        };
+        return done(host.apply(b.instanceIds.map((instanceId) => ({ type: 'set_item_params', params: { instanceId, params } }))), `Changed the look of ${b.instanceIds.length} items.`);
+      }
+      if (name === 'name_items') {
+        const b = args as ToolArgs<'name_items'>;
+        return done(host.apply(b.instanceIds.map((id) => ({ type: 'rename', params: { kind: 'item', id, name: b.name } }))), b.name ? `Named ${b.instanceIds.length} items "${b.name}".` : 'Took the names away.');
+      }
+      if (name === 'set_item_flags') {
+        const b = args as ToolArgs<'set_item_flags'>;
+        if (b.anchored === undefined && b.floats === undefined) return { ok: false, result: 'Error: give anchored and/or floats.' };
+        return done(
+          host.apply(b.instanceIds.map((instanceId) => ({ type: 'set_item_flags', params: { instanceId, ...(b.anchored !== undefined ? { anchored: b.anchored } : {}), ...(b.floats !== undefined ? { floats: b.floats } : {}) } }))),
+          `Updated ${b.instanceIds.length} items.`,
+        );
+      }
+      if (name === 'settle_items') {
+        if (!host.settle) return { ok: false, result: 'Letting items fall needs a live Studio (physics).' };
+        const moved = host.settle(a.instanceIds);
+        return typeof moved === 'string' ? { ok: false, result: moved } : { ok: true, result: `${moved} of ${a.instanceIds.length} items came to rest somewhere new.` };
+      }
+      const b = args as ToolArgs<'group_items'>;
+      const taken = new Set(world.groups.map((g) => g.name));
+      let n = world.groups.length + 1;
+      while (taken.has(`Group ${n}`)) n += 1;
+      const groupId = newId('group', random);
+      return done(host.apply([{ type: 'group_items', params: { groupId, name: b.name ?? `Group ${n}`, instanceIds: b.instanceIds } }]), `Grouped ${b.instanceIds.length} items as ${groupId}.`);
+    }
+    case 'ungroup_items': {
+      const { groupId } = args as ToolArgs<'ungroup_items'>;
+      if (!world.groups.some((g) => g.id === groupId)) return { ok: false, result: `Error: no group "${groupId}". Use get_world_summary for ids.` };
+      return done(host.apply([{ type: 'ungroup_items', params: { groupId } }]), `Took ${groupId} apart.`);
     }
     case 'edit_river': {
       const a = args as ToolArgs<'edit_river'>;

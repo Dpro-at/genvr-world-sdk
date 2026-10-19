@@ -26,6 +26,11 @@ export function BuildContextMenu({ runtime, status }: { runtime: RefObject<Genvr
     const onMenu = (event: MouseEvent) => {
       if (event.defaultPrevented || !(event.target instanceof HTMLCanvasElement) || event.target.closest('[data-character-stage]')) return;
       const tool = live.current.tool;
+      // The blocks way digs with the right button (ITEMS-I3): no browser menu there.
+      if (tool === 'blocks') {
+        event.preventDefault();
+        return;
+      }
       if (tool && tool !== 'select') return;
       const start = press.current;
       press.current = null;

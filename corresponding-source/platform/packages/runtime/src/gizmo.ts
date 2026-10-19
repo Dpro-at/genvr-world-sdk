@@ -13,6 +13,8 @@ import {
 } from 'three/webgpu';
 
 export type GizmoHandle = 'x' | 'y' | 'z' | 'turn' | 'size';
+/** Which handles show (ITEMS-I2, the parts way): all of them, or only move arrows, the size corner or the turn ring. */
+export type GizmoMode = 'all' | 'move' | 'size' | 'turn';
 
 /** Handle colors: the usual axis colors, a little softer; always drawn on top. */
 const COLORS: Record<GizmoHandle, number> = {
@@ -31,6 +33,8 @@ export class TransformGizmo {
   readonly group = new Group();
   readonly #handles = new Map<GizmoHandle, Object3D>();
   #size = 1;
+  #mode: GizmoMode = 'all';
+  #resize = true;
 
   constructor() {
     this.group.name = 'gizmo';
@@ -91,11 +95,32 @@ export class TransformGizmo {
     this.group.visible = at !== null;
     if (!at) return;
     // Resizing works on one item at a time.
-    for (const child of this.group.children)
-      if (child.name === 'gizmo:size') child.visible = at.resize ?? true;
+    this.#resize = at.resize ?? true;
+    this.#showHandles();
     this.#size = Math.max(1.2, at.size * 0.75);
     this.group.position.set(at.x, at.y, at.z);
     this.group.scale.setScalar(this.#size);
+  }
+
+  get mode(): GizmoMode {
+    return this.#mode;
+  }
+
+  setMode(mode: GizmoMode): void {
+    this.#mode = mode;
+    this.#showHandles();
+  }
+
+  #showHandles(): void {
+    for (const child of this.group.children) {
+      const handle = child.name.startsWith('gizmo:') ? (child.name.slice(6) as GizmoHandle) : null;
+      if (!handle) continue;
+      const wanted =
+        this.#mode === 'all' ||
+        (this.#mode === 'move' && (handle === 'x' || handle === 'y' || handle === 'z')) ||
+        this.#mode === handle;
+      child.visible = wanted && (handle !== 'size' || this.#resize);
+    }
   }
 
   /** Every mesh that can be grabbed (for raycasting). */

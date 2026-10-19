@@ -157,7 +157,7 @@ function ZoneSection({
 }
 
 /** Item colors (content, not UI): bright enough for kids' worlds; none keeps the item's own. */
-const PALETTE = [
+export const PALETTE = [
   '#fafafa',
   '#9e9e9e',
   '#212121',

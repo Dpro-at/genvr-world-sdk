@@ -371,6 +371,10 @@ export interface GenvrRuntime {
   setBlockTool(settings: Partial<BlockToolSettings>): void;
   /** Chooses an item from the library (switches to the place tool). */
   setPlaceItem(itemId: string): void;
+  /** Which handles a selected item shows (ITEMS-I2): all, or only move, size or turn. */
+  setHandleMode(mode: 'all' | 'move' | 'size' | 'turn'): void;
+  /** Turn (degrees), size, colour and material of the next placed items (ITEMS-I1); null clears one. */
+  setPlaceOptions(options: { size?: number | null; color?: string | null; material?: string | null; turn?: number }): void;
   /** Quarter turn of the item being placed or moved, or of the selected item. */
   rotateItem(): void;
   /** Grid step (meters, 0 = free) and turn step (radians) for placing, moving, and turning. */
@@ -2014,7 +2018,7 @@ export async function createRuntime({
     if (!press || !tools?.tool) return;
     const moved = Math.hypot(event.clientX - press.x, event.clientY - press.y);
     if (moved < 8 && performance.now() - press.time < 600)
-      tools.tap(event.clientX, event.clientY, event.shiftKey || event.ctrlKey || event.metaKey);
+      tools.tap(event.clientX, event.clientY, event.shiftKey || event.ctrlKey || event.metaKey, event.button === 2);
   };
   const onHover = (event: PointerEvent) => {
     if (event.pointerType === 'mouse' && event.buttons === 0) tools?.hover(event.clientX, event.clientY);
@@ -3262,6 +3266,8 @@ export async function createRuntime({
     setBrush: (settings) => tools?.setBrush(settings),
     setBlockTool: (settings) => tools?.setBlockTool(settings),
     setPlaceItem: (itemId) => tools?.setPlaceItem(itemId),
+    setPlaceOptions: (options) => tools?.setPlaceOptions(options),
+    setHandleMode: (mode) => tools?.setHandleMode(mode),
     rotateItem: () => tools?.rotateItem(),
     setSnap: (settings) => tools?.setSnap(settings),
     moveItem: () => tools?.moveItem(),

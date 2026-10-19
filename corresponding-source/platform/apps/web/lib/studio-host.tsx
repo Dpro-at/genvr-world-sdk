@@ -11,8 +11,10 @@ export interface StudioHost {
   platform: boolean;
   avatarVoice?: import('@genvr/assistant').AssistantHost['avatarVoice'];
   userAvatarLibrary?: import('@genvr/assistant').AssistantHost['userAvatarLibrary'];
-  userAvatarControls?: (section: 'characters' | 'motions', search?: string, onSelfBody?: (id: `user.${string}` | 'classic') => void) => ReactNode;
-  presentationControls?: (section: 'motions' | 'expressions' | 'effects' | 'notifications' | 'cards', search?: string) => ReactNode;
+  userAvatarControls?: (section: 'characters' | 'motions', search?: string, onSelfBody?: (id: `user.${string}` | 'classic') => void, target?: string) => ReactNode;
+  presentationControls?: (section: 'motions' | 'expressions' | 'effects' | 'notifications' | 'cards', search?: string, target?: string) => ReactNode;
+  /** The avatars moves can play on (ITEMS-I4): the user's own avatar is always "self". */
+  presentationTargets?: () => Array<{ id: string; name: string }>;
   presentationOverlay?: () => ReactNode;
   characterBody?: (change: (id: import('@genvr/contracts').BodyId) => void) => () => void;
   shareStudio?: import('@genvr/assistant').AssistantHost['shareStudio'];

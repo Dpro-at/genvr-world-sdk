@@ -131,6 +131,8 @@ function hostFor(runtime: GenvrRuntime, placeId: string): AssistantHost {
       return null;
     },
     addWater: (x, z) => runtime.addWater(x, z),
+    // settle_items (ITEMS-I8): the same physics as Let it fall in Properties.
+    settle: (instanceIds) => runtime.settleItems(instanceIds),
     focus: () => {
       const { x, z, yaw } = runtime.localPlayer;
       return { x, z, yaw };

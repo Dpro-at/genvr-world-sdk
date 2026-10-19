@@ -16,7 +16,7 @@ import {
   type Object3D,
   type Ray,
 } from 'three/webgpu';
-import { TransformGizmo, type GizmoHandle } from './gizmo.js';
+import { TransformGizmo, type GizmoHandle, type GizmoMode } from './gizmo.js';
 import { yawOf, yawQuaternion, type ItemsView } from './items.js';
 
 /** The items currently selected (one item, or every member of a group). */
@@ -93,10 +93,19 @@ const turn = (yaw: number) => yawQuaternion(yaw).map(round) as [number, number, 
  * selected items can be turned, moved, duplicated, repeated in a row, or deleted. Every change
  * is a normal world command (undo, saving, and multiplayer just work).
  */
+/** How the next placed items look (ITEMS-I1). */
+export interface PlaceOptions {
+  size?: number;
+  color?: string;
+  material?: string;
+}
+
 export class ItemTools {
   #placeItemId: string | null = null;
   #snap: SnapSettings = { ...DEFAULT_SNAP };
   #yaw = 0;
+  /** Size, colour and material the next placed items get (ITEMS-I1); empty = as the item is made. */
+  #placeOptions: PlaceOptions = {};
   #selected: string[] = [];
   #moving = false;
   #ghost: Mesh | null = null;
@@ -356,6 +365,35 @@ export class ItemTools {
     this.options.endGroup?.();
   }
 
+  /** Which handles the selection shows (ITEMS-I2): all, or only move, size or turn. */
+  get handleMode(): GizmoMode {
+    return this.#gizmo.mode;
+  }
+
+  setHandleMode(mode: GizmoMode): void {
+    this.#gizmo.setMode(mode);
+  }
+
+  get placeOptions(): PlaceOptions & { turn: number } {
+    return { ...this.#placeOptions, turn: Math.round(((this.#yaw * 180) / Math.PI) % 360) };
+  }
+
+  /** What the next placed items look like (ITEMS-I1): size 0.2–10, a colour, a material; null clears one. */
+  setPlaceOptions(options: { size?: number | null; color?: string | null; material?: string | null; turn?: number }): void {
+    const next = { ...this.#placeOptions };
+    for (const key of ['size', 'color', 'material'] as const) {
+      const value = options[key];
+      if (value === null) delete next[key];
+      else if (value !== undefined) (next as Record<string, unknown>)[key] = key === 'size' ? Math.min(10, Math.max(0.2, value as number)) : value;
+    }
+    this.#placeOptions = next;
+    if (options.turn !== undefined) this.#yaw = (((options.turn % 360) + 360) % 360) * (Math.PI / 180);
+    if (this.#ghost) {
+      this.#ghost.rotation.y = this.#yaw;
+      this.#ghost.scale.setScalar(next.size ?? 1);
+    }
+  }
+
   get placeItemId(): string | null {
     return this.#placeItemId;
   }
@@ -462,6 +500,10 @@ export class ItemTools {
         itemId,
         position: spot,
         rotation: turn(this.#yaw),
+        ...(this.#placeOptions.size && this.#placeOptions.size !== 1 ? { scale: [this.#placeOptions.size, this.#placeOptions.size, this.#placeOptions.size] as [number, number, number] } : {}),
+        ...(this.#placeOptions.color || this.#placeOptions.material
+          ? { itemParams: { ...(this.#placeOptions.color ? { color: this.#placeOptions.color } : {}), ...(this.#placeOptions.material ? { material: this.#placeOptions.material } : {}) } }
+          : {}),
         ...restFlag(asksForRest(this.options.items.model(itemId).grid)),
       },
     });
@@ -738,6 +780,7 @@ export class ItemTools {
     this.#hideGhost();
     this.#ghost = this.options.items.previewMesh(itemId, this.#ghostMaterial);
     this.#ghostItemId = itemId;
+    this.#ghost.scale.setScalar(this.#placeOptions.size ?? 1);
     this.#ghost.userData.helper = true;
     this.options.scene.add(this.#ghost);
   }

@@ -95,7 +95,7 @@ export function worldSummary(world: WorldDocument, maxItems: number, fromItem = 
     const name = instance.name ?? getCoreItem(instance.itemId)?.manifest.name ?? instance.itemId;
     const zone = zoneFromParams(instance.params, zoneShapeOfItem(instance.itemId));
     const ride = rideFromParams(instance.params, getLibraryItem(instance.itemId)?.manifest.ride);
-    const line = `- ${instance.instanceId}: ${name} (${instance.itemId}) at (${r(x)}, ${r(z)})${zone ? describeZone(zone, instance) : ''}${ride ? `, rideable ${ride.model}${ride.tag ? ` "${ride.tag}"` : ''}` : ''}${instance.locked ? ', locked' : ''}`;
+    const line = `- ${instance.instanceId}: ${name} (${instance.itemId}) at (${r(x)}, ${r(z)})${zone ? describeZone(zone, instance) : ''}${ride ? `, rideable ${ride.model}${ride.tag ? ` "${ride.tag}"` : ''}` : ''}${instance.locked ? ', locked' : ''}${instance.groupId ? `, in ${instance.groupId}` : ''}${typeof instance.params.material === 'string' ? `, ${instance.params.material}` : ''}${typeof instance.params.color === 'string' ? `, ${instance.params.color}` : ''}`;
     if (index > fromItem && used + line.length + 1 > budget) {
       end = index;
       break;
@@ -133,6 +133,14 @@ function tailLines(world: WorldDocument): string[] {
         `- ${wall.id} ${wall.closed ? 'room' : 'wall'}${wallLook(wall.materialId)} ${firstPoint(wall.points)}` +
           (wall.openings.length ? `, openings: ${wall.openings.map((o) => `${o.id} ${o.kind}`).join(', ')}` : ''),
       );
+  }
+  // Groups (ITEMS-I8): ungroup_items takes one apart by its id.
+  if (world.groups.length) {
+    lines.push(`Groups: ${world.groups.length}.`);
+    for (const group of world.groups.slice(0, 20)) {
+      const count = world.instances.filter((i) => i.groupId === group.id).length;
+      lines.push(`- ${group.id} "${group.name}" (${count} items)`);
+    }
   }
   if (world.pavings.length) {
     lines.push(`Paved areas: ${world.pavings.length}.`);

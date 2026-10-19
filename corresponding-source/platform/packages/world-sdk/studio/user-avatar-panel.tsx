@@ -4,13 +4,16 @@ import type { UserAvatarMetadata, UserAvatarStorage } from '../src/user-avatar-l
 import { userAvatarThumbnail } from './user-avatar-thumbnail';
 import { importUserAvatar } from './user-avatar-import';
 
-export function UserAvatarPanel({ storage, section, search = '', agents, assign, play }: {
+export function UserAvatarPanel({ storage, section, search = '', agents, assign, play, target: sharedTarget }: {
   storage: UserAvatarStorage; section: 'characters' | 'motions'; search?: string;
+  /** One "Plays on" chosen by the caller (ITEMS-I4); the panel's own "Use for" otherwise. */
+  target?: string | undefined;
   agents: Array<{ id: string; name: string }>;
   assign(target: string, id: string | null): Promise<void>;
   play(target: string, id: string): Promise<void>;
 }) {
-  const [rows, setRows] = useState<UserAvatarMetadata[]>([]), [target, setTarget] = useState('self');
+  const [rows, setRows] = useState<UserAvatarMetadata[]>([]), [ownTarget, setTarget] = useState('self');
+  const target = sharedTarget ?? ownTarget;
   const [filter, setFilter] = useState(''), [importOpen, setImportOpen] = useState(false), [selected, setSelected] = useState<string | null>(null), [progress, setProgress] = useState({ current: 0, total: 0 });
   const filesInput = useRef<HTMLInputElement>(null), folderInput = useRef<HTMLInputElement>(null);
   const [status, setStatus] = useState(''), [error, setError] = useState(''), [busy, setBusy] = useState(false), [report, setReport] = useState<string[]>([]);
@@ -97,7 +100,7 @@ export function UserAvatarPanel({ storage, section, search = '', agents, assign,
     </div> : null}
     {rows.some(row => row.kind === kind) ? <>
       <label className="flex items-center gap-2 rounded-lg border border-ink/10 px-2.5 py-2"><Search size={13} className="shrink-0 text-ink/50" /><input aria-label={`Search my ${section}`} placeholder={`Search ${section}`} value={filter} onChange={event => setFilter(event.target.value)} className="min-w-0 w-full bg-transparent text-xs outline-none" /></label>
-      <label className="block text-[11px] text-ink/60">Use for<select aria-label={`User ${section} target`} className="mt-1 w-full rounded-lg border border-ink/10 bg-paper p-2 text-xs text-ink" value={target} disabled={busy} onChange={event => setTarget(event.target.value)}><option value="self">My avatar</option>{agents.map(agent => <option key={agent.id} value={agent.id}>{agent.name}</option>)}</select></label>
+      {sharedTarget === undefined ? <label className="block text-[11px] text-ink/60">Use for<select aria-label={`User ${section} target`} className="mt-1 w-full rounded-lg border border-ink/10 bg-paper p-2 text-xs text-ink" value={target} disabled={busy} onChange={event => setTarget(event.target.value)}><option value="self">My avatar</option>{agents.map(agent => <option key={agent.id} value={agent.id}>{agent.name}</option>)}</select></label> : null}
       <div ref={cardGrid} className="grid max-h-80 grid-cols-2 gap-2 overflow-y-auto pr-1" aria-label={`Private ${section}`}>
         {unique.map(row => { const active = selected === row.id; const name = row.name.split('__')[0]!.replace(/_/g, ' '); return <button type="button" key={row.id} data-avatar-id={row.id} disabled={busy} aria-label={`${kind === 'character' ? 'Use' : 'Play'} ${row.name}`} aria-pressed={active} className={`group relative overflow-hidden rounded-lg border text-left transition-colors disabled:opacity-40 ${active ? 'border-ink bg-ink/10' : 'border-ink/10 hover:border-ink/40'}`} title={row.name} onClick={() => void run(async () => { if (kind === 'character') await assign(target, row.id); else await play(target, row.id); if (alive.current) { setSelected(row.id); setStatus(`${kind === 'character' ? 'Using' : 'Playing'} ${name}`); } })}>
           <div className="flex h-20 items-center justify-center bg-ink/5">{row.thumbnail ? <img src={row.thumbnail} alt={name} className="h-full w-full object-contain" /> : <Icon size={kind === 'character' ? 38 : 24} strokeWidth={1.25} className="text-ink/50" />}</div>

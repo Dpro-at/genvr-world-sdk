@@ -61,7 +61,8 @@ export function defaultLayout(mode: WorkspaceMode): StudioLayout {
     bottom: mode === 'filming' ? 320 : 180,
     leftOpen: true,
     rightOpen: true,
-    bottomOpen: true,
+    // Debug starts folded into the status bar (ITEMS-I10); Filming keeps its timeline open.
+    bottomOpen: mode === 'filming',
     worldSounds: false,
   };
 }

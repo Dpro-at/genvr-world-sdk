@@ -51,6 +51,7 @@ import { OceanResourceControls } from './ocean-resource-controls';
 import { FreeSourcesWindow, OriginLine } from './free-sources';
 import { coreLibraryPicture } from './library-picture';
 import { useStudioHost } from '../../lib/studio-host';
+import { kindName, setLibraryDetails, STYLE_NAMES, useLibraryDetails } from '../../lib/library-details';
 
 type Style = 'blocky' | 'realistic' | 'anime' | 'voxel';
 
@@ -202,160 +203,20 @@ function Chips<T>({
   );
 }
 
-/**
- * Studio library (P3-06, P1-08): the whole Core Library and the approved creator items by kind,
- * with search, filters for price, maker, and art style, price badges, and a details view with a
- * large preview. Picking a model starts placing it (creator models load their glTF package), a
- * road starts drawing it, a move plays it on the avatar.
- */
-export function LibraryPanel({
+/** The picture of a library item: its icon, rendered model, ground texture or engine preview. */
+export function LibraryPicture({
+  entry,
   runtime,
-  status,
-  style: suppliedStyle,
+  style,
+  selected,
+  large = false,
 }: {
+  entry: LibraryEntry;
   runtime: RefObject<GenvrRuntime | null>;
-  status: ToolStatus;
   style: Style;
+  selected: boolean;
+  large?: boolean;
 }) {
-  const host = useStudioHost();
-  const kinds = host.presentationControls ? KINDS : KINDS.filter(row => row.id !== 'notifications' && row.id !== 'cards');
-  const [text, setText] = useState('');
-  const [kind, setKind] = useState(KINDS[0]!.id);
-  const [group, setGroup] = useState<string | undefined>(undefined);
-  const [price, setPrice] = useState<'free' | 'paid' | undefined>(undefined);
-  const [source, setSource] = useState<ItemSource | undefined>(undefined);
-  const [style, setStyle] = useState(suppliedStyle);
-  useEffect(() => {
-    const sync = () => setStyle(runtime.current?.world.style.base ?? suppliedStyle);
-    sync();
-    const timer = setInterval(sync, 300);
-    return () => clearInterval(timer);
-  }, [runtime, suppliedStyle]);
-  const [filtersOpen, setFiltersOpen] = useState(false);
-  const [details, setDetails] = useState<LibraryEntry | null>(null);
-  const [selectionError, setSelectionError] = useState('');
-  const [catalogError, setCatalogError] = useState('');
-  const [catalogLoading, setCatalogLoading] = useState(false);
-  const [catalogRetry, setCatalogRetry] = useState(0);
-  const [store, setStore] = useState<StoreEntry[]>([]);
-  useEffect(() => {
-    if (!host.platform && !host.catalog) return;
-    const controller = new AbortController();
-    setCatalogLoading(true); setCatalogError('');
-    const work = host.catalog ? host.catalog.list() : fetchStoreItems(controller.signal);
-    void work.then(items => { if (!controller.signal.aborted) setStore(items); }).catch(() => { if (!controller.signal.aborted) setCatalogError('Marketplace is unavailable. Bundled library items still work.'); }).finally(() => { if (!controller.signal.aborted) setCatalogLoading(false); });
-    return () => controller.abort();
-  }, [host.platform, host.catalog, catalogRetry]);
-  const [external, setExternal] = useState<StoreEntry[]>([]);
-  const [freeOpen, setFreeOpen] = useState(false);
-  useEffect(() => {
-    if (!host.platform) return;
-    const controller = new AbortController();
-    fetchExternalItems(controller.signal)
-      .then(setExternal)
-      .catch(() => undefined);
-    return () => controller.abort();
-  }, [host.platform]);
-  const externalById = useMemo(
-    () => new Map(external.map((entry) => [entry.manifest.id, entry])),
-    [external],
-  );
-  const everything = useMemo(() => [...LIBRARY, ...store, ...external], [store, external]);
-  // Block ground (P2-26): only road types with blocks, and no height field tools.
-  const worksHere = (id: string, subcategory: string) => {
-    const rt = runtime.current;
-    if (!rt?.blockGround) return true;
-    if (subcategory === 'roads') return rt.blockRoadTypes?.includes(id) ?? true;
-    const drawn = DRAWN_ITEMS.find((item) => item.manifest.id === id);
-    return !drawn || !HEIGHT_FIELD_TOOLS.has(drawn.tool);
-  };
-
-  const section = KINDS.find((entry) => entry.id === kind)!;
-  const picked = section.groups?.find((g) => ('ids' in g ? g.value : g.subcategory) === group);
-  const pickedIds = picked && 'ids' in picked ? picked.ids : null;
-  const entries = queryLibrary(
-    {
-      ...section.filter,
-      ...(picked && !pickedIds ? { subcategory: group } : {}),
-      style,
-      ...(price ? { price } : {}),
-      ...(source ? { source } : {}),
-      text,
-    },
-    everything,
-  ).filter(
-    (entry) =>
-      worksHere(entry.manifest.id, entry.manifest.subcategory) &&
-      (!pickedIds || pickedIds.includes(entry.manifest.id)),
-  );
-  const activeFilters = [price, source].filter(Boolean).length;
-
-  const use = (entry: LibraryEntry) => {
-    const rt = runtime.current;
-    const { manifest } = entry;
-    setDetails(entry);
-    setSelectionError('');
-    if (!rt) return;
-    if (!manifest.styles.includes(rt.world.style.base)) { setSelectionError('This item is not available for the current world style.'); return; }
-    if (host.catalog && manifest.price.type !== 'free') { setSelectionError('This item requires a Genvr account and an authorized purchase.'); return; }
-    const drawn = DRAWN_ITEMS.find((item) => item.manifest.id === manifest.id);
-    const ocean = getOceanResource(manifest.id);
-    if (ocean) {
-      if (!ocean.manifest.styles.includes(rt.world.style.base)) {
-        setSelectionError('This ocean supports the Realistic style.');
-        return;
-      }
-      // Opening the already selected resource is a read-only properties action.
-      if (rt.world.environment.sea?.resourceId === ocean.resourceId) return;
-      const applied = rt.applyCommand({
-        type: 'set_sea',
-        params: {
-          level: rt.world.environment.sea?.level ?? ocean.controls.find((c) => c.key === 'level')!.default!,
-          resourceId: ocean.resourceId,
-        },
-      });
-      if (!applied) setSelectionError('The ocean could not be applied.');
-    } else if (drawn) {
-      // Walls, doors, windows, and water are drawn with their build tool.
-      rt.setTool(drawn.tool);
-    } else if (manifest.subcategory === 'roads') {
-      rt.setTool('road');
-      rt.setRoadType(manifest.id);
-    } else if (manifest.subcategory === 'ground') {
-      // Ground materials (P2-37) are painted with the Terrain brush.
-      const material = getGround(manifest.id);
-      if (!material) return;
-      rt.setTool('terrain');
-      rt.setBrush({ mode: 'paint', soil: material.soil, material: groundRef(material) });
-    } else if (manifest.type === 'animation') {
-      if (host.presentAvatar) { const error = host.presentAvatar({ kind: 'animation', target: 'self', animation: manifest.id, duration: 5500 }); if (error) setSelectionError(error); }
-      else rt.playAnimation(manifest.id);
-    } else if (manifest.subcategory === 'sky' || manifest.subcategory === 'weather') {
-      // Sky and weather items apply to the whole place (live for everyone, undoable).
-      const preset = manifest.id.split('.').pop() as never;
-      rt.applyCommand(
-        manifest.subcategory === 'sky'
-          ? { type: 'set_sky', params: { preset } }
-          : { type: 'set_weather', params: { preset } },
-      );
-    } else if (manifest.type === 'model') {
-      // Creator models start loading their package now, so the ghost shows the real model.
-      if (isStoreEntry(entry)) rt.itemName(manifest.id);
-      rt.setTool('place');
-      rt.setPlaceItem(manifest.id);
-    }
-  };
-  const drawnId = DRAWN_ITEMS.find((item) => item.tool === status.tool)?.manifest.id ?? null;
-  const selectedId =
-    status.tool === 'road'
-      ? status.roadType
-      : status.tool === 'place'
-        ? status.placeItemId
-        : status.tool === 'terrain' && status.brush.mode === 'paint'
-          ? (status.brush.material?.id ?? null)
-          : drawnId;
-
-  const picture = (entry: LibraryEntry, selected: boolean, large = false) => {
     const { manifest } = entry;
     const drawnIcon = DRAWN_ICONS[manifest.id];
     if (drawnIcon || manifest.type === 'animation' || manifest.type === 'environment') {
@@ -406,7 +267,168 @@ export function LibraryPanel({
         large={large}
       />
     );
+  }
+
+/**
+ * Studio library (P3-06, P1-08): the whole Core Library and the approved creator items by kind,
+ * with search, filters for price, maker, and art style, price badges, and a details view with a
+ * large preview. Picking a model starts placing it (creator models load their glTF package), a
+ * road starts drawing it, a move plays it on the avatar.
+ */
+export function LibraryPanel({
+  runtime,
+  status,
+  style: suppliedStyle,
+}: {
+  runtime: RefObject<GenvrRuntime | null>;
+  status: ToolStatus;
+  style: Style;
+}) {
+  const host = useStudioHost();
+  const kinds = host.presentationControls ? KINDS : KINDS.filter(row => row.id !== 'notifications' && row.id !== 'cards');
+  const [text, setText] = useState('');
+  const [kind, setKind] = useState(KINDS[0]!.id);
+  const [group, setGroup] = useState<string | undefined>(undefined);
+  const [price, setPrice] = useState<'free' | 'paid' | undefined>(undefined);
+  const [source, setSource] = useState<ItemSource | undefined>(undefined);
+  const [style, setStyle] = useState(suppliedStyle);
+  useEffect(() => {
+    const sync = () => setStyle(runtime.current?.world.style.base ?? suppliedStyle);
+    sync();
+    const timer = setInterval(sync, 300);
+    return () => clearInterval(timer);
+  }, [runtime, suppliedStyle]);
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const details = useLibraryDetails();
+  const setDetails = setLibraryDetails;
+  // Moves (ITEMS-I4): one "Plays on" for every source, and three tabs instead of four stacked lists.
+  const [moveTab, setMoveTab] = useState<'library' | 'mine' | 'faces'>('library');
+  const [moveTarget, setMoveTarget] = useState('self');
+  const [selectionError, setSelectionError] = useState('');
+  const [catalogError, setCatalogError] = useState('');
+  const [catalogLoading, setCatalogLoading] = useState(false);
+  const [catalogRetry, setCatalogRetry] = useState(0);
+  const [store, setStore] = useState<StoreEntry[]>([]);
+  useEffect(() => {
+    if (!host.platform && !host.catalog) return;
+    const controller = new AbortController();
+    setCatalogLoading(true); setCatalogError('');
+    const work = host.catalog ? host.catalog.list() : fetchStoreItems(controller.signal);
+    void work.then(items => { if (!controller.signal.aborted) setStore(items); }).catch(() => { if (!controller.signal.aborted) setCatalogError('Marketplace is unavailable. Bundled library items still work.'); }).finally(() => { if (!controller.signal.aborted) setCatalogLoading(false); });
+    return () => controller.abort();
+  }, [host.platform, host.catalog, catalogRetry]);
+  const [external, setExternal] = useState<StoreEntry[]>([]);
+  const [freeOpen, setFreeOpen] = useState(false);
+  useEffect(() => {
+    if (!host.platform) return;
+    const controller = new AbortController();
+    fetchExternalItems(controller.signal)
+      .then(setExternal)
+      .catch(() => undefined);
+    return () => controller.abort();
+  }, [host.platform]);
+  const externalById = useMemo(
+    () => new Map(external.map((entry) => [entry.manifest.id, entry])),
+    [external],
+  );
+  const everything = useMemo(() => [...LIBRARY, ...store, ...external], [store, external]);
+  // Block ground (P2-26): only road types with blocks, and no height field tools.
+  const worksHere = (id: string, subcategory: string) => {
+    const rt = runtime.current;
+    if (!rt?.blockGround) return true;
+    if (subcategory === 'roads') return rt.blockRoadTypes?.includes(id) ?? true;
+    const drawn = DRAWN_ITEMS.find((item) => item.manifest.id === id);
+    return !drawn || !HEIGHT_FIELD_TOOLS.has(drawn.tool);
   };
+
+  const section = KINDS.find((entry) => entry.id === kind)!;
+  const picked = section.groups?.find((g) => ('ids' in g ? g.value : g.subcategory) === group);
+  const pickedIds = picked && 'ids' in picked ? picked.ids : null;
+  const entries = kind === 'notifications' || kind === 'cards' ? [] : queryLibrary(
+    {
+      ...section.filter,
+      ...(picked && !pickedIds ? { subcategory: group } : {}),
+      style,
+      ...(price ? { price } : {}),
+      ...(source ? { source } : {}),
+      text,
+    },
+    everything,
+  ).filter(
+    (entry) =>
+      worksHere(entry.manifest.id, entry.manifest.subcategory) &&
+      (!pickedIds || pickedIds.includes(entry.manifest.id)),
+  );
+  const activeFilters = [price, source].filter(Boolean).length;
+
+  const use = (entry: LibraryEntry) => {
+    const rt = runtime.current;
+    const { manifest } = entry;
+    setDetails(entry);
+    setSelectionError('');
+    if (!rt) return;
+    if (!manifest.styles.includes(rt.world.style.base)) { setSelectionError('This item is not available for the current world style.'); return; }
+    // Paid items need a purchase on every host (ITEMS-I7): the platform marks owned ones "purchased".
+    const owned = (manifest as { tags?: readonly string[] }).tags?.includes('purchased') ?? false;
+    if (manifest.price.type !== 'free' && !owned) { setSelectionError('This item is paid: buy it in the marketplace first, then place it.'); return; }
+    const drawn = DRAWN_ITEMS.find((item) => item.manifest.id === manifest.id);
+    const ocean = getOceanResource(manifest.id);
+    if (ocean) {
+      if (!ocean.manifest.styles.includes(rt.world.style.base)) {
+        setSelectionError('This ocean supports the Realistic style.');
+        return;
+      }
+      // Opening the already selected resource is a read-only properties action.
+      if (rt.world.environment.sea?.resourceId === ocean.resourceId) return;
+      const applied = rt.applyCommand({
+        type: 'set_sea',
+        params: {
+          level: rt.world.environment.sea?.level ?? ocean.controls.find((c) => c.key === 'level')!.default!,
+          resourceId: ocean.resourceId,
+        },
+      });
+      if (!applied) setSelectionError('The ocean could not be applied.');
+    } else if (drawn) {
+      // Walls, doors, windows, and water are drawn with their build tool.
+      rt.setTool(drawn.tool);
+    } else if (manifest.subcategory === 'roads') {
+      rt.setTool('road');
+      rt.setRoadType(manifest.id);
+    } else if (manifest.subcategory === 'ground') {
+      // Ground materials (P2-37) are painted with the Terrain brush.
+      const material = getGround(manifest.id);
+      if (!material) return;
+      rt.setTool('terrain');
+      rt.setBrush({ mode: 'paint', soil: material.soil, material: groundRef(material) });
+    } else if (manifest.type === 'animation') {
+      if (host.presentAvatar) { const error = host.presentAvatar({ kind: 'animation', target: moveTarget, animation: manifest.id, duration: 5500 }); if (error) setSelectionError(error); }
+      else rt.playAnimation(manifest.id);
+    } else if (manifest.subcategory === 'sky' || manifest.subcategory === 'weather') {
+      // Sky and weather items apply to the whole place (live for everyone, undoable).
+      const preset = manifest.id.split('.').pop() as never;
+      rt.applyCommand(
+        manifest.subcategory === 'sky'
+          ? { type: 'set_sky', params: { preset } }
+          : { type: 'set_weather', params: { preset } },
+      );
+    } else if (manifest.type === 'model') {
+      // Creator models start loading their package now, so the ghost shows the real model.
+      if (isStoreEntry(entry)) rt.itemName(manifest.id);
+      rt.setTool('place');
+      rt.setPlaceItem(manifest.id);
+    }
+  };
+  const drawnId = DRAWN_ITEMS.find((item) => item.tool === status.tool)?.manifest.id ?? null;
+  const selectedId =
+    status.tool === 'road'
+      ? status.roadType
+      : status.tool === 'place'
+        ? status.placeItemId
+        : status.tool === 'terrain' && status.brush.mode === 'paint'
+          ? (status.brush.material?.id ?? null)
+          : drawnId;
+
+  const picture = (entry: LibraryEntry, selected: boolean, large = false) => <LibraryPicture entry={entry} runtime={runtime} style={style} selected={selected} large={large} />;
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-2">
@@ -441,9 +463,9 @@ export function LibraryPanel({
         </button>
       </div>
 
-      <p role="status" aria-label="Library world style" className="rounded-lg border border-ink/10 bg-paper px-2 py-1.5 text-[11px] font-semibold">{style === 'blocky' ? 'Simple' : style === 'anime' ? 'Cartoon' : style === 'voxel' ? 'Voxel' : 'Realistic'} world · compatible items only</p>
+      <p role="status" aria-label="Library world style" className="px-1 text-[11px] font-semibold text-ink/60">{STYLE_NAMES[style] ?? style} world · only items that fit it</p>
       {catalogLoading ? <p role="status" className="text-xs">Loading marketplace…</p> : null}
-      {catalogError ? <div role="alert" className="text-xs"><p>{catalogError}</p><button type="button" onClick={() => setCatalogRetry(value => value + 1)}>Retry marketplace</button></div> : null}
+      {catalogError ? <div role="alert" className="text-xs"><p>{catalogError}</p><button type="button" onClick={() => setCatalogRetry(value => value + 1)} className="mt-1 rounded-lg bg-paper px-2 py-1 font-bold hover:bg-ink/10">Retry marketplace</button></div> : null}
       {filtersOpen ? (
         <div className="flex flex-col gap-2 rounded-xl border border-ink/10 p-2">
           <p className="text-[11px] font-black text-ink/50 uppercase">Price</p>
@@ -454,13 +476,15 @@ export function LibraryPanel({
         </div>
       ) : null}
 
-      <div role="tablist" aria-label="Kinds" className="grid grid-cols-3 gap-1.5 pb-1">
+      <div role="tablist" aria-label="Kinds" className="flex flex-wrap gap-1 border-b border-ink/10 pb-2">
         {kinds.filter(entry => host.platform || entry.id !== 'free').map((entry) => (
           <button
             key={entry.id}
             type="button"
             role="tab"
             aria-selected={kind === entry.id}
+            aria-label={entry.label}
+            title={entry.label}
             onClick={() => {
               setKind(entry.id);
               // The Free tab opens the Free sources window at once (owner, 2026-10-06).
@@ -468,12 +492,12 @@ export function LibraryPanel({
               setGroup(undefined);
               setDetails(null);
             }}
-            className={`flex min-h-14 min-w-0 flex-col justify-center gap-1 items-center rounded-xl px-1.5 py-2 text-xs font-bold ${
-              kind === entry.id ? 'bg-ink text-on-brand' : 'text-ink/60 hover:bg-ink/5'
+            className={`flex h-8 items-center justify-center gap-1.5 rounded-lg text-xs font-bold ${
+              kind === entry.id ? 'bg-ink px-2.5 text-on-brand' : 'w-8 text-ink/60 hover:bg-ink/10 hover:text-ink'
             }`}
           >
-            <entry.Icon className="size-5" aria-hidden />
-            {entry.label}
+            <entry.Icon className="size-4" aria-hidden />
+            {kind === entry.id ? entry.label : null}
           </button>
         ))}
       </div>
@@ -516,14 +540,36 @@ export function LibraryPanel({
           }}
         />
       ) : null}
-      {host.presentationControls && ['moves', 'effects', 'notifications', 'cards'].includes(kind) ? <div className="overflow-y-auto space-y-3">{kind === 'moves' ? host.userAvatarControls?.('motions', text) : null}{host.presentationControls(kind === 'moves' ? 'motions' : kind as 'effects' | 'notifications' | 'cards', text)}{kind === 'moves' ? host.presentationControls('expressions', text) : null}</div> : null}
-      <div className="grid min-h-0 flex-1 auto-rows-min grid-cols-[repeat(auto-fill,minmax(88px,1fr))] gap-1.5 overflow-y-auto pr-1">
+      {kind === 'moves' ? (
+        <div className="flex flex-col gap-2">
+          {host.presentAvatar ? (
+            <label className="flex items-center gap-2 text-xs font-bold">
+              <span className="flex-1 text-ink/60">Plays on</span>
+              <select aria-label="Plays on" value={moveTarget} onChange={(event) => setMoveTarget(event.target.value)} className="rounded-lg bg-paper px-2 py-1.5">
+                <option value="self">My avatar</option>
+                {(host.presentationTargets?.() ?? []).map((agent) => <option key={agent.id} value={agent.id}>{agent.name}</option>)}
+              </select>
+            </label>
+          ) : null}
+          <div role="tablist" aria-label="Moves" className="grid grid-cols-3 gap-1 rounded-xl bg-paper p-1">
+            {([['library', 'Library'], ['mine', 'My motions'], ['faces', 'Faces']] as const)
+              .filter(([id]) => id === 'library' || host.presentationControls)
+              .map(([id, label]) => (
+                <button key={id} type="button" role="tab" aria-selected={moveTab === id} onClick={() => setMoveTab(id)}
+                  className={`rounded-lg py-1.5 text-xs font-bold ${moveTab === id ? 'bg-surface shadow' : 'text-ink/60 hover:text-ink'}`}>{label}</button>
+              ))}
+          </div>
+        </div>
+      ) : null}
+      {host.presentationControls && kind === 'moves' && moveTab !== 'library' ? <div className="min-h-0 flex-1 space-y-3 overflow-y-auto">{moveTab === 'mine' ? <>{host.userAvatarControls?.('motions', text, undefined, moveTarget)}{host.presentationControls('motions', text, moveTarget)}</> : host.presentationControls('expressions', text, moveTarget)}</div> : null}
+      {host.presentationControls && ['effects', 'notifications', 'cards'].includes(kind) ? <div className={`space-y-3 overflow-y-auto ${kind === 'effects' && entries.length ? 'max-h-[60%]' : 'min-h-0 flex-1'}`}>{host.presentationControls(kind as 'effects' | 'notifications' | 'cards', text)}</div> : null}
+      {kind === 'moves' && moveTab !== 'library' ? null : (kind === 'notifications' || kind === 'cards') && host.presentationControls ? null : <div className="grid min-h-0 flex-1 auto-rows-min grid-cols-3 gap-1.5 overflow-y-auto pr-1">
         {entries.length === 0 && !(host.presentationControls && ['effects', 'notifications', 'cards'].includes(kind)) ? (
           <div className="col-span-full flex flex-col items-start gap-2 px-1 py-4 text-sm text-ink/50">
-            <p>{section.empty ?? `No compatible items found for this ${style === 'blocky' ? 'Simple' : style} world.`}</p>
+            <p>{section.empty ?? `No items fit this ${STYLE_NAMES[style] ?? style} world yet.`}</p>
           </div>
         ) : null}
-        {(host.presentationControls && ['notifications', 'cards'].includes(kind) ? [] : entries).map((entry) => {
+        {entries.map((entry) => {
           const { manifest } = entry;
           const selected = selectedId === manifest.id || details?.manifest.id === manifest.id;
           return (
@@ -549,73 +595,14 @@ export function LibraryPanel({
             </button>
           );
         })}
-      </div>
+      </div>}
 
       {selectionError ? (
         <p role="alert" className="text-xs text-red-600">
           {selectionError}
         </p>
       ) : null}
-      {details && getOceanResource(details.manifest.id) ? (
-        <OceanResourceControls
-          key={details.manifest.id}
-          runtime={runtime}
-          resource={getOceanResource(details.manifest.id)!}
-        />
-      ) : null}
-      {details ? (
-        <div className="flex gap-2 rounded-xl border border-ink/10 p-2">
-          <div className="shrink-0 overflow-hidden rounded-lg bg-paper">{picture(details, false, true)}</div>
-          <dl className="min-w-0 text-xs">
-            <dt className="sr-only">Name</dt>
-            <dd className="truncate text-sm font-black">{details.manifest.name}</dd>
-            <dt className="sr-only">Kind</dt>
-            <dd className="text-ink/60">
-              {details.manifest.category} / {details.manifest.subcategory}
-            </dd>
-            <dt className="mt-1.5 font-bold text-ink/50">Price</dt>
-            <dd className="font-bold">{priceLabel(details.manifest)}</dd>
-            <dt className="mt-1.5 font-bold text-ink/50">Made by</dt>
-            <dd>{details.manifest.author.name}</dd>
-            {details.manifest.origin ? <OriginLine origin={details.manifest.origin} /> : null}
-            {(() => {
-              const core = getCoreItem(details.manifest.id);
-              const look = core ? itemModelLook(core, style) : null;
-              return look ? (
-                <>
-                  <dt className="mt-1.5 font-bold text-ink/50">Size</dt>
-                  <dd>
-                    {look.model.levels
-                      .map(
-                        (level) =>
-                          `${level.triangles.toLocaleString()} tri, ${(level.bytes / 1e6).toFixed(1)} MB`,
-                      )
-                      .join(' / ')}
-                  </dd>
-                </>
-              ) : null;
-            })()}
-            {getGround(details.manifest.id) ? (
-              <>
-                <dt className="mt-1.5 font-bold text-ink/50">Size</dt>
-                <dd>
-                  {getGround(details.manifest.id)!
-                    .files.map((files) => `${files.size}: ${(files.bytes / 1e6).toFixed(1)} MB`)
-                    .join(', ')}
-                </dd>
-              </>
-            ) : null}
-            <dt className="mt-1.5 font-bold text-ink/50">Styles</dt>
-            <dd>{details.manifest.styles.join(', ')}</dd>
-            {isStoreEntry(details) && details.caption ? (
-              <>
-                <dt className="sr-only">About</dt>
-                <dd className="mt-1.5 line-clamp-3 text-ink/70">{details.caption}</dd>
-              </>
-            ) : null}
-          </dl>
-        </div>
-      ) : null}
+      <p className="text-[11px] text-ink/50">Click to place or use · details show on the right.</p>
     </div>
   );
 }

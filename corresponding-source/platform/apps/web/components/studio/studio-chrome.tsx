@@ -12,7 +12,7 @@ import { recipeLook } from '@genvr/contracts';
 import type { PlayDevice } from '@genvr/contracts';
 import type { GenvrRuntime, ToolStatus } from '@genvr/runtime';
 import { Share2, Mic, Camera, Users, Focus, Lightbulb, Circle, Globe, Play, Redo2, Square, Undo2, type LucideIcon, Settings2, Volume2, VolumeX } from 'lucide-react';
-import { useEffect, type ReactNode, type RefObject } from 'react';
+import { useEffect, type ReactNode, type RefObject, useRef } from 'react';
 import { toolsFor } from '../build-panel';
 import { EnvironmentPicker } from '../environment-picker';
 import { ThemeToggle } from '../theme-toggle';
@@ -27,6 +27,7 @@ import { CaptureButton } from './capture-button';
 import { ExplorerPanel } from './explorer-panel';
 import { PropertiesPanel } from './properties-panel';
 import { OPTION_TOOLS, ToolOptionsPanel } from './tool-options-panel';
+import { ItemsSidePanel } from './items-side-panel';
 import { setStructureFocus } from '../../lib/structure-focus';
 import { SnapBar } from './snap-bar';
 import { GenvrMark } from '../genvr-mark';
@@ -201,6 +202,15 @@ export function StudioChrome({
     if (status.tool !== 'select' && status.tool !== null) setStructureFocus(null);
   }, [status.tool]);
   useEffect(() => setStructureFocus(null), [tab]);
+  // A Build or Items tool does not follow into another tab (ITEMS-I0: the Map hint stayed on Items).
+  const lastTab = useRef(tab);
+  const toolNow = useRef(status.tool);
+  toolNow.current = status.tool;
+  useEffect(() => {
+    if (lastTab.current === tab) return;
+    lastTab.current = tab;
+    if (toolNow.current && toolNow.current !== 'select') runtime.current?.setTool(tab === 'build' || tab === 'items' ? 'select' : null);
+  }, [tab, runtime]);
   // Build keys (BUILD-B1): a letter picks a tool; Ctrl/Cmd+Z undoes, Ctrl+Y or Shift+Ctrl/Cmd+Z redoes.
   useEffect(() => {
     if (testing || (tab !== 'build' && tab !== 'items' && tab !== 'world')) return;
@@ -274,6 +284,18 @@ export function StudioChrome({
     if (id === 'assistant') return <AssistantPanel runtime={runtime} placeId={placeId} />;
     if (id === 'properties' && tab === 'build' && status.tool && OPTION_TOOLS.has(status.tool))
       return <ToolOptionsPanel runtime={runtime} status={status} placeId={placeId} />;
+    if (id === 'properties' && tab === 'items')
+      return (
+        <ItemsSidePanel
+          runtime={runtime}
+          status={status}
+          placeId={placeId}
+          savePlaceId={isOwner && host.platform ? placeId : undefined}
+          grid={layout.snapGrid}
+          angle={layout.snapAngle}
+          style={style}
+        />
+      );
     if (id === 'properties')
       return (
         <div className="px-3 pb-3">
