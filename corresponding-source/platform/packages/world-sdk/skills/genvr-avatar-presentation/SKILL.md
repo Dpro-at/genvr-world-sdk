@@ -83,6 +83,7 @@ Character recipe editing is separate from this presentation tool: use `avatar_st
 - `view` shows the body as `normal`, `first-person`, `skeleton`, `skeleton-mesh`, `muscles` (red), `fat` (yellow), `wireframe`, `clay` or `normals`; `shading` is `smooth` or `flat`. Views change only the display, not the recipe.
 - `expression` shows `neutral`, `smile`, `angry`, `sad`, `surprised` or `thinking` on the face. It is refused when the body has no face controls; say so instead of claiming it worked.
 - `play` plays a move id (from `list_avatar_motions`); `reset_shape` returns the shape to normal; `save` keeps the character in this browser; `export` returns the recipe JSON.
+- `undo` / `redo` step through the character's edits (a slider drag is one step), the same as Ctrl+Z / Ctrl+Y on the Avatar tab.
 
 ```json
 {"action":"set","recipe":{"shape":{"muscle":0.4,"fat":0.1,"muscles":{"shoulders":0.6},"face":{"eyeSize":0.3}}}}
