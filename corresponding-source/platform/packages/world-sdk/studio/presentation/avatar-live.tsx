@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
-import { Monitor, X, Share2, Settings, User, Mic, Image, Globe, ShieldCheck, Bell, MapPin, MessageSquare, Activity } from 'lucide-react';
+import { Monitor, X, Share2, Settings, Maximize2, Minimize2, User, Mic, Image, Globe, ShieldCheck, Bell, MapPin, MessageSquare, Activity } from 'lucide-react';
 import { type CharacterRecipe } from '@genvr/contracts';
 import type { CharacterStage } from '@genvr/runtime/character';
 import { AvatarPresentation } from '../../src/avatar-presentation';
@@ -101,6 +101,10 @@ export function AvatarLive({ controller, recipe, onStage, projectId, characters,
   useEffect(()=>{hostRef.current?.onPrefs?.(prefs);},[prefs]);
   useEffect(()=>{hostRef.current?.onSettings?.(settingsOpen);},[settingsOpen]);
   useEffect(()=>{if(host?.settingsRequest)setSettingsOpen(true);},[host?.settingsRequest]);
+  // Full screen (page header only): real full screen where the browser allows it.
+  const [full,setFull]=useState(false);
+  const setFullscreen=(on:boolean)=>{setFull(on);if(on)void dialog.current?.requestFullscreen?.().catch(()=>{/* the host or page view stays */});else if(document.fullscreenElement)void document.exitFullscreen().catch(()=>{});};
+  useEffect(()=>{const sync=()=>{if(!document.fullscreenElement&&full)setFullscreen(false);};document.addEventListener('fullscreenchange',sync);return()=>document.removeEventListener('fullscreenchange',sync);},[full]);
   useEffect(()=>{if(!embedded||!settingsOpen)return;const escape=(e:KeyboardEvent)=>{if(e.key==='Escape')setSettingsOpen(false);};window.addEventListener('keydown',escape);return()=>window.removeEventListener('keydown',escape);},[embedded,settingsOpen]);
   const current = useRef({ recipe, onStage, framing:display.framing, round:display.layout==='circle'||display.layout==='watch' }); current.current={recipe,onStage,framing:display.framing,round:display.layout==='circle'||display.layout==='watch'};
   const change = (patch: Record<string,unknown>) => setError(controller.execute({kind:'display',...patch})??'');
@@ -194,6 +198,7 @@ export function AvatarLive({ controller, recipe, onStage, projectId, characters,
       {agent?<span className="rounded-full border border-ink/15 px-3 py-1 text-xs font-bold">{agent.name}</span>:null}
       <div role="group" aria-label="Who it talks to" className="flex gap-1 rounded-xl border border-ink/15 p-1">{([['me','For me'],['customers','For my customers']] as const).map(([id,label])=><button key={id} aria-pressed={prefs.mode===id} className={pill(prefs.mode===id)} onClick={()=>setPrefs({mode:id})}>{label}</button>)}</div>
       <span className="flex-1"/>
+      <button onClick={()=>setFullscreen(!full)} aria-pressed={full} aria-label={full?'Exit full screen':'Full screen'} title={full?'Exit full screen':'Full screen'} className="inline-flex min-h-10 items-center rounded-lg border border-ink/15 px-3">{full?<Minimize2 className="size-4"/>:<Maximize2 className="size-4"/>}</button>
       <button onClick={()=>setSettingsOpen(true)} aria-haspopup="dialog" className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-ink/15 px-3 text-xs font-bold"><Settings className="size-4"/>Settings</button>
       {onShare?<button onClick={onShare} className="inline-flex min-h-10 items-center gap-2 rounded-lg bg-ink px-4 text-xs font-bold text-on-brand"><Share2 className="size-4"/>Share</button>:null}
       <button aria-label="Close Avatar Live" onClick={()=>change({open:false})} className="rounded p-2"><X className="size-4"/></button>
