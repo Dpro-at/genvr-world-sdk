@@ -99,6 +99,12 @@ export const LabRunSettings = z.object({
   wait_for_green: z.boolean().default(true),
 }).strict();
 export type LabRunSettings = z.infer<typeof LabRunSettings>;
+/** A change to some run settings. Without defaults, so the settings not named keep their current values. */
+const runShape = LabRunSettings.shape;
+export const LabRunSettingsPatch = z.object({ motion: runShape.motion.unwrap(), character: runShape.character.unwrap(), speed: runShape.speed.unwrap(),
+  stride: runShape.stride.unwrap(), step_height: runShape.step_height.unwrap(), jump_timing_ms: runShape.jump_timing_ms.unwrap(),
+  blend_s: runShape.blend_s.unwrap(), lean_deg: runShape.lean_deg.unwrap(), wait_for_green: runShape.wait_for_green.unwrap() }).partial().strict();
+export type LabRunSettingsPatch = z.infer<typeof LabRunSettingsPatch>;
 
 export const LabScore = z.object({
   /** Planted feet drifting over the ground, both feet, whole run (cm). */
@@ -181,8 +187,8 @@ export const MotionLabOperation = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('course_from_seed'), seed: z.number().int().min(0).max(2 ** 31 - 1), obstacles: z.number().int().min(1).max(12).default(5),
     hardness: z.number().int().min(1).max(5).default(2), street: z.boolean().default(true) }).strict(),
   z.object({ kind: z.literal('traffic_set'), street: LabStreet.nullable().optional(), cars: z.array(LabCar).max(8).optional() }).strict(),
-  z.object({ kind: z.literal('settings_set'), settings: LabRunSettings.partial() }).strict(),
-  z.object({ kind: z.literal('run'), settings: LabRunSettings.partial().optional(), version: labId.optional() }).strict(),
+  z.object({ kind: z.literal('settings_set'), settings: LabRunSettingsPatch }).strict(),
+  z.object({ kind: z.literal('run'), settings: LabRunSettingsPatch.optional(), version: labId.optional() }).strict(),
   z.object({ kind: z.literal('runs_list') }).strict(),
   z.object({ kind: z.literal('scores'), run: labId.optional() }).strict(),
   z.object({ kind: z.literal('frame'), run: labId.optional(), t: z.number().min(0).max(600) }).strict(),

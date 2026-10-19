@@ -30,4 +30,9 @@ describe('motion lab contracts (MOTION-LAB L1)', () => {
     expect(MotionLabOperation.parse({ kind: 'obstacle_set', id: 'gap-1', set: { width: 1.4 } })).toMatchObject({ set: { width: 1.4 } });
     expect(() => MotionLabOperation.parse({ kind: 'view_set', speed: 3 })).toThrow();
   });
+  it('changes only the run settings that are named', () => {
+    expect(MotionLabOperation.parse({ kind: 'settings_set', settings: { speed: 2 } })).toEqual({ kind: 'settings_set', settings: { speed: 2 } });
+    expect(MotionLabOperation.parse({ kind: 'run', settings: { stride: 0.6 } })).toEqual({ kind: 'run', settings: { stride: 0.6 } });
+    expect(() => MotionLabOperation.parse({ kind: 'run', settings: { stride: 3 } })).toThrow();
+  });
 });

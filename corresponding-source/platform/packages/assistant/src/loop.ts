@@ -103,6 +103,8 @@ export interface AssistantHost {
   userAvatarLibrary?(input: ToolArgs<'user_avatar_library'>): Promise<unknown>;
   /** The Avatar tab's character editor (AV-01). */
   avatarStudio?(input: ToolArgs<'avatar_studio'>): Promise<unknown>;
+  /** The Lab area of an open motion lab project; the lab applies the owner gates. */
+  motionLab?(input: ToolArgs<'motion_lab'>): Promise<unknown>;
   world(): WorldDocument;
   heightAt(x: number, z: number): number;
   /**
@@ -503,6 +505,7 @@ export function executeTool(
     case 'avatar_voice': return { ok:false, result:'Use the asynchronous tool runner for voice operations.' };
     case 'user_avatar_library': return { ok: false, result: 'Use the asynchronous tool runner for private library operations.' };
     case 'avatar_studio': return { ok: false, result: 'Use the asynchronous tool runner for the Avatar tab.' };
+    case 'motion_lab': return { ok: false, result: 'Use the asynchronous tool runner for the motion lab.' };
     case 'present_avatar': {
       if (!host.presentAvatar) return { ok: false, result: 'Avatar presentation is not enabled in this host.' };
       const error = host.presentAvatar((args as ToolArgs<'present_avatar'>).event);
@@ -1909,6 +1912,11 @@ async function callTool(
   if (name === 'avatar_studio') {
     if (!host.avatarStudio) return { outcome: { ok: false, result: 'The Avatar tab is not open in this host.' }, args: parsed.args };
     try { return { outcome: { ok: true, result: JSON.stringify(await host.avatarStudio(parsed.args as ToolArgs<'avatar_studio'>)) }, args: parsed.args }; }
+    catch (error) { return { outcome: { ok: false, result: error instanceof Error ? error.message : String(error) }, args: parsed.args }; }
+  }
+  if (name === 'motion_lab') {
+    if (!host.motionLab) return { outcome: { ok: false, result: 'Open a motion lab project to use the Lab (My projects › New motion lab).' }, args: parsed.args };
+    try { return { outcome: { ok: true, result: JSON.stringify(await host.motionLab(parsed.args as ToolArgs<'motion_lab'>)) }, args: parsed.args }; }
     catch (error) { return { outcome: { ok: false, result: error instanceof Error ? error.message : String(error) }, args: parsed.args }; }
   }
   if (name === 'user_avatar_library') {

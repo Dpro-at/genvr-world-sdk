@@ -34,7 +34,8 @@ const localTools = [
   { name: 'get_motion_lab_guide', description: 'Read the motion lab skill: course sizes, runs, scores and how they are measured, versions and owner gates.', inputSchema: { type: 'object' as const, properties: {}, additionalProperties: false } },
 ];
 server.setRequestHandler(ListToolsRequestSchema, async () => ({ tools: [ ...publication.tools(), ...localTools, ...LIVE_TOOLS, ...FILMING_TOOLS,
-  ...TOOL_DEFINITIONS.map(tool => ({ name: tool.function.name, description: tool.function.description,
+  // motion_lab is defined above with the live-Studio wording; skip the assistant copy so it is listed once.
+  ...TOOL_DEFINITIONS.filter(tool => tool.function.name !== 'motion_lab').map(tool => ({ name: tool.function.name, description: tool.function.description,
     inputSchema: tool.function.parameters as { type: 'object' } })),
 ] }));
 server.setRequestHandler(CallToolRequestSchema, async request => {

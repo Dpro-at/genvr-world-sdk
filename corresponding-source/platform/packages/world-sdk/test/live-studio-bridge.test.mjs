@@ -45,3 +45,19 @@ it('scopes voice assignment to the selected project and refuses conflicting proj
     expect(calls).toHaveLength(1);
   } finally { bridge.close(); server.closeAllConnections(); await new Promise(resolve => server.close(resolve)); }
 });
+it('delivers the Avatar tab and motion lab tools to the Studio', async () => {
+  const bridge = createLiveStudioBridge({ timeout: 1000 });
+  const server = createServer(async (req, res) => { if (!await bridge.handle(req, res)) res.writeHead(404).end(); });
+  await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
+  const send = (route, data) => fetch(`http://127.0.0.1:${server.address().port}/studio-bridge/${route}`, { method: 'POST', headers: { Authorization: `Bearer ${bridge.token}`, 'Content-Type': 'application/json' }, body: JSON.stringify(data) }).then(response => response.json());
+  try {
+    const { sessionId } = await send('connect', { projectId: 'lab-project', title: 'Motion lab', capabilities: { motionLab: true } });
+    for (const tool of ['avatar_studio', 'motion_lab']) {
+      const waiting = bridge.call(tool, { operation: { kind: 'commands' } }, sessionId);
+      const { commands } = await send('poll', { sessionId });
+      expect(commands[0].tool).toBe(tool);
+      await send('result', { sessionId, id: commands[0].id, result: { ok: tool } });
+      expect(await waiting).toEqual({ ok: tool });
+    }
+  } finally { bridge.close(); server.closeAllConnections(); await new Promise(resolve => server.close(resolve)); }
+});

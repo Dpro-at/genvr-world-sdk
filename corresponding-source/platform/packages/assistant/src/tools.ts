@@ -1,4 +1,4 @@
-import { StudioShareRequest } from '@genvr/contracts';
+import { MotionLabOperation, StudioShareRequest } from '@genvr/contracts';
 import {
   Counter,
   GAME_LIMITS,
@@ -81,6 +81,11 @@ export const TOOL_ARGS = {
     expression: z.enum(['neutral', 'smile', 'angry', 'sad', 'surprised', 'thinking']).optional(),
     clip: z.string().max(150).optional(),
   }).strict(),
+  /**
+   * The Lab area of a motion lab project (MOTION-LAB L1 + L2): build a measured course, run the lab robot,
+   * read scores and keep motion versions. One operation per call; the owner gates live in the lab controller.
+   */
+  motion_lab: z.object({ operation: MotionLabOperation }).strict(),
   get_resource_controls: z.object({
     item_id: z
       .string()
@@ -837,6 +842,7 @@ const DESCRIPTIONS: Record<ToolName, string> = {
   share_studio: 'Inspect sharing capability, open the separate Share dialog, or create a host-authorized world/Avatar Live link. Creating requires explicit user authorization and an attached platform sharing service; local SDK cannot publish private data. Password enforcement belongs to the host server.',
   avatar_studio: 'Avatar tab: inspect the character (recipe, view, bones, height, whether the face can move); set merges recipe parts (name, body, shape {height, weight, scale, anime, muscle, fat, fatPattern, definition, muscles {group: -1..1}, fatRegions {region: -1..1}, face {feature: -1..1}}, colors {skin, hair, top, bottom, shoes}, hair); view sets the view mode (skeleton, muscles, fat…) and shading; expression holds a facial expression; play a move by id; save the character to My characters; export the recipe JSON; reset_shape back to the normal shape; undo / redo step through the character edits. Works on the live Studio only.',
   present_avatar: 'Use kind display to open/configure Avatar Live layouts (large, desktop, browser, compact, banner, circle, watch), background and framing. For saved world backgrounds, use worldId from inspect_studio.availableWorlds and optional worldSpot {position,target,player} XYZ coordinates; set worldId/worldSpot to null for the current live world view. Optionally show a gesture, facial expression, visual effect, notification or rich card when useful. Transient, never saves the world. target is self or a host agent ID. Use only available Core animation IDs. Never invent live app or stock data. No action permissions are granted by a card.',
+  motion_lab: 'Motion lab (only in a motion lab project): { operation: { kind } }. Kinds: commands (list with help), inspect, course_get, course_set, obstacle_add {obstacle: {kind step|ramp|gap|low_wall|window, z, sizes in metres}}, obstacle_set {id, set}, obstacle_remove {id}, course_from_seed {seed, obstacles?, hardness?, street?}, traffic_set {street?, cars?}, settings_set {settings}, run {settings?, version?} (fixed step + seed, returns score and events), runs_list, scores {run?}, frame {run?, t}, view_set {overlays?, speed?}, versions, save_version {run?, note?}, save_best {version} (only asks: the owner confirms it in the Lab), rollback {version}, version_delete {version, confirm: true} (only versions an agent made, never the best). Read inspect before changing the course.',
   get_resource_controls:
     'Read supported controls, scope, source defaults and documentation for a Core model or ocean resource. Models use instance-scoped set_resource_params; oceans use world-scoped set_sea. Empty model controls means no generated settings; creator package controls are not described.',
   set_resource_params:

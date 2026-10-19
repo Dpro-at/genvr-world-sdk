@@ -1,6 +1,7 @@
 'use client';
 
 import { runAvatarStudio } from '../../lib/avatar-studio';
+import { motionLabBridge, runMotionLab } from '../../lib/motion-lab';
 import { runAssistant, streamingChatModel, type AssistantHost, type ChatMessage , executeTool } from '@genvr/assistant';
 import type { GenvrRuntime } from '@genvr/runtime';
 import { ArrowUp, Check, ShieldCheck, Sparkles, Square, X } from 'lucide-react';
@@ -222,7 +223,7 @@ export function AssistantPanel({
         model: services.model ?? streamingChatModel(`${API_URL}/v1/experiences/${encodeURIComponent(placeId)}/assistant`, {
           credentials: 'include',
         }),
-        host: { ...hostFor(rt, placeId), ...(services.shareStudio?{shareStudio:services.shareStudio}:{}), ...(services.avatarVoice ? {avatarVoice:services.avatarVoice} : {}), ...(services.userAvatarLibrary ? { userAvatarLibrary: services.userAvatarLibrary } : {}), avatarStudio: async (input) => runAvatarStudio(input), ...(services.presentAvatar ? { presentAvatar: services.presentAvatar, presentationInfo: services.presentationInfo } : {}) },
+        host: { ...hostFor(rt, placeId), ...(services.shareStudio?{shareStudio:services.shareStudio}:{}), ...(services.avatarVoice ? {avatarVoice:services.avatarVoice} : {}), ...(services.userAvatarLibrary ? { userAvatarLibrary: services.userAvatarLibrary } : {}), avatarStudio: async (input) => runAvatarStudio(input), motionLab: async (input) => runMotionLab(motionLabBridge.get(), input.operation, { kind: 'agent', name: 'Assistant' }), ...(services.presentAvatar ? { presentAvatar: services.presentAvatar, presentationInfo: services.presentationInfo } : {}) },
         // The last messages are enough context and keep requests small.
         history: history.current.slice(-30),
         prompt: text,

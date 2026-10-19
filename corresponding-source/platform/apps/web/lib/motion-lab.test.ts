@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { simulateLabRun } from '@genvr/runtime';
-import { LabController, newLabData, runMotionLab, PERSON } from './motion-lab';
+import { runTool, type AssistantHost } from '@genvr/assistant';
+import { LabController, motionLabBridge, newLabData, runMotionLab, PERSON } from './motion-lab';
 
 const simulateOn = (lab: LabController) => simulateLabRun(lab.data.course, lab.best()!.settings, lab.data.course.seed).frames.at(-1);
 
@@ -66,5 +67,44 @@ describe('motion lab controller (MOTION-LAB L1 + L2)', () => {
     const agentRun = (await runMotionLab(b, { kind: 'run', settings: { stride: 0.7 } }, agent)) as { score: unknown };
     expect(agentRun.score).toEqual(personRun.score);
     expect(await runMotionLab(null, { kind: 'inspect' }, agent).catch((e: Error) => e.message)).toMatch(/motion lab project/);
+  });
+});
+
+describe('run settings changes', () => {
+  it('keeps the settings an agent does not name', async () => {
+    const lab = new LabController(newLabData());
+    lab.setSettings({ stride: 0.6, lean_deg: 8 });
+    await runMotionLab(lab, { kind: 'settings_set', settings: { speed: 2 } }, agent);
+    expect(lab.data.settings).toMatchObject({ speed: 2, stride: 0.6, lean_deg: 8 });
+    await runMotionLab(lab, { kind: 'run', settings: { speed: 1.8 } }, agent);
+    expect(lab.data.runs.at(-1)!.settings).toMatchObject({ speed: 1.8, stride: 0.6, lean_deg: 8 });
+  });
+});
+
+describe('motion lab in the in-app Assistant', () => {
+  // The same host wiring as assistant-panel.tsx.
+  const host = { motionLab: async (input: { operation: unknown }) => runMotionLab(motionLabBridge.get(), input.operation, { kind: 'agent', name: 'Assistant' }) } as unknown as AssistantHost;
+  it('builds, runs and asks for the best version, and the owner confirms it', async () => {
+    const lab = new LabController(newLabData());
+    const unregister = motionLabBridge.register(lab);
+    try {
+      expect((await runTool('motion_lab', { operation: { kind: 'obstacle_set', id: 'gap-1', set: { width: 1.2 } } }, host)).ok).toBe(true);
+      const run = await runTool('motion_lab', { operation: { kind: 'run' } }, host);
+      expect(run.ok).toBe(true);
+      expect(lab.data.runs.at(-1)?.by).toBe('agent');
+      const saved = JSON.parse((await runTool('motion_lab', { operation: { kind: 'save_version' } }, host)).result) as { id: string; by: string };
+      expect(saved.by).toBe('agent');
+      expect(JSON.parse((await runTool('motion_lab', { operation: { kind: 'save_best', version: saved.id } }, host)).result)).toMatchObject({ best: null, pending: saved.id });
+      expect(lab.best()).toBeUndefined();
+      expect(lab.data.best_pending).toMatchObject({ version: saved.id, by: 'Assistant' });
+      lab.confirmPendingBest();
+      expect(lab.best()?.id).toBe(saved.id);
+      expect(await runTool('motion_lab', { operation: { kind: 'version_delete', version: saved.id, confirm: true } }, host))
+        .toMatchObject({ ok: false, result: 'Only the owner can delete the best version.' });
+      const personVersion = lab.saveVersion(undefined, '', PERSON);
+      expect((await runTool('motion_lab', { operation: { kind: 'version_delete', version: personVersion.id, confirm: true } }, host)).ok).toBe(false);
+      expect(lab.data.versions.map((v) => v.id)).toContain(personVersion.id);
+    } finally { unregister(); }
+    expect((await runTool('motion_lab', { operation: { kind: 'inspect' } }, host)).result).toMatch(/motion lab project/);
   });
 });
