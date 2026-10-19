@@ -95,14 +95,41 @@ function checkReply(rt: GenvrRuntime, before: ReadonlySet<string>): string[] {
  * The studio runtime as the assistant sees it: every change is a normal world command. The script tools (P2-10) get
  * the sandbox (loaded on first use) and the place's script log and last match from its open rooms through the API.
  */
+/**
+ * world_history (BUILD-B9): where the undo history stood right after the assistant's last step, and after its last
+ * undo. A different size means the person changed the place since, so their work is never taken back.
+ */
+const agentSteps = new WeakMap<GenvrRuntime, { done: number | null; undone: number | null }>();
+
 function hostFor(runtime: GenvrRuntime, placeId: string): AssistantHost {
+  const steps = agentSteps.get(runtime) ?? { done: null, undone: null };
+  agentSteps.set(runtime, steps);
   return {
     world: () => runtime.world,
     heightAt: (x, z) => runtime.terrainHeightAt(x, z),
     restingPoint: (x, z, on) => runtime.restingPoint(x, z, on),
     canStand: (itemId, position, yaw) => runtime.canStand(itemId, position, yaw),
-    apply: (commands) =>
-      runtime.applyBatch(commands) ? null : (runtime.lastCommandError ?? 'It cannot go there.'),
+    apply: (commands) => {
+      if (!runtime.applyBatch(commands)) return runtime.lastCommandError ?? 'It cannot go there.';
+      steps.done = runtime.undoMark();
+      steps.undone = null;
+      return null;
+    },
+    history: (action) => {
+      if (action === 'undo') {
+        if (steps.done === null || runtime.undoMark() !== steps.done)
+          return 'The person changed the place after your last step (or there is none); ask them to use Undo.';
+        if (!runtime.undo()) return 'Nothing to undo.';
+        steps.done = null;
+        steps.undone = runtime.undoMark();
+        return null;
+      }
+      if (steps.undone === null || runtime.undoMark() !== steps.undone) return 'There is no step of yours to redo.';
+      if (!runtime.redo()) return 'Nothing to redo.';
+      steps.done = runtime.undoMark();
+      steps.undone = null;
+      return null;
+    },
     addWater: (x, z) => runtime.addWater(x, z),
     focus: () => {
       const { x, z, yaw } = runtime.localPlayer;

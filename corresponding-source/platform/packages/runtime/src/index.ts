@@ -40,8 +40,10 @@ export {
   BUILD_TOOLS,
   BuildTools,
   DEFAULT_RIVER,
+  DEFAULT_WALL,
   type BuildTool,
   type RiverToolSettings,
+  type WallToolSettings,
   type RoadToolSettings,
   type SelectedWater,
   type ToolStatus,
@@ -123,3 +125,5 @@ export { retargetAvatarMotion } from './avatar-motion.js';
 export { registerAvatarMotionLibrary, avatarMotionEntry as findAvatarMotion, avatarMotionEntries, type AvatarMotionLibrary, type AvatarMotionEntry } from './avatar-motion-library.js';
 
 export { MOTION_CATEGORIES, motionCategories, type MotionCategory } from './avatar-motion-categories.js';
+/** The wall looks the Wall tool offers (BUILD-B6), the same textures as the draw_wall material names. */
+export { WALL_SURFACES, type WallSurface } from '@genvr/world';

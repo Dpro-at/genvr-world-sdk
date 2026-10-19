@@ -185,6 +185,39 @@ export const TOOL_ARGS = {
   remove_items: z.object({
     instanceIds: z.array(z.string().max(128)).min(1).max(100),
   }),
+  edit_river: z.object({
+    riverId: z.string().max(128).describe('River id from get_world_summary'),
+    points: z.array(Point).min(2).max(50).optional().describe('A new course; the bed is carved again'),
+    width: z.number().min(2).max(40).optional(),
+    widen: z.number().min(1).max(2).optional(),
+    flow: z.number().min(0).max(6).optional(),
+  }),
+  add_opening: z.object({
+    wallId: z.string().max(128).describe('Wall id from get_world_summary'),
+    kind: z.enum(['door', 'window']),
+    at: Point.describe('A point [x, z] on or near the wall; the opening goes on the closest straight part'),
+    width: z.number().min(0.4).max(6).optional().describe('Metres (door 1.2, window 1.4 by default)'),
+    height: z.number().min(0.4).max(10).optional().describe('Metres (door 2.2, window 1.2 by default)'),
+    bottom: z.number().min(0).max(10).optional().describe('Window: metres above the wall base (1 by default); doors start at 0'),
+  }),
+  remove_parts: z.object({
+    parts: z
+      .array(
+        z.object({
+          kind: z.enum(['road', 'wall', 'water', 'river', 'paving', 'opening']),
+          id: z.string().max(128),
+          wallId: z.string().max(128).optional().describe('For an opening: the wall it is in'),
+        }),
+      )
+      .min(1)
+      .max(50),
+  }),
+  lock_items: z.object({
+    instanceIds: z.array(z.string().max(128)).min(1).max(100),
+  }),
+  world_history: z.object({
+    action: z.enum(['undo', 'redo']),
+  }),
   fill_blocks: z.object({
     ...Area,
     block: BlockName,
@@ -229,6 +262,9 @@ export const TOOL_ARGS = {
       .optional()
       .describe('Traffic lanes of a street, both directions together; lane lines are painted between them'),
     oneway: z.boolean().optional().describe('true: traffic runs one way, along the points (no centre line)'),
+    width: z.number().min(2).max(16).optional().describe('Metres across; the kind of road decides when left out'),
+    sidewalk: z.number().min(0.5).max(6).optional().describe('Raised sidewalk in metres on each side; none when left out'),
+    sidewalkSide: z.enum(['both', 'left', 'right']).optional().describe('Which sides get the sidewalk, along the points (both by default)'),
   }),
   pave_area: z.object({
     points: z
@@ -287,6 +323,12 @@ export const TOOL_ARGS = {
       .optional()
       .describe('Metres across (8 by default); from 11 it is deep enough to swim in'),
     flow: z.number().min(0).max(6).optional().describe('How fast the water runs (1.5 by default)'),
+    widen: z
+      .number()
+      .min(1)
+      .max(2)
+      .optional()
+      .describe('How much wider it gets towards its end: 1 = the same all along, 1.3 by default (Wider at end)'),
   }),
   set_sea: z.strictObject({
     level: z
@@ -751,6 +793,11 @@ const DESCRIPTIONS: Record<ToolName, string> = {
   build_platforms:
     "Side-view (2D) places only: build a course of platforms on the players' line at x positions and heights, for jumping from one to the next. It keeps every jump possible by itself (moves platforms closer or lowers them), so call it once per course.",
   move_item: 'Move, turn or resize a placed item by its instance id.',
+  edit_river: 'Change a river already drawn: its width, how much it widens, its current, or its course (the bed is carved again).',
+  add_opening: 'Cut a door or a window into a wall (the same as the Door and Window tools). Doors start at the ground.',
+  remove_parts: 'Remove roads, walls and rooms, ponds and lakes, rivers, paved areas, or one door or window (kind opening with its wallId), by their ids from get_world_summary.',
+  lock_items: 'Lock placed items so nobody moves them by accident. Locked items cannot be moved or removed with these tools; only the owner unlocks them in the Studio.',
+  world_history: 'Undo or redo your own last world change. It refuses when the person changed the place after it, so their work is never undone.',
   remove_items: 'Remove placed items by their instance ids (from get_world_summary).',
   fill_blocks:
     'Block places only: fill a box of blocks between two corners, on the ground (towers, blocks, platforms); hollow: true makes a hut with walls, floor, and roof.',

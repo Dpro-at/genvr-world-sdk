@@ -11,6 +11,8 @@ import {
   roadsCrossedBy,
   roadShapeError,
   wallShapeError,
+  WALL_SURFACES,
+  type WallSurface,
 } from '@genvr/world';
 import {
   Group,
@@ -76,7 +78,27 @@ export const DEFAULT_RIVER: RiverToolSettings = { width: 8, widen: 1.3, flow: 1.
 export interface RoadToolSettings {
   lanes?: number | undefined;
   oneway: boolean;
+  /** Metres across (2–16, BUILD-B5); the road type's width when absent. */
+  width?: number | undefined;
+  /** Raised sidewalk in metres (0.5–6) on the chosen sides; none when absent. */
+  sidewalk?: number | undefined;
+  sidewalkSide?: 'both' | 'left' | 'right' | undefined;
 }
+
+/** What the wall, door and window tools build (BUILD-B6): wall height and look, and the size of openings. */
+export interface WallToolSettings {
+  height: number;
+  /** A wall look from the library; light plaster when absent. */
+  surface?: WallSurface | undefined;
+  door: { width: number; height: number };
+  window: { width: number; height: number; bottom: number };
+}
+
+export const DEFAULT_WALL: WallToolSettings = {
+  height: 3,
+  door: { width: OPENING_PRESETS.door.width, height: OPENING_PRESETS.door.height },
+  window: { ...OPENING_PRESETS.window },
+};
 
 /** A lake or a river picked in the 3D view (P2-39). */
 export interface SelectedWater {
@@ -105,12 +127,18 @@ export interface ToolStatus {
   road: RoadToolSettings;
   /** What the river tool draws (P2-39). */
   river: RiverToolSettings;
+  /** Wall height and look, door and window sizes (BUILD-B6). */
+  wall?: WallToolSettings;
   /** The lake or river picked with the select tool, whose settings the properties panel shows. */
   water: SelectedWater | null;
   /** Digging and stacking on block ground (P2-26); null where the ground is a height field. */
   blocks?: BlockToolSettings | null;
   /** Where the Real place tool builds (the ground point last tapped with the map tool), or null for the middle. */
   mapSpot?: { x: number; z: number } | null;
+  /** Metres along the points drawn so far by the road, wall or river tool (BUILD-B4). */
+  length?: number;
+  /** What the eraser would remove under the pointer (BUILD-B8), or null. */
+  eraseTarget?: { kind: 'item' | 'road' | 'wall' | 'water' | 'river'; id: string; name: string } | null;
 }
 
 interface BuildToolsOptions {
@@ -167,6 +195,8 @@ const snap = (v: number) => Math.round(v / SNAP) * SNAP;
  */
 export class BuildTools {
   #tool: BuildTool | null = null;
+  #eraseTarget: NonNullable<ToolStatus["eraseTarget"]> | null = null;
+  #wall: WallToolSettings = { ...DEFAULT_WALL, door: { ...DEFAULT_WALL.door }, window: { ...DEFAULT_WALL.window } };
   #points: Array<[number, number]> = [];
   #hover: [number, number] | null = null;
   #message: string | null = null;
@@ -264,6 +294,12 @@ export class BuildTools {
   setRoadType(typeId: string): void {
     this.#roadType = getRoadType(typeId).id;
     if (this.#tool !== 'road') this.setTool('road');
+    this.#refresh();
+  }
+
+  /** Height and look of new walls, and the size of new doors and windows (BUILD-B6). */
+  setWall(settings: Partial<WallToolSettings>): void {
+    this.#wall = { ...this.#wall, ...settings };
     this.#refresh();
   }
 
@@ -470,7 +506,7 @@ export class BuildTools {
       const error = roadShapeError(points);
       if (error) return this.#fail(error);
       const type = getRoadType(this.#roadType);
-      const road = { roadId: newId('road'), points, width: type.width, materialId: type.id, ...this.#markings(type.look) };
+      const road = { roadId: newId('road'), points, width: this.#road.width ?? type.width, materialId: type.id, ...this.#markings(type.look), ...this.#sidewalk() };
       if (!this.options.apply({ type: 'draw_road', params: road }))
         return this.#fail('The road cannot go there.');
     } else if (this.#tool === 'river' && points.length >= 2) {
@@ -506,7 +542,9 @@ export class BuildTools {
     } else if (this.#tool === 'wall' && points.length >= 2) {
       const error = wallShapeError(points, closed);
       if (error) return this.#fail(error);
-      if (!this.options.apply({ type: 'draw_wall', params: { wallId: newId('wall'), points, closed } }))
+      const look = this.#wall.surface ? { materialId: WALL_SURFACES[this.#wall.surface] } : {};
+      const params = { wallId: newId('wall'), points, closed, height: this.#wall.height, ...look };
+      if (!this.options.apply({ type: 'draw_wall', params }))
         return this.#fail('The wall cannot go there.');
     } else {
       return false;
@@ -668,6 +706,14 @@ export class BuildTools {
 
   /** Mouse hover: shows where the next point would go. */
   hover(clientX: number, clientY: number): void {
+    if (this.#tool === 'eraser') {
+      const next = this.#eraseTargetAt(clientX, clientY);
+      if (next?.kind !== this.#eraseTarget?.kind || next?.id !== this.#eraseTarget?.id) {
+        this.#eraseTarget = next;
+        this.#emit();
+      }
+      return;
+    }
     if (this.#tool === 'place' || this.#tool === 'select') {
       this.#items.hover(clientX, clientY);
       return;
@@ -685,14 +731,43 @@ export class BuildTools {
     this.#refreshPreview();
   }
 
+  /** What a click of the eraser would remove at this point, in the same order as the click itself. */
+  #eraseTargetAt(clientX: number, clientY: number): NonNullable<ToolStatus['eraseTarget']> | null {
+    const world = this.options.world();
+    const item = this.#items.pickItem(clientX, clientY);
+    if (item) {
+      const instance = world.instances.find((i) => i.instanceId === item);
+      return { kind: 'item', id: item, name: instance?.name ?? instance?.itemId.split('.').pop() ?? 'Item' };
+    }
+    const hit = this.#cast(clientX, clientY, [this.options.structures, this.options.water, this.options.rivers])[0];
+    const [kind, id] = (hit?.object.name ?? '').split(':') as [string, string | undefined];
+    if (id && kind === 'water') return { kind: 'water', id, name: world.environment.water.find((w) => w.id === id)?.name ?? 'Water' };
+    if (id && kind === 'river') {
+      const river = world.environment.rivers.find((r) => r.id === id);
+      return { kind: 'river', id, name: river?.name ?? `River · ${river?.width ?? ''} m` };
+    }
+    const structure = this.#pickStructure(clientX, clientY);
+    const [skind, sid] = (structure?.name ?? '').split(':') as [string, string | undefined];
+    if (sid && skind === 'road') {
+      const road = world.roads.find((r) => r.id === sid);
+      return { kind: 'road', id: sid, name: road?.name ?? `${getRoadType(road?.materialId ?? DEFAULT_ROAD_TYPE.id).name} · ${road?.width ?? ''} m` };
+    }
+    if (sid && (skind === 'wall' || skind === 'floor')) {
+      const wall = world.walls.find((w) => w.id === sid);
+      return { kind: 'wall', id: sid, name: wall?.name ?? (wall?.closed ? 'Room' : 'Wall') };
+    }
+    return null;
+  }
+
   #addOpening(wall: Wall, kind: 'door' | 'window', x: number, z: number) {
     const { segment, offset } = nearestWallPosition(wall, x, z);
+    const size = kind === 'door' ? { ...this.#wall.door, bottom: 0 } : this.#wall.window;
     const opening = {
       id: newId(kind),
       kind,
       segment,
       offset: Math.round(offset * 10) / 10,
-      ...OPENING_PRESETS[kind],
+      ...size,
     };
     const error = openingError(wall, opening);
     if (error) {
@@ -765,10 +840,19 @@ export class BuildTools {
       roadType: this.#roadType,
       road: { ...this.#road },
       river: { ...this.#river },
+      wall: { ...this.#wall, door: { ...this.#wall.door }, window: { ...this.#wall.window } },
       water: this.#water ? { ...this.#water } : null,
       blocks: this.#blocks?.settings ?? null,
       mapSpot: this.#mapSpot ? { ...this.#mapSpot } : null,
+      length: Math.round(this.#points.reduce((sum, point, i) => (i ? sum + Math.hypot(point[0] - this.#points[i - 1]![0], point[1] - this.#points[i - 1]![1]) : 0), 0) * 10) / 10,
+      eraseTarget: this.#eraseTarget,
     });
+  }
+
+  /** The sidewalk of a new road (R2h), when one is chosen. */
+  #sidewalk(): { sidewalk?: number; sidewalkSide?: 'both' | 'left' | 'right' } {
+    const { sidewalk, sidewalkSide } = this.#road;
+    return sidewalk ? { sidewalk, ...(sidewalkSide && sidewalkSide !== 'both' ? { sidewalkSide } : {}) } : {};
   }
 
   /** Lanes and direction for a new road: streets only (other looks have no lane lines). */
@@ -808,7 +892,7 @@ export class BuildTools {
         const type = getRoadType(this.#roadType);
         const samples = roadProfile({ heightAt }, points, this.options.world().environment.water);
         const built = buildRoad(
-          { id: 'preview', width: type.width, materialId: type.id, ...this.#markings(type.look) },
+          { id: 'preview', width: this.#road.width ?? type.width, materialId: type.id, ...this.#markings(type.look), ...this.#sidewalk() },
           samples,
           heightAt,
           this.options.roadMaterials,
@@ -846,7 +930,7 @@ export class BuildTools {
           }
         }
       } else if (this.#tool === 'wall' && !wallShapeError(points, Boolean(closing))) {
-        const wall: Wall = { id: 'preview', points, height: 3, closed: Boolean(closing), openings: [] };
+        const wall: Wall = { id: 'preview', points, height: this.#wall.height, closed: Boolean(closing), openings: [], ...(this.#wall.surface ? { materialId: WALL_SURFACES[this.#wall.surface] } : {}) };
         for (const mesh of buildWallMeshes(wall, heightAt, this.#ghost).meshes) this.#preview.add(mesh);
       }
     }

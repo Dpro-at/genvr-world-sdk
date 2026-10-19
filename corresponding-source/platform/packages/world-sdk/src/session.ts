@@ -142,6 +142,11 @@ export class WorldSession {
       blockGround: () => !!this.#state.voxels,
       isPlaceable: id => !!getCoreItem(id) || this.#record.assets.some(asset => asset.id === id),
       apply: commands => { try { this.apply(commands); return null; } catch (e) { return e instanceof Error ? e.message : String(e); } },
+      // world_history (BUILD-B9): a local file world is edited only through these tools, so every step is the agent's.
+      history: action => {
+        if (action === 'undo') { if (!this.#undo.length) return 'Nothing to undo.'; this.undo(); return null; }
+        if (!this.#redo.length) return 'Nothing to redo.'; this.redo(); return null;
+      },
       addWater: (x, z) => {
         if (this.#state.voxels) return 'Water filling needs heightfield terrain in this host.';
         try {

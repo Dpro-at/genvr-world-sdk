@@ -347,7 +347,10 @@ function Editor({ initial, storage, options, leave, beforeClose }: { initial: St
           testing={testing} onTesting={test} logs={logs} onClearLogs={() => setLogs([])} onStyle={() => changed()} /> : null}
         {preview.model && desktop ? <DeviceEmulator placeId={initial.id} model={preview.model} orientation={preview.orientation} zoom={preview.zoom} reloadKey={preview.reloadKey}
           source={`?studioPreview=${initial.id}&touch=${preview.model.kind === 'phone' || preview.model.kind === 'tablet' ? '1' : '0'}`} /> : null}
-        {ready && !testing && (desktop || tab !== 'filming') ? <BuildPanel runtime={runtime} status={status} studio={desktop} placeId={initial.id} onTest={() => test(true)} /> : null}
+        {ready && !testing && (desktop || tab !== 'filming') ? (desktop
+          // Inside the 3D view (BUILD-B1): hints and the drawing bar never cover the docks.
+          ? <div style={{ gridArea: 'viewport' }} className="pointer-events-none relative z-30 min-h-0 min-w-0"><BuildPanel runtime={runtime} status={status} studio contextMenu={tab === 'build'} placeId={initial.id} onTest={() => test(true)} /></div>
+          : <BuildPanel runtime={runtime} status={status} studio={false} placeId={initial.id} onTest={() => test(true)} />) : null}
         {!desktop && testing ? <button className="absolute right-3 top-3 rounded-lg bg-surface px-3 py-2 font-bold" onClick={() => setTesting(false)}>Stop test</button> : null}
         {ready && !status.tool && (testing || (tab !== 'filming' && tab !== 'avatar')) && !preview.model ? <PlayControls runtime={runtime} raised={!desktop && !testing} forceTouch={!desktop} dash={testing && initial.play.view === 'side' && initial.play.moves.includes('dash')} /> : null}
         {!desktop && !testing && tab === 'filming' && ready ? <PhoneFilming filming={filming} onClose={() => setTab('build')} /> : null}

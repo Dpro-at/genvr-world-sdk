@@ -95,7 +95,7 @@ export function worldSummary(world: WorldDocument, maxItems: number, fromItem = 
     const name = instance.name ?? getCoreItem(instance.itemId)?.manifest.name ?? instance.itemId;
     const zone = zoneFromParams(instance.params, zoneShapeOfItem(instance.itemId));
     const ride = rideFromParams(instance.params, getLibraryItem(instance.itemId)?.manifest.ride);
-    const line = `- ${instance.instanceId}: ${name} (${instance.itemId}) at (${r(x)}, ${r(z)})${zone ? describeZone(zone, instance) : ''}${ride ? `, rideable ${ride.model}${ride.tag ? ` "${ride.tag}"` : ''}` : ''}`;
+    const line = `- ${instance.instanceId}: ${name} (${instance.itemId}) at (${r(x)}, ${r(z)})${zone ? describeZone(zone, instance) : ''}${ride ? `, rideable ${ride.model}${ride.tag ? ` "${ride.tag}"` : ''}` : ''}${instance.locked ? ', locked' : ''}`;
     if (index > fromItem && used + line.length + 1 > budget) {
       end = index;
       break;
@@ -130,8 +130,13 @@ function tailLines(world: WorldDocument): string[] {
     lines.push(`Walls and rooms: ${world.walls.length}.`);
     for (const wall of world.walls.slice(0, 20))
       lines.push(
-        `- ${wall.id} ${wall.closed ? 'room' : 'wall'}${wallLook(wall.materialId)} ${firstPoint(wall.points)}`,
+        `- ${wall.id} ${wall.closed ? 'room' : 'wall'}${wallLook(wall.materialId)} ${firstPoint(wall.points)}` +
+          (wall.openings.length ? `, openings: ${wall.openings.map((o) => `${o.id} ${o.kind}`).join(', ')}` : ''),
       );
+  }
+  if (world.pavings.length) {
+    lines.push(`Paved areas: ${world.pavings.length}.`);
+    for (const paving of world.pavings.slice(0, 20)) lines.push(`- ${paving.id} ${firstPoint(paving.area)}`);
   }
   if (world.environment.water.length) {
     lines.push(`Water: ${world.environment.water.length}.`);

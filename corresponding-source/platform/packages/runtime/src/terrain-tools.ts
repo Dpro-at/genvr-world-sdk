@@ -8,6 +8,10 @@ export type BrushSize = 'small' | 'medium' | 'large';
 export interface BrushSettings {
   mode: BrushMode;
   size: BrushSize;
+  /** Exact brush radius in metres (BUILD-B1, 1–100, as the MCP tools take it); the size preset decides when absent. */
+  radius?: number | undefined;
+  /** How much one stroke changes, 0.1–1 of the mode's normal effect (1 when absent). */
+  strength?: number | undefined;
   /** Soil used by the paint mode. */
   soil: Soil;
   /** A library ground material to paint with (Realistic places, P2-37); counts as `soil`. */
@@ -75,7 +79,8 @@ export class TerrainTools {
   }
 
   get radius(): number {
-    return BRUSH_RADIUS[this.settings.size];
+    const exact = this.settings.radius;
+    return exact !== undefined ? Math.min(100, Math.max(1, exact)) : BRUSH_RADIUS[this.settings.size];
   }
 
   get stroking(): boolean {
@@ -83,7 +88,9 @@ export class TerrainTools {
   }
 
   setSettings(settings: Partial<BrushSettings>): void {
-    this.settings = { ...this.settings, ...settings };
+    // Choosing S, M or L goes back to the preset radius.
+    const preset = settings.size !== undefined && settings.radius === undefined ? { radius: undefined } : {};
+    this.settings = { ...this.settings, ...preset, ...settings };
   }
 
   /** Shows the brush ring under the pointer (mouse hover and while dragging). */
@@ -150,7 +157,7 @@ export class TerrainTools {
       params: {
         area,
         operation: mode,
-        strength: STRENGTH[mode],
+        strength: Math.round(STRENGTH[mode] * Math.min(1, Math.max(0.1, this.settings.strength ?? 1)) * 1000) / 1000,
         soft: true,
         ...(mode === 'flatten' ? { targetHeight: Math.round(this.#stroke!.target * 100) / 100 } : {}),
       },

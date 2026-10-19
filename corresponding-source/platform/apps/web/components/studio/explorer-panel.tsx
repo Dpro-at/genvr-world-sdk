@@ -1,5 +1,6 @@
 'use client';
 
+import { setStructureFocus } from '../../lib/structure-focus';
 import type { WorldDocument } from '@genvr/contracts';
 import { getCoreItem } from '@genvr/core-library';
 import type { GenvrRuntime, ToolStatus } from '@genvr/runtime';
@@ -180,9 +181,12 @@ export function ExplorerPanel({
     if (!runtimeNow) return;
     if (row.select.length === 0) {
       setFocused(`${row.kind}:${row.id}`);
+      // Roads and walls show their Properties in the right dock (BUILD-B7).
+      setStructureFocus(row.kind === 'road' || row.kind === 'wall' ? { kind: row.kind, id: row.id } : null);
       return;
     }
     setFocused(null);
+    setStructureFocus(null);
     if (!additive) {
       runtimeNow.selectItems(row.select);
       return;

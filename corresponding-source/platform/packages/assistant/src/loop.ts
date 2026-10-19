@@ -45,6 +45,9 @@ import {
   BUILDING_WALL_MATERIAL,
   defaultRoofHeight,
   WALL_SURFACES,
+  OPENING_PRESETS,
+  nearestWallPosition,
+  openingError,
   type TerrainData,
 } from '@genvr/world';
 import type { ScriptRecording } from '@genvr/contracts';
@@ -105,6 +108,11 @@ export interface AssistantHost {
   canStand?(itemId: string, position: [number, number, number], yaw?: number): string | null;
   /** Applies commands as one undo step; returns an error message, or null when all applied. */
   apply(commands: CommandPayload[]): string | null;
+  /**
+   * world_history (BUILD-B9): undo or redo the assistant's own last step. Returns an error message, or null when
+   * done. The host refuses when the person changed the place after that step. Without it, the tool is unavailable.
+   */
+  history?(action: 'undo' | 'redo'): string | null;
   /** Digs and fills a pond at x, z; returns an error message or null. */
   addWater(x: number, z: number): string | null;
   /** Where the builder stands and the way they face (radians, 0 = +z), for "here" and "in front". */
@@ -859,6 +867,8 @@ export function executeTool(
           ok: false,
           result: `Error: no placed item "${a.instanceId}". Use get_world_summary for ids.`,
         };
+      if (instance.locked)
+        return { ok: false, result: `Error: ${a.instanceId} is locked. Only the owner unlocks it in the Studio.` };
       if (
         a.x === undefined &&
         a.z === undefined &&
@@ -913,11 +923,105 @@ export function executeTool(
         `Moved ${instance.instanceId} to (${x}, ${z}).`,
       );
     }
+    case 'edit_river': {
+      const a = args as ToolArgs<'edit_river'>;
+      if (!world.environment.rivers.some((r) => r.id === a.riverId))
+        return { ok: false, result: `Error: no river "${a.riverId}". Use get_world_summary for ids.` };
+      if (a.points === undefined && a.width === undefined && a.widen === undefined && a.flow === undefined)
+        return { ok: false, result: 'Error: give points, width, widen or flow.' };
+      const outside = a.points?.find(([x, z]) => !inside(x, z));
+      if (outside) return done(`The point (${outside[0]}, ${outside[1]}) is outside the place.`, '');
+      return done(
+        host.apply([
+          {
+            type: 'edit_river',
+            params: {
+              riverId: a.riverId,
+              ...(a.points ? { points: a.points } : {}),
+              ...(a.width !== undefined ? { width: a.width } : {}),
+              ...(a.widen !== undefined ? { widen: a.widen } : {}),
+              ...(a.flow !== undefined ? { flow: a.flow } : {}),
+            },
+          },
+        ]),
+        `Changed ${a.riverId}.`,
+      );
+    }
+    case 'add_opening': {
+      const a = args as ToolArgs<'add_opening'>;
+      const wall = world.walls.find((w) => w.id === a.wallId);
+      if (!wall) return { ok: false, result: `Error: no wall "${a.wallId}". Use get_world_summary for wall ids.` };
+      const { segment, offset } = nearestWallPosition(wall, a.at[0], a.at[1]);
+      const preset = OPENING_PRESETS[a.kind];
+      const opening = {
+        id: newId(a.kind, random),
+        kind: a.kind,
+        segment,
+        offset: Math.round(offset * 10) / 10,
+        width: a.width ?? preset.width,
+        height: a.height ?? preset.height,
+        bottom: a.kind === 'door' ? 0 : (a.bottom ?? preset.bottom),
+      };
+      const error = openingError(wall, opening);
+      if (error) return { ok: false, result: `Error: ${error}` };
+      return done(
+        host.apply([{ type: 'add_wall_opening', params: { wallId: wall.id, opening } }]),
+        `Added a ${a.kind} (${opening.id}) to ${wall.id}.`,
+      );
+    }
+    case 'remove_parts': {
+      const { parts } = args as ToolArgs<'remove_parts'>;
+      const commands: CommandPayload[] = [];
+      for (const part of parts) {
+        const missing = `Error: no ${part.kind} "${part.id}". Use get_world_summary for ids.`;
+        if (part.kind === 'road') {
+          if (!world.roads.some((r) => r.id === part.id)) return { ok: false, result: missing };
+          commands.push({ type: 'remove_road', params: { roadId: part.id } });
+        } else if (part.kind === 'wall') {
+          if (!world.walls.some((w) => w.id === part.id)) return { ok: false, result: missing };
+          commands.push({ type: 'remove_wall', params: { wallId: part.id } });
+        } else if (part.kind === 'water') {
+          if (!world.environment.water.some((w) => w.id === part.id)) return { ok: false, result: missing };
+          commands.push({ type: 'remove_water', params: { waterId: part.id } });
+        } else if (part.kind === 'river') {
+          if (!(world.environment.rivers ?? []).some((r) => r.id === part.id)) return { ok: false, result: missing };
+          commands.push({ type: 'remove_river', params: { riverId: part.id } });
+        } else if (part.kind === 'paving') {
+          if (!(world.pavings ?? []).some((p) => p.id === part.id)) return { ok: false, result: missing };
+          commands.push({ type: 'remove_paving', params: { pavingId: part.id } });
+        } else {
+          const wall = world.walls.find((w) => w.id === part.wallId);
+          if (!wall || !wall.openings.some((o) => o.id === part.id))
+            return { ok: false, result: `Error: no opening "${part.id}" in wall "${part.wallId ?? ''}".` };
+          commands.push({ type: 'remove_wall_opening', params: { wallId: wall.id, openingId: part.id } });
+        }
+      }
+      return done(host.apply(commands), `Removed ${parts.length} part${parts.length === 1 ? '' : 's'}.`);
+    }
+    case 'lock_items': {
+      const { instanceIds } = args as ToolArgs<'lock_items'>;
+      const existing = new Set(world.instances.map((i) => i.instanceId));
+      const missing = instanceIds.filter((id) => !existing.has(id));
+      if (missing.length) return { ok: false, result: `Error: no items with ids ${missing.join(', ')}.` };
+      return done(
+        host.apply(instanceIds.map((instanceId) => ({ type: 'set_item_flags', params: { instanceId, locked: true } }))),
+        `Locked ${instanceIds.length} items. Only the owner unlocks them.`,
+      );
+    }
+    case 'world_history': {
+      const { action } = args as ToolArgs<'world_history'>;
+      if (!host.history) return { ok: false, result: 'Undo and redo are not available in this host.' };
+      const error = host.history(action);
+      return { ok: !error, result: error ?? (action === 'undo' ? 'Took back your last change.' : 'Put your change back.') };
+    }
     case 'remove_items': {
       const { instanceIds } = args as ToolArgs<'remove_items'>;
       const existing = new Set(world.instances.map((i) => i.instanceId));
       const missing = instanceIds.filter((id) => !existing.has(id));
       if (missing.length) return { ok: false, result: `Error: no items with ids ${missing.join(', ')}.` };
+      const locked = world.instances.filter((i) => i.locked && instanceIds.includes(i.instanceId)).map((i) => i.instanceId);
+      if (locked.length)
+        return { ok: false, result: `Error: ${locked.join(', ')} locked. Only the owner unlocks items in the Studio.` };
       return done(
         host.apply(instanceIds.map((instanceId) => ({ type: 'remove_item', params: { instanceId } }))),
         `Removed ${instanceIds.length} items.`,
@@ -934,10 +1038,11 @@ export function executeTool(
             params: {
               roadId,
               points: a.points.map(([x, z]) => [round(x), round(z)]),
-              width: type.width,
+              width: a.width ?? type.width,
               materialId: type.id,
               ...(a.lanes ? { lanes: a.lanes } : {}),
               ...(a.oneway ? { oneway: true } : {}),
+              ...(a.sidewalk !== undefined ? { sidewalk: a.sidewalk, ...(a.sidewalkSide ? { sidewalkSide: a.sidewalkSide } : {}) } : {}),
             },
           },
         ]),
@@ -1038,7 +1143,7 @@ export function executeTool(
         host.apply([
           {
             type: 'draw_river',
-            params: { riverId: newId('river', random), points: a.points, width, flow: a.flow ?? 1.5 },
+            params: { riverId: newId('river', random), points: a.points, width, flow: a.flow ?? 1.5, ...(a.widen !== undefined ? { widen: a.widen } : {}) },
           },
         ]),
         // The builder is told whether this river can be swum in, because the width decides it.

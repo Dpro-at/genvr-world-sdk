@@ -563,7 +563,8 @@ function BuildControls({ editor }: { editor: CharacterEditor }) {
               onShow={show('fat', 0, 0)}
               onChange={(fatPattern) => set({ fatPattern })}
             />
-            <MusclePaintPanel editor={editor} />
+            {/* Save and bake use the dev server's /api/dev endpoints, so the painter stays a development tool. */}
+      {process.env.NODE_ENV === 'development' ? <MusclePaintPanel editor={editor} /> : null}
             <button
               type="button"
               onClick={() => set(NORMAL_BUILD)}
@@ -1117,7 +1118,7 @@ export function MovesSection({
         <button type="button" disabled={!savable(chosen.id)} aria-pressed={favourites.has(chosen.id)} aria-label={favourites.has(chosen.id) ? 'Remove from favourites' : 'Add to favourites'} title="Favourite" onClick={() => toggleFavourite(chosen.id)} className="rounded-md p-1.5 hover:bg-ink/10 disabled:opacity-35"><Star className={`size-4 ${favourites.has(chosen.id) ? 'fill-current' : ''}`} /></button>
         <button type="button" disabled={!savable(chosen.id) || chosen.id === idle} onClick={() => useAsIdle(chosen.id)} className="rounded-md border border-ink/10 px-2 py-1 font-semibold hover:bg-ink/10 disabled:opacity-35">Use as idle</button>
       </div> : null}
-      <p className="text-[11px] text-ink/60">{filtered.length} {category === 'Facial expressions' ? 'expressions' : 'items'}{category === 'Favourites' && !filtered.length ? ' · Play a move, then ★ it.' : ''}</p>
+      <p className="text-[11px] text-ink/60">{filtered.length} {category === 'Facial expressions' ? 'expressions' : 'items'}{category === 'Favourites' && !filtered.length ? ' · Play a move, then ★ it.' : ' · Some moves match multiple categories.'}</p>
     </> : null}
     <div role="radiogroup" aria-label="Moves" className={`grid gap-1.5 ${columns}`}>
       {filtered.slice(page * 60, (page + 1) * 60).map(({ id, name, title, Icon }) => <button key={id} type="button" role="radio" aria-label={title} title={title} aria-checked={selected(id)} onClick={() => play(id)} className={`flex flex-col items-center gap-1 rounded-xl px-1 py-2 text-[11px] font-bold transition active:scale-95 ${selected(id) ? 'bg-ink text-on-brand' : 'bg-paper text-ink hover:bg-ink/5'}`}>

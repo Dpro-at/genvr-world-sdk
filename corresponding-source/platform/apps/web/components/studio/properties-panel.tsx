@@ -1,5 +1,7 @@
 'use client';
 
+import { useStructureFocus } from '../../lib/structure-focus';
+import { StructureProperties } from './structure-properties';
 import {
   CORE_SURFACES,
   describeGeneratedControls,
@@ -290,6 +292,7 @@ export function PropertiesPanel({
   placeId?: string;
 }) {
   const [, redraw] = useState(0);
+  const structure = useStructureFocus();
   const rt = () => runtime.current;
   const instance = status.selected
     ? rt()?.world.instances.find((entry) => entry.instanceId === status.selected?.instanceId)
@@ -299,6 +302,8 @@ export function PropertiesPanel({
   if (!status.selected && status.water && rt()) {
     return <WaterProperties runtime={runtime} picked={status.water} onChange={() => redraw((n) => n + 1)} />;
   }
+
+  if (!status.selected && structure) return <StructureProperties runtime={runtime} focus={structure} />;
 
   if (!status.selected || !instance) {
     return (

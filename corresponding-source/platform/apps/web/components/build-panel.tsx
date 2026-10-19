@@ -75,6 +75,7 @@ import { CatalogPanel } from './catalog-panel';
 import { AssistantPanel } from './studio/assistant-panel';
 import { RealPlacePanel, buildStage } from './real-place-panel';
 import { applyMapBuild, closeOpenEdit } from '../lib/map-build';
+import { BuildContextMenu } from './studio/build-context-menu';
 
 export const TOOLS: Array<{ tool: BuildTool | null; Icon: LucideIcon; label: string }> = [
   { tool: null, Icon: Footprints, label: 'Play' },
@@ -110,9 +111,9 @@ export const toolsFor = (runtime: GenvrRuntime | null) =>
     : TOOLS.filter((entry) => entry.tool !== 'blocks');
 
 /** A block's color for its picker swatch: the middle of its clean top face. */
-const blockColor = (name: string) => hex(getBlock(name)?.look.plain.top[8 * 16 + 8] ?? 0x888888);
+export const blockColor = (name: string) => hex(getBlock(name)?.look.plain.top[8 * 16 + 8] ?? 0x888888);
 
-const HINTS: Partial<Record<BuildTool, string>> = {
+export const HINTS: Partial<Record<BuildTool, string>> = {
   road: 'Tap the ground to add points. Tap the last point again, or Done, to finish.',
   wall: 'Tap to add corners. Tap the first corner to make a room.',
   door: 'Tap a wall to add a door.',
@@ -134,7 +135,7 @@ export const GROUPS: Array<{ group: ItemGroup; label: string }> = [
   { group: 'buildings', label: 'Buildings' },
 ];
 
-const BRUSH_MODES: Array<{ mode: BrushMode; Icon: LucideIcon; label: string }> = [
+export const BRUSH_MODES: Array<{ mode: BrushMode; Icon: LucideIcon; label: string }> = [
   { mode: 'raise', Icon: ArrowBigUp, label: 'Raise' },
   { mode: 'lower', Icon: ArrowBigDown, label: 'Lower' },
   { mode: 'flatten', Icon: Equal, label: 'Flatten' },
@@ -151,22 +152,22 @@ const BRUSH_MODES: Array<{ mode: BrushMode; Icon: LucideIcon; label: string }> =
  * eraser clears back to 0 and in another that 0 means the world's own rules, which cannot both
  * hold, so both are offered and each says what it does.
  */
-const COVER_BRUSHES: Array<{ cover: Cover; Icon: LucideIcon; label: string }> = [
+export const COVER_BRUSHES: Array<{ cover: Cover; Icon: LucideIcon; label: string }> = [
   { cover: 'plants', Icon: Sprout, label: 'Plants' },
   { cover: 'pebbles', Icon: Grip, label: 'Pebbles' },
   { cover: 'cleared', Icon: Eraser, label: 'Clear' },
   { cover: 'default', Icon: Leaf, label: 'Let it grow' },
 ];
 
-const BRUSH_SIZES: Array<{ size: BrushSize; label: string }> = [
+export const BRUSH_SIZES: Array<{ size: BrushSize; label: string }> = [
   { size: 'small', label: 'S' },
   { size: 'medium', label: 'M' },
   { size: 'large', label: 'L' },
 ];
 
-const SOILS = ['grass', 'dirt', 'sand', 'rock', 'snow', 'mud'] as const;
+export const SOILS = ['grass', 'dirt', 'sand', 'rock', 'snow', 'mud'] as const;
 
-const hex = (color: number) => `#${color.toString(16).padStart(6, '0')}`;
+export const hex = (color: number) => `#${color.toString(16).padStart(6, '0')}`;
 
 function PillButton({
   onClick,
@@ -312,6 +313,52 @@ function ItemLibrary({
 }
 
 /** Kid-first build UI over the 3D view: tools, item library, brush options, selection actions. */
+/**
+ * The Real place tool (Map): find a real place and build it here. The phone shows it in a side sheet, the desktop
+ * studio in the right dock (BUILD-B8). One undo step takes the whole build back.
+ */
+export function MapToolPanel({
+  runtime,
+  status,
+  placeId,
+}: {
+  runtime: RefObject<GenvrRuntime | null>;
+  status: ToolStatus;
+  placeId: string;
+}) {
+  // The undo history size right after the last Map build: its Undo button takes back only that build.
+  const mapBuildMark = useRef<number | null>(null);
+  const rt = () => runtime.current;
+  return (
+    <RealPlacePanel
+      placeId={placeId}
+      placeSide={SIZE_TIERS[rt()?.world.sizeTier ?? 'small'].sideMeters}
+      at={status.mapSpot ?? { x: 0, z: 0 }}
+      onBuild={async (plan, _area, progress) => {
+        const current = rt();
+        if (!current) throw new Error('The place is not open.');
+        // One undo step for the whole area, saved and shared like any other edit, applied in pieces so a big
+        // area never freezes the studio (REAL-06). A build that is cancelled or fails keeps the mark of an
+        // earlier build, which stays undoable.
+        const mark = await applyMapBuild(current, plan.commands, {
+          stage: buildStage,
+          ...(progress ? { progress } : {}),
+        });
+        mapBuildMark.current = mark;
+      }}
+      onUndoBuild={() => {
+        const current = rt();
+        // An edit still open (a stroke, a drag) is closed first, so Undo never takes it back instead.
+        if (current) closeOpenEdit(current);
+        if (!current || mapBuildMark.current === null || current.undoMark() !== mapBuildMark.current)
+          return 'Something else changed after the build. Use Undo at the top to step back.';
+        mapBuildMark.current = null;
+        return current.undo() ? null : 'The build could not be taken back.';
+      }}
+    />
+  );
+}
+
 export function BuildPanel({
   runtime,
   status,
@@ -321,9 +368,12 @@ export function BuildPanel({
   onTest,
   placeId,
   onAssistant,
+  contextMenu = false,
 }: {
   runtime: RefObject<GenvrRuntime | null>;
   status: ToolStatus;
+  /** Desktop Build tab: right-click in the 3D view opens the selection menu (BUILD-B7). */
+  contextMenu?: boolean;
   /** Shown first in the toolbar (the Avatar button). */
   leading?: ReactNode;
   /** Called when the player picks a tool (e.g. to close the avatar panel). */
@@ -345,8 +395,6 @@ export function BuildPanel({
   const [skyOpen, setSkyOpen] = useState(false);
   // Assistant chat (the studio has it in its right dock; here it is a left side panel).
   const [assistantOpen, setAssistantOpen] = useState(false);
-  // The undo history size right after the last Map build: its Undo button takes back only that build.
-  const mapBuildMark = useRef<number | null>(null);
   const drawing =
     (status.tool === 'road' || status.tool === 'wall' || status.tool === 'river') && status.points > 0;
   const rt = () => runtime.current;
@@ -360,6 +408,10 @@ export function BuildPanel({
     hint = 'Click an item to select it. Shift-click adds more; Shift-drag draws a box.';
   if (status.tool === 'select' && status.moving) hint = 'Tap where it should go.';
   if (status.tool === 'select' && status.selected && !status.moving) hint = null;
+  // The eraser names what a click takes away (BUILD-B8).
+  if (status.tool === 'eraser' && status.eraseTarget) hint = `Remove: ${status.eraseTarget.name} · click`;
+  // Drawing: how many points and how long so far (BUILD-B4).
+  if (drawing) hint = `${status.points} point${status.points === 1 ? '' : 's'} · ${status.length ?? 0} m · ${hint ?? ''}`.replace(/ · $/, '');
 
   const chooseTool = (tool: BuildTool | null) => {
     if (tool === 'place' || tool === 'road') setPanelOpen(true);
@@ -372,7 +424,7 @@ export function BuildPanel({
 
   return (
     <>
-      {status.tool === 'map' && placeId ? (
+      {status.tool === 'map' && placeId && !studio ? (
         <aside
           aria-label="Real place"
           className="pointer-events-auto absolute top-16 right-3 bottom-28 z-20 flex w-96 max-w-[calc(100vw-1.5rem)] flex-col rounded-3xl bg-surface/95 p-3 shadow-xl"
@@ -387,32 +439,7 @@ export function BuildPanel({
               Close
             </button>
           </div>
-          <RealPlacePanel
-            placeId={placeId}
-            placeSide={SIZE_TIERS[rt()?.world.sizeTier ?? 'small'].sideMeters}
-            at={status.mapSpot ?? { x: 0, z: 0 }}
-            onBuild={async (plan, _area, progress) => {
-              const runtime = rt();
-              if (!runtime) throw new Error('The place is not open.');
-              // One undo step for the whole area, saved and shared like any other edit, applied in pieces so a big
-              // area never freezes the studio (REAL-06). A build that is cancelled or fails keeps the mark of an
-              // earlier build, which stays undoable.
-              const mark = await applyMapBuild(runtime, plan.commands, {
-                stage: buildStage,
-                ...(progress ? { progress } : {}),
-              });
-              mapBuildMark.current = mark;
-            }}
-            onUndoBuild={() => {
-              const runtime = rt();
-              // An edit still open (a stroke, a drag) is closed first, so Undo never takes it back instead.
-              if (runtime) closeOpenEdit(runtime);
-              if (!runtime || mapBuildMark.current === null || runtime.undoMark() !== mapBuildMark.current)
-                return 'Something else changed after the build. Use Undo at the top to step back.';
-              mapBuildMark.current = null;
-              return runtime.undo() ? null : 'The build could not be taken back.';
-            }}
-          />
+          <MapToolPanel runtime={runtime} status={status} placeId={placeId} />
         </aside>
       ) : null}
       {assistantOpen && placeId && !studio ? (
@@ -446,11 +473,11 @@ export function BuildPanel({
         />
       ) : null}
 
-      {status.tool === 'road' && getRoadType(status.roadType).look === 'street' ? (
+      {!studio && status.tool === 'road' && getRoadType(status.roadType).look === 'street' ? (
         <RoadSettings road={status.road} onChange={(change) => rt()?.setRoad(change)} studio={studio} />
       ) : null}
 
-      {status.tool === 'river' ? (
+      {!studio && status.tool === 'river' ? (
         <RiverSettings river={status.river} onChange={(change) => rt()?.setRiver(change)} studio={studio} />
       ) : null}
 
@@ -464,8 +491,19 @@ export function BuildPanel({
         />
       ) : null}
 
+      {studio && contextMenu ? <BuildContextMenu runtime={runtime} status={status} /> : null}
+      {studio && (status.message || hint) ? (
+        <div className="pointer-events-none absolute top-3 left-3 z-10 max-w-[min(32rem,calc(100%-9rem))]">
+          <div
+            role="status"
+            className={`rounded-xl px-3 py-1.5 text-xs font-bold shadow ${status.message ? 'bg-coral text-on-brand' : 'bg-surface/90 text-ink'}`}
+          >
+            {status.message ?? hint}
+          </div>
+        </div>
+      ) : null}
       <div className="pointer-events-none absolute inset-x-0 bottom-0 flex flex-col items-center gap-2 p-3">
-        {status.message ? (
+        {studio ? null : status.message ? (
           <div className="rounded-2xl bg-coral px-4 py-2 text-sm font-bold text-on-brand shadow">
             {status.message}
           </div>
@@ -507,7 +545,7 @@ export function BuildPanel({
           </div>
         ) : null}
 
-        {status.tool === 'cover' ? (
+        {!studio && status.tool === 'cover' ? (
           <div className="pointer-events-auto flex max-w-full flex-wrap items-center justify-center gap-1 rounded-3xl bg-surface/95 p-1.5 shadow-lg">
             {COVER_BRUSHES.map((entry) => {
               const selected = status.brush.cover === entry.cover;
@@ -544,7 +582,7 @@ export function BuildPanel({
           </div>
         ) : null}
 
-        {status.tool === 'terrain' ? (
+        {!studio && status.tool === 'terrain' ? (
           <div className="pointer-events-auto flex max-w-full flex-wrap items-center justify-center gap-1 rounded-3xl bg-surface/95 p-1.5 shadow-lg">
             {BRUSH_MODES.map((entry) => {
               const selected = status.brush.mode === entry.mode;
@@ -612,7 +650,7 @@ export function BuildPanel({
           </div>
         ) : null}
 
-        {status.tool === 'blocks' && status.blocks ? (
+        {!studio && status.tool === 'blocks' && status.blocks ? (
           <div className="pointer-events-auto flex max-w-full flex-wrap items-center justify-center gap-1 rounded-3xl bg-surface/95 p-1.5 shadow-lg">
             {(
               [
@@ -806,7 +844,7 @@ const GROUND_GROUPS: Array<{ kind: GroundKind; label: string }> = [
  * Realistic ground materials for the paint brush (P2-37): one button with the chosen material's
  * picture; it opens the materials from the library, grouped and searchable.
  */
-function GroundPicker({
+export function GroundPicker({
   selected,
   soil,
   onPick,
@@ -915,10 +953,10 @@ function GroundPicker({
  * than swum and its current carries nobody. The panel says so rather than leaving it a surprise.
  */
 /** From this width a river is deep enough to swim in, so its current carries players (P2-39). */
-const SWIMMABLE_WIDTH = 11;
+export const SWIMMABLE_WIDTH = 11;
 
 /** Lanes and direction of the streets the road tool draws (R2g): lane lines are painted from them. */
-function RoadSettings({
+export function RoadSettings({
   road,
   onChange,
   studio,
@@ -935,6 +973,58 @@ function RoadSettings({
         studio ? '' : 'absolute top-16 left-3'
       }`}
     >
+      <h3 className="text-[11px] font-black tracking-wide text-ink/50 uppercase">Size</h3>
+      <label className="flex flex-col gap-1 text-xs font-bold text-ink/70">
+        <span className="flex justify-between gap-3">
+          Width<span className="text-ink">{road.width ? `${road.width} m` : 'Auto'}</span>
+        </span>
+        <input
+          type="range"
+          aria-label="Road width"
+          min={1}
+          max={16}
+          step={0.5}
+          value={road.width ?? 1}
+          onChange={(event) => {
+            const value = Number(event.target.value);
+            onChange({ width: value < 2 ? undefined : value });
+          }}
+          className="accent-ink"
+        />
+      </label>
+      <label className="flex flex-col gap-1 text-xs font-bold text-ink/70">
+        <span className="flex justify-between gap-3">
+          Sidewalk<span className="text-ink">{road.sidewalk ? `${road.sidewalk} m` : 'None'}</span>
+        </span>
+        <input
+          type="range"
+          aria-label="Sidewalk"
+          min={0}
+          max={6}
+          step={0.5}
+          value={road.sidewalk ?? 0}
+          onChange={(event) => {
+            const value = Number(event.target.value);
+            onChange({ sidewalk: value < 0.5 ? undefined : value });
+          }}
+          className="accent-ink"
+        />
+      </label>
+      {road.sidewalk ? (
+        <div className="flex gap-1" role="group" aria-label="Sidewalk sides">
+          {(['both', 'left', 'right'] as const).map((side) => (
+            <button
+              key={side}
+              type="button"
+              aria-pressed={(road.sidewalkSide ?? 'both') === side}
+              onClick={() => onChange({ sidewalkSide: side })}
+              className={`${choice((road.sidewalkSide ?? 'both') === side)} capitalize`}
+            >
+              {side}
+            </button>
+          ))}
+        </div>
+      ) : null}
       <h3 className="text-[11px] font-black tracking-wide text-ink/50 uppercase">Street</h3>
       <div className="flex flex-col gap-1 text-xs font-bold text-ink/70">
         Lanes
@@ -967,7 +1057,7 @@ function RoadSettings({
   );
 }
 
-function RiverSettings({
+export function RiverSettings({
   river,
   onChange,
   studio,

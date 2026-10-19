@@ -68,6 +68,7 @@ import {
   type BuildTool,
   type RiverToolSettings,
   type RoadToolSettings,
+  type WallToolSettings,
   type ToolStatus,
 } from './build-tools.js';
 import type { SnapSettings } from './item-tools.js';
@@ -362,6 +363,8 @@ export interface GenvrRuntime {
   setRiver(settings: Partial<RiverToolSettings>): void;
   /** Lanes and direction of the streets the road tool draws (R2g). */
   setRoad(settings: Partial<RoadToolSettings>): void;
+  /** Height and look of new walls, and the size of new doors and windows (BUILD-B6). */
+  setWall(settings: Partial<WallToolSettings>): void;
   /** Changes the terrain brush (mode, size, paint soil). */
   setBrush(settings: Partial<BrushSettings>): void;
   /** Digging and stacking on block ground (Stack or Dig, which block); switches to the Blocks tool. */
@@ -3255,6 +3258,7 @@ export async function createRuntime({
     setRoadType: (typeId) => tools?.setRoadType(typeId),
     setRiver: (settings) => tools?.setRiver(settings),
     setRoad: (settings) => tools?.setRoad(settings),
+    setWall: (settings) => tools?.setWall(settings),
     setBrush: (settings) => tools?.setBrush(settings),
     setBlockTool: (settings) => tools?.setBlockTool(settings),
     setPlaceItem: (itemId) => tools?.setPlaceItem(itemId),

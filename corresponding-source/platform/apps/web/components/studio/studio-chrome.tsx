@@ -26,6 +26,7 @@ import { AssistantPanel } from './assistant-panel';
 import { CaptureButton } from './capture-button';
 import { ExplorerPanel } from './explorer-panel';
 import { PropertiesPanel } from './properties-panel';
+import { OPTION_TOOLS, ToolOptionsPanel } from './tool-options-panel';
 import { SnapBar } from './snap-bar';
 import { GenvrMark } from '../genvr-mark';
 import { FilmingPanel } from './filming-panel';
@@ -69,7 +70,15 @@ const TABS: Array<{ id: StudioTab; label: string }> = [
  * Play is the Test button, not a tool; items come from the Library tab; doors and windows are put
  * in from the wall they belong to.
  */
-const NOT_IN_DOCK = new Set<string | null>([null, 'place', 'door', 'window']);
+const NOT_IN_DOCK = new Set<string | null>([null, 'place']);
+/** The Build dock in groups with a key on each tool (BUILD-B1); R stays Turn and Delete stays Delete. */
+const DOCK_GROUPS: Array<{ label: string; tools: Array<{ tool: string; key: string }> }> = [
+  { label: 'Edit', tools: [{ tool: 'select', key: 'V' }, { tool: 'eraser', key: 'E' }] },
+  { label: 'Land', tools: [{ tool: 'terrain', key: 'T' }, { tool: 'cover', key: 'G' }, { tool: 'water', key: 'L' }, { tool: 'river', key: 'I' }] },
+  { label: 'Build', tools: [{ tool: 'road', key: 'D' }, { tool: 'wall', key: 'W' }, { tool: 'door', key: 'O' }, { tool: 'window', key: 'N' }, { tool: 'blocks', key: 'B' }] },
+  { label: 'Real place', tools: [{ tool: 'map', key: 'M' }] },
+];
+const TOOL_KEYS = new Map(DOCK_GROUPS.flatMap((group) => group.tools.map((one) => [one.key.toLowerCase(), one.tool] as const)));
 
 /** Panel titles; the tab panel is named after the open tab. */
 const PANEL_TITLES: Record<DockPanel, (tab: StudioTab) => string> = {
@@ -86,22 +95,27 @@ function SidebarButton({
   label,
   Icon,
   active = false,
+  shortcut,
   onClick,
 }: {
   label: string;
   Icon: LucideIcon;
   active?: boolean;
+  shortcut?: string;
   onClick: () => void;
 }) {
   return (
     <button
       type="button"
       aria-pressed={active}
+      aria-keyshortcuts={shortcut}
+      title={shortcut ? `${label} (${shortcut})` : label}
       onClick={onClick}
-      className={`flex flex-col items-center gap-1 rounded-xl py-2.5 text-[11px] font-bold ${
+      className={`relative flex flex-col items-center gap-1 rounded-xl py-2.5 text-[11px] font-bold ${
         active ? 'bg-ink text-on-brand' : 'bg-paper text-ink hover:bg-ink/10'
       }`}
     >
+      {shortcut ? <span aria-hidden className="absolute top-1 right-1.5 font-mono text-[9px] font-medium opacity-50">{shortcut}</span> : null}
       <Icon className="size-5" strokeWidth={2} aria-hidden />
       {label}
     </button>
@@ -181,6 +195,29 @@ export function StudioChrome({
   // The Avatar tab is the character editor (CHAR-01): its own stage over the viewport, the world rests meanwhile.
   const character = useCharacterEditor();
   useEffect(() => avatarStudioBridge.register(character), [character]);
+  // Build keys (BUILD-B1): a letter picks a tool; Ctrl/Cmd+Z undoes, Ctrl+Y or Shift+Ctrl/Cmd+Z redoes.
+  useEffect(() => {
+    if (testing || (tab !== 'build' && tab !== 'items' && tab !== 'world')) return;
+    const onKey = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null;
+      if (target?.closest('input, textarea, select, [contenteditable="true"]')) return;
+      const key = event.key.toLowerCase();
+      if (event.ctrlKey || event.metaKey) {
+        if (event.altKey) return;
+        if (key === 'z' && !event.shiftKey) { event.preventDefault(); runtime.current?.undo(); }
+        else if (key === 'y' || (key === 'z' && event.shiftKey)) { event.preventDefault(); runtime.current?.redo(); }
+        return;
+      }
+      if (tab !== 'build' || event.altKey || event.shiftKey || event.repeat) return;
+      const tool = TOOL_KEYS.get(key);
+      const runtimeNow = runtime.current;
+      if (!tool || !runtimeNow || !toolsFor(runtimeNow).some((entry) => entry.tool === tool)) return;
+      event.preventDefault();
+      runtimeNow.setTool(tool as Parameters<typeof runtimeNow.setTool>[0]);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [tab, testing, runtime]);
   const workflowOpen = useWorkflowOpen();
   useEffect(()=>{onCharacter?.(character);},[character]);
   useEffect(() => host.characterBody?.(body => character.change(recipe => ({ ...recipe, body }))), [host.characterBody]);
@@ -229,6 +266,8 @@ export function StudioChrome({
         </div>
       );
     if (id === 'assistant') return <AssistantPanel runtime={runtime} placeId={placeId} />;
+    if (id === 'properties' && tab === 'build' && status.tool && OPTION_TOOLS.has(status.tool))
+      return <ToolOptionsPanel runtime={runtime} status={status} placeId={placeId} />;
     if (id === 'properties')
       return (
         <div className="px-3 pb-3">
@@ -254,19 +293,34 @@ export function StudioChrome({
         </div>
       );
     if (tab === 'avatar') return <CharacterTabs editor={character} />;
+    const available = toolsFor(rt()).filter((entry) => !NOT_IN_DOCK.has(entry.tool));
     return (
-      <div className="grid grid-cols-3 gap-1.5 px-2 pb-2">
-        {toolsFor(rt())
-          .filter((entry) => !NOT_IN_DOCK.has(entry.tool))
-          .map((entry) => (
-            <SidebarButton
-              key={entry.label}
-              label={entry.label}
-              Icon={entry.Icon}
-              active={entry.tool === status.tool}
-              onClick={() => rt()?.setTool(entry.tool === status.tool ? null : entry.tool)}
-            />
-          ))}
+      <div className="flex flex-col gap-1 px-2 pb-2">
+        {DOCK_GROUPS.map((group) => {
+          const entries = group.tools.flatMap((one) => {
+            const entry = available.find((tool) => tool.tool === one.tool);
+            return entry ? [{ ...entry, key: one.key }] : [];
+          });
+          if (!entries.length) return null;
+          return (
+            <section key={group.label} aria-label={group.label}>
+              <h3 className="mt-1 mb-1 px-1 text-[10px] font-black tracking-wide text-ink/45 uppercase">{group.label}</h3>
+              <div className="grid grid-cols-3 gap-1.5">
+                {entries.map((entry) => (
+                  <SidebarButton
+                    key={entry.label}
+                    label={entry.label}
+                    Icon={entry.Icon}
+                    shortcut={entry.key}
+                    active={entry.tool === status.tool}
+                    onClick={() => rt()?.setTool(entry.tool === status.tool ? null : entry.tool)}
+                  />
+                ))}
+              </div>
+            </section>
+          );
+        })}
+        <p className="mt-2 px-1 text-[11px] text-ink/50">Keys pick a tool · Esc stops drawing · each tool's options are on the right.</p>
       </div>
     );
   };
