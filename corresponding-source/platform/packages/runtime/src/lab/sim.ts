@@ -32,17 +32,23 @@ export const LAB_GROUND_MOVES: Record<string, { speed: number; stride: number; c
   Sneak: { speed: 0.8, stride: 0.55, clip: 'Sneak' },
   'Crouch Walk': { speed: 0.9, stride: 0.55, clip: 'Crouch Walk' },
 };
-/** The ground move for a name (own keys only); unknown names use Walk. */
-export function labGroundMove(name: string): { speed: number; stride: number; clip: string } {
+export type LabGroundMove = { speed: number; stride: number; clip: string };
+/**
+ * The ground move for a name (own keys only); unknown names use Walk. `made`: motions made in the Lab (board M11) with
+ * their pace measured from their keys; a made motion that does not travel still moves at the run's speed, so its
+ * planted feet slide (an honest score).
+ */
+export function labGroundMove(name: string, made: Readonly<Record<string, LabGroundMove>> = {}): LabGroundMove {
+  if (Object.hasOwn(made, name)) { const m = made[name]!; return { speed: Math.max(0.05, m.speed), stride: Math.max(0.05, m.stride), clip: m.clip }; }
   return Object.hasOwn(LAB_GROUND_MOVES, name) ? LAB_GROUND_MOVES[name]! : LAB_GROUND_MOVES.Walk!;
 }
 const MAX_TIME = 120;
 const HIP = 0.95;
 const FOOT_X = 0.12;
 
-export function simulateLabRun(course: LabCourse, input: Partial<LabRunSettings> = {}, seed = course.seed): LabRunResult {
+export function simulateLabRun(course: LabCourse, input: Partial<LabRunSettings> = {}, seed = course.seed, made: Readonly<Record<string, LabGroundMove>> = {}): LabRunResult {
   const s = LabRunSettings.parse(input);
-  const move = labGroundMove(s.motion);
+  const move = labGroundMove(s.motion, made);
   const rnd = labRandom(seed ^ 0x5bd1e995);
   const boxes = courseBoxes(course);
   const ground = (x: number, z: number) => groundAt(course, x, z, boxes);

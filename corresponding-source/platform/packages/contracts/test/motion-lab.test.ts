@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { LabCourse, LabProjectData, LabRunSettings, MotionLabOperation, MOTION_LAB_KINDS } from '../src/motion-lab.js';
+import { LabCourse, LabMadeMotion, LabProjectData, LabRunSettings, MotionLabOperation, MOTION_LAB_KINDS } from '../src/motion-lab.js';
 
 describe('motion lab contracts (MOTION-LAB L1)', () => {
   it('fills a course with sizes in metres', () => {
@@ -44,5 +44,25 @@ describe('lab character (board M17)', () => {
     expect(LabRunSettings.parse({ character: id }).character).toBe(id);
     expect(MotionLabOperation.parse({ kind: 'who_set', who: id })).toMatchObject({ kind: 'who_set' });
     expect(MOTION_LAB_KINDS).toEqual(expect.arrayContaining(['characters', 'who_set']));
+  });
+});
+
+describe('made motions by pose and key frames (board M11)', () => {
+  it('keeps keys of pose sliders on frames inside the motion, one key per frame', () => {
+    const motion = LabMadeMotion.parse({ id: 'made-punch', name: 'Punch', keys: [{ frame: 0, values: { 'R.elbow.bend': 12, 'root.y': 0 } }] });
+    expect(motion).toMatchObject({ frames: 120, loop: true, pins: [], draft: null });
+    expect(motion.keys[0]!.ease).toBe('smooth');
+    expect(() => LabMadeMotion.parse({ ...motion, keys: [...motion.keys, { frame: 0, values: {} }] })).toThrow(/Two keys/);
+    expect(() => LabMadeMotion.parse({ ...motion, keys: [{ frame: 200, values: {} }] })).toThrow(/120 frames/);
+    expect(() => LabMadeMotion.parse({ ...motion, keys: [{ frame: 1, values: { 'Right elbow': 3 } }] })).toThrow();
+    expect(() => LabProjectData.parse({ motions: [motion, { ...motion, id: 'made-punch-2', name: 'punch' }] })).toThrow(/called/);
+  });
+  it('has the M11 operations, with sides, rows, eases and limbs checked', () => {
+    expect(MOTION_LAB_KINDS).toEqual(expect.arrayContaining(['pose_get', 'pose_set', 'key_add', 'key_remove', 'limb_move', 'pin', 'pose_mirror', 'pose_test', 'pose_save_version']));
+    expect(MotionLabOperation.parse({ kind: 'pose_set', frame: 412, joint: 'elbow.bend', value: 38 })).toMatchObject({ side: 'both' });
+    expect(() => MotionLabOperation.parse({ kind: 'key_add', frame: 1, rows: ['tail'] })).toThrow();
+    expect(() => MotionLabOperation.parse({ kind: 'key_ease', frame: 1, ease: 'bouncy' })).toThrow();
+    expect(() => MotionLabOperation.parse({ kind: 'pin', limb: 'head' })).toThrow();
+    expect(MotionLabOperation.parse({ kind: 'limb_move', frame: 0, limb: 'right_hand', by: [0, 0.1, 0] })).toMatchObject({ limb: 'right_hand' });
   });
 });

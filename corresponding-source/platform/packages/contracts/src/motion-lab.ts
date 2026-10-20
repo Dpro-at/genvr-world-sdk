@@ -129,6 +129,54 @@ export const LabEventKind = z.enum(['start', 'step', 'ramp', 'gap_jump', 'land',
 export const LabEvent = z.object({ t: z.number().min(0), kind: LabEventKind, label: z.string().max(120), obstacle: labId.optional() }).strict();
 export type LabEvent = z.infer<typeof LabEvent>;
 
+/**
+ * Motions made in the Lab by pose and key frames (board M11). A key is the pose of some joints on one frame: slider
+ * values with the same keys as the Avatar pose panel (`head.nod`, `R.elbow.bend`, `L.index.mid` …, degrees or %)
+ * plus where the hips are (`root.x`, `root.y`, `root.z`, metres). The lab fills the frames between keys, slider by
+ * slider, from the key before (its ease) to the key after. Frames run at 60 per second, as runs do.
+ */
+export const LAB_POSE_FPS = 60;
+export const LAB_POSE_MAX_FRAMES = 3600;
+/** The key track's rows: which sliders a key holds decides the rows it shows in. */
+export const LAB_POSE_ROWS = ['body', 'right_arm', 'right_hand', 'left_arm', 'left_hand', 'legs'] as const;
+export const LabPoseRow = z.enum(LAB_POSE_ROWS);
+export type LabPoseRow = z.infer<typeof LabPoseRow>;
+/** Linear: straight from key to key; smooth: eases out of the key and into the next; hold: stays until the next key. */
+export const LabPoseEase = z.enum(['linear', 'smooth', 'hold']);
+export type LabPoseEase = z.infer<typeof LabPoseEase>;
+export const LAB_LIMBS = ['left_hand', 'right_hand', 'left_foot', 'right_foot'] as const;
+export const LabLimb = z.enum(LAB_LIMBS);
+export type LabLimb = z.infer<typeof LabLimb>;
+export const LabPoseKeyName = z.string().regex(/^([LR]\.)?[a-z]+\.[a-z]+$/, 'A pose slider like "head.nod", "R.elbow.bend" or "root.y".').max(24);
+export const LabPoseValues = z.record(LabPoseKeyName, z.number().min(-360).max(360)).refine((v) => Object.keys(v).length <= 200, 'At most 200 sliders in one key.');
+export type LabPoseValues = z.infer<typeof LabPoseValues>;
+const poseFrame = z.number().int().min(0).max(LAB_POSE_MAX_FRAMES - 1);
+export const LabPoseKey = z.object({ frame: poseFrame, ease: LabPoseEase.default('smooth'), values: LabPoseValues }).strict();
+export type LabPoseKey = z.infer<typeof LabPoseKey>;
+export const LabMadeMotion = z.object({
+  id: labId,
+  name: z.string().trim().min(1).max(60),
+  /** Length in frames (60 per second). */
+  frames: z.number().int().min(2).max(LAB_POSE_MAX_FRAMES).default(120),
+  /** A loop runs from the last key back into the first (a walk); otherwise the last key holds. */
+  loop: z.boolean().default(true),
+  keys: z.array(LabPoseKey).max(400).default([]),
+  /** Slider changes on a frame not keyed yet for that joint: kept here until Key (K) makes them a key. */
+  draft: z.object({ frame: poseFrame, values: LabPoseValues }).strict().nullable().default(null),
+  /** Hands and feet that stay where they are while other joints change (an editing aid). */
+  pins: z.array(LabLimb).max(4).default([]),
+  by: z.enum(['person', 'agent']).default('person'),
+  at: z.string().max(40).default(''),
+}).strict().superRefine((motion, ctx) => {
+  const frames = new Set<number>();
+  for (const [i, key] of motion.keys.entries()) {
+    if (frames.has(key.frame)) ctx.addIssue({ code: 'custom', message: `Two keys on frame ${key.frame}.`, path: ['keys', i, 'frame'] });
+    if (key.frame >= motion.frames) ctx.addIssue({ code: 'custom', message: `Key on frame ${key.frame}, the motion has ${motion.frames} frames.`, path: ['keys', i, 'frame'] });
+    frames.add(key.frame);
+  }
+});
+export type LabMadeMotion = z.infer<typeof LabMadeMotion>;
+
 export const LabRun = z.object({
   id: labId,
   at: z.string().max(40),
@@ -141,6 +189,8 @@ export const LabRun = z.object({
   /** The version this run was made from, if any. */
   version: labId.optional(),
   by: z.enum(['person', 'agent']).default('person'),
+  /** A run of a motion made in the Lab (board M11): its natural pace measured from its keys, so a replay is exact. */
+  move: z.object({ speed: z.number().min(0).max(20), stride: z.number().min(0).max(4) }).strict().optional(),
 }).strict();
 export type LabRun = z.infer<typeof LabRun>;
 
@@ -155,6 +205,8 @@ export const MotionVersion = z.object({
   best: z.boolean().default(false),
   by: z.enum(['person', 'agent']).default('person'),
   at: z.string().max(40),
+  /** A motion made in the Lab (board M11): its keys as they were, so rolling back brings them back. */
+  made: LabMadeMotion.optional(),
 }).strict();
 export type MotionVersion = z.infer<typeof MotionVersion>;
 
@@ -213,7 +265,15 @@ export const LabProjectData = z.object({
   best_pending: z.object({ version: labId, by: z.string().max(80) }).strict().nullable().default(null),
   /** Board M14: shares of versions with the GenVR community (one per version). */
   shares: z.array(MotionShare).max(500).default([]),
-}).strict();
+  /** Board M11: motions made here by pose and key frames. */
+  motions: z.array(LabMadeMotion).max(50).default([]),
+}).strict().superRefine((data, ctx) => {
+  const names = new Set<string>();
+  for (const [i, m] of data.motions.entries()) {
+    if (names.has(m.name.toLowerCase())) ctx.addIssue({ code: 'custom', message: `Two made motions are called "${m.name}".`, path: ['motions', i, 'name'] });
+    names.add(m.name.toLowerCase());
+  }
+});
 export type LabProjectData = z.infer<typeof LabProjectData>;
 
 export const LAB_OVERLAYS = ['skeleton', 'feet', 'balance', 'speed', 'ghost', 'measures'] as const;
@@ -254,6 +314,38 @@ export const MotionLabOperation = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('save_best'), version: labId }).strict(),
   z.object({ kind: z.literal('rollback'), version: labId }).strict(),
   z.object({ kind: z.literal('version_delete'), version: labId, confirm: z.literal(true) }).strict(),
+  // ---- pose and key frames (board M11)
+  /** Motions made in the Lab and the one open in Pose. */
+  z.object({ kind: z.literal('pose_list') }).strict(),
+  /** A new made motion (it opens in Pose): standing (arms down) or T-pose on frame 0. */
+  z.object({ kind: z.literal('pose_new'), name: z.string().trim().min(1).max(60), frames: z.number().int().min(2).max(LAB_POSE_MAX_FRAMES).optional(),
+    loop: z.boolean().optional(), from: z.enum(['stand', 't_pose']).default('stand') }).strict(),
+  /** Open a made motion in Pose (by id or name), or change its length / loop. */
+  z.object({ kind: z.literal('pose_open'), motion: z.string().min(1).max(60), frames: z.number().int().min(2).max(LAB_POSE_MAX_FRAMES).optional(), loop: z.boolean().optional() }).strict(),
+  /** The pose on a frame: every slider, which rows have a key there, the joint law check, hands and feet in metres. */
+  z.object({ kind: z.literal('pose_get'), frame: poseFrame }).strict(),
+  /** Move one slider (joint + side) or several (`values`); it stops at the joint law. Pinned hands and feet stay. */
+  z.object({ kind: z.literal('pose_set'), frame: poseFrame, joint: LabPoseKeyName.optional(), side: z.enum(['both', 'left', 'right']).default('both'),
+    value: z.number().min(-360).max(360).optional(), values: LabPoseValues.optional() }).strict(),
+  /** Key the pose of some rows (default: every row) on a frame. */
+  z.object({ kind: z.literal('key_add'), frame: poseFrame, rows: z.array(LabPoseRow).max(6).optional(), ease: LabPoseEase.optional() }).strict(),
+  /** Remove the key of some rows (default: every row) on a frame. */
+  z.object({ kind: z.literal('key_remove'), frame: poseFrame, rows: z.array(LabPoseRow).max(6).optional() }).strict(),
+  /** How the frames after a key are filled: linear, smooth or hold. */
+  z.object({ kind: z.literal('key_ease'), frame: poseFrame, ease: LabPoseEase }).strict(),
+  /** Copy the pose of some rows from one frame onto another as a key. */
+  z.object({ kind: z.literal('key_copy'), from: poseFrame, to: poseFrame, rows: z.array(LabPoseRow).max(6).optional() }).strict(),
+  /** Move a hand or foot (metres, x his left, y up, z his front, from his feet) and the arm or leg follows (two bones). */
+  z.object({ kind: z.literal('limb_move'), frame: poseFrame, limb: LabLimb, target: z.tuple([z.number().min(-3).max(3), z.number().min(-1).max(3), z.number().min(-3).max(3)]).optional(),
+    by: z.tuple([z.number().min(-2).max(2), z.number().min(-2).max(2), z.number().min(-2).max(2)]).optional() }).strict(),
+  /** Pin a hand or foot where it is (or unpin it): it stays while other joints change. */
+  z.object({ kind: z.literal('pin'), limb: LabLimb, on: z.boolean().default(true) }).strict(),
+  /** Mirror the pose on a frame: swap his left and right, or copy one side onto the other. */
+  z.object({ kind: z.literal('pose_mirror'), frame: poseFrame, mode: z.enum(['swap', 'left_to_right', 'right_to_left']).default('swap') }).strict(),
+  /** Test in course: run the course with the open made motion. */
+  z.object({ kind: z.literal('pose_test') }).strict(),
+  /** Save as version: tests it in the course when its keys changed since the last test, then keeps that run as a version. */
+  z.object({ kind: z.literal('pose_save_version'), note: z.string().max(120).optional() }).strict(),
   // ---- sharing (board M14)
   /** My motions: every version with its share state and the rights checks. */
   z.object({ kind: z.literal('motions_mine') }).strict(),

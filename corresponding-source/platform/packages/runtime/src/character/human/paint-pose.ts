@@ -408,8 +408,9 @@ const RIG_BONES = /^(Hips|Spine|Spine1|Spine2|Neck|Head|(Left|Right)(UpLeg|Leg|F
  * turns from the T-pose under the pose's turns. Unlike `tPose` (a plain swing per bone) the upper arm is rolled so its
  * elbow hinge is the law's: with a plain swing this mesh's A-pose elbow already reads ~20 degrees "sideways" and a full
  * bend breaks the law (found 2026-10-05; the Core clips bend the elbow about the same law hinge - see HANDOFF).
+ * `bones` picks the bones returned (the clips' rig bones by default; the motion lab also takes the fingers).
  */
-export function clipPose(skeleton: PoseSkeleton, values: PaintPoseValues): Pose {
+export function clipPose(skeleton: PoseSkeleton, values: PaintPoseValues, bones: RegExp = RIG_BONES): Pose {
   const { world } = poseJoints(skeleton, values);
   const fromT: Quat[] = [];
   skeleton.names.forEach((name, j) => {
@@ -440,7 +441,7 @@ export function clipPose(skeleton: PoseSkeleton, values: PaintPoseValues): Pose 
   const total = world.map((q, j) => mul(q, fromT[j]!));
   const pose: Record<string, Vec> = {};
   skeleton.names.forEach((name, j) => {
-    if (!RIG_BONES.test(name)) return;
+    if (!bones.test(name)) return;
     const parent = skeleton.parents[j]!;
     pose[name] = eulerOf(parent >= 0 ? mul(inverse(total[parent]!), total[j]!) : total[j]!);
   });

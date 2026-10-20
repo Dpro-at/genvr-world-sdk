@@ -7,6 +7,7 @@ import {
   LAB_OVERLAYS,
   LabCar,
   LabCourse,
+  LabMadeMotion,
   LabObstacle,
   LabProjectData,
   LabRunSettings,
@@ -17,12 +18,19 @@ import {
   MotionShare,
   MotionShareDraft,
   type BodyId,
+  type LabLimb,
   type LabObstacleKind,
   type LabOverlay,
+  type LabPoseEase,
+  type LabPoseRow,
   type LabRun,
   type MotionVersion,
 } from '@genvr/contracts';
-import { courseFromSeed, defaultLabCourse, labGroundMove, scoreLabRun, simulateLabRun, LAB_GROUND_MOVES, type LabFrame, type LabRunResult } from '@genvr/runtime';
+import {
+  courseFromSeed, defaultLabCourse, labGroundMove, labHoldPins, labKeyRows, labLimbMove, labLimbPositions, labMadeMotionPace, labMirror, labPoseAt,
+  labPoseLimit, labPoseProblems, labPoseRow as labRowOf, labRowKeys, labAsk, labStandPose, labTPose, scoreLabRun, simulateLabRun, LAB_GROUND_MOVES, LAB_POSE_KEYS,
+  type LabFrame, type LabGroundMove, type LabPose, type LabPoseSide, type LabRunResult,
+} from '@genvr/runtime';
 
 /**
  * The motion lab's state and actions (MOTION-LAB L1 + L2). The Lab area and the `motion_lab` agent tool both go
@@ -43,7 +51,21 @@ export interface LabView {
   /** The shown run (replayed from its course + settings + seed) and the best version's run for the ghost. */
   run: { id: string; result: LabRunResult } | null;
   ghost: LabRunResult | null;
+  /** Board M11: Run shows runs on the course; Pose edits a made motion by pose and key frames. */
+  mode: 'run' | 'pose';
+  pose: LabPoseView;
 }
+/** What the Pose mode shows: the open made motion, the frame, the chosen joints and the mouse tool. */
+export interface LabPoseView {
+  motion: string | null;
+  frame: number;
+  playing: boolean;
+  group: string;
+  side: LabPoseSide;
+  tool: 'turn' | 'move' | 'pin';
+  onion: boolean;
+}
+const ALL_ROWS: readonly LabPoseRow[] = ['body', 'right_arm', 'right_hand', 'left_arm', 'left_hand', 'legs'];
 
 export const LAB_MOVES = Object.keys(LAB_GROUND_MOVES);
 
@@ -52,14 +74,15 @@ export const LAB_MOVES = Object.keys(LAB_GROUND_MOVES);
  * walked over their natural speed, so the feet keep pace with the floor at any speed and in slow motion; other moves
  * (jump, climb, landing) count the time since they began. Driven from the run, the pose also follows seeking.
  */
-export function labClipTime(frames: readonly LabFrame[], index: number, legScale = 1): number {
+export function labClipTime(frames: readonly LabFrame[], index: number, legScale = 1, made: Readonly<Record<string, LabGroundMove>> = {}): number {
   const i = Math.max(0, Math.min(frames.length - 1, Math.floor(index)));
   const clip = frames[i]?.clip;
   if (!clip) return 0;
   let start = i;
   while (start > 0 && frames[start - 1]!.clip === clip) start--;
-  // A longer-legged character covers more ground per step: its natural speed grows with its legs (board M17).
-  const base = Object.values(LAB_GROUND_MOVES).find((move) => move.clip === clip)?.speed;
+  // A longer-legged character covers more ground per step: its natural speed grows with its legs (board M17). A made
+  // motion that does not travel (pace 0) counts time instead.
+  const base = [...Object.values(LAB_GROUND_MOVES), ...Object.values(made).filter((m) => m.speed > 0.05)].find((move) => move.clip === clip)?.speed;
   const natural = base ? base * legScale : undefined;
   if (!natural) return frames[i]!.t - frames[start]!.t;
   let walked = 0;
@@ -107,7 +130,10 @@ export function newLabData(): LabProjectData {
 
 export class LabController {
   #data: LabProjectData;
-  #view: LabView = { overlays: ['skeleton', 'feet', 'balance', 'speed', 'ghost', 'measures'], speed: 1, playing: false, t: 0, selected: null, run: null, ghost: null };
+  #view: LabView = { overlays: ['skeleton', 'feet', 'balance', 'speed', 'ghost', 'measures'], speed: 1, playing: false, t: 0, selected: null, run: null, ghost: null,
+    mode: 'run', pose: { motion: null, frame: 0, playing: false, group: 'Elbow', side: 'R', tool: 'turn', onion: false } };
+  /** The made motion each run of this session used, as it was (Save as version keeps it with the version). */
+  #runMotion = new Map<string, LabMadeMotion>();
   #listeners = new Set<() => void>();
   #version = 0;
   #onChange: (data: LabProjectData) => void;
@@ -121,6 +147,7 @@ export class LabController {
     this.#onChange = onChange;
     const last = this.#data.runs.at(-1);
     if (last) this.#view.run = { id: last.id, result: replay(last) };
+    this.#view.pose = { ...this.#view.pose, motion: this.#data.motions[0]?.id ?? null };
     this.#view.ghost = this.#ghost();
   }
 
@@ -234,7 +261,9 @@ export class LabController {
     if (patch.character !== undefined && patch.character !== this.character.id) this.setWho(patch.character);
     const settings = LabRunSettings.parse({ ...base, ...patch, character: this.character.id });
     const course = this.#data.course;
-    const result = simulateLabRun(course, settings, course.seed);
+    const made = this.madeMotion(settings.motion);
+    const move = made ? labMadeMotionPace(made) : undefined;
+    const result = simulateLabRun(course, settings, course.seed, made && move ? { [made.name]: { ...move, clip: made.name } } : {});
     const run: LabRun = {
       id: freeRunId(this.#data.runs),
       at: new Date().toISOString(),
@@ -245,9 +274,11 @@ export class LabController {
       events: result.events.slice(0, 400),
       ...(fromVersion ? { version: fromVersion } : {}),
       by: by.kind,
+      ...(move ? { move } : {}),
     };
+    if (made) this.#runMotion.set(run.id, made);
     this.#data = LabProjectData.parse({ ...this.#data, settings, runs: [...this.#data.runs, run].slice(-LAB_KEEP_RUNS) });
-    this.#view = { ...this.#view, run: { id: run.id, result }, t: 0, playing: true };
+    this.#view = { ...this.#view, run: { id: run.id, result }, t: 0, playing: true, mode: 'run' };
     this.#emit(true);
     return run;
   }
@@ -272,7 +303,9 @@ export class LabController {
   saveVersion(runId?: string, note = '', by: LabActor = PERSON): MotionVersion {
     const run = this.runById(runId);
     const n = this.#data.versions.filter((v) => v.motion === run.settings.motion).length + 1;
-    const version: MotionVersion = { id: freeVersionId(this.#data.versions, run.settings.motion, n), motion: run.settings.motion, n, note, settings: run.settings, score: run.score, run: run.id, best: false, by: by.kind, at: new Date().toISOString() };
+    const made = this.#runMotion.get(run.id) ?? this.madeMotion(run.settings.motion);
+    const version: MotionVersion = { id: freeVersionId(this.#data.versions, run.settings.motion, n), motion: run.settings.motion, n, note, settings: run.settings, score: run.score, run: run.id, best: false, by: by.kind, at: new Date().toISOString(),
+      ...(made ? { made } : {}) };
     this.#set({ versions: [...this.#data.versions, version] });
     return version;
   }
@@ -291,7 +324,17 @@ export class LabController {
   }
   confirmPendingBest() { const pending = this.#data.best_pending; if (pending) this.saveBest(pending.version, PERSON); }
   rejectPendingBest() { this.#set({ best_pending: null }); }
-  rollback(id: string) { const v = this.#versionById(id); this.setSettings(v.settings); return v; }
+  /** Use a version's settings again; a made motion's version also brings its keys back (board M11). */
+  rollback(id: string) {
+    const v = this.#versionById(id);
+    if (v.made) {
+      const others = this.#data.motions.filter((m) => m.id !== v.made!.id && m.name.toLowerCase() !== v.made!.name.toLowerCase());
+      this.#data = LabProjectData.parse({ ...this.#data, motions: [...others, v.made] });
+      this.#view = { ...this.#view, pose: { ...this.#view.pose, motion: v.made.id, frame: 0 } };
+    }
+    this.setSettings(v.settings);
+    return v;
+  }
   /** An agent may delete only versions an agent made, never the best one; a person may delete any. */
   deleteVersion(id: string, by: LabActor = PERSON) {
     const version = this.#versionById(id);
@@ -311,7 +354,8 @@ export class LabController {
     if (!best) return null;
     // The best version's settings on the course as it is now, so the ghost runs beside the new run on the same course
     // (it keeps working when the best run has left the last 20: a run is replayed from settings + course + seed).
-    return simulateLabRun(this.#data.course, best.settings, this.#data.course.seed);
+    const made = best.made ?? this.madeMotion(best.motion);
+    return simulateLabRun(this.#data.course, best.settings, this.#data.course.seed, made ? { [best.motion]: { ...labMadeMotionPace(made), clip: best.motion } } : {});
   }
 
   // ---- sharing with the GenVR community (board M14)
@@ -324,10 +368,11 @@ export class LabController {
     const v = this.#versionById(id), reasons: string[] = [];
     const run = this.#data.runs.find((r) => r.id === v.run);
     const madeHere = Boolean(run) || v.run.startsWith('run-');
-    const native = Object.hasOwn(LAB_GROUND_MOVES, v.settings.motion) && !v.settings.character.startsWith('user.');
+    // A motion made here by pose and key frames counts as made in the lab (board M11).
+    const native = (Object.hasOwn(LAB_GROUND_MOVES, v.settings.motion) || Boolean(v.made)) && !v.settings.character.startsWith('user.');
     const passes = v.score.finished && !v.score.fell && !v.score.car_hit;
     if (!madeHere) reasons.push('It was not made in this lab.');
-    if (!native) reasons.push(`"${v.settings.motion}" on "${v.settings.character}" is not a GenVR library move on a GenVR character (moves made from Mixamo are never shared).`);
+    if (!native) reasons.push(`"${v.settings.motion}" on "${v.settings.character}" is not a GenVR library move or a motion made in this lab, on a GenVR character (moves made from Mixamo are never shared).`);
     if (!passes) reasons.push(v.score.fell ? 'It falls on the course.' : v.score.car_hit ? 'A car hits it on the course.' : 'It does not finish the course.');
     // The lab has no video-to-motion yet (board M8), so no version has a source video.
     return { made_here: madeHere, not_mixamo: native, video_rights: true, passes_course: passes, reasons };
@@ -416,6 +461,176 @@ export class LabController {
     return next;
   }
 
+  // ---- pose and key frames (board M11)
+  /** A made motion by id or name. */
+  madeMotion(ref: string): LabMadeMotion | undefined {
+    const name = ref.trim().toLowerCase();
+    return this.#data.motions.find((m) => m.id === ref || m.name.toLowerCase() === name);
+  }
+  /** The made motion open in Pose. */
+  get openMotion(): LabMadeMotion | undefined { return this.#view.pose.motion ? this.madeMotion(this.#view.pose.motion) : undefined; }
+  #open(): LabMadeMotion {
+    const open = this.openMotion;
+    if (!open) throw new Error('No made motion is open. Make one with pose_new (Pose › New motion) or open one with pose_open.');
+    return open;
+  }
+  #frame(frame: number) {
+    const open = this.#open();
+    if (frame >= open.frames) throw new Error(`Frame ${frame} is past the end: "${open.name}" has ${open.frames} frames (0–${open.frames - 1}).`);
+    return Math.round(frame);
+  }
+  #putMotion(next: LabMadeMotion, view: Partial<LabPoseView> = {}) {
+    const motion = LabMadeMotion.parse(next);
+    this.#data = LabProjectData.parse({ ...this.#data, motions: this.#data.motions.map((m) => (m.id === motion.id ? motion : m)) });
+    this.#view = { ...this.#view, mode: 'pose', pose: { ...this.#view.pose, motion: motion.id, ...view } };
+    this.#emit(true);
+    return motion;
+  }
+  newMotion(name: string, options: { frames?: number; loop?: boolean; from?: 'stand' | 't_pose' } = {}, by: LabActor = PERSON): LabMadeMotion {
+    const clean = name.trim();
+    if (Object.keys(LAB_GROUND_MOVES).some((m) => m.toLowerCase() === clean.toLowerCase())) throw new Error(`"${clean}" is a library move. Give the made motion its own name.`);
+    if (this.madeMotion(clean)) throw new Error(`A made motion is already called "${clean}". Open it with pose_open.`);
+    const slug = clean.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 30) || 'motion';
+    let id = `made-${slug}`;
+    for (let n = 2; this.#data.motions.some((m) => m.id === id); n++) id = `made-${slug}-${n}`;
+    const start = options.from === 't_pose' ? labTPose() : labStandPose();
+    const motion = LabMadeMotion.parse({ id, name: clean, frames: options.frames ?? 120, loop: options.loop ?? true, keys: [{ frame: 0, ease: 'smooth', values: start }], by: by.kind, at: new Date().toISOString() });
+    this.#data = LabProjectData.parse({ ...this.#data, motions: [...this.#data.motions, motion] });
+    this.#view = { ...this.#view, mode: 'pose', pose: { ...this.#view.pose, motion: id, frame: 0, playing: false } };
+    this.#emit(true);
+    return motion;
+  }
+  openMotionAt(ref: string, change: { frames?: number; loop?: boolean } = {}): LabMadeMotion {
+    const motion = this.madeMotion(ref);
+    if (!motion) throw new Error(`No made motion "${ref}". Ask pose_list for the names.`);
+    if (change.frames !== undefined && motion.keys.some((k) => k.frame >= change.frames!)) throw new Error(`Keys lie past frame ${change.frames - 1}: remove them first, or keep the length.`);
+    const frame = Math.min(Math.round(this.#view.pose.frame), (change.frames ?? motion.frames) - 1);
+    return this.#putMotion({ ...motion, ...change }, { frame, playing: false });
+  }
+  /** The pose on a frame (keys filled in, the draft on its frame). */
+  poseAt(frame: number, motion = this.openMotion): LabPose { return motion ? labPoseAt(motion, frame) : labStandPose(); }
+  poseGet(frame: number) {
+    const open = this.#open(), f = this.#frame(frame), pose = this.poseAt(f), key = open.keys.find((k) => k.frame === f);
+    return {
+      motion: { id: open.id, name: open.name, frames: open.frames, loop: open.loop }, frame: f, pose,
+      keyed_rows: key ? labKeyRows(key.values) : [], ease: key?.ease ?? null,
+      draft: open.draft?.frame === f ? Object.keys(open.draft.values) : [],
+      problems: labPoseProblems(pose), limbs: labLimbPositions(pose), pins: open.pins,
+      keys: open.keys.map((k) => ({ frame: k.frame, ease: k.ease, rows: labKeyRows(k.values) })).sort((a, b) => a.frame - b.frame),
+    };
+  }
+  /**
+   * Writes changed sliders on a frame: into the key there when it already holds that slider's row, else into the draft
+   * (Key makes the draft a key; a draft on another frame is dropped).
+   */
+  #write(frame: number, before: LabPose, after: LabPose) {
+    const open = this.#open();
+    const key = open.keys.find((k) => k.frame === frame);
+    const rows = new Set(key ? labKeyRows(key.values) : []);
+    const keyValues = { ...(key?.values ?? {}) };
+    const draft = { ...(open.draft?.frame === frame ? open.draft.values : {}) };
+    for (const slider of LAB_POSE_KEYS) {
+      if (Math.abs((after[slider] ?? 0) - (before[slider] ?? 0)) < 1e-4) continue;
+      if (rows.has(labRowOf(slider))) keyValues[slider] = after[slider]!;
+      else draft[slider] = after[slider]!;
+    }
+    const keys = key ? open.keys.map((k) => (k === key ? { ...k, values: keyValues } : k)) : open.keys;
+    return this.#putMotion({ ...open, keys, draft: Object.keys(draft).length ? { frame, values: draft } : null }, { frame, playing: false });
+  }
+  /** Move sliders on a frame; each stops at the joint law, and pinned hands and feet stay where they are. */
+  poseSet(frame: number, asked: Record<string, number>) {
+    const f = this.#frame(frame), open = this.#open(), before = this.poseAt(f);
+    const limited = labPoseLimit(before, asked);
+    const after = labHoldPins(before, limited.pose, open.pins, Object.keys(asked));
+    this.#write(f, before, after);
+    return { frame: f, set: Object.fromEntries(Object.keys(asked).map((k) => [k, after[k]])), stopped: limited.stopped, problems: labPoseProblems(after),
+      ...(limited.stopped.length ? { note: `Stopped at the joint law: ${limited.stopped.join(', ')}.` } : {}) };
+  }
+  /** Key the pose of some rows on a frame (default: every row). */
+  keyAdd(frame: number, rows: readonly LabPoseRow[] = ALL_ROWS, ease?: LabPoseEase) {
+    const open = this.#open(), f = this.#frame(frame), pose = this.poseAt(f);
+    const key = open.keys.find((k) => k.frame === f);
+    const values = { ...(key?.values ?? {}) };
+    for (const row of rows) for (const slider of labRowKeys(row)) values[slider] = pose[slider]!;
+    const draft = open.draft?.frame === f ? Object.fromEntries(Object.entries(open.draft.values).filter(([k]) => !rows.includes(labRowOf(k)))) : open.draft?.values ?? {};
+    const next = { frame: f, ease: ease ?? key?.ease ?? 'smooth', values };
+    const keys = key ? open.keys.map((k) => (k === key ? next : k)) : [...open.keys, next].sort((a, b) => a.frame - b.frame);
+    this.#putMotion({ ...open, keys, draft: Object.keys(draft).length && open.draft ? { frame: open.draft.frame, values: draft } : null }, { frame: f });
+    return { frame: f, ease: next.ease, rows: labKeyRows(values) };
+  }
+  keyRemove(frame: number, rows: readonly LabPoseRow[] = ALL_ROWS) {
+    const open = this.#open(), f = this.#frame(frame), key = open.keys.find((k) => k.frame === f);
+    if (!key) throw new Error(`No key on frame ${f}.`);
+    const values = Object.fromEntries(Object.entries(key.values).filter(([k]) => !rows.includes(labRowOf(k))));
+    const keys = Object.keys(values).length ? open.keys.map((k) => (k === key ? { ...k, values } : k)) : open.keys.filter((k) => k !== key);
+    if (!keys.length) throw new Error('A made motion keeps at least one key.');
+    this.#putMotion({ ...open, keys }, { frame: f });
+    return { frame: f, rows: Object.keys(values).length ? labKeyRows(values) : [] };
+  }
+  keyEase(frame: number, ease: LabPoseEase) {
+    const open = this.#open(), f = this.#frame(frame), key = open.keys.find((k) => k.frame === f);
+    if (!key) throw new Error(`No key on frame ${f}.`);
+    this.#putMotion({ ...open, keys: open.keys.map((k) => (k === key ? { ...k, ease } : k)) }, { frame: f });
+    return { frame: f, ease };
+  }
+  /** Copy the pose of some rows from one frame onto another as a key. */
+  keyCopy(from: number, to: number, rows: readonly LabPoseRow[] = ALL_ROWS) {
+    const open = this.#open(), a = this.#frame(from), b = this.#frame(to), pose = this.poseAt(a);
+    const key = open.keys.find((k) => k.frame === b);
+    const values = { ...(key?.values ?? {}) };
+    for (const row of rows) for (const slider of labRowKeys(row)) values[slider] = pose[slider]!;
+    const next = { frame: b, ease: key?.ease ?? open.keys.find((k) => k.frame === a)?.ease ?? 'smooth', values };
+    this.#putMotion({ ...open, keys: key ? open.keys.map((k) => (k === key ? next : k)) : [...open.keys, next].sort((x, y) => x.frame - y.frame) }, { frame: b });
+    return { from: a, to: b, rows: labKeyRows(values) };
+  }
+  /** Move a wrist or ankle to a point (or by an offset) and the limb follows; pinned limbs stay. */
+  limbMove(frame: number, limb: LabLimb, target?: readonly number[], by?: readonly number[], quick = false) {
+    const open = this.#open(), f = this.#frame(frame), before = this.poseAt(f);
+    const from = labLimbPositions(before)[limb];
+    const goal = (target ?? (by ? from.map((x, i) => x + by[i]!) : null)) as [number, number, number] | null;
+    if (!goal) throw new Error('Give a target [x, y, z] or by [dx, dy, dz] in metres.');
+    const moved = labLimbMove(before, limb, goal, quick);
+    const after = labHoldPins(before, moved.pose, open.pins.filter((p) => p !== limb), Object.keys(moved.pose).filter((k) => moved.pose[k] !== before[k]));
+    this.#write(f, before, after);
+    return { frame: f, limb, reached: moved.reached, miss_cm: moved.miss_cm, stopped: moved.stopped,
+      ...(moved.miss_cm > 2 ? { note: moved.stopped ? 'Stopped at the joint law before the point.' : 'The point is out of reach.' } : {}) };
+  }
+  pin(limb: LabLimb, on = true) {
+    const open = this.#open();
+    const pins = on ? [...new Set([...open.pins, limb])] : open.pins.filter((p) => p !== limb);
+    this.#putMotion({ ...open, pins });
+    return { pins };
+  }
+  poseMirror(frame: number, mode: 'swap' | 'left_to_right' | 'right_to_left' = 'swap') {
+    const f = this.#frame(frame), before = this.poseAt(f);
+    const after = labMirror(before, mode);
+    this.#write(f, before, after);
+    return { frame: f, mode, problems: labPoseProblems(after) };
+  }
+  #signature(m: LabMadeMotion) { return JSON.stringify([m.frames, m.loop, m.keys]); }
+  /** Test in course: the course run with the open made motion, at the pace its feet give (when it travels). */
+  poseTest(by: LabActor = PERSON): LabRun {
+    const open = this.#open();
+    const pace = labMadeMotionPace(open);
+    const travels = pace.speed >= 0.3;
+    return this.run({ motion: open.name, ...(travels ? { speed: Math.min(8, Math.max(0.5, pace.speed)), stride: Math.min(1.6, Math.max(0.3, pace.stride)) } : {}) }, by);
+  }
+  /** Save as version: tests the open made motion in the course when its keys changed since the last test, then keeps that run. */
+  poseSaveVersion(note = '', by: LabActor = PERSON): MotionVersion {
+    const open = this.#open();
+    const last = [...this.#data.runs].reverse().find((r) => r.settings.motion === open.name && r.settings.character === this.character.id);
+    const tested = last && this.#runMotion.get(last.id);
+    const run = tested && this.#signature(tested) === this.#signature(open) ? last : this.poseTest(by);
+    return this.saveVersion(run.id, note, by);
+  }
+  // Pose view (person's choices; an agent's pose operations also move the view to their frame).
+  setMode(mode: 'run' | 'pose') { this.#setView({ mode, playing: mode === 'run' ? this.#view.playing : false, pose: { ...this.#view.pose, playing: false } }); }
+  setPoseView(change: Partial<Omit<LabPoseView, 'motion'>>) {
+    const open = this.openMotion;
+    const frame = change.frame === undefined ? this.#view.pose.frame : Math.max(0, Math.min((open?.frames ?? 1) - 1, change.frame));
+    this.#setView({ pose: { ...this.#view.pose, ...change, frame } });
+  }
+
   // ---- view
   select(id: string | null) { this.#setView({ selected: id }); }
   toggleOverlay(overlay: LabOverlay) { const on = this.#view.overlays.includes(overlay); this.#setView({ overlays: on ? this.#view.overlays.filter((o) => o !== overlay) : [...this.#view.overlays, overlay] }); }
@@ -427,6 +642,15 @@ export class LabController {
   duration() { const f = this.#view.run?.result.frames; return f?.length ? f[f.length - 1]!.t : 0; }
   /** Advance the playhead (called by the view every animation frame). */
   tick(dt: number) {
+    const pose = this.#view.pose, open = this.openMotion;
+    if (this.#view.mode === 'pose' && pose.playing && open) {
+      const next = pose.frame + dt * 60 * this.#view.speed;
+      const frame = open.loop ? next % open.frames : Math.min(open.frames - 1, next);
+      this.#view = { ...this.#view, pose: { ...pose, frame, playing: open.loop || next < open.frames - 1 } };
+      this.#version++;
+      for (const listener of this.#listeners) listener();
+      return;
+    }
     if (!this.#view.playing || !this.#view.run) return;
     const t = this.#view.t + dt * this.#view.speed;
     const end = this.duration();
@@ -436,7 +660,8 @@ export class LabController {
   }
 }
 
-function replay(run: LabRun): LabRunResult { return simulateLabRun(run.course, run.settings, run.seed); }
+function replay(run: LabRun): LabRunResult { return simulateLabRun(run.course, run.settings, run.seed, run.move ? { [run.settings.motion]: { ...run.move, clip: run.settings.motion } } : {}); }
+
 function freeId(course: LabCourse, base: string): string {
   const used = new Set([...course.obstacles.map((o) => o.id), ...course.cars.map((c) => c.id)]);
   for (let n = 1; ; n++) if (!used.has(`${base}-${n}`)) return `${base}-${n}`;
@@ -481,6 +706,20 @@ const HELP: Record<string, string> = {
   share_prepare: 'Prepare a share with the GenVR community: { version, share: { name, description?, tags?, preview_s? } }. Nothing is published; it waits for the owner.',
   share: 'Publish a prepared share: { version, confirm: true }. Owner only: an agent is refused and the share keeps waiting for the owner in the Lab.',
   unshare: 'Stop sharing a motion, or drop a prepared share: { version, confirm: true }.',
+  pose_list: 'Motions made here by pose and key frames (board M11): id, name, frames (60 per second), loop, keys, pins; and the one open in Pose.',
+  pose_new: 'A new made motion: { name, frames? (default 120 = 2 s), loop? (default true), from: stand|t_pose }. Frame 0 gets a key of the whole pose; it opens in Pose.',
+  pose_open: 'Open a made motion in Pose: { motion: id or name, frames?, loop? }.',
+  pose_get: 'The pose on a frame: { frame }. Every slider (same names as the Avatar pose panel: head.nod, R.elbow.bend, L.index.mid …, degrees or %; root.x/y/z in metres), the rows keyed there, the joint law check, wrists and ankles in metres (x his left, y up, z his front), pins and the list of keys.',
+  pose_set: 'Move sliders on a frame: { frame, joint: "elbow.bend", side: both|left|right, value } or { frame, values: { "R.elbow.bend": 38, … } }. Each stops at the joint law (answer says which stopped); pinned hands and feet stay. On a frame keyed for that joint it changes the key, else it waits as a draft until key_add.',
+  key_add: 'Key the pose on a frame: { frame, rows?: body|right_arm|right_hand|left_arm|left_hand|legs (default all), ease?: linear|smooth|hold }. The lab fills the frames between keys.',
+  key_remove: 'Remove the key of some rows (default all) on a frame: { frame, rows? }.',
+  key_ease: 'How the frames after a key are filled: { frame, ease: linear|smooth|hold }.',
+  key_copy: 'Copy the pose of some rows from one frame to another as a key: { from, to, rows? }.',
+  limb_move: 'Move a wrist or ankle and the arm or leg follows (two bones, inside the joint law): { frame, limb: left_hand|right_hand|left_foot|right_foot, target: [x, y, z] or by: [dx, dy, dz] } in metres.',
+  pin: 'Pin a hand or foot where it is, or unpin it: { limb, on }. A pinned foot keeps its spot (the hips move); a pinned hand reaches back to its place.',
+  pose_mirror: 'Mirror the pose on a frame: { frame, mode: swap|left_to_right|right_to_left }.',
+  pose_test: 'Test in course: run the course with the open made motion (at the pace its feet give, when it travels). Returns the run and scores.',
+  pose_save_version: 'Save as version: tests the open made motion in the course if its keys changed since the last test, then keeps the run as a version with its keys: { note? }.',
 };
 
 export async function runMotionLab(lab: LabController | null, input: unknown, by: LabActor): Promise<unknown> {
@@ -493,7 +732,8 @@ export async function runMotionLab(lab: LabController | null, input: unknown, by
       const d = lab.data, last = d.runs.at(-1), best = lab.best();
       return { character: { id: lab.character.id, name: lab.character.name, follows_avatar: d.who === LAB_FOLLOW_AVATAR }, course: { seed: d.course.seed, finish_z: d.course.finish_z, obstacles: d.course.obstacles.map((o) => `${o.id} ${o.kind} at ${o.z} m`), street: d.course.street, cars: d.course.cars.length },
         settings: d.settings, moves: LAB_MOVES, last_run: last ? summary(last) : null, best: best ? { id: best.id, score: best.score.total } : null, best_pending: d.best_pending,
-        runs: d.runs.length, versions: d.versions.length, view: { overlays: lab.view.overlays, speed: lab.view.speed } };
+        runs: d.runs.length, versions: d.versions.length, view: { overlays: lab.view.overlays, speed: lab.view.speed, mode: lab.view.mode },
+        made_motions: d.motions.map((m) => m.name), open_motion: lab.openMotion?.name ?? null };
     }
     case 'course_get': return lab.data.course;
     case 'course_set': return lab.setCourse(op.course);
@@ -536,6 +776,25 @@ export async function runMotionLab(lab: LabController | null, input: unknown, by
       return { share, note: share.where === 'local-preview' ? 'Local preview: marked shared on this device only. Nothing was published (no GenVR hosting connected).' : 'Shared with the GenVR community.' };
     }
     case 'unshare': return { share: await lab.unshare(op.version) };
+    case 'pose_list': return { open: lab.openMotion?.id ?? null, motions: lab.data.motions.map((m) => ({ id: m.id, name: m.name, frames: m.frames, seconds: m.frames / 60, loop: m.loop, keys: m.keys.length, pins: m.pins, by: m.by })) };
+    case 'pose_new': return lab.newMotion(op.name, { ...(op.frames ? { frames: op.frames } : {}), ...(op.loop !== undefined ? { loop: op.loop } : {}), from: op.from }, by);
+    case 'pose_open': return lab.openMotionAt(op.motion, { ...(op.frames ? { frames: op.frames } : {}), ...(op.loop !== undefined ? { loop: op.loop } : {}) });
+    case 'pose_get': { const got = lab.poseGet(op.frame); lab.setPoseView({ frame: got.frame }); return got; }
+    case 'pose_set': {
+      const asked = { ...(op.values ?? {}), ...(op.joint !== undefined ? labAsk(op.joint, op.side === 'left' ? 'L' : op.side === 'right' ? 'R' : 'both', op.value ?? Number.NaN) : {}) };
+      if (op.joint !== undefined && op.value === undefined) throw new Error('Give a value for the joint.');
+      if (!Object.keys(asked).length) throw new Error('Give { joint, side, value } or { values }.');
+      return lab.poseSet(op.frame, asked);
+    }
+    case 'key_add': return lab.keyAdd(op.frame, op.rows, op.ease);
+    case 'key_remove': return lab.keyRemove(op.frame, op.rows);
+    case 'key_ease': return lab.keyEase(op.frame, op.ease);
+    case 'key_copy': return lab.keyCopy(op.from, op.to, op.rows);
+    case 'limb_move': return lab.limbMove(op.frame, op.limb, op.target, op.by);
+    case 'pin': return lab.pin(op.limb, op.on);
+    case 'pose_mirror': return lab.poseMirror(op.frame, op.mode);
+    case 'pose_test': return summary(lab.poseTest(by));
+    case 'pose_save_version': return lab.poseSaveVersion(op.note ?? '', by);
   }
 }
 

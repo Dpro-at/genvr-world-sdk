@@ -32,3 +32,11 @@ it('lists motion_lab once with every operation kind', () => {
   expect(defs).toHaveLength(1);
   expect(JSON.stringify(defs[0]!.function.parameters)).toContain('save_best');
 });
+
+it('routes the pose and key frame kinds (board M11) and checks them first', async () => {
+  const motionLab = vi.fn(async (input: unknown) => input), host = { motionLab } as unknown as AssistantHost;
+  expect((await runTool('motion_lab', { operation: { kind: 'pose_set', frame: 412, joint: 'elbow.bend', side: 'right', value: 38 } }, host)).ok).toBe(true);
+  expect((await runTool('motion_lab', { operation: { kind: 'key_add', frame: 412, rows: ['right_arm'], ease: 'smooth' } }, host)).ok).toBe(true);
+  expect((await runTool('motion_lab', { operation: { kind: 'limb_move', frame: 1, limb: 'tail', target: [0, 1, 0] } }, host)).ok).toBe(false);
+  expect(motionLab).toHaveBeenCalledTimes(2);
+});

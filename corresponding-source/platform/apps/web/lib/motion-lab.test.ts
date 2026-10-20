@@ -246,3 +246,87 @@ describe('lab character (board M17)', () => {
     expect(labClipTime(frames, 2, 2)).toBeCloseTo(labClipTime(frames, 2) / 2);
   });
 });
+
+describe('bones by numbers and mouse + key frames (board M11)', () => {
+  const made = () => { const lab = new LabController(newLabData()); lab.newMotion('Punch', { frames: 120 }); return lab; };
+  it('makes a motion with a whole-pose key on frame 0 and opens it in Pose', () => {
+    const lab = made();
+    expect(lab.view.mode).toBe('pose');
+    expect(lab.openMotion).toMatchObject({ id: 'made-punch', frames: 120, loop: true });
+    expect(lab.poseGet(0).keyed_rows).toEqual(['body', 'right_arm', 'right_hand', 'left_arm', 'left_hand', 'legs']);
+    expect(() => lab.newMotion('walk')).toThrow(/library move/);
+    expect(() => lab.newMotion('punch')).toThrow(/already/);
+  });
+  it('keeps a slider change as a draft until Key, and fills the frames between keys', () => {
+    const lab = made();
+    lab.poseSet(60, { 'R.elbow.bend': 100 });
+    expect(lab.poseGet(60)).toMatchObject({ keyed_rows: [], draft: ['R.elbow.bend'] });
+    lab.keyAdd(60, ['right_arm'], 'linear');
+    expect(lab.poseGet(60).keyed_rows).toEqual(['right_arm']);
+    expect(lab.openMotion!.draft).toBeNull();
+    // Frame 0 holds 12 (standing); frame 30 lies halfway on the smooth ease out of frame 0.
+    expect(lab.poseAt(30)['R.elbow.bend']).toBeCloseTo(56, 0);
+    lab.keyEase(0, 'hold');
+    expect(lab.poseAt(30)['R.elbow.bend']).toBe(12);
+    // A change on a keyed frame changes the key.
+    lab.poseSet(60, { 'R.elbow.bend': 90 });
+    expect(lab.openMotion!.keys.find((k) => k.frame === 60)!.values['R.elbow.bend']).toBe(90);
+    lab.keyCopy(60, 90, ['right_arm']);
+    expect(lab.poseGet(90).keyed_rows).toEqual(['right_arm']);
+    lab.keyRemove(90);
+    expect(lab.openMotion!.keys.map((k) => k.frame)).toEqual([0, 60]);
+    expect(() => lab.keyRemove(0, undefined) && lab.keyRemove(60)).toThrow(/at least one key/);
+  });
+  it('stops at the joint law, mirrors, moves a hand and keeps a pinned foot', () => {
+    const lab = made();
+    expect(lab.poseSet(10, { 'R.elbow.bend': 400 }).stopped).toEqual(['R.elbow.bend']);
+    lab.keyAdd(10);
+    lab.poseMirror(10);
+    expect(lab.poseAt(10)['L.elbow.bend']).toBeGreaterThan(100);
+    const move = lab.limbMove(20, 'right_hand', [-0.3, 1.35, 0.35]);
+    expect(move.miss_cm).toBeLessThan(3);
+    lab.pin('left_foot');
+    const foot = lab.poseGet(30).limbs.left_foot;
+    lab.poseSet(30, { 'L.knee.bend': 60, 'L.leg.forward': 30 });
+    const after = lab.poseGet(30);
+    expect(Math.hypot(...after.limbs.left_foot.map((v, i) => v - foot[i]!))).toBeLessThan(0.01);
+    expect(after.pose['root.y']).toBeLessThan(0);
+  });
+  it('tests in the course, saves a version with its keys, rolls the keys back and counts as made in the lab', () => {
+    const lab = made();
+    lab.poseSet(60, { 'R.elbow.bend': 120 }); lab.keyAdd(60);
+    const run = lab.poseTest();
+    expect(run.settings.motion).toBe('Punch');
+    expect(run.move).toEqual({ speed: 0, stride: 0 });
+    expect(lab.view.mode).toBe('run');
+    const v = lab.poseSaveVersion('first punch');
+    expect(v.run).toBe(run.id);
+    expect(v.made?.keys).toHaveLength(2);
+    expect(lab.rights(v.id).not_mixamo).toBe(true);
+    lab.keyRemove(60);
+    lab.rollback(v.id);
+    expect(lab.openMotion!.keys).toHaveLength(2);
+    // Keys unchanged: Save as version keeps the last test; changed keys test again.
+    expect(lab.poseSaveVersion().run).toBe(run.id);
+    lab.poseSet(60, { 'R.elbow.bend': 110 });
+    expect(lab.poseSaveVersion().run).not.toBe(run.id);
+  });
+  it('does the same through motion_lab', async () => {
+    const lab = new LabController(newLabData());
+    await runMotionLab(lab, { kind: 'pose_new', name: 'Wave', frames: 60 }, agent);
+    const set = await runMotionLab(lab, { kind: 'pose_set', frame: 30, joint: 'arm.up', side: 'right', value: 150 }, agent) as { set: Record<string, number> };
+    expect(set.set['R.arm.up']).toBeGreaterThan(100);
+    await runMotionLab(lab, { kind: 'key_add', frame: 30, rows: ['right_arm'] }, agent);
+    await runMotionLab(lab, { kind: 'pin', limb: 'right_foot' }, agent);
+    await runMotionLab(lab, { kind: 'limb_move', frame: 45, limb: 'left_hand', by: [0, 0.2, 0.2] }, agent);
+    await runMotionLab(lab, { kind: 'pose_mirror', frame: 45, mode: 'left_to_right' }, agent);
+    const got = await runMotionLab(lab, { kind: 'pose_get', frame: 30 }, agent) as { keyed_rows: string[]; pins: string[] };
+    expect(got).toMatchObject({ keyed_rows: ['right_arm'], pins: ['right_foot'] });
+    expect(await runMotionLab(lab, { kind: 'pose_list' }, agent)).toMatchObject({ open: 'made-wave', motions: [{ name: 'Wave', keys: 2 }] });
+    const version = await runMotionLab(lab, { kind: 'pose_save_version' }, agent) as { by: string; made: unknown };
+    expect(version).toMatchObject({ by: 'agent' });
+    expect(version.made).toBeTruthy();
+    await expect(runMotionLab(lab, { kind: 'pose_set', frame: 90, joint: 'arm.up', value: 1 }, agent)).rejects.toThrow(/past the end/);
+    await expect(runMotionLab(lab, { kind: 'pose_set', frame: 1, joint: 'tail.wag', value: 1 }, agent)).rejects.toThrow(/not a pose slider/);
+  });
+});
