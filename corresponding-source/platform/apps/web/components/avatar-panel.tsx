@@ -17,7 +17,8 @@ import {
   CORE_EMOTES,
   DEFAULT_FAVORITE_ANIMATIONS,
   allowedInPlace,
-  PLAYER_BODIES,
+  HIDDEN_BODY_IDS,
+  PICKABLE_BODIES,
   findBody,
   applyPlaceAvatar,
   toggleWearable,
@@ -278,9 +279,11 @@ function SectionTitle({ children, first = false }: { children: string; first?: b
  * look: switching keeps the worn look for the old body and brings back the new body's look.
  */
 export function BodyPicker({ look, onChange }: { look: AvatarLook; onChange: LookChange }) {
+  // A player already on a hidden body still sees it (board A12); nobody can pick one anew.
+  const bodies = HIDDEN_BODY_IDS.has(look.body) ? [...PICKABLE_BODIES, findBody(look.body)] : PICKABLE_BODIES;
   return (
     <div role="radiogroup" aria-label="Body type" className="grid grid-cols-2 gap-2">
-      {PLAYER_BODIES.map((body) => {
+      {bodies.map((body) => {
         const on = look.body === body.id;
         return (
           <button

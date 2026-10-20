@@ -192,7 +192,7 @@ export const CharacterRecipe = z
     rig: z.preprocess(normalizeCharacterRig, z.literal(CHARACTER_RIG).default(CHARACTER_RIG)),
     name: z.string().trim().min(1).max(60).default('My character'),
     /** The body shaped and coloured: one of Genvr's, or a creator's uploaded body item. */
-    body: BodyId.default('starter'),
+    body: BodyId.default('robot'),
     base: z.enum(CHARACTER_BASES).default('human'),
     sex: z.enum(CHARACTER_SEXES).default('boy'),
     style: z.enum(CHARACTER_STYLES).default('anime'),

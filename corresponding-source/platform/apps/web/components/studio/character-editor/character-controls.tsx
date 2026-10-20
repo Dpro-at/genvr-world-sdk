@@ -30,7 +30,8 @@ import {
   CORE_ANIMATIONS,
   CORE_EMOTES,
   findBody,
-  PLAYER_BODIES,
+  HIDDEN_BODY_IDS,
+  PICKABLE_BODIES,
   SKIN_MATERIALS,
   type SkinMaterial,
 } from '@genvr/core-library';
@@ -79,14 +80,17 @@ export function EditorSection({ title, children }: { title: string; children: Re
 export function BodySection({ editor }: { editor: CharacterEditor }) {
   const { recipe } = editor;
   const look = recipeLook(recipe);
+  // A character already on a hidden body still sees it (board A12); nobody can pick one anew.
+  const current = HIDDEN_BODY_IDS.has(recipe.body) ? findBody(recipe.body) : undefined;
+  const bodies = current ? [...PICKABLE_BODIES, current] : PICKABLE_BODIES;
   return (
     <div role="radiogroup" aria-label="Body" className="grid grid-cols-2 gap-2">
-      {PLAYER_BODIES.map((body) => (
+      {bodies.map((body) => (
         <BodyCard
           key={body.id}
           on={recipe.body === body.id}
           label={body.manifest.name}
-          note={`${body.joints.length} bones`}
+          note={HIDDEN_BODY_IDS.has(body.id) ? 'Current · hidden' : `${body.joints.length} bones`}
           onPick={() => editor.change((current) => ({ ...current, body: body.id }))}
         >
           <AvatarSketch look={{ ...look, body: body.id }} className="h-20 w-full" />

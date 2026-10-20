@@ -1,6 +1,6 @@
 import { Color, MeshStandardMaterial, Texture, Vector3 } from 'three/webgpu';
 import { describe, expect, it } from 'vitest';
-import { findBody } from '@genvr/core-library';
+import { DEFAULT_BODY_ID, findBody } from '@genvr/core-library';
 import { createGenvrAvatar, DEFAULT_LOOK, headTopOf, HitTint } from '../src/avatar.js';
 import { DAMAGE_NUMBER, DamageNumbers } from '../src/damage-numbers.js';
 import { HIT_FLASH_SECONDS, NUMBER_ABOVE_HEAD, RemotePlayers } from '../src/remote-players.js';
@@ -50,7 +50,8 @@ describe('a hit player flashes red (P9-12)', () => {
     expect(head.y).toBeGreaterThanOrEqual(1.85 + NUMBER_ABOVE_HEAD - 0.01);
     expect(head.y).toBeLessThan(1.85 + 0.5);
     remotes.showNames = false;
-    expect(remotes.numberAnchor('a')!.y).toBeCloseTo(createGenvrAvatar().headTop + NUMBER_ABOVE_HEAD);
+    // A player without a readable look wears the default body (the Standard robot, board A12).
+    expect(remotes.numberAnchor('a')!.y).toBeCloseTo(createGenvrAvatar({ ...DEFAULT_LOOK, body: DEFAULT_BODY_ID }).headTop + NUMBER_ABOVE_HEAD);
     expect(remotes.numberAnchor('nobody')).toBeNull();
     remotes.dispose();
   });

@@ -19,9 +19,9 @@ describe("other players' blocks in hand (decision 109)", () => {
     remotes.upsert('a', base);
     expect(held(remotes)).toBeNull();
     remotes.upsert('a', { ...base, hand: Block.planks });
-    expect(held(remotes)).toEqual({ parent: 'RightHand' });
+    expect(held(remotes)).toEqual({ parent: expect.stringMatching(/RightHand$/) });
     remotes.upsert('a', { ...base, hand: Block.brick });
-    expect(held(remotes)).toEqual({ parent: 'RightHand' });
+    expect(held(remotes)).toEqual({ parent: expect.stringMatching(/RightHand$/) });
     remotes.upsert('a', { ...base, hand: 0 });
     expect(held(remotes)).toBeNull();
     // A player who joins holding a block shows it at once; unknown blocks show nothing.
@@ -49,13 +49,13 @@ describe("other players' game tools in hand (P9-12)", () => {
     const remotes = new RemotePlayers();
     remotes.setBlockStyle('plain');
     remotes.upsert('a', { ...base, hand: Block.planks, tool: 'genvr.core.gameplay.melee-tool' });
-    expect(tool(remotes)).toEqual([{ parent: 'RightHand', item: 'genvr.core.gameplay.melee-tool' }]);
+    expect(tool(remotes)).toEqual([{ parent: expect.stringMatching(/RightHand$/), item: 'genvr.core.gameplay.melee-tool' }]);
     expect(held(remotes)).toBeNull();
     remotes.upsert('a', { ...base, hand: Block.planks, tool: 'genvr.core.gameplay.melee-tool' });
     expect(tool(remotes)).toHaveLength(1);
     remotes.upsert('a', { ...base, hand: Block.planks, tool: '' });
     expect(tool(remotes)).toEqual([]);
-    expect(held(remotes)).toEqual({ parent: 'RightHand' });
+    expect(held(remotes)).toEqual({ parent: expect.stringMatching(/RightHand$/) });
     // Items outside the Core Library show nothing, and the block stays in hand through later updates.
     remotes.upsert('b', { ...base, name: 'Bo', hand: Block.sand, tool: 'nobody.unknown' });
     remotes.upsert('b', { ...base, name: 'Bo', hand: Block.sand, tool: 'nobody.unknown' });

@@ -259,7 +259,8 @@ export type HumanHair = z.infer<typeof HumanHair>;
  * (item ids). Saved on the account and in the browser until signed in.
  */
 export const AvatarLook = z.object({
-  body: BodyId.default('classic'),
+  /** New looks start as the Standard robot (owner, 2026-10-20, board A12; was Classic). */
+  body: BodyId.default('robot'),
   /** Height, width, and head size of the body. */
   scale: AvatarScale.default({ height: 1, width: 1, head: 1 }),
   skin: Hex.default('#f2c49b'),

@@ -18,7 +18,7 @@ describe('character recipe (CHAR-01)', () => {
     expect(DEFAULT_CHARACTER_RECIPE).toMatchObject({
       version: 1,
       rig: CHARACTER_RIG,
-      body: 'starter',
+      body: 'robot',
       shape: { height: 1, weight: 1, scale: 1 },
       clothes: [],
       animations: { idle: 'Idle', emotes: [] },

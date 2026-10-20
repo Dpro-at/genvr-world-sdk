@@ -1,4 +1,5 @@
 import { parseCharacterRecipe, NORMAL_CHARACTER_SHAPE, type CharacterRecipe } from '@genvr/contracts';
+import { HIDDEN_BODY_IDS, PICKABLE_BODIES } from '@genvr/core-library';
 import type { CharacterEditor } from '../components/studio/character-editor/use-character-editor';
 
 /** The Avatar tab's character editor while it is mounted (AV-01): MCP and the assistant change the same character. */
@@ -27,6 +28,7 @@ const describe = (editor: CharacterEditor) => ({
   info: editor.info ? { height: editor.info.height, bones: editor.info.bones, expression: editor.info.expression, expressionSupported: editor.info.expressionSupported } : null,
   // What the Standard robot's feet and screen face can do (board A11).
   ...(editor.recipe.body === 'robot' ? { body: { toes: 5, toeJoint: 'ToeBase 0–45° (bends up when the heel lifts)', eyes: 'round, blink, follow the viewer' } } : {}),
+  pickableBodies: PICKABLE_BODIES.map((body) => body.id),
   saved: editor.saved.map((s) => ({ id: s.id, name: s.recipe.name, savedAt: s.savedAt })),
 });
 
@@ -40,6 +42,9 @@ export function runAvatarStudio(input: Input): unknown {
       if (!input.recipe) throw new Error('Send recipe with the parts to change.');
       const parsed = parseCharacterRecipe(merge(editor.recipe as unknown as Record<string, unknown>, input.recipe));
       if (!parsed.ok) throw new Error(`The recipe was refused: ${parsed.error}`);
+      // Hidden bodies (board A12): a character already on one keeps it, nobody picks one anew.
+      if (parsed.recipe.body !== editor.recipe.body && HIDDEN_BODY_IDS.has(parsed.recipe.body))
+        throw new Error(`The body "${parsed.recipe.body}" is hidden. Pick one of: ${PICKABLE_BODIES.map((body) => body.id).join(', ')}, or a body of My characters.`);
       editor.load(parsed.recipe);
       return { changed: Object.keys(input.recipe), recipe: parsed.recipe };
     }

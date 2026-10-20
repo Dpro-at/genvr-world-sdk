@@ -75,6 +75,7 @@ Character recipe editing is separate from this presentation tool: use `avatar_st
 `avatar_studio` changes the same character a person edits in the Avatar tab (tabs Look · Shape · Face · Colours · Voice · Saved). It needs a live Studio; the call opens the Avatar tab. Always start with `{"action":"inspect"}`: it returns the current recipe, view, shading, playing clip, facts (height in metres, bones, current expression, `expressionSupported`) and the saved characters.
 
 - `set` merges `recipe` parts into the current recipe (one level deep inside objects, so `{"shape":{"muscles":{"biceps":0.5}}}` keeps the other muscles). The result is validated; out-of-range values are refused with the reason.
+- Bodies: pick `robot` (the Standard robot, the default for new characters) or `human` (Anime body), or a body of My characters; `inspect` lists them as `pickableBodies`. `classic`, `simple`, `starter`, `anime-boy` and `warrior` are hidden: refused as a new choice, but a character already on one keeps it.
 - Shape: `height` 0.85–1.15, `weight` 0.75–1.35, `scale` 0.6–1.6, `anime` 0–1, `muscle` −1–1 (overall), `fat` 0–0.85 (healthy range only), `fatPattern` −1 (lower body) .. 1 (belly), `definition` 0–1.
 - `shape.muscles` (each −1–1): neck, shoulders, chest, traps, lats, biceps, triceps, forearms, abs, obliques, waist, lowerBack, hips, glutes, quads, hamstrings, calves, hands.
 - `shape.fatRegions` (each −1–1): belly, waist, hips, buttocks, thighs, upperArms, forearms, calves, face, chin.

@@ -12,7 +12,7 @@ import {
   type MeshStandardMaterial,
 } from 'three/webgpu';
 import { AvatarAnimator } from './animator.js';
-import { normalizeAvatarLook, type BlockStyle } from '@genvr/core-library';
+import { DEFAULT_BODY_ID, normalizeAvatarLook, type BlockStyle } from '@genvr/core-library';
 import { BLOCKS } from '@genvr/world';
 import { BlockFaces, heldBlockMesh, heldItemMesh, holdInRightHand } from './player-hands.js';
 import {
@@ -125,7 +125,8 @@ export function lookFor(id: string, look?: string): AvatarLook {
   }
   let hash = 0;
   for (const char of id) hash = (hash * 31 + char.charCodeAt(0)) | 0;
-  return { ...DEFAULT_LOOK, shirt: SHIRTS[Math.abs(hash) % SHIRTS.length]! };
+  // The same body a new look starts with (the Standard robot, board A12).
+  return { ...DEFAULT_LOOK, body: DEFAULT_BODY_ID, shirt: SHIRTS[Math.abs(hash) % SHIRTS.length]! };
 }
 
 /** Name above the head: a sprite with the text drawn on a rounded label. */

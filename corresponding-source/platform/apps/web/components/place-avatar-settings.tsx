@@ -1,7 +1,7 @@
 'use client';
 
 import type { AvatarLook, PlaceAvatar, PlaceAvatarMode } from '@genvr/contracts';
-import { AVATAR_BODIES, PLAYER_BODIES } from '@genvr/core-library';
+import { AVATAR_BODIES, HIDDEN_BODY_IDS, PICKABLE_BODIES } from '@genvr/core-library';
 import { CORE_ACCESSORIES, CORE_CLOTHING } from '@genvr/core-library';
 import { AvatarSketch } from './avatar-sketch';
 import { Check, Minimize2, Shirt, UserRound, type LucideIcon } from 'lucide-react';
@@ -42,7 +42,10 @@ export function PlaceAvatarSettings({
 }) {
   const [avatar, setAvatar] = useState(value);
   // The 2D body is offered in side-view places (and kept visible while chosen).
-  const bodies = AVATAR_BODIES.filter((body) => !body.flat || view === 'side' || value.body === body.id);
+  // Hidden bodies (board A12) stay listed only while this place already uses one.
+  const bodies = AVATAR_BODIES.filter(
+    (body) => (!body.flat || view === 'side' || value.body === body.id) && (!HIDDEN_BODY_IDS.has(body.id) || value.body === body.id),
+  );
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const save = useRef(onSave);
   useEffect(() => {
@@ -115,7 +118,7 @@ export function PlaceAvatarSettings({
                   <AvatarSketch look={{ ...outfit, body: body.id }} className="h-24 w-full" />
                 ) : (
                   <span className="flex h-24 w-full items-end justify-center gap-1">
-                    {PLAYER_BODIES.map((entry) => (
+                    {PICKABLE_BODIES.map((entry) => (
                       <AvatarSketch
                         key={entry.id}
                         look={{ ...outfit, body: entry.id }}

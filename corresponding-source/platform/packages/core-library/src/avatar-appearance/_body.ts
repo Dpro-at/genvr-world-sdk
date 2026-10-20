@@ -28,7 +28,7 @@ import robot from './bodies/robot.js';
  * avatar sketches from it, so both always show the same look.
  */
 
-/** Body types in library order; Classic is the main avatar (decision 73). */
+/** Body types in library order (all of them, hidden ones too, so old worlds still open). */
 export const AVATAR_BODIES: readonly CoreBody[] = [classic, simple, starter, flat, animeBoy, warrior, human, robot];
 
 /**
@@ -36,6 +36,21 @@ export const AVATAR_BODIES: readonly CoreBody[] = [classic, simple, starter, fla
  * worn only where a side-view place uses it for everyone (decision 93).
  */
 export const PLAYER_BODIES: readonly CoreBody[] = AVATAR_BODIES.filter((body) => !body.flat);
+
+/**
+ * Bodies no longer offered for a new choice (owner, 2026-10-20, board A12). Worlds, players and saved
+ * characters that already wear one keep it, and the code stays (the robot reuses Starter's joints and clips).
+ */
+export const HIDDEN_BODY_IDS: ReadonlySet<string> = new Set(['classic', 'simple', 'starter', 'anime-boy', 'warrior']);
+
+/** The default body for a new player look and a new character. */
+export const DEFAULT_BODY_ID = 'robot';
+
+/** Bodies a person or an agent can pick now: the Standard robot first, then the others still offered. */
+export const PICKABLE_BODIES: readonly CoreBody[] = [
+  ...PLAYER_BODIES.filter((body) => body.id === DEFAULT_BODY_ID),
+  ...PLAYER_BODIES.filter((body) => body.id !== DEFAULT_BODY_ID && !HIDDEN_BODY_IDS.has(body.id)),
+];
 
 const bodies = new Map(AVATAR_BODIES.map((body) => [body.id, body]));
 
