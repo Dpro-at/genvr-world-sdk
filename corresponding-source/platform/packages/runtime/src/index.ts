@@ -121,7 +121,8 @@ export {
   registerSeaLife,
 } from './sealife/index.js';
 
-export { retargetAvatarMotion } from './avatar-motion.js';
+export { retargetAvatarMotion, retargetMotionScene } from './avatar-motion.js';
+export { bakeMotion, bakedAnimation, BAKE_FPS, type BakedMotion } from './avatar-motion-bake.js';
 
 export { registerAvatarMotionLibrary, avatarMotionEntry as findAvatarMotion, avatarMotionEntries, type AvatarMotionLibrary, type AvatarMotionEntry } from './avatar-motion-library.js';
 

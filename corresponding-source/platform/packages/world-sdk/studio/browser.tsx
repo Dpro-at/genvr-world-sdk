@@ -1,2 +1,3 @@
 import { mountStudio } from './app';
-mountStudio(document.getElementById('studio')!);
+import { privateMotionLibrary } from './private-motions';
+void privateMotionLibrary().then(motionLibrary => mountStudio(document.getElementById('studio')!, motionLibrary ? { motionLibrary } : {}));

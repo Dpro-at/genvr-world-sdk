@@ -1264,7 +1264,7 @@ export function clipFromAnimation(
   animation: AnimationItem,
   body: AvatarBody = findBody('starter'),
 ): AnimationClip {
-  const keys = hasOwnShoulders(body) ? animation.keys.map(withShoulders) : animation.keys;
+  const keys = hasOwnShoulders(body) && !animation.recorded ? animation.keys.map(withShoulders) : animation.keys;
   const used = new Set<string>();
   for (const [, pose] of keys) for (const bone of Object.keys(pose)) used.add(bone);
   const tracks: Array<QuaternionKeyframeTrack | VectorKeyframeTrack> = [];

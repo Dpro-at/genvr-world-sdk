@@ -57,6 +57,11 @@ export interface AnimationItem {
   keys: Key[];
   /** Hand grip for the whole clip on bodies with fingers (0 open, 1 fist); absent: a relaxed hand. */
   grip?: number;
+  /**
+   * Keys recorded from a played motion (our own motion files): the shoulders already move as they did, so the runtime
+   * adds no shoulder lift of its own to raised arms.
+   */
+  recorded?: boolean;
 }
 
 /** A relaxed hand: fingers a little curled, as a hand hangs on its own. */
