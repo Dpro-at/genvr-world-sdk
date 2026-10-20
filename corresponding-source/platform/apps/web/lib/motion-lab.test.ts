@@ -191,3 +191,58 @@ describe('the lab view keeps the move in step with the run', () => {
     expect(labClipTime(frames, 30)).toBe(0);
   });
 });
+
+describe('lab character (board M17)', () => {
+  const ID = 'user.mixamo.' + 'a'.repeat(64) + '.character';
+  const source = (avatar: string | null, list = [{ id: ID, name: 'rpm-male-blue', source: 'mine' as const, leg: 0.97 }]) => ({
+    list: async () => list, avatar: async () => avatar, body: async (id: string) => id as `user.${string}`,
+  });
+  it('follows the Avatar tab by default and runs with that character', async () => {
+    const lab = new LabController(newLabData());
+    lab.setCharacterSource(source(ID));
+    await lab.refreshCharacters();
+    expect(lab.data.who).toBe('avatar');
+    expect(lab.character.id).toBe(ID);
+    expect(lab.legScale).toBeCloseTo(0.97 / 0.84);
+    expect(lab.run({}, PERSON).settings.character).toBe(ID);
+  });
+  it('picking in the Lab stops following; a deleted pick falls back to the robot', async () => {
+    const lab = new LabController(newLabData());
+    lab.setCharacterSource(source(ID));
+    await lab.refreshCharacters();
+    lab.setWho('robot');
+    expect(lab.character.id).toBe('robot');
+    lab.setWho(ID);
+    lab.setCharacterSource(source(null, []));
+    await lab.refreshCharacters();
+    expect(lab.missingCharacter).toBe(ID);
+    expect(lab.character.id).toBe('robot');
+    expect(() => lab.setWho('human')).toThrow(/No character "human"/);
+  });
+  it('keeps the best version per move and character', async () => {
+    const lab = new LabController(newLabData());
+    lab.setCharacterSource(source(null));
+    await lab.refreshCharacters();
+    const robot = lab.saveVersion(lab.run({}, PERSON).id);
+    lab.saveBest(robot.id);
+    lab.setWho(ID);
+    expect(lab.best()).toBeUndefined();
+    const mine = lab.saveVersion(lab.run({}, PERSON).id);
+    lab.saveBest(mine.id);
+    expect(lab.best()?.id).toBe(mine.id);
+    expect(lab.best('Walk', 'robot')?.id).toBe(robot.id);
+  });
+  it('lists and picks characters through the agent tool', async () => {
+    const lab = new LabController(newLabData());
+    lab.setCharacterSource(source(null));
+    const list = await runMotionLab(lab, { kind: 'characters' }, agent) as { characters: Array<{ id: string }> };
+    expect(list.characters.map((c) => c.id)).toEqual(['robot', ID]);
+    await runMotionLab(lab, { kind: 'who_set', who: ID }, agent);
+    expect(lab.character.name).toBe('rpm-male-blue');
+    await expect(runMotionLab(lab, { kind: 'who_set', who: 'warrior' }, agent)).rejects.toThrow(/No character/);
+  });
+  it('paces the clip with the leg length', () => {
+    const frames = [0, 1, 2].map((i) => ({ x: 0, z: i * 0.1, clip: 'Walk', t: i / 60 })) as unknown as LabFrame[];
+    expect(labClipTime(frames, 2, 2)).toBeCloseTo(labClipTime(frames, 2) / 2);
+  });
+});

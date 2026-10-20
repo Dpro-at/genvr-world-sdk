@@ -5,7 +5,7 @@ import {
   ArrowRight, Bone, Car, Check, Copy, Dices, Eye, EyeOff, Footprints, Ghost, Play, Plus, RotateCcw, Ruler, Scale, Square, Star,
   StepBack, StepForward, TrafficCone, Trash2, X,
 } from 'lucide-react';
-import { LAB_LATER_KINDS, LAB_OBSTACLE_KINDS, type LabObstacle, type LabObstacleKind, type LabOverlay, type LabRun } from '@genvr/contracts';
+import { LAB_FOLLOW_AVATAR, LAB_LATER_KINDS, LAB_OBSTACLE_KINDS, type LabObstacle, type LabObstacleKind, type LabOverlay, type LabRun } from '@genvr/contracts';
 import { LAB_MOVES, PERSON, type LabController, type LabSpeed } from '../../../lib/motion-lab';
 import { measure } from './lab-stage';
 import { MyMotions, ShareMotionDialog } from './lab-share';
@@ -197,12 +197,21 @@ function RunPanel({ lab, share }: { lab: LabController; share: (version: string)
   const shown = lab.view.run ? lab.data.runs.find((r) => r.id === lab.view.run!.id) : undefined;
   const best = lab.best();
   const pending = lab.data.best_pending;
-  const versions = lab.data.versions.filter((v) => v.motion === s.motion);
+  // Versions and best compare one character's runs only (board M17).
+  const versions = lab.data.versions.filter((v) => v.motion === s.motion && v.settings.character === lab.character.id);
+  const [allRuns, setAllRuns] = useState(false);
+  const runs = allRuns ? lab.data.runs : lab.data.runs.filter((r) => r.settings.character === lab.character.id);
+  const nameOf = (id: string) => lab.characters.find((c) => c.id === id)?.name ?? 'removed character';
   return (
     <section aria-label="Run" className="flex flex-col gap-2">
       <div className={label}>Motion</div>
       <div className="grid grid-cols-2 gap-1.5">
-        <label className="flex h-8 items-center gap-1.5 rounded-lg border border-ink/10 bg-paper px-2 text-xs"><span className="text-[10px] font-black uppercase text-ink/50">Who</span><span className="truncate font-semibold">Standard robot</span></label>
+        <label className="flex h-8 items-center gap-1.5 rounded-lg border border-ink/10 bg-paper px-2 text-xs"><span className="text-[10px] font-black uppercase text-ink/50">Who</span>
+          <select aria-label="Who runs" className="min-w-0 flex-1 truncate bg-transparent font-semibold outline-none" value={lab.missingCharacter ? LAB_FOLLOW_AVATAR : lab.data.who} onChange={(e) => tryRun(() => lab.setWho(e.target.value), setError)}>
+            <option value={LAB_FOLLOW_AVATAR}>Follow the Avatar tab ({lab.avatarCharacter?.name ?? 'Standard robot'})</option>
+            <optgroup label="Lab">{lab.characters.filter((c) => c.source === 'lab').map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</optgroup>
+            {lab.characters.some((c) => c.source === 'mine') ? <optgroup label="My characters · private">{lab.characters.filter((c) => c.source === 'mine').map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</optgroup> : null}
+          </select></label>
         <label className="flex h-8 items-center gap-1.5 rounded-lg border border-ink/10 bg-paper px-2 text-xs"><span className="text-[10px] font-black uppercase text-ink/50">Move</span>
           <select className="min-w-0 flex-1 bg-transparent font-semibold outline-none" value={s.motion} onChange={(e) => set({ motion: e.target.value })}>{LAB_MOVES.map((m) => <option key={m}>{m}</option>)}</select></label>
         <NumberField name="Speed" unit="m/s" step={0.1} value={s.speed} onChange={(v) => set({ speed: v })} />
@@ -212,6 +221,9 @@ function RunPanel({ lab, share }: { lab: LabController; share: (version: string)
         <NumberField name="Blend" unit="s" step={0.05} value={s.blend_s} onChange={(v) => set({ blend_s: v })} />
         <NumberField name="Lean" unit="°" step={1} value={s.lean_deg} onChange={(v) => set({ lean_deg: v })} />
       </div>
+      {lab.missingCharacter ? <p role="status" className="text-[11px] text-coral">The character picked here is no longer in My characters: the Standard robot runs meanwhile.</p>
+        : lab.data.who !== LAB_FOLLOW_AVATAR ? <p className="text-[11px] text-ink/50">Picked in the Lab · <button type="button" className="underline" onClick={() => tryRun(() => lab.setWho(LAB_FOLLOW_AVATAR), setError)}>Follow the Avatar tab</button></p>
+        : <p className="text-[11px] text-ink/50">Follows the Avatar tab.</p>}
       <label className="flex items-center gap-2 text-xs"><input type="checkbox" checked={s.wait_for_green} onChange={(e) => set({ wait_for_green: e.target.checked })} />Waits for green at the crossing</label>
       <button type="button" className="flex h-9 items-center justify-center gap-2 rounded-lg bg-ink text-sm font-bold text-on-brand" onClick={() => tryRun(() => lab.run({}, PERSON), setError)}><Play className="size-4" />Run<kbd className="font-mono text-[10px] opacity-70">R</kbd></button>
       <Problem text={error} />
@@ -246,11 +258,15 @@ function RunPanel({ lab, share }: { lab: LabController; share: (version: string)
           </li>
         ))}
       </ul>
-      <span className={`${label} mt-2`}>Last runs · {lab.data.runs.length} of 20</span>
+      <div className="mt-2 flex items-center gap-1.5"><span className={`${label} flex-1`}>Last runs · {lab.data.runs.length} of 20</span>
+        {([['This character', false], ['All characters', true]] as const).map(([name, all]) => (
+          <button key={name} type="button" aria-pressed={allRuns === all} className={`rounded-full px-2 py-0.5 text-[11px] font-bold ${allRuns === all ? 'bg-ink text-on-brand' : 'bg-ink/5 hover:bg-ink/10'}`} onClick={() => setAllRuns(all)}>{name}</button>
+        ))}</div>
       <ul className="flex flex-col gap-0.5" aria-label="Last runs">
-        {[...lab.data.runs].reverse().slice(0, 8).map((r) => (
+        {runs.length === 0 ? <li className="text-xs text-ink/50">No runs with {lab.character.name} yet.</li> : null}
+        {[...runs].reverse().slice(0, 8).map((r) => (
           <li key={r.id}><button type="button" className={`${row} w-full ${lab.view.run?.id === r.id ? 'bg-ink/10' : 'hover:bg-ink/5'}`} onClick={() => tryRun(() => lab.showRun(r.id), setError)}>
-            <span className="w-12 font-mono text-[11px] text-ink/50">{r.id}</span><span className="flex-1 truncate">{r.events.at(-1)?.label}</span><b className="font-mono">{r.score.total}</b>
+            <span className="w-12 font-mono text-[11px] text-ink/50">{r.id}</span><span className="flex-1 truncate">{allRuns ? `${nameOf(r.settings.character)} · ` : ''}{r.events.at(-1)?.label}</span><b className="font-mono">{r.score.total}</b>
             <span className={`size-2 rounded-full ${r.score.finished ? 'bg-emerald-500' : 'bg-coral'}`} /></button></li>
         ))}
       </ul>

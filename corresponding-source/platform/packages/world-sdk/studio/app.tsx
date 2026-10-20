@@ -22,7 +22,7 @@ import { PresentationViewport } from './presentation/viewport';
 import { createRoot } from 'react-dom/client';
 import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
 import { Monitor, Share2, Clapperboard, Download, FolderOpen, FlaskConical, House, Save, Settings2, Mic, X, ChevronUp } from 'lucide-react';
-import { LabController, newLabData, runMotionLab, type MotionSharePublisher } from '../../../apps/web/lib/motion-lab';
+import { LAB_ROBOT_LEG, LabController, newLabData, runMotionLab, type MotionSharePublisher } from '../../../apps/web/lib/motion-lab';
 import { createRuntime, DEFAULT_BRUSH, DEFAULT_RIVER, type GenvrRuntime, type ToolStatus } from '@genvr/runtime';
 import { runTool, TOOL_ARGS, EXPRESSIONS, type AssistantHost, type ChatModel } from '@genvr/assistant';
 import { CreateFlow, type CreationOptions } from '../../../apps/web/components/create-flow';
@@ -127,6 +127,7 @@ function Editor({ initial, storage, options, leave, beforeClose }: { initial: St
     if (look) localLooks.current.set(target, look); else localLooks.current.delete(target);
     if (target === 'self') { setLiveRecipe(current=>({...current,body:look?.body??'classic'})); liveStage.current?.setRecipe({...liveRecipe,body:look?.body??'classic'}); runtime.current.setAvatarLook(look ?? DEFAULT_AVATAR_LOOK); selfLibraryBody.current?.(look?.body ?? 'classic'); }
     else syncStudioAgents(runtime.current, agentRows.current, localLooks.current);
+    if (target === 'self') void lab?.refreshCharacters();
   };
   const playUserMotion = async (target: string, id: string) => {
     const asset = await library?.get(id);
@@ -176,6 +177,15 @@ function Editor({ initial, storage, options, leave, beforeClose }: { initial: St
   };
   // MOTION-LAB: a lab project's course, runs and versions; every change is saved with the project.
   const [lab] = useState(() => { const made = initial.lab ? new LabController(initial.lab, data => { project.current = { ...project.current, lab: data }; changed(); }) : undefined; made?.setPublisher(options.motionSharing ?? null); return made; });
+  // Board M17: the Lab runs the Avatar tab's character or one picked in the Lab, from the bodies and My characters.
+  useEffect(() => lab?.setCharacterSource(library && userAvatars ? {
+    list: async () => (await library.list()).filter(row => row.kind === 'character' && row.joints && row.height).map(row => ({
+      id: row.id, name: row.name.split('__')[0]!.replace(/_/g, ' '), source: 'mine' as const,
+      leg: row.joints!.find(joint => joint.name === 'LeftUpLeg')?.at[1] ?? LAB_ROBOT_LEG })),
+    avatar: async () => project.current.avatarBodies?.self ?? await library.assignment(initial.id, 'self'),
+    body: async id => (await userAvatars.look(id)).body,
+    ...(library.subscribe ? { subscribe: (listener: () => void) => library.subscribe!(listener) } : {}),
+  } : null), [lab]);
   useEffect(() => {
     mounted.current = true;
     const abort = new AbortController(); let current: GenvrRuntime | null = null;

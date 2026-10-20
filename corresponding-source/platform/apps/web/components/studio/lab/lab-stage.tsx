@@ -36,6 +36,8 @@ import { labClipTime, type LabController } from '../../../lib/motion-lab';
  */
 const CLIPS = new Map(CORE_ANIMATIONS.map((a) => [a.manifest.name, a.clip]));
 const OBSTACLE = 0xc5c9d1, SELECTED = 0xf5b942;
+/** Behind the character, a little to its right and above (azimuth from +z, elevation, distance). */
+const LAB_ORBIT = [215, 24, 11] as const;
 
 export function LabStage({ lab }: { lab: LabController }) {
   useSyncExternalStore(lab.subscribe, lab.getVersion, lab.getVersion);
@@ -56,8 +58,9 @@ export function LabStage({ lab }: { lab: LabController }) {
         if (cancelled) { made.dispose(); return; }
         made.setGrid(false);
         made.resetView();
-        // Behind the robot, a little to its right and above: the course ahead is in view (board M1).
-        made.setOrbit(35, 24, 11);
+        // Behind the robot, a little to its right and above: the course ahead is in view (board M1). The robot faces
+        // +z with its right side at −x, so behind-right is 180° + 35° from +z.
+        made.setOrbit(...LAB_ORBIT);
         stage.current = made;
         world.current = new LabWorld();
         made.setEnvironment(world.current.root);
@@ -89,18 +92,32 @@ export function LabStage({ lab }: { lab: LabController }) {
   const clip = finished ? 'Idle' : frame?.clip ?? 'Idle';
 
   useEffect(() => { if (ready) world.current?.setCourse(course, view.selected, view.overlays.includes('measures')); }, [ready, course, view.selected, view.overlays]);
-  useEffect(() => { if (ready) stage.current?.setViewMode(view.overlays.includes('skeleton') ? 'skeleton-mesh' : 'normal'); }, [ready, view.overlays]);
-  useEffect(() => { const id = CLIPS.get(clip) ?? CLIPS.get('Idle'); if (ready && id) stage.current?.play(id); }, [ready, clip]);
+
+  // Board M17: the stage shows who runs (the Avatar tab's character or the one picked in the Lab).
+  const who = lab.character.id;
+  const [shown, setShown] = useState<string | null>(null);
+  useEffect(() => {
+    if (!ready) return;
+    let live = true;
+    void lab.characterBody(who).then((body) => { if (live && stage.current) {
+      // A new body resets the stage's camera to the front: put the Lab's view back behind the character.
+      stage.current.setRecipe({ ...DEFAULT_CHARACTER_RECIPE, body }); stage.current.setOrbit(...LAB_ORBIT); setShown(who);
+    } }).catch(() => { if (live) setShown(null); });
+    return () => { live = false; };
+  }, [ready, who, lab]);
+  useEffect(() => { const id = CLIPS.get(clip) ?? CLIPS.get('Idle'); if (ready && id) stage.current?.play(id); }, [ready, clip, shown]);
+  // Again after a character swap: the new body starts in the stage's own view mode.
+  useEffect(() => { if (ready) stage.current?.setViewMode(view.overlays.includes('skeleton') ? 'skeleton-mesh' : 'normal'); }, [ready, view.overlays, shown]);
   useEffect(() => {
     if (!ready || !stage.current) return;
     stage.current.setPaused(driven);
-    if (driven && frames) stage.current.setClipTime(labClipTime(frames, view.t * 60));
+    if (driven && frames) stage.current.setClipTime(labClipTime(frames, view.t * 60, lab.legScale));
   });
   useEffect(() => { if (ready) world.current?.show(course, frame, ghost, view.t, view.overlays); });
 
   return (
     <div className="relative h-full min-h-0 w-full overflow-hidden" style={{ background: '#30343c' }}>
-      <div ref={container} className="absolute inset-0" aria-label="Motion lab view: the lab robot on the course" role="img" />
+      <div ref={container} className="absolute inset-0" aria-label={`Motion lab view: ${lab.character.name} on the course`} role="img" />
       {failed ? <p role="alert" className="absolute inset-x-0 top-1/2 text-center text-sm text-white">The lab view could not start (WebGL is needed).</p> : null}
     </div>
   );

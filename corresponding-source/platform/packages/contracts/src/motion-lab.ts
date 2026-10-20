@@ -12,6 +12,10 @@ export const LAB_STEP = 1 / 60;
 export const LAB_KEEP_RUNS = 20;
 /** The lab character (Mohamed, 2026-10-19): our latest robot, body id `robot` ("Standard robot"). */
 export const LAB_CHARACTER = 'robot';
+/** Board M17: the Lab uses the project's avatar (the Avatar tab) unless a character is picked in the Lab. */
+export const LAB_FOLLOW_AVATAR = 'avatar';
+/** A body id (`robot`) or an imported character's id (`user.….character`, about 90 characters). */
+const characterId = z.string().min(1).max(150);
 
 const labId = z.string().regex(/^[a-z0-9][a-z0-9-]{0,39}$/, 'Use a short id: lower-case letters, digits and dashes.');
 const metres = (min: number, max: number) => z.number().min(min).max(max);
@@ -86,7 +90,7 @@ export type LabCourse = z.infer<typeof LabCourse>;
 /** How the character runs the course. `motion`: the base move from the Moves list (Walk, Run …). */
 export const LabRunSettings = z.object({
   motion: z.string().min(1).max(60).default('Walk'),
-  character: z.string().min(1).max(60).default(LAB_CHARACTER),
+  character: characterId.default(LAB_CHARACTER),
   speed: metres(0.5, 8).default(1.6),
   stride: metres(0.3, 1.6).default(0.74),
   /** How high the feet lift over a step (metres). */
@@ -174,7 +178,7 @@ export const MotionShare = z.object({
   name: z.string().trim().min(1).max(80),
   description: z.string().max(400).default(''),
   tags: z.array(MotionShareTag).max(8).default([]),
-  character: z.string().min(1).max(60),
+  character: characterId,
   score: z.number().min(0).max(100),
   /** Seconds of the version's run shown as the preview clip. */
   preview_s: metres(2, 10).default(4),
@@ -202,6 +206,8 @@ export const LabProjectData = z.object({
   format: z.literal(LAB_FORMAT).default(LAB_FORMAT),
   course: LabCourse.default(() => LabCourse.parse({})),
   settings: LabRunSettings.default(() => LabRunSettings.parse({})),
+  /** Who runs (board M17): `avatar` follows the Avatar tab; otherwise the character picked in the Lab. */
+  who: characterId.default(LAB_FOLLOW_AVATAR),
   runs: z.array(LabRun).max(LAB_KEEP_RUNS).default([]),
   versions: z.array(MotionVersion).max(500).default([]),
   best_pending: z.object({ version: labId, by: z.string().max(80) }).strict().nullable().default(null),
@@ -233,6 +239,10 @@ export const MotionLabOperation = z.discriminatedUnion('kind', [
     hardness: z.number().int().min(1).max(5).default(2), street: z.boolean().default(true) }).strict(),
   z.object({ kind: z.literal('traffic_set'), street: LabStreet.nullable().optional(), cars: z.array(LabCar).max(8).optional() }).strict(),
   z.object({ kind: z.literal('settings_set'), settings: LabRunSettingsPatch }).strict(),
+  /** Characters the Lab can use (board M17) and who runs now. */
+  z.object({ kind: z.literal('characters') }).strict(),
+  /** Pick who runs: a character id from `characters`, or `avatar` to follow the Avatar tab. */
+  z.object({ kind: z.literal('who_set'), who: characterId }).strict(),
   z.object({ kind: z.literal('run'), settings: LabRunSettingsPatch.optional(), version: labId.optional() }).strict(),
   z.object({ kind: z.literal('runs_list') }).strict(),
   z.object({ kind: z.literal('scores'), run: labId.optional() }).strict(),

@@ -16,6 +16,15 @@ character is the Standard robot (body `robot`): the same 52-bone human skeleton 
 on one ToeBase joint per foot that bend up 0–45° by themselves when the heel lifts (a clip that keys ToeBase wins). Everything a person can do in the Lab area, an agent can do with
 `motion_lab`, with the same owner gates.
 
+## Who runs
+
+By default the Lab follows the Avatar tab: it runs the project's avatar when the Lab can use it (the Standard robot or
+a character imported into My characters; hidden bodies never), else the robot. `characters` lists who can run (id,
+name, source `lab` or `mine`, leg = hip height in metres) and who runs now; `who_set {who}` picks one, and
+`who_set {who: "avatar"}` follows the Avatar tab again. A picked character that was deleted falls back to the robot.
+Imported characters are private: their versions are never shareable. Scores and the best version compare one
+character's runs only, and the clip's pace on the floor scales with leg length (robot hip 0.84 m).
+
 ## Start
 
 1. `get_studio_capabilities` → `motionLab.executable` must be true (a motion lab project is open in the live Studio).

@@ -1,5 +1,6 @@
 import {
   LAB_CHARACTER,
+  LAB_FOLLOW_AVATAR,
   LAB_KEEP_RUNS,
   LAB_LATER_KINDS,
   LAB_OBSTACLE_KINDS,
@@ -15,6 +16,7 @@ import {
   MotionLabOperation,
   MotionShare,
   MotionShareDraft,
+  type BodyId,
   type LabObstacleKind,
   type LabOverlay,
   type LabRun,
@@ -50,13 +52,15 @@ export const LAB_MOVES = Object.keys(LAB_GROUND_MOVES);
  * walked over their natural speed, so the feet keep pace with the floor at any speed and in slow motion; other moves
  * (jump, climb, landing) count the time since they began. Driven from the run, the pose also follows seeking.
  */
-export function labClipTime(frames: readonly LabFrame[], index: number): number {
+export function labClipTime(frames: readonly LabFrame[], index: number, legScale = 1): number {
   const i = Math.max(0, Math.min(frames.length - 1, Math.floor(index)));
   const clip = frames[i]?.clip;
   if (!clip) return 0;
   let start = i;
   while (start > 0 && frames[start - 1]!.clip === clip) start--;
-  const natural = Object.values(LAB_GROUND_MOVES).find((move) => move.clip === clip)?.speed;
+  // A longer-legged character covers more ground per step: its natural speed grows with its legs (board M17).
+  const base = Object.values(LAB_GROUND_MOVES).find((move) => move.clip === clip)?.speed;
+  const natural = base ? base * legScale : undefined;
   if (!natural) return frames[i]!.t - frames[start]!.t;
   let walked = 0;
   for (let k = start + 1; k <= i; k++) walked += Math.hypot(frames[k]!.x - frames[k - 1]!.x, frames[k]!.z - frames[k - 1]!.z);
@@ -76,6 +80,27 @@ export interface MotionShareRights { made_here: boolean; not_mixamo: boolean; vi
 export type MotionShareStatus = 'private' | 'pending' | 'shared' | 'blocked';
 export interface SimilarMotion { name: string; source: 'library' | 'mine'; alike: number; note: string }
 
+/** A character the Lab can use (board M17): the Standard robot, or one imported into My characters. */
+export interface LabCharacter {
+  id: string;
+  name: string;
+  source: 'lab' | 'mine';
+  /** Hip height (m), for the stride: a character with longer legs walks with longer steps. */
+  leg: number;
+}
+/** Where the Lab finds characters: the Studio's body list and private library, and the project's avatar. */
+export interface LabCharacterSource {
+  list(): Promise<LabCharacter[]>;
+  /** The Avatar tab's character for this project (a body id or a library id), or null for the default. */
+  avatar(): Promise<string | null>;
+  /** The body id the character stage draws for this character (an imported one is loaded first). */
+  body(id: string): Promise<BodyId>;
+  subscribe?(listener: () => void): () => void;
+}
+/** The lab robot's hip height (m, its LeftUpLeg joint), the scale every other character's stride is measured against. */
+export const LAB_ROBOT_LEG = 0.84;
+const ROBOT: LabCharacter = { id: LAB_CHARACTER, name: 'Standard robot', source: 'lab', leg: LAB_ROBOT_LEG };
+
 export function newLabData(): LabProjectData {
   return LabProjectData.parse({ course: defaultLabCourse() });
 }
@@ -87,6 +112,9 @@ export class LabController {
   #version = 0;
   #onChange: (data: LabProjectData) => void;
   #publisher: MotionSharePublisher | null = null;
+  #source: LabCharacterSource | null = null;
+  #characters: LabCharacter[] = [ROBOT];
+  #avatar: string | null = null;
 
   constructor(data: LabProjectData, onChange: (data: LabProjectData) => void = () => {}) {
     this.#data = LabProjectData.parse(data);
@@ -158,11 +186,53 @@ export class LabController {
   }
   setSettings(patch: Partial<LabRunSettings>) { const settings = LabRunSettings.parse({ ...this.#data.settings, ...patch }); this.#set({ settings }); return settings; }
 
+  // ---- who runs (board M17)
+  /** Connects the Studio's characters; the list and the Avatar tab's choice are read again whenever they change. */
+  setCharacterSource(source: LabCharacterSource | null) {
+    this.#source = source;
+    void this.refreshCharacters();
+    return source?.subscribe?.(() => void this.refreshCharacters());
+  }
+  async refreshCharacters() {
+    const source = this.#source;
+    const [list, avatar] = source ? await Promise.all([source.list(), source.avatar()]) : [[], null];
+    this.#characters = [ROBOT, ...list.filter((c) => c.id !== ROBOT.id)];
+    this.#avatar = avatar;
+    this.#view = { ...this.#view, ghost: this.#ghost() };
+    this.#emit(false);
+  }
+  get characters(): readonly LabCharacter[] { return this.#characters; }
+  /** The character the Avatar tab uses, when the Lab can use it (hidden bodies cannot); else null. */
+  get avatarCharacter(): LabCharacter | null { return this.#characters.find((c) => c.id === this.#avatar) ?? null; }
+  /** Who runs now: the Avatar tab's character when following it, else the picked one; the robot when either is gone. */
+  get character(): LabCharacter {
+    const who = this.#data.who;
+    if (who === LAB_FOLLOW_AVATAR) return this.avatarCharacter ?? ROBOT;
+    return this.#characters.find((c) => c.id === who) ?? ROBOT;
+  }
+  /** A character picked in the Lab that is no longer in My characters (the Lab uses the robot meanwhile). */
+  get missingCharacter(): string | null {
+    const who = this.#data.who;
+    return who !== LAB_FOLLOW_AVATAR && !this.#characters.some((c) => c.id === who) ? who : null;
+  }
+  /** Leg length over the robot's, for the clip's pace on the floor. */
+  get legScale(): number { return this.character.leg / LAB_ROBOT_LEG; }
+  characterBody(id: string): Promise<BodyId> { return id === ROBOT.id || !this.#source ? Promise.resolve(LAB_CHARACTER) : this.#source.body(id); }
+  setWho(who: string) {
+    if (who !== LAB_FOLLOW_AVATAR && !this.#characters.some((c) => c.id === who))
+      throw new Error(`No character "${who}". Ask characters for the ids, or use "${LAB_FOLLOW_AVATAR}" to follow the Avatar tab.`);
+    this.#set({ who });
+    this.#view = { ...this.#view, ghost: this.#ghost() };
+    this.#emit(false);
+    return { who, character: this.character };
+  }
+
   // ---- runs (boards M1, M3)
   run(patch: Partial<LabRunSettings> = {}, by: LabActor = PERSON, fromVersion?: string): LabRun {
     let base = this.#data.settings;
     if (fromVersion) base = this.#versionById(fromVersion).settings;
-    const settings = LabRunSettings.parse({ ...base, ...patch });
+    if (patch.character !== undefined && patch.character !== this.character.id) this.setWho(patch.character);
+    const settings = LabRunSettings.parse({ ...base, ...patch, character: this.character.id });
     const course = this.#data.course;
     const result = simulateLabRun(course, settings, course.seed);
     const run: LabRun = {
@@ -213,7 +283,8 @@ export class LabController {
       this.#set({ best_pending: { version: version.id, by: by.name } });
       return { best: this.best()?.id ?? null, pending: version.id };
     }
-    this.#set({ versions: this.#data.versions.map((v) => ({ ...v, best: v.motion === version.motion ? v.id === version.id : v.best })), best_pending: null });
+    const same = (v: MotionVersion) => v.motion === version.motion && v.settings.character === version.settings.character;
+    this.#set({ versions: this.#data.versions.map((v) => ({ ...v, best: same(v) ? v.id === version.id : v.best })), best_pending: null });
     this.#view = { ...this.#view, ghost: this.#ghost() };
     this.#emit(false);
     return { best: version.id, pending: null };
@@ -230,7 +301,10 @@ export class LabController {
     this.#view = { ...this.#view, ghost: this.#ghost() };
     this.#emit(false);
   }
-  best(motion = this.#data.settings.motion): MotionVersion | undefined { return this.#data.versions.find((v) => v.best && v.motion === motion); }
+  /** The best version of a move for one character: scores only compare runs of the same character (board M17). */
+  best(motion = this.#data.settings.motion, character = this.character.id): MotionVersion | undefined {
+    return this.#data.versions.find((v) => v.best && v.motion === motion && v.settings.character === character);
+  }
   #versionById(id: string) { const v = this.#data.versions.find((x) => x.id === id); if (!v) throw new Error(`No version "${id}". Ask versions for the ids.`); return v; }
   #ghost(): LabRunResult | null {
     const best = this.best();
@@ -310,7 +384,7 @@ export class LabController {
     if (old?.state === 'shared') throw new Error(`${id} is already shared. Stop sharing first to change it.`);
     const share = MotionShare.parse({
       version: v.id, state: 'pending', name: input.name, description: input.description ?? old?.description ?? '', tags: input.tags ?? old?.tags ?? [],
-      character: v.settings.character === LAB_CHARACTER ? 'Standard robot' : v.settings.character, score: v.score.total, preview_s: input.preview_s ?? old?.preview_s ?? 4,
+      character: this.#characters.find((c) => c.id === v.settings.character)?.name ?? v.settings.character, score: v.score.total, preview_s: input.preview_s ?? old?.preview_s ?? 4,
       licence: MOTION_SHARE_LICENCE.id, prepared_by: by.kind === 'agent' ? by.name : 'you', prepared_at: new Date().toISOString(),
     });
     this.#set({ shares: [...this.#data.shares.filter((s) => s.version !== id), share] });
@@ -389,6 +463,8 @@ const HELP: Record<string, string> = {
   obstacle_remove: 'Remove one obstacle: { id }.',
   course_from_seed: 'A new course from { seed, obstacles 1–12, hardness 1–5, street }. Same seed = same course.',
   traffic_set: 'Street (lanes, light) and cars (speed, lane, offset_s, runs_red).',
+  characters: 'Characters the Lab can use (id, name, source lab|mine, leg in metres), who runs now, and whether the Lab follows the Avatar tab.',
+  who_set: 'Pick who runs: { who: a character id from characters, or "avatar" to follow the Avatar tab }. Hidden bodies are not offered.',
   settings_set: 'Run settings: motion (Walk, Run, Sneak, Crouch Walk), speed, stride, step_height, jump_timing_ms, blend_s, lean_deg, wait_for_green.',
   run: 'Run the course once (fixed step, seed). Optional settings or a version to start from. Returns the run id and scores.',
   runs_list: 'The last 20 runs with their scores.',
@@ -415,7 +491,7 @@ export async function runMotionLab(lab: LabController | null, input: unknown, by
     case 'commands': return MOTION_LAB_KINDS.map((kind) => ({ kind, help: HELP[kind] }));
     case 'inspect': {
       const d = lab.data, last = d.runs.at(-1), best = lab.best();
-      return { character: 'Standard robot (body robot)', course: { seed: d.course.seed, finish_z: d.course.finish_z, obstacles: d.course.obstacles.map((o) => `${o.id} ${o.kind} at ${o.z} m`), street: d.course.street, cars: d.course.cars.length },
+      return { character: { id: lab.character.id, name: lab.character.name, follows_avatar: d.who === LAB_FOLLOW_AVATAR }, course: { seed: d.course.seed, finish_z: d.course.finish_z, obstacles: d.course.obstacles.map((o) => `${o.id} ${o.kind} at ${o.z} m`), street: d.course.street, cars: d.course.cars.length },
         settings: d.settings, moves: LAB_MOVES, last_run: last ? summary(last) : null, best: best ? { id: best.id, score: best.score.total } : null, best_pending: d.best_pending,
         runs: d.runs.length, versions: d.versions.length, view: { overlays: lab.view.overlays, speed: lab.view.speed } };
     }
@@ -429,9 +505,15 @@ export async function runMotionLab(lab: LabController | null, input: unknown, by
     case 'obstacle_remove': lab.removeObstacle(op.id); return { removed: op.id };
     case 'course_from_seed': return lab.fromSeed(op.seed, op.obstacles, op.hardness, op.street);
     case 'traffic_set': return lab.setTraffic(op.street, op.cars);
-    case 'settings_set': return lab.setSettings(op.settings);
+    case 'settings_set': {
+      const { character, ...rest } = op.settings;
+      if (character !== undefined) lab.setWho(character);
+      return lab.setSettings(rest);
+    }
+    case 'characters': await lab.refreshCharacters(); return { who: lab.data.who, follows_avatar: lab.data.who === LAB_FOLLOW_AVATAR, now: lab.character, avatar: lab.avatarCharacter, missing: lab.missingCharacter, characters: lab.characters };
+    case 'who_set': return lab.setWho(op.who);
     case 'run': return summary(lab.run(op.settings ?? {}, by, op.version));
-    case 'runs_list': return lab.data.runs.map((r) => ({ id: r.id, motion: r.settings.motion, total: r.score.total, at: r.at, by: r.by }));
+    case 'runs_list': return lab.data.runs.map((r) => ({ id: r.id, motion: r.settings.motion, character: r.settings.character, total: r.score.total, at: r.at, by: r.by }));
     case 'scores': { const run = lab.runById(op.run); return { run: run.id, score: run.score, best: lab.best()?.score ?? null }; }
     case 'frame': { const f = lab.frameAt(op.t, op.run); if (!f) throw new Error('No run yet. Use run first.'); return f; }
     case 'view_set': { if (op.overlays) lab.setOverlays(op.overlays); if (op.speed) lab.setSpeed(op.speed as LabSpeed); return { overlays: lab.view.overlays, speed: lab.view.speed }; }

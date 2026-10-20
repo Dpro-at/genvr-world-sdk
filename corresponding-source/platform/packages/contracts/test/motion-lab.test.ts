@@ -36,3 +36,13 @@ describe('motion lab contracts (MOTION-LAB L1)', () => {
     expect(() => MotionLabOperation.parse({ kind: 'run', settings: { stride: 3 } })).toThrow();
   });
 });
+
+describe('lab character (board M17)', () => {
+  it('follows the Avatar tab by default and accepts imported character ids', () => {
+    expect(LabProjectData.parse({}).who).toBe('avatar');
+    const id = 'user.mixamo.' + 'f'.repeat(64) + '.character';
+    expect(LabRunSettings.parse({ character: id }).character).toBe(id);
+    expect(MotionLabOperation.parse({ kind: 'who_set', who: id })).toMatchObject({ kind: 'who_set' });
+    expect(MOTION_LAB_KINDS).toEqual(expect.arrayContaining(['characters', 'who_set']));
+  });
+});
