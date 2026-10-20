@@ -39,7 +39,7 @@ import type { LogEntry } from '../../../apps/web/components/studio/console-panel
 import { StudioHostProvider, useStudioHost } from '../../../apps/web/lib/studio-host';
 import { setPlatformEnabled } from '../../../apps/web/lib/api';
 import { useStudioFilming } from '../../../apps/web/lib/use-studio-filming';
-import { browserStudioStorage, createLabProject, createStudioProject, importStudioProject, readStudioProject, STUDIO_PROJECT_BYTES, type StudioProject, type StudioStorage } from '../src/studio-project';
+import { browserStudioStorage, createLabProject, myLabId, createStudioProject, importStudioProject, readStudioProject, STUDIO_PROJECT_BYTES, type StudioProject, type StudioStorage } from '../src/studio-project';
 import { syncStudioAgents, type StudioAgent } from '../src/studio-agents';
 import type { StoreEntry } from '../../../apps/web/lib/store-items';
 import { StudioSaveQueue, flushStudioClose } from '../src/studio-save';
@@ -57,7 +57,7 @@ const download = (project: StudioProject) => {
 };
 
 type BeforeClose = { current: () => Promise<boolean> };
-function Editor({ initial, storage, options, leave, beforeClose }: { initial: StudioProject; storage: StudioStorage; options: StudioOptions; leave: () => void; beforeClose: BeforeClose }) {
+function Editor({ initial, storage, options, leave, openOther, beforeClose }: { initial: StudioProject; storage: StudioStorage; options: StudioOptions; leave: () => void; /** Open another project (the Lab tab of a world opens a lab project; null = a new one). */ openOther?: (id: string | null) => Promise<void>; beforeClose: BeforeClose }) {
   const container = useRef<HTMLDivElement>(null), runtime = useRef<GenvrRuntime | null>(null);
   const characterFingerprint = useRef('');
   const speechPlayback = useRef<AvatarSpeechPlayback|null>(null);
@@ -339,6 +339,8 @@ function Editor({ initial, storage, options, leave, beforeClose }: { initial: St
   };
   beforeClose.current = flush;
   const goHome = async () => { if (await flush()) leave(); };
+  // The Lab tab of a world project (Mohamed, 2026-10-20): my lab projects; opening one saves this project first.
+  const [labProjects] = useState(() => openOther ? { openMine: async () => { if (await flush()) await openOther(myLabId(await storage.list())); } } : undefined);
   const test = (value: boolean) => { if (value) runtime.current?.setTool(null); setTesting(value); };
   const updateMetadata = (next: StudioProject) => { project.current = next; setMetadata(next); changed(); };
   return <StudioHostProvider value={{ platform: false,
@@ -385,7 +387,7 @@ function Editor({ initial, storage, options, leave, beforeClose }: { initial: St
             if (next.model && options.storage) { setError('Device preview requires the default local project storage.'); return; }
             void save().then(ok => { if (ok) setPreview(next); });
           }}
-          testing={testing} onTesting={test} logs={logs} onClearLogs={() => setLogs([])} onStyle={() => changed()} lab={lab} /> : null}
+          testing={testing} onTesting={test} logs={logs} onClearLogs={() => setLogs([])} onStyle={() => changed()} lab={lab} labProjects={labProjects} /> : null}
         {preview.model && desktop ? <DeviceEmulator placeId={initial.id} model={preview.model} orientation={preview.orientation} zoom={preview.zoom} reloadKey={preview.reloadKey}
           source={`?studioPreview=${initial.id}&touch=${preview.model.kind === 'phone' || preview.model.kind === 'tablet' ? '1' : '0'}`} /> : null}
         {ready && !testing && tab !== 'lab' && (desktop || tab !== 'filming') ? (desktop
@@ -435,18 +437,22 @@ function App({ options, beforeClose }: { options: StudioOptions; beforeClose: Be
   const refresh = () => { void storage.list().then(setRecent).catch(error => setError(message(error))); };
   useEffect(() => { refresh(); const id=new URLSearchParams(window.location.search).get('project')??options.initialProjectId; if(id)void open(id); }, []);
   const open = async (id: string) => { try { setProject(await storage.read(id)); setError(null); } catch (error) { setError(message(error)); } };
+  // One motion lab (Mohamed, 2026-10-20): Motion lab opens mine, and makes it only the first time.
+  const makeLab = async () => { const next = createLabProject(newLabData()); await storage.write(next); return next; };
+  const openMyLab = async () => { const id = myLabId(await storage.list()); setProject(id ? await storage.read(id) : await makeLab()); setError(null); };
   const create = async ({ style, worldKind, play }: CreationOptions) => {
     const next = createStudioProject(style, worldKind, play); await storage.write(next); setProject(next);
   };
   const previewId = new URLSearchParams(location.search).get('studioPreview');
   if (previewId) return <PlayerPreview id={previewId} storage={storage} options={options} />;
   if (!project) beforeClose.current = async () => true;
-  return project ? <Editor key={project.id} initial={project} storage={storage} options={options} beforeClose={beforeClose} leave={() => { setProject(null); refresh(); }} /> : <div className="min-h-dvh bg-paper text-ink">
+  return project ? <Editor key={project.id} initial={project} storage={storage} options={options} beforeClose={beforeClose} leave={() => { setProject(null); refresh(); }}
+    openOther={async id => { if (id) { setProject(await storage.read(id)); return; } setProject(await makeLab()); }} /> : <div className="min-h-dvh bg-paper text-ink">
     <header className="flex min-h-14 flex-wrap items-center gap-3 border-b border-ink/10 bg-surface px-4 py-2">
       <strong>Genvr Studio</strong>
       {recent.length ? <select aria-label="Open project" className="min-w-0 max-w-full rounded border border-ink/20 bg-paper p-2 text-sm" value="" onChange={event => void open(event.target.value)}><option value="" disabled>My projects</option>{recent.map(p => <option key={p.id} value={p.id}>{p.title}</option>)}</select> : null}
       <IconButton label="Import project" onClick={() => picker.current?.click()}><FolderOpen className="size-4" /></IconButton>
-      <button type="button" className="inline-flex items-center gap-1.5 rounded-lg border border-ink/20 px-3 py-1.5 text-xs font-bold" title="A test world for making and training motion" onClick={async () => { try { const next = createLabProject(newLabData()); await storage.write(next); setProject(next); setError(null); } catch (error) { setError(message(error)); } }}><FlaskConical className="size-4" aria-hidden />New motion lab</button>
+      <button type="button" className="inline-flex items-center gap-1.5 rounded-lg border border-ink/20 px-3 py-1.5 text-xs font-bold" title="My motion lab: a test world for making and training motion (made the first time)" onClick={async () => { try { await openMyLab(); } catch (error) { setError(message(error)); } }}><FlaskConical className="size-4" aria-hidden />Motion lab</button>
     </header>
     <input ref={picker} type="file" accept=".genvr-studio,.genvr-world,application/json" className="hidden" aria-label="Project file" onChange={async event => {
       const file = event.target.files?.[0]; event.target.value = ''; if (!file) return;

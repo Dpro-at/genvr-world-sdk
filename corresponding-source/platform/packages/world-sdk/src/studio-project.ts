@@ -99,6 +99,12 @@ export function createStudioProject(style: Style, kind: WorldSeed['kind'] | 'emp
 }
 
 /** A motion lab is its own project (Q-LAB-1): an empty flat world and the lab part; it never changes a real world. */
+/** My motion lab (Mohamed, 2026-10-20: one lab is enough): the lab project with the most work, or null when there is none. */
+export function myLabId(projects: ReadonlyArray<{ id: string; lab?: boolean; labWork?: number }>): string | null {
+  const labs = projects.filter(p => p.lab).sort((a, b) => (b.labWork ?? 0) - (a.labWork ?? 0));
+  return labs[0]?.id ?? null;
+}
+
 export function createLabProject(lab: LabProjectData, play = defaultPlaySettings()): StudioProject {
   const project = createStudioProject('blocky', 'empty', play);
   return readStudioProject({ ...project, title: 'Motion lab', lab });
@@ -112,7 +118,7 @@ export function importStudioProject(text: string): StudioProject {
   return fromState(legacy.state, legacy.package.title, defaultPlaySettings(), legacy.package.assets);
 }
 
-export interface StudioStorage { list(): Promise<Array<{ id: string; title: string }>>; read(id: string): Promise<StudioProject>; write(project: StudioProject): Promise<void>; }
+export interface StudioStorage { list(): Promise<Array<{ id: string; title: string; /** A motion lab project (MOTION-LAB), and how much work it holds (runs + versions + made motions). */ lab?: boolean; labWork?: number }>>; read(id: string): Promise<StudioProject>; write(project: StudioProject): Promise<void>; }
 
 /** One transaction per project; a failed save leaves the previous complete record intact. */
 export function browserStudioStorage(): StudioStorage {
@@ -128,7 +134,7 @@ export function browserStudioStorage(): StudioStorage {
     }); } finally { db.close(); }
   };
   return {
-    list: async () => (await transact('readonly', store => store.getAll())).map((p: StudioProject) => ({ id: p.id, title: p.title })),
+    list: async () => (await transact('readonly', store => store.getAll())).map((p: StudioProject) => ({ id: p.id, title: p.title, ...(p.lab ? { lab: true, labWork: p.lab.runs.length + p.lab.versions.length + p.lab.motions.length } : {}) })),
     read: async id => readStudioProject(await transact('readonly', store => store.get(id))),
     write: async project => { const checked = readStudioProject(project); await transact('readwrite', store => store.put(checked)); },
   };

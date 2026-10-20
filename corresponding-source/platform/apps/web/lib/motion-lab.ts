@@ -723,7 +723,7 @@ const HELP: Record<string, string> = {
 };
 
 export async function runMotionLab(lab: LabController | null, input: unknown, by: LabActor): Promise<unknown> {
-  if (!lab) throw new Error('Open a motion lab project first (My projects › New motion lab).');
+  if (!lab) throw new Error('Open the motion lab project first (the Lab tab in the Studio).');
   const op = MotionLabOperation.parse(input);
   const summary = (run: LabRun) => ({ id: run.id, motion: run.settings.motion, score: run.score, events: run.events.map((e) => `${e.t.toFixed(1)} s ${e.label}`) });
   switch (op.kind) {

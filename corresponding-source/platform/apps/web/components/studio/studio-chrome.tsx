@@ -46,6 +46,7 @@ import {
 } from './character-editor/character-editor';
 import { LabLeft, LabRight, LabRunBar, LabRunStrip } from './lab/lab-panels';
 import { LabStage } from './lab/lab-stage';
+import { LabPicker, type LabProjects } from './lab/lab-picker';
 import { motionLabBridge, type LabController } from '../../lib/motion-lab';
 
 /** World is not a tab of its own any more: it is a panel in the Build left dock, Tools · World · Explorer (WORLD-W10). */
@@ -55,7 +56,7 @@ const TABS: Array<{ id: StudioTab; label: string }> = [
   { id: 'items', label: 'Items' },
   { id: 'avatar', label: 'Avatar' },
   { id: 'filming', label: 'Filming' },
-  // MOTION-LAB: only in a motion lab project.
+  // MOTION-LAB: always shown; in a world project it opens or makes a lab project.
   { id: 'lab', label: 'Lab' },
 ];
 
@@ -169,11 +170,14 @@ export function StudioChrome({
   onStyle,
   filming,
   lab,
+  labProjects,
 }: {
   runtime: RefObject<GenvrRuntime | null>;
   filming: StudioFilming;
-  /** The motion lab of a lab project (MOTION-LAB); absent in other projects, which then have no Lab tab. */
+  /** The motion lab of a lab project (MOTION-LAB); in other projects the Lab tab opens or makes a lab project. */
   lab?: LabController;
+  /** My lab projects, for the Lab tab of a world project. */
+  labProjects?: LabProjects;
   /** The place being built (the assistant works on it). */
   placeId: string;
   /** Devices the place is made for (P9-15); the device preview marks the others. */
@@ -286,7 +290,7 @@ export function StudioChrome({
   useEffect(() => { host.characterLook?.(recipeLook(character.recipe)); }, [character.recipe, host.characterLook]);
   const characterWorkspace = tab === 'avatar' && !testing;
   // The Lab draws its own stage too (MOTION-LAB): the world rests meanwhile.
-  const labWorkspace = tab === 'lab' && Boolean(lab) && !testing;
+  const labWorkspace = tab === 'lab' && !testing;
   useEffect(() => {
     if (!characterWorkspace && !labWorkspace) return;
     runtime.current?.setPaused(true);
@@ -305,6 +309,7 @@ export function StudioChrome({
     if (filmWorkspace && id === 'properties') return <VideoSceneInspector filming={filming} />;
     if (tab === 'avatar' && id === 'properties') return <CharacterMoves editor={character} />;
     if (tab === 'lab' && lab) { if (id === 'properties') return <LabRight lab={lab} />; if (id === 'tab') return <LabLeft lab={lab} />; }
+    if (tab === 'lab' && !lab && (id === 'properties' || id === 'tab')) return <p className="p-3 text-xs text-ink/50">Open or make a motion lab in the middle.</p>;
     // The scroll story is a Filming workspace (SCROLL-03): it is camera work, like filming.
     if (id === 'tab' && tab === 'filming' && filming.studio.workspace === 'story')
       return <StoryPanel runtime={runtime} status={status} placeId={placeId} filming={filming} />;
@@ -446,13 +451,13 @@ export function StudioChrome({
             aria-label="Workspace mode"
             className="flex shrink-0 gap-1 rounded-xl bg-paper p-1"
           >
-            {TABS.filter((entry) => entry.id !== 'lab' || lab).map((entry) => (
+            {TABS.map((entry) => (
               <button
                 key={entry.id}
                 type="button"
                 role="tab"
                 aria-selected={tab === entry.id}
-                onClick={() => { if(entry.id === 'filming'){ filming.studio.setWorkspace('shoot'); filming.studio.setPreviewing(false); runtime.current?.setTool(null); } onTab(entry.id); }}
+                onClick={() => { if (entry.id === 'lab' && !lab && labProjects) { void labProjects.openMine().catch(() => onTab('lab')); return; } if(entry.id === 'filming'){ filming.studio.setWorkspace('shoot'); filming.studio.setPreviewing(false); runtime.current?.setTool(null); } onTab(entry.id); }}
                 className={`rounded-lg px-3 py-1.5 text-xs font-bold ${tab === entry.id ? 'bg-surface text-ink shadow' : 'text-ink/60 hover:text-ink'}`}
               >
                 {entry.label}
@@ -629,7 +634,7 @@ export function StudioChrome({
             className="ml-1 inline-flex items-center gap-1.5 rounded-lg bg-brand px-3 py-1.5 text-xs font-bold text-on-brand"
           >
             {testing ? <Square className="size-4" aria-hidden /> : <Play className="size-4" aria-hidden />}
-            {filmWorkspace ? (filming.studio.filmPlaying ? 'Pause film' : 'Play film') : labWorkspace ? 'Run lab' : tab === 'avatar' && host.avatarLive ? 'Preview avatar' : testing ? 'Stop test' : 'Test world'}
+            {filmWorkspace ? (filming.studio.filmPlaying ? 'Pause film' : 'Play film') : labWorkspace && lab ? 'Run lab' : tab === 'avatar' && host.avatarLive ? 'Preview avatar' : testing ? 'Stop test' : 'Test world'}
           </button>
         </div>
       </header>
@@ -659,6 +664,7 @@ export function StudioChrome({
           <div className="h-48 shrink-0 border-t border-ink/10"><LabRunStrip lab={lab} /></div>
         </div>
       ) : null}
+      {labWorkspace && !lab ? <div style={{ gridArea: 'viewport' }} className="relative z-20 min-h-0 min-w-0"><LabPicker projects={labProjects} /></div> : null}
 
       {characterWorkspace ? (
         <div style={{ gridArea: 'viewport' }} className="relative z-20 min-h-0 min-w-0">
