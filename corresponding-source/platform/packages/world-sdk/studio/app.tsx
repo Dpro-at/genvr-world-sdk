@@ -218,10 +218,15 @@ function Editor({ initial, storage, options, leave, openOther, beforeClose }: { 
     avatar: async () => project.current.avatarBodies?.self ?? await library.assignment(initial.id, 'self'),
     body: async id => (await userAvatars.look(id)).body,
     // Board M20: My motions (private on this device, e.g. Mixamo) for the Lab; a pack name comes before "__" in the file name.
-    motions: async () => (await library.list()).filter(row => row.kind === 'motion').map(row => {
-      const [pack, motion] = row.originalFile.replace(/\.(fbx|glb)$/i, '').includes('__') ? row.originalFile.replace(/\.(fbx|glb)$/i, '').split('__') as [string, string] : ['Imported', row.name];
-      return { id: row.id, name: motion || row.name, pack, seconds: row.duration ?? null };
-    }),
+    motions: async () => [
+      ...(await library.list()).filter(row => row.kind === 'motion').map(row => {
+        const [pack, motion] = row.originalFile.replace(/\.(fbx|glb)$/i, '').includes('__') ? row.originalFile.replace(/\.(fbx|glb)$/i, '').split('__') as [string, string] : ['Imported', row.name];
+        return { id: row.id, name: motion || row.name, pack, seconds: row.duration ?? null, kind: 'file' as const };
+      }),
+      // Our private motion library (our keys), by its category.
+      ...avatarMotionEntries().filter(entry => entry.motion).map(entry => ({ id: entry.id, name: entry.name, pack: `Library · ${entry.category}`, seconds: null, kind: 'library' as const })),
+    ],
+    libraryMotion: async id => { const entry = avatarMotionEntries().find(row => row.id === id); if (!entry?.motion) throw new Error('That motion is not in the motion library.'); return entry.motion(); },
     motionData: async id => { const asset = await library.get(id); if (!asset || asset.metadata.kind !== 'motion') throw new Error('That motion is no longer in My motions.'); return asset.data; },
     ...(library.subscribe ? { subscribe: (listener: () => void) => library.subscribe!(listener) } : {}),
   } : null), [lab]);

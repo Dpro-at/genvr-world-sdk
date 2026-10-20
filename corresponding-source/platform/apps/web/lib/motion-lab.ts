@@ -43,7 +43,7 @@ import {
 } from '@genvr/contracts';
 import {
   courseFromSeed, defaultLabCourse, labGroundMove, labHoldPins, labKeyRows, labLimbMove, labLimbPositions, labMadeMotionPace, labMirror, labPoseAt,
-  labPoseLimit, labPoseProblems, labPoseRow as labRowOf, labRowKeys, labAsk, labStandPose, labTPose, runAllStations, runStation, checkAllMoves, checkMove as checkOneMove, rankCells, sampleImportedMotion, sampleMoves, DEFAULT_LOOK, type SampledMove, scoreLabRun, simulateLabRun, LAB_GROUND_MOVES, LAB_POSE_KEYS, LAB_RUNNABLE_STATIONS, STATION_REFERENCE_HIP,
+  labPoseLimit, labPoseProblems, labPoseRow as labRowOf, labRowKeys, labAsk, labStandPose, labTPose, runAllStations, runStation, checkAllMoves, checkMove as checkOneMove, rankCells, sampleBakedMotion, sampleImportedMotion, sampleMoves, type BakedMotion, DEFAULT_LOOK, type SampledMove, scoreLabRun, simulateLabRun, LAB_GROUND_MOVES, LAB_POSE_KEYS, LAB_RUNNABLE_STATIONS, STATION_REFERENCE_HIP,
   type LabFrame, type LabGroundMove, type LabPose, type LabPoseSide, type LabRunResult, type StationReportRow,
 } from '@genvr/runtime';
 import { madeEntry, type MadeMotionStore } from './made-moves';
@@ -153,14 +153,21 @@ export interface LabCharacterSource {
   /** Board M20: motions the person imported (My motions, private on this device) and one's motion-only GLB. */
   motions?(): Promise<LabMine[]>;
   motionData?(id: string): Promise<ArrayBuffer>;
+  /** Our private motion library (our keys made from the owner's downloads): one motion by its library id. */
+  libraryMotion?(id: string): Promise<BakedMotion>;
   subscribe?(listener: () => void): () => void;
 }
 /** A private imported motion (for example from Mixamo): known to the Lab by its library id only; the file stays on the device. */
-export interface LabMine { id: string; name: string; pack: string; seconds: number | null }
+export interface LabMine { id: string; name: string; pack: string; seconds: number | null; /** `library`: our private motion library (our keys); else an imported file. */ kind?: 'file' | 'library' }
 /** What trying a private motion measured: its cells per style (kept in memory only) and the pace its feet give. */
 export interface LabMineCheck { key: string; cells: Partial<Record<MotionStyleId, MotionCheckCell>>; pace: { speed: number; stride: number }; sampled: SampledMove }
-/** The short name a private motion has in the Lab (in Move lists and runs): "mine:" + the first 12 letters of its hash. */
-export const mineKey = (id: string) => `mine:${id.split('.')[2]?.slice(0, 12) ?? id.slice(-12)}`;
+/** Twelve hex letters from a text (two FNV-1a hashes): a library motion's id stays out of saved projects. */
+const hex12 = (text: string) => [0x811c9dc5, 0x01000193].map((seed) => { let h = seed >>> 0; for (const c of text) h = Math.imul(h ^ c.charCodeAt(0), 0x01000193) >>> 0; return h.toString(16).padStart(8, '0'); }).join('').slice(0, 12);
+/**
+ * The short name a private motion has in the Lab (in Move lists and runs): "mine:" + 12 hex letters, the first of an
+ * imported file's hash, or a hash of a library motion's id (board M20).
+ */
+export const mineKey = (id: string) => `mine:${id.startsWith('motion:') ? hex12(id) : id.split('.')[2]?.slice(0, 12) ?? id.slice(-12)}`;
 /** The lab robot's hip height (m, its LeftUpLeg joint), the scale every other character's stride is measured against. */
 export const LAB_ROBOT_LEG = 0.84;
 const ROBOT: LabCharacter = { id: LAB_CHARACTER, name: 'Standard robot', source: 'lab', leg: LAB_ROBOT_LEG };
@@ -364,10 +371,17 @@ export class LabController {
     if (!mine || !this.#source?.motionData) throw new Error(`No private motion "${key}". Ask mine_list for the motions.`);
     return this.#source.motionData(mine.id);
   }
+  /** A library motion's own keys (for the check; the view plays it from the library by its id). */
+  async mineMotion(key: string): Promise<BakedMotion> {
+    const mine = this.mineByKey(key);
+    if (!mine || mine.kind !== 'library' || !this.#source?.libraryMotion) throw new Error(`No library motion "${key}". Ask mine_list for the motions.`);
+    return this.#source.libraryMotion(mine.id);
+  }
   /** Plays a private motion on the robot at the fixed step and checks it in a style; the result stays in memory only. */
   async tryMine(key: string, style: MotionStyleId = this.#view.check.style): Promise<LabMineCheck> {
     const known = this.#mineChecks.get(key);
-    const sampled = known?.sampled ?? await sampleImportedMotion(this.#checkLook(), key, await this.mineData(key));
+    const library = this.mineByKey(key)?.kind === 'library';
+    const sampled = known?.sampled ?? (library ? sampleBakedMotion(this.#checkLook(), key, await this.mineMotion(key)) : await sampleImportedMotion(this.#checkLook(), key, await this.mineData(key)));
     const cell = known?.cells[style] ?? checkOneMove({ ...sampled, style }, this.#data.styles[style].limits);
     // The pace its planted feet give (0 for a motion in place); the stride follows the speed.
     const speed = Math.hypot(...sampled.velocity);
@@ -1049,7 +1063,7 @@ export async function runMotionLab(lab: LabController | null, input: unknown, by
     case 'check_report': { if (!lab.data.check) throw new Error('No check yet. Use check_all first.'); return { at: lab.data.check.at, body: lab.data.check.body, cells: lab.checkReport(op.style, op.limit) }; }
     case 'compare': { const result = await lab.compare(op.ours, op.ref, op.style, op.place); return { ...result, private_reference: true, shown: op.place }; }
     case 'check_move': { if (op.move.startsWith('mine:')) { const tried = await lab.tryMine(op.move, op.style); return { ...tried.cells[op.style], pace: tried.pace, private: true }; } return lab.checkMove(op.move, op.style); }
-    case 'mine_list': { const list = lab.privateMotions(op.query, op.pack); return { total: list.length, private: true, motions: list.slice(0, op.limit).map((m) => ({ key: mineKey(m.id), name: m.name, pack: m.pack, seconds: m.seconds })) }; }
+    case 'mine_list': { const list = lab.privateMotions(op.query, op.pack); return { total: list.length, private: true, motions: list.slice(0, op.limit).map((m) => ({ key: mineKey(m.id), name: m.name, pack: m.pack, seconds: m.seconds, kind: m.kind ?? 'file' })) }; }
     case 'style_params': return { styles: lab.styleParams(op.style), pending: lab.data.style_pending };
     case 'style_set': return lab.setStyle(op.style, { params: op.params, limits: op.limits }, by);
     case 'style_confirm': return lab.confirmPendingStyle(by);

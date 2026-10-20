@@ -129,7 +129,10 @@ export function LabStage({ lab }: { lab: LabController }) {
   useEffect(() => {
     if (!ready || !wanted || !stage.current) return;
     let live = true;
-    void lab.mineData(wanted).then((data) => stage.current?.importAvatarMotion(wanted, data)).then(() => { if (live) setImported((s) => new Set([...s, wanted])); }).catch(() => undefined);
+    // A library motion (our keys) loads from the motion library; an imported file is retargeted here.
+    const mine = lab.mineByKey(wanted);
+    const load = mine?.kind === 'library' ? stage.current.loadLibraryMotion(mine.id, wanted) : lab.mineData(wanted).then((data) => stage.current?.importAvatarMotion(wanted, data));
+    void load.then((ok) => { if (live && ok !== false) setImported((s) => new Set([...s, wanted])); }).catch(() => undefined);
     return () => { live = false; };
   }, [ready, wanted, lab, shown]);
   // Board M20 · Compare: the reference plays on a see-through body beside ours or over it, on the same clock.

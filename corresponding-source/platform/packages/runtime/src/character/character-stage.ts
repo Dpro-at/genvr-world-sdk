@@ -105,6 +105,8 @@ export interface CharacterStage {
   setMouth(shape: import('@genvr/contracts').MouthShape): void;
   presentExpression(expression: AvatarExpression): boolean;
   importAvatarMotion(id: string, data: ArrayBuffer): Promise<boolean>;
+  /** Board M20: a motion of the registered motion library (`id`), ready to play under another name (`as`, the Lab's key). */
+  loadLibraryMotion(id: string, as: string): Promise<boolean>;
   setPaused(paused: boolean): void;
   /** Shows the playing clip at this time (seconds, looped): a host that drives the clock (the motion lab) pauses the stage and calls this every frame. */
   setClipTime(seconds: number): void;
@@ -864,6 +866,11 @@ export async function createCharacterStage({
     presentAnimation,
     setMouth(shape) { avatar.setMouth(shape); },
     presentExpression(expression) { if (expression !== 'neutral' && !avatar.expressionSupported) return false; currentExpression = expression; avatar.setExpression(expression); emit(); return true; },
+    async loadLibraryMotion(id, as) {
+      const result = await resolveAvatarLibraryMotion(avatar.root, id);
+      if (!result) return false;
+      result.clip.name = as; clips = [...clips.filter(row => row.name !== as), result.clip]; emit(); return true;
+    },
     async importAvatarMotion(id, data) {
       const clip = await retargetAvatarMotion(data, avatar, id); clips = [...clips.filter(row => row.name !== id), clip]; emit(); return true;
     },

@@ -1,8 +1,10 @@
 import { AnimationMixer, LoopRepeat, Quaternion, Vector3, type AnimationClip, type Bone } from 'three/webgpu';
 import { CORE_ANIMATIONS } from '@genvr/core-library';
 import { DEFAULT_MOTION_STYLES, LAB_STEP, type MotionCheckCell, type MotionStyleId } from '@genvr/contracts';
-import { createGenvrAvatar, DEFAULT_LOOK, type AvatarLook, type GenvrAvatar } from '../avatar.js';
+import type { AvatarBody } from '@genvr/core-library';
+import { createGenvrAvatar, DEFAULT_LOOK, fixedClip, type AvatarLook, type GenvrAvatar } from '../avatar.js';
 import { retargetAvatarMotion } from '../avatar-motion.js';
+import { bakedAnimation, type BakedMotion } from '../avatar-motion-bake.js';
 import { checkMove, PLANT_HEIGHT, rankCells, type CheckFrame, type CheckLimb, type Vec3 } from './motion-check.js';
 import { LAB_GROUND_MOVES } from './sim.js';
 
@@ -104,6 +106,15 @@ export async function sampleImportedMotion(look: AvatarLook, name: string, data:
   const avatar = createGenvrAvatar(look);
   try { return recordClip(avatar, look, name, await retargetAvatarMotion(data, avatar, name), loop, step); }
   finally { avatar.dispose(); }
+}
+
+/** A motion of our own motion library (our keys, `bakeMotion`) on the body, through our clip pipeline like a Core move. */
+export function sampleBakedMotion(look: AvatarLook, name: string, motion: BakedMotion, step = LAB_STEP): SampledMove {
+  const avatar = createGenvrAvatar(look);
+  try {
+    const body = avatar.mesh.userData.fittedBody as AvatarBody;
+    return recordClip(avatar, look, name, fixedClip(bakedAnimation(motion, name), body), motion.kind === 'loop', step);
+  } finally { avatar.dispose(); }
 }
 
 /** Check all moves on one body in the chosen styles; the ranked list puts the worst first. */

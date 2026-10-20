@@ -81,3 +81,28 @@ describe('board M20 P2 · Compare our move with a private reference', () => {
     await expect(runMotionLab(lab, { kind: 'compare', ours: 'Walk', ref: 'Swing Walk' } as never, agent)).rejects.toThrow();
   }, 60000);
 });
+
+describe('board M20 · our private motion library in the Lab', () => {
+  it('lists library motions by a hashed key; checks, runs and compares them; saves only the key', async () => {
+    const { GLTFLoader } = await import('three/examples/jsm/loaders/GLTFLoader.js');
+    const { bakeMotion } = await import('@genvr/runtime');
+    const gltf = await new GLTFLoader().parseAsync(motionGlb('mixamorig:', 25), '');
+    const baked = bakeMotion(gltf.scene, gltf.animations[0]!, { slug: 'samba-dancing', name: 'Samba Dancing', category: 'Dance', source: 'Dance Pack' });
+    const saved: LabProjectData[] = [];
+    const lab = new LabController(newLabData(), (d) => saved.push(d));
+    lab.setCharacterSource({ ...source(), motions: async () => [{ id: 'motion:samba-dancing', name: 'Samba Dancing', pack: 'Library · Dance', seconds: null, kind: 'library' }], libraryMotion: async () => baked });
+    await lab.refreshCharacters();
+    const key = mineKey('motion:samba-dancing');
+    expect(key).toMatch(/^mine:[0-9a-f]{12}$/);
+    expect(mineKey('motion:samba-dancing')).toBe(key);
+    const list = await runMotionLab(lab, { kind: 'mine_list', query: 'samba' }, agent) as { motions: Array<{ key: string; kind: string }> };
+    expect(list.motions).toEqual([expect.objectContaining({ key, kind: 'library' })]);
+    const card = await runMotionLab(lab, { kind: 'check_move', move: key }, agent) as { move: string; score: number; private: boolean };
+    expect(card).toMatchObject({ move: key, private: true });
+    await runMotionLab(lab, { kind: 'run', settings: { motion: key } }, agent);
+    await runMotionLab(lab, { kind: 'compare', ours: 'Walk', ref: key }, agent);
+    const text = JSON.stringify(saved.at(-1));
+    expect(text).toContain(key);
+    for (const secret of ['samba', 'Samba', 'motion:', 'Dance Pack']) expect(text).not.toContain(secret);
+  }, 120000);
+});
