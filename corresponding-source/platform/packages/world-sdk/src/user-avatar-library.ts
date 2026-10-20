@@ -16,6 +16,8 @@ export const UserAvatarMetadata = z.object({
   height: z.number().min(.3).max(4).optional(),
   joints: z.array(z.object({ name: z.string().min(1).max(64), parent: z.string().nullable(), at: z.tuple([z.number(), z.number(), z.number()]) })).max(128).optional(),
   duration: z.number().positive().max(120).optional(),
+  /** Set when the import turned A-pose arms out to the T-pose the native clips start from. */
+  restPose: z.literal('t-from-a').optional(),
 }).strict();
 export type UserAvatarMetadata = z.infer<typeof UserAvatarMetadata>;
 export interface UserAvatarAsset { metadata: UserAvatarMetadata; data: ArrayBuffer; }

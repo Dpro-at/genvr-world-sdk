@@ -1,4 +1,4 @@
-import { AnimationClip, Bone, Box3, BufferAttribute, BufferGeometry, Group, LoadingManager, Matrix4, MeshStandardMaterial, Skeleton, SkinnedMesh, Vector3, type Material, type Object3D } from 'three';
+import { AnimationClip, Bone, Box3, BufferAttribute, BufferGeometry, Group, LoadingManager, Matrix4, MeshStandardMaterial, Quaternion, Skeleton, SkinnedMesh, Vector3, type Material, type Object3D } from 'three';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { GLTFExporter } from 'three/examples/jsm/exporters/GLTFExporter.js';
@@ -53,8 +53,33 @@ async function readScene(file: File, companions: readonly File[]): Promise<{ roo
   } catch (error) { release(); throw error; }
 }
 
+/** Native clips start from a T-pose. Arms hanging clearly below the shoulder line (an A-pose bind) are turned
+ * straight out before the bind is baked; arms already near T are left exactly as they are. */
+function straightenArms(byName: Map<string, Bone>): 't-from-a' | undefined {
+  const at = (bone: Bone) => bone.getWorldPosition(new Vector3());
+  let changed = false;
+  for (const side of ['Left', 'Right']) {
+    const arm = byName.get(side + 'Arm')!, fore = byName.get(side + 'ForeArm')!, hand = byName.get(side + 'Hand')!;
+    const out = at(arm).sub(at(byName.get('Neck')!)); out.y = 0;
+    if (out.lengthSq() < 1e-12) continue;
+    out.normalize();
+    const upper = at(fore).sub(at(arm));
+    if (upper.lengthSq() < 1e-12 || Math.asin(Math.min(1, -upper.normalize().y)) < 25 * Math.PI / 180) continue;
+    for (const [bone, child] of [[arm, fore], [fore, hand]] as const) {
+      const dir = at(child).sub(at(bone));
+      if (dir.lengthSq() < 1e-12) continue;
+      const turn = new Quaternion().setFromUnitVectors(dir.normalize(), out);
+      const parent = bone.parent ? bone.parent.getWorldQuaternion(new Quaternion()) : new Quaternion();
+      bone.quaternion.copy(parent.invert().multiply(turn.multiply(bone.getWorldQuaternion(new Quaternion()))));
+      bone.updateMatrixWorld(true);
+    }
+    changed = true;
+  }
+  return changed ? 't-from-a' : undefined;
+}
+
 /** Canonical world-aligned bind axes let native clips and imported motion share the existing runtime. */
-export function canonicalCharacter(root: Group): { root: Group; joints: NonNullable<UserAvatarMetadata['joints']>; height: number } {
+export function canonicalCharacter(root: Group): { root: Group; joints: NonNullable<UserAvatarMetadata['joints']>; height: number; restPose?: 't-from-a' } {
   const meshes: SkinnedMesh[] = [];
   root.traverse(node => { if ((node as SkinnedMesh).isSkinnedMesh) meshes.push(node as SkinnedMesh); });
   if (!meshes.length) throw new Error('No rigged character found. Download With Skin.');
@@ -75,6 +100,8 @@ export function canonicalCharacter(root: Group): { root: Group; joints: NonNulla
     byName.set(name, bone); source.push(bone);
   });
   if (source.length > 128 || required.some(name => !byName.has(name))) throw new Error('Character needs a standard humanoid skeleton with no more than 128 joints.');
+  const restPose = straightenArms(byName);
+  root.updateMatrixWorld(true);
   const bounds = new Box3().makeEmpty(), point = new Vector3();
   for (const mesh of meshes) {
     mesh.skeleton.update();
@@ -136,7 +163,7 @@ export function canonicalCharacter(root: Group): { root: Group; joints: NonNulla
   for (const part of geometries) part.dispose();
   for (const group of groups) geometry.addGroup(group.start, group.count, group.material);
   const character = new SkinnedMesh(geometry, materials); character.name = 'ImportedCharacter'; character.add(bones[0]!); character.updateMatrixWorld(true); character.bind(new Skeleton(bones), new Matrix4());
-  const out = new Group(); out.add(character); return { root: out, joints, height };
+  const out = new Group(); out.add(character); return { root: out, joints, height, ...(restPose ? { restPose } : {}) };
 }
 
 async function glb(root: Group, clips: AnimationClip[] = []): Promise<ArrayBuffer> {
@@ -174,7 +201,7 @@ export async function importUserAvatar(file: File, mode: 'character' | 'motion',
     let hasMesh = false; parsed.root.traverse(node => { if ((node as SkinnedMesh).isSkinnedMesh) hasMesh = true; });
     if (mode === 'character' && hasMesh) {
       const character = canonicalCharacter(parsed.root);
-      await add('character', nameOf(file.name), await glb(character.root), { joints: character.joints, height: character.height });
+      await add('character', nameOf(file.name), await glb(character.root), { joints: character.joints, height: character.height, ...(character.restPose ? { restPose: character.restPose } : {}) });
     } else if (!result.length) throw new Error('No rigged character or skeletal animation found in this file.');
     return result;
   } finally {
