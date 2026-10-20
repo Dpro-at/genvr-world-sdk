@@ -132,7 +132,7 @@ export type LabScore = z.infer<typeof LabScore>;
 
 export const LabEventKind = z.enum(['start', 'step', 'ramp', 'gap_jump', 'land', 'vault', 'window', 'wait', 'crossing', 'car_near', 'car_hit', 'fall', 'slide', 'blocked', 'finish',
   // Board M18 · stations.
-  'take_off', 'foul', 'grab', 'drop', 'place', 'swing_hit', 'water_in', 'float', 'stroke', 'ladder', 'bar_touch']);
+  'take_off', 'foul', 'grab', 'drop', 'place', 'miss', 'swing_hit', 'self_hit', 'water_in', 'float', 'stroke', 'ladder', 'bar_touch']);
 export const LabEvent = z.object({ t: z.number().min(0), kind: LabEventKind, label: z.string().max(120), obstacle: labId.optional(), station: labId.optional() }).strict();
 export type LabEvent = z.infer<typeof LabEvent>;
 

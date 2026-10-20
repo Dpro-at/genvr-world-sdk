@@ -23,7 +23,7 @@ import {
   Vector3,
   type Material,
 } from 'three';
-import { DEFAULT_CHARACTER_RECIPE, type LabCourse, type LabObstacle, type LabStation } from '@genvr/contracts';
+import { DEFAULT_CHARACTER_RECIPE, type LabCourse, type LabObstacle, type LabProp, type LabStation } from '@genvr/contracts';
 import { CORE_ANIMATIONS } from '@genvr/core-library';
 import { carBoxes, courseBoxes, fittedHeight, graspObjects, labClipPose, labMadeMotionPace, labPoseAt, laneCentreZ, stationParts, stationToWorld, LAB_CAR_SIZE, STATION_REFERENCE_HIP, walkerGreen, type LabFrame, type LabRunResult, type StationPart, type StationRunResult } from '@genvr/runtime';
 import type { CharacterStage } from '@genvr/runtime/character';
@@ -151,6 +151,9 @@ class LabWorld {
   #cars = new Group();
   /** Board M18: objects on stations, moved along a station run's object tracks. */
   #props = new Group();
+  /** Objects a station run brings itself (the conveyor's), made once per run. */
+  #spawned = new Group();
+  #spawnedFor: StationRunResult | null = null;
   #marks = new Group();
   #light: Mesh[] = [];
   #red = new Mesh(new SphereGeometry(0.11, 12, 10), new MeshBasicMaterial({ color: 0xe5484d }));
@@ -162,7 +165,7 @@ class LabWorld {
   #key = '';
 
   constructor() {
-    this.root.add(this.#course, this.#cars, this.#marks, this.#props);
+    this.root.add(this.#course, this.#cars, this.#marks, this.#props, this.#spawned);
     const dot = (color: number) => { const m = new Mesh(new CylinderGeometry(0.07, 0.07, 0.01, 20), new MeshBasicMaterial({ color })); this.#marks.add(m); return m; };
     this.#feet = [dot(0x3dd68c), dot(0x3dd68c)];
     this.#balance = new Mesh(new BoxGeometry(0.12, 0.012, 0.12), new MeshBasicMaterial({ color: 0xf5b942 }));
@@ -232,10 +235,8 @@ class LabWorld {
     for (const prop of course.props) {
       const station = course.stations.find((s) => s.id === prop.on);
       if (!station || station.hidden) continue;
-      const mesh = prop.shape === 'sphere' ? new Mesh(unitSphere(), material(PROP)) : prop.shape === 'cylinder' ? new Mesh(unitCylinder(), material(PROP)) : new Mesh(unitBox ??= new BoxGeometry(1, 1, 1), material(prop.material === 'wood' ? 0xa97c50 : prop.material === 'card' ? 0xc8a46e : PROP));
-      mesh.scale.set(...prop.size_m);
+      const mesh = propMesh(prop);
       mesh.rotation.y = (station.turn * Math.PI) / 180;
-      mesh.castShadow = true;
       mesh.name = prop.id;
       this.#props.add(mesh);
     }
@@ -283,9 +284,13 @@ class LabWorld {
     const station = result && 'heading' in result ? result as StationRunResult : null, h = ((station?.heading ?? 0) * Math.PI) / 180;
     this.root.rotation.y = -h;
     this.root.position.set(-(f.x * Math.cos(h) - f.z * Math.sin(h)), -f.y, -(f.x * Math.sin(h) + f.z * Math.cos(h)));
+    if (station !== this.#spawnedFor) {
+      this.#spawned.clear(); this.#spawnedFor = station;
+      for (const prop of station?.spawned ?? []) { const mesh = propMesh(prop); mesh.name = prop.id; this.#spawned.add(mesh); }
+    }
     if (station?.objects.length) {
       const i = Math.max(0, Math.min(station.frames.length - 1, Math.round(t * 60)));
-      for (const track of station.objects) { const at = track.at[Math.min(i, track.at.length - 1)]; if (at) this.#props.getObjectByName(track.id)?.position.set(...at); }
+      for (const track of station.objects) { const at = track.at[Math.min(i, track.at.length - 1)]; if (at) (this.#props.getObjectByName(track.id) ?? this.#spawned.getObjectByName(track.id))?.position.set(...at); }
     } else this.#restProps(course, STATION_REFERENCE_HIP * legScale);
     const feetOn = overlays.includes('feet');
     f.feet.forEach((foot, i) => {
@@ -400,6 +405,14 @@ let sphere: SphereGeometry | null = null, cylinder: CylinderGeometry | null = nu
 const unitSphere = () => (sphere ??= new SphereGeometry(0.5, 18, 12));
 const unitCylinder = () => (cylinder ??= new CylinderGeometry(0.5, 0.5, 1, 18));
 const waterMaterial = () => (water ??= new MeshStandardMaterial({ color: SURFACE.water, transparent: true, opacity: 0.55, roughness: 0.2, depthWrite: false }));
+/** An object's shape and colour by what it is made of. */
+function propMesh(prop: LabProp): Mesh {
+  const color = prop.material === 'wood' ? 0xa97c50 : prop.material === 'card' ? 0xc8a46e : prop.material === 'metal' ? 0x9ca3af : PROP;
+  const mesh = new Mesh(prop.shape === 'sphere' ? unitSphere() : prop.shape === 'cylinder' ? unitCylinder() : (unitBox ??= new BoxGeometry(1, 1, 1)), material(color));
+  mesh.scale.set(...prop.size_m);
+  mesh.castShadow = true;
+  return mesh;
+}
 const STATION_NAMES: Record<LabStation['kind'], string> = { jump_pit: 'Jump pit', high_bar: 'High bar', hurdles: 'Hurdles', pool: 'Pool', climb_wall: 'Climbing wall', ladder: 'Ladder',
   grasp_table: 'Grasp table', conveyor: 'Conveyor', tool_bench: 'Tool bench', weapon_rack: 'Weapons rack', target_post: 'Target post' };
 /** A station's name and main sizes, as its label and in the course list. */

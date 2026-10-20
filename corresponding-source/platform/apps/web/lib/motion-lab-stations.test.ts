@@ -36,8 +36,16 @@ describe('board M18 · stations in the Lab and through motion_lab', () => {
     await runMotionLab(lab, { kind: 'station_add', station: { kind: 'conveyor', id: 'belt', x: 6, z: 4 } }, agent);
     expect(await runMotionLab(lab, { kind: 'conveyor_set', id: 'belt', speed_mps: 0.8 }, agent)).toMatchObject({ speed_mps: 0.8 });
     await expect(runMotionLab(lab, { kind: 'conveyor_set', id: 'belt', speed_mps: 2 }, agent)).rejects.toThrow();
-    // Runs on stations without a phase-1 engine are refused with a reason.
-    await expect(runMotionLab(lab, { kind: 'run', station: 'belt' }, agent)).rejects.toThrow('later phase');
+    // Phase 2: the belt and the tool bench run too; stations without an engine yet are refused with a reason.
+    const belt = await runMotionLab(lab, { kind: 'run', station: 'belt' }, agent) as { station_score: { kind: string; values: Record<string, number> } };
+    expect(belt.station_score.kind).toBe('conveyor');
+    expect(belt.station_score.values.objects).toBe(8);
+    await runMotionLab(lab, { kind: 'station_add', station: { kind: 'tool_bench', id: 'bench', x: 10, z: 4 } }, agent);
+    expect(lab.data.course.props.filter((p) => p.on === 'bench').map((p) => p.name)).toEqual(['Hammer', 'Nail board', 'Screwdriver', 'Screw plate', 'Hand saw', 'Plank in clamp', 'Wrench', 'Bolt']);
+    const bench = await runMotionLab(lab, { kind: 'run', station: 'bench' }, agent) as { station_score: { values: Record<string, unknown> } };
+    expect(bench.station_score.values).toMatchObject({ wrench_pulls: 8, other_hand_holds: 'yes' });
+    await runMotionLab(lab, { kind: 'station_add', station: { kind: 'pool', id: 'pool', x: 20, z: 4 } }, agent);
+    await expect(runMotionLab(lab, { kind: 'run', station: 'pool' }, agent)).rejects.toThrow('later phase');
   });
   it('removing needs confirm, like version_delete; the base lab puts all 11 stations in the yard', async () => {
     const lab = new LabController(newLabData());
@@ -51,7 +59,8 @@ describe('board M18 · stations in the Lab and through motion_lab', () => {
     expect(base.stations).toHaveLength(11);
     const inspect = await runMotionLab(lab, { kind: 'inspect' }, agent) as { course: { stations: string[]; objects: number } };
     expect(inspect.course.stations.find((s) => s.startsWith('pool'))).toContain('runs later');
-    expect(inspect.course.objects).toBe(12);
+    // 12 grasp objects + the tool bench's 4 tools and 4 pieces.
+    expect(inspect.course.objects).toBe(20);
     // Ids stay unique across obstacles, stations and objects.
     await expect(runMotionLab(lab, { kind: 'station_add', station: { kind: 'ladder', id: 'pool', z: 1 } }, agent)).rejects.toThrow('share the id');
   });

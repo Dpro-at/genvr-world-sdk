@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { LAB_STATION_KINDS, LabCourse, LabStation, baseLabStations, graspTableProps } from '@genvr/contracts';
+import { LAB_STATION_KINDS, LabCourse, LabStation, baseLabStations, graspTableProps, toolBenchProps } from '@genvr/contracts';
 import type { LabFrame } from '../src/lab/sim.js';
 import { fittedHeight, measureLongJump, runGraspTable, runStation, stationParts, stationToWorld, worldToStation, type GraspHand, type Vec3 } from '../src/lab/stations.js';
 
@@ -117,5 +117,46 @@ describe('board M18 · runs on a station', () => {
     const pool = LabCourse.parse({ stations: [LabStation.parse({ kind: 'pool', id: 'pool', z: 0 })] });
     expect(() => runStation(pool, 'pool')).toThrow('later phase');
     expect(() => runStation(pool, 'nope')).toThrow('No station');
+  });
+});
+
+describe('board M18 · phase 2: conveyor and tool bench', () => {
+  const belt = LabStation.parse({ kind: 'conveyor', id: 'belt', z: 0, speed_mps: 0.5, every_s: 2 }) as Extract<LabStation, { kind: 'conveyor' }>;
+  const bench = LabStation.parse({ kind: 'tool_bench', id: 'bench', z: 0 }) as Extract<LabStation, { kind: 'tool_bench' }>;
+  const course = LabCourse.parse({ stations: [belt, bench], props: toolBenchProps('bench') });
+  it('a good hand picks the belt objects in time and tosses them into the bin, feet planted', () => {
+    const { result, score } = runStation(course, 'belt', { jump_timing_ms: 0 });
+    const v = result.stationScore.values;
+    expect(v).toMatchObject({ objects: 8, steps: 0 });
+    expect(v.picked as number).toBeGreaterThanOrEqual(6);
+    expect(v.in_bin as number).toBeGreaterThanOrEqual(5);
+    expect(Math.abs(v.timing_ms as number)).toBeLessThan(60);
+    expect(result.spawned).toHaveLength(8);
+    expect(result.objects.every(o => o.at.length === result.frames.length)).toBe(true);
+    expect(score.foot_slide_cm).toBe(0);
+    expect(runStation(course, 'belt', { jump_timing_ms: 0 }).result.stationScore).toEqual(result.stationScore);
+  });
+  it('objects nobody picks ride to the belt end and fall into the bin', () => {
+    const { result } = runStation(course, 'belt', { jump_timing_ms: 300 });
+    const v = result.stationScore.values;
+    expect(v).toMatchObject({ picked: 0, missed: 8, reached_end: 8 });
+    const binX = stationToWorld(belt, [belt.length / 2 + 0.35, 0, 0])[0];
+    for (const track of result.objects) expect(track.at.at(-1)![0]).toBeCloseTo(binX, 6);
+    expect(result.events.filter(e => e.kind === 'miss')).toHaveLength(8);
+  });
+  it('tool bench: hammer hits on the nail head are counted; a faster swing is less accurate', () => {
+    const slow = runStation(course, 'bench', { speed: 0.8 }).result, fast = runStation(course, 'bench', { speed: 7 }).result;
+    const s = slow.stationScore.values, q = fast.stationScore.values;
+    expect(s.hammer_hits).toBe(slow.events.filter(e => e.kind === 'swing_hit').length);
+    expect(s.hammer_hits as number).toBe(4);
+    expect((q.hammer_hits as number) / (q.hammer_swings as number)).toBeLessThan((s.hammer_hits as number) / (s.hammer_swings as number));
+    // At speed 0.8 a wrist turn is a quarter turn of the screw (half a turn from 1.6 m/s up).
+    expect(s).toMatchObject({ screw_wrist_turns: 24, wrench_pulls: 8, other_hand_holds: 'yes' });
+    expect(q.screw_wrist_turns).toBe(12);
+    expect(s.saw_straightness_cm as number).toBeLessThan(q.saw_straightness_cm as number);
+    // The tools leave their spots and come back.
+    const hammer = slow.objects.find(o => o.id === 'bench-hammer')!;
+    expect(hammer.at.at(-1)).toEqual(hammer.at[0]);
+    expect(Math.max(...hammer.at.map(p => p[1]))).toBeGreaterThan(hammer.at[0]![1] + 0.1);
   });
 });

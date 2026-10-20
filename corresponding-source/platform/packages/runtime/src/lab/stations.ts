@@ -1,6 +1,7 @@
-import { LabCourse, LabRunSettings, type LabEvent, type LabProp, type LabScore, type LabStation, type LabStationScore } from '@genvr/contracts';
+import { LabCourse, LabProp, LabRunSettings, type LabEvent, type LabScore, type LabStation, type LabStationScore } from '@genvr/contracts';
 import type { LabFrame, LabFoot, LabRunResult } from './sim.js';
 import { LAB_SCORE_WEIGHTS, scoreLabRun } from './score.js';
+import { labRandom } from './course.js';
 
 /**
  * Board M18 · training stations in the engine: each station as boxes (what the Lab draws and what a run stands on) and
@@ -198,6 +199,8 @@ export interface StationRunResult extends LabRunResult {
   heading: number;
   stationScore: LabStationScore;
   objects: Array<{ id: string; at: Vec3[] }>;
+  /** Objects the run brings itself (the conveyor's), drawn while it plays. */
+  spawned: LabProp[];
 }
 const foot = (x: number, y: number, z: number, planted: boolean): LabFoot => ({ x, y, z, planted });
 /** Station-local frame → course frame. */
@@ -250,7 +253,7 @@ export function simulateJumpPit(station: Extract<LabStation, { kind: 'jump_pit' 
   }
   events.push({ t, kind: 'finish', label: 'finish', station: station.id });
   const placed = frames.map(f => placeFrame(station, f)), measured = measureLongJump(station, placed);
-  return { frames: placed, events, settings, seed, end: 'finish', station: station.id, heading: station.turn, objects: [],
+  return { frames: placed, events, settings, seed, end: 'finish', station: station.id, heading: station.turn, objects: [], spawned: [],
     stationScore: { kind: 'jump_pit', values: { distance_m: measured.distance_m, foul_cm: measured.foul_cm, take_off_speed: measured.take_off_speed, steps: measured.steps, landing: measured.landing } } };
 }
 
@@ -307,18 +310,20 @@ export function simulateGraspTable(station: GraspTable, props: readonly LabProp[
   const run = runGraspTable(station, props, hand, hipHeight), events: LabEvent[] = [{ t: 0, kind: 'start', label: 'start', station: station.id }];
   for (const event of run.events) events.push({ t: event.t, kind: event.kind, label: `${event.kind} ${event.prop}${event.kind === 'grab' && event.value !== undefined ? ` (${event.value} cm from it)` : ''}`, station: station.id });
   events.push({ t, kind: 'finish', label: 'finish', station: station.id });
-  return { frames: frames.map(f => placeFrame(station, f)), events, settings, seed, end: 'finish', station: station.id, heading: (station.turn + 180) % 360, objects: run.track,
+  return { frames: frames.map(f => placeFrame(station, f)), events, settings, seed, end: 'finish', station: station.id, heading: (station.turn + 180) % 360, objects: run.track, spawned: [],
     stationScore: { kind: 'grasp_table', values: { objects: mine.length, grabbed: run.score.grabbed, held_without_drop: run.score.held_without_drop, drops: run.score.drops, reach_cm: run.score.reach_cm, place_error_cm: run.score.place_error_cm } } };
 }
 
 /** Stations whose runs are built (phase 1); the others are placed and drawn, their runs come in later phases. */
-export const LAB_RUNNABLE_STATIONS: ReadonlyArray<LabStation['kind']> = ['jump_pit', 'grasp_table'];
+export const LAB_RUNNABLE_STATIONS: ReadonlyArray<LabStation['kind']> = ['jump_pit', 'grasp_table', 'conveyor', 'tool_bench'];
 
 /** How well the station's task went (0–100): a clean jump's distance against 8 m; objects held without a drop, less the place error. */
 export function stationQuality(score: LabStationScore): number {
   const v = score.values, n = (key: string) => (typeof v[key] === 'number' ? v[key] as number : 0);
   if (score.kind === 'jump_pit') return n('foul_cm') > 0 || v.distance_m === null ? 0 : Math.round(Math.min(100, n('distance_m') / 8 * 100));
   if (score.kind === 'grasp_table') return n('objects') ? Math.max(0, Math.round(100 * n('held_without_drop') / n('objects') - Math.min(30, n('place_error_cm')))) : 0;
+  if (score.kind === 'conveyor') return Math.max(0, Math.round(n('picked_pct') - Math.min(20, n('timing_ms') / 10) - 5 * n('dropped')));
+  if (score.kind === 'tool_bench') return Math.max(0, Math.min(100, Math.round(n('quality'))));
   return 0;
 }
 
@@ -327,9 +332,159 @@ export function runStation(course: LabCourse, id: string, input: Partial<LabRunS
   const station = course.stations.find(s => s.id === id);
   if (!station) throw new Error(`No station "${id}". Ask course_get for the ids.`);
   if (!LAB_RUNNABLE_STATIONS.includes(station.kind)) throw new Error(`Runs on the ${station.kind.replace('_', ' ')} come in a later phase; it is placed and drawn now.`);
-  const result = station.kind === 'jump_pit' ? simulateJumpPit(station, input, seed) : simulateGraspTable(station as GraspTable, course.props, input, seed, hipHeight);
+  const result = station.kind === 'jump_pit' ? simulateJumpPit(station, input, seed)
+    : station.kind === 'conveyor' ? simulateConveyor(station, input, seed, hipHeight)
+    : station.kind === 'tool_bench' ? simulateToolBench(station, course.props, input, seed, hipHeight)
+    : simulateGraspTable(station as GraspTable, course.props, input, seed, hipHeight);
   const base = scoreLabRun(LabCourse.parse({ finish_z: 120 }), result), w = LAB_SCORE_WEIGHTS;
   let common = 100 - Math.min(w.slideMax, base.foot_slide_cm * w.slidePerCm) - Math.min(w.penetrationMax, base.penetration_cm * w.penetrationPerCm) - (1 - base.smoothness) * w.roughMax;
   if (base.fell) common = Math.min(common, w.fallCap);
   return { result, score: { ...base, finished: true, total: Math.max(0, Math.round((common + stationQuality(result.stationScore)) / 2)) } };
+}
+
+// ── Phase 2: conveyor and tool bench ────────────────────────────────────────────────────────────────────────────
+
+/** A standing character at a station's stand mark (feet planted, facing the station), one frame per step. */
+function standFrames(z: number, until: number, clip: string): LabFrame[] {
+  return Array.from({ length: Math.max(2, Math.round(until / STEP) + 1) }, (_, i) => ({ t: i * STEP, x: 0, y: 0, z, tilt: 0, com: [0, z - 0.05] as [number, number], speed: 0, clip,
+    feet: [foot(0.12, 0, z, true), foot(-0.12, 0, z, true)] as [LabFoot, LabFoot] }));
+}
+/** A seeded normal value (mean 0, spread 1). */
+function gauss(next: () => number): number { return Math.sqrt(-2 * Math.log(Math.max(1e-9, next()))) * Math.cos(2 * Math.PI * next()); }
+
+/** What the conveyor brings: light objects from the grasp table's set (mixed, or bottles only). */
+const BELT_KINDS: Array<Pick<LabProp, 'name' | 'shape' | 'size_m' | 'mass_kg' | 'grip' | 'material'>> = [
+  { name: 'Cube', shape: 'box', size_m: [0.05, 0.05, 0.05], mass_kg: 0.1, grip: 'pinch', material: 'plastic' },
+  { name: 'Cup', shape: 'cylinder', size_m: [0.08, 0.1, 0.08], mass_kg: 0.3, grip: 'handle', material: 'plastic' },
+  { name: 'Ball', shape: 'sphere', size_m: [0.22, 0.22, 0.22], mass_kg: 0.5, grip: 'power', material: 'plastic' },
+  { name: 'Bottle', shape: 'cylinder', size_m: [0.08, 0.3, 0.08], mass_kg: 1, grip: 'power', material: 'plastic' },
+  { name: 'Box', shape: 'box', size_m: [0.3, 0.3, 0.3], mass_kg: 3, grip: 'power', material: 'card' },
+];
+export const CONVEYOR_RUN_OBJECTS = 8;
+
+/**
+ * Conveyor run (engine v1): objects come every `every_s` at the belt's speed; the character stays on the stand mark.
+ * The hand meets each object in front of it when it is free (0.35 s to reach, 0.9 s to toss and come back), closing
+ * `jump_timing_ms` early (−) or late (+) plus a small seeded spread; a grab more than 5 cm off the object misses, an
+ * edge grab (over 3 cm) of 1 kg or more slips. Picked objects are tossed into the bin; objects nobody picks ride to the
+ * belt's end and fall into the bin.
+ */
+export function simulateConveyor(station: Extract<LabStation, { kind: 'conveyor' }>, input: Partial<LabRunSettings> = {}, seed = 0, hipHeight = STATION_REFERENCE_HIP): StationRunResult {
+  const settings = LabRunSettings.parse(input), next = labRandom(seed ^ 0x5eed), size = hipHeight / STATION_REFERENCE_HIP;
+  const top = fittedHeight(station, hipHeight), half = station.length / 2, beltZ = station.width / 2, standZ = station.width + station.stand_mark;
+  const bin: Vec3 = [half + 0.35, 0.35, beltZ], reachX = Math.sqrt(Math.max(0, (1.07 * size) ** 2 - (standZ - beltZ) ** 2 - (1.4 * size - top) ** 2));
+  const spawned = Array.from({ length: CONVEYOR_RUN_OBJECTS }, (_, i) => { const kind = station.mix ? BELT_KINDS[Math.floor(next() * BELT_KINDS.length)]! : BELT_KINDS[3]!;
+    return LabProp.parse({ ...kind, id: `${station.id}-item-${i + 1}`, on: station.id, at: [-half + 0.1, 0] }); });
+  const enter = spawned.map((_, i) => 1 + i * station.every_s), end = enter.at(-1)! + station.length / station.speed_mps + 1.5;
+  const frames = standFrames(standZ, end, 'Point'), events: LabEvent[] = [{ t: 0, kind: 'start', label: 'start', station: station.id }];
+  type Fate = { picked: number | null; tossed: boolean; dropped: boolean; timing: number | null };
+  const fates: Fate[] = spawned.map(() => ({ picked: null, tossed: false, dropped: false, timing: null }));
+  let free = 0;
+  spawned.forEach((prop, i) => {
+    const x = (t: number) => -half + 0.1 + station.speed_mps * (t - enter[i]!);
+    // Meet it in front (x 0) or, when the hand is still busy, as soon as it is free while the object is in reach.
+    let meet = enter[i]! + (half - 0.1) / station.speed_mps;
+    if (meet - 0.35 < free) meet = free + 0.35;
+    if (x(meet) > reachX || x(meet) > half) { events.push({ t: meet, kind: 'miss', label: `missed ${prop.name.toLowerCase()} (${prop.id}): out of reach before the hand was free`, station: station.id }); return; }
+    const timing = settings.jump_timing_ms + gauss(next) * 15 * (1 + station.speed_mps), off = Math.abs(station.speed_mps * timing / 1000);
+    fates[i]!.timing = Math.round(timing);
+    free = meet + 0.9;
+    if (off > 0.05) { events.push({ t: meet, kind: 'miss', label: `missed ${prop.name.toLowerCase()} by ${Math.round(off * 100)} cm (${Math.round(timing)} ms)`, station: station.id }); return; }
+    fates[i]!.picked = meet + timing / 1000;
+    events.push({ t: fates[i]!.picked!, kind: 'grab', label: `grab ${prop.name.toLowerCase()} (${Math.round(timing)} ms)`, station: station.id });
+    if (off > 0.03 && prop.mass_kg >= 1) { fates[i]!.dropped = true; events.push({ t: fates[i]!.picked! + 0.2, kind: 'drop', label: `dropped ${prop.name.toLowerCase()} (edge grip)`, station: station.id }); return; }
+    fates[i]!.tossed = true;
+    events.push({ t: fates[i]!.picked! + 0.6, kind: 'place', label: `${prop.name.toLowerCase()} into the bin`, station: station.id });
+  });
+  events.sort((a, b) => a.t - b.t);
+  events.push({ t: end, kind: 'finish', label: 'finish', station: station.id });
+  // Where each object is on every frame.
+  const objects = spawned.map((prop, i) => {
+    const fate = fates[i]!, onBelt = (t: number): Vec3 => [Math.min(half, -half + 0.1 + station.speed_mps * (t - enter[i]!)), top + prop.size_m[1] / 2, beltZ];
+    const hand = (t: number): Vec3 => { const at = onBelt(fate.picked!); return [at[0] * (1 - Math.min(1, (t - fate.picked!) / 0.6)) + bin[0] * Math.min(1, (t - fate.picked!) / 0.6), at[1] + 0.3 * Math.sin(Math.PI * Math.min(1, (t - fate.picked!) / 0.6)), beltZ]; };
+    return { id: prop.id, at: frames.map(({ t }): Vec3 => {
+      if (t < enter[i]!) return [-half - 0.6, -2, beltZ];
+      if (fate.picked !== null && t >= fate.picked) {
+        if (fate.dropped) return [onBelt(fate.picked)[0], Math.max(prop.size_m[1] / 2, top - 4.9 * (t - fate.picked) ** 2), station.width + 0.15];
+        return t >= fate.picked + 0.6 ? [bin[0], bin[1], bin[2]] : hand(t);
+      }
+      const at = onBelt(t), past = -half + 0.1 + station.speed_mps * (t - enter[i]!) - half;
+      return past > 0 ? [bin[0], Math.max(bin[1], at[1] - 4.9 * (past / station.speed_mps) ** 2), bin[2]] : at;
+    }).map(p => stationToWorld(station, p)) };
+  });
+  const picked = fates.filter(f => f.picked !== null).length, timings = fates.flatMap(f => (f.timing === null ? [] : [Math.abs(f.timing)]));
+  return { frames: frames.map(f => placeFrame(station, f)), events, settings, seed, end: 'finish', station: station.id, heading: (station.turn + 180) % 360, objects, spawned,
+    stationScore: { kind: 'conveyor', values: { objects: spawned.length, picked, picked_pct: Math.round(100 * picked / spawned.length), timing_ms: timings.length ? Math.round(timings.reduce((a, b) => a + b, 0) / timings.length) : null,
+      missed: spawned.length - picked, dropped: fates.filter(f => f.dropped).length, in_bin: fates.filter(f => f.tossed).length, reached_end: fates.filter(f => f.picked === null).length, steps: 0 } } };
+}
+
+/**
+ * Tool bench run (engine v1): each tool on the bench in turn. Hammer: swings until the nail is in (4 hits) or 8 swings;
+ * a swing lands off the nail head by a seeded spread that grows with the swing speed (the run speed); off by more than
+ * 1.2 cm misses, 5 cm or more toward the holding hand hits it. Screwdriver: 6 turns of the screw at half a turn per
+ * wrist turn at speed 1.6 or more. Saw: 12 strokes, straightness = mean sideways wander (cm). Wrench: two turns of the
+ * bolt in quarter-turn pulls. The other hand holds the piece; swing smoothness follows the blend.
+ */
+export function simulateToolBench(station: Extract<LabStation, { kind: 'tool_bench' }>, props: readonly LabProp[], input: Partial<LabRunSettings> = {}, seed = 0, hipHeight = STATION_REFERENCE_HIP): StationRunResult {
+  const settings = LabRunSettings.parse(input), next = labRandom(seed ^ 0x700f), f = settings.speed, top = fittedHeight(station, hipHeight), standZ = station.depth + 0.4;
+  const events: LabEvent[] = [{ t: 0, kind: 'start', label: 'start', station: station.id }], values: Record<string, number | string | null> = {}, parts: number[] = [];
+  const mine = props.filter(p => p.on === station.id), spot = (id: string): Vec3 | null => { const p = mine.find(q => q.id === `${station.id}-${id}`); return p ? [p.at[0], top + p.size_m[1] / 2, station.depth / 2 + p.at[1]] : null; };
+  const moves: Array<{ id: string; from: number; to: number; path: (k: number) => Vec3 }> = [];
+  let t = 0.3;
+  const use = (tool: string, piece: string, seconds: number, motion: (k: number, rest: Vec3, work: Vec3) => Vec3) => {
+    const rest = spot(tool), work = spot(piece);
+    if (!rest || !work) return false;
+    const lift: Vec3 = [work[0], work[1] + 0.12, work[2]];
+    moves.push({ id: `${station.id}-${tool}`, from: t, to: t + 0.6, path: k => [rest[0] + (lift[0] - rest[0]) * k, rest[1] + 0.15 * Math.sin(Math.PI * k) + (lift[1] - rest[1]) * k, rest[2] + (lift[2] - rest[2]) * k] });
+    moves.push({ id: `${station.id}-${tool}`, from: t + 0.6, to: t + 0.6 + seconds, path: k => motion(k, rest, lift) });
+    moves.push({ id: `${station.id}-${tool}`, from: t + 0.6 + seconds, to: t + 1.2 + seconds, path: k => [lift[0] + (rest[0] - lift[0]) * k, lift[1] + 0.15 * Math.sin(Math.PI * k) + (rest[1] - lift[1]) * k, lift[2] + (rest[2] - lift[2]) * k] });
+    return true;
+  };
+  for (const tool of station.tools) {
+    if (tool === 'hammer') {
+      const swingS = Math.max(0.25, Math.min(1.2, 0.8 / f)), spread = 0.4 + 0.35 * f;
+      let hits = 0, swings = 0, selfHits = 0;
+      const start = t + 0.6;
+      while (hits < 4 && swings < 8) {
+        swings++;
+        const error = gauss(next) * spread, at = start + swings * swingS;
+        if (error <= -5) { selfHits++; events.push({ t: at, kind: 'self_hit', label: `hammer hit the holding hand (${Math.round(-error)} cm off)`, station: station.id }); }
+        else if (Math.abs(error) <= 1.2) { hits++; events.push({ t: at, kind: 'swing_hit', label: `hit the nail head (${Math.abs(error).toFixed(1)} cm)`, station: station.id }); }
+        else events.push({ t: at, kind: 'miss', label: `missed the nail head by ${Math.abs(error).toFixed(1)} cm`, station: station.id });
+      }
+      if (use('hammer', 'nail-board', swings * swingS, (k, _rest, work) => [work[0], work[1] + 0.25 * Math.abs(Math.sin(Math.PI * k * swings)), work[2]])) {
+        Object.assign(values, { hammer_hits: hits, hammer_swings: swings, swing_smoothness: Math.round(Math.min(1, 0.55 + settings.blend_s * 1.2) * 100) / 100, self_hits: selfHits });
+        parts.push(100 * hits / swings - 50 * selfHits);
+        t += 1.2 + swings * swingS + 0.3;
+      }
+    } else if (tool === 'screwdriver') {
+      const perTwist = 0.5 * Math.min(1, f / 1.6), twists = Math.ceil(6 / perTwist);
+      if (use('screwdriver', 'screw-plate', twists * 0.35, (k, _rest, work) => [work[0], work[1] - 0.04 * k, work[2]])) {
+        values.screw_wrist_turns = twists; parts.push(100 * Math.min(1, 12 / twists)); t += 1.2 + twists * 0.35 + 0.3;
+      }
+    } else if (tool === 'saw') {
+      let wander = 0;
+      for (let i = 0; i < 12; i++) wander += Math.abs(gauss(next)) * (0.3 + 0.25 * f);
+      const straight = Math.round(wander / 12 * 10) / 10;
+      if (use('saw', 'plank', 12 * 0.5, (k, _rest, work) => [work[0] + 0.15 * Math.sin(Math.PI * 2 * 12 * k), work[1] - 0.02 * k, work[2]])) {
+        values.saw_straightness_cm = straight; parts.push(100 * (1 - Math.min(1, straight / 3))); t += 1.2 + 6 + 0.3;
+      }
+    } else if (tool === 'wrench') {
+      if (use('wrench', 'bolt', 8 * 0.4, (k, _rest, work) => [work[0] + 0.08 * Math.cos(Math.PI * 2 * 8 * k), work[1], work[2] + 0.08 * Math.sin(Math.PI * 2 * 8 * k)])) {
+        values.wrench_pulls = 8; parts.push(100); t += 1.2 + 3.2 + 0.3;
+      }
+    }
+  }
+  values.other_hand_holds = 'yes';
+  values.quality = parts.length ? Math.round(parts.reduce((a, b) => a + b, 0) / parts.length) : 0;
+  events.sort((a, b) => a.t - b.t);
+  events.push({ t, kind: 'finish', label: 'finish', station: station.id });
+  const frames = standFrames(standZ, t, 'Build');
+  const objects = [...new Set(moves.map(m => m.id))].map(id => {
+    const own = moves.filter(m => m.id === id), rest = own[0]!.path(0);
+    let last = rest;
+    return { id, at: frames.map(({ t: now }) => { const m = own.find(row => now >= row.from && now <= row.to); if (m) last = m.path(Math.min(1, (now - m.from) / ((m.to - m.from) || 1))); else if (now < own[0]!.from) last = rest; return stationToWorld(station, last); }) };
+  });
+  return { frames: frames.map(fr => placeFrame(station, fr)), events, settings, seed, end: 'finish', station: station.id, heading: (station.turn + 180) % 360, objects, spawned: [],
+    stationScore: { kind: 'tool_bench', values } };
 }

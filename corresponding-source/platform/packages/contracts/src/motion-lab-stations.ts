@@ -79,6 +79,22 @@ export function graspTableProps(on: string): LabProp[] {
     return LabProp.parse({ ...kind, id: `${on}-${kind.name.toLowerCase()}-${copy + 1}`, on, at: [x, z], target: [x, z] }); }));
 }
 
+/** The tool bench's tools (hammer 0.5 kg and the others) and the pieces they work on (nail board, screw plate, plank in a clamp, bolt). */
+export function toolBenchProps(on: string, tools: readonly (typeof LAB_TOOLS)[number][] = LAB_TOOLS): LabProp[] {
+  const sets: Record<(typeof LAB_TOOLS)[number], Array<Omit<LabProp, 'id' | 'on' | 'at'> & { key: string }>> = {
+    hammer: [{ key: 'hammer', name: 'Hammer', shape: 'tool', size_m: [0.1, 0.03, 0.32], mass_kg: 0.5, grip: 'handle', material: 'wood' },
+      { key: 'nail-board', name: 'Nail board', shape: 'box', size_m: [0.3, 0.04, 0.2], mass_kg: 1.2, grip: 'power', material: 'wood' }],
+    screwdriver: [{ key: 'screwdriver', name: 'Screwdriver', shape: 'tool', size_m: [0.03, 0.03, 0.22], mass_kg: 0.15, grip: 'handle', material: 'plastic' },
+      { key: 'screw-plate', name: 'Screw plate', shape: 'box', size_m: [0.2, 0.02, 0.15], mass_kg: 0.6, grip: 'power', material: 'metal' }],
+    saw: [{ key: 'saw', name: 'Hand saw', shape: 'tool', size_m: [0.12, 0.02, 0.5], mass_kg: 0.45, grip: 'handle', material: 'metal' },
+      { key: 'plank', name: 'Plank in clamp', shape: 'box', size_m: [0.6, 0.03, 0.12], mass_kg: 1.5, grip: 'power', material: 'wood' }],
+    wrench: [{ key: 'wrench', name: 'Wrench', shape: 'tool', size_m: [0.04, 0.02, 0.25], mass_kg: 0.3, grip: 'handle', material: 'metal' },
+      { key: 'bolt', name: 'Bolt', shape: 'cylinder', size_m: [0.03, 0.06, 0.03], mass_kg: 0.08, grip: 'pinch', material: 'metal' }],
+  };
+  // Each tool lies by its piece, the tools in a row across the bench.
+  return tools.flatMap((tool, i) => sets[tool].map(({ key, ...prop }, k) => LabProp.parse({ ...prop, id: `${on}-${key}`, on, at: [-0.66 + i * 0.44 + (k ? 0.08 : -0.08), k ? -0.12 : 0.15] })));
+}
+
 /** The base lab yard (board M18): 42 × 26 m with a 1 m grid, beside the course (its middle at x 25 m, clear of the run line). */
 export const LAB_BASE_YARD = { width: 42, depth: 26, x: 25 } as const;
 /**
