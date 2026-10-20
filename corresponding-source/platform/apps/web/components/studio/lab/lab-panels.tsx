@@ -221,7 +221,10 @@ function RunPanel({ lab, share }: { lab: LabController; share: (version: string)
             {lab.characters.some((c) => c.source === 'mine') ? <optgroup label="My characters · private">{lab.characters.filter((c) => c.source === 'mine').map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</optgroup> : null}
           </select></label>
         <label className="flex h-8 items-center gap-1.5 rounded-lg border border-ink/10 bg-paper px-2 text-xs"><span className="text-[10px] font-black uppercase text-ink/50">Move</span>
-          <select className="min-w-0 flex-1 bg-transparent font-semibold outline-none" value={s.motion} onChange={(e) => set({ motion: e.target.value })}>{LAB_MOVES.map((m) => <option key={m}>{m}</option>)}</select></label>
+          <select className="min-w-0 flex-1 bg-transparent font-semibold outline-none" value={s.motion} onChange={(e) => set({ motion: e.target.value })}>
+            <optgroup label="Library">{LAB_MOVES.map((m) => <option key={m}>{m}</option>)}</optgroup>
+            {lab.data.motions.length ? <optgroup label="Made in the Lab">{lab.data.motions.map((m) => <option key={m.id}>{m.name}</option>)}</optgroup> : null}
+          </select></label>
         <NumberField name="Speed" unit="m/s" step={0.1} value={s.speed} onChange={(v) => set({ speed: v })} />
         <NumberField name="Stride" unit="m" step={0.02} value={s.stride} onChange={(v) => set({ stride: v })} />
         <NumberField name="Step h" unit="m" step={0.02} value={s.step_height} onChange={(v) => set({ step_height: v })} />

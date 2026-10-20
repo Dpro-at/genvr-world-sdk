@@ -5,8 +5,9 @@ description: >-
   building a measured test course (step, ramp, gap, low wall, window, a street with a timed light and box cars),
   running the lab robot through it with repeatable fixed-step runs, reading the scores (foot slide, penetration,
   fall, car hit, time, smoothness), keeping motion versions and sharing a version with the GenVR community (owner
-  confirms). Use whenever an agent tests, tunes, compares or prepares to share
-  motion in a motion lab project.
+  confirms), and making a new motion by pose and key frames (every joint and finger by number inside the joint law,
+  a hand or foot moved and the limb following, pins, mirror, Test in course, Save as version). Use whenever an agent
+  tests, tunes, compares, makes or prepares to share motion in a motion lab project.
 ---
 
 # Motion lab
@@ -92,12 +93,42 @@ Every version is private on this device first. Sharing publishes it, so the owne
 - `share { version, confirm: true }` is the owner's: an agent is refused and the prepared share keeps waiting.
 - `unshare { version, confirm: true }` stops sharing (or drops a prepared share). A shared version cannot be deleted
   before it is unshared.
-- Never shareable: a motion not made from a GenVR library move on a GenVR character (for example made from Mixamo),
+- A motion made here by pose and key frames counts as made in the lab (it can be shared from a GenVR character).
+- Never shareable: a motion not made from a GenVR library move or in this lab, on a GenVR character (for example made from Mixamo),
   a motion from a video the owner has no rights to, and a version that falls, is hit by a car or does not finish.
 - Licence shown on every shared motion: **GenVR community licence** — free to use in GenVR worlds and films, also
   commercially; credit the creator; do not sell or re-share the motion file on its own.
 - Without GenVR hosting a share is a local preview: say so plainly ("marked shared on this device, nothing was
   published").
+
+## Making a motion by pose and key frames (board M11)
+
+The Lab's **Pose and keys** mode (left: body map + hand map; right: the sliders; over the view: Turn joint 1, Move
+hand / foot 2, Pin 3, Onion skin O, Play Space; under it: the key track). Same through `motion_lab`:
+
+- `pose_new { name, frames?, loop?, from: stand|t_pose }` — 60 frames per second (120 = 2 s); frame 0 gets a key of
+  the whole pose. A made motion may not take a library move's name (Walk, Run …). `pose_list`, `pose_open { motion }`.
+- `pose_get { frame }` — every slider, rows keyed there, the joint law check (`problems`, empty = natural), wrists and
+  ankles in metres (`limbs`: x his left, y up, z his front, feet on the floor at y ≈ 0.1), pins and all keys.
+- Sliders have the Avatar pose panel's names: `head.nod|turn|tilt`, `spine.bend|turn|side`, per side with `L.`/`R.`
+  (his left / right): `collar.lift`, `arm.up|forward|twist`, `elbow.bend|twist`, `wrist.bend|side`,
+  `hand.fist` (%), `hand.spread`, `palm.cup`, `thumb.across|out|turn|mid|tip`, `index|middle|ring|pinky.base|side|mid|tip`,
+  `leg.forward|out|twist`, `knee.bend`, `ankle.bend|side`; and the hips `root.x|y|z` (metres; y < 0 = lower).
+- `pose_set { frame, joint, side: both|left|right, value }` or `{ frame, values: { "R.elbow.bend": 38 } }` — each
+  stops at the joint law; the answer lists `stopped`. On a frame keyed for that joint's row it changes the key;
+  otherwise it waits as a **draft** — call `key_add` or it is lost when another frame is edited.
+- `key_add { frame, rows?, ease? }` — rows: body, right_arm, right_hand, left_arm, left_hand, legs (default all);
+  ease: linear, smooth (default), hold. The lab fills the frames between keys; a loop runs from the last key into the
+  first. `key_remove`, `key_ease`, `key_copy { from, to, rows? }`.
+- `limb_move { frame, limb, target: [x,y,z] | by: [dx,dy,dz] }` — two-bone reach; `miss_cm` > 2 means out of reach
+  or stopped by the joint law. `pin { limb, on }` — a pinned foot keeps its spot (the hips move), a pinned hand
+  reaches back. `pose_mirror { frame, mode: swap|left_to_right|right_to_left }`.
+- `pose_test` — Test in course (pace measured from the motion's feet; a motion that does not walk scores a big foot
+  slide: say so, it is honest). `pose_save_version { note? }` — tests again only when the keys changed, then keeps the
+  run as a version with the keys; `rollback` brings the keys back.
+
+Habits: key the whole body on frame 0, then only the joints that change; read `problems` after big changes; mirror
+for the other side instead of setting it by hand.
 
 ## Good habits
 
