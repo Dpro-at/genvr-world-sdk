@@ -119,6 +119,13 @@ Every version is private on this device first. Sharing publishes it, so the owne
 - Moves in the air or in water (Jump, Swim, Breaststroke) skip the floor checks; seated and climbing moves are not scored for balance.
 - The limits above are the board's proposals. `style_params { style? }` shows a style's numbers (timing curve, amplitude, holds, transition, cancel points, overlap) and limits. `style_set { style, params?, limits? }` from you waits for the owner: a style is for everyone; the owner applies it in Lab › Check (`style_confirm` is the owner's).
 
+## My motions in the Lab — private references (board M20)
+
+Motions the owner imported in Avatar › My motions (for example Mixamo) are private references on this device. `mine_list { query?, pack? }` lists them by key (`mine:` + 12 letters), name and pack. `check_move { move: key, style? }` plays one on the Lab body and checks it like our moves (also its pace from its feet); `settings_set { motion: key }` + `run` runs the course with it. The project keeps only the key, never the file, its name or its pack.
+
+- Use them to compare and learn: run and check ours and the reference the same way, then improve our move in Pose and keys.
+- Never share, publish or adopt a private motion (Q-MIXAMO); only our own versions can join the basics, and the owner confirms (later phases of M20).
+
 ## Training stations (board M18)
 
 The lab has stations to train every kind of move, standing in the course like obstacles (same ids, `x` across, `z` along, `turn` in degrees, sizes in metres). `stations_base { confirm: true }` puts the base lab's 11 in the 42 × 26 m yard; `station_add` adds one. Pick a station by what the move needs:

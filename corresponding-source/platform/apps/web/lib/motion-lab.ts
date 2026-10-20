@@ -43,7 +43,7 @@ import {
 } from '@genvr/contracts';
 import {
   courseFromSeed, defaultLabCourse, labGroundMove, labHoldPins, labKeyRows, labLimbMove, labLimbPositions, labMadeMotionPace, labMirror, labPoseAt,
-  labPoseLimit, labPoseProblems, labPoseRow as labRowOf, labRowKeys, labAsk, labStandPose, labTPose, runAllStations, runStation, checkAllMoves, checkMove as checkOneMove, rankCells, sampleMoves, DEFAULT_LOOK, scoreLabRun, simulateLabRun, LAB_GROUND_MOVES, LAB_POSE_KEYS, LAB_RUNNABLE_STATIONS, STATION_REFERENCE_HIP,
+  labPoseLimit, labPoseProblems, labPoseRow as labRowOf, labRowKeys, labAsk, labStandPose, labTPose, runAllStations, runStation, checkAllMoves, checkMove as checkOneMove, rankCells, sampleImportedMotion, sampleMoves, DEFAULT_LOOK, type SampledMove, scoreLabRun, simulateLabRun, LAB_GROUND_MOVES, LAB_POSE_KEYS, LAB_RUNNABLE_STATIONS, STATION_REFERENCE_HIP,
   type LabFrame, type LabGroundMove, type LabPose, type LabPoseSide, type LabRunResult, type StationReportRow,
 } from '@genvr/runtime';
 import { madeEntry, type MadeMotionStore } from './made-moves';
@@ -140,8 +140,17 @@ export interface LabCharacterSource {
   avatar(): Promise<string | null>;
   /** The body id the character stage draws for this character (an imported one is loaded first). */
   body(id: string): Promise<BodyId>;
+  /** Board M20: motions the person imported (My motions, private on this device) and one's motion-only GLB. */
+  motions?(): Promise<LabMine[]>;
+  motionData?(id: string): Promise<ArrayBuffer>;
   subscribe?(listener: () => void): () => void;
 }
+/** A private imported motion (for example from Mixamo): known to the Lab by its library id only; the file stays on the device. */
+export interface LabMine { id: string; name: string; pack: string; seconds: number | null }
+/** What trying a private motion measured: its cells per style (kept in memory only) and the pace its feet give. */
+export interface LabMineCheck { key: string; cells: Partial<Record<MotionStyleId, MotionCheckCell>>; pace: { speed: number; stride: number }; sampled: SampledMove }
+/** The short name a private motion has in the Lab (in Move lists and runs): "mine:" + the first 12 letters of its hash. */
+export const mineKey = (id: string) => `mine:${id.split('.')[2]?.slice(0, 12) ?? id.slice(-12)}`;
 /** The lab robot's hip height (m, its LeftUpLeg joint), the scale every other character's stride is measured against. */
 export const LAB_ROBOT_LEG = 0.84;
 const ROBOT: LabCharacter = { id: LAB_CHARACTER, name: 'Standard robot', source: 'lab', leg: LAB_ROBOT_LEG };
@@ -164,6 +173,8 @@ export class LabController {
   #publisher: MotionSharePublisher | null = null;
   #source: LabCharacterSource | null = null;
   #characters: LabCharacter[] = [ROBOT];
+  #mine: LabMine[] = [];
+  #mineChecks = new Map<string, LabMineCheck>();
   #avatar: string | null = null;
 
   constructor(data: LabProjectData, onChange: (data: LabProjectData) => void = () => {}) {
@@ -319,13 +330,49 @@ export class LabController {
   }
   async refreshCharacters() {
     const source = this.#source;
-    const [list, avatar] = source ? await Promise.all([source.list(), source.avatar()]) : [[], null];
+    const [list, avatar, mine] = source ? await Promise.all([source.list(), source.avatar(), source.motions?.() ?? []]) : [[], null, []];
     this.#characters = [ROBOT, ...list.filter((c) => c.id !== ROBOT.id)];
+    this.#mine = mine;
     this.#avatar = avatar;
     this.#view = { ...this.#view, ghost: this.#ghost() };
     this.#emit(false);
   }
   get characters(): readonly LabCharacter[] { return this.#characters; }
+  // ---- Mixamo and other private motions in the Lab (board M20)
+  /** My motions (private on this device), by name; `query` searches the name and the pack. */
+  privateMotions(query = '', pack?: string): LabMine[] {
+    const q = query.toLowerCase();
+    return this.#mine.filter((m) => (!pack || m.pack === pack) && `${m.name} ${m.pack}`.toLowerCase().includes(q)).sort((a, b) => a.pack.localeCompare(b.pack) || a.name.localeCompare(b.name));
+  }
+  mineByKey(key: string): LabMine | undefined { return this.#mine.find((m) => mineKey(m.id) === key); }
+  mineCheck(key: string): LabMineCheck | undefined { return this.#mineChecks.get(key); }
+  /** The motion-only GLB of a private motion (for the view to play it). */
+  async mineData(key: string): Promise<ArrayBuffer> {
+    const mine = this.mineByKey(key);
+    if (!mine || !this.#source?.motionData) throw new Error(`No private motion "${key}". Ask mine_list for the motions.`);
+    return this.#source.motionData(mine.id);
+  }
+  /** Plays a private motion on the robot at the fixed step and checks it in a style; the result stays in memory only. */
+  async tryMine(key: string, style: MotionStyleId = this.#view.check.style): Promise<LabMineCheck> {
+    const known = this.#mineChecks.get(key);
+    const sampled = known?.sampled ?? await sampleImportedMotion(this.#checkLook(), key, await this.mineData(key));
+    const cell = known?.cells[style] ?? checkOneMove({ ...sampled, style }, this.#data.styles[style].limits);
+    // The pace its planted feet give (0 for a motion in place); the stride follows the speed.
+    const speed = Math.hypot(...sampled.velocity);
+    const pace = known?.pace ?? { speed: Math.round(speed * 100) / 100, stride: Math.round(Math.max(0.3, speed * 0.55) * 100) / 100 };
+    const check: LabMineCheck = { key, cells: { ...known?.cells, [style]: cell }, pace, sampled };
+    this.#mineChecks.set(key, check);
+    this.#emit(false);
+    return check;
+  }
+  /** Run; a private motion not tried yet is tried first (its pace comes from its feet). */
+  async runPrepared(patch: Partial<LabRunSettings> = {}, by: LabActor = PERSON) {
+    const motion = patch.motion ?? this.#data.settings.motion;
+    if (motion.startsWith('mine:') && !this.#mineChecks.has(motion)) await this.tryMine(motion);
+    return this.run(patch, by);
+  }
+  /** Paces of the private motions tried so far, for the run and the view's clip time. */
+  get minePace(): Record<string, LabGroundMove> { return Object.fromEntries([...this.#mineChecks.values()].map((c) => [c.key, { ...c.pace, clip: c.key }])); }
   /** The character the Avatar tab uses, when the Lab can use it (hidden bodies cannot); else null. */
   get avatarCharacter(): LabCharacter | null { return this.#characters.find((c) => c.id === this.#avatar) ?? null; }
   /** Who runs now: the Avatar tab's character when following it, else the picked one; the robot when either is gone. */
@@ -360,8 +407,11 @@ export class LabController {
     const settings = LabRunSettings.parse({ ...base, ...patch, character: this.character.id });
     const course = this.#data.course;
     const made = this.madeMotion(settings.motion);
-    const move = made ? labMadeMotionPace(made) : undefined;
-    const result = simulateLabRun(course, settings, course.seed, made && move ? { [made.name]: { ...move, clip: made.name } } : {});
+    // Board M20: a private motion runs at the pace its feet gave when it was tried.
+    const mine = settings.motion.startsWith('mine:') ? this.#mineChecks.get(settings.motion) : undefined;
+    if (settings.motion.startsWith('mine:') && !mine) throw new Error(`Try "${settings.motion}" first (Check moves › My motions, or check_move).`);
+    const move = made ? labMadeMotionPace(made) : mine?.pace;
+    const result = simulateLabRun(course, settings, course.seed, made && move ? { [made.name]: { ...move, clip: made.name } } : mine ? { [mine.key]: { ...mine.pace, clip: mine.key } } : {});
     const run: LabRun = {
       id: freeRunId(this.#data.runs),
       at: new Date().toISOString(),
@@ -897,6 +947,7 @@ const HELP: Record<string, string> = {
   prop_set: 'Change an object: { id, set: { mass_kg, at, target, … } }.',
   prop_remove: 'Remove an object: { id, confirm: true }.',
   conveyor_set: 'Belt speed (0.1–1 m/s), one object every 1–5 s, mixed objects: { id, speed_mps?, every_s?, mix? }.',
+  mine_list: 'Board M20: My motions, private on this device (for example Mixamo): { query?, pack?, limit? } → key (mine:…), name, pack, seconds. They stay on the device; never shared, published or adopted. Use the key in check_move, settings_set { motion } and run.',
   check_all: 'Board M16 motion check: every move on the Lab body (the Standard robot) in { styles? } (default realistic, game, anime): foot slide, ground, joint limits, body clash, balance, loop seam, speed match against each style\'s limits; 0–100 per move. The report is kept in the project; returns the worst 10 per style.',
   check_report: 'The kept check report, worst first: { style?, limit? }. Each cell: move, body, style, score, issues (check, frames from–to, value, limit, unit).',
   check_move: 'One move\'s card, checked again now: { move, style? } (after fixing a move).',
@@ -955,7 +1006,8 @@ export async function runMotionLab(lab: LabController | null, input: unknown, by
     case 'stations_run_all': return { report: lab.runAllStations(op.repeats, op.settings ?? {}) };
     case 'check_all': { const styles = op.styles ?? [...MOTION_STYLES]; lab.checkAll(styles); return { body: lab.checkBody, moves: new Set(lab.checkReport(undefined, 9999).map((c) => c.move)).size, worst: Object.fromEntries(styles.map((st) => [st, lab.checkReport(st, 10).map((c) => ({ move: c.move, score: c.score, worst: c.issues[0] ?? null }))])) }; }
     case 'check_report': { if (!lab.data.check) throw new Error('No check yet. Use check_all first.'); return { at: lab.data.check.at, body: lab.data.check.body, cells: lab.checkReport(op.style, op.limit) }; }
-    case 'check_move': return lab.checkMove(op.move, op.style);
+    case 'check_move': { if (op.move.startsWith('mine:')) { const tried = await lab.tryMine(op.move, op.style); return { ...tried.cells[op.style], pace: tried.pace, private: true }; } return lab.checkMove(op.move, op.style); }
+    case 'mine_list': { const list = lab.privateMotions(op.query, op.pack); return { total: list.length, private: true, motions: list.slice(0, op.limit).map((m) => ({ key: mineKey(m.id), name: m.name, pack: m.pack, seconds: m.seconds })) }; }
     case 'style_params': return { styles: lab.styleParams(op.style), pending: lab.data.style_pending };
     case 'style_set': return lab.setStyle(op.style, { params: op.params, limits: op.limits }, by);
     case 'style_confirm': return lab.confirmPendingStyle(by);
@@ -967,7 +1019,9 @@ export async function runMotionLab(lab: LabController | null, input: unknown, by
     }
     case 'characters': await lab.refreshCharacters(); return { who: lab.data.who, follows_avatar: lab.data.who === LAB_FOLLOW_AVATAR, now: lab.character, avatar: lab.avatarCharacter, missing: lab.missingCharacter, characters: lab.characters };
     case 'who_set': return lab.setWho(op.who);
-    case 'run': { const run = lab.run(op.settings ?? {}, by, op.version, op.station ?? null); return { ...summary(run), ...(run.station ? { station: run.station, station_score: run.station_score } : {}) }; }
+    case 'run': {
+      const motion = op.settings?.motion ?? lab.data.settings.motion;
+      if (motion.startsWith('mine:') && !lab.mineCheck(motion)) await lab.tryMine(motion); const run = lab.run(op.settings ?? {}, by, op.version, op.station ?? null); return { ...summary(run), ...(run.station ? { station: run.station, station_score: run.station_score } : {}) }; }
     case 'runs_list': return lab.data.runs.map((r) => ({ id: r.id, motion: r.settings.motion, character: r.settings.character, total: r.score.total, at: r.at, by: r.by }));
     case 'scores': { const run = lab.runById(op.run); return { run: run.id, score: run.score, ...(run.station ? { station: run.station, station_score: run.station_score } : {}), best: lab.best()?.score ?? null }; }
     case 'frame': { const f = lab.frameAt(op.t, op.run); if (!f) throw new Error('No run yet. Use run first.'); return f; }

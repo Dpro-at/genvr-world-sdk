@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { DEFAULT_MOTION_STYLES, MotionCheckCell, defaultMotionStyle } from '@genvr/contracts';
 import { checkMove, hingeBend, rankCells, type CheckFrame, type Vec3 } from '../src/lab/motion-check.js';
-import { checkAllMoves, sampleMoves } from '../src/lab/motion-check-sample.js';
+import { checkAllMoves, sampleImportedMotion, sampleMoves } from '../src/lab/motion-check-sample.js';
+import { DEFAULT_LOOK } from '../src/avatar.js';
+import { motionGlb } from './helpers/motion-glb.js';
 
 /** A person standing still, facing +z, +x is the left: legs straight down, arms out (T-pose). */
 function stand(t: number, change: (f: Mutable) => void = () => {}): CheckFrame {
@@ -119,4 +121,18 @@ describe('board M16 · headless run on the Standard robot', () => {
     // Crouch walk travels at its Lab speed.
     expect(sampleMoves(undefined, ['CrouchWalk'])[0]!.velocity).toEqual([0, 0.9]);
   }, 60000);
+});
+
+describe('board M20 · an imported motion is checked like our moves', () => {
+  it('a motion-only GLB plays on the Standard robot, is sampled at the fixed step and gets a check cell', async () => {
+    const moved = await sampleImportedMotion({ ...DEFAULT_LOOK, body: 'robot' }, 'mine:test', motionGlb());
+    expect(moved.frames.length).toBe(61);
+    expect(moved.body).toBe('robot');
+    // The legs swing: the left knee moves along z over the loop.
+    const zs = moved.frames.map(f => f.legs[0].mid[2]);
+    expect(Math.max(...zs) - Math.min(...zs)).toBeGreaterThan(0.1);
+    const cell = checkMove({ ...moved, style: 'realistic' }, DEFAULT_MOTION_STYLES.realistic.limits);
+    expect(MotionCheckCell.parse(cell)).toEqual(cell);
+    await expect(sampleImportedMotion({ ...DEFAULT_LOOK, body: 'robot' }, 'mine:bad', new ArrayBuffer(8))).rejects.toThrow();
+  });
 });

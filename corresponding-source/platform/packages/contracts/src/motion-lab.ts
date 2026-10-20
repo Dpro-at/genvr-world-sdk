@@ -411,6 +411,9 @@ export const MotionLabOperation = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('conveyor_set'), id: labId, speed_mps: metres(0.1, 1).optional(), every_s: metres(1, 5).optional(), mix: z.boolean().optional() }).strict(),
   /** Run every station `repeats` times (seeds seed, +1, …) without keeping the runs: the best per station, worst first. */
   z.object({ kind: z.literal('stations_run_all'), repeats: z.number().int().min(1).max(20).default(3), settings: LabRunSettingsPatch.optional() }).strict(),
+  // ---- private motions in the Lab (board M20)
+  /** My motions, private on this device (for example Mixamo): key, name, pack. They never leave the device. */
+  z.object({ kind: z.literal('mine_list'), query: z.string().max(80).default(''), pack: z.string().max(80).optional(), limit: z.number().int().min(1).max(200).default(30) }).strict(),
   // ---- motion check and styles (board M16)
   /** Check every move on the Lab's body in the styles asked (default all three); the report is kept in the project. */
   z.object({ kind: z.literal('check_all'), styles: z.array(MotionStyleId).min(1).max(3).optional() }).strict(),

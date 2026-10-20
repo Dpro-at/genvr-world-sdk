@@ -120,7 +120,18 @@ export function LabStage({ lab }: { lab: LabController }) {
     } }).catch(() => { if (live) setShown(null); });
     return () => { live = false; };
   }, [ready, who, lab]);
-  useEffect(() => { const id = checking ? (view.check.move ?? 'Idle') : CLIPS.get(clip) ?? CLIPS.get('Idle'); if (ready && id) stage.current?.play(id); }, [ready, clip, shown, checking, view.check.move]);
+  // Board M20: a private motion (My motions) is imported into the stage once, then played like any clip.
+  const [imported, setImported] = useState<ReadonlySet<string>>(new Set());
+  // A new body rebuilds the stage's clips: import again.
+  useEffect(() => setImported(new Set()), [shown]);
+  const wanted = checking ? view.check.move : frame?.clip;
+  useEffect(() => {
+    if (!ready || !wanted?.startsWith('mine:') || imported.has(wanted) || !stage.current) return;
+    let live = true;
+    void lab.mineData(wanted).then((data) => stage.current?.importAvatarMotion(wanted, data)).then(() => { if (live) setImported((s) => new Set([...s, wanted])); }).catch(() => undefined);
+    return () => { live = false; };
+  }, [ready, wanted, imported, lab, shown]);
+  useEffect(() => { const id = checking ? (view.check.move ?? 'Idle') : clip.startsWith('mine:') ? clip : CLIPS.get(clip) ?? CLIPS.get('Idle'); if (ready && id && (!id.startsWith('mine:') || imported.has(id))) stage.current?.play(id); }, [ready, clip, shown, checking, view.check.move, imported]);
   // Pose (board M11) looks at the character from close, in front and to his right; the run view goes back behind him.
   useEffect(() => {
     if (!ready || !stage.current) return;
@@ -132,7 +143,7 @@ export function LabStage({ lab }: { lab: LabController }) {
     if (!ready || !stage.current) return;
     if (checking) { stage.current.setHeldPose(null); stage.current.setPaused(view.check.frame !== null); if (view.check.frame !== null) stage.current.setClipTime(view.check.frame / 60); return; }
     stage.current.setPaused(driven || posing);
-    if (driven && frames && !madeInRun) stage.current.setClipTime(labClipTime(frames, view.t * 60, lab.legScale));
+    if (driven && frames && !madeInRun) stage.current.setClipTime(labClipTime(frames, view.t * 60, lab.legScale, lab.minePace));
     if (heldPose) { const { bones, root } = labClipPose(heldPose); stage.current.setHeldPose({ bones, root: root.map((m) => m * lab.legScale) }); }
     else stage.current.setHeldPose(null);
   });

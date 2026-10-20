@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import { LAB_FOLLOW_AVATAR, LAB_LATER_KINDS, LAB_OBSTACLE_KINDS, LAB_STATION_KINDS, type LabObstacle, type LabObstacleKind, type LabOverlay, type LabRun, type LabStation, type LabStationKind } from '@genvr/contracts';
 import { LAB_RUNNABLE_STATIONS } from '@genvr/runtime';
-import { LAB_MOVES, PERSON, type LabController, type LabSpeed } from '../../../lib/motion-lab';
+import { LAB_MOVES, PERSON, mineKey, type LabController, type LabSpeed } from '../../../lib/motion-lab';
 import { measure, stationName } from './lab-stage';
 import { MyMotions, ShareMotionDialog } from './lab-share';
 import { LabKeyTrack, LabModeSwitch, LabPoseBar, LabPoseLeft, LabPoseRight } from './lab-pose';
@@ -305,6 +305,7 @@ function RunPanel({ lab, share }: { lab: LabController; share: (version: string)
           <select className="min-w-0 flex-1 bg-transparent font-semibold outline-none" value={s.motion} onChange={(e) => set({ motion: e.target.value })}>
             <optgroup label="Library">{LAB_MOVES.map((m) => <option key={m}>{m}</option>)}</optgroup>
             {lab.data.motions.length ? <optgroup label="Made in the Lab">{lab.data.motions.map((m) => <option key={m.id}>{m.name}</option>)}</optgroup> : null}
+            {lab.privateMotions().length ? <optgroup label="My motions · private">{lab.privateMotions().map((m) => <option key={m.id} value={mineKey(m.id)}>{m.name} · {m.pack}</option>)}</optgroup> : null}
           </select></label>
         <NumberField name="Speed" unit="m/s" step={0.1} value={s.speed} onChange={(v) => set({ speed: v })} />
         <NumberField name="Stride" unit="m" step={0.02} value={s.stride} onChange={(v) => set({ stride: v })} />
@@ -323,7 +324,7 @@ function RunPanel({ lab, share }: { lab: LabController; share: (version: string)
             <option value="">The course</option>
             {lab.data.course.stations.filter((st) => LAB_RUNNABLE_STATIONS.includes(st.kind)).map((st) => <option key={st.id} value={st.id}>{STATION_NAMES[st.kind]} · {st.id}</option>)}
           </select></label>) : null}
-      <button type="button" className="flex h-9 items-center justify-center gap-2 rounded-lg bg-ink text-sm font-bold text-on-brand" onClick={() => tryRun(() => lab.run({}, PERSON), setError)}><Play className="size-4" />Run<kbd className="font-mono text-[10px] opacity-70">R</kbd></button>
+      <button type="button" className="flex h-9 items-center justify-center gap-2 rounded-lg bg-ink text-sm font-bold text-on-brand" onClick={() => { setError(null); void lab.runPrepared({}, PERSON).catch((e: unknown) => setError(e instanceof Error ? e.message : String(e))); }}><Play className="size-4" />Run<kbd className="font-mono text-[10px] opacity-70">R</kbd></button>
       <Problem text={error} />
       {lab.data.course.stations.some((st) => LAB_RUNNABLE_STATIONS.includes(st.kind)) ? (
         <div className="flex items-center gap-2">

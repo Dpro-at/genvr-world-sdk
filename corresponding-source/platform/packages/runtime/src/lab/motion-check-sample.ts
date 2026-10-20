@@ -1,7 +1,8 @@
-import { AnimationMixer, LoopRepeat, Quaternion, Vector3, type Bone } from 'three/webgpu';
+import { AnimationMixer, LoopRepeat, Quaternion, Vector3, type AnimationClip, type Bone } from 'three/webgpu';
 import { CORE_ANIMATIONS } from '@genvr/core-library';
 import { DEFAULT_MOTION_STYLES, LAB_STEP, type MotionCheckCell, type MotionStyleId } from '@genvr/contracts';
-import { createGenvrAvatar, DEFAULT_LOOK, type AvatarLook } from '../avatar.js';
+import { createGenvrAvatar, DEFAULT_LOOK, type AvatarLook, type GenvrAvatar } from '../avatar.js';
+import { retargetAvatarMotion } from '../avatar-motion.js';
 import { checkMove, PLANT_HEIGHT, rankCells, type CheckFrame, type CheckLimb, type Vec3 } from './motion-check.js';
 import { LAB_GROUND_MOVES } from './sim.js';
 
@@ -47,48 +48,62 @@ export function impliedVelocity(frames: readonly CheckFrame[]): [number, number]
   return Math.hypot(vx, vz) > 0.2 ? [vx, vz] : [0, 0];
 }
 
+/** Records one clip on an avatar at the fixed step: soles, joints and hinge axes, moved along at its speed. */
+function recordClip(avatar: GenvrAvatar, look: AvatarLook, name: string, clip: AnimationClip, loop: boolean, step: number, declared?: number): SampledMove {
+  const bone = (n: string) => { const found = avatar.skeleton.bones.find(b => b.name.endsWith(n)); if (!found) throw new Error(`The body has no ${n} joint.`); return found; };
+  const at = (b: Bone) => vec(b.getWorldPosition(new Vector3()));
+  avatar.root.updateMatrixWorld(true);
+  // Rest pose (T-pose facing +z, +x is the body's left): heights of the sole joints and the hinge axes in each bone's own frame.
+  const floor = avatar.root.getWorldPosition(new Vector3()).y;
+  const restHeight = (n: string) => at(bone(n))[1] - floor;
+  const soles = (['Left', 'Right'] as const).map(side => ({ heel: restHeight(`${side}Foot`), toe: restHeight(`${side}ToeBase`) }));
+  const localAxis = (n: string, axis: Vec3) => new Vector3(...axis).applyQuaternion(bone(n).getWorldQuaternion(new Quaternion()).invert());
+  // Knees bend the shin back (+x), the left elbow brings the hand forward (−y), the right elbow (+y).
+  const axes = { LeftUpLeg: localAxis('LeftUpLeg', X), RightUpLeg: localAxis('RightUpLeg', X), LeftArm: localAxis('LeftArm', [0, -1, 0]), RightArm: localAxis('RightArm', Y) };
+  const [leftShoulder, rightShoulder] = [at(bone('LeftArm')), at(bone('RightArm'))];
+  const torsoRadius = Math.hypot(leftShoulder[0] - rightShoulder[0], leftShoulder[1] - rightShoulder[1], leftShoulder[2] - rightShoulder[2]) * 0.3;
+  const limb = (root: string, mid: string, end: string, upper: keyof typeof axes): CheckLimb => ({
+    root: at(bone(root)), mid: at(bone(mid)), end: at(bone(end)), axis: vec(axes[upper].clone().applyQuaternion(bone(upper).getWorldQuaternion(new Quaternion()))),
+  });
+  const sole = (n: string, height: number): Vec3 => { const p = at(bone(n)); return [p[0], p[1] - height, p[2]]; };
+  const mixer = new AnimationMixer(avatar.root);
+  mixer.clipAction(clip).setLoop(LoopRepeat, Infinity).play();
+  const inPlace: CheckFrame[] = [], count = Math.max(2, Math.round(clip.duration / step) + 1);
+  for (let i = 0; i < count; i++) {
+    const t = Math.min(clip.duration, i * step);
+    mixer.setTime(i === count - 1 ? clip.duration - 1e-6 : t); avatar.updateSprings(i ? step : 0); avatar.root.updateMatrixWorld(true);
+    inPlace.push({ t, hips: at(bone('Hips')), chest: at(bone('Spine2')), neck: at(bone('Neck')), head: at(bone('Head')),
+      feet: [{ heel: sole('LeftFoot', soles[0]!.heel), toe: sole('LeftToeBase', soles[0]!.toe) }, { heel: sole('RightFoot', soles[1]!.heel), toe: sole('RightToeBase', soles[1]!.toe) }],
+      legs: [limb('LeftUpLeg', 'LeftLeg', 'LeftFoot', 'LeftUpLeg'), limb('RightUpLeg', 'RightLeg', 'RightFoot', 'RightUpLeg')],
+      arms: [limb('LeftArm', 'LeftForeArm', 'LeftHand', 'LeftArm'), limb('RightArm', 'RightForeArm', 'RightHand', 'RightArm')] });
+  }
+  mixer.stopAllAction(); mixer.uncacheRoot(avatar.root);
+  const velocity: [number, number] = declared !== undefined ? [0, declared] : SUPPORTED_MOVES.has(name) || OFF_FLOOR_MOVES.has(name) || !loop ? [0, 0] : impliedVelocity(inPlace);
+  return { move: name, body: look.body ?? 'robot', loop, torsoRadius, supported: SUPPORTED_MOVES.has(name), offFloor: OFF_FLOOR_MOVES.has(name), velocity,
+    frames: inPlace.map(f => moveFrame(f, velocity[0] * f.t, velocity[1] * f.t)) };
+}
+
 export function sampleMoves(look: AvatarLook = { ...DEFAULT_LOOK, body: 'robot' }, moves = CORE_ANIMATIONS.map(row => row.clip), step = LAB_STEP): SampledMove[] {
   const avatar = createGenvrAvatar(look);
   try {
-    const bone = (name: string) => { const found = avatar.skeleton.bones.find(b => b.name.endsWith(name)); if (!found) throw new Error(`The body has no ${name} joint.`); return found; };
-    const at = (b: Bone) => vec(b.getWorldPosition(new Vector3()));
-    avatar.root.updateMatrixWorld(true);
-    // Rest pose (T-pose facing +z, +x is the body's left): heights of the sole joints and the hinge axes in each bone's own frame.
-    const floor = avatar.root.getWorldPosition(new Vector3()).y;
-    const restHeight = (name: string) => at(bone(name))[1] - floor;
-    const soles = (['Left', 'Right'] as const).map(side => ({ heel: restHeight(`${side}Foot`), toe: restHeight(`${side}ToeBase`) }));
-    const localAxis = (name: string, axis: Vec3) => new Vector3(...axis).applyQuaternion(bone(name).getWorldQuaternion(new Quaternion()).invert());
-    // Knees bend the shin back (+x), the left elbow brings the hand forward (−y), the right elbow (+y).
-    const axes = { LeftUpLeg: localAxis('LeftUpLeg', X), RightUpLeg: localAxis('RightUpLeg', X), LeftArm: localAxis('LeftArm', [0, -1, 0]), RightArm: localAxis('RightArm', Y) };
-    const [leftShoulder, rightShoulder] = [at(bone('LeftArm')), at(bone('RightArm'))];
-    const torsoRadius = Math.hypot(leftShoulder[0] - rightShoulder[0], leftShoulder[1] - rightShoulder[1], leftShoulder[2] - rightShoulder[2]) * 0.3;
-    const limb = (root: string, mid: string, end: string, upper: keyof typeof axes): CheckLimb => ({
-      root: at(bone(root)), mid: at(bone(mid)), end: at(bone(end)), axis: vec(axes[upper].clone().applyQuaternion(bone(upper).getWorldQuaternion(new Quaternion()))),
-    });
-    const sole = (name: string, height: number): Vec3 => { const p = at(bone(name)); return [p[0], p[1] - height, p[2]]; };
     const out: SampledMove[] = [];
     for (const name of moves) {
       const item = CORE_ANIMATIONS.find(row => row.clip === name), clip = avatar.clips.find(row => row.name === name);
       if (!item || !clip) continue;
-      const mixer = new AnimationMixer(avatar.root);
-      mixer.clipAction(clip).setLoop(LoopRepeat, Infinity).play();
-      const inPlace: CheckFrame[] = [], count = Math.max(2, Math.round(clip.duration / step) + 1);
-      for (let i = 0; i < count; i++) {
-        const t = Math.min(clip.duration, i * step);
-        mixer.setTime(i === count - 1 ? clip.duration - 1e-6 : t); avatar.updateSprings(i ? step : 0); avatar.root.updateMatrixWorld(true);
-        inPlace.push({ t, hips: at(bone('Hips')), chest: at(bone('Spine2')), neck: at(bone('Neck')), head: at(bone('Head')),
-          feet: [{ heel: sole('LeftFoot', soles[0]!.heel), toe: sole('LeftToeBase', soles[0]!.toe) }, { heel: sole('RightFoot', soles[1]!.heel), toe: sole('RightToeBase', soles[1]!.toe) }],
-          legs: [limb('LeftUpLeg', 'LeftLeg', 'LeftFoot', 'LeftUpLeg'), limb('RightUpLeg', 'RightLeg', 'RightFoot', 'RightUpLeg')],
-          arms: [limb('LeftArm', 'LeftForeArm', 'LeftHand', 'LeftArm'), limb('RightArm', 'RightForeArm', 'RightHand', 'RightArm')] });
-      }
-      mixer.stopAllAction(); mixer.uncacheRoot(avatar.root);
-      const declared = Object.values(LAB_GROUND_MOVES).find(row => row.clip.replace(/ /g, '') === name)?.speed;
-      const velocity: [number, number] = declared !== undefined ? [0, declared] : SUPPORTED_MOVES.has(name) || OFF_FLOOR_MOVES.has(name) || item.kind !== 'loop' ? [0, 0] : impliedVelocity(inPlace);
-      out.push({ move: name, body: look.body ?? 'robot', loop: item.kind === 'loop', torsoRadius, supported: SUPPORTED_MOVES.has(name), offFloor: OFF_FLOOR_MOVES.has(name), velocity,
-        frames: inPlace.map(f => moveFrame(f, velocity[0] * f.t, velocity[1] * f.t)) });
+      out.push(recordClip(avatar, look, name, clip, item.kind === 'loop', step, Object.values(LAB_GROUND_MOVES).find(row => row.clip.replace(/ /g, '') === name)?.speed));
     }
     return out;
   } finally { avatar.dispose(); }
+}
+
+/**
+ * Board M20: a motion the person imported (My motions, private on this device; a motion-only GLB) played on the body
+ * the same way as our moves, so it is checked the same way. It travels at the speed its planted feet imply.
+ */
+export async function sampleImportedMotion(look: AvatarLook, name: string, data: ArrayBuffer, loop = true, step = LAB_STEP): Promise<SampledMove> {
+  const avatar = createGenvrAvatar(look);
+  try { return recordClip(avatar, look, name, await retargetAvatarMotion(data, avatar, name), loop, step); }
+  finally { avatar.dispose(); }
 }
 
 /** Check all moves on one body in the chosen styles; the ranked list puts the worst first. */

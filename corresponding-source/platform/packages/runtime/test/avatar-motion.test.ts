@@ -5,6 +5,7 @@ import { readFile } from 'node:fs/promises';
 import { describe, expect, it, vi } from 'vitest';
 import { createGenvrAvatar, DEFAULT_LOOK, loadBodyModel } from '../src/avatar.js';
 import { retargetAvatarMotion } from '../src/avatar-motion.js';
+import { motionGlb } from './helpers/motion-glb.js';
 // Real legacy fixtures remain local/private and are supplied explicitly for the compatibility check.
 describe('legacy motion import', () => {
   it.skipIf(!process.env.LEGACY_AVATAR_MOTION).each(['starter','human'])('retargets real legacy limb axes onto %s without changing its bind pose', async (bodyId) => {
@@ -42,6 +43,16 @@ describe('legacy motion import', () => {
     expect(targetBone('LeftFoot').getWorldPosition(new Vector3()).y).toBeLessThan(targetBone('Hips').getWorldPosition(new Vector3()).y);
     sourceMixer.stopAllAction();sourceMixer.uncacheRoot(source.scene);
     mixer.stopAllAction(); mixer.uncacheRoot(avatar.root); avatar.dispose();
+  });
+  it('a source rig whose arm bones are rolled about their own axis does not twist our arms (board M20)', async () => {
+    const avatar = createGenvrAvatar({ ...DEFAULT_LOOK, body: 'robot' });
+    const plain = await retargetAvatarMotion(motionGlb(), avatar, 'plain');
+    const rolled = await retargetAvatarMotion(motionGlb('mixamorig:', 20, 90), avatar, 'rolled');
+    for (const side of ['LeftArm', 'RightArm', 'LeftForeArm', 'LeftUpLeg']) {
+      const a = plain.tracks.find(track => track.name.endsWith(`${side}.quaternion`))!, b = rolled.tracks.find(track => track.name.endsWith(`${side}.quaternion`))!;
+      for (let i = 0; i < a.values.length; i += 4) expect(Math.abs(a.values[i]! * b.values[i]! + a.values[i + 1]! * b.values[i + 1]! + a.values[i + 2]! * b.values[i + 2]! + a.values[i + 3]! * b.values[i + 3]!), side).toBeGreaterThan(.9999);
+    }
+    avatar.dispose();
   });
   it('rejects invalid and oversized motion buffers', async () => {
     const avatar = createGenvrAvatar();

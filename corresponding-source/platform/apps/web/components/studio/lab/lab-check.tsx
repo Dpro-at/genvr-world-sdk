@@ -3,7 +3,7 @@
 import { useState, useSyncExternalStore } from 'react';
 import { Check, Play, RotateCcw, X } from 'lucide-react';
 import { MOTION_STYLES, type MotionCheckCell, type MotionCheckLimits, type MotionStyleId } from '@genvr/contracts';
-import { PERSON, type LabController } from '../../../lib/motion-lab';
+import { PERSON, mineKey, type LabController } from '../../../lib/motion-lab';
 import { LabModeSwitch } from './lab-pose';
 
 /**
@@ -28,6 +28,10 @@ export function LabCheckLeft({ lab }: { lab: LabController }) {
   const [error, setError] = useState<string | null>(null);
   const { style, move } = lab.view.check;
   const cells = lab.checkReport(style, 200);
+  // Board M20: the private motions (My motions, e.g. Mixamo), checked one by one; the results stay in memory.
+  const [source, setSource] = useState<'ours' | 'mine'>('ours'), [query, setQuery] = useState(''), [busy, setBusy] = useState<string | null>(null);
+  const mine = lab.privateMotions(query).slice(0, 80);
+  const tryOne = (key: string) => { setBusy(key); setError(null); void lab.tryMine(key, style).then(() => lab.setCheckView({ move: key, frame: null }), (e: unknown) => setError(e instanceof Error ? e.message : String(e))).finally(() => setBusy(null)); };
   return (
     <div className="flex h-full min-h-0 flex-col gap-2 overflow-auto p-3">
       <LabModeSwitch lab={lab} />
@@ -35,6 +39,22 @@ export function LabCheckLeft({ lab }: { lab: LabController }) {
         {MOTION_STYLES.map((s) => <button key={s} type="button" role="radio" aria-checked={style === s} onClick={() => lab.setCheckView({ style: s })}
           className={`rounded-full py-1 text-[11px] font-bold ${style === s ? 'bg-ink text-on-brand' : 'bg-ink/5 hover:bg-ink/10'}`}>{STYLE_NAMES[s]}</button>)}
       </div>
+      <div role="radiogroup" aria-label="Moves to check" className="grid grid-cols-2 gap-1 rounded-lg bg-ink/5 p-0.5">
+        {([['ours', 'Our moves'], ['mine', 'My motions · private']] as const).map(([id, name]) => <button key={id} type="button" role="radio" aria-checked={source === id} onClick={() => setSource(id)}
+          className={`rounded-md py-1 text-[11px] font-bold ${source === id ? 'bg-ink text-on-brand' : 'text-ink/70 hover:bg-ink/10'}`}>{name}</button>)}
+      </div>
+      {source === 'mine' ? <>
+        <p className="text-[11px] text-ink/50">Imported in Avatar › My motions. They stay on this device: compare and learn; never shared or adopted.</p>
+        <input aria-label="Search my motions" placeholder={`Search ${lab.privateMotions().length} motions`} value={query} onChange={(e) => setQuery(e.target.value)} className="h-8 rounded-lg border border-ink/10 bg-paper px-2 text-xs outline-none" />
+        <ul className="flex flex-col gap-0.5" aria-label="My motions">
+          {mine.length === 0 ? <li className="text-xs text-ink/50">{lab.privateMotions().length ? 'No match.' : 'No motions yet: import them in Avatar › My motions (drop the folder).'}</li> : null}
+          {mine.map((m) => { const key = mineKey(m.id), cell = lab.mineCheck(key)?.cells[style]; return (
+            <li key={m.id}><button type="button" aria-pressed={move === key} disabled={busy !== null} onClick={() => tryOne(key)}
+              className={`flex h-8 w-full items-center gap-2 rounded-lg px-2 text-left text-xs disabled:opacity-60 ${move === key ? 'bg-ink/10 ring-1 ring-ink' : 'hover:bg-ink/5'}`}>
+              {cell ? <span className={`size-2 shrink-0 rounded-full ${tone(cell.score)}`} /> : <span className="size-2 shrink-0 rounded-full bg-ink/20" />}
+              <b className="min-w-0 flex-1 truncate">{m.name}</b><span className="max-w-[40%] truncate text-[11px] text-ink/50">{busy === key ? 'checking…' : m.pack}</span>
+              <b className="w-7 text-right font-mono tabular-nums">{cell?.score ?? ''}</b></button></li>); })}
+        </ul></> : <>
       <button type="button" className="flex h-9 items-center justify-center gap-2 rounded-lg bg-ink text-sm font-bold text-on-brand" onClick={() => tryRun(() => lab.checkAll(), setError)}>
         <Play className="size-4" />Check all moves</button>
       <p className="text-[11px] text-ink/50">{lab.data.check ? `Checked ${new Date(lab.data.check.at).toLocaleString()} · on the Standard robot · fixed step 1/60 s` : 'Every move on the Standard robot, in all three styles. Other bodies are checked in the Studio later.'}</p>
@@ -47,7 +67,7 @@ export function LabCheckLeft({ lab }: { lab: LabController }) {
               <span className={`size-2 shrink-0 rounded-full ${tone(cell.score)}`} /><b className="min-w-0 flex-1 truncate">{cell.move}</b>
               <span className="truncate text-[11px] text-ink/50">{issueText(cell)}</span><b className="w-7 text-right font-mono tabular-nums">{cell.score}</b></button></li>
           ))}
-        </ul></> : null}
+        </ul></> : null}</>}
       {error ? <p role="alert" className="rounded-lg bg-coral/15 px-2 py-1.5 text-xs font-semibold text-coral">{error}</p> : null}
     </div>
   );
@@ -57,7 +77,8 @@ export function LabCheckRight({ lab }: { lab: LabController }) {
   useLab(lab);
   const [error, setError] = useState<string | null>(null);
   const { style, move, frame } = lab.view.check;
-  const cell = move ? lab.checkReport(style, 999).find((c) => c.move === move) : undefined;
+  const privateMotion = move?.startsWith('mine:') ? lab.mineByKey(move) : undefined;
+  const cell = move?.startsWith('mine:') ? lab.mineCheck(move)?.cells[style] : move ? lab.checkReport(style, 999).find((c) => c.move === move) : undefined;
   const limits = lab.data.styles[style].limits, pending = lab.data.style_pending;
   return (
     <div className="flex h-full min-h-0 flex-col gap-3 overflow-auto p-3">
@@ -72,7 +93,7 @@ export function LabCheckRight({ lab }: { lab: LabController }) {
         </div>) : null}
       {cell ? (
         <section aria-label={`${cell.move} card`} className="flex flex-col gap-2">
-          <div className="flex items-center gap-2"><div className="flex-1"><div className={label}>Move card · {STYLE_NAMES[style]}</div><b className="text-sm">{cell.move} · Standard robot</b></div>
+          <div className="flex items-center gap-2"><div className="flex-1"><div className={label}>Move card · {STYLE_NAMES[style]}</div><b className="text-sm">{privateMotion ? `${privateMotion.name} · ${privateMotion.pack}` : cell.move} · Standard robot</b>{privateMotion ? <div className="text-[11px] text-ink/50">Private reference · on this device · pace {lab.mineCheck(move!)?.pace.speed ?? 0} m/s</div> : null}</div>
             <b className="font-mono text-2xl tabular-nums">{cell.score}</b>
             <button type="button" className="rounded p-1.5 hover:bg-ink/10" aria-label="Close the card" onClick={() => lab.setCheckView({ move: null, frame: null })}><X className="size-4" /></button></div>
           <span className={label}>Issues · worst first</span>
@@ -88,12 +109,13 @@ export function LabCheckRight({ lab }: { lab: LabController }) {
           <div className="grid grid-cols-2 gap-1.5">
             <button type="button" className="flex h-8 items-center justify-center gap-1.5 rounded-lg border border-ink/15 text-xs font-bold hover:bg-ink/5" onClick={() => lab.setCheckView({ frame: frame === null ? 0 : null })}>
               <Play className="size-3.5" />{frame === null ? 'Hold frame 0' : 'Play'}</button>
-            <button type="button" className="flex h-8 items-center justify-center gap-1.5 rounded-lg border border-ink/15 text-xs font-bold hover:bg-ink/5" onClick={() => tryRun(() => lab.checkMove(cell.move, style), setError)}>
+            <button type="button" className="flex h-8 items-center justify-center gap-1.5 rounded-lg border border-ink/15 text-xs font-bold hover:bg-ink/5" onClick={() => (move?.startsWith('mine:') ? void lab.tryMine(move, style).catch((e: unknown) => setError(String(e))) : tryRun(() => lab.checkMove(cell.move, style), setError))}>
               <RotateCcw className="size-3.5" />Check again</button>
           </div>
           <p className="text-[11px] text-ink/50">Compare (board M4) comes later.</p>
         </section>
-      ) : <p className="text-xs text-ink/50">{lab.data.check ? 'Pick a move to open its card.' : 'Check all moves first.'}</p>}
+      ) : move?.startsWith('mine:') ? <button type="button" className="h-8 rounded-lg border border-ink/15 text-xs font-bold hover:bg-ink/5" onClick={() => void lab.tryMine(move, style).catch((e: unknown) => setError(String(e)))}>Check it in {STYLE_NAMES[style]}</button>
+        : <p className="text-xs text-ink/50">{lab.data.check ? 'Pick a move to open its card.' : 'Check all moves first.'}</p>}
       <section aria-label={`${STYLE_NAMES[style]} limits`} className="flex flex-col gap-1.5">
         <span className={label}>{STYLE_NAMES[style]} limits · proposals you can change</span>
         <div className="grid grid-cols-1 gap-1.5">
