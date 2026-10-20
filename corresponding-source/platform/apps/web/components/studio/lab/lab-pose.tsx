@@ -285,6 +285,7 @@ export function LabKeyTrack({ lab }: { lab: LabController }) {
   const [error, setError] = useState<string | null>(null);
   const [ease, setEase] = useState<LabPoseEase>('smooth');
   const [copied, setCopied] = useState<{ frame: number; rows: LabPoseRow[] } | null>(null);
+  const [saved, setSaved] = useState<string | null>(null);
   const open = lab.openMotion;
   if (!open) return <section aria-label="Key track" className="p-3 text-xs text-ink/60">Keys · make a motion on the left first.</section>;
   const frame = frameNow(lab), end = Math.max(1, open.frames - 1);
@@ -313,9 +314,10 @@ export function LabKeyTrack({ lab }: { lab: LabController }) {
         <button type="button" className={button} title="Mirror: swap his left and right on this frame" onClick={() => attempt(() => lab.poseMirror(frame), setError)}><FlipHorizontal2 className="size-3.5" /><span className="sr-only">Mirror</span></button>
         <button type="button" className={button} disabled={!keyHere} title="Remove the chosen joints' key on this frame (Delete)" onClick={() => attempt(() => lab.keyRemove(frame, chosenRows(lab)), setError)}><Trash2 className="size-3.5" /><span className="sr-only">Remove key</span></button>
         <button type="button" className={button} title="Run the course with this motion" onClick={() => attempt(() => lab.poseTest(PERSON), setError)}><Play className="size-3.5" />Test in course</button>
-        <button type="button" className={button} title="Keep it as a version (tests it first when its keys changed)" onClick={() => attempt(() => lab.poseSaveVersion('', PERSON), setError)}><Save className="size-3.5" />Save as version</button>
+        <button type="button" className={button} title="Keep it as a version (tests it first when its keys changed)" onClick={() => attempt(() => { const v = lab.poseSaveVersion('', PERSON); setSaved(`${v.motion} v${v.n} saved · in My motions (Avatar › Moves) for keys 1–8 or a base move`); }, setError)}><Save className="size-3.5" />Save as version</button>
       </div>
       {error ? <p role="alert" className="px-2 py-1 font-semibold text-coral">{error}</p> : null}
+      {saved && !error ? <p role="status" className="px-2 py-1 font-semibold text-emerald-600">{saved}</p> : null}
       <div className="flex min-h-0 flex-1 overflow-auto">
         <div className="w-24 shrink-0 border-r border-ink/10">
           <div className="h-5 border-b border-ink/5" />

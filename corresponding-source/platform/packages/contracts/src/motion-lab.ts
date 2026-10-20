@@ -276,6 +276,69 @@ export const LabProjectData = z.object({
 });
 export type LabProjectData = z.infer<typeof LabProjectData>;
 
+/**
+ * Board M19: motions made in the Lab used in the game. Saving a version of a made motion puts it in My motions (a
+ * private store on this device); a project then uses it as a player move on a key 1–8 (once or loop) or instead of
+ * a base move of this project's avatar. The project keeps the motion's keys, so it plays without the lab.
+ */
+export const GAME_BASE_MOVES = ['Idle', 'Walk', 'Run', 'Jump'] as const;
+export const GameBaseMove = z.enum(GAME_BASE_MOVES);
+export type GameBaseMove = z.infer<typeof GameBaseMove>;
+/** Below this pace (m/s, measured from its feet) a made motion does not travel and cannot replace Walk or Run. */
+export const MADE_TRAVEL_PACE = 0.3;
+export const MadeMotionRights = z.object({ shareable: z.boolean(), reasons: z.array(z.string().max(300)).max(8) }).strict();
+/** One saved version of a made motion in My motions. */
+export const MadeMotionEntry = z.object({
+  id: labId,
+  name: z.string().trim().min(1).max(60),
+  n: z.number().int().min(1).max(9999),
+  score: z.number().min(0).max(100),
+  passes_course: z.boolean(),
+  pace: z.object({ speed: z.number().min(0).max(20), stride: z.number().min(0).max(4) }).strict(),
+  character: characterId,
+  rights: MadeMotionRights,
+  motion: LabMadeMotion,
+  saved_at: z.string().max(40),
+}).strict();
+export type MadeMotionEntry = z.infer<typeof MadeMotionEntry>;
+/** A made motion used in a project: on a key (slot) or instead of a base move (replaces). */
+export const GameMadeMove = z.object({
+  /** The My motions entry (a version id). */
+  id: labId,
+  name: z.string().trim().min(1).max(60),
+  slot: z.number().int().min(1).max(8).optional(),
+  replaces: GameBaseMove.optional(),
+  once: z.boolean().default(true),
+  passes_course: z.boolean(),
+  pace: z.object({ speed: z.number().min(0).max(20), stride: z.number().min(0).max(4) }).strict(),
+  rights: MadeMotionRights,
+  motion: LabMadeMotion,
+}).strict().superRefine((move, ctx) => {
+  if ((move.slot === undefined) === (move.replaces === undefined)) ctx.addIssue({ code: 'custom', message: 'A game move is on a key (slot 1–8) or replaces a base move, one of the two.' });
+  const why = madeMoveProblem(move);
+  if (why) ctx.addIssue({ code: 'custom', message: why, path: ['replaces'] });
+});
+export type GameMadeMove = z.infer<typeof GameMadeMove>;
+/** Why a made motion cannot replace a base move (null: it can). Walk and Run need a travelling loop that passes the course. */
+export function madeMoveProblem(move: { replaces?: GameBaseMove | undefined; passes_course: boolean; pace: { speed: number }; motion: { loop: boolean }; name: string }): string | null {
+  if (!move.replaces) return null;
+  if ((move.replaces === 'Idle' || move.replaces === 'Walk' || move.replaces === 'Run') && !move.motion.loop) return `"${move.name}" does not loop; ${move.replaces} needs a loop.`;
+  if (move.replaces === 'Walk' || move.replaces === 'Run') {
+    if (move.pace.speed < MADE_TRAVEL_PACE) return `"${move.name}" does not travel (its feet give ${move.pace.speed} m/s); ${move.replaces} needs a motion that walks.`;
+    if (!move.passes_course) return `"${move.name}" did not pass the course (it fell, was hit or did not finish); test it in the Lab first.`;
+  }
+  return null;
+}
+/** Every game move of a project: at most one per key and one per base move. */
+export const GameMadeMoves = z.array(GameMadeMove).max(12).superRefine((moves, ctx) => {
+  const used = new Set<string>();
+  for (const [i, m] of moves.entries()) {
+    const key = m.slot !== undefined ? `slot ${m.slot}` : `${m.replaces}`;
+    if (used.has(key)) ctx.addIssue({ code: 'custom', message: `Two game moves on ${key}.`, path: [i] });
+    used.add(key);
+  }
+});
+
 export const LAB_OVERLAYS = ['skeleton', 'feet', 'balance', 'speed', 'ghost', 'measures'] as const;
 export const LabOverlay = z.enum(LAB_OVERLAYS);
 export type LabOverlay = z.infer<typeof LabOverlay>;
@@ -346,6 +409,9 @@ export const MotionLabOperation = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('pose_test') }).strict(),
   /** Save as version: tests it in the course when its keys changed since the last test, then keeps that run as a version. */
   z.object({ kind: z.literal('pose_save_version'), note: z.string().max(120).optional() }).strict(),
+  // ---- made motions in the game (board M19)
+  /** Put a version of a made motion in My motions (Save as version does it too): { version? } (default: the newest of the open motion). */
+  z.object({ kind: z.literal('made_to_moves'), version: labId.optional() }).strict(),
   // ---- sharing (board M14)
   /** My motions: every version with its share state and the rights checks. */
   z.object({ kind: z.literal('motions_mine') }).strict(),

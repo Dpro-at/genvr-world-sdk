@@ -31,6 +31,7 @@ import {
   labPoseLimit, labPoseProblems, labPoseRow as labRowOf, labRowKeys, labAsk, labStandPose, labTPose, scoreLabRun, simulateLabRun, LAB_GROUND_MOVES, LAB_POSE_KEYS,
   type LabFrame, type LabGroundMove, type LabPose, type LabPoseSide, type LabRunResult,
 } from '@genvr/runtime';
+import { madeEntry, type MadeMotionStore } from './made-moves';
 
 /**
  * The motion lab's state and actions (MOTION-LAB L1 + L2). The Lab area and the `motion_lab` agent tool both go
@@ -134,6 +135,8 @@ export class LabController {
     mode: 'run', pose: { motion: null, frame: 0, playing: false, group: 'Elbow', side: 'R', tool: 'turn', onion: false } };
   /** The made motion each run of this session used, as it was (Save as version keeps it with the version). */
   #runMotion = new Map<string, LabMadeMotion>();
+  /** Board M19: My motions, where every saved version of a made motion goes. */
+  #madeStore: MadeMotionStore | null = null;
   #listeners = new Set<() => void>();
   #version = 0;
   #onChange: (data: LabProjectData) => void;
@@ -307,6 +310,7 @@ export class LabController {
     const version: MotionVersion = { id: freeVersionId(this.#data.versions, run.settings.motion, n), motion: run.settings.motion, n, note, settings: run.settings, score: run.score, run: run.id, best: false, by: by.kind, at: new Date().toISOString(),
       ...(made ? { made } : {}) };
     this.#set({ versions: [...this.#data.versions, version] });
+    if (made) void this.toMoves(version.id).catch(() => { /* My motions is optional; made_to_moves reports problems */ });
     return version;
   }
   /** A person makes it the best at once; an agent's request waits for the owner. */
@@ -459,6 +463,21 @@ export class LabController {
     const next = MotionShare.parse({ ...share, state: 'stopped', stopped_at: new Date().toISOString() });
     this.#set({ shares: this.#data.shares.map((s) => (s.version === id ? next : s)) });
     return next;
+  }
+
+  // ---- made motions in the game (board M19)
+  setMadeStore(store: MadeMotionStore | null) { this.#madeStore = store; }
+  /** Puts a saved version of a made motion in My motions (Save as version does it at once). */
+  async toMoves(versionId?: string) {
+    if (!this.#madeStore) throw new Error('My motions is not connected here (the Studio keeps it on this device).');
+    const open = this.openMotion;
+    const id = versionId ?? [...this.#data.versions].reverse().find((v) => v.made && (!open || v.made.id === open.id))?.id;
+    if (!id) throw new Error('Save a version of the made motion first (pose_save_version).');
+    const version = this.#versionById(id), rights = this.rights(id);
+    const entry = madeEntry(version, this.#data.runs.find((r) => r.id === version.run), { shareable: !rights.reasons.length, reasons: rights.reasons });
+    if (!entry) throw new Error(`${id} is not a made motion (only motions made in Pose go to My motions).`);
+    await this.#madeStore.put(entry);
+    return entry;
   }
 
   // ---- pose and key frames (board M11)
@@ -719,6 +738,7 @@ const HELP: Record<string, string> = {
   pin: 'Pin a hand or foot where it is, or unpin it: { limb, on }. A pinned foot keeps its spot (the hips move); a pinned hand reaches back to its place.',
   pose_mirror: 'Mirror the pose on a frame: { frame, mode: swap|left_to_right|right_to_left }.',
   pose_test: 'Test in course: run the course with the open made motion (at the pace its feet give, when it travels). Returns the run and scores.',
+  made_to_moves: 'Put a saved version of a made motion in My motions (Avatar › Moves), ready for keys 1–8 or a base move: { version? } (default: the newest version of the open motion). Save as version does it already.',
   pose_save_version: 'Save as version: tests the open made motion in the course if its keys changed since the last test, then keeps the run as a version with its keys: { note? }.',
 };
 
@@ -795,6 +815,7 @@ export async function runMotionLab(lab: LabController | null, input: unknown, by
     case 'pose_mirror': return lab.poseMirror(op.frame, op.mode);
     case 'pose_test': return summary(lab.poseTest(by));
     case 'pose_save_version': return lab.poseSaveVersion(op.note ?? '', by);
+    case 'made_to_moves': { const entry = await lab.toMoves(op.version); return { id: entry.id, name: entry.name, version: entry.n, score: entry.score, passes_course: entry.passes_course, pace: entry.pace, note: 'In My motions. Use it with avatar_studio move_use { motion, slot 1–8 | replaces Idle|Walk|Run|Jump }.' }; }
   }
 }
 

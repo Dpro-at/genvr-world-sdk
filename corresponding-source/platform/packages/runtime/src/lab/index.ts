@@ -3,3 +3,4 @@ export * from './traffic.js';
 export * from './sim.js';
 export * from './score.js';
 export * from './pose.js';
+export * from './made-clip.js';

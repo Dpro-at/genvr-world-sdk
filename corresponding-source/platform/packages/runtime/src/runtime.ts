@@ -38,6 +38,9 @@ import {
   restRule,
   SIT_ANIMATION_ID,
 } from '@genvr/core-library';
+import type { AvatarBody as MadeBody } from '@genvr/core-library';
+import type { LabMadeMotion } from '@genvr/contracts';
+import { madeMotionClip } from './lab/made-clip.js';
 import {
   CanvasTexture,
   Euler,
@@ -404,6 +407,13 @@ export interface GenvrRuntime {
    * toggles sitting. Returns false for unknown animations.
    */
   playAnimation(id: string): boolean;
+  /**
+   * Motions made in the Lab used in the game (board M19): each plays as `motion:made-<id>` (on its key 1–8, once or
+   * loop) and may replace a base move (Idle, Walk, Run, Jump) of this avatar. Replaces the whole list.
+   */
+  setMadeMoves(moves: ReadonlyArray<{ id: string; motion: Pick<LabMadeMotion, 'frames' | 'loop' | 'keys'>; once: boolean; slot?: number | undefined; replaces?: string | undefined }>): void;
+  /** The move on a key 1–8 set by this place (`motion:made-<id>`), or null for the player's own favourite. */
+  moveSlot(slot: number): string | null;
   presentAnimation(target: string, animationId: string): boolean;
   importAvatarMotion(target: string, id: string, data: ArrayBuffer): Promise<boolean>;
   presentExpression(target: string, expression: AvatarExpression): boolean;
@@ -1194,10 +1204,24 @@ export async function createRuntime({
   if (avatarLook) await preloadAvatarLook(avatarLook);
   const avatar = createGenvrAvatar(avatarLook, {
     cubes: style.avatar === 'cubes',
-    onBodyReady: () => animator.rebind(avatar.mesh, avatar.clips),
+    onBodyReady: () => { animator.rebind(avatar.mesh, avatar.clips); applyMadeMoves(); },
   });
   const animator = new AvatarAnimator(avatar.mesh, avatar.clips);
   animator.play('Idle');
+  // Board M19: made motions on keys and instead of base moves; built again for every body the avatar takes.
+  let madeMoves: Parameters<GenvrRuntime['setMadeMoves']>[0] = [];
+  const replacedBase = new Map<string, import('three/webgpu').AnimationClip>();
+  function applyMadeMoves() {
+    const body = avatar.mesh.userData.fittedBody as MadeBody | undefined;
+    for (const clip of replacedBase.values()) animator.register(clip);
+    replacedBase.clear();
+    if (!body) return;
+    for (const move of madeMoves) {
+      animator.register(madeMotionClip(move.motion, body, `motion:made-${move.id}`), move.once);
+      const original = move.replaces ? avatar.clips.find((clip) => clip.name === move.replaces) : undefined;
+      if (move.replaces && original) { replacedBase.set(move.replaces, original); animator.register(madeMotionClip(move.motion, body, move.replaces), false); }
+    }
+  }
   const avatarPose = avatar.pose;
   const [sx, sy, sz] = world.spawn.position;
   avatar.root.position.set(sx, Math.max(0, sy - 1), sz);
@@ -2419,6 +2443,9 @@ export async function createRuntime({
   };
   window.addEventListener('keydown', onSitKey);
   const playAnimation = (id: string) => {
+    // A made motion on a key (board M19): once plays to its end, loop until the player moves.
+    const made = madeMoves.find((m) => `motion:made-${m.id}` === id);
+    if (made && animator.clipNames.includes(id)) { sitting = null; emote = { clip: id, left: made.once ? animator.duration(id) : null }; return true; }
     const animation = findAnimation(id);
     if (!animation) return false;
     if (animation.manifest.id === SIT_ANIMATION_ID) {
@@ -3627,8 +3654,10 @@ export async function createRuntime({
     setPresentationBackdrop: (on, navigation=false) => {presentationBackdrop=on;presentationNavigation=navigation;},
     setAvatarLook: (look) => {
       // Another body type brings another skeleton: the animator binds to its clips.
-      if (avatar.setLook(look)) animator.rebind(avatar.mesh, avatar.clips);
+      if (avatar.setLook(look)) { animator.rebind(avatar.mesh, avatar.clips); applyMadeMoves(); }
     },
+    setMadeMoves: (moves) => { madeMoves = [...moves]; applyMadeMoves(); },
+    moveSlot: (slot) => { const move = madeMoves.find((m) => m.slot === slot); return move ? `motion:made-${move.id}` : null; },
     setPaused: (paused) => {
       renderingPaused = paused;
       renderer.setAnimationLoop(paused ? null : frame);

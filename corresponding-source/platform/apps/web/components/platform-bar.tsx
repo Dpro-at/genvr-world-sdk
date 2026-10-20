@@ -1,6 +1,5 @@
 'use client';
 
-import { DEFAULT_FAVORITE_ANIMATIONS } from '@genvr/core-library';
 import type { GenvrRuntime } from '@genvr/runtime';
 import { MessageCircle, ShoppingBag } from 'lucide-react';
 import { useEffect, useState, type RefObject } from 'react';
@@ -12,6 +11,7 @@ import { useSettings } from '../lib/settings';
 import { ChatPanel } from './chat-panel';
 import { SystemMenu, type ItemCredit } from './system-menu';
 import { GenvrMark } from './genvr-mark';
+import { moveForSlot } from './move-keys';
 
 const typing = (target: EventTarget | null) =>
   target instanceof HTMLInputElement ||
@@ -93,7 +93,7 @@ export function PlatformBar({
       return;
     }
     const slot = [PAD.up, PAD.right, PAD.down, PAD.left].indexOf(button as never);
-    const id = slot >= 0 ? DEFAULT_FAVORITE_ANIMATIONS[slot] : undefined;
+    const id = slot >= 0 ? moveForSlot(runtime.current, slot + 1) : undefined;
     if (id) runtime.current?.playAnimation(id);
   });
 
@@ -119,7 +119,8 @@ export function PlatformBar({
       }
       const slot = /^Digit([1-8])$/.exec(event.code);
       if (slot && !toolActive) {
-        const id = DEFAULT_FAVORITE_ANIMATIONS[Number(slot[1]) - 1];
+        // The place's made motion on this key (board M19), else the favourite.
+        const id = moveForSlot(runtime.current, Number(slot[1]));
         if (id) runtime.current?.playAnimation(id);
       }
     };

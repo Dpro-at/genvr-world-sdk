@@ -1,6 +1,7 @@
 import { parseCharacterRecipe, NORMAL_CHARACTER_SHAPE, type CharacterRecipe } from '@genvr/contracts';
 import { HIDDEN_BODY_IDS, PICKABLE_BODIES } from '@genvr/core-library';
 import type { CharacterEditor } from '../components/studio/character-editor/use-character-editor';
+import { madeMovesBridge } from './made-moves';
 
 /** The Avatar tab's character editor while it is mounted (AV-01): MCP and the assistant change the same character. */
 let current: CharacterEditor | null = null;
@@ -10,7 +11,9 @@ export const avatarStudioBridge = {
 };
 
 type Input = {
-  action: 'inspect' | 'set' | 'view' | 'expression' | 'play' | 'save' | 'export' | 'reset_shape' | 'undo' | 'redo';
+  action: 'inspect' | 'set' | 'view' | 'expression' | 'play' | 'save' | 'export' | 'reset_shape' | 'undo' | 'redo' | 'moves_mine' | 'move_use' | 'move_unuse' | 'move_preview';
+  /** Board M19: a made motion (My motions id or name), its key 1–8 or the base move it replaces, once or loop. */
+  motion?: string | undefined; slot?: number | undefined; replaces?: 'Idle' | 'Walk' | 'Run' | 'Jump' | undefined; once?: boolean | undefined;
   recipe?: Record<string, unknown> | undefined; view?: CharacterEditor['view'] | undefined; shading?: CharacterEditor['shading'] | undefined;
   expression?: 'neutral' | 'smile' | 'angry' | 'sad' | 'surprised' | 'thinking' | undefined; clip?: string | undefined;
 };
@@ -34,6 +37,17 @@ const describe = (editor: CharacterEditor) => ({
 
 /** Runs one avatar_studio call on the Avatar tab; throws with a reason a person or agent can act on. */
 export function runAvatarStudio(input: Input): unknown {
+  // Board M19: made motions in the game (My motions → a key 1–8 or a base move of this project's avatar).
+  if (input.action.startsWith('move')) {
+    const moves = madeMovesBridge.get();
+    if (!moves) throw new Error('Made motions need the local Studio with a project open.');
+    if (input.action === 'moves_mine') return moves.mine().then((mine) => ({ mine, used: moves.moves.map((m) => ({ id: m.id, name: m.name, slot: m.slot ?? null, replaces: m.replaces ?? null, once: m.once })) }));
+    if (!input.motion) throw new Error('Send motion (an id or name from moves_mine).');
+    if (input.action === 'move_unuse') { moves.unuse(input.motion); return { unused: input.motion }; }
+    if (input.action === 'move_preview') return moves.preview(input.motion).then(() => ({ playing: input.motion }));
+    if ((input.slot === undefined) === (input.replaces === undefined)) throw new Error('Send slot 1–8 or replaces (Idle, Walk, Run, Jump), one of the two.');
+    return moves.use(input.motion, input.slot !== undefined ? { slot: input.slot } : { replaces: input.replaces! }, input.once ?? true);
+  }
   const editor = current;
   if (!editor) throw new Error('Open the Avatar tab in the Studio first.');
   switch (input.action) {

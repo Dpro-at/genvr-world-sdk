@@ -12,6 +12,10 @@ import { AvatarCatalogQuery } from '../src/avatar-catalog-query';
 import { CORE_ANIMATIONS } from '@genvr/core-library';
 import { registerAvatarMotionLibrary, avatarMotionEntries, motionCategories, type AvatarMotionLibrary } from '@genvr/runtime';
 import { browserUserAvatarStorage, type UserAvatarStorage } from '../src/user-avatar-library';
+import { browserMadeMotionStorage } from '../src/made-motion-library';
+import { MadeMovesController, madeMovesBridge, memoryMadeMotionStore } from '../../../apps/web/lib/made-moves';
+import { MadeMotionsPanel } from './made-motions-panel';
+import { MoveKeys } from '../../../apps/web/components/move-keys';
 import { UserAvatarSession } from './user-avatar-session';
 import { DeleteConfirm, UserAvatarPanel } from './user-avatar-panel';
 import { DeleteConfirmGate, FALLBACK_BODY_NAME, deletable, deleteFromLibrary, deletePlan } from './user-avatar-delete';
@@ -198,6 +202,14 @@ function Editor({ initial, storage, options, leave, openOther, beforeClose }: { 
   };
   // MOTION-LAB: a lab project's course, runs and versions; every change is saved with the project.
   const [lab] = useState(() => { const made = initial.lab ? new LabController(initial.lab, data => { project.current = { ...project.current, lab: data }; changed(); }) : undefined; made?.setPublisher(options.motionSharing ?? null); return made; });
+  // Board M19: My motions made in the Lab (private on this device) and the ones this project uses in the game.
+  const [madeStore] = useState(() => options.userLibrary ? browserMadeMotionStorage(options.userLibrary.scope) : memoryMadeMotionStore());
+  const [madeMoves] = useState(() => new MadeMovesController(madeStore, initial.madeMoves ?? [], moves => { project.current = { ...project.current, madeMoves: moves }; changed(); }));
+  const madeVersion = useSyncExternalStore(madeMoves.subscribe, madeMoves.getVersion, madeMoves.getVersion);
+  const madeOnKeys = Object.fromEntries(madeMoves.moves.flatMap(m => m.slot !== undefined ? [[m.slot, m.name]] : [])) as Record<number, string>;
+  void madeVersion;
+  useEffect(() => { lab?.setMadeStore(madeStore); return madeMovesBridge.register(madeMoves); }, []);
+  useEffect(() => { if (!ready || !runtime.current) return; madeMoves.setPlayer(runtime.current); return () => madeMoves.setPlayer(null); }, [ready]);
   // Board M17: the Lab runs the Avatar tab's character or one picked in the Lab, from the bodies and My characters.
   useEffect(() => lab?.setCharacterSource(library && userAvatars ? {
     list: async () => (await library.list()).filter(row => row.kind === 'character' && row.joints && row.height).map(row => ({
@@ -344,7 +356,7 @@ function Editor({ initial, storage, options, leave, openOther, beforeClose }: { 
   const test = (value: boolean) => { if (value) runtime.current?.setTool(null); setTesting(value); };
   const updateMetadata = (next: StudioProject) => { project.current = next; setMetadata(next); changed(); };
   return <StudioHostProvider value={{ platform: false,
-    userAvatarControls: library ? (section, search, _onSelfBody, target) => { return <UserAvatarPanel storage={library} section={section} search={search} agents={presentationAgents} assign={assignUserAvatar} play={playUserMotion} remove={id => deleteUserAvatar(id, 'owner')} deleted={lastDeleted} target={target} />; } : undefined,
+    userAvatarControls: library ? (section, search, _onSelfBody, target) => { return <>{section === 'motions' ? <MadeMotionsPanel moves={madeMoves} /> : null}<UserAvatarPanel storage={library} section={section} search={search} agents={presentationAgents} assign={assignUserAvatar} play={playUserMotion} remove={id => deleteUserAvatar(id, 'owner')} deleted={lastDeleted} target={target} /></>; } : undefined,
     presentationControls: options.presentation?.enabled === false ? undefined : (section, search, target) => <PresentationControls controller={presentation} section={section} search={search} agents={presentationAgents} target={target} />,
     presentationTargets: () => presentationAgents,
     presentationOverlay: () => options.presentation?.enabled === false ? null : <PresentationViewport controller={presentation} />,
@@ -396,6 +408,7 @@ function Editor({ initial, storage, options, leave, openOther, beforeClose }: { 
           : <BuildPanel runtime={runtime} status={status} studio={false} placeId={initial.id} onTest={() => test(true)} />) : null}
         {!desktop && testing ? <button className="absolute right-3 top-3 rounded-lg bg-surface px-3 py-2 font-bold" onClick={() => setTesting(false)}>Stop test</button> : null}
         {ready && !status.tool && (testing || (tab !== 'filming' && tab !== 'avatar' && tab !== 'lab')) && !preview.model ? <PlayControls runtime={runtime} raised={!desktop && !testing} forceTouch={!desktop} dash={testing && initial.play.view === 'side' && initial.play.moves.includes('dash')} /> : null}
+        {ready && testing && !preview.model ? <MoveKeys runtime={runtime} made={madeOnKeys} active /> : null}
         {!desktop && !testing && tab === 'filming' && ready ? <PhoneFilming filming={filming} onClose={() => setTab('build')} /> : null}
       </main>
       {desktop && !embedLayout ? (
@@ -469,17 +482,20 @@ function PlayerPreview({ id, storage, options }: { id: string; storage: StudioSt
   const player = useRef<GenvrRuntime | null>(null), [project, setProject] = useState<StudioProject | null>(null);
   const touch = new URLSearchParams(location.search).get('touch') === '1';
   useEffect(() => {
-    const abort = new AbortController(); let runtime: GenvrRuntime | undefined;
-    void storage.read(id).then(project => { setProject(project); return createRuntime({ container: container.current!, world: project.world, terrainChunks: project.terrainChunks,
+    const abort = new AbortController(); let runtime: GenvrRuntime | undefined, loaded: StudioProject | null = null;
+    void storage.read(id).then(project => { setProject(project); loaded = project; return createRuntime({ container: container.current!, world: project.world, terrainChunks: project.terrainChunks,
       editable: false, playView: project.play.view, sideMoves: project.play.moves, forceWebGL: options.forceWebGL, loadSignal: abort.signal,
       emulateTouch: touch,
       fetchPackage: async id => { const asset = project.assets.find(a => a.id === id); if (!asset) throw new Error('Local asset missing.');
         return { id, manifest: asset.manifest, files: asset.files.map(f => ({ path: f.path, contentType: f.contentType, size: atob(f.data).length, url: `data:${f.contentType};base64,${f.data}` })) }; },
-    }); }).then(view => { if (abort.signal.aborted) view.dispose(); else { runtime = view; player.current = view; } }).catch(error => { if (!abort.signal.aborted) setError(message(error)); });
+    }); }).then(view => { if (abort.signal.aborted) view.dispose(); else { runtime = view; player.current = view;
+      // Board M19: the place's made motions on keys and instead of base moves.
+      view.setMadeMoves((loaded?.madeMoves ?? []).map(m => ({ id: m.id, motion: m.motion, once: m.once, slot: m.slot, replaces: m.replaces }))); } }).catch(error => { if (!abort.signal.aborted) setError(message(error)); });
     return () => { abort.abort(); runtime?.dispose(); player.current = null; };
   }, [id]);
   return <div className="relative h-dvh w-full"><div ref={container} className="h-full w-full" />{error ? <p role="alert">{error}</p> : null}
-    {project ? <PlayControls runtime={player} raised={false} forceTouch={touch} dash={project.play.view === 'side' && project.play.moves.includes('dash')} /> : null}</div>;
+    {project ? <PlayControls runtime={player} raised={false} forceTouch={touch} dash={project.play.view === 'side' && project.play.moves.includes('dash')} /> : null}
+    {project ? <MoveKeys runtime={player} made={Object.fromEntries((project.madeMoves ?? []).flatMap(m => m.slot !== undefined ? [[m.slot, m.name]] : []))} active /> : null}</div>;
 }
 
 let mounted = false;

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { LabProjectData, PlaySettings, WorldDocument, WorldPackage, SIZE_TIERS, WORLD_GENERATOR, supportsWorldStarter, defaultPlaySettings, type Style, type WorldSeed } from '@genvr/contracts';
+import { GameMadeMoves, LabProjectData, PlaySettings, WorldDocument, WorldPackage, SIZE_TIERS, WORLD_GENERATOR, supportsWorldStarter, defaultPlaySettings, type Style, type WorldSeed } from '@genvr/contracts';
 import { getCoreItem, getGround, groundRef, itemBoundsForStyle, itemFootprint, starterGroundMaterials } from '@genvr/core-library';
 import { applyCommand, createWorldState, decodeChunk, encodeTerrain, smallStarterCommands, starterWorldCommands, BLOCKS, VOXEL_CHUNK, VOXEL_LAYERS, type WorldState } from '@genvr/world';
 import { replayWorldPackage } from './session.js';
@@ -14,6 +14,8 @@ export const StudioProject = z.object({
   assets: WorldPackage.shape.assets,
   /** A motion lab project (MOTION-LAB): its course, run settings, last runs and motion versions. */
   lab: LabProjectData.optional(),
+  /** Board M19: motions made in the Lab used in this project (keys 1–8, or instead of a base move of its avatar), with their keys. */
+  madeMoves: GameMadeMoves.optional(),
 }).strict();
 export type StudioProject = z.infer<typeof StudioProject>;
 
