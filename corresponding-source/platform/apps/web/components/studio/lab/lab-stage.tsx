@@ -202,10 +202,10 @@ class LabWorld {
 
   show(course: LabCourse, frame: LabFrame | null, ghost: LabFrame | null, t: number, overlays: readonly string[]) {
     const f = frame ?? { x: 0, y: 0, z: -1, tilt: 0, feet: [{ x: -0.12, y: 0, z: -1, planted: true }, { x: 0.12, y: 0, z: -0.8, planted: true }], com: [0, -1], speed: 0, clip: 'Idle', t: 0 } as LabFrame;
-    // The robot stays at the origin facing the stage's −z: the world is turned half round (the course runs along
-    // the robot's facing) and moves under it.
-    this.root.rotation.y = Math.PI;
-    this.root.position.set(f.x, -f.y, f.z);
+    // The robot stays at the origin facing the stage's +z (the character stage's front, towards its camera); the
+    // course runs along +z too, so it lies ahead of the robot, and the world moves under it.
+    this.root.rotation.y = 0;
+    this.root.position.set(-f.x, -f.y, -f.z);
     const feetOn = overlays.includes('feet');
     f.feet.forEach((foot, i) => {
       const m = this.#feet[i]!;
