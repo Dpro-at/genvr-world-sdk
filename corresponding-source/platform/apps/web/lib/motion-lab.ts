@@ -803,7 +803,7 @@ const HELP: Record<string, string> = {
   characters: 'Characters the Lab can use (id, name, source lab|mine, leg in metres), who runs now, and whether the Lab follows the Avatar tab.',
   who_set: 'Pick who runs: { who: a character id from characters, or "avatar" to follow the Avatar tab }. Hidden bodies are not offered.',
   settings_set: 'Run settings: motion (Walk, Run, Sneak, Crouch Walk), speed, stride, step_height, jump_timing_ms, blend_s, lean_deg, wait_for_green.',
-  run: 'Run the course once (fixed step, seed). Optional settings or a version to start from; { station } runs on a training station instead (jump_pit, grasp_table, conveyor, tool_bench now). Returns the run id and scores (station scores too).',
+  run: 'Run the course once (fixed step, seed). Optional settings or a version to start from; { station } runs on a training station instead (jump_pit, grasp_table, conveyor, tool_bench, pool, climb_wall, ladder now). Returns the run id and scores (station scores too).',
   runs_list: 'The last 20 runs with their scores.',
   scores: 'Scores of a run (default: the last).',
   frame: 'One frame of a run at time t: body, feet (planted), balance point, speed, move.',

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { LAB_STATION_KINDS, LabCourse, LabStation, baseLabStations, graspTableProps, toolBenchProps } from '@genvr/contracts';
 import type { LabFrame } from '../src/lab/sim.js';
-import { fittedHeight, measureLongJump, runGraspTable, runStation, stationParts, stationToWorld, worldToStation, type GraspHand, type Vec3 } from '../src/lab/stations.js';
+import { fittedHeight, measureLongJump, poolDepth, runGraspTable, runStation, stationParts, stationQuality, stationToWorld, worldToStation, type GraspHand, type Vec3 } from '../src/lab/stations.js';
 
 const pit = LabStation.parse({ kind: 'jump_pit', id: 'pit', z: 0 }) as Extract<LabStation, { kind: 'jump_pit' }>;
 const table = LabStation.parse({ kind: 'grasp_table', id: 'table', z: 0 }) as Extract<LabStation, { kind: 'grasp_table' }>;
@@ -114,9 +114,9 @@ describe('board M18 · runs on a station', () => {
     expect(small.grabbed as number).toBeLessThanOrEqual(v.grabbed as number);
   });
   it('stations without a phase-1 engine say so', () => {
-    const pool = LabCourse.parse({ stations: [LabStation.parse({ kind: 'pool', id: 'pool', z: 0 })] });
-    expect(() => runStation(pool, 'pool')).toThrow('later phase');
-    expect(() => runStation(pool, 'nope')).toThrow('No station');
+    const rack = LabCourse.parse({ stations: [LabStation.parse({ kind: 'weapon_rack', id: 'rack', z: 0 })] });
+    expect(() => runStation(rack, 'rack')).toThrow('later phase');
+    expect(() => runStation(rack, 'nope')).toThrow('No station');
   });
 });
 
@@ -158,5 +158,54 @@ describe('board M18 · phase 2: conveyor and tool bench', () => {
     const hammer = slow.objects.find(o => o.id === 'bench-hammer')!;
     expect(hammer.at.at(-1)).toEqual(hammer.at[0]);
     expect(Math.max(...hammer.at.map(p => p[1]))).toBeGreaterThan(hammer.at[0]![1] + 0.1);
+  });
+});
+
+describe('board M18 · phase 3: pool, climbing wall and ladder', () => {
+  const pool = LabStation.parse({ kind: 'pool', id: 'pool', z: 0 }) as Extract<LabStation, { kind: 'pool' }>;
+  const wall = LabStation.parse({ kind: 'climb_wall', id: 'wall', z: 0 });
+  const ladder = LabStation.parse({ kind: 'ladder', id: 'ladder', z: 0 });
+  const course = LabCourse.parse({ stations: [pool, wall, ladder] });
+  it('pool: walks in the shallow end, swims from 1.4 m, floats with the head above water in 2.0 m and climbs out', () => {
+    const { result, score } = runStation(course, 'pool', { speed: 1.6 });
+    const v = result.stationScore.values;
+    expect(poolDepth(pool, 2)).toBe(1); expect(poolDepth(pool, 5)).toBe(1.4); expect(poolDepth(pool, 10)).toBe(2);
+    expect(v).toMatchObject({ stroke: 'breaststroke', reached_deep_end: 'yes', sank: 'no', breath_every: 1, head_above_pct: 100 });
+    expect(v.swim_from_m as number).toBeCloseTo(4, 1);
+    expect(v.strokes as number).toBeGreaterThan(5);
+    expect(v.ladder_exit_s as number).toBeGreaterThan(2);
+    expect(result.events.map(e => e.kind)).toEqual(expect.arrayContaining(['water_in', 'swim', 'float', 'ladder', 'finish']));
+    // Treading water at the deep end keeps the head above the 2.0 m deep water.
+    const tread = result.frames.filter(f => f.clip === 'Breaststroke' && f.speed === 0);
+    expect(tread.length).toBeGreaterThan(100);
+    expect(v.strokes_per_min as number).toBeGreaterThan(20);
+    // Walking in the shallow end steps with planted feet; the pool floor is not a penetration.
+    expect(score.foot_slide_cm).toBeLessThan(2);
+    expect(score.penetration_cm).toBe(0);
+    expect(score.total).toBeGreaterThan(50);
+  });
+  it('pool: the front crawl breathes every third stroke; too slow in deep water sinks (fail)', () => {
+    const fast = runStation(course, 'pool', { speed: 3 }).result.stationScore.values;
+    expect(fast).toMatchObject({ stroke: 'front crawl', breath_every: 3 });
+    expect(fast.head_above_pct as number).toBeLessThan(100);
+    const slow = runStation(course, 'pool', { speed: 0.5 });
+    expect(slow.result.stationScore.values).toMatchObject({ sank: 'yes', reached_deep_end: 'no' });
+    expect(slow.result.events.some(e => e.kind === 'sink')).toBe(true);
+    expect(stationQuality(slow.result.stationScore)).toBe(0);
+  });
+  it('climbing wall: three-point contact, the top, a clean climb down; too fast moves two limbs and slips more', () => {
+    const calm = runStation(course, 'wall', { speed: 1.6 }).result.stationScore.values;
+    expect(calm).toMatchObject({ three_point_pct: 100, reached_top: 'yes' });
+    expect(calm.holds_reached as number).toBeGreaterThan(3);
+    const rush = runStation(course, 'wall', { speed: 6 }).result.stationScore.values;
+    expect(rush.three_point_pct).toBe(0);
+    expect(rush.time_to_top_s as number).toBeLessThan(calm.time_to_top_s as number);
+    // Same seed, same climb.
+    expect(runStation(course, 'wall', { speed: 6 }).result.stationScore).toEqual(runStation(course, 'wall', { speed: 6 }).result.stationScore);
+  });
+  it('ladder: rung by rung to the top and back down', () => {
+    const v = runStation(course, 'ladder').result.stationScore.values;
+    expect(v).toMatchObject({ reached_top: 'yes', holds_total: 10 });
+    expect(v.time_to_top_s as number).toBeGreaterThan(1);
   });
 });

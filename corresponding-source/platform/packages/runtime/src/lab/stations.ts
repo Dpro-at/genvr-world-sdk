@@ -315,7 +315,7 @@ export function simulateGraspTable(station: GraspTable, props: readonly LabProp[
 }
 
 /** Stations whose runs are built (phase 1); the others are placed and drawn, their runs come in later phases. */
-export const LAB_RUNNABLE_STATIONS: ReadonlyArray<LabStation['kind']> = ['jump_pit', 'grasp_table', 'conveyor', 'tool_bench'];
+export const LAB_RUNNABLE_STATIONS: ReadonlyArray<LabStation['kind']> = ['jump_pit', 'grasp_table', 'conveyor', 'tool_bench', 'pool', 'climb_wall', 'ladder'];
 
 /** How well the station's task went (0–100): a clean jump's distance against 8 m; objects held without a drop, less the place error. */
 export function stationQuality(score: LabStationScore): number {
@@ -324,6 +324,8 @@ export function stationQuality(score: LabStationScore): number {
   if (score.kind === 'grasp_table') return n('objects') ? Math.max(0, Math.round(100 * n('held_without_drop') / n('objects') - Math.min(30, n('place_error_cm')))) : 0;
   if (score.kind === 'conveyor') return Math.max(0, Math.round(n('picked_pct') - Math.min(20, n('timing_ms') / 10) - 5 * n('dropped')));
   if (score.kind === 'tool_bench') return Math.max(0, Math.min(100, Math.round(n('quality'))));
+  if (score.kind === 'pool') return v.sank === 'yes' ? 0 : Math.round(0.5 * n('head_above_pct') + (v.reached_deep_end === 'yes' ? 30 : 0) + (n('ladder_exit_s') > 0 && n('ladder_exit_s') <= 8 ? 20 : 0));
+  if (score.kind === 'climb_wall' || score.kind === 'ladder') return Math.max(0, Math.min(100, Math.round((v.reached_top === 'yes' ? 60 : 0) + 0.3 * n('three_point_pct') - 10 * n('slips') + (v.climb_down_clean === 'yes' ? 10 : 0))));
   return 0;
 }
 
@@ -335,8 +337,12 @@ export function runStation(course: LabCourse, id: string, input: Partial<LabRunS
   const result = station.kind === 'jump_pit' ? simulateJumpPit(station, input, seed)
     : station.kind === 'conveyor' ? simulateConveyor(station, input, seed, hipHeight)
     : station.kind === 'tool_bench' ? simulateToolBench(station, course.props, input, seed, hipHeight)
+    : station.kind === 'pool' ? simulatePool(station, input, seed, hipHeight)
+    : station.kind === 'climb_wall' || station.kind === 'ladder' ? simulateClimb(station, input, seed, hipHeight)
     : simulateGraspTable(station as GraspTable, course.props, input, seed, hipHeight);
-  const base = scoreLabRun(LabCourse.parse({ finish_z: 120 }), result), w = LAB_SCORE_WEIGHTS;
+  const measured = scoreLabRun(LabCourse.parse({ finish_z: 120 }), result), w = LAB_SCORE_WEIGHTS;
+  // In the pool the feet stand on the pool's own floor, below the yard's: the yard floor is not a penetration there.
+  const base = station.kind === 'pool' ? { ...measured, penetration_cm: 0 } : measured;
   let common = 100 - Math.min(w.slideMax, base.foot_slide_cm * w.slidePerCm) - Math.min(w.penetrationMax, base.penetration_cm * w.penetrationPerCm) - (1 - base.smoothness) * w.roughMax;
   if (base.fell) common = Math.min(common, w.fallCap);
   return { result, score: { ...base, finished: true, total: Math.max(0, Math.round((common + stationQuality(result.stationScore)) / 2)) } };
@@ -487,4 +493,114 @@ export function simulateToolBench(station: Extract<LabStation, { kind: 'tool_ben
   });
   return { frames: frames.map(fr => placeFrame(station, fr)), events, settings, seed, end: 'finish', station: station.id, heading: (station.turn + 180) % 360, objects, spawned: [],
     stationScore: { kind: 'tool_bench', values } };
+}
+
+// ── Phase 3: pool, climbing wall and ladder ─────────────────────────────────────────────────────────────────────
+
+/** Water depth (m) at a spot along the pool (its zones, shallow end first). */
+export function poolDepth(station: Extract<LabStation, { kind: 'pool' }>, along: number): number {
+  const zones = [...station.zones].sort((a, b) => a.from_m - b.from_m);
+  return [...zones].reverse().find(zone => along >= zone.from_m)?.depth_m ?? zones[0]!.depth_m;
+}
+/** Water this deep or more is swum; shallower water is walked (the board's stand vs swim switch). */
+export const SWIM_DEPTH = 1.4;
+/** Swimming faster than this (m/s) is the front crawl, slower the breaststroke (as in the game). */
+const CRAWL_SPEED = 1.8;
+
+/**
+ * Pool run (engine v1): in by the steps at the shallow end, walking while the water is shallower than 1.4 m, then
+ * swimming along the middle at ¾ of the run speed (at most 2 m/s; breaststroke below 1.8 m/s, a stroke every metre, a
+ * breath every stroke; front crawl above, 1.8 m a stroke, a breath every third stroke), treading water for 3 s at the
+ * deep end and out by the ladder (0.5 m/s, scaled by size). Swimming slower than 0.4 m/s in deep water sinks (fail). The head
+ * is above the water while walking, treading and breathing, and under it between crawl breaths.
+ */
+export function simulatePool(station: Extract<LabStation, { kind: 'pool' }>, input: Partial<LabRunSettings> = {}, seed = 0, hipHeight = STATION_REFERENCE_HIP): StationRunResult {
+  const settings = LabRunSettings.parse(input), size = hipHeight / STATION_REFERENCE_HIP, swim = Math.min(2, settings.speed * 0.75), crawl = swim > CRAWL_SPEED;
+  const strokeLength = crawl ? 1.8 : 1, breathEvery = crawl ? 3 : 1, headHeight = 1.65 * size;
+  const frames: LabFrame[] = [], events: LabEvent[] = [{ t: 0, kind: 'start', label: 'start', station: station.id }];
+  let t = 0, z = -0.6, headAbove = 0, inWater = 0, strokes = 0, switchAt: number | null = null, sank = false, reachedDeep = false, exitS: number | null = null;
+  // Walking: one foot planted where it stepped (a step every 0.6 m), the other swinging; swimming and climbing: no feet down.
+  const walkFeet = (y: number): [LabFoot, LabFoot] => { const i = Math.floor((z + 0.6) / 0.6), at = i * 0.6 - 0.6, k = i % 2;
+    const feet: [LabFoot, LabFoot] = [foot(0.12, y + 0.08, z + 0.3, false), foot(-0.12, y + 0.08, z + 0.3, false)];
+    feet[k] = foot(k ? -0.12 : 0.12, y, at, true); return feet; };
+  const push = (y: number, clip: string, speed: number, head: number, walking: boolean, tilt = 0) => {
+    const water = z >= 0 && z <= station.length;
+    if (water) { inWater++; if (head >= 0) headAbove++; }
+    frames.push({ t, x: 0, y, z, tilt, com: [0, z], speed, clip, feet: walking ? walkFeet(y) : [foot(0.12, y - 0.3, z - 0.5, false), foot(-0.12, y - 0.3, z - 0.5, false)] });
+    t += STEP;
+  };
+  // In by the steps: a walk down to the floor of the shallow end.
+  events.push({ t: 0.3, kind: 'water_in', label: `in by the steps (splash ${Math.round(10 + 10 * Math.min(1, settings.speed / 4))} cm)`, station: station.id });
+  const walk = Math.min(1.2, Math.max(0.4, settings.speed)), shallow = poolDepth(station, 0);
+  while (z < 1.2) { const k = Math.max(0, Math.min(1, (z + 0.6) / 1.8)), floor = -shallow * k; push(floor, 'Walk', walk, floor + headHeight, true); z += walk * STEP; }
+  // Walk while shallow, swim when 1.4 m deep or more.
+  while (z < station.length - 0.5) {
+    const depth = poolDepth(station, z);
+    if (depth < SWIM_DEPTH) { push(-depth, 'Walk', walk * 0.7, headHeight - depth, true); z += walk * 0.7 * STEP; continue; }
+    if (switchAt === null) { switchAt = z; events.push({ t, kind: 'swim', label: `swims from ${round2(z)} m (water ${depth} m deep)`, station: station.id }); }
+    if (swim < 0.4) { sank = true; events.push({ t, kind: 'sink', label: `sank in ${depth} m deep water (too slow to swim)`, station: station.id }); break; }
+    const before = Math.floor((z - switchAt) / strokeLength);
+    z += swim * STEP;
+    const now = Math.floor((z - switchAt) / strokeLength);
+    if (now > before) { strokes++; if (strokes % breathEvery === 0) events.push({ t, kind: 'stroke', label: `stroke ${strokes} · breath`, station: station.id }); }
+    // Breathing: the head is up for the first third of a breathing stroke.
+    const phase = ((z - switchAt) / strokeLength) % 1, breathing = now % breathEvery === breathEvery - 1 || !crawl;
+    push(-0.15, crawl ? 'Swim' : 'Breaststroke', swim, breathing && phase < (crawl ? 0.35 : 1) ? 0.1 : -0.12, false, 80);
+  }
+  if (!sank) {
+    reachedDeep = true;
+    events.push({ t, kind: 'float', label: `treads water in ${poolDepth(station, z)} m`, station: station.id });
+    for (let i = 0; i < 180; i++) push(-0.6 * size, 'Breaststroke', 0, 0.15, false);
+    // The ladder is reached floating (head just above the water), not from the pool floor.
+    const from = Math.min(poolDepth(station, z), headHeight - 0.25), climb = (from + 0.3) / (0.5 * size), start = t;
+    events.push({ t, kind: 'ladder', label: 'out by the ladder', station: station.id });
+    for (let i = 0, n = Math.round(climb / STEP); i < n; i++) { const y = -from + (from + 0.05) * (i / n); push(y, 'Climb', 0, y + headHeight, false); }
+    z += 0.6; push(0, 'Idle', 0, headHeight, true);
+    events.push({ t, kind: 'finish', label: 'finish', station: station.id });
+    exitS = round2(t - start);
+  } else events.push({ t, kind: 'fall', label: 'sank', station: station.id });
+  const swimTime = switchAt === null ? 0 : frames.filter(f => f.tilt > 45 && f.speed > 0).length * STEP;
+  return { frames: frames.map(f => placeFrame(station, f)), events, settings, seed, end: sank ? 'fall' : 'finish', station: station.id, heading: station.turn, objects: [], spawned: [],
+    stationScore: { kind: 'pool', values: { splash_cm: Math.round(10 + 10 * Math.min(1, settings.speed / 4)), head_above_pct: inWater ? Math.round(100 * headAbove / inWater) : 100,
+      stroke: crawl ? 'front crawl' : 'breaststroke', strokes, strokes_per_min: swimTime ? Math.round(strokes / swimTime * 60) : 0, swim_speed: switchAt === null ? 0 : round2(swim),
+      breath_every: breathEvery, swim_from_m: switchAt === null ? null : round2(switchAt), reached_deep_end: reachedDeep ? 'yes' : 'no', ladder_exit_s: exitS, sank: sank ? 'yes' : 'no' } } };
+}
+
+/**
+ * Climbing wall or ladder run (engine v1): straight up and back down in front of it. On the wall each move takes one
+ * limb to the next hold (holds every `hold_spacing`) while the other three hold; faster than 3 m/s run speed two limbs
+ * move together (two-point contact). Each move may slip (seeded, 2 % plus 4 % per m/s over 1.6). On the ladder the
+ * rungs are the holds. Time per move 0.6 s at 1.6 m/s (faster is quicker); the top is reached when the hands reach it.
+ */
+export function simulateClimb(station: Extract<LabStation, { kind: 'climb_wall' | 'ladder' }>, input: Partial<LabRunSettings> = {}, seed = 0, hipHeight = STATION_REFERENCE_HIP): StationRunResult {
+  const settings = LabRunSettings.parse(input), next = labRandom(seed ^ 0xc11b), size = hipHeight / STATION_REFERENCE_HIP, f = Math.max(0.3, settings.speed);
+  const wall = station.kind === 'climb_wall', height = station.height, spacing = wall ? station.hold_spacing : station.rung_spacing;
+  const reach = 2.05 * size, moveS = Math.max(0.25, 0.6 * 1.6 / f), twoPoint = f > 3, slipChance = 0.02 + 0.04 * Math.max(0, f - 1.6);
+  const rows = Math.floor(height / spacing), frontZ = wall ? 0.6 : 0.65;
+  const frames: LabFrame[] = [], events: LabEvent[] = [{ t: 0, kind: 'start', label: 'start', station: station.id }];
+  let t = 0, y = 0, holds = 0, moves = 0, threePoint = 0, slips = 0, slipsDown = 0, top = false;
+  const hold = (seconds: number, clip: string, speed: number) => { for (let i = 0, n = Math.max(1, Math.round(seconds / STEP)); i < n; i++) {
+    frames.push({ t, x: 0, y, z: frontZ, tilt: 0, com: [0, frontZ], speed, clip, feet: [foot(0.12, y, frontZ - 0.25, true), foot(-0.12, y, frontZ - 0.25, true)] }); t += STEP; } };
+  hold(0.4, 'Idle', 0);
+  // Up: the hands go one hold higher per hand move; the body follows.
+  const limbs = ['right hand', 'left foot', 'left hand', 'right foot'];
+  while (!top && moves < 400) {
+    const limb = limbs[moves % 4]!, step = twoPoint ? 2 : 1;
+    moves += step; if (!twoPoint) threePoint++;
+    if (next() < slipChance) { slips++; events.push({ t, kind: 'slip', label: `${limb} slipped at ${round2(y)} m`, station: station.id }); hold(moveS, 'Climb', 0); continue; }
+    if (limb.endsWith('hand') || twoPoint) { holds++; y = Math.min(height - reach * 0.55, y + spacing * (twoPoint ? 1 : 0.5)); }
+    else y = Math.min(height - reach * 0.55, y + spacing * 0.5);
+    hold(moveS, 'Climb', spacing / moveS);
+    if (y + reach * 0.55 >= height - 1e-9 || holds >= rows) top = true;
+  }
+  if (top) events.push({ t, kind: 'top_out', label: `reached the top (${height} m)`, station: station.id });
+  const upS = round2(t);
+  hold(0.5, 'Idle', 0);
+  // Down: the same moves back, with their own slips.
+  while (y > 0) { if (next() < slipChance) { slipsDown++; events.push({ t, kind: 'slip', label: `slipped on the way down at ${round2(y)} m`, station: station.id }); } y = Math.max(0, y - spacing * 0.5); hold(moveS, 'Climb', spacing / moveS); }
+  hold(0.3, 'Idle', 0);
+  events.push({ t, kind: 'finish', label: 'finish', station: station.id });
+  return { frames: frames.map(fr => placeFrame(station, fr)), events, settings, seed, end: 'finish', station: station.id, heading: (station.turn + 180) % 360, objects: [], spawned: [],
+    stationScore: { kind: station.kind, values: { holds_reached: holds, holds_total: rows, three_point_pct: moves ? Math.round(100 * threePoint / moves) : 0, slips: slips + slipsDown,
+      time_to_top_s: top ? upS : null, reached_top: top ? 'yes' : 'no', climb_down_clean: slipsDown === 0 ? 'yes' : 'no' } } };
 }

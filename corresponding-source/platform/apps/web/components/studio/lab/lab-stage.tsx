@@ -226,7 +226,8 @@ class LabWorld {
         const color = station.id === selected ? SELECTED : part.surface ? SURFACE[part.surface] : OBSTACLE;
         const mesh = block(part.size[0], part.size[1], part.size[2], at[0], at[1], at[2], color);
         mesh.rotation.y = (station.turn * Math.PI) / 180;
-        if (part.surface === 'water') { mesh.material = waterMaterial(); mesh.position.y = Math.min(-0.03, at[1]); }
+        // Water lies under the yard floor: its surface is drawn at floor level so the pool shows.
+        if (part.surface === 'water') { mesh.material = waterMaterial(); mesh.scale.y = 0.02; mesh.position.y = 0.012; }
         mesh.castShadow = part.surface !== 'water';
         this.#course.add(mesh);
       }
