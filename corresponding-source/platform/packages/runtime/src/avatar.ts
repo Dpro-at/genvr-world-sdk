@@ -2,6 +2,7 @@ import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js
 import { LEGACY_BONE_PREFIX } from './avatar-rig-compatibility.js';
 import { createRobotFace } from './robot-face.js';
 import { createToeRoll } from './toe-roll.js';
+import { LAB_GROUND_MOVES } from './lab/sim.js';
 import { applyAvatarExpression, EXPRESSION_KEYS, type AvatarExpression } from './avatar-expression.js';
 import {
   AnimationClip,
@@ -1289,7 +1290,7 @@ const clipCache = new WeakMap<AvatarBody, AnimationClip[]>();
 function avatarClips(body: AvatarBody): AnimationClip[] {
   let clips = clipCache.get(body);
   if (!clips) {
-    clips = CORE_ANIMATIONS.map((animation) => groundClip(clipFromAnimation(animation, body), body));
+    clips = CORE_ANIMATIONS.map((animation) => fixedClip(animation, body));
     clipCache.set(body, clips);
   }
   return clips;
@@ -1326,6 +1327,108 @@ export function groundClip(clip: AnimationClip, body: AvatarBody): AnimationClip
   tracks.push(new VectorKeyframeTrack(hipsName, times, values));
   return new AnimationClip(clip.name, clip.duration, tracks);
 }
+
+/** A sole point touches the floor below this height (m) when it is not moving up or down fast (as the motion check). */
+const PLANT_HEIGHT = 0.03, PLANT_VERTICAL_SPEED = 0.2, LOCK_RELEASE_FRAMES = 6;
+/**
+ * Board M16 (fix the base, "feet locked while planted"): while a heel or toe touches the floor it stays on one spot of
+ * the ground; the thigh and shin bend to reach it (two-bone IK, the knee keeps its own side) and the foot keeps its own
+ * angle. A ground move travels forward at its Lab speed, another looping move at the speed its planted feet imply, a
+ * one-off move stays in place. The correction
+ * eases out over a few frames after lift-off. Baked on this body's own skeleton at 1/60 s; swims are left alone.
+ */
+export function lockFeet(clip: AnimationClip, body: AvatarBody, loop: boolean, speed?: number): AnimationClip {
+  const sides = (['Left', 'Right'] as const).map((side) => ({ side, joints: ['UpLeg', 'Leg', 'Foot', 'ToeBase'].map((part) => body.joints.find((joint) => joint.name === `${side}${part}`)) }));
+  if (SWIM_CLIPS.has(clip.name) || sides.some((leg) => leg.joints.some((joint) => !joint)) || !clip.tracks.length) return clip;
+  const { root } = buildSkeleton(body);
+  const bone = (name: string) => root.getObjectByName(nodeName(body, name)) as Bone;
+  const count = Math.max(2, Math.floor(clip.duration * 60) + 1), times = Array.from({ length: count }, (_, i) => Math.min(clip.duration, i / 60));
+  const mixer = new AnimationMixer(root), action = mixer.clipAction(clip);
+  action.setLoop(LoopOnce, 1); action.clampWhenFinished = true; action.play();
+  type Leg = { hip: Vector3; knee: Vector3; ankle: Vector3; heel: Vector3; toe: Vector3; upLeg: Quaternion; leg: Quaternion; foot: Quaternion };
+  const frames = times.map((time) => {
+    mixer.setTime(time); root.updateMatrixWorld(true);
+    return { hips: root.getWorldQuaternion(new Quaternion()), legs: sides.map(({ side, joints }): Leg => {
+      const [upLeg, leg, foot, toe] = ['UpLeg', 'Leg', 'Foot', 'ToeBase'].map((part) => bone(`${side}${part}`));
+      const ankle = foot!.getWorldPosition(new Vector3()), toeAt = toe!.getWorldPosition(new Vector3());
+      return { hip: upLeg!.getWorldPosition(new Vector3()), knee: leg!.getWorldPosition(new Vector3()), ankle,
+        heel: ankle.clone().setY(ankle.y - joints[2]!.at[1]), toe: toeAt.setY(toeAt.y - joints[3]!.at[1]),
+        upLeg: upLeg!.getWorldQuaternion(new Quaternion()), leg: leg!.getWorldQuaternion(new Quaternion()), foot: foot!.getWorldQuaternion(new Quaternion()) };
+    }) };
+  });
+  mixer.stopAllAction(); mixer.uncacheRoot(root);
+  const planted = (leg: number, point: 'heel' | 'toe', i: number) => {
+    const p = frames[i]!.legs[leg]![point], before = frames[Math.max(0, i - 1)]!.legs[leg]![point], after = frames[Math.min(count - 1, i + 1)]!.legs[leg]![point];
+    return p.y < PLANT_HEIGHT && Math.abs(after.y - before.y) / ((times[Math.min(count - 1, i + 1)]! - times[Math.max(0, i - 1)]!) || 1) < PLANT_VERTICAL_SPEED;
+  };
+  // The speed a looping move implies: minus the median speed of its planted sole points.
+  const vx: number[] = [], vz: number[] = [];
+  if (loop) for (let i = 1; i < count; i++) for (const leg of [0, 1]) for (const point of ['heel', 'toe'] as const)
+    if (planted(leg, point, i) && planted(leg, point, i - 1)) { const a = frames[i - 1]!.legs[leg]![point], b = frames[i]!.legs[leg]![point]; vx.push((b.x - a.x) * 60); vz.push((b.z - a.z) * 60); }
+  const median = (values: number[]) => values.length ? [...values].sort((a, b) => a - b)[Math.floor(values.length / 2)]! : 0;
+  let velocity = speed !== undefined ? new Vector3(0, 0, speed) : new Vector3(-median(vx), 0, -median(vz));
+  if (velocity.length() < 0.2) velocity = new Vector3();
+  // Per frame and foot: the horizontal correction that keeps the planted point on its spot of the ground.
+  const unique = loop ? count - 1 : count;
+  // Heading of a foot on the floor (heel → toe), so a planted foot cannot twist on the spot either.
+  const headingOf = (l: Leg) => Math.atan2(l.toe.x - l.heel.x, l.toe.z - l.heel.z), wrap = (a: number) => Math.atan2(Math.sin(a), Math.cos(a));
+  const UP = new Vector3(0, 1, 0);
+  const corrections = [0, 1].map((leg) => {
+    const out = Array.from({ length: count }, () => ({ move: new Vector3(), turn: 0 }));
+    // A loop starts where the foot is in the air, so one contact never splits at the seam.
+    const start = loop ? Math.max(0, Array.from({ length: unique }, (_, i) => i).find((i) => !planted(leg, 'heel', i) && !planted(leg, 'toe', i)) ?? 0) : 0;
+    // `current` is the correction of the previous frame: a new anchor (touch-down, or heel → toe) carries it on, so nothing pops.
+    let anchor = null as { point: 'heel' | 'toe'; at: Vector3; heading: number } | null, left = 0, turn = 0;
+    const current = new Vector3();
+    for (let k = 0; k < unique; k++) {
+      const i = loop ? (start + k) % unique : k, lap = loop && start + k >= unique ? clip.duration : 0;
+      const point = planted(leg, 'heel', i) ? 'heel' : planted(leg, 'toe', i) ? 'toe' : null;
+      if (!point) {
+        anchor = null;
+        if (left > 0) { current.multiplyScalar((left - 1) / left); turn *= (left - 1) / left; left--; } else { current.set(0, 0, 0); turn = 0; }
+        out[i]!.move.copy(current); out[i]!.turn = turn; continue;
+      }
+      const l = frames[i]!.legs[leg]!;
+      if (!anchor || anchor.point !== point) anchor = { point, at: new Vector3(), heading: headingOf(l) + turn };
+      turn = wrap(anchor.heading - headingOf(l));
+      // The planted point after the heading fix (the foot turns about its ankle), on the ground the body travels over.
+      const here = l[point].clone().sub(l.ankle).applyAxisAngle(UP, turn).add(l.ankle).addScaledVector(velocity, times[i]! + lap).setY(0);
+      if (anchor.at.lengthSq() === 0) anchor.at.copy(here).add(current);
+      current.copy(anchor.at).sub(here); out[i]!.move.copy(current); out[i]!.turn = turn; left = LOCK_RELEASE_FRAMES;
+    }
+    if (loop) { out[count - 1]!.move.copy(out[0]!.move); out[count - 1]!.turn = out[0]!.turn; }
+    return out;
+  });
+  if (corrections.every((rows) => rows.every((row) => row.move.lengthSq() < 1e-6 && Math.abs(row.turn) < 1e-4))) return clip;
+  // Two-bone IK per frame; the new joint rotations replace the leg tracks at 1/60 s.
+  const values = new Map<string, number[]>();
+  const push = (name: string, q: Quaternion) => { const key = `${nodeName(body, name)}.quaternion`; if (!values.has(key)) values.set(key, []); values.get(key)!.push(q.x, q.y, q.z, q.w); };
+  frames.forEach((frame, i) => sides.forEach(({ side }, leg) => {
+    const l = frame.legs[leg]!, fix = corrections[leg]![i]!, target = l.ankle.clone().add(fix.move);
+    const a = l.knee.distanceTo(l.hip), b = l.ankle.distanceTo(l.knee), reach = target.clone().sub(l.hip);
+    const d = Math.min(a + b - 1e-4, Math.max(Math.abs(a - b) + 1e-4, reach.length())), dir = reach.normalize();
+    // The knee bends forward around the thigh's own hinge axis (+x at rest), so it never flips to the wrong side.
+    const pole = new Vector3().crossVectors(dir, new Vector3(1, 0, 0).applyQuaternion(l.upLeg)).normalize();
+    const cos = Math.min(1, Math.max(-1, (a * a + d * d - b * b) / (2 * a * d)));
+    const knee = l.hip.clone().addScaledVector(dir, a * cos).addScaledVector(pole, a * Math.sqrt(1 - cos * cos));
+    const ankle = l.hip.clone().addScaledVector(dir, d);
+    const turnThigh = new Quaternion().setFromUnitVectors(l.knee.clone().sub(l.hip).normalize(), knee.clone().sub(l.hip).normalize());
+    const upLeg = turnThigh.clone().multiply(l.upLeg);
+    const shin = l.ankle.clone().sub(l.knee).normalize().applyQuaternion(turnThigh);
+    const legWorld = new Quaternion().setFromUnitVectors(shin, ankle.clone().sub(knee).normalize()).multiply(turnThigh).multiply(l.leg);
+    push(`${side}UpLeg`, frame.hips.clone().invert().multiply(upLeg));
+    push(`${side}Leg`, upLeg.clone().invert().multiply(legWorld));
+    push(`${side}Foot`, legWorld.clone().invert().multiply(new Quaternion().setFromAxisAngle(UP, fix.turn).multiply(l.foot)));
+  }));
+  const tracks = clip.tracks.filter((track) => !values.has(track.name));
+  for (const [name, rows] of values) tracks.push(new QuaternionKeyframeTrack(name, times, rows));
+  return new AnimationClip(clip.name, clip.duration, tracks);
+}
+
+/** A Core move on this body with its base fixed (board M16): feet on the floor and locked while planted. */
+export const fixedClip = (animation: (typeof CORE_ANIMATIONS)[number], body: AvatarBody): AnimationClip =>
+  groundClip(lockFeet(groundClip(clipFromAnimation(animation, body), body), body, animation.kind === 'loop',
+    Object.values(LAB_GROUND_MOVES).find((move) => move.clip.replace(/ /g, '') === animation.clip)?.speed), body);
 
 /** Every Core animation as clips of a body type (Classic when not given). */
 export const createAvatarClips = (body?: AvatarBodyType): AnimationClip[] => avatarClips(findBody(body));

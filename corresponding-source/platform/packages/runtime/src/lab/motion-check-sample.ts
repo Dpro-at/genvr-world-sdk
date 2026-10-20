@@ -11,12 +11,14 @@ import { LAB_GROUND_MOVES } from './sim.js';
  * the speed its planted feet imply (none for a move in place); one-off moves (jumps, turns, landings) stay in place. Bodies built in code (the Standard robot) run headless;
  * mesh bodies are sampled the same way once the viewport has loaded them.
  */
-export interface SampledMove { move: string; body: string; loop: boolean; torsoRadius: number; supported: boolean; frames: CheckFrame[];
+export interface SampledMove { move: string; body: string; loop: boolean; torsoRadius: number; supported: boolean; offFloor: boolean; frames: CheckFrame[];
   /** Body speed used (m/s, x and z). */
   velocity: [number, number]; }
 
 /** A seat or a wall carries the weight. */
 export const SUPPORTED_MOVES = new Set(['Sit', 'SitGround', 'Climb']);
+/** Played in the air (Jump is the airborne pose) or in water. */
+export const OFF_FLOOR_MOVES = new Set(['Jump', 'Swim', 'SwimBreast']);
 
 const X: Vec3 = [1, 0, 0], Y: Vec3 = [0, 1, 0];
 const vec = (v: Vector3): Vec3 => [v.x, v.y, v.z];
@@ -81,8 +83,8 @@ export function sampleMoves(look: AvatarLook = { ...DEFAULT_LOOK, body: 'robot' 
       }
       mixer.stopAllAction(); mixer.uncacheRoot(avatar.root);
       const declared = Object.values(LAB_GROUND_MOVES).find(row => row.clip.replace(/ /g, '') === name)?.speed;
-      const velocity: [number, number] = declared !== undefined ? [0, declared] : SUPPORTED_MOVES.has(name) || item.kind !== 'loop' ? [0, 0] : impliedVelocity(inPlace);
-      out.push({ move: name, body: look.body ?? 'robot', loop: item.kind === 'loop', torsoRadius, supported: SUPPORTED_MOVES.has(name), velocity,
+      const velocity: [number, number] = declared !== undefined ? [0, declared] : SUPPORTED_MOVES.has(name) || OFF_FLOOR_MOVES.has(name) || item.kind !== 'loop' ? [0, 0] : impliedVelocity(inPlace);
+      out.push({ move: name, body: look.body ?? 'robot', loop: item.kind === 'loop', torsoRadius, supported: SUPPORTED_MOVES.has(name), offFloor: OFF_FLOOR_MOVES.has(name), velocity,
         frames: inPlace.map(f => moveFrame(f, velocity[0] * f.t, velocity[1] * f.t)) });
     }
     return out;

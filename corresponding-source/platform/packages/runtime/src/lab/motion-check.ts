@@ -19,7 +19,9 @@ export interface CheckMove { move: string; body: string; style: MotionStyleId; l
   /** Radius of the torso around the hips → neck line (m); from the body's rest pose. */
   torsoRadius: number;
   /** A seat or a wall carries the weight (Sit, Climb): balance is not scored. */
-  supported?: boolean; }
+  supported?: boolean;
+  /** Played in the air or in water (Jump, swims): floor, slide, balance and speed are not scored. */
+  offFloor?: boolean; }
 
 /** A sole point touches the floor below this height (m) when it is not moving up or down fast. */
 export const PLANT_HEIGHT = 0.03, PLANT_VERTICAL_SPEED = 0.2;
@@ -91,14 +93,33 @@ function bodySpeed(frames: readonly CheckFrame[], i: number): number {
   return flat(b.hips, a.hips) / ((b.t - a.t) || 1);
 }
 
-/** Balance: while standing, seconds the weight (mean of hips, chest, head) has been outside the planted feet. */
+/**
+ * Centre of mass on the floor from rough body-segment weights: trunk 30 %, pelvis 15 %, head 8 %, each thigh 10 % (its
+ * middle), each shin and foot 6 % (its middle), each arm 5 % (the elbow).
+ */
+export function centreOfMass(f: CheckFrame): Vec3 {
+  const parts: Array<[Vec3, number]> = [[f.chest, 0.3], [f.hips, 0.15], [f.head, 0.08]];
+  for (const leg of f.legs) parts.push([mid(leg.root, leg.mid), 0.1], [mid(leg.mid, leg.end), 0.06]);
+  for (const arm of f.arms) parts.push([arm.mid, 0.05]);
+  const total = parts.reduce((sum, [, w]) => sum + w, 0);
+  return [parts.reduce((sum, [p, w]) => sum + p[0] * w, 0) / total, 0, parts.reduce((sum, [p, w]) => sum + p[2] * w, 0) / total];
+}
+const mid = (a: Vec3, b: Vec3): Vec3 => [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2, (a[2] + b[2]) / 2];
+
+/** Hips speed in 3D: rising or sinking (a jump's take-off, a landing) is not standing. */
+function hipsSpeed(frames: readonly CheckFrame[], i: number): number {
+  const a = frames[Math.max(0, i - 1)]!, b = frames[Math.min(frames.length - 1, i + 1)]!;
+  return len(sub(b.hips, a.hips)) / ((b.t - a.t) || 1);
+}
+
+/** Balance: while standing, seconds the centre of mass has been outside the planted feet. */
 function balance(frames: readonly CheckFrame[]): Series {
   let outside = 0;
   return frames.map((f, i) => {
     const dt = i ? f.t - frames[i - 1]!.t : 0;
     const support = ([0, 1] as const).flatMap(foot => (['heel', 'toe'] as const).filter(p => planted(frames, foot, p, i)).map(p => f.feet[foot][p]));
-    if (!support.length || bodySpeed(frames, i) > MOVING_SPEED) { outside = 0; return 0; }
-    const weight: Vec3 = [(f.hips[0] + f.chest[0] + f.head[0]) / 3, 0, (f.hips[2] + f.chest[2] + f.head[2]) / 3];
+    if (!support.length || hipsSpeed(frames, i) > MOVING_SPEED) { outside = 0; return 0; }
+    const weight = centreOfMass(f);
     // Support area: the planted points, their segments, and a 6 cm margin for the foot's width.
     let near = Infinity;
     for (const a of support) for (const b of support) near = Math.min(near, distanceToSegment(weight, [a[0], 0, a[2]], [b[0], 0, b[2]]));
@@ -165,14 +186,15 @@ const penalty = (issue: MotionCheckIssue) => Math.min(MOTION_CHECK_WEIGHTS[issue
 /** One cell of the grid: every check against the style's limits, a 0–100 score and the issues, worst first. */
 export function checkMove(input: CheckMove, limits: MotionCheckLimits): MotionCheckCell {
   const { frames } = input;
+  const floor = !input.offFloor;
   const all: MotionCheckIssue[] = [
-    ...ranges('foot_slide', footSlide(frames), limits.foot_slide_cm),
-    ...ranges('ground', ground(frames), limits.ground_cm),
+    ...(floor ? ranges('foot_slide', footSlide(frames), limits.foot_slide_cm) : []),
+    ...(floor ? ranges('ground', ground(frames), limits.ground_cm) : []),
     ...ranges('joint_limits', jointLimits(frames), limits.joint_extra_deg),
     ...ranges('body_clash', bodyClash(frames, input.torsoRadius), limits.body_clash_cm),
-    ...(limits.balance_s === null || input.supported ? [] : ranges('balance', balance(frames), limits.balance_s)),
+    ...(limits.balance_s === null || input.supported || !floor ? [] : ranges('balance', balance(frames), limits.balance_s)),
     ...(input.loop ? ranges('loop_seam', loopSeam(frames), limits.loop_seam_deg) : []),
-    ...ranges('speed_match', speedMatch(frames), limits.speed_match_pct),
+    ...(floor ? ranges('speed_match', speedMatch(frames), limits.speed_match_pct) : []),
   ];
   // A check takes points once, from its worst issue.
   const worst = new Map<MotionCheckId, number>();

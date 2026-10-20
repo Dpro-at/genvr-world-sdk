@@ -60,6 +60,11 @@ describe('board M16 · motion check', () => {
     expect(run(lean).issues).toContainEqual(expect.objectContaining({ check: 'balance', unit: 's' }));
     expect(run(lean, false, 'anime').issues.filter(i => i.check === 'balance')).toEqual([]);
   });
+  it('moves in the air or in water skip the floor checks but keep the body checks', () => {
+    const sunk = frames(10, f => { f.feet[0] = { heel: [0.1, -0.2, -0.05], toe: [0.1, -0.2, 0.12] }; f.arms[1] = { ...f.arms[1], end: [0.02, 1.3, 0.03] }; });
+    const cell = checkMove({ move: 'Swim', body: 'robot', style: 'realistic', loop: false, frames: sunk, torsoRadius: 0.12, offFloor: true }, realistic);
+    expect(checks(cell)).toEqual(['body_clash']);
+  });
   it('a loop whose last frame differs from the first is caught', () => {
     const cell = run(frames(20, (f, i) => { if (i === 19) f.arms[0] = { ...f.arms[0], mid: [0.5, 1.35, 0], end: [0.75, 1.3, 0] }; }), true);
     expect(cell.issues).toContainEqual(expect.objectContaining({ check: 'loop_seam', from: 19 }));
@@ -101,6 +106,13 @@ describe('board M16 · headless run on the Standard robot', () => {
       if (move.move.startsWith('Swim')) continue;
       const lowest = Math.min(...move.frames.flatMap(f => f.feet.flatMap(foot => [foot.heel[1], foot.toe[1]])));
       expect(lowest, move.move).toBeGreaterThan(-0.01);
+    }
+    // Feet locked while planted: walking, crouch walking and backing up score at least 90 and slide at most 2 cm.
+    const cells = checkAllMoves(undefined, ['realistic']);
+    for (const move of ['Walk', 'CrouchWalk', 'Sneak', 'Backpedal', 'SoftLanding', 'HardLanding']) {
+      const cell = cells.find(row => row.move === move)!;
+      expect(cell.score, move).toBeGreaterThanOrEqual(90);
+      expect(Math.max(0, ...cell.issues.filter(issue => issue.check === 'foot_slide').map(issue => issue.value)), move).toBeLessThanOrEqual(2);
     }
     // Crouch walk travels at its Lab speed.
     expect(sampleMoves(undefined, ['CrouchWalk'])[0]!.velocity).toEqual([0, 0.9]);
