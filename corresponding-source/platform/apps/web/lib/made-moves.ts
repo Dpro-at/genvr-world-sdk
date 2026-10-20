@@ -104,6 +104,18 @@ export class MadeMovesController {
   }
 }
 
+/**
+ * What may leave this device with a published world (board M19, Q-M19a): only made motions that pass the M14 rights
+ * (made here, not from Mixamo or a video, on a GenVR character); the others stay in this project and are listed with
+ * the reason, so the owner sees them before confirming the publish.
+ */
+export function publishableMadeMoves(moves: readonly GameMadeMove[]): { send: GameMadeMove[]; held: Array<{ name: string; reasons: string[] }> } {
+  return {
+    send: moves.filter((m) => m.rights.shareable),
+    held: moves.filter((m) => !m.rights.shareable).map((m) => ({ name: m.name, reasons: m.rights.reasons.length ? m.rights.reasons : ['Not shareable.'] })),
+  };
+}
+
 /** The open project's made moves, for the live bridge and the in-app assistant. */
 export const madeMovesBridge = (() => {
   let current: MadeMovesController | null = null;

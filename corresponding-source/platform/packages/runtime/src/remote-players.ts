@@ -12,6 +12,9 @@ import {
   type MeshStandardMaterial,
 } from 'three/webgpu';
 import { AvatarAnimator } from './animator.js';
+import { madeMotionClip } from './lab/made-clip.js';
+import type { AvatarBody } from '@genvr/core-library';
+import type { LabMadeMotion } from '@genvr/contracts';
 import { DEFAULT_BODY_ID, normalizeAvatarLook, type BlockStyle } from '@genvr/core-library';
 import { BLOCKS } from '@genvr/world';
 import { BlockFaces, heldBlockMesh, heldItemMesh, holdInRightHand } from './player-hands.js';
@@ -184,6 +187,19 @@ export class RemotePlayers {
   #cubes = false;
   /** Pictures of the blocks in other players' hands, in the place's block look. */
   #faces: BlockFaces | null = null;
+  /** Board M19: the place's made motions, so another player's `motion:made-<id>` plays on their avatar too. */
+  #made: ReadonlyArray<{ id: string; motion: Pick<LabMadeMotion, 'frames' | 'loop' | 'keys'>; once: boolean }> = [];
+
+  /** The place's made motions (board M19): built on every other player's body, now and when one joins or changes body. */
+  setMadeMoves(moves: ReadonlyArray<{ id: string; motion: Pick<LabMadeMotion, 'frames' | 'loop' | 'keys'>; once: boolean }>): void {
+    this.#made = [...moves];
+    for (const remote of this.#players.values()) this.#learnMade(remote.avatar, remote.animator);
+  }
+  #learnMade(avatar: GenvrAvatar, animator: AvatarAnimator): void {
+    const body = avatar.mesh.userData.fittedBody as AvatarBody | undefined;
+    if (!body) return;
+    for (const move of this.#made) animator.register(madeMotionClip(move.motion, body, `motion:made-${move.id}`), move.once);
+  }
 
   constructor(options: { cubes?: boolean } = {}) {
     this.group.name = 'remote-players';
@@ -262,8 +278,10 @@ export class RemotePlayers {
       const look = state.look ?? '';
       if (look !== existing.look) {
         existing.look = look;
-        if (existing.avatar.setLook(lookFor(id, look)))
+        if (existing.avatar.setLook(lookFor(id, look))) {
           existing.animator.rebind(existing.avatar.mesh, existing.avatar.clips);
+          this.#learnMade(existing.avatar, existing.animator);
+        }
       }
       this.#holdTool(existing, state.tool ?? '');
       this.#hold(existing, state.hand ?? 0);
@@ -272,9 +290,10 @@ export class RemotePlayers {
     // A mesh body shows as Classic until its model arrives, then the animator binds to it.
     const avatar = createGenvrAvatar(lookFor(id, state.look), {
       cubes: this.#cubes,
-      onBodyReady: () => animator.rebind(avatar.mesh, avatar.clips),
+      onBodyReady: () => { animator.rebind(avatar.mesh, avatar.clips); this.#learnMade(avatar, animator); },
     });
     const animator = new AvatarAnimator(avatar.mesh, avatar.clips);
+    this.#learnMade(avatar, animator);
     animator.play(state.clip);
     const tag = nameTag(state.name);
     avatar.root.add(tag);

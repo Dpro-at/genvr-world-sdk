@@ -99,6 +99,17 @@ Show the change to the person (a view or the face close-up) and describe what ch
 
 The SDK forwards the existing platform filming tools when its operator configures `GENVR_HOST_MCP_URL` and `GENVR_HOST_MCP_TOKEN`. First inspect `get_studio_capabilities`, then `list_capture_sessions` for the host place. Use `set_camera`, `capture_photo`, `record_video`, and `get_capture` with the returned session ID. For editing, call `studio_action` with operation `{ "kind": "commands" }` before issuing commands or batches. These are the same editor operations as the Filming workspace. A local file-world ID is not a platform place ID. Do not claim a recording, render or edit succeeded until the host job reports success.
 
+## Made motions in the game (board M19)
+
+Motions made in the Motion lab (Pose and keys) go to **My motions › Made in the Lab** when a version is saved (or with `motion_lab` `made_to_moves`). Use them in a project through `avatar_studio`:
+
+- `moves_mine` — the made motions (newest version of each: id, name, version, score, whether it passed the course, how fast its feet travel, loop, shareable) and where this project uses each.
+- `move_use { motion, slot: 1–8, once? }` — the player's key 1–8 plays it (once by default; `once: false` loops until the player moves). One move per key; a new one takes the key.
+- `move_use { motion, replaces: Idle | Walk | Run | Jump }` — it plays instead of that base move for this project's avatar only. Walk and Run take only a loop that travels (its feet give at least 0.3 m/s) and passed the course; Idle needs a loop. The answer explains a refusal: fix the motion in the Lab, do not retry.
+- `move_unuse { motion }`, `move_preview { motion }` (plays it once on the avatar).
+
+In Test world and play: keys 1–8 and the move bar; controllers: D-pad 1–4, hold LB + D-pad 5–8. Other players see a made motion only when the world carries it: only shareable ones (made in the lab, not from Mixamo or a video, on a GenVR character) may go with a published world, and the owner confirms the publish. Never publish for the owner.
+
 ## Private user library
 
 Use `user_avatar_library` with `action: "list"` to discover private character and motion IDs. Paginate with `offset` and `limit` (maximum100). Use `action: "assign"`, `target` and an available character `id`; `id: null` restores the default. Use `action: "play"` with an available private motion ID for playback. Use `action: "delete"` with an `id` only when the owner asks to delete that imported character or motion: list first and use the returned ID. The Studio shows the owner a confirm and the tool waits for the owner's Delete or Cancel; it answers `result: "deleted"` or `result: "cancelled"` (also when nobody answers in time). Nothing is deleted without the owner's click, and built-in bodies cannot be deleted. When the answer lists `targets`, tell the owner that the Standard robot now replaces the deleted character for them. Requires an attached Studio host. Standalone file-only MCP reports it unavailable. Never infer permission to publish or redistribute private files. Imported facial morph support varies; skeletal playback does not imply facial expression support.

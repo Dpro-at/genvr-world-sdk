@@ -147,6 +147,8 @@ hand / foot 2, Pin 3, Onion skin O, Play Space; under it: the key track). Same t
   slide: say so, it is honest). `pose_save_version { note? }` — tests again only when the keys changed, then keeps the
   run as a version with the keys; `rollback` brings the keys back.
 
+After Save as version the motion is in My motions (Avatar › Moves); `made_to_moves { version? }` puts an older version there. Using it in the game (keys 1–8, or instead of Idle / Walk / Run / Jump) is `avatar_studio` `move_use` — see the avatar-presentation skill.
+
 Habits: key the whole body on frame 0, then only the joints that change; read `problems` after big changes; mirror
 for the other side instead of setting it by hand.
 

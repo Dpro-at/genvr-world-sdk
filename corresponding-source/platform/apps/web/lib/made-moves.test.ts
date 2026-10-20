@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { LabController, newLabData, runMotionLab } from './motion-lab';
-import { MadeMovesController, madeMovesBridge, memoryMadeMotionStore } from './made-moves';
+import { MadeMovesController, madeMovesBridge, memoryMadeMotionStore, publishableMadeMoves } from './made-moves';
 import { runAvatarStudio } from './avatar-studio';
 
 const agent = { kind: 'agent' as const, name: 'Luna' };
@@ -68,5 +68,13 @@ describe('made motions in the game (board M19)', () => {
       lab.openMotionAt('Punch');
       expect(await runMotionLab(lab, { kind: 'made_to_moves' }, agent)).toMatchObject({ name: 'Punch', version: 1 });
     } finally { off(); }
+  });
+  it('sends only shareable made motions with a published world', async () => {
+    const { moves } = await setup();
+    const punch = await moves.use('Punch', { slot: 1 });
+    const imported = { ...punch, id: 'made-x-v1', name: 'On my imported character', slot: 2, rights: { shareable: false, reasons: ['"Punch" on "user.mixamo.x.character" is not a GenVR character.'] } };
+    const out = publishableMadeMoves([punch, imported]);
+    expect(out.send.map((m) => m.name)).toEqual(['Punch']);
+    expect(out.held).toEqual([{ name: 'On my imported character', reasons: [expect.stringMatching(/not a GenVR character/)] }]);
   });
 });

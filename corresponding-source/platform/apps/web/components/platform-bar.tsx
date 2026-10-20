@@ -11,7 +11,7 @@ import { useSettings } from '../lib/settings';
 import { ChatPanel } from './chat-panel';
 import { SystemMenu, type ItemCredit } from './system-menu';
 import { GenvrMark } from './genvr-mark';
-import { moveForSlot } from './move-keys';
+import { moveForSlot, padMoveSlot } from './move-keys';
 
 const typing = (target: EventTarget | null) =>
   target instanceof HTMLInputElement ||
@@ -92,8 +92,9 @@ export function PlatformBar({
       else if (button === PAD.leave) onLeave();
       return;
     }
-    const slot = [PAD.up, PAD.right, PAD.down, PAD.left].indexOf(button as never);
-    const id = slot >= 0 ? moveForSlot(runtime.current, slot + 1) : undefined;
+    // D-pad: keys 1–4; with LB held: 5–8 (board M19).
+    const slot = padMoveSlot(button);
+    const id = slot ? moveForSlot(runtime.current, slot) : undefined;
     if (id) runtime.current?.playAnimation(id);
   });
 

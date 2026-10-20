@@ -3656,7 +3656,7 @@ export async function createRuntime({
       // Another body type brings another skeleton: the animator binds to its clips.
       if (avatar.setLook(look)) { animator.rebind(avatar.mesh, avatar.clips); applyMadeMoves(); }
     },
-    setMadeMoves: (moves) => { madeMoves = [...moves]; applyMadeMoves(); },
+    setMadeMoves: (moves) => { madeMoves = [...moves]; applyMadeMoves(); remotePlayers.setMadeMoves(moves); },
     moveSlot: (slot) => { const move = madeMoves.find((m) => m.slot === slot); return move ? `motion:made-${move.id}` : null; },
     setPaused: (paused) => {
       renderingPaused = paused;
