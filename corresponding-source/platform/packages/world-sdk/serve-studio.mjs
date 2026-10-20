@@ -14,6 +14,8 @@ const types = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/ja
  * the package, never copied into dist, so it cannot ship. GENVR_PRIVATE_MOTIONS, or the source tree's .local-runtime.
  */
 const PRIVATE_MOTIONS = '/private-motions/';
+/** In the source tree, body models kept out of the build (local bodies) still load from the web app's own folder. */
+const SOURCE_BODIES = resolve(root, '../../apps/web/public/bodies');
 const LOCAL_HOST = /^((127\.0\.0\.1|localhost)(:\d+)?|\[::1\](:\d+)?)$/;
 export function createStudioServer({ bridge, privateMotions } = {}) {
   return createServer(async (req, res) => {
@@ -28,7 +30,12 @@ export function createStudioServer({ bridge, privateMotions } = {}) {
       // Private files answer only this machine's own address (a rebound DNS name must not read them).
       if (own && !LOCAL_HOST.test(req.headers.host ?? '')) { res.writeHead(403); res.end(); return; }
       const file = own ? resolve(privateMotions, '.' + path.slice(PRIVATE_MOTIONS.length - 1)) : path === '/' ? resolve(dist, 'studio.html') : path.startsWith('/dist/') ? resolve(root, '.' + path) : resolve(dist, 'studio-assets', '.' + path);
-      const actual = await realpath(file), inside = relative(await realpath(base), actual);
+      let actual = await realpath(file).catch(() => null), inside = actual ? relative(await realpath(base), actual) : '..';
+      if (!actual && !own && path.startsWith('/bodies/') && LOCAL_HOST.test(req.headers.host ?? '')) {
+        actual = await realpath(resolve(SOURCE_BODIES, '.' + path.slice('/bodies'.length))).catch(() => null);
+        inside = actual ? relative(await realpath(SOURCE_BODIES), actual) : '..';
+      }
+      if (!actual) throw new Error('Not found');
       if (inside.startsWith('..') || isAbsolute(inside)) { res.writeHead(403); res.end(); return; }
       let data = await readFile(actual);
       if (path === '/' && bridge) {

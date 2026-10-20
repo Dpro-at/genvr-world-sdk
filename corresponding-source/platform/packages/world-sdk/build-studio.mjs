@@ -5,6 +5,7 @@ import { createHash } from 'node:crypto';
 import { createRequire } from 'node:module';
 import { LIBRARY } from '@genvr/core-library';
 import { THEME_BOOT_SCRIPT } from '../../apps/web/lib/theme-script.ts';
+import { LOCAL_BODIES } from '@genvr/core-library';
 const web = resolve('../../apps/web');
 const requireWeb = createRequire(resolve(web, 'package.json'));
 const postcss = requireWeb('postcss'), tailwind = requireWeb('@tailwindcss/postcss');
@@ -30,8 +31,10 @@ const styled = await postcss([tailwind({ base: web, optimize: true })]).process(
 const componentCss = await readFile('dist/studio.css', 'utf8');
 await writeFile('dist/studio.css', styled.css + '\n' + componentCss);
 // The same tracked application assets, with their existing credits, served from the local package.
+// Local bodies (models only on the owner's device, licence not settled) never go into the build.
+const localBodyFiles = new Set(LOCAL_BODIES.flatMap(body => [body.model, body.picture]).filter(Boolean).map(path => path.split('/').pop()));
 for (const directory of ['film-examples', 'brand', 'create', 'materials', 'models', 'human', 'bodies', 'audio', 'market', 'mediapipe']) {
-  await cp(resolve(web, 'public', directory), resolve('dist/studio-assets', directory), { recursive: true });
+  await cp(resolve(web, 'public', directory), resolve('dist/studio-assets', directory), { recursive: true, filter: source => !(directory === 'bodies' && localBodyFiles.has(source.split('/').pop())) });
 }
 for (const family of ['draco', 'basis']) {
   const entry = family === 'draco' ? 'draco_decoder.js' : 'basis_transcoder.js';

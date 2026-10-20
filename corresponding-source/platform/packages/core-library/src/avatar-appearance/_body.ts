@@ -48,11 +48,29 @@ export const HIDDEN_BODY_IDS: ReadonlySet<string> = new Set(['classic', 'simple'
 /** The default body for a new player look and a new character. */
 export const DEFAULT_BODY_ID = 'robot';
 
-/** Bodies a person or an agent can pick now: the Standard robot first, then the others still offered. */
-export const PICKABLE_BODIES: readonly CoreBody[] = [
+/**
+ * Bodies a person or an agent can pick now: the Standard robot first, then the others still offered. A local body
+ * (model only on the owner's device) joins when the host found its model (`offerLocalBody`).
+ */
+const pickable: CoreBody[] = [
   ...PLAYER_BODIES.filter((body) => body.id === DEFAULT_BODY_ID),
-  ...PLAYER_BODIES.filter((body) => body.id !== DEFAULT_BODY_ID && !HIDDEN_BODY_IDS.has(body.id)),
+  ...PLAYER_BODIES.filter((body) => body.id !== DEFAULT_BODY_ID && !HIDDEN_BODY_IDS.has(body.id) && !body.local),
 ];
+export const PICKABLE_BODIES: readonly CoreBody[] = pickable;
+
+/** Bodies whose models live only on the owner's device; the host checks each model before offering it. */
+export const LOCAL_BODIES: readonly CoreBody[] = PLAYER_BODIES.filter((body) => body.local);
+
+/** Offers a local body once its model is there (in library order); returns whether it is offered. */
+export function offerLocalBody(id: string): boolean {
+  const body = LOCAL_BODIES.find((row) => row.id === id);
+  if (!body) return false;
+  if (!pickable.includes(body)) {
+    pickable.push(body);
+    pickable.sort((a, b) => (a.id === DEFAULT_BODY_ID ? -1 : b.id === DEFAULT_BODY_ID ? 1 : PLAYER_BODIES.indexOf(a) - PLAYER_BODIES.indexOf(b)));
+  }
+  return true;
+}
 
 const bodies = new Map(AVATAR_BODIES.map((body) => [body.id, body]));
 

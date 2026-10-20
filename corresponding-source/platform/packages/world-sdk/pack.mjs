@@ -1,4 +1,5 @@
 import { THEME_BOOT_SCRIPT } from '../../apps/web/lib/theme-script.ts';
+import { LOCAL_BODIES } from '@genvr/core-library';
 import { constants } from 'node:fs';
 import { cp, mkdir, mkdtemp, readFile, writeFile, rm, lstat, readdir, link, unlink } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
@@ -23,7 +24,10 @@ async function copy(source, destination, options = {}) {
 const temp = await mkdtemp(resolve(tmpdir(), 'genvr-sdk-pack-'));
 try {
 const root = resolve(temp, 'package'); await mkdir(root);
-await copy('dist', resolve(root, 'dist'), { recursive: true, filter: source => !source.endsWith('.tgz') && !source.endsWith('.map') });
+// Local bodies (models only on the owner's device, licence not settled) never ship, even from a stale build.
+const localBodyFiles = new Set(LOCAL_BODIES.flatMap(body => [body.model, body.picture]).filter(Boolean).map(path => path.split('/').pop()));
+const localBody = source => source.includes('/bodies/') && localBodyFiles.has(source.split('/').pop());
+await copy('dist', resolve(root, 'dist'), { recursive: true, filter: source => !source.endsWith('.tgz') && !source.endsWith('.map') && !localBody(source) });
 // Package the canonical launcher, never a host's locally configured preview HTML.
 const studioTemplate = await readFile('studio/index.html', 'utf8');
 await unlink(resolve(root, 'dist/studio.html'));
@@ -57,7 +61,7 @@ for (const file of new Set(files)) {
     || (parts[0] === 'platform' && parts[1] === 'packages' && packages.has(parts[2]))
     || (file.startsWith('platform/apps/web/') && ['components', 'lib', 'public', 'package.json', 'tsconfig.json'].includes(parts[3]))
     || file === 'platform/apps/web/app/globals.css';
-  if (!selected || parts.some(part => ['.env', 'node_modules', 'dist', '.next', '.data'].includes(part)) || file.endsWith('.tsbuildinfo')) continue;
+  if (!selected || parts.some(part => ['.env', 'node_modules', 'dist', '.next', '.data'].includes(part)) || file.endsWith('.tsbuildinfo') || localBody(file)) continue;
   await mkdir(dirname(resolve(source, file)), { recursive: true });
   await copy(resolve(repo, file), resolve(source, file));
 }

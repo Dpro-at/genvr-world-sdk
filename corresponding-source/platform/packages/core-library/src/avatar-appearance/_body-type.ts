@@ -127,6 +127,11 @@ export interface AvatarBody {
    * head and neck shrink and grow with the body instead of keeping their size (owner, 2026-10-20: long necks).
    */
   proportional?: boolean;
+  /**
+   * A body whose model is kept only on the owner's device (its licence is not settled): never offered unless the host
+   * found the model and called `offerLocalBody`; releases leave its files out.
+   */
+  local?: boolean;
   /** Hair, coat panels, and tassels that swing with the body's motion (P2-35 warrior). */
   springs?: { chains: readonly SpringChain[]; colliders: readonly SpringCollider[] };
 }

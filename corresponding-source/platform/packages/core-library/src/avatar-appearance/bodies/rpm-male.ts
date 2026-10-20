@@ -96,6 +96,7 @@ export default defineBody({
   fit: {},
   sketchArm: { start: 0.2, axisY: 1.44, hangX: 0.2, topY: 1.44 },
   proportional: true,
+  local: true,
   model: '/bodies/rpm-male.glb',
   picture: '/bodies/rpm-male.png',
   triangles: 13369,
