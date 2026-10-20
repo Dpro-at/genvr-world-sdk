@@ -466,6 +466,8 @@ export class LabController {
   /** A person's change applies at once; an agent's waits for the owner (a style is for everyone). */
   setStyle(style: MotionStyleId, change: { params?: Partial<MotionStyleParams> | undefined; limits?: Partial<MotionCheckLimits> | undefined }, by: LabActor = PERSON) {
     if (by.kind === 'agent') {
+      // One proposal at a time: the owner confirms exactly the change shown, never one swapped in after it.
+      if (this.#data.style_pending) throw new Error(`A style change by ${this.#data.style_pending.by} is already waiting for the owner.`);
       this.#set({ style_pending: { style, ...(change.params ? { params: change.params } : {}), ...(change.limits ? { limits: change.limits } : {}), by: by.name } });
       return { applied: false, pending: style, note: 'The owner confirms changes to a style in the Lab (Check).' };
     }
@@ -474,10 +476,12 @@ export class LabController {
     this.#set({ styles: { ...this.#data.styles, [style]: next } });
     return { applied: true, style: next };
   }
-  confirmPendingStyle(by: LabActor = PERSON) {
+  /** `seen`: the proposal as the owner saw it; the change applies only if it is still exactly that one. */
+  confirmPendingStyle(by: LabActor = PERSON, seen?: string) {
     if (by.kind === 'agent') throw new Error('Only the owner confirms a style change (in the Lab, Check). It keeps waiting.');
     const pending = this.#data.style_pending;
     if (!pending) throw new Error('No style change is waiting.');
+    if (seen !== undefined && seen !== JSON.stringify(pending)) throw new Error('The waiting style change was replaced. Look at it again before applying.');
     this.#data = LabProjectData.parse({ ...this.#data, style_pending: null });
     return this.setStyle(pending.style, { params: pending.params, limits: pending.limits }, PERSON);
   }

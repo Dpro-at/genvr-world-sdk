@@ -63,8 +63,11 @@ export function LabCheckRight({ lab }: { lab: LabController }) {
     <div className="flex h-full min-h-0 flex-col gap-3 overflow-auto p-3">
       {pending ? (
         <div role="status" className="flex items-center gap-2 rounded-lg bg-amber-500/15 px-2 py-1.5 text-xs">
-          <span className="flex-1">{pending.by} asks to change the {STYLE_NAMES[pending.style]} style ({Object.keys({ ...pending.params, ...pending.limits }).join(', ')}).</span>
-          <button type="button" className="flex items-center gap-1 rounded bg-ink px-2 py-1 font-bold text-on-brand" onClick={() => tryRun(() => lab.confirmPendingStyle(PERSON), setError)}><Check className="size-3.5" />Apply</button>
+          <span className="flex-1">{pending.by} asks to change the {STYLE_NAMES[pending.style]} style:{' '}
+            {Object.entries({ ...pending.params, ...pending.limits }).map(([key, value]) => {
+              const now = (lab.data.styles[pending.style].params as Record<string, unknown>)[key] ?? (lab.data.styles[pending.style].limits as Record<string, unknown>)[key];
+              return <b key={key} className="mr-1 font-mono">{key} {JSON.stringify(now)} → {JSON.stringify(value)}</b>; })}</span>
+          <button type="button" className="flex items-center gap-1 rounded bg-ink px-2 py-1 font-bold text-on-brand" onClick={() => tryRun(() => lab.confirmPendingStyle(PERSON, JSON.stringify(pending)), setError)}><Check className="size-3.5" />Apply</button>
           <button type="button" className="rounded px-2 py-1 font-bold hover:bg-ink/10" onClick={() => lab.rejectPendingStyle()}>No</button>
         </div>) : null}
       {cell ? (

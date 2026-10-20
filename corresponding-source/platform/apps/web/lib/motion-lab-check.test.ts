@@ -40,7 +40,10 @@ describe('board M16 · motion check and styles in the Lab and through motion_lab
     expect(lab.data.styles.anime.params.amplitude).toBe(1.3);
     await expect(runMotionLab(lab, { kind: 'style_confirm', confirm: true }, agent)).rejects.toThrow('Only the owner');
     expect(lab.data.style_pending).toMatchObject({ style: 'anime', by: 'Luna' });
-    lab.confirmPendingStyle(PERSON);
+    // A second proposal cannot replace the one the owner is looking at, and Apply only takes the proposal shown.
+    await expect(runMotionLab(lab, { kind: 'style_set', style: 'anime', params: { amplitude: 2 } }, agent)).rejects.toThrow('already waiting');
+    expect(() => lab.confirmPendingStyle(PERSON, JSON.stringify({ ...lab.data.style_pending, params: { amplitude: 2 } }))).toThrow('replaced');
+    lab.confirmPendingStyle(PERSON, JSON.stringify(lab.data.style_pending));
     expect(lab.data.styles.anime.params.amplitude).toBe(1.4);
     expect(lab.data.style_pending).toBeNull();
     // Limits stay inside the contract.
