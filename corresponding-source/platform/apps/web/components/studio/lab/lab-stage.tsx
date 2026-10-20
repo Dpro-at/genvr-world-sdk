@@ -90,7 +90,9 @@ export function LabStage({ lab }: { lab: LabController }) {
   const view = lab.view;
   // Board M11: in Pose the character stands at the start holding the open made motion's pose on the pose frame.
   const posing = view.mode === 'pose' && Boolean(lab.openMotion);
-  const frame = posing ? null : lab.frameAt(view.t);
+  // Board M16: in Check the character plays the open move in place (or holds the frame of an issue).
+  const checking = view.mode === 'check';
+  const frame = posing || checking ? null : lab.frameAt(view.t);
   const ghost = view.ghost?.frames[Math.min(view.ghost.frames.length - 1, Math.round(view.t * 60))] ?? null;
   // During a run the move's clip follows the run itself (feet keep pace with the floor at any speed, slow motion,
   // pause and seeking); at the end of the run the robot stands in Idle instead of walking on the spot.
@@ -118,7 +120,7 @@ export function LabStage({ lab }: { lab: LabController }) {
     } }).catch(() => { if (live) setShown(null); });
     return () => { live = false; };
   }, [ready, who, lab]);
-  useEffect(() => { const id = CLIPS.get(clip) ?? CLIPS.get('Idle'); if (ready && id) stage.current?.play(id); }, [ready, clip, shown]);
+  useEffect(() => { const id = checking ? (view.check.move ?? 'Idle') : CLIPS.get(clip) ?? CLIPS.get('Idle'); if (ready && id) stage.current?.play(id); }, [ready, clip, shown, checking, view.check.move]);
   // Pose (board M11) looks at the character from close, in front and to his right; the run view goes back behind him.
   useEffect(() => {
     if (!ready || !stage.current) return;
@@ -128,6 +130,7 @@ export function LabStage({ lab }: { lab: LabController }) {
   useEffect(() => { if (ready) stage.current?.setViewMode(view.overlays.includes('skeleton') ? 'skeleton-mesh' : 'normal'); }, [ready, view.overlays, shown]);
   useEffect(() => {
     if (!ready || !stage.current) return;
+    if (checking) { stage.current.setHeldPose(null); stage.current.setPaused(view.check.frame !== null); if (view.check.frame !== null) stage.current.setClipTime(view.check.frame / 60); return; }
     stage.current.setPaused(driven || posing);
     if (driven && frames && !madeInRun) stage.current.setClipTime(labClipTime(frames, view.t * 60, lab.legScale));
     if (heldPose) { const { bones, root } = labClipPose(heldPose); stage.current.setHeldPose({ bones, root: root.map((m) => m * lab.legScale) }); }

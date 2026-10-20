@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { LAB_MAX_STATIONS, LAB_STATION_KINDS, LabProp, LabStation, stationProblems } from './motion-lab-stations.js';
+import { DEFAULT_MOTION_STYLES, MotionCheckLimits, MotionCheckReport, MotionStyle, MotionStyleId, MotionStyleParams } from './motion-style.js';
 
 /**
  * Motion lab (MOTION-LAB L1 + L2): an empty grey test world with a measured course, a street with box cars, repeatable
@@ -281,6 +282,12 @@ export const LabProjectData = z.object({
   shares: z.array(MotionShare).max(500).default([]),
   /** Board M11: motions made here by pose and key frames. */
   motions: z.array(LabMadeMotion).max(50).default([]),
+  /** Board M16: the last motion check (every move on a body, in each style) and when it ran. */
+  check: z.object({ at: z.string().max(40), body: characterId, report: MotionCheckReport }).strict().nullable().default(null),
+  /** Board M16: each style's numbers and check limits as the owner set them (the board's proposals until then). */
+  styles: z.object({ realistic: MotionStyle, game: MotionStyle, anime: MotionStyle }).strict().default(() => structuredClone(DEFAULT_MOTION_STYLES)),
+  /** An agent's change to a style waits here until the owner confirms it (a style is for everyone). */
+  style_pending: z.object({ style: MotionStyleId, params: MotionStyleParams.partial().optional(), limits: MotionCheckLimits.partial().optional(), by: z.string().max(80) }).strict().nullable().default(null),
 }).strict().superRefine((data, ctx) => {
   const names = new Set<string>();
   for (const [i, m] of data.motions.entries()) {
@@ -404,6 +411,19 @@ export const MotionLabOperation = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('conveyor_set'), id: labId, speed_mps: metres(0.1, 1).optional(), every_s: metres(1, 5).optional(), mix: z.boolean().optional() }).strict(),
   /** Run every station `repeats` times (seeds seed, +1, …) without keeping the runs: the best per station, worst first. */
   z.object({ kind: z.literal('stations_run_all'), repeats: z.number().int().min(1).max(20).default(3), settings: LabRunSettingsPatch.optional() }).strict(),
+  // ---- motion check and styles (board M16)
+  /** Check every move on the Lab's body in the styles asked (default all three); the report is kept in the project. */
+  z.object({ kind: z.literal('check_all'), styles: z.array(MotionStyleId).min(1).max(3).optional() }).strict(),
+  /** The kept report, worst first: { style?, limit? }. */
+  z.object({ kind: z.literal('check_report'), style: MotionStyleId.optional(), limit: z.number().int().min(1).max(200).default(20) }).strict(),
+  /** One move's card: score and issues by frame in a style (checked again now). */
+  z.object({ kind: z.literal('check_move'), move: z.string().min(1).max(60), style: MotionStyleId.default('realistic') }).strict(),
+  /** A style's numbers and limits. */
+  z.object({ kind: z.literal('style_params'), style: MotionStyleId.optional() }).strict(),
+  /** Change a style's numbers or limits. A person's change applies; an agent's waits for the owner (style_confirm). */
+  z.object({ kind: z.literal('style_set'), style: MotionStyleId, params: MotionStyleParams.partial().optional(), limits: MotionCheckLimits.partial().optional() }).strict(),
+  /** Apply the waiting style change. Owner only: an agent's call is refused and the change keeps waiting. */
+  z.object({ kind: z.literal('style_confirm'), confirm: z.literal(true) }).strict(),
   // ---- pose and key frames (board M11)
   /** Motions made in the Lab and the one open in Pose. */
   z.object({ kind: z.literal('pose_list') }).strict(),

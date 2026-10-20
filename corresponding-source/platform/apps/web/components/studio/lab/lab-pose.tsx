@@ -30,8 +30,8 @@ const chosenRows = (lab: LabController) => labRowsOf(lab.view.pose.group, lab.vi
 export function LabModeSwitch({ lab }: { lab: LabController }) {
   useLab(lab);
   return (
-    <div role="radiogroup" aria-label="Lab mode" className="grid grid-cols-2 gap-1 rounded-lg bg-ink/5 p-0.5">
-      {([['run', 'Course and runs'], ['pose', 'Pose and keys']] as const).map(([mode, name]) => (
+    <div role="radiogroup" aria-label="Lab mode" className="grid grid-cols-3 gap-1 rounded-lg bg-ink/5 p-0.5">
+      {([['run', 'Course and runs'], ['pose', 'Pose and keys'], ['check', 'Check moves']] as const).map(([mode, name]) => (
         <button key={mode} type="button" role="radio" aria-checked={lab.view.mode === mode} onClick={() => lab.setMode(mode)}
           className={`rounded-md py-1 text-[11px] font-bold ${lab.view.mode === mode ? 'bg-ink text-on-brand' : 'text-ink/70 hover:bg-ink/10'}`}>{name}</button>
       ))}

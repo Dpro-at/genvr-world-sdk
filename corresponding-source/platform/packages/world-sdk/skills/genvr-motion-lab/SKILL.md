@@ -101,6 +101,24 @@ Every version is private on this device first. Sharing publishes it, so the owne
 - Without GenVR hosting a share is a local preview: say so plainly ("marked shared on this device, nothing was
   published").
 
+## Motion check and styles (board M16)
+
+`check_all { styles? }` plays every move on the Lab body (the Standard robot; other bodies are checked in the Studio later) at the fixed step 1/60 s and checks it against each style's limits; the report is kept in the project. Read it with `check_report { style?, limit? }` (worst first) and open one move with `check_move { move, style? }`, which checks it again now (after a fix).
+
+| Check | What it catches | Realistic | Game | Anime |
+|---|---|---|---|---|
+| foot_slide | a planted foot drifting on the ground | ≤ 1 cm | ≤ 1.5 cm | ≤ 1 cm |
+| ground | a foot or the body under the floor | 0 cm | 0 cm | 0 cm |
+| joint_limits | knee forward, elbow backward past human limits | 0° extra | 0° extra | +15° |
+| body_clash | a hand or foot inside the body | 0 cm | 0 cm | 0 cm |
+| balance | weight outside the planted feet while standing | ≤ 0.1 s | ≤ 0.2 s | not scored |
+| loop_seam | last frame ≠ first frame of a loop | ≤ 2° | ≤ 2° | ≤ 2° |
+| speed_match | planted feet speed vs body speed | ± 10 % | ± 15 % | ± 10 % |
+
+- Reading a card: the score is 100 less a capped penalty per check (its worst issue only); each issue names the frames it covers (from–to at 60 per second), its value, the limit and the unit. Fix the worst move first, the base moves first (Idle, Walk, Run, Jump, Turn), then check it again.
+- Moves in the air or in water (Jump, Swim, Breaststroke) skip the floor checks; seated and climbing moves are not scored for balance.
+- The limits above are the board's proposals. `style_params { style? }` shows a style's numbers (timing curve, amplitude, holds, transition, cancel points, overlap) and limits. `style_set { style, params?, limits? }` from you waits for the owner: a style is for everyone; the owner applies it in Lab › Check (`style_confirm` is the owner's).
+
 ## Training stations (board M18)
 
 The lab has stations to train every kind of move, standing in the course like obstacles (same ids, `x` across, `z` along, `turn` in degrees, sizes in metres). `stations_base { confirm: true }` puts the base lab's 11 in the 42 × 26 m yard; `station_add` adds one. Pick a station by what the move needs:

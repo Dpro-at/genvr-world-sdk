@@ -13,6 +13,11 @@ import {
   LabRunSettings,
   LabStreet,
   LabProp,
+  LAB_STEP,
+  MOTION_STYLES,
+  MotionCheckLimits,
+  MotionStyle,
+  MotionStyleParams,
   LabStation,
   LAB_STATION_KINDS,
   MOTION_LAB_KINDS,
@@ -32,11 +37,13 @@ import {
   type LabPoseRow,
   type LabRun,
   type LabStationKind,
+  type MotionCheckCell,
+  type MotionStyleId,
   type MotionVersion,
 } from '@genvr/contracts';
 import {
   courseFromSeed, defaultLabCourse, labGroundMove, labHoldPins, labKeyRows, labLimbMove, labLimbPositions, labMadeMotionPace, labMirror, labPoseAt,
-  labPoseLimit, labPoseProblems, labPoseRow as labRowOf, labRowKeys, labAsk, labStandPose, labTPose, runAllStations, runStation, scoreLabRun, simulateLabRun, LAB_GROUND_MOVES, LAB_POSE_KEYS, LAB_RUNNABLE_STATIONS, STATION_REFERENCE_HIP,
+  labPoseLimit, labPoseProblems, labPoseRow as labRowOf, labRowKeys, labAsk, labStandPose, labTPose, runAllStations, runStation, checkAllMoves, checkMove as checkOneMove, rankCells, sampleMoves, DEFAULT_LOOK, scoreLabRun, simulateLabRun, LAB_GROUND_MOVES, LAB_POSE_KEYS, LAB_RUNNABLE_STATIONS, STATION_REFERENCE_HIP,
   type LabFrame, type LabGroundMove, type LabPose, type LabPoseSide, type LabRunResult, type StationReportRow,
 } from '@genvr/runtime';
 import { madeEntry, type MadeMotionStore } from './made-moves';
@@ -60,12 +67,14 @@ export interface LabView {
   /** The shown run (replayed from its course + settings + seed) and the best version's run for the ghost. */
   run: { id: string; result: LabRunResult } | null;
   ghost: LabRunResult | null;
-  /** Board M11: Run shows runs on the course; Pose edits a made motion by pose and key frames. */
-  mode: 'run' | 'pose';
+  /** Board M11: Run shows runs on the course; Pose edits a made motion by pose and key frames; Check (M16) checks every move. */
+  mode: 'run' | 'pose' | 'check';
   /** Board M18: Run goes on the course (null) or on this station. */
   station: string | null;
   /** Board M18 phase 5: the last Run all stations report (not saved; runs are not kept). */
   report: StationReportRow[] | null;
+  /** Board M16 · Check: the style shown, the move open in the card and the frame it stands on (null = playing). */
+  check: { style: MotionStyleId; move: string | null; frame: number | null };
   pose: LabPoseView;
 }
 /** What the Pose mode shows: the open made motion, the frame, the chosen joints and the mouse tool. */
@@ -144,7 +153,7 @@ export function newLabData(): LabProjectData {
 export class LabController {
   #data: LabProjectData;
   #view: LabView = { overlays: ['skeleton', 'feet', 'balance', 'speed', 'ghost', 'measures'], speed: 1, playing: false, t: 0, selected: null, run: null, ghost: null,
-    mode: 'run', station: null, report: null, pose: { motion: null, frame: 0, playing: false, group: 'Elbow', side: 'R', tool: 'turn', onion: false } };
+    mode: 'run', station: null, report: null, check: { style: 'realistic', move: null, frame: null }, pose: { motion: null, frame: 0, playing: false, group: 'Elbow', side: 'R', tool: 'turn', onion: false } };
   /** The made motion each run of this session used, as it was (Save as version keeps it with the version). */
   #runMotion = new Map<string, LabMadeMotion>();
   /** Board M19: My motions, where every saved version of a made motion goes. */
@@ -427,6 +436,53 @@ export class LabController {
     this.#emit(false);
     return { best: version.id, pending: null };
   }
+  // ---- motion check and styles (board M16)
+  /** The body the check plays the moves on: the Standard robot (other bodies are checked in the Studio later). */
+  get checkBody(): string { return 'robot'; }
+  #checkLook() { return { ...DEFAULT_LOOK, body: 'robot' as const }; }
+  checkAll(styles: readonly MotionStyleId[] = MOTION_STYLES) {
+    const cells = checkAllMoves(this.#checkLook(), styles, this.#data.styles);
+    const report = { step: LAB_STEP, seed: this.#data.course.seed, cells };
+    this.#set({ check: { at: new Date().toISOString(), body: this.checkBody, report } });
+    return report;
+  }
+  checkReport(style?: MotionStyleId, limit = 20): MotionCheckCell[] {
+    const cells = this.#data.check?.report.cells ?? [];
+    return rankCells(style ? cells.filter((c) => c.style === style) : cells).slice(0, limit);
+  }
+  /** Checks one move again now (after a fix) and puts the new cell in the kept report. */
+  checkMove(move: string, style: MotionStyleId = 'realistic'): MotionCheckCell {
+    const [sampled] = sampleMoves(this.#checkLook(), [move]);
+    if (!sampled) throw new Error(`No move "${move}". Ask check_report for the moves.`);
+    const cell = checkOneMove({ ...sampled, style }, this.#data.styles[style].limits);
+    const kept = this.#data.check;
+    if (kept) {
+      const cells = [...kept.report.cells.filter((c) => !(c.move === cell.move && c.body === cell.body && c.style === style)), cell];
+      this.#set({ check: { ...kept, report: { ...kept.report, cells } } });
+    }
+    return cell;
+  }
+  styleParams(style?: MotionStyleId) { return style ? this.#data.styles[style] : this.#data.styles; }
+  /** A person's change applies at once; an agent's waits for the owner (a style is for everyone). */
+  setStyle(style: MotionStyleId, change: { params?: Partial<MotionStyleParams> | undefined; limits?: Partial<MotionCheckLimits> | undefined }, by: LabActor = PERSON) {
+    if (by.kind === 'agent') {
+      this.#set({ style_pending: { style, ...(change.params ? { params: change.params } : {}), ...(change.limits ? { limits: change.limits } : {}), by: by.name } });
+      return { applied: false, pending: style, note: 'The owner confirms changes to a style in the Lab (Check).' };
+    }
+    const now = this.#data.styles[style];
+    const next = MotionStyle.parse({ ...now, params: { ...now.params, ...change.params }, limits: { ...now.limits, ...change.limits } });
+    this.#set({ styles: { ...this.#data.styles, [style]: next } });
+    return { applied: true, style: next };
+  }
+  confirmPendingStyle(by: LabActor = PERSON) {
+    if (by.kind === 'agent') throw new Error('Only the owner confirms a style change (in the Lab, Check). It keeps waiting.');
+    const pending = this.#data.style_pending;
+    if (!pending) throw new Error('No style change is waiting.');
+    this.#data = LabProjectData.parse({ ...this.#data, style_pending: null });
+    return this.setStyle(pending.style, { params: pending.params, limits: pending.limits }, PERSON);
+  }
+  rejectPendingStyle() { this.#set({ style_pending: null }); }
+  setCheckView(change: Partial<LabView['check']>) { this.#setView({ check: { ...this.#view.check, ...change } }); }
   confirmPendingBest() { const pending = this.#data.best_pending; if (pending) this.saveBest(pending.version, PERSON); }
   rejectPendingBest() { this.#set({ best_pending: null }); }
   /** Use a version's settings again; a made motion's version also brings its keys back (board M11). */
@@ -744,7 +800,7 @@ export class LabController {
     return this.saveVersion(run.id, note, by);
   }
   // Pose view (person's choices; an agent's pose operations also move the view to their frame).
-  setMode(mode: 'run' | 'pose') { this.#setView({ mode, playing: mode === 'run' ? this.#view.playing : false, pose: { ...this.#view.pose, playing: false } }); }
+  setMode(mode: 'run' | 'pose' | 'check') { this.#setView({ mode, playing: mode === 'run' ? this.#view.playing : false, pose: { ...this.#view.pose, playing: false } }); }
   setPoseView(change: Partial<Omit<LabPoseView, 'motion'>>) {
     const open = this.openMotion;
     const frame = change.frame === undefined ? this.#view.pose.frame : Math.max(0, Math.min((open?.frames ?? 1) - 1, change.frame));
@@ -837,6 +893,12 @@ const HELP: Record<string, string> = {
   prop_set: 'Change an object: { id, set: { mass_kg, at, target, … } }.',
   prop_remove: 'Remove an object: { id, confirm: true }.',
   conveyor_set: 'Belt speed (0.1–1 m/s), one object every 1–5 s, mixed objects: { id, speed_mps?, every_s?, mix? }.',
+  check_all: 'Board M16 motion check: every move on the Lab body (the Standard robot) in { styles? } (default realistic, game, anime): foot slide, ground, joint limits, body clash, balance, loop seam, speed match against each style\'s limits; 0–100 per move. The report is kept in the project; returns the worst 10 per style.',
+  check_report: 'The kept check report, worst first: { style?, limit? }. Each cell: move, body, style, score, issues (check, frames from–to, value, limit, unit).',
+  check_move: 'One move\'s card, checked again now: { move, style? } (after fixing a move).',
+  style_params: 'A style\'s numbers (timing curve, amplitude, holds, transition, cancel points, overlap) and check limits: { style? }.',
+  style_set: 'Change a style\'s numbers or limits: { style, params?, limits? }. Yours waits for the owner (style_confirm in the Lab): a style is for everyone.',
+  style_confirm: 'Apply the waiting style change: { confirm: true }. Owner only: an agent is refused and the change keeps waiting.',
   stations_run_all: 'Run every station { repeats 1–20 (default 3), settings? } with seeds seed, seed+1 …; the runs are not kept. Returns the best total per station with its values and seed, worst first: what to train next.',
   pose_list: 'Motions made here by pose and key frames (board M11): id, name, frames (60 per second), loop, keys, pins; and the one open in Pose.',
   pose_new: 'A new made motion: { name, frames? (default 120 = 2 s), loop? (default true), from: stand|t_pose }. Frame 0 gets a key of the whole pose; it opens in Pose.',
@@ -887,6 +949,12 @@ export async function runMotionLab(lab: LabController | null, input: unknown, by
     case 'prop_remove': lab.removeProp(op.id); return { removed: op.id };
     case 'conveyor_set': return lab.setConveyor(op.id, { speed_mps: op.speed_mps, every_s: op.every_s, mix: op.mix });
     case 'stations_run_all': return { report: lab.runAllStations(op.repeats, op.settings ?? {}) };
+    case 'check_all': { const styles = op.styles ?? [...MOTION_STYLES]; lab.checkAll(styles); return { body: lab.checkBody, moves: new Set(lab.checkReport(undefined, 9999).map((c) => c.move)).size, worst: Object.fromEntries(styles.map((st) => [st, lab.checkReport(st, 10).map((c) => ({ move: c.move, score: c.score, worst: c.issues[0] ?? null }))])) }; }
+    case 'check_report': { if (!lab.data.check) throw new Error('No check yet. Use check_all first.'); return { at: lab.data.check.at, body: lab.data.check.body, cells: lab.checkReport(op.style, op.limit) }; }
+    case 'check_move': return lab.checkMove(op.move, op.style);
+    case 'style_params': return { styles: lab.styleParams(op.style), pending: lab.data.style_pending };
+    case 'style_set': return lab.setStyle(op.style, { params: op.params, limits: op.limits }, by);
+    case 'style_confirm': return lab.confirmPendingStyle(by);
     case 'traffic_set': return lab.setTraffic(op.street, op.cars);
     case 'settings_set': {
       const { character, ...rest } = op.settings;

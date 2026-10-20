@@ -11,6 +11,7 @@ import { LAB_MOVES, PERSON, type LabController, type LabSpeed } from '../../../l
 import { measure, stationName } from './lab-stage';
 import { MyMotions, ShareMotionDialog } from './lab-share';
 import { LabKeyTrack, LabModeSwitch, LabPoseBar, LabPoseLeft, LabPoseRight } from './lab-pose';
+import { LabCheckLeft, LabCheckRight } from './lab-check';
 
 /**
  * The Lab area's panels (boards M1, M2, M3): course list and add tiles on the left; the chosen obstacle's sizes, the
@@ -49,10 +50,10 @@ function Problem({ text }: { text: string | null }) {
 
 // ---------------------------------------------------------------- left: course (M1, M2)
 // Board M11: each Lab panel shows the Pose mode's own panel while Pose is on.
-export function LabLeft({ lab }: { lab: LabController }) { useLab(lab); return lab.view.mode === 'pose' ? <LabPoseLeft lab={lab} /> : <LabCourseLeft lab={lab} />; }
-export function LabRight({ lab }: { lab: LabController }) { useLab(lab); return lab.view.mode === 'pose' ? <LabPoseRight lab={lab} /> : <LabRunRight lab={lab} />; }
+export function LabLeft({ lab }: { lab: LabController }) { useLab(lab); return lab.view.mode === 'check' ? <LabCheckLeft lab={lab} /> : lab.view.mode === 'pose' ? <LabPoseLeft lab={lab} /> : <LabCourseLeft lab={lab} />; }
+export function LabRight({ lab }: { lab: LabController }) { useLab(lab); return lab.view.mode === 'check' ? <LabCheckRight lab={lab} /> : lab.view.mode === 'pose' ? <LabPoseRight lab={lab} /> : <LabRunRight lab={lab} />; }
 export function LabRunBar({ lab }: { lab: LabController }) { useLab(lab); return lab.view.mode === 'pose' ? <LabPoseBar lab={lab} /> : <LabCourseBar lab={lab} />; }
-export function LabRunStrip({ lab }: { lab: LabController }) { useLab(lab); return lab.view.mode === 'pose' ? <LabKeyTrack lab={lab} /> : <LabRunTimeline lab={lab} />; }
+export function LabRunStrip({ lab }: { lab: LabController }) { useLab(lab); return lab.view.mode === 'check' ? <p className="p-3 text-xs text-ink/50">Check moves: pick a move on the left; an issue's frames show it in the view.</p> : lab.view.mode === 'pose' ? <LabKeyTrack lab={lab} /> : <LabRunTimeline lab={lab} />; }
 
 function LabCourseLeft({ lab }: { lab: LabController }) {
   useLab(lab);
