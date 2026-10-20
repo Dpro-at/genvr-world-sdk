@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { LAB_STATION_KINDS, LabCourse, LabStation, baseLabStations, graspTableProps, toolBenchProps, weaponRackProps } from '@genvr/contracts';
 import type { LabFrame } from '../src/lab/sim.js';
-import { fittedHeight, measureLongJump, poolDepth, runGraspTable, runStation, stationParts, stationQuality, stationToWorld, worldToStation, type GraspHand, type Vec3 } from '../src/lab/stations.js';
+import { fittedHeight, measureLongJump, poolDepth, runAllStations, runGraspTable, runStation, stationParts, stationQuality, stationToWorld, worldToStation, type GraspHand, type Vec3 } from '../src/lab/stations.js';
 
 const pit = LabStation.parse({ kind: 'jump_pit', id: 'pit', z: 0 }) as Extract<LabStation, { kind: 'jump_pit' }>;
 const table = LabStation.parse({ kind: 'grasp_table', id: 'table', z: 0 }) as Extract<LabStation, { kind: 'grasp_table' }>;
@@ -113,9 +113,9 @@ describe('board M18 · runs on a station', () => {
     const small = runStation(course, 'table', {}, course.seed, 0.42).result.stationScore.values;
     expect(small.grabbed as number).toBeLessThanOrEqual(v.grabbed as number);
   });
-  it('stations without a phase-1 engine say so', () => {
+  it('an unknown station is refused', () => {
+    // Every station kind runs now (phase 5); an unknown id is refused.
     const bar = LabCourse.parse({ stations: [LabStation.parse({ kind: 'high_bar', id: 'bar', z: 0 })] });
-    expect(() => runStation(bar, 'bar')).toThrow('later phase');
     expect(() => runStation(bar, 'nope')).toThrow('No station');
   });
 });
@@ -245,4 +245,38 @@ describe('board M18 · phase 4: training weapons rack and target post', () => {
     const alone = LabCourse.parse({ stations: [rack], props: weaponRackProps('rack') });
     expect(runStation(alone, 'rack').result.stationScore.values.target).toBe('practice target');
   });
+});
+
+describe('board M18 · phase 5: high bar, hurdles and running every station', () => {
+  const bar = LabStation.parse({ kind: 'high_bar', id: 'bar', z: 0, height: 1.2 }) as Extract<LabStation, { kind: 'high_bar' }>;
+  const hurdles = LabStation.parse({ kind: 'hurdles', id: 'hurdles', x: 4, z: 0 });
+  const course = LabCourse.parse({ stations: [bar, hurdles] });
+  it('high bar: clearance over the bar is measured; a higher bar is touched; leaning back loses balance on the mat', () => {
+    const v = runStation(course, 'bar', { speed: 6 }).result.stationScore.values;
+    expect(v).toMatchObject({ bar_m: 1.2, bar_touched: 'no', landing: 'on the feet' });
+    expect(v.clearance_cm as number).toBeGreaterThan(0);
+    const high = LabCourse.parse({ stations: [{ ...bar, height: 2 }] });
+    const touched = runStation(high, 'bar', { speed: 6 }).result;
+    expect(touched.stationScore.values.bar_touched).toBe('yes');
+    expect(touched.events.some(e => e.kind === 'bar_touch')).toBe(true);
+    expect(runStation(course, 'bar', { speed: 6, lean_deg: -15 }).result.stationScore.values.landing).toBe('lost balance');
+  });
+  it('hurdles: each hit counted once; the three-step rhythm at a fitting speed', () => {
+    const run = runStation(course, 'hurdles', { speed: 3.6 }).result;
+    const v = run.stationScore.values;
+    expect(v).toMatchObject({ hurdles: 4, steps_between: 3, three_step: 'yes' });
+    expect(run.events.filter(e => e.kind === 'bar_touch')).toHaveLength(v.hurdles_hit as number);
+    const high = LabCourse.parse({ stations: [{ ...hurdles, height: 1 }] });
+    expect(runStation(high, 'hurdles', { speed: 3.6 }).result.stationScore.values.hurdles_hit).toBe(4);
+    // A small body lifts its trail leg less.
+    expect(runStation(course, 'hurdles', { speed: 3.6 }, course.seed, 0.6).result.stationScore.values.hurdles_hit as number).toBeGreaterThan(v.hurdles_hit as number);
+  });
+  it('running every station: one row per station with the best of its runs, worst first', () => {
+    const all = LabCourse.parse({ stations: baseLabStations(), props: [...graspTableProps('grasp-table'), ...toolBenchProps('tool-bench'), ...weaponRackProps('weapon-rack')] });
+    const report = runAllStations(all, { speed: 3.6, stride: 1.4 }, 2);
+    expect(report).toHaveLength(11);
+    expect(report.every(row => row.runs === 2 && row.best >= row.worst)).toBe(true);
+    expect(report.map(row => row.best)).toEqual([...report.map(row => row.best)].sort((a, b) => a - b));
+    expect(runAllStations(all, { speed: 3.6, stride: 1.4 }, 2)).toEqual(report);
+  }, 60000);
 });

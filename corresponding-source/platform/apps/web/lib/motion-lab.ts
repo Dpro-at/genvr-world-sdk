@@ -36,8 +36,8 @@ import {
 } from '@genvr/contracts';
 import {
   courseFromSeed, defaultLabCourse, labGroundMove, labHoldPins, labKeyRows, labLimbMove, labLimbPositions, labMadeMotionPace, labMirror, labPoseAt,
-  labPoseLimit, labPoseProblems, labPoseRow as labRowOf, labRowKeys, labAsk, labStandPose, labTPose, runStation, scoreLabRun, simulateLabRun, LAB_GROUND_MOVES, LAB_POSE_KEYS, LAB_RUNNABLE_STATIONS, STATION_REFERENCE_HIP,
-  type LabFrame, type LabGroundMove, type LabPose, type LabPoseSide, type LabRunResult,
+  labPoseLimit, labPoseProblems, labPoseRow as labRowOf, labRowKeys, labAsk, labStandPose, labTPose, runAllStations, runStation, scoreLabRun, simulateLabRun, LAB_GROUND_MOVES, LAB_POSE_KEYS, LAB_RUNNABLE_STATIONS, STATION_REFERENCE_HIP,
+  type LabFrame, type LabGroundMove, type LabPose, type LabPoseSide, type LabRunResult, type StationReportRow,
 } from '@genvr/runtime';
 import { madeEntry, type MadeMotionStore } from './made-moves';
 
@@ -64,6 +64,8 @@ export interface LabView {
   mode: 'run' | 'pose';
   /** Board M18: Run goes on the course (null) or on this station. */
   station: string | null;
+  /** Board M18 phase 5: the last Run all stations report (not saved; runs are not kept). */
+  report: StationReportRow[] | null;
   pose: LabPoseView;
 }
 /** What the Pose mode shows: the open made motion, the frame, the chosen joints and the mouse tool. */
@@ -142,7 +144,7 @@ export function newLabData(): LabProjectData {
 export class LabController {
   #data: LabProjectData;
   #view: LabView = { overlays: ['skeleton', 'feet', 'balance', 'speed', 'ghost', 'measures'], speed: 1, playing: false, t: 0, selected: null, run: null, ghost: null,
-    mode: 'run', station: null, pose: { motion: null, frame: 0, playing: false, group: 'Elbow', side: 'R', tool: 'turn', onion: false } };
+    mode: 'run', station: null, report: null, pose: { motion: null, frame: 0, playing: false, group: 'Elbow', side: 'R', tool: 'turn', onion: false } };
   /** The made motion each run of this session used, as it was (Save as version keeps it with the version). */
   #runMotion = new Map<string, LabMadeMotion>();
   /** Board M19: My motions, where every saved version of a made motion goes. */
@@ -283,6 +285,14 @@ export class LabController {
       if (!LAB_RUNNABLE_STATIONS.includes(station.kind)) throw new Error(`Runs on the ${station.kind.replace('_', ' ')} come in a later phase.`);
     }
     this.#setView({ station: id });
+  }
+  clearReport() { this.#setView({ report: null }); }
+  /** Every station `repeats` times, the best per station (worst first); the runs are not kept. */
+  runAllStations(repeats = 3, patch: Partial<LabRunSettings> = {}) {
+    const settings = LabRunSettings.parse({ ...this.#data.settings, ...patch, character: this.character.id });
+    const report = runAllStations(this.#data.course, settings, repeats, STATION_REFERENCE_HIP * this.legScale);
+    this.#setView({ report });
+    return report;
   }
   fromSeed(seed: number, count = 5, hardness = 2, street = true) { const course = this.setCourse(courseFromSeed(seed, count, hardness, street)); this.select(null); return course; }
   setTraffic(street?: unknown, cars?: unknown[]) {
@@ -804,7 +814,7 @@ const HELP: Record<string, string> = {
   characters: 'Characters the Lab can use (id, name, source lab|mine, leg in metres), who runs now, and whether the Lab follows the Avatar tab.',
   who_set: 'Pick who runs: { who: a character id from characters, or "avatar" to follow the Avatar tab }. Hidden bodies are not offered.',
   settings_set: 'Run settings: motion (Walk, Run, Sneak, Crouch Walk), speed, stride, step_height, jump_timing_ms, blend_s, lean_deg, wait_for_green.',
-  run: 'Run the course once (fixed step, seed). Optional settings or a version to start from; { station } runs on a training station instead (jump_pit, grasp_table, conveyor, tool_bench, pool, climb_wall, ladder, weapon_rack, target_post now). Returns the run id and scores (station scores too).',
+  run: 'Run the course once (fixed step, seed). Optional settings or a version to start from; { station } runs on a training station instead (every station kind). Returns the run id and scores (station scores too).',
   runs_list: 'The last 20 runs with their scores.',
   scores: 'Scores of a run (default: the last).',
   frame: 'One frame of a run at time t: body, feet (planted), balance point, speed, move.',
@@ -827,6 +837,7 @@ const HELP: Record<string, string> = {
   prop_set: 'Change an object: { id, set: { mass_kg, at, target, … } }.',
   prop_remove: 'Remove an object: { id, confirm: true }.',
   conveyor_set: 'Belt speed (0.1–1 m/s), one object every 1–5 s, mixed objects: { id, speed_mps?, every_s?, mix? }.',
+  stations_run_all: 'Run every station { repeats 1–20 (default 3), settings? } with seeds seed, seed+1 …; the runs are not kept. Returns the best total per station with its values and seed, worst first: what to train next.',
   pose_list: 'Motions made here by pose and key frames (board M11): id, name, frames (60 per second), loop, keys, pins; and the one open in Pose.',
   pose_new: 'A new made motion: { name, frames? (default 120 = 2 s), loop? (default true), from: stand|t_pose }. Frame 0 gets a key of the whole pose; it opens in Pose.',
   pose_open: 'Open a made motion in Pose: { motion: id or name, frames?, loop? }.',
@@ -875,6 +886,7 @@ export async function runMotionLab(lab: LabController | null, input: unknown, by
     case 'prop_set': return lab.setProp(op.id, op.set);
     case 'prop_remove': lab.removeProp(op.id); return { removed: op.id };
     case 'conveyor_set': return lab.setConveyor(op.id, { speed_mps: op.speed_mps, every_s: op.every_s, mix: op.mix });
+    case 'stations_run_all': return { report: lab.runAllStations(op.repeats, op.settings ?? {}) };
     case 'traffic_set': return lab.setTraffic(op.street, op.cars);
     case 'settings_set': {
       const { character, ...rest } = op.settings;

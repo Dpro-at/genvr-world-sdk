@@ -324,6 +324,19 @@ function RunPanel({ lab, share }: { lab: LabController; share: (version: string)
           </select></label>) : null}
       <button type="button" className="flex h-9 items-center justify-center gap-2 rounded-lg bg-ink text-sm font-bold text-on-brand" onClick={() => tryRun(() => lab.run({}, PERSON), setError)}><Play className="size-4" />Run<kbd className="font-mono text-[10px] opacity-70">R</kbd></button>
       <Problem text={error} />
+      {lab.data.course.stations.some((st) => LAB_RUNNABLE_STATIONS.includes(st.kind)) ? (
+        <div className="flex items-center gap-2">
+          <button type="button" className="flex h-8 flex-1 items-center justify-center gap-1.5 rounded-lg border border-ink/15 text-xs font-bold hover:bg-ink/5" title="Run every station three times (the runs are not kept) and list the best of each, worst first"
+            onClick={() => tryRun(() => lab.runAllStations(3), setError)}><Play className="size-3.5" />Run all stations</button>
+          {lab.view.report ? <button type="button" className="rounded p-1 hover:bg-ink/10" aria-label="Close the report" onClick={() => tryRun(() => lab.clearReport(), setError)}><X className="size-3.5" /></button> : null}
+        </div>) : null}
+      {lab.view.report ? (
+        <div aria-label="All stations report" className="rounded-lg bg-ink/5 p-2">
+          <div className={label}>All stations · best of {lab.view.report[0]?.runs ?? 0} runs · worst first</div>
+          {lab.view.report.map((row) => (
+            <button key={row.station} type="button" className="flex h-6 w-full items-center gap-2 text-left text-xs hover:bg-ink/5" title="Run on this station" onClick={() => tryRun(() => lab.runOn(row.station), setError)}>
+              <span className="flex-1 truncate">{STATION_NAMES[row.kind]} · {row.station}</span><span className="font-mono text-[11px] text-ink/50">{row.worst}–</span><b className="w-7 text-right font-mono tabular-nums">{row.best}</b></button>))}
+        </div>) : null}
       {shown?.station_score ? (
         <div aria-label="Station scores" className="rounded-lg bg-ink/5 p-2">
           <div className={label}>{STATION_NAMES[shown.station_score.kind]} · {shown.station}</div>

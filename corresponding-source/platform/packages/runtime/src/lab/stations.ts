@@ -315,7 +315,7 @@ export function simulateGraspTable(station: GraspTable, props: readonly LabProp[
 }
 
 /** Stations whose runs are built (phase 1); the others are placed and drawn, their runs come in later phases. */
-export const LAB_RUNNABLE_STATIONS: ReadonlyArray<LabStation['kind']> = ['jump_pit', 'grasp_table', 'conveyor', 'tool_bench', 'pool', 'climb_wall', 'ladder', 'weapon_rack', 'target_post'];
+export const LAB_RUNNABLE_STATIONS: ReadonlyArray<LabStation['kind']> = ['jump_pit', 'grasp_table', 'conveyor', 'tool_bench', 'pool', 'climb_wall', 'ladder', 'weapon_rack', 'target_post', 'high_bar', 'hurdles'];
 
 /** How well the station's task went (0–100): a clean jump's distance against 8 m; objects held without a drop, less the place error. */
 export function stationQuality(score: LabStationScore): number {
@@ -326,6 +326,8 @@ export function stationQuality(score: LabStationScore): number {
   if (score.kind === 'tool_bench') return Math.max(0, Math.min(100, Math.round(n('quality'))));
   if (score.kind === 'pool') return v.sank === 'yes' ? 0 : Math.round(0.5 * n('head_above_pct') + (v.reached_deep_end === 'yes' ? 30 : 0) + (n('ladder_exit_s') > 0 && n('ladder_exit_s') <= 8 ? 20 : 0));
   if (score.kind === 'weapon_rack' || score.kind === 'target_post') return v.body_cross === 'yes' ? 0 : Math.max(0, Math.round(n('hit_pct') - Math.min(20, n('mean_off_cm') / 2) - (v.balance === 'lost' ? 30 : 0)));
+  if (score.kind === 'high_bar') return v.bar_touched === 'yes' ? 20 : Math.max(0, Math.min(100, Math.round(70 + Math.min(30, n('clearance_cm')) - (v.landing === 'lost balance' ? 30 : 0))));
+  if (score.kind === 'hurdles') return Math.max(0, Math.round(100 - 25 * n('hurdles_hit') - (v.three_step === 'yes' ? 0 : 15) - (v.landing === 'lost balance' ? 30 : 0)));
   if (score.kind === 'climb_wall' || score.kind === 'ladder') return Math.max(0, Math.min(100, Math.round((v.reached_top === 'yes' ? 60 : 0) + 0.3 * n('three_point_pct') - 10 * n('slips') + (v.climb_down_clean === 'yes' ? 10 : 0))));
   return 0;
 }
@@ -341,6 +343,8 @@ export function runStation(course: LabCourse, id: string, input: Partial<LabRunS
     : station.kind === 'pool' ? simulatePool(station, input, seed, hipHeight)
     : station.kind === 'climb_wall' || station.kind === 'ladder' ? simulateClimb(station, input, seed, hipHeight)
     : station.kind === 'weapon_rack' || station.kind === 'target_post' ? simulateStrikes(station, course, input, seed, hipHeight)
+    : station.kind === 'high_bar' ? simulateHighBar(station, input, seed, hipHeight)
+    : station.kind === 'hurdles' ? simulateHurdles(station, input, seed, hipHeight)
     : simulateGraspTable(station as GraspTable, course.props, input, seed, hipHeight);
   const measured = scoreLabRun(LabCourse.parse({ finish_z: 120 }), result), w = LAB_SCORE_WEIGHTS;
   // In the pool the feet stand on the pool's own floor, below the yard's: the yard floor is not a penetration there.
@@ -732,4 +736,96 @@ export function simulateStrikes(station: Extract<LabStation, { kind: 'weapon_rac
     stationScore: { kind: station.kind, values: { ...(rack ? { weapons: props.length } : {}), strikes, hits, hit_pct: strikes ? Math.round(100 * hits / strikes) : 0, mean_off_cm: strikes ? Math.round(off / strikes) : null,
       recovery_s: recoveries ? round2(recovery / recoveries) : null, ...(blocks ? { blocks, shield_angle_deg: Math.round(angles.reduce((a, b) => a + b, 0) / angles.length) } : {}),
       body_cross: bodyCross ? 'yes' : 'no', balance, grip: 'handle end', target: usePost ? usePost.id : 'practice target' } } };
+}
+
+// ── Phase 5: high bar, hurdles and running every station ────────────────────────────────────────────────────────
+
+/** A straight run-up along the station (local z) with planted steps; returns where it ended. */
+function runUp(frames: LabFrame[], from: number, to: number, speed: number, stride: number, t0: number): number {
+  let t = t0;
+  for (let z = from; z < to; z += speed * STEP, t += STEP) {
+    const i = Math.floor((z - from) / stride), k = i % 2, plant = from + i * stride, contact = z - plant < stride * 0.45;
+    const feet: [LabFoot, LabFoot] = [foot(0.12, 0.06, z + stride * 0.3, false), foot(-0.12, 0.06, z + stride * 0.3, false)];
+    feet[k] = contact ? foot(k ? -0.12 : 0.12, 0, plant, true) : foot(k ? -0.12 : 0.12, 0.08, z - stride * 0.2, false);
+    frames.push({ t, x: 0, y: contact ? 0 : 0.04, z, tilt: 0, com: [0, z], speed, clip: 'Run', feet });
+  }
+  return t;
+}
+
+/**
+ * High bar run (engine v1, a scissor jump): run-up of 8 m at the run speed (at most 7 m/s), take-off 1 m before the bar
+ * with a vertical speed of 55 % of the run speed (at most 4 m/s); the hips rise from 0.95 m × size by v² / 2g and pass the bar 25 cm
+ * lower than their top (the scissor). Clearance = that lowest point over the bar; below it touches the bar. The body
+ * lands on the mat; leaning back more than 12° loses balance.
+ */
+export function simulateHighBar(station: Extract<LabStation, { kind: 'high_bar' }>, input: Partial<LabRunSettings> = {}, seed = 0, hipHeight = STATION_REFERENCE_HIP): StationRunResult {
+  const settings = LabRunSettings.parse(input), size = hipHeight / STATION_REFERENCE_HIP, v = Math.min(7, settings.speed), stride = Math.max(settings.stride, v * 0.32);
+  const frames: LabFrame[] = [], events: LabEvent[] = [{ t: 0, kind: 'start', label: 'start', station: station.id }];
+  const barZ = 0.5, takeOffZ = barZ - 1;
+  let t = runUp(frames, takeOffZ - 8, takeOffZ, v, stride, 0);
+  events.push({ t, kind: 'take_off', label: 'take-off 1 m before the bar', station: station.id });
+  const vy = Math.min(4, v * 0.55), peak = 0.95 * size + vy * vy / 19.62, low = peak - 0.25, clearance = Math.round((low - station.height) * 100), touched = clearance < 0;
+  const flight = 2 * vy / 9.81 + 0.15, vz = (barZ + 1.2 - takeOffZ) / flight;
+  for (let a = 0; a < flight; a += STEP, t += STEP) {
+    const z = takeOffZ + vz * a, y = Math.max(0, vy * a - 4.905 * a * a);
+    frames.push({ t, x: 0, y, z, tilt: 0, com: [0, z], speed: vz, clip: 'Jump', feet: [foot(0.12, y + 0.2, z, false), foot(-0.12, y + 0.4, z + 0.3, false)] });
+  }
+  if (touched) events.push({ t: t - flight / 2, kind: 'bar_touch', label: `touched the bar (${-clearance} cm short)`, station: station.id });
+  events.push({ t, kind: 'land', label: touched ? 'landed on the mat with the bar' : `cleared ${station.height} m by ${clearance} cm`, station: station.id });
+  const back = settings.lean_deg < -12, matTop = station.mat[2], landZ = barZ + 1.2;
+  for (let i = 0; i < 40; i++, t += STEP) frames.push({ t, x: 0, y: matTop, z: landZ, tilt: back ? 70 * Math.min(1, i / 18) : 0, com: [0, landZ], speed: 0, clip: back ? 'Hard Landing' : 'Soft Landing', feet: [foot(0.12, matTop, landZ, true), foot(-0.12, matTop, landZ, true)] });
+  events.push({ t, kind: 'finish', label: 'finish', station: station.id });
+  return { frames: frames.map(f => placeFrame(station, f)), events, settings, seed, end: 'finish', station: station.id, heading: station.turn, objects: [], spawned: [],
+    stationScore: { kind: 'high_bar', values: { bar_m: station.height, clearance_cm: clearance, bar_touched: touched ? 'yes' : 'no', take_off_speed: round2(v), landing: back ? 'lost balance' : 'on the feet' } } };
+}
+
+/**
+ * Hurdles run (engine v1): along the lane at the run speed; each hurdle is cleared by a 3.2 m hurdle stride whose
+ * trail leg rises to 0.62 m × size plus 4 cm per m/s; lower than the hurdle hits it (it falls, counted once). Between
+ * hurdles the steps are (spacing − 3.2) / stride, rounded: three is the rhythm that keeps the same lead leg.
+ */
+export function simulateHurdles(station: Extract<LabStation, { kind: 'hurdles' }>, input: Partial<LabRunSettings> = {}, seed = 0, hipHeight = STATION_REFERENCE_HIP): StationRunResult {
+  const settings = LabRunSettings.parse(input), size = hipHeight / STATION_REFERENCE_HIP, v = Math.min(9, settings.speed), stride = Math.max(settings.stride, v * 0.3);
+  const first = Math.max(2, station.lane_length - (station.count - 1) * station.spacing - 3), lift = 0.62 * size + 0.04 * v;
+  const frames: LabFrame[] = [], events: LabEvent[] = [{ t: 0, kind: 'start', label: 'start', station: station.id }];
+  let t = 0, z = 0, hits = 0;
+  const steps = Math.max(1, Math.round((station.spacing - 3.2) / stride));
+  for (let h = 0; h < station.count; h++) {
+    const at = first + h * station.spacing;
+    t = runUp(frames, z, at - 1.6, v, stride, t);
+    // The hurdle stride: 3.2 m over the hurdle.
+    const n = Math.max(2, Math.round(3.2 / v / STEP));
+    for (let i = 1; i <= n; i++, t += STEP) { const zz = at - 1.6 + 3.2 * i / n, y = lift * Math.sin(Math.PI * i / n); frames.push({ t, x: 0, y: y * 0.5, z: zz, tilt: 0, com: [0, zz], speed: v, clip: 'Jump Forward', feet: [foot(0.12, y, zz + 0.3, false), foot(-0.12, y * 0.8, zz - 0.3, false)] }); }
+    if (lift < station.height) { hits++; events.push({ t, kind: 'bar_touch', label: `hit hurdle ${h + 1} (trail leg ${Math.round((station.height - lift) * 100)} cm low)`, station: station.id }); }
+    else events.push({ t, kind: 'step', label: `over hurdle ${h + 1} by ${Math.round((lift - station.height) * 100)} cm`, station: station.id });
+    z = at + 1.6;
+  }
+  t = runUp(frames, z, station.lane_length, v, stride, t);
+  const back = Math.abs(settings.lean_deg) > 12;
+  for (let i = 0; i < 30; i++, t += STEP) frames.push({ t, x: 0, y: 0, z: station.lane_length, tilt: back ? 70 * Math.min(1, i / 18) : 0, com: [0, station.lane_length], speed: 0, clip: 'Sprint Stop', feet: [foot(0.12, 0, station.lane_length, true), foot(-0.12, 0, station.lane_length, true)] });
+  events.push({ t, kind: 'finish', label: 'finish', station: station.id });
+  return { frames: frames.map(f => placeFrame(station, f)), events, settings, seed, end: 'finish', station: station.id, heading: station.turn, objects: [], spawned: [],
+    stationScore: { kind: 'hurdles', values: { hurdles: station.count, hurdles_hit: hits, steps_between: steps, three_step: steps === 3 ? 'yes' : 'no', trail_leg_m: round2(lift), time_s: round2(t), landing: back ? 'lost balance' : 'on the feet' } } };
+}
+
+/** One line of the all-stations report: the best of the station's runs and the seed that gave it. */
+export interface StationReportRow { station: string; kind: LabStation['kind']; runs: number; best: number; worst: number; seed: number; values: LabStationScore['values'] }
+
+/**
+ * Runs every station with an engine `repeats` times (seeds course.seed, +1, …) without keeping the runs, and reports
+ * the best total per station, worst first (what to train next). The step before the night queue (board M6).
+ */
+export function runAllStations(course: LabCourse, input: Partial<LabRunSettings> = {}, repeats = 3, hipHeight = STATION_REFERENCE_HIP): StationReportRow[] {
+  const rows: StationReportRow[] = [];
+  for (const station of course.stations) {
+    if (station.hidden || !LAB_RUNNABLE_STATIONS.includes(station.kind)) continue;
+    let best: { total: number; seed: number; values: LabStationScore['values'] } | null = null, worst = 100;
+    for (let r = 0; r < Math.max(1, Math.min(20, repeats)); r++) {
+      const seed = course.seed + r, { result, score } = runStation(course, station.id, input, seed, hipHeight);
+      worst = Math.min(worst, score.total);
+      if (!best || score.total > best.total) best = { total: score.total, seed, values: result.stationScore.values };
+    }
+    rows.push({ station: station.id, kind: station.kind, runs: Math.max(1, Math.min(20, repeats)), best: best!.total, worst, seed: best!.seed, values: best!.values });
+  }
+  return rows.sort((a, b) => a.best - b.best || a.station.localeCompare(b.station));
 }

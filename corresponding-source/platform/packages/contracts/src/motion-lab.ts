@@ -402,6 +402,8 @@ export const MotionLabOperation = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('prop_set'), id: labId, set: z.record(z.string().max(40), z.unknown()) }).strict(),
   z.object({ kind: z.literal('prop_remove'), id: labId, confirm: z.literal(true) }).strict(),
   z.object({ kind: z.literal('conveyor_set'), id: labId, speed_mps: metres(0.1, 1).optional(), every_s: metres(1, 5).optional(), mix: z.boolean().optional() }).strict(),
+  /** Run every station `repeats` times (seeds seed, +1, …) without keeping the runs: the best per station, worst first. */
+  z.object({ kind: z.literal('stations_run_all'), repeats: z.number().int().min(1).max(20).default(3), settings: LabRunSettingsPatch.optional() }).strict(),
   // ---- pose and key frames (board M11)
   /** Motions made in the Lab and the one open in Pose. */
   z.object({ kind: z.literal('pose_list') }).strict(),
