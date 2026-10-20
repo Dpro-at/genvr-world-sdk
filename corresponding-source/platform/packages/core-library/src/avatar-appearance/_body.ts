@@ -41,7 +41,7 @@ export const PLAYER_BODIES: readonly CoreBody[] = AVATAR_BODIES.filter((body) =>
  * Bodies no longer offered for a new choice (owner, 2026-10-20, board A12). Worlds, players and saved
  * characters that already wear one keep it, and the code stays (the robot reuses Starter's joints and clips).
  */
-export const HIDDEN_BODY_IDS: ReadonlySet<string> = new Set(['classic', 'simple', 'starter', 'anime-boy', 'warrior']);
+export const HIDDEN_BODY_IDS: ReadonlySet<string> = new Set(['classic', 'simple', 'starter', 'anime-boy', 'warrior', 'human']);
 
 /** The default body for a new player look and a new character. */
 export const DEFAULT_BODY_ID = 'robot';

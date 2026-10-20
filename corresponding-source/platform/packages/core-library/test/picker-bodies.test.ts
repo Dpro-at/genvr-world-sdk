@@ -3,9 +3,9 @@ import { AvatarLook, DEFAULT_CHARACTER_RECIPE } from '@genvr/contracts';
 import { AVATAR_BODIES, DEFAULT_BODY_ID, findBody, HIDDEN_BODY_IDS, PICKABLE_BODIES } from '../src/index.js';
 
 describe('bodies offered for a new choice (board A12)', () => {
-  it('offers the Standard robot first, then Anime body; hides the five early bodies', () => {
-    expect(PICKABLE_BODIES.map((body) => body.id)).toEqual(['robot', 'human']);
-    for (const id of ['classic', 'simple', 'starter', 'anime-boy', 'warrior']) expect(HIDDEN_BODY_IDS.has(id)).toBe(true);
+  it('offers only the Standard robot; hides the five early bodies and the Anime body (Mohamed, 2026-10-20)', () => {
+    expect(PICKABLE_BODIES.map((body) => body.id)).toEqual(['robot']);
+    for (const id of ['classic', 'simple', 'starter', 'anime-boy', 'warrior', 'human']) expect(HIDDEN_BODY_IDS.has(id)).toBe(true);
     expect(PICKABLE_BODIES.some((body) => HIDDEN_BODY_IDS.has(body.id))).toBe(false);
   });
   it('starts new looks and new characters as the robot', () => {
