@@ -9,7 +9,7 @@ export { screenDisplay, type CaptureAdapter, type DisplayAdapter } from './adapt
 export { TerrainColliders } from './terrain-physics.js';
 export { inspectResources, type DiagnosticOptions, type RuntimeDiagnostics } from './diagnostics.js';
 export { hydrateTerrainFieldSet, type TerrainFieldPageLoader } from './terrain-field-loader.js';
-export { BUILD_TOOLS, BuildTools, DEFAULT_RIVER, type BuildTool, type RiverToolSettings, type RoadToolSettings, type SelectedWater, type ToolStatus, } from './build-tools.js';
+export { BUILD_TOOLS, BuildTools, DEFAULT_RIVER, DEFAULT_WALL, type BuildTool, type RiverToolSettings, type WallToolSettings, type RoadToolSettings, type SelectedWater, type ToolStatus, } from './build-tools.js';
 export { STACKABLE_BLOCKS, type BlockMode, type BlockToolSettings } from './block-tools.js';
 export { HAND_BLOCKS, HAND_REACH, PlayerHands, rayBlock, type HandsMode } from './player-hands.js';
 export { StructuresView } from './structures.js';
@@ -36,3 +36,6 @@ export { CLAM_GENERATOR, SHELL_GENERATOR, STARFISH_GENERATOR, registerSeaLife, }
 export { retargetAvatarMotion } from './avatar-motion.js';
 export { registerAvatarMotionLibrary, avatarMotionEntry as findAvatarMotion, avatarMotionEntries, type AvatarMotionLibrary, type AvatarMotionEntry } from './avatar-motion-library.js';
 export { MOTION_CATEGORIES, motionCategories, type MotionCategory } from './avatar-motion-categories.js';
+/** The wall looks the Wall tool offers (BUILD-B6), the same textures as the draw_wall material names. */
+export { WALL_SURFACES, type WallSurface } from '../world/index.js';
+export * from './lab/index.js';

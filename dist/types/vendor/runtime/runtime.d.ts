@@ -2,7 +2,7 @@ import type { AvatarExpression } from './avatar-expression.js';
 import { type PlaceBlockLook, type RideModel, type CommandPayload, type SideMove, type VoiceLine, type WorldDocument } from '../contracts/index.js';
 import { PerspectiveCamera } from 'three/webgpu';
 import { type AvatarLook } from './avatar.js';
-import { type BuildTool, type RiverToolSettings, type RoadToolSettings, type ToolStatus } from './build-tools.js';
+import { type BuildTool, type RiverToolSettings, type RoadToolSettings, type WallToolSettings, type ToolStatus } from './build-tools.js';
 import type { SnapSettings } from './item-tools.js';
 import { type Pose4 } from './ride.js';
 import { type PackageFetcher } from './item-packages.js';
@@ -185,12 +185,23 @@ export interface GenvrRuntime {
     setRiver(settings: Partial<RiverToolSettings>): void;
     /** Lanes and direction of the streets the road tool draws (R2g). */
     setRoad(settings: Partial<RoadToolSettings>): void;
+    /** Height and look of new walls, and the size of new doors and windows (BUILD-B6). */
+    setWall(settings: Partial<WallToolSettings>): void;
     /** Changes the terrain brush (mode, size, paint soil). */
     setBrush(settings: Partial<BrushSettings>): void;
     /** Digging and stacking on block ground (Stack or Dig, which block); switches to the Blocks tool. */
     setBlockTool(settings: Partial<BlockToolSettings>): void;
     /** Chooses an item from the library (switches to the place tool). */
     setPlaceItem(itemId: string): void;
+    /** Which handles a selected item shows (ITEMS-I2): all, or only move, size or turn. */
+    setHandleMode(mode: 'all' | 'move' | 'size' | 'turn'): void;
+    /** Turn (degrees), size, colour and material of the next placed items (ITEMS-I1); null clears one. */
+    setPlaceOptions(options: {
+        size?: number | null;
+        color?: string | null;
+        material?: string | null;
+        turn?: number;
+    }): void;
     /** Quarter turn of the item being placed or moved, or of the selected item. */
     rotateItem(): void;
     /** Grid step (meters, 0 = free) and turn step (radians) for placing, moving, and turning. */
@@ -353,6 +364,11 @@ export interface GenvrRuntime {
         effects: number;
         ambience: number;
     }): void;
+    /** The loudness now set for effects and ambience. */
+    audioVolumes(): {
+        effects: number;
+        ambience: number;
+    };
     /** The player's own avatar: colors and worn clothing and accessories (P2-20). */
     setPresentationBackdrop(on: boolean, navigation?: boolean): void;
     setAvatarLook(look: AvatarLook): void;

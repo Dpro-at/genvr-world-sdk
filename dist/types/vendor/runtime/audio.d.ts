@@ -33,6 +33,8 @@ export declare class WorldAudio {
     #private;
     private readonly target;
     constructor(target?: EventTarget);
+    /** The loudness now set (FILM-C3: a scene's own sound is applied for a take, then this is restored). */
+    volumes(): AudioVolumes;
     setVolumes(volumes: AudioVolumes): void;
     /**
      * The camera went under or came back up (P2-39): everything turns dull under water and clear

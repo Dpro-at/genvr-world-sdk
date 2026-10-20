@@ -78,6 +78,7 @@ export declare const FILMING_ARGS: {
                 start: "start";
                 stop: "stop";
             }>;
+            seconds: z.ZodOptional<z.ZodNumber>;
         }, z.core.$strict>, z.ZodObject<{
             kind: z.ZodLiteral<"lighting">;
             lights: z.ZodOptional<z.ZodArray<z.ZodObject<{
@@ -199,6 +200,7 @@ export declare const FILMING_ARGS: {
             }, z.core.$strict>>;
             world_sound: z.ZodOptional<z.ZodBoolean>;
             live_actors: z.ZodOptional<z.ZodBoolean>;
+            scene_id: z.ZodOptional<z.ZodString>;
         }, z.core.$strict>, z.ZodObject<{
             kind: z.ZodLiteral<"sound_import">;
             name: z.ZodString;
@@ -242,8 +244,26 @@ export declare const FILMING_ARGS: {
         }, z.core.$strict>, z.ZodObject<{
             kind: z.ZodLiteral<"export">;
             shot_id: z.ZodOptional<z.ZodString>;
+            range: z.ZodOptional<z.ZodEnum<{
+                film: "film";
+                marked: "marked";
+            }>>;
             width: z.ZodDefault<z.ZodNumber>;
             height: z.ZodDefault<z.ZodNumber>;
+            language: z.ZodOptional<z.ZodString>;
+            captions: z.ZodDefault<z.ZodEnum<{
+                none: "none";
+                picture: "picture";
+            }>>;
+        }, z.core.$strict>, z.ZodObject<{
+            kind: z.ZodLiteral<"language">;
+            action: z.ZodLiteral<"make_missing">;
+            what: z.ZodDefault<z.ZodEnum<{
+                captions: "captions";
+                voices: "voices";
+                both: "both";
+            }>>;
+            languages: z.ZodOptional<z.ZodArray<z.ZodString>>;
         }, z.core.$strict>, z.ZodObject<{
             kind: z.ZodLiteral<"undo">;
         }, z.core.$strict>, z.ZodObject<{

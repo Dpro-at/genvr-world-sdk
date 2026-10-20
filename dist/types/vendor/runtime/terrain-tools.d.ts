@@ -6,6 +6,10 @@ export type BrushSize = 'small' | 'medium' | 'large';
 export interface BrushSettings {
     mode: BrushMode;
     size: BrushSize;
+    /** Exact brush radius in metres (BUILD-B1, 1–100, as the MCP tools take it); the size preset decides when absent. */
+    radius?: number | undefined;
+    /** How much one stroke changes, 0.1–1 of the mode's normal effect (1 when absent). */
+    strength?: number | undefined;
     /** Soil used by the paint mode. */
     soil: Soil;
     /** A library ground material to paint with (Realistic places, P2-37); counts as `soil`. */

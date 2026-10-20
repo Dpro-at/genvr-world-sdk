@@ -2,7 +2,7 @@ import { CommandPayload, WorldDocument, WorldPackage, WORLD_PACKAGE_BYTES, WORLD
 import { getCoreItem } from '@genvr/core-library';
 import { runAssistant, runTool } from '@genvr/assistant';
 import { applyCommand, createWorldState, encodeTerrain, planWaterFill } from '@genvr/world';
-export const SDK_VERSION = '0.3.0-preview.13';
+export const SDK_VERSION = '0.3.0-preview.14';
 export const PACKAGE_WORK_BUDGET = 5_000_000;
 export function readWorldPackage(input) {
     const text = typeof input === 'string' ? input : JSON.stringify(input);
@@ -179,6 +179,19 @@ export class WorldSession {
             catch (e) {
                 return e instanceof Error ? e.message : String(e);
             } },
+            // world_history (BUILD-B9): a local file world is edited only through these tools, so every step is the agent's.
+            history: action => {
+                if (action === 'undo') {
+                    if (!this.#undo.length)
+                        return 'Nothing to undo.';
+                    this.undo();
+                    return null;
+                }
+                if (!this.#redo.length)
+                    return 'Nothing to redo.';
+                this.redo();
+                return null;
+            },
             addWater: (x, z) => {
                 if (this.#state.voxels)
                     return 'Water filling needs heightfield terrain in this host.';

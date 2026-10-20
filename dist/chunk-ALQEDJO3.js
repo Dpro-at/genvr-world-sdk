@@ -7860,8 +7860,8 @@ var error20 = () => {
       case "invalid_union":
         return "\u05E7\u05DC\u05D8 \u05DC\u05D0 \u05EA\u05E7\u05D9\u05DF";
       case "invalid_element": {
-        const place3 = withDefinite(issue2.origin ?? "array");
-        return `\u05E2\u05E8\u05DA \u05DC\u05D0 \u05EA\u05E7\u05D9\u05DF \u05D1${place3}`;
+        const place4 = withDefinite(issue2.origin ?? "array");
+        return `\u05E2\u05E8\u05DA \u05DC\u05D0 \u05EA\u05E7\u05D9\u05DF \u05D1${place4}`;
       }
       default:
         return `\u05E7\u05DC\u05D8 \u05DC\u05D0 \u05EA\u05E7\u05D9\u05DF`;
@@ -21097,7 +21097,8 @@ var FilmWorkspace = external_exports.enum(["shoot", "edit", "captions", "sound",
 var commandId = external_exports.string().min(1).max(60).regex(/^[a-z]+\.[a-zA-Z]+$/);
 var FilmStudioStep = external_exports.object({ id: commandId, args: external_exports.record(external_exports.string(), external_exports.unknown()).default({}) }).strict();
 var FilmStudioOperation = external_exports.discriminatedUnion("kind", [
-  external_exports.object({ kind: external_exports.literal("manual_record"), action: external_exports.enum(["start", "stop"]) }).strict(),
+  /** Live take (FILM-A3): the person moves the character; `seconds` is the longest the take may run (default 30). */
+  external_exports.object({ kind: external_exports.literal("manual_record"), action: external_exports.enum(["start", "stop"]), seconds: external_exports.number().int().min(1).max(30).optional() }).strict(),
   external_exports.object({ kind: external_exports.literal("lighting"), lights: SceneLights.optional() }).strict(),
   external_exports.object({ kind: external_exports.literal("inspect") }).strict(),
   external_exports.object({ kind: external_exports.literal("commands") }).strict(),
@@ -21138,7 +21139,9 @@ var FilmStudioOperation = external_exports.discriminatedUnion("kind", [
     settings: FilmVideo.default(() => FilmVideo.parse({})),
     /** The Studio's recording options for this take and after (absent: as set in the Studio): world sound, live actors' voices (FILM-11). */
     world_sound: external_exports.boolean().optional(),
-    live_actors: external_exports.boolean().optional()
+    live_actors: external_exports.boolean().optional(),
+    /** FILM-C1/C3: the scene this take belongs to; the new shot joins it and the scene's own sound is used. */
+    scene_id: studioId.optional()
   }).strict(),
   /** Speak one language's subtitles with its free voice onto its voice track (FILM-12b). */
   external_exports.object({ kind: external_exports.literal("sound_import"), name: external_exports.string().min(1).max(120), mime: external_exports.enum(["audio/wav", "audio/mpeg", "audio/ogg", "audio/mp4", "audio/webm", "audio/flac", "audio/aac"]), data: external_exports.string().min(4).max(11184812).regex(/^[A-Za-z0-9+/]+={0,2}$/) }).strict(),
@@ -21148,7 +21151,30 @@ var FilmStudioOperation = external_exports.discriminatedUnion("kind", [
   external_exports.object({ kind: external_exports.literal("voice"), language: external_exports.string().regex(/^[a-z]{2,3}$/) }).strict(),
   /** One language's subtitles as .srt or .vtt text (FILM-12). */
   external_exports.object({ kind: external_exports.literal("subtitle_file"), language: external_exports.string().regex(/^[a-z]{2,3}$/), format: external_exports.enum(["srt", "vtt"]).default("srt") }).strict(),
-  external_exports.object({ kind: external_exports.literal("export"), shot_id: studioId.optional(), width: external_exports.number().int().min(320).max(1920).default(1280), height: external_exports.number().int().min(240).max(1920).default(720) }).strict(),
+  /**
+   * Export (FILM-A3): the whole film, one shot, or the marked In/Out range; up to 4K. `language` keeps only that
+   * language's captions and voice track (one file per language: call once per language); `captions` none hides
+   * every caption track.
+   */
+  external_exports.object({
+    kind: external_exports.literal("export"),
+    shot_id: studioId.optional(),
+    range: external_exports.enum(["film", "marked"]).optional(),
+    width: external_exports.number().int().min(320).max(3840).default(1280),
+    height: external_exports.number().int().min(240).max(2160).default(720),
+    language: external_exports.string().regex(/^[a-z]{2,3}(-[A-Za-z0-9]{2,8})?$/).optional(),
+    captions: external_exports.enum(["picture", "none"]).default("picture")
+  }).strict(),
+  /**
+   * Languages (FILM-B3): make what Film settings asks for but the film lacks — captions (from the film's voice) and,
+   * for languages set to text + voice, the dubbed voice. `languages` limits it; absent: every language with a gap.
+   */
+  external_exports.object({
+    kind: external_exports.literal("language"),
+    action: external_exports.literal("make_missing"),
+    what: external_exports.enum(["captions", "voices", "both"]).default("both"),
+    languages: external_exports.array(external_exports.string().regex(/^[a-z]{2,3}$/)).min(1).max(12).optional()
+  }).strict(),
   external_exports.object({ kind: external_exports.literal("undo") }).strict(),
   external_exports.object({ kind: external_exports.literal("redo") }).strict()
 ]);
@@ -22072,6 +22098,225 @@ var StudioShareRequest = external_exports.object({
   if (request.access === "invite" && !request.guests.length)
     ctx.addIssue({ code: "custom", message: "Choose at least one invited person." });
 });
+
+// ../contracts/dist/motion-lab.js
+var LAB_FORMAT = 1;
+var LAB_STEP = 1 / 60;
+var LAB_KEEP_RUNS = 20;
+var LAB_CHARACTER = "robot";
+var labId = external_exports.string().regex(/^[a-z0-9][a-z0-9-]{0,39}$/, "Use a short id: lower-case letters, digits and dashes.");
+var metres2 = (min2, max2) => external_exports.number().min(min2).max(max2);
+var place = { id: labId, z: metres2(0, 60), x: metres2(-10, 10).default(0), hidden: external_exports.boolean().default(false) };
+var LabStep = external_exports.object({
+  ...place,
+  kind: external_exports.literal("step"),
+  height: metres2(0.05, 0.6).default(0.3),
+  depth: metres2(0.2, 2).default(0.6),
+  width: metres2(0.5, 6).default(3)
+}).strict();
+var LabRamp = external_exports.object({
+  ...place,
+  kind: external_exports.literal("ramp"),
+  rise: metres2(0.1, 2).default(0.8),
+  length: metres2(1, 10).default(3),
+  /** A flat top after the slope, at the ramp's full height. */
+  top: metres2(0, 4).default(1),
+  width: metres2(0.5, 6).default(3)
+}).strict();
+var LabGap = external_exports.object({
+  ...place,
+  kind: external_exports.literal("gap"),
+  width: metres2(0.2, 3).default(1),
+  height: metres2(0, 2).default(0.8),
+  /** Landing block higher (+) or lower (−) than the take-off block. */
+  landing: metres2(-1, 1).default(0),
+  landing_depth: metres2(0.5, 4).default(1.2),
+  lane: metres2(0.5, 6).default(3)
+}).strict();
+var LabLowWall = external_exports.object({
+  ...place,
+  kind: external_exports.literal("low_wall"),
+  height: metres2(0.3, 1.5).default(0.9),
+  thickness: metres2(0.1, 0.6).default(0.3),
+  width: metres2(0.5, 8).default(4)
+}).strict();
+var LabWindow = external_exports.object({
+  ...place,
+  kind: external_exports.literal("window"),
+  sill: metres2(0.3, 1.5).default(0.9),
+  opening_width: metres2(0.5, 2).default(1),
+  opening_height: metres2(0.4, 2).default(0.8),
+  wall_height: metres2(2, 4).default(2.4),
+  wall_width: metres2(1, 10).default(5),
+  thickness: metres2(0.1, 0.6).default(0.3)
+}).strict();
+var LabObstacle = external_exports.discriminatedUnion("kind", [LabStep, LabRamp, LabGap, LabLowWall, LabWindow]);
+var LabStreet = external_exports.object({
+  z: metres2(0, 80).default(22),
+  lanes: external_exports.number().int().min(1).max(4).default(2),
+  lane_width: metres2(2, 5).default(3),
+  crossing: external_exports.boolean().default(true),
+  /** Traffic light for walkers: red for `red_s`, then green, repeating every `cycle_s`. */
+  light: external_exports.object({ cycle_s: metres2(5, 120).default(30), red_s: metres2(1, 110).default(20) }).strict().default({ cycle_s: 30, red_s: 20 })
+}).strict();
+var LabCar = external_exports.object({
+  id: labId,
+  lane: external_exports.number().int().min(0).max(3).default(0),
+  speed: metres2(0, 30).default(8),
+  /** Seconds after the run's start when the car is at the crossing for the first time. */
+  offset_s: metres2(0, 120).default(6),
+  runs_red: external_exports.boolean().default(false)
+}).strict();
+var LabCourse = external_exports.object({
+  format: external_exports.literal(LAB_FORMAT).default(LAB_FORMAT),
+  seed: external_exports.number().int().min(0).max(2 ** 31 - 1).default(4127),
+  obstacles: external_exports.array(LabObstacle).max(40).default([]),
+  street: LabStreet.nullable().default(null),
+  cars: external_exports.array(LabCar).max(8).default([]),
+  /** Where the run ends (metres along the course). */
+  finish_z: metres2(2, 120).default(30)
+}).strict().superRefine((course, ctx) => {
+  const ids = /* @__PURE__ */ new Set();
+  for (const [i, o] of [...course.obstacles, ...course.cars].entries()) {
+    if (ids.has(o.id))
+      ctx.addIssue({ code: "custom", message: `Two parts share the id "${o.id}".`, path: ["obstacles", i, "id"] });
+    ids.add(o.id);
+  }
+  if (course.street) {
+    for (const [i, car] of course.cars.entries())
+      if (car.lane >= course.street.lanes)
+        ctx.addIssue({ code: "custom", message: `Car "${car.id}" is on lane ${car.lane}, the street has ${course.street.lanes}.`, path: ["cars", i, "lane"] });
+  }
+  if (course.street && course.street.light.red_s >= course.street.light.cycle_s)
+    ctx.addIssue({ code: "custom", message: "The red time must be shorter than the whole light cycle.", path: ["street", "light", "red_s"] });
+});
+var LabRunSettings = external_exports.object({
+  motion: external_exports.string().min(1).max(60).default("Walk"),
+  character: external_exports.string().min(1).max(60).default(LAB_CHARACTER),
+  speed: metres2(0.5, 8).default(1.6),
+  stride: metres2(0.3, 1.6).default(0.74),
+  /** How high the feet lift over a step (metres). */
+  step_height: metres2(0.05, 0.6).default(0.32),
+  /** Take-off before (−) or after (+) the edge of a gap, in milliseconds. */
+  jump_timing_ms: external_exports.number().int().min(-300).max(300).default(-20),
+  blend_s: metres2(0, 1).default(0.25),
+  lean_deg: external_exports.number().min(-20).max(20).default(4),
+  /** Waits at the crossing for green (true) or crosses at once (false). */
+  wait_for_green: external_exports.boolean().default(true)
+}).strict();
+var runShape = LabRunSettings.shape;
+var LabRunSettingsPatch = external_exports.object({
+  motion: runShape.motion.unwrap(),
+  character: runShape.character.unwrap(),
+  speed: runShape.speed.unwrap(),
+  stride: runShape.stride.unwrap(),
+  step_height: runShape.step_height.unwrap(),
+  jump_timing_ms: runShape.jump_timing_ms.unwrap(),
+  blend_s: runShape.blend_s.unwrap(),
+  lean_deg: runShape.lean_deg.unwrap(),
+  wait_for_green: runShape.wait_for_green.unwrap()
+}).partial().strict();
+var LabScore = external_exports.object({
+  /** Planted feet drifting over the ground, both feet, whole run (cm). */
+  foot_slide_cm: external_exports.number().min(0),
+  /** Deepest a foot or the body went into the floor or an obstacle (cm). */
+  penetration_cm: external_exports.number().min(0),
+  fell: external_exports.boolean(),
+  car_hit: external_exports.boolean(),
+  finished: external_exports.boolean(),
+  time_s: external_exports.number().min(0),
+  /** 1 = no jerk, 0 = very jerky. */
+  smoothness: external_exports.number().min(0).max(1),
+  total: external_exports.number().min(0).max(100)
+}).strict();
+var LabEventKind = external_exports.enum(["start", "step", "ramp", "gap_jump", "land", "vault", "window", "wait", "crossing", "car_near", "car_hit", "fall", "slide", "blocked", "finish"]);
+var LabEvent = external_exports.object({ t: external_exports.number().min(0), kind: LabEventKind, label: external_exports.string().max(120), obstacle: labId.optional() }).strict();
+var LabRun = external_exports.object({
+  id: labId,
+  at: external_exports.string().max(40),
+  seed: external_exports.number().int().min(0),
+  settings: LabRunSettings,
+  /** The course as it was: a run is replayed from course + settings + seed (its frames are not stored). */
+  course: LabCourse,
+  score: LabScore,
+  events: external_exports.array(LabEvent).max(400),
+  /** The version this run was made from, if any. */
+  version: labId.optional(),
+  by: external_exports.enum(["person", "agent"]).default("person")
+}).strict();
+var MotionVersion = external_exports.object({
+  id: labId,
+  motion: external_exports.string().min(1).max(60),
+  n: external_exports.number().int().min(1).max(9999),
+  note: external_exports.string().max(120).default(""),
+  settings: LabRunSettings,
+  score: LabScore,
+  run: labId,
+  best: external_exports.boolean().default(false),
+  by: external_exports.enum(["person", "agent"]).default("person"),
+  at: external_exports.string().max(40)
+}).strict();
+var LabProjectData = external_exports.object({
+  format: external_exports.literal(LAB_FORMAT).default(LAB_FORMAT),
+  course: LabCourse.default(() => LabCourse.parse({})),
+  settings: LabRunSettings.default(() => LabRunSettings.parse({})),
+  runs: external_exports.array(LabRun).max(LAB_KEEP_RUNS).default([]),
+  versions: external_exports.array(MotionVersion).max(500).default([]),
+  best_pending: external_exports.object({ version: labId, by: external_exports.string().max(80) }).strict().nullable().default(null)
+}).strict();
+var LAB_OVERLAYS = ["skeleton", "feet", "balance", "speed", "ghost", "measures"];
+var LabOverlay = external_exports.enum(LAB_OVERLAYS);
+var LabPlaySpeed = external_exports.union([external_exports.literal(0.25), external_exports.literal(0.5), external_exports.literal(1), external_exports.literal(2)]);
+var obstaclePatch = external_exports.object({
+  z: metres2(0, 60),
+  x: metres2(-10, 10),
+  hidden: external_exports.boolean(),
+  height: metres2(0, 4),
+  depth: metres2(0.2, 4),
+  width: metres2(0.2, 10),
+  rise: metres2(0.1, 2),
+  length: metres2(1, 10),
+  top: metres2(0, 4),
+  landing: metres2(-1, 1),
+  landing_depth: metres2(0.5, 4),
+  lane: metres2(0.5, 6),
+  thickness: metres2(0.1, 0.6),
+  sill: metres2(0.3, 1.5),
+  opening_width: metres2(0.5, 2),
+  opening_height: metres2(0.4, 2),
+  wall_height: metres2(2, 4),
+  wall_width: metres2(1, 10)
+}).partial().strict();
+var MotionLabOperation = external_exports.discriminatedUnion("kind", [
+  external_exports.object({ kind: external_exports.literal("inspect") }).strict(),
+  external_exports.object({ kind: external_exports.literal("commands") }).strict(),
+  external_exports.object({ kind: external_exports.literal("course_get") }).strict(),
+  external_exports.object({ kind: external_exports.literal("course_set"), course: external_exports.unknown() }).strict(),
+  external_exports.object({ kind: external_exports.literal("obstacle_add"), obstacle: external_exports.unknown() }).strict(),
+  external_exports.object({ kind: external_exports.literal("obstacle_set"), id: labId, set: obstaclePatch }).strict(),
+  external_exports.object({ kind: external_exports.literal("obstacle_remove"), id: labId }).strict(),
+  external_exports.object({
+    kind: external_exports.literal("course_from_seed"),
+    seed: external_exports.number().int().min(0).max(2 ** 31 - 1),
+    obstacles: external_exports.number().int().min(1).max(12).default(5),
+    hardness: external_exports.number().int().min(1).max(5).default(2),
+    street: external_exports.boolean().default(true)
+  }).strict(),
+  external_exports.object({ kind: external_exports.literal("traffic_set"), street: LabStreet.nullable().optional(), cars: external_exports.array(LabCar).max(8).optional() }).strict(),
+  external_exports.object({ kind: external_exports.literal("settings_set"), settings: LabRunSettingsPatch }).strict(),
+  external_exports.object({ kind: external_exports.literal("run"), settings: LabRunSettingsPatch.optional(), version: labId.optional() }).strict(),
+  external_exports.object({ kind: external_exports.literal("runs_list") }).strict(),
+  external_exports.object({ kind: external_exports.literal("scores"), run: labId.optional() }).strict(),
+  external_exports.object({ kind: external_exports.literal("frame"), run: labId.optional(), t: external_exports.number().min(0).max(600) }).strict(),
+  external_exports.object({ kind: external_exports.literal("view_set"), overlays: external_exports.array(LabOverlay).max(6).optional(), speed: LabPlaySpeed.optional() }).strict(),
+  external_exports.object({ kind: external_exports.literal("versions") }).strict(),
+  external_exports.object({ kind: external_exports.literal("save_version"), run: labId.optional(), note: external_exports.string().max(120).optional() }).strict(),
+  /** A person makes a version the best at once; an agent's request waits for the owner (`best_pending`). */
+  external_exports.object({ kind: external_exports.literal("save_best"), version: labId }).strict(),
+  external_exports.object({ kind: external_exports.literal("rollback"), version: labId }).strict(),
+  external_exports.object({ kind: external_exports.literal("version_delete"), version: labId, confirm: external_exports.literal(true) }).strict()
+]);
+var MOTION_LAB_KINDS = MotionLabOperation.options.map((o) => o.shape.kind.value);
 
 // ../contracts/dist/events.js
 var EventName = external_exports.enum([
@@ -29034,13 +29279,13 @@ var CORE_ACCESSORIES = [
 var CORE_WEARABLES = [...CORE_CLOTHING, ...CORE_ACCESSORIES];
 var byId2 = new Map(CORE_WEARABLES.map((item4) => [item4.manifest.id, item4]));
 var findWearable = (id) => byId2.get(id);
-var place = (item4) => `${item4.slot}:${item4.layer}`;
+var place2 = (item4) => `${item4.slot}:${item4.layer}`;
 function wornItems(ids) {
   const byPlace = /* @__PURE__ */ new Map();
   for (const id of ids) {
     const item4 = byId2.get(id);
     if (item4)
-      byPlace.set(place(item4), item4);
+      byPlace.set(place2(item4), item4);
   }
   const items = [...byPlace.values()];
   return [
@@ -29833,15 +30078,15 @@ function sizedBody(id, scale2 = NORMAL_AVATAR_SCALE) {
     const q = grow(p);
     return [neck[0] + (q[0] - neck[0]) * s, neck[1] + (q[1] - neck[1]) * s, neck[2] + (q[2] - neck[2]) * s];
   };
-  const place3 = (joint, box2) => joint === "Head" ? { center: head(box2.center), size: growSize(box2.size).map((v) => v * s) } : { center: grow(box2.center), size: growSize(box2.size) };
+  const place4 = (joint, box2) => joint === "Head" ? { center: head(box2.center), size: growSize(box2.size).map((v) => v * s) } : { center: grow(box2.center), size: growSize(box2.size) };
   const body = {
     ...base,
     scale: { height: h, width: w, head: s },
     joints: base.joints.map((joint) => ({ ...joint, at: grow(joint.at) })),
-    parts: base.parts.map((part) => ({ ...part, ...place3(part.joint, part) })),
+    parts: base.parts.map((part) => ({ ...part, ...place4(part.joint, part) })),
     fit: Object.fromEntries(Object.entries(base.fit).map(([bone, target]) => [
       bone,
-      { ...target, box: place3(target.joint, target.box) }
+      { ...target, box: place4(target.joint, target.box) }
     ])),
     sketchArm: {
       start: base.sketchArm.start * w,
@@ -29851,7 +30096,7 @@ function sizedBody(id, scale2 = NORMAL_AVATAR_SCALE) {
     }
   };
   if (base.id === "starter")
-    body.fit = Object.fromEntries([...STARTER_BOXES].map(([bone, box2]) => [bone, { joint: bone, box: place3(bone, box2) }]));
+    body.fit = Object.fromEntries([...STARTER_BOXES].map(([bone, box2]) => [bone, { joint: bone, box: place4(bone, box2) }]));
   if (sized.size > 64)
     sized.clear();
   sized.set(key2, body);
@@ -34234,12 +34479,12 @@ var VoxelData = class {
     if (!cells13?.size)
       return null;
     const names = authors ? [...new Set([...cells13.values()].map((cell) => cell.author))] : [];
-    const place3 = new Map(names.map((name, n) => [name, n]));
+    const place4 = new Map(names.map((name, n) => [name, n]));
     const bytes2 = new Uint8Array(cells13.size * 6);
     const view = new DataView(bytes2.buffer);
     [...cells13].sort((a, b) => a[0] - b[0]).forEach(([index, cell], n) => {
       view.setUint32(n * 6, (index << 8 | cell.block) >>> 0, true);
-      view.setUint16(n * 6 + 4, place3.get(cell.author) ?? 0, true);
+      view.setUint16(n * 6 + 4, place4.get(cell.author) ?? 0, true);
     });
     return JSON.stringify({ kind: PLAYER_BLOCKS_KIND, v: 1, cx, cz, a: names, e: toBase64(bytes2) });
   }
@@ -35244,9 +35489,9 @@ function applyToDocument(state, input2) {
       const t = state.terrain;
       if (Math.abs(step - t.spacing) > 1e-6)
         throw new CommandError("invalid", `step must be the ground spacing (${t.spacing} m).`);
-      let metres2;
+      let metres3;
       try {
-        metres2 = decodeHeightTile(heights, cols * rows, base);
+        metres3 = decodeHeightTile(heights, cols * rows, base);
       } catch (error62) {
         throw new CommandError("invalid", error62.message);
       }
@@ -35270,7 +35515,7 @@ function applyToDocument(state, input2) {
       const changed = t.applyHeights(t.planHeights(box2, (x, z2) => {
         const i = Math.round((x - gx) / t.spacing);
         const j = Math.round((z2 - gz) / t.spacing);
-        return i >= 0 && i < cols && j >= 0 && j < rows ? metres2[j * cols + i] : void 0;
+        return i >= 0 && i < cols && j >= 0 && j < rows ? metres3[j * cols + i] : void 0;
       }));
       return {
         inverse: { type: "revert_terrain", params: { edits: diffTerrain(t, before) } },
@@ -36336,6 +36581,24 @@ var TOOL_ARGS = {
   avatar_voice: external_exports.object({ action: external_exports.enum(["models", "install", "voices", "clone", "assign", "speak", "job", "recordings", "audio", "replay", "demo", "playback", "demo_all", "preview", "preview_demo", "prepare_previews", "remove", "design", "save_design", "export_voice"]), preview: external_exports.boolean().optional(), voiceType: external_exports.enum(["male", "female", "child"]).optional(), description: external_exports.string().max(400).optional(), confirm: external_exports.boolean().optional(), command: external_exports.enum(["play", "pause", "stop", "seek", "rate", "volume"]).optional(), value: external_exports.number().finite().optional(), demoId: external_exports.string().max(80).optional(), audioId: external_exports.string().uuid().optional(), model: external_exports.string().max(80).optional(), jobId: external_exports.string().uuid().optional(), voiceId: external_exports.string().uuid().optional(), name: external_exports.string().max(80).optional(), audio: external_exports.string().max(12 * 1024 * 1024).optional(), consent: external_exports.boolean().optional(), projectId: external_exports.string().max(120).optional(), target: external_exports.string().regex(/^(self|[A-Za-z0-9_-]{1,100})$/).default("self"), text: external_exports.string().max(1200).optional(), language: external_exports.string().max(8).optional() }).strict(),
   user_avatar_library: external_exports.object({ action: external_exports.enum(["list", "assign", "play"]), target: external_exports.string().regex(/^(self|[A-Za-z0-9_-]{1,100})$/).default("self"), id: external_exports.string().max(150).nullable().optional(), query: external_exports.string().max(200).default(""), offset: external_exports.number().int().min(0).default(0), limit: external_exports.number().int().min(1).max(100).default(30) }).strict(),
   present_avatar: external_exports.object({ event: AvatarPresentationEvent }).strict(),
+  /**
+   * The Avatar tab (AV-01, Avatar design A0–A9): read and change the character itself — body, shape, muscle, fat,
+   * face controls, colours, hair — the view mode (skeleton, muscles, fat…), a held facial expression, a move, and
+   * save / export the recipe. `recipe` parts merge into the current recipe and are checked by the recipe schema.
+   */
+  avatar_studio: external_exports.object({
+    action: external_exports.enum(["inspect", "set", "view", "expression", "play", "save", "export", "reset_shape", "undo", "redo"]),
+    recipe: external_exports.record(external_exports.string(), external_exports.unknown()).optional(),
+    view: external_exports.enum(["normal", "first-person", "skeleton", "skeleton-mesh", "wireframe", "clay", "normals", "muscles", "fat"]).optional(),
+    shading: external_exports.enum(["smooth", "flat"]).optional(),
+    expression: external_exports.enum(["neutral", "smile", "angry", "sad", "surprised", "thinking"]).optional(),
+    clip: external_exports.string().max(150).optional()
+  }).strict(),
+  /**
+   * The Lab area of a motion lab project (MOTION-LAB L1 + L2): build a measured course, run the lab robot,
+   * read scores and keep motion versions. One operation per call; the owner gates live in the lab controller.
+   */
+  motion_lab: external_exports.object({ operation: MotionLabOperation }).strict(),
   get_resource_controls: external_exports.object({
     item_id: external_exports.string().min(1).max(128).describe("Core library model or ocean resource id; returns supported controls, scope and source defaults")
   }),
@@ -36361,7 +36624,8 @@ var TOOL_ARGS = {
     size: external_exports.number().min(0.2).max(10).optional().describe("Size factor, 1 = normal"),
     stretch: Stretch.optional(),
     on: external_exports.string().max(128).optional().describe("Instance id of a placed item to stand it on, e.g. a table for a lamp"),
-    color: external_exports.string().regex(/^#[0-9a-fA-F]{6}$/).optional().describe("Tint color such as #e53935")
+    color: external_exports.string().regex(/^#[0-9a-fA-F]{6}$/).optional().describe("Tint color such as #e53935"),
+    material: external_exports.enum(["plastic", "wood", "stone", "metal", "glass", "neon"]).optional().describe("Surface, as the Appearance tab: plastic (default), wood, stone, metal, glass, neon")
   }),
   scatter_items: external_exports.object({
     itemIds: external_exports.array(external_exports.string().max(128)).min(1).max(8).describe("Items to mix, e.g. trees and rocks"),
@@ -36392,6 +36656,62 @@ var TOOL_ARGS = {
   remove_items: external_exports.object({
     instanceIds: external_exports.array(external_exports.string().max(128)).min(1).max(100)
   }),
+  list_library: external_exports.object({
+    kind: external_exports.enum(["models", "game", "roads", "ground", "walls", "water", "sky", "moves", "effects"]).describe("A kind of the Items tab: models (3D), game, roads, ground, walls, water, sky, moves, effects"),
+    group: external_exports.enum(["parts", "nature", "props-and-decor", "structures", "building-blocks"]).optional().describe("3D only: Parts, Nature, Props, Buildings or Blocks"),
+    offset: external_exports.number().int().min(0).max(5e3).optional(),
+    limit: external_exports.number().int().min(1).max(100).optional()
+  }),
+  set_item_look: external_exports.object({
+    instanceIds: external_exports.array(external_exports.string().max(128)).min(1).max(100),
+    color: external_exports.string().regex(/^#[0-9a-fA-F]{6}$/).nullable().optional().describe("Tint such as #e53935; null gives back its own colour"),
+    material: external_exports.enum(["plastic", "wood", "stone", "metal", "glass", "neon"]).nullable().optional().describe("Surface; null gives back plastic")
+  }),
+  name_items: external_exports.object({
+    instanceIds: external_exports.array(external_exports.string().max(128)).min(1).max(100),
+    name: external_exports.string().max(64).nullable().describe("Shown in the Explorer; null takes the name away")
+  }),
+  group_items: external_exports.object({
+    instanceIds: external_exports.array(external_exports.string().max(128)).min(2).max(100),
+    name: external_exports.string().min(1).max(64).optional()
+  }),
+  ungroup_items: external_exports.object({ groupId: external_exports.string().max(128).describe("Group id from get_world_summary") }),
+  set_item_flags: external_exports.object({
+    instanceIds: external_exports.array(external_exports.string().max(128)).min(1).max(100),
+    anchored: external_exports.boolean().optional().describe("false lets physics move it while playing"),
+    floats: external_exports.boolean().nullable().optional().describe("true keeps it in the air; null gives the choice back to the item")
+  }),
+  settle_items: external_exports.object({
+    instanceIds: external_exports.array(external_exports.string().max(128)).min(1).max(100).describe("Let them fall and come to rest, like in play")
+  }),
+  edit_river: external_exports.object({
+    riverId: external_exports.string().max(128).describe("River id from get_world_summary"),
+    points: external_exports.array(Point).min(2).max(50).optional().describe("A new course; the bed is carved again"),
+    width: external_exports.number().min(2).max(40).optional(),
+    widen: external_exports.number().min(1).max(2).optional(),
+    flow: external_exports.number().min(0).max(6).optional()
+  }),
+  add_opening: external_exports.object({
+    wallId: external_exports.string().max(128).describe("Wall id from get_world_summary"),
+    kind: external_exports.enum(["door", "window"]),
+    at: Point.describe("A point [x, z] on or near the wall; the opening goes on the closest straight part"),
+    width: external_exports.number().min(0.4).max(6).optional().describe("Metres (door 1.2, window 1.4 by default)"),
+    height: external_exports.number().min(0.4).max(10).optional().describe("Metres (door 2.2, window 1.2 by default)"),
+    bottom: external_exports.number().min(0).max(10).optional().describe("Window: metres above the wall base (1 by default); doors start at 0")
+  }),
+  remove_parts: external_exports.object({
+    parts: external_exports.array(external_exports.object({
+      kind: external_exports.enum(["road", "wall", "water", "river", "paving", "opening"]),
+      id: external_exports.string().max(128),
+      wallId: external_exports.string().max(128).optional().describe("For an opening: the wall it is in")
+    })).min(1).max(50)
+  }),
+  lock_items: external_exports.object({
+    instanceIds: external_exports.array(external_exports.string().max(128)).min(1).max(100)
+  }),
+  world_history: external_exports.object({
+    action: external_exports.enum(["undo", "redo"])
+  }),
   fill_blocks: external_exports.object({
     ...Area2,
     block: BlockName,
@@ -36413,7 +36733,10 @@ var TOOL_ARGS = {
     points: external_exports.array(Point).min(2).max(50).describe("Points [x, z] along the road"),
     roadType: external_exports.enum(["street", "dirt", "tram", "rail", "fantasy", "path"]).optional().describe("Kind of road (street by default)"),
     lanes: external_exports.number().int().min(1).max(8).optional().describe("Traffic lanes of a street, both directions together; lane lines are painted between them"),
-    oneway: external_exports.boolean().optional().describe("true: traffic runs one way, along the points (no centre line)")
+    oneway: external_exports.boolean().optional().describe("true: traffic runs one way, along the points (no centre line)"),
+    width: external_exports.number().min(2).max(16).optional().describe("Metres across; the kind of road decides when left out"),
+    sidewalk: external_exports.number().min(0.5).max(6).optional().describe("Raised sidewalk in metres on each side; none when left out"),
+    sidewalkSide: external_exports.enum(["both", "left", "right"]).optional().describe("Which sides get the sidewalk, along the points (both by default)")
   }),
   pave_area: external_exports.object({
     points: external_exports.array(Point).min(3).max(100).describe("Outline [x, z] of a square, market place or car park, at least 3 corners"),
@@ -36444,7 +36767,8 @@ var TOOL_ARGS = {
   draw_river: external_exports.object({
     points: external_exports.array(Point).min(2).max(50).describe("Points [x, z] along the river, from where it starts down to where it ends"),
     width: external_exports.number().min(2).max(40).optional().describe("Metres across (8 by default); from 11 it is deep enough to swim in"),
-    flow: external_exports.number().min(0).max(6).optional().describe("How fast the water runs (1.5 by default)")
+    flow: external_exports.number().min(0).max(6).optional().describe("How fast the water runs (1.5 by default)"),
+    widen: external_exports.number().min(1).max(2).optional().describe("How much wider it gets towards its end: 1 = the same all along, 1.3 by default (Wider at end)")
   }),
   set_sea: external_exports.strictObject({
     level: external_exports.number().min(-50).max(50).nullable().describe("Height the sea fills up to; null takes the sea away"),
@@ -36520,8 +36844,34 @@ var TOOL_ARGS = {
     slope: external_exports.tuple([external_exports.number().min(0).max(90), external_exports.number().min(0).max(90)]).optional().describe("Only where the ground is this steep, in degrees"),
     depth_below_sea: external_exports.tuple([external_exports.number(), external_exports.number()]).optional().describe("Only where the ground lies this many metres below the sea")
   }),
-  set_weather: external_exports.object({ preset: WeatherPreset }),
+  set_weather: external_exports.object({
+    preset: WeatherPreset,
+    strength: external_exports.number().min(0.2).max(2).optional().describe("How much rain, snow or sand falls: 1 is the preset (WORLD-W4); kept when only the preset changes")
+  }),
   /** The place's scroll story (SCROLL-02): every call replaces all stops. */
+  set_lights: external_exports.object({
+    action: external_exports.enum(["list", "add", "update", "remove", "three_point"]).describe("three_point replaces every light with a key, a fill and a back light on the avatar"),
+    id: external_exports.string().max(80).optional().describe("Light id from list (update, remove)"),
+    name: external_exports.string().min(1).max(80).optional(),
+    enabled: external_exports.boolean().optional(),
+    color: external_exports.string().regex(/^#[0-9a-fA-F]{6}$/).optional(),
+    intensity: external_exports.number().min(0).max(200).optional().describe("Brightness (20 by default)"),
+    angle: external_exports.number().min(5).max(85).optional().describe("Beam width in degrees"),
+    softness: external_exports.number().min(0).max(1).optional().describe("Soft edge, 0 hard .. 1 soft"),
+    distance: external_exports.number().min(1).max(200).optional().describe("Reach in metres"),
+    follows: external_exports.string().max(120).nullable().optional().describe('"self" follows the avatar, an actor id follows it, null stays at a world position'),
+    position: external_exports.tuple([Coordinate, external_exports.number().min(-500).max(500), Coordinate]).optional().describe("[x, y, z]; an offset from the actor when it follows one"),
+    aim: external_exports.tuple([Coordinate, external_exports.number().min(-500).max(500), Coordinate]).optional().describe("Where it points, [x, y, z]")
+  }),
+  set_spawn: external_exports.object({
+    x: Coordinate,
+    z: Coordinate,
+    turn: external_exports.number().min(-360).max(360).optional().describe("Facing in degrees (0 = +z)")
+  }),
+  set_water_look: external_exports.object({
+    clarity: external_exports.number().min(1).max(20).optional().describe("How far you see through the water, metres"),
+    waves: external_exports.enum(["calm", "normal", "rough"]).optional()
+  }),
   set_story: external_exports.strictObject({
     title: external_exports.string().max(120).optional().describe("Name of the story page"),
     stops: external_exports.array(external_exports.strictObject({
@@ -36635,7 +36985,9 @@ var DESCRIPTIONS = {
   avatar_voice: "Manage local avatar voices: design a synthetic voice using language/voiceType/text/description, audition its draft, save_design with audioId/name, then assign separately. Models and installation, authorized reference voice profiles (clone), assign a voice, generate speech (speak), and poll job status. Call models/voices first; install and speak return job IDs. Audio stays local. Arabic support depends on the selected model.",
   user_avatar_library: "List private user characters and motions, assign an available character ID to self or a host agent, or play an available private motion ID. No asset publishing or redistribution. List before choosing IDs.",
   share_studio: "Inspect sharing capability, open the separate Share dialog, or create a host-authorized world/Avatar Live link. Creating requires explicit user authorization and an attached platform sharing service; local SDK cannot publish private data. Password enforcement belongs to the host server.",
+  avatar_studio: "Avatar tab: inspect the character (recipe, view, bones, height, whether the face can move); set merges recipe parts (name, body, shape {height, weight, scale, anime, muscle, fat, fatPattern, definition, muscles {group: -1..1}, fatRegions {region: -1..1}, face {feature: -1..1}}, colors {skin, hair, top, bottom, shoes}, hair); view sets the view mode (skeleton, muscles, fat\u2026) and shading; expression holds a facial expression; play a move by id; save the character to My characters; export the recipe JSON; reset_shape back to the normal shape; undo / redo step through the character edits. Works on the live Studio only.",
   present_avatar: "Use kind display to open/configure Avatar Live layouts (large, desktop, browser, compact, banner, circle, watch), background and framing. For saved world backgrounds, use worldId from inspect_studio.availableWorlds and optional worldSpot {position,target,player} XYZ coordinates; set worldId/worldSpot to null for the current live world view. Optionally show a gesture, facial expression, visual effect, notification or rich card when useful. Transient, never saves the world. target is self or a host agent ID. Use only available Core animation IDs. Never invent live app or stock data. No action permissions are granted by a card.",
+  motion_lab: "Motion lab (only in a motion lab project): { operation: { kind } }. Kinds: commands (list with help), inspect, course_get, course_set, obstacle_add {obstacle: {kind step|ramp|gap|low_wall|window, z, sizes in metres}}, obstacle_set {id, set}, obstacle_remove {id}, course_from_seed {seed, obstacles?, hardness?, street?}, traffic_set {street?, cars?}, settings_set {settings}, run {settings?, version?} (fixed step + seed, returns score and events), runs_list, scores {run?}, frame {run?, t}, view_set {overlays?, speed?}, versions, save_version {run?, note?}, save_best {version} (only asks: the owner confirms it in the Lab), rollback {version}, version_delete {version, confirm: true} (only versions an agent made, never the best). Read inspect before changing the course.",
   get_resource_controls: "Read supported controls, scope, source defaults and documentation for a Core model or ocean resource. Models use instance-scoped set_resource_params; oceans use world-scoped set_sea. Empty model controls means no generated settings; creator package controls are not described.",
   set_resource_params: "Change supported generated controls on one placed Core item. Use keys and ranges from get_resource_controls; null removes an instance override and restores its resource default. Saved as a normal undoable change. Does not change world defaults or arbitrary script parameters.",
   get_world_summary: "Describe the place now: size, style, sky, items with ids and positions, roads, walls, water, rivers, and the sea. Items come 100 at a time; more_items_from names the from_item of the next page.",
@@ -36645,6 +36997,18 @@ var DESCRIPTIONS = {
   scatter_items: "Place many items at random inside a circle (forests, flower fields, rocks).",
   build_platforms: "Side-view (2D) places only: build a course of platforms on the players' line at x positions and heights, for jumping from one to the next. It keeps every jump possible by itself (moves platforms closer or lowers them), so call it once per course.",
   move_item: "Move, turn or resize a placed item by its instance id.",
+  list_library: "Browse the Items tab library by kind (and 3D group), only items that fit this place's style: id, name, price. Use search_catalog for words.",
+  set_item_look: "Change the colour and/or material of placed items (the Appearance tab). Locked items are refused.",
+  name_items: "Name placed items as they show in the Explorer.",
+  group_items: "Group placed items so they move, lock and copy together.",
+  ungroup_items: "Take a group apart; its items stay where they are.",
+  set_item_flags: "Anchor items (they stay put) or let physics move them while playing; mark items as meant to float.",
+  settle_items: "Let items fall and come to rest, like in play (one undo step). Needs a live Studio.",
+  edit_river: "Change a river already drawn: its width, how much it widens, its current, or its course (the bed is carved again).",
+  add_opening: "Cut a door or a window into a wall (the same as the Door and Window tools). Doors start at the ground.",
+  remove_parts: "Remove roads, walls and rooms, ponds and lakes, rivers, paved areas, or one door or window (kind opening with its wallId), by their ids from get_world_summary.",
+  lock_items: "Lock placed items so nobody moves them by accident. Locked items cannot be moved or removed with these tools; only the owner unlocks them in the Studio.",
+  world_history: "Undo or redo your own last world change. It refuses when the person changed the place after it, so their work is never undone.",
   remove_items: "Remove placed items by their instance ids (from get_world_summary).",
   fill_blocks: "Block places only: fill a box of blocks between two corners, on the ground (towers, blocks, platforms); hollow: true makes a hut with walls, floor, and roof.",
   block_line: "Block places only: a line of blocks through points that follows the ground, height blocks high (walls, fences, paths of stone).",
@@ -36656,6 +37020,9 @@ var DESCRIPTIONS = {
   build_house: "Build a house seen from outside (like the real town houses): walls on an outline with windows by storey, a door, and a roof (gabled, hipped, ...) in real textures.",
   add_water: "Make a pond or lake at x, z (the ground is dug when needed).",
   draw_river: "Draw a river through points. It carves its own bed, always runs downhill, turns steep drops into waterfalls, and stops by itself when it reaches a lake or the sea. From 11 m wide players can swim in it and the current carries them.",
+  set_lights: "The place's lights (World \u203A Lighting, also used by Filming): list them, add (up to 4), update or remove one by id, or three_point for a key, fill and back light on the avatar.",
+  set_spawn: "Move the start point, where players appear.",
+  set_water_look: "How the water looks in Realistic places: clarity (see through, metres) and waves (calm, normal, rough).",
   set_story: "Tell the place as a scroll page (/showcase?place=<place id>): the camera flies from stop to stop as visitors scroll, with words at each stop. Replaces all stops at once (get_world_summary lists the current ones); stops: null removes the story. Creators can also add stops from the studio camera in the Story panel.",
   set_sea: "Fill everything below a height with sea water. Select a reusable ocean with resource_id and read get_resource_controls for its supported style and swell controls. Swell replaces the override; null resets automatic direction and source defaults. Omitted resource_id/swell preserve them. level null removes the sea. This is a normal undoable world setting.",
   sculpt_terrain: "Raise (hills), lower (valleys), flatten, or smooth the ground in a circle.",
@@ -36780,10 +37147,19 @@ function describeZone(zone, instance) {
   }
   return `${head}, ${r(size.width)} m wide x ${r(size.depth)} m deep${turn === 0 ? "" : `, turn ${turn}\xB0`}`;
 }
+function skyDetails(world) {
+  const p = world.environment.sky.params;
+  const parts6 = [
+    typeof p.timeOfDay === "number" ? `${p.timeOfDay} h` : "",
+    typeof p.sunAzimuth === "number" ? `sun path ${p.sunAzimuth}\xB0` : "",
+    typeof p.windSpeed === "number" ? `wind ${p.windSpeed} m/s from ${Number(p.windDirection ?? 0)}\xB0` : ""
+  ].filter(Boolean);
+  return parts6.length ? ` Sky settings: ${parts6.join(", ")}.` : "";
+}
 function worldSummary(world, maxItems, fromItem = 0) {
   const side3 = SIZE_TIERS[world.sizeTier].sideMeters;
   const lines = [
-    `Size: ${side3} x ${side3} m. Style: ${world.style.base}. Sky: ${world.environment.sky.preset}${Number(world.environment.sky.params.cycle) > 0 ? ` (day and night cycle, ${Number(world.environment.sky.params.cycle)} minutes per day)` : ""}. Weather: ${world.environment.weather.preset}.`,
+    `Size: ${side3} x ${side3} m. Style: ${world.style.base}. Sky: ${world.environment.sky.preset}${Number(world.environment.sky.params.cycle) > 0 ? ` (day and night cycle, ${Number(world.environment.sky.params.cycle)} minutes per day)` : ""}. Weather: ${world.environment.weather.preset}${world.environment.weather.params?.strength !== void 0 ? ` at ${Math.round(Number(world.environment.weather.params.strength) * 100)}%` : ""}.${skyDetails(world)} Start point: (${r(world.spawn.position[0])}, ${r(world.spawn.position[2])}).${(world.environment.lighting ?? []).length ? ` Lights: ${(world.environment.lighting ?? []).map((l) => `${l.id} "${l.name}"${l.enabled ? "" : " off"}`).join(", ")}.` : ""}`,
     groundLine(world),
     `Game: ${world.game ? describeGame(world.game) : "none"}.`,
     `Items: ${world.instances.length}${fromItem > 0 ? ` (listed from ${fromItem})` : ""}.`
@@ -36803,7 +37179,7 @@ function worldSummary(world, maxItems, fromItem = 0) {
     const name = instance.name ?? getCoreItem(instance.itemId)?.manifest.name ?? instance.itemId;
     const zone = zoneFromParams(instance.params, zoneShapeOfItem(instance.itemId));
     const ride = rideFromParams(instance.params, getLibraryItem(instance.itemId)?.manifest.ride);
-    const line = `- ${instance.instanceId}: ${name} (${instance.itemId}) at (${r(x)}, ${r(z2)})${zone ? describeZone(zone, instance) : ""}${ride ? `, rideable ${ride.model}${ride.tag ? ` "${ride.tag}"` : ""}` : ""}`;
+    const line = `- ${instance.instanceId}: ${name} (${instance.itemId}) at (${r(x)}, ${r(z2)})${zone ? describeZone(zone, instance) : ""}${ride ? `, rideable ${ride.model}${ride.tag ? ` "${ride.tag}"` : ""}` : ""}${instance.locked ? ", locked" : ""}${instance.groupId ? `, in ${instance.groupId}` : ""}${typeof instance.params.material === "string" ? `, ${instance.params.material}` : ""}${typeof instance.params.color === "string" ? `, ${instance.params.color}` : ""}`;
     if (index > fromItem && used + line.length + 1 > budget) {
       end = index;
       break;
@@ -36833,7 +37209,19 @@ function tailLines(world) {
   if (world.walls.length) {
     lines.push(`Walls and rooms: ${world.walls.length}.`);
     for (const wall of world.walls.slice(0, 20))
-      lines.push(`- ${wall.id} ${wall.closed ? "room" : "wall"}${wallLook(wall.materialId)} ${firstPoint(wall.points)}`);
+      lines.push(`- ${wall.id} ${wall.closed ? "room" : "wall"}${wallLook(wall.materialId)} ${firstPoint(wall.points)}` + (wall.openings.length ? `, openings: ${wall.openings.map((o) => `${o.id} ${o.kind}`).join(", ")}` : ""));
+  }
+  if (world.groups.length) {
+    lines.push(`Groups: ${world.groups.length}.`);
+    for (const group2 of world.groups.slice(0, 20)) {
+      const count2 = world.instances.filter((i) => i.groupId === group2.id).length;
+      lines.push(`- ${group2.id} "${group2.name}" (${count2} items)`);
+    }
+  }
+  if (world.pavings.length) {
+    lines.push(`Paved areas: ${world.pavings.length}.`);
+    for (const paving of world.pavings.slice(0, 20))
+      lines.push(`- ${paving.id} ${firstPoint(paving.area)}`);
   }
   if (world.environment.water.length) {
     lines.push(`Water: ${world.environment.water.length}.`);
@@ -36940,7 +37328,7 @@ function rotate([x, y, z2], q) {
     z2 + qw * tz + (qx * ty - qy * tx)
   ];
 }
-function place2(instance, shape2) {
+function place3(instance, shape2) {
   const { position, rotation, scale: scale2 } = instance.transform;
   const world = (local2) => {
     const turned = rotate([local2[0] * scale2[0], local2[1] * scale2[1], local2[2] * scale2[2]], rotation);
@@ -36991,7 +37379,7 @@ function place2(instance, shape2) {
   };
 }
 function worldBox(instance, shape2) {
-  const { min: min2, max: max2 } = place2(instance, shape2);
+  const { min: min2, max: max2 } = place3(instance, shape2);
   return { min: min2, max: max2 };
 }
 function insidePolygon2(x, z2, points) {
@@ -37855,14 +38243,14 @@ function ruleReport(doc, env, instance, nameOf = (i) => env.itemName?.(i.itemId)
   const shape2 = env.itemShape(instance.itemId);
   if (!rules || !shape2)
     return null;
-  const item4 = place2(instance, shape2);
+  const item4 = place3(instance, shape2);
   const others = [];
   for (const other of doc.instances) {
     if (other.instanceId === instance.instanceId)
       continue;
     const otherShape = env.itemShape(other.itemId);
     if (otherShape)
-      others.push(place2(other, otherShape));
+      others.push(place3(other, otherShape));
   }
   return checkItemRules(item4, rules, env, others, nameOf);
 }
@@ -38818,7 +39206,7 @@ function validateWorld(doc, env) {
     triangles += env.itemTriangles?.(instance.itemId) ?? 0;
     const shape2 = env.itemShape(instance.itemId);
     if (shape2)
-      placed.push(place2(instance, shape2));
+      placed.push(place3(instance, shape2));
   }
   const surfaces = env.restShape ? env.surfaces?.() ?? new SurfaceIndex(doc, {
     groundAt: env.groundAt,
@@ -39737,6 +40125,11 @@ async function getScriptLogs(args, host) {
 }
 
 // ../assistant/dist/loop.js
+var THREE_POINT_LIGHTS = [
+  { id: "light-key", name: "Key light", enabled: true, color: "#fff4e0", intensity: 24, angle: 35, softness: 0.5, distance: 30, actor: "self", position: [2, 3, 3], target: [0, 1.5, 0] },
+  { id: "light-fill", name: "Fill light", enabled: true, color: "#dfe8ff", intensity: 9, angle: 50, softness: 0.9, distance: 30, actor: "self", position: [-3, 2, 2.5], target: [0, 1.4, 0] },
+  { id: "light-back", name: "Back light", enabled: true, color: "#ffffff", intensity: 16, angle: 30, softness: 0.4, distance: 30, actor: "self", position: [0, 3.2, -3], target: [0, 1.6, 0] }
+];
 var offered = /* @__PURE__ */ new WeakMap();
 var MAX_FAILURES = 2;
 var newId = (prefix, random12) => `${prefix}-${Math.floor(random12() * 2 ** 40).toString(36).padStart(8, "0")}`;
@@ -39949,6 +40342,10 @@ function executeTool(name, args, host, random12 = Math.random) {
       return { ok: false, result: "Use the asynchronous tool runner for voice operations." };
     case "user_avatar_library":
       return { ok: false, result: "Use the asynchronous tool runner for private library operations." };
+    case "avatar_studio":
+      return { ok: false, result: "Use the asynchronous tool runner for the Avatar tab." };
+    case "motion_lab":
+      return { ok: false, result: "Use the asynchronous tool runner for the motion lab." };
     case "present_avatar": {
       if (!host.presentAvatar)
         return { ok: false, result: "Avatar presentation is not enabled in this host." };
@@ -40082,7 +40479,7 @@ function executeTool(name, args, host, random12 = Math.random) {
             position: [x, y, z2],
             rotation: yawQuat2(a.turn ?? 0),
             ...plain2 ? {} : { scale: sized2.scale },
-            ...a.color ? { itemParams: { color: a.color } } : {},
+            ...a.color || a.material ? { itemParams: { ...a.color ? { color: a.color } : {}, ...a.material && a.material !== "plastic" ? { material: a.material } : {} } } : {},
             // The spot above is the hint; the rest law sets the height and lean (P2-43).
             rest: true
           }
@@ -40282,6 +40679,8 @@ function executeTool(name, args, host, random12 = Math.random) {
           ok: false,
           result: `Error: no placed item "${a.instanceId}". Use get_world_summary for ids.`
         };
+      if (instance.locked)
+        return { ok: false, result: `Error: ${a.instanceId} is locked. Only the owner unlocks it in the Studio.` };
       if (a.x === void 0 && a.z === void 0 && a.turn === void 0 && a.size === void 0 && a.stretch === void 0)
         return { ok: false, result: "Error: give a new x and z, a turn, a size or a stretch." };
       const [oldX, , oldZ] = instance.transform.position;
@@ -40327,12 +40726,188 @@ function executeTool(name, args, host, random12 = Math.random) {
         }
       ]), `Moved ${instance.instanceId} to (${x}, ${z2}).`);
     }
+    case "list_library": {
+      const a = args;
+      const filters = {
+        models: { category: "3d-models", subcategory: a.group ?? ["parts", "nature", "props-and-decor", "structures", "building-blocks"] },
+        game: { category: "3d-models", subcategory: "gameplay" },
+        roads: { category: "environment", subcategory: "roads" },
+        ground: { category: "environment", subcategory: "ground" },
+        walls: { category: "3d-models", subcategory: ["walls", "openings"] },
+        water: { category: "environment", subcategory: "water" },
+        sky: { category: "environment", subcategory: ["sky", "weather"] },
+        moves: { category: "avatar-appearance", subcategory: "emotes" },
+        effects: { type: "vfx" }
+      };
+      const all = queryLibrary({ ...filters[a.kind], style: world.style.base, text: "" });
+      const offset = a.offset ?? 0, limit = a.limit ?? 50;
+      const page = all.slice(offset, offset + limit);
+      return {
+        ok: true,
+        result: JSON.stringify({
+          kind: a.kind,
+          total: all.length,
+          offset,
+          items: page.map((entry) => ({ id: entry.manifest.id, name: entry.manifest.name, group: entry.manifest.subcategory, price: entry.manifest.price.type })),
+          ...offset + limit < all.length ? { next: offset + limit } : {},
+          ...a.kind === "effects" ? { screenEffects: 'Screen effects (snow, rain, confetti\u2026) are present_avatar kind "effect".' } : {}
+        })
+      };
+    }
+    case "set_item_look":
+    case "name_items":
+    case "set_item_flags":
+    case "settle_items":
+    case "group_items": {
+      const a = args;
+      const found = a.instanceIds.map((id) => world.instances.find((i) => i.instanceId === id));
+      const missing = a.instanceIds.filter((_, index) => !found[index]);
+      if (missing.length)
+        return { ok: false, result: `Error: no items with ids ${missing.join(", ")}.` };
+      const locked = found.filter((i) => i.locked).map((i) => i.instanceId);
+      if (locked.length && name !== "name_items")
+        return { ok: false, result: `Error: ${locked.join(", ")} locked. Only the owner unlocks items in the Studio.` };
+      if (name === "set_item_look") {
+        const b2 = args;
+        if (b2.color === void 0 && b2.material === void 0)
+          return { ok: false, result: "Error: give a color and/or a material." };
+        const params = {
+          ...b2.color !== void 0 ? { color: b2.color } : {},
+          ...b2.material !== void 0 ? { material: b2.material === "plastic" ? null : b2.material } : {}
+        };
+        return done(host.apply(b2.instanceIds.map((instanceId) => ({ type: "set_item_params", params: { instanceId, params } }))), `Changed the look of ${b2.instanceIds.length} items.`);
+      }
+      if (name === "name_items") {
+        const b2 = args;
+        return done(host.apply(b2.instanceIds.map((id) => ({ type: "rename", params: { kind: "item", id, name: b2.name } }))), b2.name ? `Named ${b2.instanceIds.length} items "${b2.name}".` : "Took the names away.");
+      }
+      if (name === "set_item_flags") {
+        const b2 = args;
+        if (b2.anchored === void 0 && b2.floats === void 0)
+          return { ok: false, result: "Error: give anchored and/or floats." };
+        return done(host.apply(b2.instanceIds.map((instanceId) => ({ type: "set_item_flags", params: { instanceId, ...b2.anchored !== void 0 ? { anchored: b2.anchored } : {}, ...b2.floats !== void 0 ? { floats: b2.floats } : {} } }))), `Updated ${b2.instanceIds.length} items.`);
+      }
+      if (name === "settle_items") {
+        if (!host.settle)
+          return { ok: false, result: "Letting items fall needs a live Studio (physics)." };
+        const moved = host.settle(a.instanceIds);
+        return typeof moved === "string" ? { ok: false, result: moved } : { ok: true, result: `${moved} of ${a.instanceIds.length} items came to rest somewhere new.` };
+      }
+      const b = args;
+      const taken = new Set(world.groups.map((g) => g.name));
+      let n = world.groups.length + 1;
+      while (taken.has(`Group ${n}`))
+        n += 1;
+      const groupId = newId("group", random12);
+      return done(host.apply([{ type: "group_items", params: { groupId, name: b.name ?? `Group ${n}`, instanceIds: b.instanceIds } }]), `Grouped ${b.instanceIds.length} items as ${groupId}.`);
+    }
+    case "ungroup_items": {
+      const { groupId } = args;
+      if (!world.groups.some((g) => g.id === groupId))
+        return { ok: false, result: `Error: no group "${groupId}". Use get_world_summary for ids.` };
+      return done(host.apply([{ type: "ungroup_items", params: { groupId } }]), `Took ${groupId} apart.`);
+    }
+    case "edit_river": {
+      const a = args;
+      if (!world.environment.rivers.some((r2) => r2.id === a.riverId))
+        return { ok: false, result: `Error: no river "${a.riverId}". Use get_world_summary for ids.` };
+      if (a.points === void 0 && a.width === void 0 && a.widen === void 0 && a.flow === void 0)
+        return { ok: false, result: "Error: give points, width, widen or flow." };
+      const outside = a.points?.find(([x, z2]) => !inside(x, z2));
+      if (outside)
+        return done(`The point (${outside[0]}, ${outside[1]}) is outside the place.`, "");
+      return done(host.apply([
+        {
+          type: "edit_river",
+          params: {
+            riverId: a.riverId,
+            ...a.points ? { points: a.points } : {},
+            ...a.width !== void 0 ? { width: a.width } : {},
+            ...a.widen !== void 0 ? { widen: a.widen } : {},
+            ...a.flow !== void 0 ? { flow: a.flow } : {}
+          }
+        }
+      ]), `Changed ${a.riverId}.`);
+    }
+    case "add_opening": {
+      const a = args;
+      const wall = world.walls.find((w) => w.id === a.wallId);
+      if (!wall)
+        return { ok: false, result: `Error: no wall "${a.wallId}". Use get_world_summary for wall ids.` };
+      const { segment, offset } = nearestWallPosition(wall, a.at[0], a.at[1]);
+      const preset = OPENING_PRESETS[a.kind];
+      const opening = {
+        id: newId(a.kind, random12),
+        kind: a.kind,
+        segment,
+        offset: Math.round(offset * 10) / 10,
+        width: a.width ?? preset.width,
+        height: a.height ?? preset.height,
+        bottom: a.kind === "door" ? 0 : a.bottom ?? preset.bottom
+      };
+      const error62 = openingError(wall, opening);
+      if (error62)
+        return { ok: false, result: `Error: ${error62}` };
+      return done(host.apply([{ type: "add_wall_opening", params: { wallId: wall.id, opening } }]), `Added a ${a.kind} (${opening.id}) to ${wall.id}.`);
+    }
+    case "remove_parts": {
+      const { parts: parts6 } = args;
+      const commands = [];
+      for (const part of parts6) {
+        const missing = `Error: no ${part.kind} "${part.id}". Use get_world_summary for ids.`;
+        if (part.kind === "road") {
+          if (!world.roads.some((r2) => r2.id === part.id))
+            return { ok: false, result: missing };
+          commands.push({ type: "remove_road", params: { roadId: part.id } });
+        } else if (part.kind === "wall") {
+          if (!world.walls.some((w) => w.id === part.id))
+            return { ok: false, result: missing };
+          commands.push({ type: "remove_wall", params: { wallId: part.id } });
+        } else if (part.kind === "water") {
+          if (!world.environment.water.some((w) => w.id === part.id))
+            return { ok: false, result: missing };
+          commands.push({ type: "remove_water", params: { waterId: part.id } });
+        } else if (part.kind === "river") {
+          if (!(world.environment.rivers ?? []).some((r2) => r2.id === part.id))
+            return { ok: false, result: missing };
+          commands.push({ type: "remove_river", params: { riverId: part.id } });
+        } else if (part.kind === "paving") {
+          if (!(world.pavings ?? []).some((p) => p.id === part.id))
+            return { ok: false, result: missing };
+          commands.push({ type: "remove_paving", params: { pavingId: part.id } });
+        } else {
+          const wall = world.walls.find((w) => w.id === part.wallId);
+          if (!wall || !wall.openings.some((o) => o.id === part.id))
+            return { ok: false, result: `Error: no opening "${part.id}" in wall "${part.wallId ?? ""}".` };
+          commands.push({ type: "remove_wall_opening", params: { wallId: wall.id, openingId: part.id } });
+        }
+      }
+      return done(host.apply(commands), `Removed ${parts6.length} part${parts6.length === 1 ? "" : "s"}.`);
+    }
+    case "lock_items": {
+      const { instanceIds } = args;
+      const existing = new Set(world.instances.map((i) => i.instanceId));
+      const missing = instanceIds.filter((id) => !existing.has(id));
+      if (missing.length)
+        return { ok: false, result: `Error: no items with ids ${missing.join(", ")}.` };
+      return done(host.apply(instanceIds.map((instanceId) => ({ type: "set_item_flags", params: { instanceId, locked: true } }))), `Locked ${instanceIds.length} items. Only the owner unlocks them.`);
+    }
+    case "world_history": {
+      const { action } = args;
+      if (!host.history)
+        return { ok: false, result: "Undo and redo are not available in this host." };
+      const error62 = host.history(action);
+      return { ok: !error62, result: error62 ?? (action === "undo" ? "Took back your last change." : "Put your change back.") };
+    }
     case "remove_items": {
       const { instanceIds } = args;
       const existing = new Set(world.instances.map((i) => i.instanceId));
       const missing = instanceIds.filter((id) => !existing.has(id));
       if (missing.length)
         return { ok: false, result: `Error: no items with ids ${missing.join(", ")}.` };
+      const locked = world.instances.filter((i) => i.locked && instanceIds.includes(i.instanceId)).map((i) => i.instanceId);
+      if (locked.length)
+        return { ok: false, result: `Error: ${locked.join(", ")} locked. Only the owner unlocks items in the Studio.` };
       return done(host.apply(instanceIds.map((instanceId) => ({ type: "remove_item", params: { instanceId } }))), `Removed ${instanceIds.length} items.`);
     }
     case "draw_road": {
@@ -40345,10 +40920,11 @@ function executeTool(name, args, host, random12 = Math.random) {
           params: {
             roadId,
             points: a.points.map(([x, z2]) => [round5(x), round5(z2)]),
-            width: type.width,
+            width: a.width ?? type.width,
             materialId: type.id,
             ...a.lanes ? { lanes: a.lanes } : {},
-            ...a.oneway ? { oneway: true } : {}
+            ...a.oneway ? { oneway: true } : {},
+            ...a.sidewalk !== void 0 ? { sidewalk: a.sidewalk, ...a.sidewalkSide ? { sidewalkSide: a.sidewalkSide } : {} } : {}
           }
         }
       ]), `Drew a ${type.name} (${roadId}).`);
@@ -40439,7 +41015,7 @@ function executeTool(name, args, host, random12 = Math.random) {
         host.apply([
           {
             type: "draw_river",
-            params: { riverId: newId("river", random12), points: a.points, width, flow: a.flow ?? 1.5 }
+            params: { riverId: newId("river", random12), points: a.points, width, flow: a.flow ?? 1.5, ...a.widen !== void 0 ? { widen: a.widen } : {} }
           }
         ]),
         // The builder is told whether this river can be swum in, because the width decides it.
@@ -40633,14 +41209,74 @@ function executeTool(name, args, host, random12 = Math.random) {
         ...a.wind_direction !== void 0 ? { windDirection: a.wind_direction } : {},
         ...a.wind_speed !== void 0 ? { windSpeed: a.wind_speed } : {}
       };
+      const kept = { ...world.environment.sky.params };
+      if (minutes === 0)
+        delete kept.cycle;
       if (Object.keys(settings).length > 0 && !(minutes && minutes >= 1))
-        return done(host.apply([{ type: "set_sky", params: { preset, params: settings } }]), `Sky is now ${preset}` + (a.time_of_day !== void 0 ? ` at ${a.time_of_day} h` : "") + (a.wind_speed !== void 0 ? `, wind ${a.wind_speed} m/s` : "") + ".");
+        return done(host.apply([{ type: "set_sky", params: { preset, params: { ...kept, ...settings } } }]), `Sky is now ${preset}` + (a.time_of_day !== void 0 ? ` at ${a.time_of_day} h` : "") + (a.wind_speed !== void 0 ? `, wind ${a.wind_speed} m/s` : "") + ".");
       if (minutes && minutes >= 1) {
         const cycle = Math.round(minutes);
-        const base = preset === "storm" ? "storm" : "day";
-        return done(host.apply([{ type: "set_sky", params: { preset: base, params: { cycle, ...settings } } }]), `Day and night now follow each other, ${cycle} minutes per day.`);
+        return done(host.apply([{ type: "set_sky", params: { preset, params: { ...kept, cycle, ...settings } } }]), `Day and night now follow each other, ${cycle} minutes per day.`);
       }
-      return done(host.apply([{ type: "set_sky", params: { preset } }]), `Sky is now ${preset}.`);
+      return done(host.apply([{ type: "set_sky", params: { preset, ...Object.keys(kept).length ? { params: kept } : {} } }]), `Sky is now ${preset}.`);
+    }
+    case "set_lights": {
+      const a = args;
+      const lights = [...world.environment.lighting ?? []];
+      const describe3 = () => JSON.stringify(lights.map((l) => ({ id: l.id, name: l.name, enabled: l.enabled, color: l.color, intensity: l.intensity, angle: l.angle, softness: l.softness, distance: l.distance, follows: l.actor, position: l.position, aim: l.target })));
+      if (a.action === "list")
+        return { ok: true, result: describe3() };
+      const fields = {
+        ...a.name !== void 0 ? { name: a.name } : {},
+        ...a.enabled !== void 0 ? { enabled: a.enabled } : {},
+        ...a.color !== void 0 ? { color: a.color } : {},
+        ...a.intensity !== void 0 ? { intensity: a.intensity } : {},
+        ...a.angle !== void 0 ? { angle: a.angle } : {},
+        ...a.softness !== void 0 ? { softness: a.softness } : {},
+        ...a.distance !== void 0 ? { distance: a.distance } : {},
+        ...a.follows !== void 0 ? { actor: a.follows } : {},
+        ...a.position !== void 0 ? { position: a.position } : {},
+        ...a.aim !== void 0 ? { target: a.aim } : {}
+      };
+      let next = lights;
+      if (a.action === "three_point")
+        next = THREE_POINT_LIGHTS.map((light) => ({ ...light }));
+      else if (a.action === "add") {
+        if (lights.length >= 4)
+          return { ok: false, result: "Error: a place has at most 4 lights; remove one first." };
+        next = [...lights, SceneLight.parse({ id: newId("light", random12), name: a.name ?? `Light ${lights.length + 1}`, ...fields })];
+      } else {
+        const index = lights.findIndex((l) => l.id === a.id);
+        if (index < 0)
+          return { ok: false, result: `Error: no light "${a.id ?? ""}". Use action list for ids.` };
+        if (a.action === "remove")
+          next = lights.filter((_, i) => i !== index);
+        else {
+          const parsed = SceneLight.safeParse({ ...lights[index], ...fields });
+          if (!parsed.success)
+            return { ok: false, result: `Error: ${parsed.error.issues[0]?.message ?? "check the light values"}` };
+          next = lights.map((l, i) => i === index ? parsed.data : l);
+        }
+      }
+      const error62 = host.apply([{ type: "set_lighting", params: { lights: next } }]);
+      lights.splice(0, lights.length, ...next);
+      return done(error62, `Lights now: ${describe3()}`);
+    }
+    case "set_spawn": {
+      const a = args;
+      if (!inside(a.x, a.z))
+        return { ok: false, result: `Error: (${a.x}, ${a.z}) is outside the place.` };
+      const y = round5(host.heightAt(a.x, a.z) + 1);
+      return done(host.apply([{ type: "set_spawn", params: { spawn: { position: [round5(a.x), y, round5(a.z)], rotation: yawQuat2(a.turn ?? 0), scale: [1, 1, 1] } } }]), `Players now start at (${round5(a.x)}, ${round5(a.z)}).`);
+    }
+    case "set_water_look": {
+      const a = args;
+      if (world.style.base !== "realistic")
+        return { ok: false, result: "Water looks are for Realistic places." };
+      if (a.clarity === void 0 && a.waves === void 0)
+        return { ok: false, result: "Error: give clarity and/or waves." };
+      const water = { clarity: 9, waves: "normal", ...world.style.water, ...a.clarity !== void 0 ? { clarity: a.clarity } : {}, ...a.waves ? { waves: a.waves } : {} };
+      return done(host.apply([{ type: "set_style", params: { ...world.style, water } }]), `Water: see through ${water.clarity} m, ${water.waves} waves.`);
     }
     case "set_story": {
       const a = args;
@@ -40663,8 +41299,9 @@ function executeTool(name, args, host, random12 = Math.random) {
       return done(host.apply([{ type: "set_story", params: { story: { ...a.title ? { title: a.title } : {}, stops } } }]), `The story has ${stops.length} stops; see it at /showcase?place=${world.experienceId}.`);
     }
     case "set_weather": {
-      const { preset } = args;
-      return done(host.apply([{ type: "set_weather", params: { preset } }]), `Weather is now ${preset}.`);
+      const { preset, strength } = args;
+      const params = { ...world.environment.weather.params, ...strength !== void 0 ? { strength } : {} };
+      return done(host.apply([{ type: "set_weather", params: { preset, ...Object.keys(params).length ? { params } : {} } }]), `Weather is now ${preset}${strength !== void 0 ? ` at ${Math.round(strength * 100)}%` : ""}.`);
     }
     case "set_style": {
       const { base } = args;
@@ -40968,6 +41605,24 @@ async function callTool(name, rawArgs, host, { signal, random: random12 = Math.r
       return { outcome: { ok: false, result: error62 instanceof Error ? error62.message : String(error62) }, args: parsed.args };
     }
   }
+  if (name === "avatar_studio") {
+    if (!host.avatarStudio)
+      return { outcome: { ok: false, result: "The Avatar tab is not open in this host." }, args: parsed.args };
+    try {
+      return { outcome: { ok: true, result: JSON.stringify(await host.avatarStudio(parsed.args)) }, args: parsed.args };
+    } catch (error62) {
+      return { outcome: { ok: false, result: error62 instanceof Error ? error62.message : String(error62) }, args: parsed.args };
+    }
+  }
+  if (name === "motion_lab") {
+    if (!host.motionLab)
+      return { outcome: { ok: false, result: "Open a motion lab project to use the Lab (My projects \u203A New motion lab)." }, args: parsed.args };
+    try {
+      return { outcome: { ok: true, result: JSON.stringify(await host.motionLab(parsed.args)) }, args: parsed.args };
+    } catch (error62) {
+      return { outcome: { ok: false, result: error62 instanceof Error ? error62.message : String(error62) }, args: parsed.args };
+    }
+  }
   if (name === "user_avatar_library") {
     if (!host.userAvatarLibrary)
       return { outcome: { ok: false, result: "Private user library is not connected in this host." }, args: parsed.args };
@@ -41031,7 +41686,7 @@ async function runAssistant({ model: model2, host, history, prompt, onEvent, max
 var CORRECTION_WINDOW_MS = 10 * 60 * 1e3;
 
 // src/session.ts
-var SDK_VERSION = "0.3.0-preview.13";
+var SDK_VERSION = "0.3.0-preview.14";
 var PACKAGE_WORK_BUDGET = 5e6;
 function readWorldPackage(input2) {
   const text = typeof input2 === "string" ? input2 : JSON.stringify(input2);
@@ -41219,6 +41874,17 @@ var WorldSession = class _WorldSession {
           return e instanceof Error ? e.message : String(e);
         }
       },
+      // world_history (BUILD-B9): a local file world is edited only through these tools, so every step is the agent's.
+      history: (action) => {
+        if (action === "undo") {
+          if (!this.#undo.length) return "Nothing to undo.";
+          this.undo();
+          return null;
+        }
+        if (!this.#redo.length) return "Nothing to redo.";
+        this.redo();
+        return null;
+      },
       addWater: (x, z2) => {
         if (this.#state.voxels) return "Water filling needs heightfield terrain in this host.";
         try {
@@ -41297,6 +41963,7 @@ export {
   WorldPackage,
   supportsWorldStarter,
   StudioShareRequest,
+  LabProjectData,
   itemParts,
   itemModelLook,
   itemGeneratedLook,
@@ -41377,6 +42044,7 @@ export {
   isSolidBlock,
   VOXEL_ROAD_BLOCKS,
   BUILDING_WALL_MATERIAL,
+  WALL_SURFACES,
   OPENING_PRESETS,
   wallShapeError,
   openingError,
@@ -41427,4 +42095,4 @@ export {
   replayWorldPackage,
   WorldSession
 };
-//# sourceMappingURL=chunk-L6ZVLN4D.js.map
+//# sourceMappingURL=chunk-ALQEDJO3.js.map

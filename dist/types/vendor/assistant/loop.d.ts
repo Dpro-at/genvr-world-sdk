@@ -25,13 +25,16 @@ onQueue?: (ahead: number) => void) => Promise<{
     content: string;
     tool_calls: ToolCall[];
 }>;
-/** What the assistant can see and change: the editor's world (the studio runtime). */
 export interface AssistantHost {
     shareStudio?(input: ToolArgs<'share_studio'>): Promise<unknown>;
     presentAvatar?(event: AvatarPresentationEvent): string | null;
     presentationInfo?(): string;
     avatarVoice?(input: ToolArgs<'avatar_voice'>): Promise<unknown>;
     userAvatarLibrary?(input: ToolArgs<'user_avatar_library'>): Promise<unknown>;
+    /** The Avatar tab's character editor (AV-01). */
+    avatarStudio?(input: ToolArgs<'avatar_studio'>): Promise<unknown>;
+    /** The Lab area of an open motion lab project; the lab applies the owner gates. */
+    motionLab?(input: ToolArgs<'motion_lab'>): Promise<unknown>;
     world(): WorldDocument;
     heightAt(x: number, z: number): number;
     /**
@@ -46,6 +49,13 @@ export interface AssistantHost {
     canStand?(itemId: string, position: [number, number, number], yaw?: number): string | null;
     /** Applies commands as one undo step; returns an error message, or null when all applied. */
     apply(commands: CommandPayload[]): string | null;
+    /**
+     * world_history (BUILD-B9): undo or redo the assistant's own last step. Returns an error message, or null when
+     * done. The host refuses when the person changed the place after that step. Without it, the tool is unavailable.
+     */
+    history?(action: 'undo' | 'redo'): string | null;
+    /** settle_items (ITEMS-I8): let items fall and rest with physics; returns how many moved, or an error. */
+    settle?(instanceIds: readonly string[]): number | string;
     /** Digs and fills a pond at x, z; returns an error message or null. */
     addWater(x: number, z: number): string | null;
     /** Where the builder stands and the way they face (radians, 0 = +z), for "here" and "in front". */

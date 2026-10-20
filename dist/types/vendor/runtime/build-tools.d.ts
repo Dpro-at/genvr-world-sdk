@@ -1,7 +1,7 @@
 import type { CommandPayload, ItemInstance, WorldDocument } from '../contracts/index.js';
-import { type TerrainData } from '../world/index.js';
+import { type TerrainData, type WallSurface } from '../world/index.js';
 import { type Camera, type Object3D } from 'three/webgpu';
-import { type ItemSelection, type SnapSettings } from './item-tools.js';
+import { ItemTools, type ItemSelection, type PlaceOptions, type SnapSettings } from './item-tools.js';
 import type { ItemsView } from './items.js';
 import { type RoadMaterials } from './road-view.js';
 import { type BlockToolSettings } from './block-tools.js';
@@ -20,7 +20,28 @@ export declare const DEFAULT_RIVER: RiverToolSettings;
 export interface RoadToolSettings {
     lanes?: number | undefined;
     oneway: boolean;
+    /** Metres across (2–16, BUILD-B5); the road type's width when absent. */
+    width?: number | undefined;
+    /** Raised sidewalk in metres (0.5–6) on the chosen sides; none when absent. */
+    sidewalk?: number | undefined;
+    sidewalkSide?: 'both' | 'left' | 'right' | undefined;
 }
+/** What the wall, door and window tools build (BUILD-B6): wall height and look, and the size of openings. */
+export interface WallToolSettings {
+    height: number;
+    /** A wall look from the library; light plaster when absent. */
+    surface?: WallSurface | undefined;
+    door: {
+        width: number;
+        height: number;
+    };
+    window: {
+        width: number;
+        height: number;
+        bottom: number;
+    };
+}
+export declare const DEFAULT_WALL: WallToolSettings;
 /** A lake or a river picked in the 3D view (P2-39). */
 export interface SelectedWater {
     kind: 'water' | 'river';
@@ -36,6 +57,12 @@ export interface ToolStatus {
     message: string | null;
     /** Item the place tool puts down. */
     placeItemId: string | null;
+    /** Turn, size, colour and material of the next placed item (ITEMS-I1). */
+    place?: PlaceOptions & {
+        turn: number;
+    };
+    /** Which handles a selected item shows (ITEMS-I2, the parts way). */
+    handles?: 'all' | 'move' | 'size' | 'turn';
     /** Item selected by the select tool. */
     selected: ItemSelection | null;
     /** True while the selected item follows the pointer (next tap drops it). */
@@ -47,6 +74,8 @@ export interface ToolStatus {
     road: RoadToolSettings;
     /** What the river tool draws (P2-39). */
     river: RiverToolSettings;
+    /** Wall height and look, door and window sizes (BUILD-B6). */
+    wall?: WallToolSettings;
     /** The lake or river picked with the select tool, whose settings the properties panel shows. */
     water: SelectedWater | null;
     /** Digging and stacking on block ground (P2-26); null where the ground is a height field. */
@@ -55,6 +84,14 @@ export interface ToolStatus {
     mapSpot?: {
         x: number;
         z: number;
+    } | null;
+    /** Metres along the points drawn so far by the road, wall or river tool (BUILD-B4). */
+    length?: number;
+    /** What the eraser would remove under the pointer (BUILD-B8), or null. */
+    eraseTarget?: {
+        kind: 'item' | 'road' | 'wall' | 'water' | 'river';
+        id: string;
+        name: string;
     } | null;
 }
 interface BuildToolsOptions {
@@ -108,6 +145,8 @@ export declare class BuildTools {
     setRiver(settings: Partial<RiverToolSettings>): void;
     /** Chooses the road type (street, dirt road, railway, ...) and switches to the road tool. */
     setRoadType(typeId: string): void;
+    /** Height and look of new walls, and the size of new doors and windows (BUILD-B6). */
+    setWall(settings: Partial<WallToolSettings>): void;
     /** Lanes and direction of the streets the road tool draws (R2g). */
     setRoad(settings: Partial<RoadToolSettings>): void;
     /** Changes the terrain brush (mode, size, paint soil). */
@@ -126,6 +165,10 @@ export declare class BuildTools {
     /** True while arrow keys move the selection instead of the player. */
     get arrowsNudge(): boolean;
     /** Chooses an item from the library and switches to the place tool. */
+    /** Show all handles on the selection, or only move, size or turn (ITEMS-I2). */
+    setHandleMode(mode: 'all' | 'move' | 'size' | 'turn'): void;
+    /** Turn, size, colour and material of the next placed items (ITEMS-I1). */
+    setPlaceOptions(options: Parameters<ItemTools['setPlaceOptions']>[0]): void;
     setPlaceItem(itemId: string): void;
     /** An item's model changed (a package finished loading): redraw what shows it. */
     itemModelChanged(itemId: string): void;
@@ -152,7 +195,8 @@ export declare class BuildTools {
     /** Finishes the current road or open wall (Enter or the Done button). */
     finish(closed?: boolean): boolean;
     /** A tap or click (no drag) at a screen position. */
-    tap(clientX: number, clientY: number, add?: boolean): void;
+    /** A tap with the tool; `secondary` is the right mouse button (the blocks way digs with it, ITEMS-I3). */
+    tap(clientX: number, clientY: number, add?: boolean, secondary?: boolean): void;
     /** Mouse hover: shows where the next point would go. */
     hover(clientX: number, clientY: number): void;
     /** The ground or building surface under a screen point, unsnapped (filming spots, FILM-10). */

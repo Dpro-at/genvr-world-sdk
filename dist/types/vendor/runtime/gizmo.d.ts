@@ -1,5 +1,7 @@
 import { Group, Vector3, type Object3D, type Ray } from 'three/webgpu';
 export type GizmoHandle = 'x' | 'y' | 'z' | 'turn' | 'size';
+/** Which handles show (ITEMS-I2, the parts way): all of them, or only move arrows, the size corner or the turn ring. */
+export type GizmoMode = 'all' | 'move' | 'size' | 'turn';
 /**
  * Drag handles for the selected item (task P3-24): arrows move it along X, Z, or up and down,
  * the ring turns it, the corner cube makes it bigger or smaller. The gizmo only shows and measures; ItemTools turns drags into commands.
@@ -16,6 +18,8 @@ export declare class TransformGizmo {
         size: number;
         resize?: boolean;
     } | null): void;
+    get mode(): GizmoMode;
+    setMode(mode: GizmoMode): void;
     /** Every mesh that can be grabbed (for raycasting). */
     get targets(): Object3D[];
     /** Which handle a hit object belongs to. */

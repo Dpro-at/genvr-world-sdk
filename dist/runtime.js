@@ -1,7 +1,7 @@
 import {
   createRuntime
-} from "./chunk-HOCADOQG.js";
-import "./chunk-L6ZVLN4D.js";
+} from "./chunk-KOKFMLWZ.js";
+import "./chunk-ALQEDJO3.js";
 
 // src/runtime.ts
 async function previewWorld(session, container, options = {}) {

@@ -198,9 +198,9 @@ export declare const Road: z.ZodObject<{
     oneway: z.ZodOptional<z.ZodBoolean>;
     sidewalk: z.ZodOptional<z.ZodNumber>;
     sidewalkSide: z.ZodOptional<z.ZodEnum<{
+        both: "both";
         left: "left";
         right: "right";
-        both: "both";
     }>>;
 }, z.core.$strip>;
 export type Road = z.infer<typeof Road>;
@@ -1112,9 +1112,9 @@ export declare const WorldDocument: z.ZodObject<{
         oneway: z.ZodOptional<z.ZodBoolean>;
         sidewalk: z.ZodOptional<z.ZodNumber>;
         sidewalkSide: z.ZodOptional<z.ZodEnum<{
+            both: "both";
             left: "left";
             right: "right";
-            both: "both";
         }>>;
     }, z.core.$strip>>>;
     walls: z.ZodDefault<z.ZodArray<z.ZodObject<{

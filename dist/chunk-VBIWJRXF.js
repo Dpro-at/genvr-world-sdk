@@ -1,11 +1,6 @@
-import "./chunk-YMQMB4TG.js";
-import {
-  QuickJSEmscriptenModuleError,
-  debugLog
-} from "./chunk-ZE7PLVGK.js";
 import {
   __export
-} from "./chunk-NSBPE2FW.js";
+} from "./chunk-PX6F3LHL.js";
 
 // ../../../../../genvr/node_modules/.pnpm/zod@4.6.5/node_modules/zod/v4/classic/external.js
 var external_exports = {};
@@ -7863,8 +7858,8 @@ var error20 = () => {
       case "invalid_union":
         return "\u05E7\u05DC\u05D8 \u05DC\u05D0 \u05EA\u05E7\u05D9\u05DF";
       case "invalid_element": {
-        const place = withDefinite(issue2.origin ?? "array");
-        return `\u05E2\u05E8\u05DA \u05DC\u05D0 \u05EA\u05E7\u05D9\u05DF \u05D1${place}`;
+        const place3 = withDefinite(issue2.origin ?? "array");
+        return `\u05E2\u05E8\u05DA \u05DC\u05D0 \u05EA\u05E7\u05D9\u05DF \u05D1${place3}`;
       }
       default:
         return `\u05E7\u05DC\u05D8 \u05DC\u05D0 \u05EA\u05E7\u05D9\u05DF`;
@@ -19675,35 +19670,6 @@ function date4(params) {
   return _coercedDate(ZodDate, params);
 }
 
-// ../contracts/dist/common.js
-var Id = external_exports.string().min(1).max(128).regex(/^[a-z0-9][a-z0-9._-]*$/, "lowercase letters, digits, dot, dash, underscore");
-var Vec2 = external_exports.tuple([external_exports.number(), external_exports.number()]);
-var Vec3 = external_exports.tuple([external_exports.number(), external_exports.number(), external_exports.number()]);
-var Quat = external_exports.tuple([external_exports.number(), external_exports.number(), external_exports.number(), external_exports.number()]);
-var Transform = external_exports.object({
-  position: Vec3,
-  rotation: Quat.default([0, 0, 0, 1]),
-  scale: Vec3.default([1, 1, 1])
-});
-var Color = external_exports.string().regex(/^#[0-9a-fA-F]{6}$/);
-var Style = external_exports.enum(["realistic", "blocky", "anime", "voxel"]);
-var SizeTier = external_exports.enum(["small", "medium", "large", "huge", "max"]);
-var ExperienceType = external_exports.enum(["game", "event", "social"]);
-var Params = external_exports.record(external_exports.string(), external_exports.unknown());
-
-// ../contracts/dist/access.js
-var AccessPolicy = external_exports.discriminatedUnion("mode", [
-  /** Development mode default: owner plus invited builders only, never listed. */
-  external_exports.object({ mode: external_exports.literal("private") }),
-  external_exports.object({ mode: external_exports.literal("friends") }),
-  external_exports.object({ mode: external_exports.literal("invite") }),
-  /** Only the server stores the hash; clients send the plain password over TLS once. */
-  external_exports.object({ mode: external_exports.literal("password"), passwordHash: external_exports.string().min(1) }),
-  external_exports.object({ mode: external_exports.literal("public") }),
-  external_exports.object({ mode: external_exports.literal("subscription"), productId: Id }),
-  external_exports.object({ mode: external_exports.literal("class"), classId: Id })
-]);
-
 // ../contracts/dist/avatar-look.js
 var Hex = external_exports.string().regex(/^#[0-9a-f]{6}$/i);
 var AVATAR_SCALE_LIMITS = {
@@ -19717,6 +19683,7 @@ var AvatarScale = external_exports.object({
   width: scalePart(AVATAR_SCALE_LIMITS.width),
   head: scalePart(AVATAR_SCALE_LIMITS.head)
 });
+var NORMAL_AVATAR_SCALE = { height: 1, width: 1, head: 1 };
 var MAX_WORN_ITEMS = 8;
 var AvatarBodyType = external_exports.enum(["classic", "simple", "starter", "flat", "anime-boy", "warrior", "human", "robot"]);
 var ItemBodyId = external_exports.string().regex(/^user\.[a-z0-9][a-z0-9._-]{2,126}$/);
@@ -19741,6 +19708,79 @@ var MUSCLE_GROUPS = [
   "calves",
   "hands"
 ];
+var MUSCLE_ZONE_COLORS = {
+  neck: "#26a7ff",
+  shoulders: "#ff8a3d",
+  chest: "#ff4048",
+  traps: "#ec4faf",
+  lats: "#287fea",
+  biceps: "#42c85a",
+  triceps: "#ff9a3c",
+  forearms: "#994fe8",
+  abs: "#ff4048",
+  obliques: "#28a4e8",
+  waist: "#58ce4c",
+  lowerBack: "#ffd43b",
+  hips: "#a64ee2",
+  glutes: "#9855e9",
+  quads: "#ff4149",
+  hamstrings: "#ff8c38",
+  calves: "#278df0",
+  hands: "#f5e663"
+};
+var MUSCLE_PARTS = [
+  "neck",
+  "deltoid",
+  "chest",
+  "traps",
+  "lats",
+  "biceps",
+  "brachialis",
+  "triceps",
+  "brachioradialis",
+  "flexors",
+  "extensors",
+  "abs",
+  "obliques",
+  "waist",
+  "lowerBack",
+  "hips",
+  "glutes",
+  "quads",
+  "hamstrings",
+  "calves",
+  "thenar",
+  "hypothenar",
+  "palm",
+  "handBack"
+];
+var MUSCLE_PART_COLOURS = {
+  deltoid: "#ff8a3d",
+  biceps: "#ff4048",
+  brachialis: "#42c85a",
+  triceps: "#287fea",
+  brachioradialis: "#994fe8",
+  flexors: "#1fb5b0",
+  extensors: "#f0a020",
+  thenar: "#f5e663",
+  hypothenar: "#e0c040",
+  palm: "#fff3a0",
+  handBack: "#c9b030",
+  // Torso parts in the drawings (distinct where the editor zones share a colour, e.g. chest and abs).
+  neck: "#26a7ff",
+  chest: "#ff4048",
+  traps: "#ec4faf",
+  lats: "#287fea",
+  abs: "#ff8fb0",
+  obliques: "#1fb5b0",
+  waist: "#58ce4c",
+  lowerBack: "#ffd43b",
+  hips: "#a64ee2",
+  glutes: "#9855e9",
+  quads: "#ff4149",
+  hamstrings: "#ff8c38",
+  calves: "#278df0"
+};
 var FAT_REGIONS = [
   "belly",
   "waist",
@@ -19785,6 +19825,15 @@ var FACE_FEATURES = [
   "headWidth",
   "headLength"
 ];
+var FACE_PARTS = {
+  eyes: ["eyeSize", "eyeOpen", "eyeSpacing", "eyeHeight", "eyeTilt", "eyeFold", "eyeDepth"],
+  brows: ["browHeight", "browAngle"],
+  nose: ["noseSize", "noseWidth", "noseLength", "noseBridge", "noseTip", "nostrils", "noseDepth"],
+  mouth: ["mouthWidth", "mouthHeight", "upperLip", "lowerLip", "mouthCorners"],
+  cheeks: ["cheekVolume", "cheekBones", "cheekInner"],
+  jaw: ["chinWidth", "chinHeight", "chinForward", "jawWidth"],
+  head: ["headWidth", "headLength"]
+};
 var MAX_BODY_FAT = 0.85;
 var BUILD_KEYS = [
   "muscle",
@@ -19824,6 +19873,18 @@ var AvatarLook = external_exports.object({
   wear: external_exports.array(external_exports.string().min(1).max(120)).max(MAX_WORN_ITEMS).default([])
 });
 var DEFAULT_AVATAR_LOOK = AvatarLook.parse({});
+function readAvatarLook(saved) {
+  const parsed = AvatarLook.safeParse(saved ?? {});
+  if (parsed.success)
+    return parsed.data;
+  const source = typeof saved === "object" && saved !== null ? saved : {};
+  const result = {};
+  for (const key of Object.keys(AvatarLook.shape)) {
+    const field = AvatarLook.shape[key].safeParse(source[key]);
+    result[key] = field.success ? field.data : DEFAULT_AVATAR_LOOK[key];
+  }
+  return result;
+}
 var AvatarBodyOutfit = AvatarLook.omit({ body: true });
 var AvatarProfile = AvatarLook.extend({
   bodies: external_exports.partialRecord(AvatarBodyType, AvatarBodyOutfit).default({})
@@ -19838,6 +19899,426 @@ var PlaceAvatar = external_exports.object({
 });
 var DEFAULT_PLACE_AVATAR = PlaceAvatar.parse({});
 
+// ../contracts/dist/lighting.js
+var point = external_exports.tuple([external_exports.number().finite().min(-6e4).max(6e4), external_exports.number().finite().min(-6e4).max(6e4), external_exports.number().finite().min(-6e4).max(6e4)]);
+var SceneLight = external_exports.object({ id: external_exports.string().min(1).max(80), name: external_exports.string().min(1).max(80), enabled: external_exports.boolean().default(true), color: external_exports.string().regex(/^#[0-9a-fA-F]{6}$/).default("#ffffff"), intensity: external_exports.number().min(0).max(200).default(20), angle: external_exports.number().min(5).max(85).default(35), softness: external_exports.number().min(0).max(1).default(0.5), distance: external_exports.number().min(1).max(200).default(30), actor: external_exports.string().min(1).max(120).nullable().default("self"), position: point.default([2, 3, 3]), target: point.default([0, 1.5, 0]) }).strict();
+var SceneLights = external_exports.array(SceneLight).max(4).refine((lights) => new Set(lights.map((l) => l.id)).size === lights.length, "Light IDs must be unique");
+
+// ../contracts/dist/filming.js
+var metres = external_exports.number().finite().min(-6e4).max(6e4);
+var FilmPoint = external_exports.tuple([metres, metres, metres]);
+var FilmPreset = external_exports.enum(["static", "handheld", "running", "drone", "follow", "side", "orbit"]);
+var FilmEase = external_exports.enum(["linear", "in", "out", "in_out"]);
+var FilmWaypoint = external_exports.object({
+  at: external_exports.number().finite().min(0).max(180),
+  position: FilmPoint,
+  target: FilmPoint,
+  /** How the move from this stop to the next one speeds up and slows down. */
+  ease: FilmEase.default("linear"),
+  fov: external_exports.number().min(10).max(120).optional()
+}).strict();
+var FilmCamera = external_exports.object({
+  preset: FilmPreset.default("static"),
+  position: FilmPoint.default([0, 3, -8]),
+  target: FilmPoint.default([0, 1.5, 0]),
+  follow_player: external_exports.boolean().default(false),
+  fov: external_exports.number().min(10).max(120).default(50),
+  responsiveness: external_exports.number().min(0.1).max(30).optional(),
+  shake: external_exports.number().min(0).max(1).optional(),
+  speed: external_exports.number().min(-30).max(30).default(12),
+  seed: external_exports.number().int().min(0).max(65535).default(1),
+  roll: external_exports.number().min(-45).max(45).default(0),
+  /** A flight through stops; when given it replaces position, target and the orbit turn. */
+  path: external_exports.array(FilmWaypoint).min(2).max(32).optional()
+}).strict().refine((camera) => !camera.path || camera.path.every((stop, i) => i === 0 || stop.at > camera.path[i - 1].at), "Path stops must have increasing times.");
+var FilmView = external_exports.object({
+  position: FilmPoint,
+  direction: FilmPoint,
+  fov: external_exports.number().finite().min(1).max(179),
+  render_width: external_exports.number().int().positive(),
+  render_height: external_exports.number().int().positive()
+});
+var FilmPhoto = external_exports.object({
+  width: external_exports.number().int().min(320).max(3840).default(1920),
+  height: external_exports.number().int().min(240).max(2160).default(1080),
+  settle_seconds: external_exports.number().min(0).max(10).default(1)
+}).strict();
+var FilmVideo = FilmPhoto.extend({
+  seconds: external_exports.number().min(1).max(30).default(5),
+  fps: external_exports.number().int().min(15).max(60).default(30)
+});
+var studioId = external_exports.string().min(1).max(120);
+var FilmSceneSpot = external_exports.object({ x: external_exports.number().finite().min(-1e5).max(1e5), z: external_exports.number().finite().min(-1e5).max(1e5) }).strict();
+var FilmCueVoice = external_exports.object({ id: external_exports.string().uuid(), name: external_exports.string().max(80), language: external_exports.string().max(8), voiceType: external_exports.enum(["male", "female", "child"]).optional(), model: external_exports.string().max(80) }).strict();
+var FilmSceneCue = external_exports.object({
+  id: studioId,
+  actor: studioId,
+  label: external_exports.string().max(120),
+  action: studioId,
+  start: external_exports.number().finite().min(0).max(180),
+  end: external_exports.number().finite().positive().max(180),
+  text: external_exports.string().max(500),
+  audio: studioId.optional(),
+  voice: FilmCueVoice.optional(),
+  volume: external_exports.number().finite().min(0).max(2),
+  /** FILM-10: where the avatar stands when the cue starts, and the spots it walks to in order (world metres). */
+  at: FilmSceneSpot.optional(),
+  to: external_exports.array(FilmSceneSpot).max(8).optional()
+}).strict().refine((cue) => cue.end > cue.start, "Cue end must follow its start.");
+var FilmWorkspace = external_exports.enum(["shoot", "edit", "captions", "sound", "transitions", "colour", "story"]);
+var commandId = external_exports.string().min(1).max(60).regex(/^[a-z]+\.[a-zA-Z]+$/);
+var FilmStudioStep = external_exports.object({ id: commandId, args: external_exports.record(external_exports.string(), external_exports.unknown()).default({}) }).strict();
+var FilmStudioOperation = external_exports.discriminatedUnion("kind", [
+  /** Live take (FILM-A3): the person moves the character; `seconds` is the longest the take may run (default 30). */
+  external_exports.object({ kind: external_exports.literal("manual_record"), action: external_exports.enum(["start", "stop"]), seconds: external_exports.number().int().min(1).max(30).optional() }).strict(),
+  external_exports.object({ kind: external_exports.literal("lighting"), lights: SceneLights.optional() }).strict(),
+  external_exports.object({ kind: external_exports.literal("inspect") }).strict(),
+  external_exports.object({ kind: external_exports.literal("commands") }).strict(),
+  /** Sound jobs that read the decoded audio (FILM-08): match dialogue loudness, or fit a music clip to the film length on beats. */
+  external_exports.object({ kind: external_exports.literal("sound"), action: external_exports.enum(["match_loudness", "fit_music"]), clip: studioId.optional() }).strict(),
+  /** Subtitles from the film's voice (FILM-12): one track per language code; `spoken` the language spoken (absent: found by ear). */
+  external_exports.object({
+    kind: external_exports.literal("subtitles"),
+    languages: external_exports.array(external_exports.string().regex(/^[a-z]{2,3}$/)).min(1).max(6),
+    spoken: external_exports.string().regex(/^[a-z]{2,3}$/).optional(),
+    /** Also speak each language that has a free voice (FILM-12b). */
+    voice: external_exports.boolean().optional()
+  }).strict(),
+  /** What the person sees (workspace, playhead, selection); `workspace` switches it. */
+  external_exports.object({ kind: external_exports.literal("ui"), workspace: FilmWorkspace.optional() }).strict(),
+  external_exports.object({ kind: external_exports.literal("command"), id: commandId, args: external_exports.record(external_exports.string(), external_exports.unknown()).default({}) }).strict(),
+  external_exports.object({
+    kind: external_exports.literal("batch"),
+    steps: external_exports.array(FilmStudioStep).min(1).max(100),
+    label: external_exports.string().max(80).optional(),
+    atomic: external_exports.boolean().default(true)
+  }).strict(),
+  external_exports.object({
+    kind: external_exports.literal("frame"),
+    at: external_exports.number().finite().min(0).max(180),
+    width: external_exports.number().int().min(160).max(1920).default(1280),
+    height: external_exports.number().int().min(90).max(1080).default(720)
+  }).strict(),
+  external_exports.object({ kind: external_exports.literal("trim"), shot_id: studioId, in: external_exports.number().finite().min(0).max(180), out: external_exports.number().finite().min(0).max(180) }).strict(),
+  external_exports.object({ kind: external_exports.literal("split"), shot_id: studioId, at: external_exports.number().finite().min(0).max(180) }).strict(),
+  external_exports.object({ kind: external_exports.literal("move"), shot_id: studioId, delta: external_exports.number().int().min(-60).max(60) }).strict(),
+  external_exports.object({ kind: external_exports.literal("remove"), shot_id: studioId }).strict(),
+  external_exports.object({ kind: external_exports.literal("cues"), shot_id: studioId.optional(), cues: external_exports.array(FilmSceneCue).max(30) }).strict(),
+  external_exports.object({
+    kind: external_exports.literal("record"),
+    shot_id: studioId.optional(),
+    gameplay: external_exports.boolean().default(false),
+    settings: FilmVideo.default(() => FilmVideo.parse({})),
+    /** The Studio's recording options for this take and after (absent: as set in the Studio): world sound, live actors' voices (FILM-11). */
+    world_sound: external_exports.boolean().optional(),
+    live_actors: external_exports.boolean().optional(),
+    /** FILM-C1/C3: the scene this take belongs to; the new shot joins it and the scene's own sound is used. */
+    scene_id: studioId.optional()
+  }).strict(),
+  /** Speak one language's subtitles with its free voice onto its voice track (FILM-12b). */
+  external_exports.object({ kind: external_exports.literal("sound_import"), name: external_exports.string().min(1).max(120), mime: external_exports.enum(["audio/wav", "audio/mpeg", "audio/ogg", "audio/mp4", "audio/webm", "audio/flac", "audio/aac"]), data: external_exports.string().min(4).max(11184812).regex(/^[A-Za-z0-9+/]+={0,2}$/) }).strict(),
+  external_exports.object({ kind: external_exports.literal("dialogue_voice"), cue_id: studioId, voice_id: external_exports.string().uuid(), language: external_exports.string().max(8), shot_id: studioId.optional() }).strict(),
+  external_exports.object({ kind: external_exports.literal("dialogue_track"), cue_id: studioId, shot_id: studioId, language: external_exports.string().regex(/^[a-z]{2,3}(-[A-Z]{2})?$/), start: external_exports.number().min(0).max(3600).optional(), append: external_exports.boolean().default(false) }).strict(),
+  external_exports.object({ kind: external_exports.literal("dialogue_preview"), cue_id: studioId, shot_id: studioId.optional() }).strict(),
+  external_exports.object({ kind: external_exports.literal("voice"), language: external_exports.string().regex(/^[a-z]{2,3}$/) }).strict(),
+  /** One language's subtitles as .srt or .vtt text (FILM-12). */
+  external_exports.object({ kind: external_exports.literal("subtitle_file"), language: external_exports.string().regex(/^[a-z]{2,3}$/), format: external_exports.enum(["srt", "vtt"]).default("srt") }).strict(),
+  /**
+   * Export (FILM-A3): the whole film, one shot, or the marked In/Out range; up to 4K. `language` keeps only that
+   * language's captions and voice track (one file per language: call once per language); `captions` none hides
+   * every caption track.
+   */
+  external_exports.object({
+    kind: external_exports.literal("export"),
+    shot_id: studioId.optional(),
+    range: external_exports.enum(["film", "marked"]).optional(),
+    width: external_exports.number().int().min(320).max(3840).default(1280),
+    height: external_exports.number().int().min(240).max(2160).default(720),
+    language: external_exports.string().regex(/^[a-z]{2,3}(-[A-Za-z0-9]{2,8})?$/).optional(),
+    captions: external_exports.enum(["picture", "none"]).default("picture")
+  }).strict(),
+  /**
+   * Languages (FILM-B3): make what Film settings asks for but the film lacks — captions (from the film's voice) and,
+   * for languages set to text + voice, the dubbed voice. `languages` limits it; absent: every language with a gap.
+   */
+  external_exports.object({
+    kind: external_exports.literal("language"),
+    action: external_exports.literal("make_missing"),
+    what: external_exports.enum(["captions", "voices", "both"]).default("both"),
+    languages: external_exports.array(external_exports.string().regex(/^[a-z]{2,3}$/)).min(1).max(12).optional()
+  }).strict(),
+  external_exports.object({ kind: external_exports.literal("undo") }).strict(),
+  external_exports.object({ kind: external_exports.literal("redo") }).strict()
+]);
+var FilmStudioResult = external_exports.object({
+  /** The film with times in seconds and ticks (tracks, clips, recordings, markers, draft cues). */
+  film: external_exports.record(external_exports.string(), external_exports.unknown()),
+  result: external_exports.unknown().optional(),
+  commands: external_exports.array(external_exports.object({
+    id: external_exports.string().max(60),
+    label: external_exports.string().max(80),
+    group: external_exports.string().max(20),
+    shortcut: external_exports.string().max(30).optional(),
+    args: external_exports.unknown(),
+    enabled: external_exports.boolean(),
+    reason: external_exports.string().max(300).optional()
+  }).strict()).max(200).optional(),
+  failed: external_exports.object({ index: external_exports.number().int().min(0), id: external_exports.string().max(60), reason: external_exports.string().max(500) }).strict().optional(),
+  undo: external_exports.string().max(80).optional(),
+  redo: external_exports.string().max(80).optional(),
+  ui: external_exports.object({ workspace: FilmWorkspace, playhead: external_exports.number().min(0), selection: external_exports.array(studioId).max(200), source: studioId.nullable() }).strict().optional(),
+  actors: external_exports.array(external_exports.object({ id: studioId, label: external_exports.string().max(120) }).strict()).max(1e3),
+  actions: external_exports.array(external_exports.object({ id: studioId, label: external_exports.string().max(120) }).strict()).max(10100),
+  assets: external_exports.array(external_exports.object({ id: studioId, mime: external_exports.string().max(100), bytes: external_exports.number().int().min(0) }).strict()).max(2e3)
+}).strict();
+var FilmCommand = external_exports.discriminatedUnion("kind", [
+  external_exports.object({ kind: external_exports.literal("camera"), camera: FilmCamera }),
+  external_exports.object({ kind: external_exports.literal("photo"), settings: FilmPhoto }),
+  external_exports.object({ kind: external_exports.literal("video"), settings: FilmVideo }),
+  external_exports.object({ kind: external_exports.literal("reset") }),
+  external_exports.object({ kind: external_exports.literal("inspect") }),
+  external_exports.object({ kind: external_exports.literal("studio"), operation: FilmStudioOperation })
+]);
+
+// ../contracts/dist/character-rig-compatibility.js
+var normalizeCharacterRig = (value) => value === "mixamo-52" ? "genvr-humanoid-52" : value;
+
+// ../contracts/dist/character-recipe.js
+var CHARACTER_RECIPE_VERSION = 1;
+var CHARACTER_RIG = "genvr-humanoid-52";
+var MAX_RECIPE_JSON = 8192;
+var CHARACTER_SHAPE_LIMITS = {
+  height: { min: 0.85, max: 1.15 },
+  weight: { min: 0.75, max: 1.35 },
+  scale: { min: 0.6, max: 1.6 }
+};
+var GARMENT_SLOTS = [
+  "head",
+  "hair",
+  "face",
+  "neck",
+  "top",
+  "bottom",
+  "full-body",
+  "waist",
+  "hands",
+  "feet",
+  "back"
+];
+var GARMENT_LAYERS = ["inner", "mid", "outer", "accessory"];
+var MAX_RECIPE_CLOTHES = 12;
+var MAX_RECIPE_EMOTES = 16;
+var MAX_RECIPE_EFFECTS = 8;
+var MAX_GARMENT_PARAMS = 16;
+var Hex2 = external_exports.string().regex(/^#[0-9a-f]{6}$/i);
+var LibraryItemId = external_exports.string().regex(/^[a-z0-9][a-z0-9._-]{2,126}$/);
+var ClipId = external_exports.string().regex(/^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$/);
+var factor = (limits) => external_exports.number().min(limits.min).max(limits.max).default(1);
+var CharacterShape = external_exports.object({
+  height: factor(CHARACTER_SHAPE_LIMITS.height),
+  weight: factor(CHARACTER_SHAPE_LIMITS.weight),
+  scale: factor(CHARACTER_SHAPE_LIMITS.scale),
+  /** Anime Shape (generated body): 0 the base face, 1 full anime proportions (bigger eyes, smaller nose...). */
+  anime: external_exports.number().min(0).max(1).default(0),
+  /** Overall muscle of a generated body: -1 less .. 1 more (0 the body as made). */
+  muscle: external_exports.number().min(-1).max(1).default(0),
+  /** Overall body fat of a generated body: 0 slim .. MAX_BODY_FAT. */
+  fat: external_exports.number().min(0).max(MAX_BODY_FAT).default(0),
+  /** Where the fat goes: -1 upper body (belly, waist, chest) .. 1 lower body (hips, buttocks, thighs). */
+  fatPattern: external_exports.number().min(-1).max(1).default(0),
+  /** How clearly the muscles show (the lines between them), 0 soft .. 1 very defined; fat softens it. */
+  definition: external_exports.number().min(0).max(1).default(0),
+  /** Each muscle group on top of the overall muscle, -1..1. */
+  muscles: external_exports.partialRecord(external_exports.enum(MUSCLE_GROUPS), external_exports.number().min(-1).max(1)).default({}),
+  /** Each fat region on top of the overall fat, -1..1. */
+  fatRegions: external_exports.partialRecord(external_exports.enum(FAT_REGIONS), external_exports.number().min(-1).max(1)).default({}),
+  /** Face controls (nose, eyes, mouth, cheeks, jaw, brows, head), -1..1 each; absent is 0 (FACE-01). */
+  face: external_exports.partialRecord(external_exports.enum(FACE_FEATURES), external_exports.number().min(-1).max(1)).default({})
+}).strict();
+var NORMAL_CHARACTER_SHAPE = {
+  height: 1,
+  weight: 1,
+  scale: 1,
+  anime: 0,
+  muscle: 0,
+  fat: 0,
+  fatPattern: 0,
+  definition: 0,
+  muscles: {},
+  fatRegions: {},
+  face: {}
+};
+var CHARACTER_BASES = ["human"];
+var CHARACTER_SEXES = ["boy", "girl"];
+var CHARACTER_STYLES = ["anime", "realistic", "cartoon"];
+var BODY_MASS_INDEX = { slim: 18.5, heaviest: 35 };
+function fatForWeight(kilograms, metres3) {
+  const bmi = kilograms / (metres3 * metres3);
+  const share = (bmi - BODY_MASS_INDEX.slim) / (BODY_MASS_INDEX.heaviest - BODY_MASS_INDEX.slim);
+  return Math.round(Math.min(1, Math.max(0, share)) * MAX_BODY_FAT * 100) / 100;
+}
+function weightForFat(fat, metres3) {
+  const share = Math.min(1, Math.max(0, fat / MAX_BODY_FAT));
+  return (BODY_MASS_INDEX.slim + share * (BODY_MASS_INDEX.heaviest - BODY_MASS_INDEX.slim)) * metres3 * metres3;
+}
+function recipeBuild(shape2) {
+  const values = {
+    muscle: shape2.muscle,
+    fat: shape2.fat,
+    fatPattern: shape2.fatPattern,
+    definition: shape2.definition,
+    ...Object.fromEntries(Object.entries(shape2.muscles).map(([group, value]) => [`muscle.${group}`, value])),
+    ...Object.fromEntries(Object.entries(shape2.fatRegions).map(([region, value]) => [`fat.${region}`, value])),
+    ...Object.fromEntries(Object.entries(shape2.face).map(([feature, value]) => [`face.${feature}`, value]))
+  };
+  return Object.fromEntries(BUILD_KEYS.filter((key) => values[key]).map((key) => [key, values[key]]));
+}
+var CharacterColors = external_exports.object({
+  skin: Hex2.default(DEFAULT_AVATAR_LOOK.skin),
+  hair: Hex2.default(DEFAULT_AVATAR_LOOK.hair),
+  top: Hex2.default(DEFAULT_AVATAR_LOOK.shirt),
+  bottom: Hex2.default(DEFAULT_AVATAR_LOOK.pants),
+  shoes: Hex2.default(DEFAULT_AVATAR_LOOK.shoes),
+  tint: Hex2.default("#ffffff"),
+  /** A fantasy skin material id (Core Library `SKIN_MATERIALS`); empty: the plain skin colour. */
+  skinMaterial: external_exports.string().regex(/^[a-z0-9-]{0,40}$/).default("")
+}).strict();
+var GarmentParam = external_exports.union([external_exports.number().finite(), external_exports.string().max(40), external_exports.boolean()]);
+var RecipeGarment = external_exports.object({
+  slot: external_exports.enum(GARMENT_SLOTS),
+  layer: external_exports.enum(GARMENT_LAYERS).default("inner"),
+  item: LibraryItemId,
+  colors: external_exports.array(Hex2).max(4).default([]),
+  params: external_exports.record(external_exports.string().regex(/^[a-zA-Z][a-zA-Z0-9]{0,31}$/), GarmentParam).refine((params) => Object.keys(params).length <= MAX_GARMENT_PARAMS, "too many params").default({})
+}).strict();
+var RecipeEffect = external_exports.object({
+  kind: external_exports.string().regex(/^[a-z][a-z0-9-]{0,31}$/),
+  color: Hex2.optional(),
+  amount: external_exports.number().min(0).max(1).optional()
+}).strict();
+var CharacterRecipe = external_exports.object({
+  version: external_exports.literal(CHARACTER_RECIPE_VERSION).default(CHARACTER_RECIPE_VERSION),
+  rig: external_exports.preprocess(normalizeCharacterRig, external_exports.literal(CHARACTER_RIG).default(CHARACTER_RIG)),
+  name: external_exports.string().trim().min(1).max(60).default("My character"),
+  /** The body shaped and coloured: one of Genvr's, or a creator's uploaded body item. */
+  body: BodyId.default("starter"),
+  base: external_exports.enum(CHARACTER_BASES).default("human"),
+  sex: external_exports.enum(CHARACTER_SEXES).default("boy"),
+  style: external_exports.enum(CHARACTER_STYLES).default("anime"),
+  shape: CharacterShape.default(NORMAL_CHARACTER_SHAPE),
+  colors: CharacterColors.default(CharacterColors.parse({})),
+  /** Hair, eyebrows and beard of a generated body (HAIR-01); coloured with `colors.hair`. */
+  hair: HumanHair.default({}),
+  clothes: external_exports.array(RecipeGarment).max(MAX_RECIPE_CLOTHES).refine((clothes) => new Set(clothes.map((g) => `${g.slot}:${g.layer}`)).size === clothes.length, "one garment per slot and layer").default([]),
+  animations: external_exports.object({
+    idle: ClipId.default("Idle"),
+    emotes: external_exports.array(ClipId).max(MAX_RECIPE_EMOTES).default([])
+  }).strict().default({ idle: "Idle", emotes: [] }),
+  effects: external_exports.array(RecipeEffect).max(MAX_RECIPE_EFFECTS).default([])
+}).strict();
+var DEFAULT_CHARACTER_RECIPE = CharacterRecipe.parse({});
+function parseCharacterRecipe(input2) {
+  let value = input2;
+  if (typeof input2 === "string") {
+    if (input2.length > MAX_RECIPE_JSON)
+      return { ok: false, error: "Recipe is larger than 8 KB" };
+    try {
+      value = JSON.parse(input2);
+    } catch {
+      return { ok: false, error: "Recipe is not JSON" };
+    }
+  } else if (JSON.stringify(input2 ?? null).length > MAX_RECIPE_JSON)
+    return { ok: false, error: "Recipe is larger than 8 KB" };
+  const parsed = CharacterRecipe.safeParse(value);
+  if (parsed.success)
+    return { ok: true, recipe: parsed.data };
+  const issue2 = parsed.error.issues[0];
+  return {
+    ok: false,
+    error: issue2 ? `${issue2.path.join(".") || "recipe"}: ${issue2.message}` : "Invalid recipe"
+  };
+}
+function readCharacterRecipe(saved) {
+  const strict = CharacterRecipe.safeParse(saved ?? {});
+  if (strict.success)
+    return strict.data;
+  const source = typeof saved === "object" && saved !== null ? saved : {};
+  const result = {};
+  for (const key of Object.keys(CharacterRecipe.shape)) {
+    const field = CharacterRecipe.shape[key].safeParse(source[key]);
+    if (field.success) {
+      result[key] = field.data;
+      continue;
+    }
+    const inner = CharacterRecipe.shape[key].unwrap?.();
+    const shape2 = inner?.shape;
+    const value = source[key];
+    if (shape2 && typeof value === "object" && value !== null) {
+      const partial2 = {};
+      for (const [name, schema] of Object.entries(shape2)) {
+        const one = schema.safeParse(value[name]);
+        if (one.success && one.data !== void 0)
+          partial2[name] = one.data;
+      }
+      const merged = CharacterRecipe.shape[key].safeParse(partial2);
+      result[key] = merged.success ? merged.data : DEFAULT_CHARACTER_RECIPE[key];
+    } else
+      result[key] = DEFAULT_CHARACTER_RECIPE[key];
+  }
+  return result;
+}
+function recipeLook(recipe) {
+  return {
+    ...DEFAULT_AVATAR_LOOK,
+    body: recipe.body,
+    skin: recipe.colors.skin,
+    hair: recipe.colors.hair,
+    shirt: recipe.colors.top,
+    pants: recipe.colors.bottom,
+    shoes: recipe.colors.shoes,
+    ...recipe.colors.skinMaterial ? { skinMaterial: recipe.colors.skinMaterial } : {},
+    ...recipe.style === "anime" && recipe.shape.anime > 0 ? { animeShape: recipe.shape.anime } : {},
+    ...Object.keys(recipeBuild(recipe.shape)).length ? { build: recipeBuild(recipe.shape) } : {},
+    ...Object.keys(recipe.hair).length ? { humanHair: { ...recipe.hair } } : {}
+  };
+}
+
+// ../contracts/dist/common.js
+var Id = external_exports.string().min(1).max(128).regex(/^[a-z0-9][a-z0-9._-]*$/, "lowercase letters, digits, dot, dash, underscore");
+var Vec2 = external_exports.tuple([external_exports.number(), external_exports.number()]);
+var Vec3 = external_exports.tuple([external_exports.number(), external_exports.number(), external_exports.number()]);
+var Quat = external_exports.tuple([external_exports.number(), external_exports.number(), external_exports.number(), external_exports.number()]);
+var Transform = external_exports.object({
+  position: Vec3,
+  rotation: Quat.default([0, 0, 0, 1]),
+  scale: Vec3.default([1, 1, 1])
+});
+var Color = external_exports.string().regex(/^#[0-9a-fA-F]{6}$/);
+var Style = external_exports.enum(["realistic", "blocky", "anime", "voxel"]);
+var SizeTier = external_exports.enum(["small", "medium", "large", "huge", "max"]);
+var SIZE_TIERS = {
+  small: { sideMeters: 500, maxPlayers: 30 },
+  medium: { sideMeters: 1e3, maxPlayers: 50 },
+  large: { sideMeters: 2e3, maxPlayers: 100 },
+  huge: { sideMeters: 4e3, maxPlayers: 100 },
+  max: { sideMeters: 8e3, maxPlayers: 100 }
+};
+var ExperienceType = external_exports.enum(["game", "event", "social"]);
+var Params = external_exports.record(external_exports.string(), external_exports.unknown());
+
+// ../contracts/dist/access.js
+var AccessPolicy = external_exports.discriminatedUnion("mode", [
+  /** Development mode default: owner plus invited builders only, never listed. */
+  external_exports.object({ mode: external_exports.literal("private") }),
+  external_exports.object({ mode: external_exports.literal("friends") }),
+  external_exports.object({ mode: external_exports.literal("invite") }),
+  /** Only the server stores the hash; clients send the plain password over TLS once. */
+  external_exports.object({ mode: external_exports.literal("password"), passwordHash: external_exports.string().min(1) }),
+  external_exports.object({ mode: external_exports.literal("public") }),
+  external_exports.object({ mode: external_exports.literal("subscription"), productId: Id }),
+  external_exports.object({ mode: external_exports.literal("class"), classId: Id })
+]);
+
 // ../contracts/dist/mouth.js
 var MOUTH_SHAPES = ["A", "B", "C", "D", "E", "F", "G", "H", "X"];
 var MouthShape = external_exports.enum(MOUTH_SHAPES);
@@ -19850,6 +20331,22 @@ var VoiceLine = external_exports.object({
 }).refine((line) => line.cues.every((cue, i) => cue.at <= line.duration && (i === 0 || line.cues[i - 1].at <= cue.at)), {
   message: "mouth cues must be in order and inside the line"
 });
+function mouthAt(line, t) {
+  if (t < 0 || t > line.duration)
+    return "X";
+  let shape2 = "X";
+  let low2 = 0;
+  let high3 = line.cues.length - 1;
+  while (low2 <= high3) {
+    const mid = low2 + high3 >> 1;
+    if (line.cues[mid].at <= t) {
+      shape2 = line.cues[mid].shape;
+      low2 = mid + 1;
+    } else
+      high3 = mid - 1;
+  }
+  return shape2;
+}
 
 // ../contracts/dist/ride.js
 var RIDE_LIMITS = {
@@ -19927,6 +20424,82 @@ var RideDefault = external_exports.object({
   model: RideModel,
   ...FIELDS
 }).partial();
+var RIDE_PRESETS = {
+  ground: {
+    seats: 1,
+    maxSpeed: 20,
+    reverse: 0.4,
+    accel: 8,
+    turn: 90,
+    grip: 0.9,
+    gravity: 1,
+    climb: 0,
+    glide: false,
+    ceiling: 100,
+    camera: 7,
+    seatHeight: 0.35,
+    pose: "sit",
+    reach: 4,
+    exit: 2,
+    returnSec: 0
+  },
+  water: {
+    seats: 1,
+    maxSpeed: 12,
+    reverse: 0.3,
+    accel: 4,
+    turn: 60,
+    grip: 0.3,
+    gravity: 1,
+    climb: 0,
+    glide: false,
+    ceiling: 100,
+    camera: 9,
+    seatHeight: 0.35,
+    pose: "sit",
+    reach: 4,
+    exit: 2,
+    returnSec: 0
+  },
+  air: {
+    seats: 1,
+    maxSpeed: 30,
+    reverse: 0,
+    accel: 6,
+    turn: 70,
+    grip: 0.6,
+    gravity: 1,
+    climb: 6,
+    glide: false,
+    ceiling: 100,
+    camera: 12,
+    seatHeight: 0.35,
+    pose: "sit",
+    reach: 4,
+    exit: 2,
+    returnSec: 0
+  }
+};
+var RIDE_PARAMS = {
+  model: "ride",
+  seats: "rideSeats",
+  maxSpeed: "rideSpeed",
+  reverse: "rideReverse",
+  accel: "rideAccel",
+  turn: "rideTurn",
+  grip: "rideGrip",
+  gravity: "rideGravity",
+  climb: "rideClimb",
+  glide: "rideGlide",
+  ceiling: "rideCeiling",
+  camera: "rideCamera",
+  seatHeight: "rideSeatHeight",
+  pose: "ridePose",
+  reach: "rideReach",
+  exit: "rideExit",
+  returnSec: "rideReturn",
+  tag: "rideTag"
+};
 var RANGES = {
   seats: { min: 1, max: RIDE_LIMITS.seats, int: true },
   maxSpeed: { min: 1, max: RIDE_LIMITS.maxSpeed },
@@ -19943,6 +20516,59 @@ var RANGES = {
   exit: { min: RIDE_LIMITS.exit[0], max: RIDE_LIMITS.exit[1] },
   returnSec: { min: RIDE_LIMITS.returnSec[0], max: RIDE_LIMITS.returnSec[1] }
 };
+function finite(value) {
+  if (typeof value !== "number" && (typeof value !== "string" || value.trim() === ""))
+    return void 0;
+  const n = Number(value);
+  return Number.isFinite(n) ? n : void 0;
+}
+function model(value) {
+  return value === "ground" || value === "water" || value === "air" ? value : void 0;
+}
+function tagOf(value) {
+  if (typeof value !== "string")
+    return void 0;
+  const tag = value.trim();
+  return tag.length > 0 && tag.length <= RIDE_LIMITS.tag ? tag : void 0;
+}
+function rideFromParams(params, itemDefault) {
+  const named = params[RIDE_PARAMS.model];
+  const chosen = named === void 0 || named === null ? model(itemDefault?.model) : model(named);
+  if (!chosen)
+    return null;
+  const preset = RIDE_PRESETS[chosen];
+  const pick2 = (key) => {
+    const own2 = params[RIDE_PARAMS[key]];
+    return own2 === void 0 || own2 === null ? itemDefault?.[key] : own2;
+  };
+  const numbers = {};
+  for (const key of Object.keys(RANGES)) {
+    const range = RANGES[key];
+    const raw = finite(pick2(key));
+    if (raw === void 0) {
+      numbers[key] = preset[key];
+      continue;
+    }
+    const clamped = Math.min(range.max, Math.max(range.min, raw));
+    numbers[key] = range.int ? Math.round(clamped) : clamped;
+  }
+  const glide = pick2("glide");
+  const pose = pick2("pose");
+  const tag = tagOf(pick2("tag"));
+  return {
+    model: chosen,
+    ...numbers,
+    glide: typeof glide === "boolean" ? glide : preset.glide,
+    pose: pose === "sit" || pose === "stand" ? pose : preset.pose,
+    ...tag === void 0 ? {} : { tag }
+  };
+}
+function rideToParams(ride) {
+  const out = {};
+  for (const [key, param] of Object.entries(RIDE_PARAMS))
+    out[param] = ride === null ? null : ride[key] ?? null;
+  return out;
+}
 var RideRequest = external_exports.object({ instanceId: Id });
 var LeaveRideRequest = external_exports.object({});
 var RideRefusal = external_exports.enum(["not_rideable", "too_far", "full", "cannot_move", "side_view", "busy", "not_here"]);
@@ -20170,11 +20796,6 @@ var ItemPackage = external_exports.object({
   }))
 });
 
-// ../contracts/dist/lighting.js
-var point = external_exports.tuple([external_exports.number().finite().min(-6e4).max(6e4), external_exports.number().finite().min(-6e4).max(6e4), external_exports.number().finite().min(-6e4).max(6e4)]);
-var SceneLight = external_exports.object({ id: external_exports.string().min(1).max(80), name: external_exports.string().min(1).max(80), enabled: external_exports.boolean().default(true), color: external_exports.string().regex(/^#[0-9a-fA-F]{6}$/).default("#ffffff"), intensity: external_exports.number().min(0).max(200).default(20), angle: external_exports.number().min(5).max(85).default(35), softness: external_exports.number().min(0).max(1).default(0.5), distance: external_exports.number().min(1).max(200).default(30), actor: external_exports.string().min(1).max(120).nullable().default("self"), position: point.default([2, 3, 3]), target: point.default([0, 1.5, 0]) }).strict();
-var SceneLights = external_exports.array(SceneLight).max(4).refine((lights) => new Set(lights.map((l) => l.id)).size === lights.length, "Light IDs must be unique");
-
 // ../contracts/dist/rules.js
 var RULE_LIMITS = {
   counters: 32,
@@ -20373,6 +20994,12 @@ function legacyCheckpointTag(index) {
 }
 function legacyFinishTag(checkpoints) {
   return `finish after ${checkpoints}`;
+}
+function isLegacyGateTag(tag) {
+  for (let n = 0; n <= MIGRATED_CHECKPOINTS; n += 1)
+    if (tag === legacyFinishTag(n) || n > 0 && tag === legacyCheckpointTag(n))
+      return true;
+  return false;
 }
 function legacyGateTags(instances) {
   const checkpoints = instances.filter((i) => i.itemId === LEGACY_GATE_ITEMS.checkpoint).map((i, index) => ({ id: i.instanceId, order: positiveInt(i.params.order) ?? 1, index })).sort((a, b) => a.order - b.order || a.index - b.index);
@@ -20774,156 +21401,95 @@ var SCRIPT_API = Object.freeze([
     doc: "Writes a line to the place's script log (builders only, never players). console.log is the same."
   }
 ]);
-
-// ../contracts/dist/filming.js
-var metres = external_exports.number().finite().min(-6e4).max(6e4);
-var FilmPoint = external_exports.tuple([metres, metres, metres]);
-var FilmPreset = external_exports.enum(["static", "handheld", "running", "drone", "follow", "side", "orbit"]);
-var FilmEase = external_exports.enum(["linear", "in", "out", "in_out"]);
-var FilmWaypoint = external_exports.object({
-  at: external_exports.number().finite().min(0).max(180),
-  position: FilmPoint,
-  target: FilmPoint,
-  /** How the move from this stop to the next one speeds up and slows down. */
-  ease: FilmEase.default("linear"),
-  fov: external_exports.number().min(10).max(120).optional()
-}).strict();
-var FilmCamera = external_exports.object({
-  preset: FilmPreset.default("static"),
-  position: FilmPoint.default([0, 3, -8]),
-  target: FilmPoint.default([0, 1.5, 0]),
-  follow_player: external_exports.boolean().default(false),
-  fov: external_exports.number().min(10).max(120).default(50),
-  responsiveness: external_exports.number().min(0.1).max(30).optional(),
-  shake: external_exports.number().min(0).max(1).optional(),
-  speed: external_exports.number().min(-30).max(30).default(12),
-  seed: external_exports.number().int().min(0).max(65535).default(1),
-  roll: external_exports.number().min(-45).max(45).default(0),
-  /** A flight through stops; when given it replaces position, target and the orbit turn. */
-  path: external_exports.array(FilmWaypoint).min(2).max(32).optional()
-}).strict().refine((camera) => !camera.path || camera.path.every((stop, i) => i === 0 || stop.at > camera.path[i - 1].at), "Path stops must have increasing times.");
-var FilmView = external_exports.object({
-  position: FilmPoint,
-  direction: FilmPoint,
-  fov: external_exports.number().finite().min(1).max(179),
-  render_width: external_exports.number().int().positive(),
-  render_height: external_exports.number().int().positive()
-});
-var FilmPhoto = external_exports.object({
-  width: external_exports.number().int().min(320).max(3840).default(1920),
-  height: external_exports.number().int().min(240).max(2160).default(1080),
-  settle_seconds: external_exports.number().min(0).max(10).default(1)
-}).strict();
-var FilmVideo = FilmPhoto.extend({
-  seconds: external_exports.number().min(1).max(30).default(5),
-  fps: external_exports.number().int().min(15).max(60).default(30)
-});
-var studioId = external_exports.string().min(1).max(120);
-var FilmSceneSpot = external_exports.object({ x: external_exports.number().finite().min(-1e5).max(1e5), z: external_exports.number().finite().min(-1e5).max(1e5) }).strict();
-var FilmCueVoice = external_exports.object({ id: external_exports.string().uuid(), name: external_exports.string().max(80), language: external_exports.string().max(8), voiceType: external_exports.enum(["male", "female", "child"]).optional(), model: external_exports.string().max(80) }).strict();
-var FilmSceneCue = external_exports.object({
-  id: studioId,
-  actor: studioId,
-  label: external_exports.string().max(120),
-  action: studioId,
-  start: external_exports.number().finite().min(0).max(180),
-  end: external_exports.number().finite().positive().max(180),
-  text: external_exports.string().max(500),
-  audio: studioId.optional(),
-  voice: FilmCueVoice.optional(),
-  volume: external_exports.number().finite().min(0).max(2),
-  /** FILM-10: where the avatar stands when the cue starts, and the spots it walks to in order (world metres). */
-  at: FilmSceneSpot.optional(),
-  to: external_exports.array(FilmSceneSpot).max(8).optional()
-}).strict().refine((cue) => cue.end > cue.start, "Cue end must follow its start.");
-var FilmWorkspace = external_exports.enum(["shoot", "edit", "captions", "sound", "transitions", "colour", "story"]);
-var commandId = external_exports.string().min(1).max(60).regex(/^[a-z]+\.[a-zA-Z]+$/);
-var FilmStudioStep = external_exports.object({ id: commandId, args: external_exports.record(external_exports.string(), external_exports.unknown()).default({}) }).strict();
-var FilmStudioOperation = external_exports.discriminatedUnion("kind", [
-  external_exports.object({ kind: external_exports.literal("manual_record"), action: external_exports.enum(["start", "stop"]) }).strict(),
-  external_exports.object({ kind: external_exports.literal("lighting"), lights: SceneLights.optional() }).strict(),
-  external_exports.object({ kind: external_exports.literal("inspect") }).strict(),
-  external_exports.object({ kind: external_exports.literal("commands") }).strict(),
-  /** Sound jobs that read the decoded audio (FILM-08): match dialogue loudness, or fit a music clip to the film length on beats. */
-  external_exports.object({ kind: external_exports.literal("sound"), action: external_exports.enum(["match_loudness", "fit_music"]), clip: studioId.optional() }).strict(),
-  /** Subtitles from the film's voice (FILM-12): one track per language code; `spoken` the language spoken (absent: found by ear). */
-  external_exports.object({
-    kind: external_exports.literal("subtitles"),
-    languages: external_exports.array(external_exports.string().regex(/^[a-z]{2,3}$/)).min(1).max(6),
-    spoken: external_exports.string().regex(/^[a-z]{2,3}$/).optional(),
-    /** Also speak each language that has a free voice (FILM-12b). */
-    voice: external_exports.boolean().optional()
-  }).strict(),
-  /** What the person sees (workspace, playhead, selection); `workspace` switches it. */
-  external_exports.object({ kind: external_exports.literal("ui"), workspace: FilmWorkspace.optional() }).strict(),
-  external_exports.object({ kind: external_exports.literal("command"), id: commandId, args: external_exports.record(external_exports.string(), external_exports.unknown()).default({}) }).strict(),
-  external_exports.object({
-    kind: external_exports.literal("batch"),
-    steps: external_exports.array(FilmStudioStep).min(1).max(100),
-    label: external_exports.string().max(80).optional(),
-    atomic: external_exports.boolean().default(true)
-  }).strict(),
-  external_exports.object({
-    kind: external_exports.literal("frame"),
-    at: external_exports.number().finite().min(0).max(180),
-    width: external_exports.number().int().min(160).max(1920).default(1280),
-    height: external_exports.number().int().min(90).max(1080).default(720)
-  }).strict(),
-  external_exports.object({ kind: external_exports.literal("trim"), shot_id: studioId, in: external_exports.number().finite().min(0).max(180), out: external_exports.number().finite().min(0).max(180) }).strict(),
-  external_exports.object({ kind: external_exports.literal("split"), shot_id: studioId, at: external_exports.number().finite().min(0).max(180) }).strict(),
-  external_exports.object({ kind: external_exports.literal("move"), shot_id: studioId, delta: external_exports.number().int().min(-60).max(60) }).strict(),
-  external_exports.object({ kind: external_exports.literal("remove"), shot_id: studioId }).strict(),
-  external_exports.object({ kind: external_exports.literal("cues"), shot_id: studioId.optional(), cues: external_exports.array(FilmSceneCue).max(30) }).strict(),
-  external_exports.object({
-    kind: external_exports.literal("record"),
-    shot_id: studioId.optional(),
-    gameplay: external_exports.boolean().default(false),
-    settings: FilmVideo.default(() => FilmVideo.parse({})),
-    /** The Studio's recording options for this take and after (absent: as set in the Studio): world sound, live actors' voices (FILM-11). */
-    world_sound: external_exports.boolean().optional(),
-    live_actors: external_exports.boolean().optional()
-  }).strict(),
-  /** Speak one language's subtitles with its free voice onto its voice track (FILM-12b). */
-  external_exports.object({ kind: external_exports.literal("sound_import"), name: external_exports.string().min(1).max(120), mime: external_exports.enum(["audio/wav", "audio/mpeg", "audio/ogg", "audio/mp4", "audio/webm", "audio/flac", "audio/aac"]), data: external_exports.string().min(4).max(11184812).regex(/^[A-Za-z0-9+/]+={0,2}$/) }).strict(),
-  external_exports.object({ kind: external_exports.literal("dialogue_voice"), cue_id: studioId, voice_id: external_exports.string().uuid(), language: external_exports.string().max(8), shot_id: studioId.optional() }).strict(),
-  external_exports.object({ kind: external_exports.literal("dialogue_track"), cue_id: studioId, shot_id: studioId, language: external_exports.string().regex(/^[a-z]{2,3}(-[A-Z]{2})?$/), start: external_exports.number().min(0).max(3600).optional(), append: external_exports.boolean().default(false) }).strict(),
-  external_exports.object({ kind: external_exports.literal("dialogue_preview"), cue_id: studioId, shot_id: studioId.optional() }).strict(),
-  external_exports.object({ kind: external_exports.literal("voice"), language: external_exports.string().regex(/^[a-z]{2,3}$/) }).strict(),
-  /** One language's subtitles as .srt or .vtt text (FILM-12). */
-  external_exports.object({ kind: external_exports.literal("subtitle_file"), language: external_exports.string().regex(/^[a-z]{2,3}$/), format: external_exports.enum(["srt", "vtt"]).default("srt") }).strict(),
-  external_exports.object({ kind: external_exports.literal("export"), shot_id: studioId.optional(), width: external_exports.number().int().min(320).max(1920).default(1280), height: external_exports.number().int().min(240).max(1920).default(720) }).strict(),
-  external_exports.object({ kind: external_exports.literal("undo") }).strict(),
-  external_exports.object({ kind: external_exports.literal("redo") }).strict()
-]);
-var FilmStudioResult = external_exports.object({
-  /** The film with times in seconds and ticks (tracks, clips, recordings, markers, draft cues). */
-  film: external_exports.record(external_exports.string(), external_exports.unknown()),
-  result: external_exports.unknown().optional(),
-  commands: external_exports.array(external_exports.object({
-    id: external_exports.string().max(60),
-    label: external_exports.string().max(80),
-    group: external_exports.string().max(20),
-    shortcut: external_exports.string().max(30).optional(),
-    args: external_exports.unknown(),
-    enabled: external_exports.boolean(),
-    reason: external_exports.string().max(300).optional()
-  }).strict()).max(200).optional(),
-  failed: external_exports.object({ index: external_exports.number().int().min(0), id: external_exports.string().max(60), reason: external_exports.string().max(500) }).strict().optional(),
-  undo: external_exports.string().max(80).optional(),
-  redo: external_exports.string().max(80).optional(),
-  ui: external_exports.object({ workspace: FilmWorkspace, playhead: external_exports.number().min(0), selection: external_exports.array(studioId).max(200), source: studioId.nullable() }).strict().optional(),
-  actors: external_exports.array(external_exports.object({ id: studioId, label: external_exports.string().max(120) }).strict()).max(1e3),
-  actions: external_exports.array(external_exports.object({ id: studioId, label: external_exports.string().max(120) }).strict()).max(10100),
-  assets: external_exports.array(external_exports.object({ id: studioId, mime: external_exports.string().max(100), bytes: external_exports.number().int().min(0) }).strict()).max(2e3)
-}).strict();
-var FilmCommand = external_exports.discriminatedUnion("kind", [
-  external_exports.object({ kind: external_exports.literal("camera"), camera: FilmCamera }),
-  external_exports.object({ kind: external_exports.literal("photo"), settings: FilmPhoto }),
-  external_exports.object({ kind: external_exports.literal("video"), settings: FilmVideo }),
-  external_exports.object({ kind: external_exports.literal("reset") }),
-  external_exports.object({ kind: external_exports.literal("inspect") }),
-  external_exports.object({ kind: external_exports.literal("studio"), operation: FilmStudioOperation })
-]);
+function tsOf(schema, indent = "") {
+  if (typeof schema !== "object" || schema === null)
+    return "unknown";
+  const s = schema;
+  const union2 = s.anyOf ?? s.oneOf;
+  if (union2)
+    return union2.map((part) => tsOf(part, indent)).join(" | ");
+  if ("const" in s)
+    return JSON.stringify(s.const);
+  if (Array.isArray(s.enum))
+    return s.enum.map((value) => JSON.stringify(value)).join(" | ");
+  switch (s.type) {
+    case "string":
+      return "string";
+    case "number":
+    case "integer":
+      return "number";
+    case "boolean":
+      return "boolean";
+    case "null":
+      return "null";
+    case "array":
+      return `Array<${tsOf(s.items, indent)}>`;
+    case "object": {
+      const properties = s.properties ?? {};
+      const required2 = new Set(s.required ?? []);
+      const inner = `${indent}  `;
+      const lines = Object.entries(properties).map(([key, value]) => `${inner}${key}${required2.has(key) ? "" : "?"}: ${tsOf(value, inner)};`);
+      return lines.length ? `{
+${lines.join("\n")}
+${indent}}` : "{}";
+    }
+    default:
+      return "unknown";
+  }
+}
+function scriptApiDts() {
+  const action = tsOf(external_exports.toJSONSchema(Action, { io: "input" }));
+  const events = tsOf(external_exports.toJSONSchema(ScriptEvent, { io: "output" }));
+  const names = [...GameEventName.options].map((name) => `'${name}'`).join(" | ");
+  const members2 = SCRIPT_API.map((entry) => `  /** ${entry.doc} */
+  ${entry.signature};`).join("\n");
+  return [
+    `// Genvr Script API ${SCRIPT_API_VERSION}. Scripts are classic JavaScript (no modules, no eval, no timers).`,
+    `type ScriptEventName = ${names};`,
+    `type ScriptEvent = ${events};`,
+    `type ScriptProductPurchase = ${tsOf(external_exports.toJSONSchema(ScriptProductPurchase, { io: "output" }))};`,
+    `type ScriptAction = ${action};`,
+    `type ScriptPlayer = {
+  team: 'red' | 'blue' | null;
+  health: number;
+  alive: boolean;
+  score: number;
+  place: number;
+  riding: string | null;
+  present: boolean;
+};`,
+    `declare const genvr: {
+${members2}
+};`,
+    ""
+  ].join("\n");
+}
+function scriptApiText() {
+  const L = SCRIPT_LIMITS;
+  const members2 = SCRIPT_API.map((entry) => `- genvr.${entry.signature}
+  ${entry.doc}`).join("\n");
+  return [
+    `Genvr Script API ${SCRIPT_API_VERSION}`,
+    "",
+    "Scripts are small classic JavaScript files in a place. They run on the server in a sandbox, hear the same events as the rules and can only ask for the rules' actions; the engine runs or refuses each request. Players are handles (p1, p2, ...), never accounts or names. No modules, eval, Function, timers or network; use the start_timer action and listen to timer_fired. Handlers are registered only while the top level runs.",
+    "",
+    "Members of the global `genvr` (frozen):",
+    members2,
+    "",
+    "Limits:",
+    `- ${L.scripts} scripts per place, ${L.sourceChars} characters each, ${L.totalChars} together.`,
+    `- Top level: ${L.startMs} ms. Each handler call (with its promise jobs): ${L.handlerMs} ms; an overrun is a strike, ${L.strikes} strikes or ${L.errors} errors switch the script off until the next match.`,
+    `- At most ${L.scriptMsPerSecond} ms a second per script and ${L.placeMsPerSecond} ms a second for all scripts of a place, top levels included; match starts also share ${L.startMsPerWindow} ms in ${L.startWindowMs / 1e3} s, and a script that does not fit waits.`,
+    `- Code that does not yield in time (such as a loop of big sorts) is stopped and every script of the place is off for the match; after ${L.kills} such stops in ${L.killWindowMs / 6e4} minutes they stay off until a script is changed (first after ${L.killRetryMs / 1e3} s, longer after each further stop) or the ${L.killWindowMs / 6e4} minutes have passed.`,
+    `- At most ${L.actsPerHandler} act or emit calls and ${L.readsPerHandler} reads per handler; actions also count toward the rules' ${RULE_LIMITS.actionsPerEvent} actions per event and their chain of ${RULE_LIMITS.chain}.`,
+    `- Memory: each script has a heap limit of about ${L.memoryBytes / 2 ** 20} MiB of objects (it counts allocations, so long strings count less than their size), and all scripts of a place share ${L.placeMemoryBytes / 2 ** 20} MiB; a call that grows the place's memory past ${L.placeMemorySoftBytes / 2 ** 20} MiB switches its script off until the next match.`,
+    `- An event in is at most ${L.eventJsonBytes} bytes of JSON, an action out ${L.actJsonBytes}, a read's argument ${L.readJsonBytes}.`,
+    `- Log: ${L.logPerSecond} lines a second per script, ${L.logChars} characters a line, the last ${L.logLines} lines of the place kept.`,
+    "",
+    "TypeScript declarations:",
+    scriptApiDts()
+  ].join("\n");
+}
 
 // ../contracts/dist/story.js
 var STORY_MAX_STOPS = 32;
@@ -21043,6 +21609,12 @@ var TerrainFieldSets = external_exports.record(TerrainFieldId, TerrainFieldSetMe
 });
 
 // ../contracts/dist/world.js
+var MAX_TERRAIN_SLOPE = {
+  realistic: 40,
+  anime: 50,
+  blocky: 55,
+  voxel: 65
+};
 var StyleSelection = external_exports.object({
   base: Style,
   /** Optional accent style for specific zones or items. */
@@ -21086,6 +21658,15 @@ var SkySettings = external_exports.object({
   windDirection: external_exports.number().min(0).lt(360).optional(),
   windSpeed: external_exports.number().min(0).max(30).optional()
 });
+function readSkySettings(params) {
+  const out = {};
+  for (const key of Object.keys(SkySettings.shape)) {
+    const parsed = SkySettings.shape[key].safeParse(params?.[key]);
+    if (parsed.success && parsed.data !== void 0)
+      out[key] = parsed.data;
+  }
+  return out;
+}
 var WeatherPreset = external_exports.enum(["clear", "rain", "snow", "storm", "fog", "sandstorm"]);
 var ObjectName = external_exports.string().min(1).max(64);
 var WaterBody = external_exports.object({
@@ -21224,6 +21805,7 @@ var WorldSeed = external_exports.object({
    */
   generator: external_exports.union([external_exports.literal(1), external_exports.literal(2)])
 });
+var WORLD_GENERATOR = 2;
 var VoxelGround = external_exports.object({
   seed: external_exports.number().int().min(0).max(2147483647),
   /** Generator version; a new version never changes places made with an older one. */
@@ -21290,6 +21872,7 @@ var WorldDocument = external_exports.object({
 // ../contracts/dist/commands.js
 var Area = external_exports.array(Vec2).min(3);
 var HEIGHT_TILE_MAX = 129;
+var PAINT_RULE_MAX_BOX = 512;
 var EncodedChunks = external_exports.array(external_exports.string().max(2e4)).min(1).max(256);
 var MAX_COMMAND_BYTES = 8 * 1024 * 1024;
 var BlockSet = external_exports.tuple([
@@ -21776,6 +22359,7 @@ var PLAY_DEVICES = PlayDevice.options;
 var PlayView = external_exports.enum(["free", "side"]);
 var SideMove = external_exports.enum(["double-jump", "wall-jump", "dash"]);
 var SIDE_MOVES = SideMove.options;
+var normalizeMoves = (moves) => SIDE_MOVES.filter((move) => moves.includes(move));
 var PlaceBlockLook = external_exports.enum(["plain", "pixel"]);
 var PlaySettings = external_exports.object({
   orientation: PlayOrientation,
@@ -21785,6 +22369,17 @@ var PlaySettings = external_exports.object({
   /** At least one device; kept in PLAY_DEVICES order without repeats. */
   devices: external_exports.array(PlayDevice).min(1).max(PLAY_DEVICES.length)
 });
+var normalizeDevices = (devices) => PLAY_DEVICES.filter((device) => devices.includes(device));
+function defaultPlaySettings(type) {
+  if (type === "social" || type === "event")
+    return { orientation: "any", view: "free", moves: [], devices: ["phone", "tablet", "computer"] };
+  return {
+    orientation: "landscape",
+    view: "free",
+    moves: [],
+    devices: ["phone", "tablet", "computer", "tv"]
+  };
+}
 var PlaceGenre = external_exports.enum([
   "obby",
   "arcade",
@@ -21864,6 +22459,18 @@ var PlayerSettings = external_exports.object({
   devConsole: external_exports.boolean().default(false)
 });
 var DEFAULT_PLAYER_SETTINGS = PlayerSettings.parse({});
+function readPlayerSettings(saved) {
+  const parsed = PlayerSettings.safeParse(saved ?? {});
+  if (parsed.success)
+    return parsed.data;
+  const source = typeof saved === "object" && saved !== null ? saved : {};
+  const result = {};
+  for (const key of Object.keys(PlayerSettings.shape)) {
+    const field = PlayerSettings.shape[key].safeParse(source[key]);
+    result[key] = field.success ? field.data : DEFAULT_PLAYER_SETTINGS[key];
+  }
+  return result;
+}
 
 // ../contracts/dist/notices.js
 var NoticeCategory = external_exports.enum([
@@ -21892,121 +22499,6 @@ var ContentNotice = external_exports.object({
   if (!notice.reporterEmail)
     ctx.addIssue({ code: "custom", path: ["reporterEmail"], message: "Your email is required." });
 });
-
-// ../contracts/dist/character-rig-compatibility.js
-var normalizeCharacterRig = (value) => value === "mixamo-52" ? "genvr-humanoid-52" : value;
-
-// ../contracts/dist/character-recipe.js
-var CHARACTER_RECIPE_VERSION = 1;
-var CHARACTER_RIG = "genvr-humanoid-52";
-var CHARACTER_SHAPE_LIMITS = {
-  height: { min: 0.85, max: 1.15 },
-  weight: { min: 0.75, max: 1.35 },
-  scale: { min: 0.6, max: 1.6 }
-};
-var GARMENT_SLOTS = [
-  "head",
-  "hair",
-  "face",
-  "neck",
-  "top",
-  "bottom",
-  "full-body",
-  "waist",
-  "hands",
-  "feet",
-  "back"
-];
-var GARMENT_LAYERS = ["inner", "mid", "outer", "accessory"];
-var MAX_RECIPE_CLOTHES = 12;
-var MAX_RECIPE_EMOTES = 16;
-var MAX_RECIPE_EFFECTS = 8;
-var MAX_GARMENT_PARAMS = 16;
-var Hex2 = external_exports.string().regex(/^#[0-9a-f]{6}$/i);
-var LibraryItemId = external_exports.string().regex(/^[a-z0-9][a-z0-9._-]{2,126}$/);
-var ClipId = external_exports.string().regex(/^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$/);
-var factor = (limits) => external_exports.number().min(limits.min).max(limits.max).default(1);
-var CharacterShape = external_exports.object({
-  height: factor(CHARACTER_SHAPE_LIMITS.height),
-  weight: factor(CHARACTER_SHAPE_LIMITS.weight),
-  scale: factor(CHARACTER_SHAPE_LIMITS.scale),
-  /** Anime Shape (generated body): 0 the base face, 1 full anime proportions (bigger eyes, smaller nose...). */
-  anime: external_exports.number().min(0).max(1).default(0),
-  /** Overall muscle of a generated body: -1 less .. 1 more (0 the body as made). */
-  muscle: external_exports.number().min(-1).max(1).default(0),
-  /** Overall body fat of a generated body: 0 slim .. MAX_BODY_FAT. */
-  fat: external_exports.number().min(0).max(MAX_BODY_FAT).default(0),
-  /** Where the fat goes: -1 upper body (belly, waist, chest) .. 1 lower body (hips, buttocks, thighs). */
-  fatPattern: external_exports.number().min(-1).max(1).default(0),
-  /** How clearly the muscles show (the lines between them), 0 soft .. 1 very defined; fat softens it. */
-  definition: external_exports.number().min(0).max(1).default(0),
-  /** Each muscle group on top of the overall muscle, -1..1. */
-  muscles: external_exports.partialRecord(external_exports.enum(MUSCLE_GROUPS), external_exports.number().min(-1).max(1)).default({}),
-  /** Each fat region on top of the overall fat, -1..1. */
-  fatRegions: external_exports.partialRecord(external_exports.enum(FAT_REGIONS), external_exports.number().min(-1).max(1)).default({}),
-  /** Face controls (nose, eyes, mouth, cheeks, jaw, brows, head), -1..1 each; absent is 0 (FACE-01). */
-  face: external_exports.partialRecord(external_exports.enum(FACE_FEATURES), external_exports.number().min(-1).max(1)).default({})
-}).strict();
-var NORMAL_CHARACTER_SHAPE = {
-  height: 1,
-  weight: 1,
-  scale: 1,
-  anime: 0,
-  muscle: 0,
-  fat: 0,
-  fatPattern: 0,
-  definition: 0,
-  muscles: {},
-  fatRegions: {},
-  face: {}
-};
-var CHARACTER_BASES = ["human"];
-var CHARACTER_SEXES = ["boy", "girl"];
-var CHARACTER_STYLES = ["anime", "realistic", "cartoon"];
-var CharacterColors = external_exports.object({
-  skin: Hex2.default(DEFAULT_AVATAR_LOOK.skin),
-  hair: Hex2.default(DEFAULT_AVATAR_LOOK.hair),
-  top: Hex2.default(DEFAULT_AVATAR_LOOK.shirt),
-  bottom: Hex2.default(DEFAULT_AVATAR_LOOK.pants),
-  shoes: Hex2.default(DEFAULT_AVATAR_LOOK.shoes),
-  tint: Hex2.default("#ffffff"),
-  /** A fantasy skin material id (Core Library `SKIN_MATERIALS`); empty: the plain skin colour. */
-  skinMaterial: external_exports.string().regex(/^[a-z0-9-]{0,40}$/).default("")
-}).strict();
-var GarmentParam = external_exports.union([external_exports.number().finite(), external_exports.string().max(40), external_exports.boolean()]);
-var RecipeGarment = external_exports.object({
-  slot: external_exports.enum(GARMENT_SLOTS),
-  layer: external_exports.enum(GARMENT_LAYERS).default("inner"),
-  item: LibraryItemId,
-  colors: external_exports.array(Hex2).max(4).default([]),
-  params: external_exports.record(external_exports.string().regex(/^[a-zA-Z][a-zA-Z0-9]{0,31}$/), GarmentParam).refine((params) => Object.keys(params).length <= MAX_GARMENT_PARAMS, "too many params").default({})
-}).strict();
-var RecipeEffect = external_exports.object({
-  kind: external_exports.string().regex(/^[a-z][a-z0-9-]{0,31}$/),
-  color: Hex2.optional(),
-  amount: external_exports.number().min(0).max(1).optional()
-}).strict();
-var CharacterRecipe = external_exports.object({
-  version: external_exports.literal(CHARACTER_RECIPE_VERSION).default(CHARACTER_RECIPE_VERSION),
-  rig: external_exports.preprocess(normalizeCharacterRig, external_exports.literal(CHARACTER_RIG).default(CHARACTER_RIG)),
-  name: external_exports.string().trim().min(1).max(60).default("My character"),
-  /** The body shaped and coloured: one of Genvr's, or a creator's uploaded body item. */
-  body: BodyId.default("starter"),
-  base: external_exports.enum(CHARACTER_BASES).default("human"),
-  sex: external_exports.enum(CHARACTER_SEXES).default("boy"),
-  style: external_exports.enum(CHARACTER_STYLES).default("anime"),
-  shape: CharacterShape.default(NORMAL_CHARACTER_SHAPE),
-  colors: CharacterColors.default(CharacterColors.parse({})),
-  /** Hair, eyebrows and beard of a generated body (HAIR-01); coloured with `colors.hair`. */
-  hair: HumanHair.default({}),
-  clothes: external_exports.array(RecipeGarment).max(MAX_RECIPE_CLOTHES).refine((clothes) => new Set(clothes.map((g) => `${g.slot}:${g.layer}`)).size === clothes.length, "one garment per slot and layer").default([]),
-  animations: external_exports.object({
-    idle: ClipId.default("Idle"),
-    emotes: external_exports.array(ClipId).max(MAX_RECIPE_EMOTES).default([])
-  }).strict().default({ idle: "Idle", emotes: [] }),
-  effects: external_exports.array(RecipeEffect).max(MAX_RECIPE_EFFECTS).default([])
-}).strict();
-var DEFAULT_CHARACTER_RECIPE = CharacterRecipe.parse({});
 
 // ../contracts/dist/assistant.js
 var CorrectionKind = external_exports.enum(["moved", "deleted", "changed", "undone", "kept"]);
@@ -22137,6 +22629,18 @@ var ImportWorldPackage = external_exports.object({
   itemMap: external_exports.record(Id, Id).default({})
 }).strict();
 
+// ../contracts/dist/world-presets.js
+var AVAILABLE_WORLD_STYLES = ["blocky", "realistic", "voxel"];
+var WORLD_STARTERS = {
+  blocky: ["small", "empty"],
+  realistic: ["small", "valley", "island", "plain", "mountains", "empty"],
+  voxel: ["small", "empty"],
+  anime: []
+};
+function supportsWorldStarter(style, kind) {
+  return WORLD_STARTERS[style]?.includes(kind) ?? false;
+}
+
 // ../contracts/dist/studio-sharing.js
 var StudioShareRequest = external_exports.object({
   projectId: external_exports.string().min(1).max(120),
@@ -22151,1861 +22655,307 @@ var StudioShareRequest = external_exports.object({
     ctx.addIssue({ code: "custom", message: "Choose at least one invited person." });
 });
 
-// ../script/dist/limits.js
-var HANDLER_TICKS = 12;
-var START_TICKS = 60;
-var SANDBOX_DEFAULTS = Object.freeze({
-  memoryBytes: 4 * 2 ** 20,
-  stackBytes: 256 * 2 ** 10,
-  ticks: HANDLER_TICKS,
-  wallMs: 5
+// ../contracts/dist/motion-lab.js
+var LAB_FORMAT = 1;
+var LAB_STEP = 1 / 60;
+var LAB_KEEP_RUNS = 20;
+var LAB_CHARACTER = "robot";
+var labId = external_exports.string().regex(/^[a-z0-9][a-z0-9-]{0,39}$/, "Use a short id: lower-case letters, digits and dashes.");
+var metres2 = (min2, max2) => external_exports.number().min(min2).max(max2);
+var place = { id: labId, z: metres2(0, 60), x: metres2(-10, 10).default(0), hidden: external_exports.boolean().default(false) };
+var LabStep = external_exports.object({
+  ...place,
+  kind: external_exports.literal("step"),
+  height: metres2(0.05, 0.6).default(0.3),
+  depth: metres2(0.2, 2).default(0.6),
+  width: metres2(0.5, 6).default(3)
+}).strict();
+var LabRamp = external_exports.object({
+  ...place,
+  kind: external_exports.literal("ramp"),
+  rise: metres2(0.1, 2).default(0.8),
+  length: metres2(1, 10).default(3),
+  /** A flat top after the slope, at the ramp's full height. */
+  top: metres2(0, 4).default(1),
+  width: metres2(0.5, 6).default(3)
+}).strict();
+var LabGap = external_exports.object({
+  ...place,
+  kind: external_exports.literal("gap"),
+  width: metres2(0.2, 3).default(1),
+  height: metres2(0, 2).default(0.8),
+  /** Landing block higher (+) or lower (−) than the take-off block. */
+  landing: metres2(-1, 1).default(0),
+  landing_depth: metres2(0.5, 4).default(1.2),
+  lane: metres2(0.5, 6).default(3)
+}).strict();
+var LabLowWall = external_exports.object({
+  ...place,
+  kind: external_exports.literal("low_wall"),
+  height: metres2(0.3, 1.5).default(0.9),
+  thickness: metres2(0.1, 0.6).default(0.3),
+  width: metres2(0.5, 8).default(4)
+}).strict();
+var LabWindow = external_exports.object({
+  ...place,
+  kind: external_exports.literal("window"),
+  sill: metres2(0.3, 1.5).default(0.9),
+  opening_width: metres2(0.5, 2).default(1),
+  opening_height: metres2(0.4, 2).default(0.8),
+  wall_height: metres2(2, 4).default(2.4),
+  wall_width: metres2(1, 10).default(5),
+  thickness: metres2(0.1, 0.6).default(0.3)
+}).strict();
+var LabObstacle = external_exports.discriminatedUnion("kind", [LabStep, LabRamp, LabGap, LabLowWall, LabWindow]);
+var LAB_OBSTACLE_KINDS = ["step", "ramp", "gap", "low_wall", "window"];
+var LAB_LATER_KINDS = ["beam", "door", "uneven", "moving_platform"];
+var LabStreet = external_exports.object({
+  z: metres2(0, 80).default(22),
+  lanes: external_exports.number().int().min(1).max(4).default(2),
+  lane_width: metres2(2, 5).default(3),
+  crossing: external_exports.boolean().default(true),
+  /** Traffic light for walkers: red for `red_s`, then green, repeating every `cycle_s`. */
+  light: external_exports.object({ cycle_s: metres2(5, 120).default(30), red_s: metres2(1, 110).default(20) }).strict().default({ cycle_s: 30, red_s: 20 })
+}).strict();
+var LabCar = external_exports.object({
+  id: labId,
+  lane: external_exports.number().int().min(0).max(3).default(0),
+  speed: metres2(0, 30).default(8),
+  /** Seconds after the run's start when the car is at the crossing for the first time. */
+  offset_s: metres2(0, 120).default(6),
+  runs_red: external_exports.boolean().default(false)
+}).strict();
+var LabCourse = external_exports.object({
+  format: external_exports.literal(LAB_FORMAT).default(LAB_FORMAT),
+  seed: external_exports.number().int().min(0).max(2 ** 31 - 1).default(4127),
+  obstacles: external_exports.array(LabObstacle).max(40).default([]),
+  street: LabStreet.nullable().default(null),
+  cars: external_exports.array(LabCar).max(8).default([]),
+  /** Where the run ends (metres along the course). */
+  finish_z: metres2(2, 120).default(30)
+}).strict().superRefine((course, ctx) => {
+  const ids = /* @__PURE__ */ new Set();
+  for (const [i, o] of [...course.obstacles, ...course.cars].entries()) {
+    if (ids.has(o.id))
+      ctx.addIssue({ code: "custom", message: `Two parts share the id "${o.id}".`, path: ["obstacles", i, "id"] });
+    ids.add(o.id);
+  }
+  if (course.street) {
+    for (const [i, car] of course.cars.entries())
+      if (car.lane >= course.street.lanes)
+        ctx.addIssue({ code: "custom", message: `Car "${car.id}" is on lane ${car.lane}, the street has ${course.street.lanes}.`, path: ["cars", i, "lane"] });
+  }
+  if (course.street && course.street.light.red_s >= course.street.light.cycle_s)
+    ctx.addIssue({ code: "custom", message: "The red time must be shorter than the whole light cycle.", path: ["street", "light", "red_s"] });
 });
-var START_DEFAULTS = Object.freeze({
-  memoryBytes: 4 * 2 ** 20,
-  stackBytes: 256 * 2 ** 10,
-  ticks: START_TICKS,
-  wallMs: 25
-});
-var MODULE_MEMORY = Object.freeze({
-  initialBytes: 16 * 2 ** 20,
-  softBytes: SCRIPT_LIMITS.placeMemorySoftBytes,
-  maximumBytes: SCRIPT_LIMITS.placeMemoryBytes
-});
-var QUICKJS_WASM_SHA256 = "b56fe5094b8751c47b8c32fb5ed4d75afe2dbb43412d3d983ac5d1156af456da";
-
-// ../../../../../genvr/node_modules/.pnpm/@jitl+quickjs-ng-wasmfile-release-sync@0.32.0/node_modules/@jitl/quickjs-ng-wasmfile-release-sync/dist/index.mjs
-var variant = { type: "sync", importFFI: () => import("./ffi-7MV7QEVA.js").then((mod) => mod.QuickJSFFI), importModuleLoader: () => import("./emscripten-module.browser-7FO232OO.js").then((mod) => mod.default) };
-var src_default = variant;
-
-// ../../../../../genvr/node_modules/.pnpm/quickjs-emscripten-core@0.32.0/node_modules/quickjs-emscripten-core/dist/index.mjs
-async function newQuickJSWASMModuleFromVariant(variantOrPromise) {
-  let variant3 = smartUnwrap(await variantOrPromise), [wasmModuleLoader, QuickJSFFI, { QuickJSWASMModule: QuickJSWASMModule2 }] = await Promise.all([variant3.importModuleLoader().then(smartUnwrap), variant3.importFFI(), import("./module-ES6BEMUI-WSO4XC5P.js").then(smartUnwrap)]), wasmModule = await wasmModuleLoader();
-  wasmModule.type = "sync";
-  let ffi = new QuickJSFFI(wasmModule);
-  return new QuickJSWASMModule2(wasmModule, ffi);
-}
-function smartUnwrap(val) {
-  return val && "default" in val && val.default ? val.default && "default" in val.default && val.default.default ? val.default.default : val.default : val;
-}
-function newVariant(baseVariant, options) {
-  return { ...baseVariant, async importModuleLoader() {
-    let moduleLoader = smartUnwrap(await baseVariant.importModuleLoader());
-    return async function() {
-      let moduleLoaderArg = options.emscriptenModule ? { ...options.emscriptenModule } : {}, log = options.log ?? ((...args) => debugLog("newVariant moduleLoader:", ...args)), tapValue = (message, val) => (log(...message, val), val), force = (val) => typeof val == "function" ? val() : val;
-      (options.wasmLocation || options.wasmSourceMapLocation || options.locateFile) && (moduleLoaderArg.locateFile = (fileName, relativeTo) => {
-        let args = { fileName, relativeTo };
-        if (fileName.endsWith(".wasm") && options.wasmLocation !== void 0) return tapValue(["locateFile .wasm: provide wasmLocation", args], options.wasmLocation);
-        if (fileName.endsWith(".map")) {
-          if (options.wasmSourceMapLocation !== void 0) return tapValue(["locateFile .map: provide wasmSourceMapLocation", args], options.wasmSourceMapLocation);
-          if (options.wasmLocation && !options.locateFile) return tapValue(["locateFile .map: infer from wasmLocation", args], options.wasmLocation + ".map");
-        }
-        return options.locateFile ? tapValue(["locateFile: use provided fn", args], options.locateFile(fileName, relativeTo)) : tapValue(["locateFile: unhandled, passthrough", args], fileName);
-      }), options.wasmBinary && (moduleLoaderArg.wasmBinary = await force(options.wasmBinary)), options.wasmMemory && (moduleLoaderArg.wasmMemory = await force(options.wasmMemory));
-      let optionsWasmModule = options.wasmModule, modulePromise;
-      optionsWasmModule && (moduleLoaderArg.instantiateWasm = async (imports, onSuccess) => {
-        modulePromise ?? (modulePromise = Promise.resolve(force(optionsWasmModule)));
-        let wasmModule = await modulePromise;
-        if (!wasmModule) throw new QuickJSEmscriptenModuleError(`options.wasmModule returned ${String(wasmModule)}`);
-        let instance = await WebAssembly.instantiate(wasmModule, imports);
-        return onSuccess(instance), instance.exports;
-      }), moduleLoaderArg.monitorRunDependencies = (left2) => {
-        log("monitorRunDependencies:", left2);
-      }, moduleLoaderArg.quickjsEmscriptenInit = () => newMockExtensions(log);
-      let resultPromise = moduleLoader(moduleLoaderArg), extensions = moduleLoaderArg.quickjsEmscriptenInit?.(log);
-      if (optionsWasmModule && extensions?.receiveWasmOffsetConverter && !extensions.existingWasmOffsetConverter) {
-        let wasmBinary = await force(options.wasmBinary) ?? new ArrayBuffer(0);
-        modulePromise ?? (modulePromise = Promise.resolve(force(optionsWasmModule)));
-        let wasmModule = await modulePromise;
-        if (!wasmModule) throw new QuickJSEmscriptenModuleError(`options.wasmModule returned ${String(wasmModule)}`);
-        extensions.receiveWasmOffsetConverter(wasmBinary, wasmModule);
-      }
-      if (extensions?.receiveSourceMapJSON) {
-        let loadedSourceMapData = await force(options.wasmSourceMapData);
-        typeof loadedSourceMapData == "string" ? extensions.receiveSourceMapJSON(JSON.parse(loadedSourceMapData)) : loadedSourceMapData ? extensions.receiveSourceMapJSON(loadedSourceMapData) : extensions.receiveSourceMapJSON({ version: 3, names: [], sources: [], mappings: "" });
-      }
-      return resultPromise;
-    };
-  } };
-}
-function newMockExtensions(log) {
-  let mockMessage = "mock called, emscripten module may not be initialized yet";
-  return { mock: true, removeRunDependency(name) {
-    log(`${mockMessage}: removeRunDependency called:`, name);
-  }, receiveSourceMapJSON(data) {
-    log(`${mockMessage}: receiveSourceMapJSON called:`, data);
-  }, WasmOffsetConverter: void 0, receiveWasmOffsetConverter(bytes, mod) {
-    log(`${mockMessage}: receiveWasmOffsetConverter called:`, bytes, mod);
-  } };
-}
-
-// ../script/dist/sandbox.js
-var variant2 = src_default;
-var FILE = "script.js";
-var MESSAGE_CHARS = 500;
-var STACK_FRAMES = 10;
-var READ_LIMITS = { ticks: 2, wallMs: 2, extraBytes: 256 * 2 ** 10 };
-var JOB_BATCH = 32;
-var HEAP_CHECK_EVERY = 16;
-var BOOTSTRAP = `(() => {
-  const parse = JSON.parse;
-  const table = Object.create(null);
-  let count = 0;
-  const register = function __on(fn) {
-    if (typeof fn !== 'function') throw new TypeError('__on expects a function');
-    const handle = count;
-    table[handle] = fn;
-    count = count + 1;
-    return handle;
-  };
-  const dispatch = function (handle, json) {
-    if (typeof handle !== 'number' || !(handle >= 0 && handle < count)) throw new TypeError('unknown handler');
-    const fn = table[handle];
-    fn(parse(json));
-  };
-  return [dispatch, register];
-})()`;
-var PAGE = 65536;
-async function createScriptModule(options = {}) {
-  const wasmMemory = new WebAssembly.Memory({
-    initial: MODULE_MEMORY.initialBytes / PAGE,
-    maximum: MODULE_MEMORY.maximumBytes / PAGE
-  });
-  const capped2 = newVariant(variant2, {
-    wasmMemory,
-    ...options.wasmModule ? { wasmModule: options.wasmModule } : {}
-  });
-  const quickjs = await newQuickJSWASMModuleFromVariant(capped2);
-  return new Module(quickjs);
-}
-var Module = class {
-  #quickjs;
-  #sandboxes = /* @__PURE__ */ new Set();
-  #disposed = false;
-  constructor(quickjs) {
-    this.#quickjs = quickjs;
-  }
-  newSandbox(name) {
-    if (this.#disposed)
-      throw new Error("script module disposed");
-    const box2 = new Sandbox(name, this.#quickjs, () => this.#sandboxes.delete(box2));
-    this.#sandboxes.add(box2);
-    return box2;
-  }
-  residentBytes() {
-    return this.#quickjs.getWasmMemory().buffer.byteLength;
-  }
-  dispose() {
-    if (this.#disposed)
-      return;
-    this.#disposed = true;
-    for (const box2 of [...this.#sandboxes])
-      box2.dispose();
-    this.#sandboxes.clear();
-  }
-};
-var Sandbox = class {
-  name;
-  #runtime;
-  #ctx;
-  #dispatch;
-  #onDispose;
-  #moduleBytes;
-  #disposed = false;
-  #ticks = 0;
-  #maxTicks = Infinity;
-  #deadline = Infinity;
-  #interrupted = false;
-  #calls = 0;
-  constructor(name, quickjs, onDispose) {
-    this.name = name;
-    this.#moduleBytes = () => quickjs.getWasmMemory().buffer.byteLength;
-    this.#onDispose = onDispose;
-    this.#runtime = quickjs.newRuntime();
-    this.#runtime.setInterruptHandler(() => {
-      this.#ticks += 1;
-      if (this.#ticks > this.#maxTicks || performance.now() > this.#deadline) {
-        this.#interrupted = true;
-        return true;
-      }
-      return false;
-    });
-    this.#ctx = this.#runtime.newContext();
-    const boot = this.#ctx.evalCode(BOOTSTRAP, "bootstrap.js", { type: "global" });
-    if (boot.error) {
-      boot.error.dispose();
-      this.#ctx.dispose();
-      this.#runtime.dispose();
-      throw new Error("script sandbox bootstrap failed");
-    }
-    const pair2 = boot.value;
-    this.#dispatch = this.#ctx.getProp(pair2, 0);
-    const register = this.#ctx.getProp(pair2, 1);
-    this.#ctx.setProp(this.#ctx.global, "__on", register);
-    register.dispose();
-    pair2.dispose();
-  }
-  get disposed() {
-    return this.#disposed;
-  }
-  defineHost(name, fn) {
-    if (this.#disposed)
-      throw new Error("script sandbox disposed");
-    const ctx = this.#ctx;
-    const handle = ctx.newFunction(name, (arg) => {
-      if (arg === void 0 || ctx.typeof(arg) !== "string") {
-        return { error: ctx.newError({ name: "TypeError", message: `${name} takes a string` }) };
-      }
-      let out;
-      try {
-        out = String(fn(ctx.getString(arg)));
-      } catch {
-        return { error: ctx.newError({ name: "Error", message: `${name} refused the request` }) };
-      }
-      return ctx.newString(out);
-    });
-    ctx.setProp(ctx.global, name, handle);
-    handle.dispose();
-  }
-  run(source, limits, file2 = FILE) {
-    return this.#guarded(limits, () => {
-      const compiled = this.#ctx.evalCode(source, file2, { type: "global", compileOnly: true });
-      if (compiled.error)
-        return { error: compiled.error, syntax: true };
-      compiled.value.dispose();
-      const result = this.#ctx.evalCode(source, file2, { type: "global" });
-      if (result.error)
-        return { error: result.error, syntax: false };
-      result.value.dispose();
-      return null;
-    });
-  }
-  compile(source, limits) {
-    return this.#guarded(limits, () => {
-      const compiled = this.#ctx.evalCode(source, FILE, { type: "global", compileOnly: true });
-      if (compiled.error)
-        return { error: compiled.error, syntax: true };
-      compiled.value.dispose();
-      return null;
-    });
-  }
-  call(handle, argJson, limits) {
-    return this.#guarded(limits, () => {
-      const ctx = this.#ctx;
-      const h = ctx.newNumber(handle);
-      const json2 = ctx.newString(argJson);
-      const result = ctx.callFunction(this.#dispatch, ctx.undefined, h, json2);
-      h.dispose();
-      json2.dispose();
-      if (result.error)
-        return { error: result.error, syntax: false };
-      result.value.dispose();
-      return null;
-    });
-  }
-  dispose() {
-    if (this.#disposed)
-      return;
-    this.#disposed = true;
-    try {
-      this.#dispatch.dispose();
-      this.#ctx.dispose();
-      this.#runtime.dispose();
-    } finally {
-      this.#onDispose();
-    }
-  }
-  #arm(ticks, wallMs) {
-    this.#ticks = 0;
-    this.#maxTicks = ticks;
-    this.#deadline = performance.now() + wallMs;
-    this.#interrupted = false;
-  }
-  #disarm() {
-    this.#maxTicks = Infinity;
-    this.#deadline = Infinity;
-  }
-  #guarded(limits, body) {
-    const start = performance.now();
-    if (this.#disposed) {
-      return { ok: false, kind: "error", message: "script sandbox disposed", ticks: 0, ms: 0 };
-    }
-    const moduleBytes = this.#moduleBytes();
-    this.#calls += 1;
-    this.#runtime.setMemoryLimit(limits.memoryBytes);
-    this.#runtime.setMaxStackSize(limits.stackBytes);
-    this.#arm(limits.ticks, limits.wallMs);
-    let failure2 = null;
-    let ticks = 0;
-    try {
-      const thrown = body() ?? this.#drainJobs();
-      ticks = this.#ticks;
-      if (thrown) {
-        failure2 = this.#classify(thrown.error, thrown.syntax, limits);
-        if (failure2.kind !== "memory" && failure2.kind !== "syntax" && this.#runtime.hasPendingJob()) {
-          const settled = this.#settleJobs(limits);
-          ticks += settled.ticks;
-          if (!settled.done) {
-            failure2 = {
-              ...failure2,
-              kind: "overrun",
-              message: "its promise jobs did not finish within the budget"
-            };
-            this.dispose();
-          }
-        }
-      } else if (this.#overModule(moduleBytes) || this.#overHeapSometimes(moduleBytes, limits)) {
-        failure2 = { ok: false, kind: "memory", message: "out of memory", ticks: 0, ms: 0 };
-      }
-    } catch {
-      failure2 = { ok: false, kind: "error", message: "script sandbox failed", ticks: 0, ms: 0 };
-      this.dispose();
-    }
-    this.#disarm();
-    const ms = performance.now() - start;
-    if (!failure2)
-      return { ok: true, value: void 0, ticks, ms };
-    if (failure2.kind === "memory" && !this.#disposed)
-      this.dispose();
-    return { ...failure2, ticks, ms };
-  }
-  /**
-   * Runs queued promise jobs inside the budget already armed for this call. A job that fails without an interrupt
-   * does not leave the rest for later: they still run in this budget, and the first failure is reported.
-   */
-  #drainJobs() {
-    let first = null;
-    while (this.#runtime.hasPendingJob()) {
-      if (performance.now() > this.#deadline) {
-        this.#interrupted = true;
-        first?.dispose();
-        return {
-          error: this.#ctx.newError({ name: "InternalError", message: "interrupted" }),
-          syntax: false
-        };
-      }
-      const jobs = this.#runtime.executePendingJobs(JOB_BATCH);
-      if (!jobs.error)
-        continue;
-      if (this.#interrupted) {
-        first?.dispose();
-        return { error: jobs.error, syntax: false };
-      }
-      if (first)
-        jobs.error.dispose();
-      else
-        first = jobs.error;
-    }
-    return first ? { error: first, syntax: false } : null;
-  }
-  /** The jobs a failed call left, on a fresh budget the size of the call's own. Whether they all ran, and the ticks. */
-  #settleJobs(limits) {
-    this.#arm(limits.ticks, limits.wallMs);
-    const left2 = this.#drainJobs();
-    const ticks = this.#ticks;
-    left2?.error.dispose();
-    return { done: !this.#interrupted && !this.#runtime.hasPendingJob(), ticks };
-  }
-  #classify(error62, syntax, limits) {
-    const interrupted = this.#interrupted;
-    const base = { ok: false, ticks: 0, ms: 0 };
-    if (interrupted) {
-      error62.dispose();
-      return { ...base, kind: "overrun", message: "interrupted: over the time budget" };
-    }
-    const fields = this.#withRoom(limits, () => this.#readFields(error62));
-    error62.dispose();
-    const line = fields.line === void 0 ? {} : { line: fields.line };
-    if (syntax)
-      return {
-        ...base,
-        ...line,
-        ...fields.column === void 0 ? {} : { column: fields.column },
-        kind: "syntax",
-        message: fields.message
-      };
-    const outOfMemory = fields.name === "InternalError" && fields.rawMessage === "out of memory";
-    if (outOfMemory || this.#overHeap(limits) || this.#moduleBytes() >= MODULE_MEMORY.maximumBytes)
-      return { ...base, kind: "memory", message: "out of memory" };
-    const stack = fields.stack.length > 0 ? { stack: fields.stack } : {};
-    return { ...base, ...line, ...stack, kind: "error", message: fields.message };
-  }
-  /** This call grew the module's memory past its soft size: the script that grew it is switched off. */
-  #overModule(before) {
-    const now = this.#moduleBytes();
-    return now > before && now > MODULE_MEMORY.softBytes;
-  }
-  #overHeapSometimes(before, limits) {
-    const due = this.#moduleBytes() > before || this.#calls % HEAP_CHECK_EVERY === 0;
-    return due && this.#overHeap(limits);
-  }
-  /**
-   * Whether this script's heap is over its limit. QuickJS-ng's own limit (`setMemoryLimit`) counts every allocation
-   * as 8 bytes in this WASM build (no `malloc_usable_size`), so it bounds the number of allocations, not bytes. The
-   * size from `computeMemoryUsage` counts objects, properties and arrays but misses most string bytes, so it is a
-   * second guard; the module's capped WebAssembly memory (`MODULE_MEMORY`) is the hard bound.
-   */
-  #overHeap(limits) {
-    return this.#withRoom(limits, () => {
-      const ctx = this.#ctx;
-      const usage = this.#runtime.computeMemoryUsage();
-      const number4 = (key) => {
-        const value = ctx.getProp(usage, key);
-        const n = ctx.typeof(value) === "number" ? ctx.getNumber(value) : 0;
-        value.dispose();
-        return n;
-      };
-      const used = number4("memory_used_size");
-      const blocks = number4("malloc_count");
-      usage.dispose();
-      return used > limits.memoryBytes || blocks * 8 >= limits.memoryBytes * 0.95;
-    }, true);
-  }
-  /** Runs `read` with a little heap room and a tiny budget of its own (it may run creator getters). */
-  #withRoom(limits, read, onFailure) {
-    this.#ticks = 0;
-    this.#maxTicks = READ_LIMITS.ticks;
-    this.#deadline = performance.now() + Math.min(READ_LIMITS.wallMs, limits.wallMs);
-    this.#runtime.setMemoryLimit(limits.memoryBytes + READ_LIMITS.extraBytes);
-    try {
-      return read();
-    } catch (error62) {
-      if (onFailure !== void 0)
-        return onFailure;
-      throw error62;
-    } finally {
-      this.#runtime.setMemoryLimit(limits.memoryBytes);
-    }
-  }
-  /** Reads name, message and stack of a thrown value (under `#withRoom`). */
-  #readFields(error62) {
-    const ctx = this.#ctx;
-    const kind = ctx.typeof(error62);
-    if (kind !== "object" && kind !== "function") {
-      const text = kind === "string" ? ctx.getString(error62) : kind === "number" ? String(ctx.getNumber(error62)) : kind;
-      return { name: "", rawMessage: text, message: cut(text), stack: [] };
-    }
-    const read = (key) => {
-      try {
-        const value = ctx.getProp(error62, key);
-        const text = ctx.typeof(value) === "string" ? ctx.getString(value) : "";
-        value.dispose();
-        return text;
-      } catch {
-        return "";
-      }
-    };
-    const name = read("name");
-    const rawMessage = read("message");
-    const stack = read("stack");
-    const match = /script\.js:(\d+)(?::(\d+))?/.exec(stack);
-    const message = cut(name ? `${name}: ${rawMessage}` : rawMessage || "unreadable error");
-    const frames = ownFrames(stack);
-    if (!match)
-      return { name, rawMessage, message, stack: frames };
-    return {
-      name,
-      rawMessage,
-      message,
-      stack: frames,
-      line: Number(match[1]),
-      ...match[2] === void 0 ? {} : { column: Number(match[2]) }
-    };
-  }
-};
-function ownFrames(stack) {
-  const frames = [];
-  for (const frame of stack.slice(0, 2e4).matchAll(/at (\S+) \(script\.js:(\d+):(\d+)\)/g)) {
-    if (frames.length >= STACK_FRAMES)
-      break;
-    const name = frame[1] === "<eval>" ? "top level" : frame[1] === "<anonymous>" ? "anonymous" : frame[1];
-    frames.push(`${name.slice(0, 40)} ${frame[2]}:${frame[3]}`);
-  }
-  return frames;
-}
-function cut(text) {
-  return text.length > MESSAGE_CHARS ? `${text.slice(0, MESSAGE_CHARS)}...` : text;
-}
-
-// ../script/dist/handles.js
-var Handles = class {
-  #byId = /* @__PURE__ */ new Map();
-  #byHandle = /* @__PURE__ */ new Map();
-  #next = 1;
-  /** The handle of `id`, given the next one if it has none yet. */
-  handleOf(id) {
-    let handle = this.#byId.get(id);
-    if (handle === void 0) {
-      handle = `p${this.#next}`;
-      this.#next += 1;
-      this.#byId.set(id, handle);
-      this.#byHandle.set(handle, id);
-    }
-    return handle;
-  }
-  /** The handle of `id` when it has one, without giving a new one. */
-  peek(id) {
-    return this.#byId.get(id);
-  }
-  /** The id behind a handle, or undefined. */
-  idOf(handle) {
-    return this.#byHandle.get(handle);
-  }
-  /** Gives handles to ids that have none, in the given (join) order. */
-  sync(ids) {
-    for (const id of ids)
-      this.handleOf(id);
-  }
-  reset() {
-    this.#byId = /* @__PURE__ */ new Map();
-    this.#byHandle = /* @__PURE__ */ new Map();
-    this.#next = 1;
-  }
-};
-
-// ../script/dist/log.js
-function cutLine(text) {
-  return text.length > SCRIPT_LIMITS.logChars ? `${text.slice(0, SCRIPT_LIMITS.logChars - 3)}...` : text;
-}
-var LogRing = class {
-  #lines = [];
-  push(line) {
-    this.#lines.push(line);
-    if (this.#lines.length > SCRIPT_LIMITS.logLines)
-      this.#lines.splice(0, this.#lines.length - SCRIPT_LIMITS.logLines);
-  }
-  lines() {
-    return [...this.#lines];
-  }
-};
-var LogRate = class {
-  #second = -1;
-  #count = 0;
-  dropped = 0;
-  /** Whether a line at session time `now` may be written; counts it either way. Returns the lines still allowed. */
-  take(now) {
-    const second = Math.floor(now / 1e3);
-    if (second !== this.#second) {
-      this.#second = second;
-      this.#count = 0;
-    }
-    if (this.#count >= SCRIPT_LIMITS.logPerSecond) {
-      this.dropped += 1;
-      return -1;
-    }
-    this.#count += 1;
-    return SCRIPT_LIMITS.logPerSecond - this.#count;
-  }
-};
-
-// ../script/dist/random.js
-function hash32(text) {
-  let h = 2166136261;
-  for (let i = 0; i < text.length; i++) {
-    h ^= text.charCodeAt(i);
-    h = Math.imul(h, 16777619);
-  }
-  return h >>> 0;
-}
-function mulberry32(seed) {
-  let state = seed >>> 0;
-  return () => {
-    state = state + 1831565813 | 0;
-    let t = state;
-    t = Math.imul(t ^ t >>> 15, t | 1);
-    t ^= t + Math.imul(t ^ t >>> 7, t | 61);
-    return ((t ^ t >>> 14) >>> 0) / 4294967296;
-  };
-}
-var MULBERRY32_SOURCE = `(seed) => {
-    let state = seed >>> 0;
-    return () => {
-      state = (state + 0x6d2b79f5) | 0;
-      let t = state;
-      t = imul(t ^ (t >>> 15), t | 1);
-      t ^= t + imul(t ^ (t >>> 7), t | 61);
-      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-    };
-  }`;
-function matchSeed(placeSeed, n, first) {
-  const base = first ?? hash32(placeSeed);
-  return n === 0 ? base >>> 0 : hash32(`${base}:${n}`);
-}
-function scriptSeed(match, scriptId) {
-  return hash32(`${match}:${scriptId}`);
-}
-
-// ../script/dist/prelude.js
-var PRELUDE_FILE = "genvr-prelude.js";
-function prelude(seed) {
-  const L = SCRIPT_LIMITS;
-  return `(() => {
-  'use strict';
-  const g = globalThis;
-  const on = g.__on, act = g.__act, read = g.__read, log = g.__log;
-  delete g.__on; delete g.__act; delete g.__read; delete g.__log;
-  const parse = JSON.parse, stringify = JSON.stringify, toText = String, imul = Math.imul;
-  const apply = Reflect.apply, construct = Reflect.construct, freeze = Object.freeze;
-  const defineProperty = Object.defineProperty, getPrototypeOf = Object.getPrototypeOf;
-  const slice = String.prototype.slice, join = Array.prototype.join, push = Array.prototype.push;
-  const OriginalDate = Date;
-  const ACTS = ${L.actsPerHandler}, READS = ${L.readsPerHandler}, ACT_BYTES = ${L.actJsonBytes}, LOG_CHARS = ${L.logChars};
-
-  // Per call: the host counts too and has the last word; these only spare needless crossings.
-  let acts = 0, reads = 0, muted = false, dropped = 0;
-  const reportDropped = () => {
-    if (dropped > 0) log('D' + dropped);
-    dropped = 0;
-  };
-  const begin = () => {
-    acts = 0; reads = 0; muted = false; dropped = 0;
-  };
-  on(() => { reportDropped(); begin(); });
-
-  // At most READS reads and ACTS actions cross per call; then one marker, so the host writes its refusal line, and
-  // nothing more (review finding 7: the check was one late).
-  const ask = (op, args) => {
-    if (reads >= READS) {
-      if (reads === READS) {
-        reads += 1;
-        read('{"op":"over"}');
-      }
-      return null;
-    }
-    reads += 1;
-    const message = args === undefined ? { op } : { op, args };
-    return parse(read(stringify(message)));
-  };
-  const text = (value) => (typeof value === 'string' ? value : '');
-
-  const random = (${MULBERRY32_SOURCE})(${seed >>> 0});
-
-  const requestAction = (action, options) => {
-    if (acts >= ACTS) {
-      if (acts === ACTS) {
-        acts += 1;
-        act('{"over":true}');
-      }
-      return false;
-    }
-    acts += 1;
-    let json;
-    try {
-      json = stringify({ a: action, o: options === undefined ? null : options });
-    } catch (error) {
-      json = undefined;
-    }
-    if (typeof json !== 'string') return act('{"a":null,"o":null}') === 'true';
-    if (json.length > ACT_BYTES) return act(stringify({ big: json.length })) === 'true';
-    return act(json) === 'true';
-  };
-
-  const cut = (value, chars) => (value.length > chars ? apply(slice, value, [0, chars]) : value);
-  const show = (value) => {
-    try {
-      if (typeof value === 'string') return cut(value, LOG_CHARS);
-      if (typeof value === 'object' && value !== null) {
-        const json = stringify(value);
-        return cut(typeof json === 'string' ? json : toText(value), LOG_CHARS);
-      }
-      return cut(toText(value), LOG_CHARS);
-    } catch (error) {
-      return '[unprintable]';
-    }
-  };
-  // Fixed parameters, not a rest array: a muted call then allocates nothing (4 times cheaper in a log loop). Up to
-  // 16 values; trailing undefined values are not printed (a lone undefined is).
-  const writeLog = function writeLine(v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15) {
-    if (muted) {
-      dropped += 1;
-      return;
-    }
-    const values = [v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15];
-    let count = values.length;
-    while (count > 1 && values[count - 1] === undefined) count -= 1;
-    const parts = [];
-    for (let i = 0; i < count; i++) apply(push, parts, [show(values[i])]);
-    const left = Number(log('L' + cut(apply(join, parts, [' ']), LOG_CHARS)));
-    if (!(left > 0)) muted = true;
-  };
-
-  const listen = (name, handler, op) => {
-    if (typeof name !== 'string') throw new TypeError('genvr.on needs an event name');
-    if (typeof handler !== 'function') throw new TypeError('genvr.on needs a handler function');
-    const handle = on((event) => {
-      begin();
-      try {
-        handler(event);
-      } finally {
-        reportDropped();
-      }
-    });
-    const answer = parse(read(stringify({ op, args: { name, handle } })));
-    if (answer !== true) throw new Error(typeof answer === 'string' ? answer : 'genvr.on was refused');
-  };
-
-  const now = () => {
-    const value = ask('now');
-    return typeof value === 'number' ? value : 0;
-  };
-
-  const genvr = freeze({
-    on: (name, handler) => listen(name, handler, 'on'),
-    onProduct: (productId, handler) => listen(productId, handler, 'onProduct'),
-    activateProduct: (receiptId) => ask('activateProduct', { receiptId: text(receiptId) }) === true,
-    now,
-    phase: () => ask('phase'),
-    timeLeft: () => ask('timeLeft'),
-    players: () => ask('players'),
-    player: (handle) => ask('player', { handle: text(handle) }),
-    counter: (name, of) => ask('counter', { name: text(name), of: of === undefined ? null : text(of) }),
-    zones: (tag) => ask('zones', { tag: tag === undefined ? null : text(tag) }),
-    random,
-    act: requestAction,
-    emit: (name) => requestAction({ kind: 'emit', event: name }),
-    log: writeLog,
-  });
-  const fixed = { writable: false, configurable: false, enumerable: false };
-  defineProperty(g, 'genvr', { ...fixed, value: genvr });
-  defineProperty(g, 'console', {
-    ...fixed,
-    value: freeze({ log: writeLog, info: writeLog, warn: writeLog, error: writeLog, debug: writeLog }),
-  });
-
-  // Determinism (spec 5.5): the session clock and the match's seeded generator; nothing else tells time.
-  defineProperty(Math, 'random', { ...fixed, value: random });
-  // Local time is UTC (review finding 6): the engine would read the host's time zone for local dates, which differs
-  // between the room, the API and a builder's browser and tells the script where the server is.
-  const P = OriginalDate.prototype, UTC = OriginalDate.UTC, originalParse = OriginalDate.parse;
-  const getTime = P.getTime, toISO = P.toISOString;
-  const zoned = /(?:Z|GMT|UTC|UT|[+-]\\d\\d:?\\d\\d)\\s*(?:\\([^)]*\\))?\\s*$/i;
-  const dateOnly = /^\\s*[+-]?\\d{4,6}(?:-\\d\\d(?:-\\d\\d)?)?\\s*$/;
-  const isoDateTime = /^\\s*[+-]?\\d{4,6}-\\d\\d-\\d\\dT/i;
-  const parseUtc = function parse(value) {
-    const s = toText(value);
-    if (zoned.test(s) || dateOnly.test(s)) return originalParse(s);
-    return originalParse(isoDateTime.test(s) ? s + 'Z' : s + ' GMT');
-  };
-  const SessionDate = function Date(...args) {
-    if (new.target === undefined) return apply(toISO, new OriginalDate(now()), []);
-    const time =
-      args.length === 0 ? [now()]
-      : args.length >= 2 ? [apply(UTC, undefined, args)]
-      : typeof args[0] === 'string' ? [parseUtc(args[0])]
-      : args;
-    return construct(OriginalDate, time, new.target);
-  };
-  const names = ['FullYear', 'Month', 'Date', 'Day', 'Hours', 'Minutes', 'Seconds', 'Milliseconds'];
-  for (let i = 0; i < names.length; i++) {
-    defineProperty(P, 'get' + names[i], { ...fixed, value: P['getUTC' + names[i]] });
-    if (names[i] !== 'Day') defineProperty(P, 'set' + names[i], { ...fixed, value: P['setUTC' + names[i]] });
-  }
-  const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-  const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  const pad = (n, width) => {
-    let s = toText(n < 0 ? -n : n);
-    while (s.length < width) s = '0' + s;
-    return n < 0 ? '-' + s : s;
-  };
-  // The parts of a date in UTC, or null for an invalid date (a non-date throws, as the built-ins do).
-  const partsOf = (d) => {
-    const t = apply(getTime, d, []);
-    if (t !== t) return null;
-    const get = (name) => apply(P['getUTC' + name], d, []);
-    return { y: get('FullYear'), mo: get('Month'), d: get('Date'), wd: get('Day'), h: get('Hours'), mi: get('Minutes'), s: get('Seconds') };
-  };
-  const dateText = (p) => DAYS[p.wd] + ' ' + MONTHS[p.mo] + ' ' + pad(p.d, 2) + ' ' + pad(p.y, 4);
-  const timeText = (p) => pad(p.h, 2) + ':' + pad(p.mi, 2) + ':' + pad(p.s, 2) + ' GMT+0000';
-  const localDate = (p) => pad(p.mo + 1, 2) + '/' + pad(p.d, 2) + '/' + pad(p.y, 4);
-  const localTime = (p) => pad(p.h % 12 === 0 ? 12 : p.h % 12, 2) + ':' + pad(p.mi, 2) + ':' + pad(p.s, 2) + (p.h < 12 ? ' AM' : ' PM');
-  const texts = {
-    toString: (p) => dateText(p) + ' ' + timeText(p),
-    toDateString: dateText,
-    toTimeString: timeText,
-    toLocaleString: (p) => localDate(p) + ', ' + localTime(p),
-    toLocaleDateString: localDate,
-    toLocaleTimeString: localTime,
-  };
-  const textNames = ['toString', 'toDateString', 'toTimeString', 'toLocaleString', 'toLocaleDateString', 'toLocaleTimeString'];
-  for (let i = 0; i < textNames.length; i++) {
-    const format = texts[textNames[i]];
-    defineProperty(P, textNames[i], {
-      ...fixed,
-      value: {
-        [textNames[i]]() {
-          const p = partsOf(this);
-          return p === null ? 'Invalid Date' : format(p);
-        },
-      }[textNames[i]],
-    });
-  }
-  defineProperty(P, 'getTimezoneOffset', {
-    ...fixed,
-    value: function getTimezoneOffset() {
-      const t = apply(getTime, this, []);
-      return t !== t ? t : 0;
-    },
-  });
-  defineProperty(P, 'getYear', {
-    ...fixed,
-    value: function getYear() {
-      return apply(P.getUTCFullYear, this, []) - 1900;
-    },
-  });
-  defineProperty(P, 'setYear', {
-    ...fixed,
-    value: function setYear(year) {
-      const y = +year;
-      return apply(P.setUTCFullYear, this, [y >= 0 && y <= 99 && y === (y | 0) ? 1900 + y : y]);
-    },
-  });
-  defineProperty(SessionDate, 'prototype', { value: P, writable: false });
-  defineProperty(SessionDate, 'now', { ...fixed, value: now });
-  defineProperty(SessionDate, 'UTC', { ...fixed, value: UTC });
-  defineProperty(SessionDate, 'parse', { ...fixed, value: parseUtc });
-  defineProperty(P, 'constructor', { ...fixed, value: SessionDate });
-  defineProperty(g, 'Date', { ...fixed, value: SessionDate });
-
-  // No code from text (spec 7.2): what a reviewer, the Checks or an AI reads is all that runs.
-  const refuse = function () {
-    throw new TypeError('creating code from text is not allowed in Genvr scripts');
-  };
-  const kinds = [function () {}, async function () {}, function* () {}, async function* () {}];
-  for (let i = 0; i < kinds.length; i++) defineProperty(getPrototypeOf(kinds[i]), 'constructor', { ...fixed, value: refuse });
-  delete g.eval;
-  delete g.Function;
-  // Not deterministic, or not needed: removed.
-  delete g.performance;
-  delete g.queueMicrotask;
-  delete g.WeakRef;
-  delete g.FinalizationRegistry;
-})();`;
-}
-
-// ../script/dist/recording.js
-var ENGINE_EVENTS = /* @__PURE__ */ new Set([...GameEventName.options, "product_purchased"]);
-var SCRIPT_EVENT_TYPES = Object.freeze([
-  ...GameEventName.options,
-  "custom"
+var LabRunSettings = external_exports.object({
+  motion: external_exports.string().min(1).max(60).default("Walk"),
+  character: external_exports.string().min(1).max(60).default(LAB_CHARACTER),
+  speed: metres2(0.5, 8).default(1.6),
+  stride: metres2(0.3, 1.6).default(0.74),
+  /** How high the feet lift over a step (metres). */
+  step_height: metres2(0.05, 0.6).default(0.32),
+  /** Take-off before (−) or after (+) the edge of a gap, in milliseconds. */
+  jump_timing_ms: external_exports.number().int().min(-300).max(300).default(-20),
+  blend_s: metres2(0, 1).default(0.25),
+  lean_deg: external_exports.number().min(-20).max(20).default(4),
+  /** Waits at the crossing for green (true) or crosses at once (false). */
+  wait_for_green: external_exports.boolean().default(true)
+}).strict();
+var runShape = LabRunSettings.shape;
+var LabRunSettingsPatch = external_exports.object({
+  motion: runShape.motion.unwrap(),
+  character: runShape.character.unwrap(),
+  speed: runShape.speed.unwrap(),
+  stride: runShape.stride.unwrap(),
+  step_height: runShape.step_height.unwrap(),
+  jump_timing_ms: runShape.jump_timing_ms.unwrap(),
+  blend_s: runShape.blend_s.unwrap(),
+  lean_deg: runShape.lean_deg.unwrap(),
+  wait_for_green: runShape.wait_for_green.unwrap()
+}).partial().strict();
+var LabScore = external_exports.object({
+  /** Planted feet drifting over the ground, both feet, whole run (cm). */
+  foot_slide_cm: external_exports.number().min(0),
+  /** Deepest a foot or the body went into the floor or an obstacle (cm). */
+  penetration_cm: external_exports.number().min(0),
+  fell: external_exports.boolean(),
+  car_hit: external_exports.boolean(),
+  finished: external_exports.boolean(),
+  time_s: external_exports.number().min(0),
+  /** 1 = no jerk, 0 = very jerky. */
+  smoothness: external_exports.number().min(0).max(1),
+  total: external_exports.number().min(0).max(100)
+}).strict();
+var LabEventKind = external_exports.enum(["start", "step", "ramp", "gap_jump", "land", "vault", "window", "wait", "crossing", "car_near", "car_hit", "fall", "slide", "blocked", "finish"]);
+var LabEvent = external_exports.object({ t: external_exports.number().min(0), kind: LabEventKind, label: external_exports.string().max(120), obstacle: labId.optional() }).strict();
+var LabRun = external_exports.object({
+  id: labId,
+  at: external_exports.string().max(40),
+  seed: external_exports.number().int().min(0),
+  settings: LabRunSettings,
+  /** The course as it was: a run is replayed from course + settings + seed (its frames are not stored). */
+  course: LabCourse,
+  score: LabScore,
+  events: external_exports.array(LabEvent).max(400),
+  /** The version this run was made from, if any. */
+  version: labId.optional(),
+  by: external_exports.enum(["person", "agent"]).default("person")
+}).strict();
+var MotionVersion = external_exports.object({
+  id: labId,
+  motion: external_exports.string().min(1).max(60),
+  n: external_exports.number().int().min(1).max(9999),
+  note: external_exports.string().max(120).default(""),
+  settings: LabRunSettings,
+  score: LabScore,
+  run: labId,
+  best: external_exports.boolean().default(false),
+  by: external_exports.enum(["person", "agent"]).default("person"),
+  at: external_exports.string().max(40)
+}).strict();
+var LabProjectData = external_exports.object({
+  format: external_exports.literal(LAB_FORMAT).default(LAB_FORMAT),
+  course: LabCourse.default(() => LabCourse.parse({})),
+  settings: LabRunSettings.default(() => LabRunSettings.parse({})),
+  runs: external_exports.array(LabRun).max(LAB_KEEP_RUNS).default([]),
+  versions: external_exports.array(MotionVersion).max(500).default([]),
+  best_pending: external_exports.object({ version: labId, by: external_exports.string().max(80) }).strict().nullable().default(null)
+}).strict();
+var LAB_OVERLAYS = ["skeleton", "feet", "balance", "speed", "ghost", "measures"];
+var LabOverlay = external_exports.enum(LAB_OVERLAYS);
+var LabPlaySpeed = external_exports.union([external_exports.literal(0.25), external_exports.literal(0.5), external_exports.literal(1), external_exports.literal(2)]);
+var obstaclePatch = external_exports.object({
+  z: metres2(0, 60),
+  x: metres2(-10, 10),
+  hidden: external_exports.boolean(),
+  height: metres2(0, 4),
+  depth: metres2(0.2, 4),
+  width: metres2(0.2, 10),
+  rise: metres2(0.1, 2),
+  length: metres2(1, 10),
+  top: metres2(0, 4),
+  landing: metres2(-1, 1),
+  landing_depth: metres2(0.5, 4),
+  lane: metres2(0.5, 6),
+  thickness: metres2(0.1, 0.6),
+  sill: metres2(0.3, 1.5),
+  opening_width: metres2(0.5, 2),
+  opening_height: metres2(0.4, 2),
+  wall_height: metres2(2, 4),
+  wall_width: metres2(1, 10)
+}).partial().strict();
+var MotionLabOperation = external_exports.discriminatedUnion("kind", [
+  external_exports.object({ kind: external_exports.literal("inspect") }).strict(),
+  external_exports.object({ kind: external_exports.literal("commands") }).strict(),
+  external_exports.object({ kind: external_exports.literal("course_get") }).strict(),
+  external_exports.object({ kind: external_exports.literal("course_set"), course: external_exports.unknown() }).strict(),
+  external_exports.object({ kind: external_exports.literal("obstacle_add"), obstacle: external_exports.unknown() }).strict(),
+  external_exports.object({ kind: external_exports.literal("obstacle_set"), id: labId, set: obstaclePatch }).strict(),
+  external_exports.object({ kind: external_exports.literal("obstacle_remove"), id: labId }).strict(),
+  external_exports.object({
+    kind: external_exports.literal("course_from_seed"),
+    seed: external_exports.number().int().min(0).max(2 ** 31 - 1),
+    obstacles: external_exports.number().int().min(1).max(12).default(5),
+    hardness: external_exports.number().int().min(1).max(5).default(2),
+    street: external_exports.boolean().default(true)
+  }).strict(),
+  external_exports.object({ kind: external_exports.literal("traffic_set"), street: LabStreet.nullable().optional(), cars: external_exports.array(LabCar).max(8).optional() }).strict(),
+  external_exports.object({ kind: external_exports.literal("settings_set"), settings: LabRunSettingsPatch }).strict(),
+  external_exports.object({ kind: external_exports.literal("run"), settings: LabRunSettingsPatch.optional(), version: labId.optional() }).strict(),
+  external_exports.object({ kind: external_exports.literal("runs_list") }).strict(),
+  external_exports.object({ kind: external_exports.literal("scores"), run: labId.optional() }).strict(),
+  external_exports.object({ kind: external_exports.literal("frame"), run: labId.optional(), t: external_exports.number().min(0).max(600) }).strict(),
+  external_exports.object({ kind: external_exports.literal("view_set"), overlays: external_exports.array(LabOverlay).max(6).optional(), speed: LabPlaySpeed.optional() }).strict(),
+  external_exports.object({ kind: external_exports.literal("versions") }).strict(),
+  external_exports.object({ kind: external_exports.literal("save_version"), run: labId.optional(), note: external_exports.string().max(120).optional() }).strict(),
+  /** A person makes a version the best at once; an agent's request waits for the owner (`best_pending`). */
+  external_exports.object({ kind: external_exports.literal("save_best"), version: labId }).strict(),
+  external_exports.object({ kind: external_exports.literal("rollback"), version: labId }).strict(),
+  external_exports.object({ kind: external_exports.literal("version_delete"), version: labId, confirm: external_exports.literal(true) }).strict()
 ]);
-function toScriptEvent(event, actorId, handles2, matchStartedAt) {
-  const h = (id) => handles2.handleOf(id);
-  const hn = (id) => id === null ? null : handles2.handleOf(id);
-  const actor = hn(actorId);
-  switch (event.type) {
-    case "zone_entered":
-    case "zone_exited":
-    case "zone_crossed":
-      return { type: event.type, actor, id: h(event.id), zone: event.zone, tag: event.tag };
-    case "player_joined":
-      return { type: "player_joined", actor, id: h(event.id), team: event.team, returning: event.returning };
-    case "player_left":
-      return { type: "player_left", actor, id: h(event.id) };
-    case "hit":
-      return {
-        type: "hit",
-        actor,
-        victim: h(event.victim),
-        by: hn(event.by),
-        damage: event.damage,
-        health: event.health
-      };
-    case "died":
-      return { type: "died", actor, victim: h(event.victim), by: hn(event.by) };
-    case "respawned":
-      return { type: "respawned", actor, id: h(event.id) };
-    case "phase_changed":
-      return {
-        type: "phase_changed",
-        actor,
-        phase: event.phase,
-        endsAt: event.endsAt === null ? null : event.endsAt - matchStartedAt
-      };
-    case "time_up":
-      return { type: "time_up", actor };
-    case "counter_changed":
-      return { type: "counter_changed", actor, name: event.name, value: event.value, id: hn(event.id) };
-    case "timer_fired":
-      return { type: "timer_fired", actor, name: event.name, id: hn(event.id) };
-    case "mounted":
-      return { type: "mounted", actor, id: h(event.id), item: event.item, tag: event.tag, seat: event.seat };
-    case "dismounted":
-      return { type: "dismounted", actor, id: h(event.id), item: event.item, tag: event.tag };
-    case "custom":
-      return { type: "custom", actor, name: event.name, id: hn(event.id) };
-    default:
-      return null;
-  }
-}
-function scriptEventName(event) {
-  if (event.type !== "custom")
-    return event.type;
-  return ENGINE_EVENTS.has(event.name) ? null : event.name;
-}
-var Recording = class {
-  #events = [];
-  #at = [];
-  #caused = [];
-  #seed;
-  #last = null;
-  constructor(seed) {
-    this.#seed = seed;
-  }
-  push(event, at2 = 0, caused = false) {
-    this.#events.push(event);
-    this.#at.push(at2);
-    this.#caused.push(caused);
-    if (this.#events.length > SCRIPT_LIMITS.recordingEvents) {
-      this.#events.shift();
-      this.#at.shift();
-      this.#caused.shift();
-    }
-  }
-  /** A new match: the finished one stays readable until the new one has events. */
-  restart(seed) {
-    if (this.#events.length > 0)
-      this.#last = { seed: this.#seed, events: this.#events, at: this.#at, caused: this.#caused };
-    this.#events = [];
-    this.#at = [];
-    this.#caused = [];
-    this.#seed = seed;
-  }
-  /** The current match's events, or the last match's while the current one has none. */
-  snapshot() {
-    if (this.#events.length === 0 && this.#last)
-      return {
-        seed: this.#last.seed,
-        events: [...this.#last.events],
-        at: [...this.#last.at],
-        caused: [...this.#last.caused]
-      };
-    return { seed: this.#seed, events: [...this.#events], at: [...this.#at], caused: [...this.#caused] };
-  }
-};
+var MOTION_LAB_KINDS = MotionLabOperation.options.map((o) => o.shape.kind.value);
 
-// ../script/dist/guard.js
-var WINDOW_MS = 1e3;
-var ScriptGuard = class {
-  #place = [];
-  #starts = [];
-  #kills = [];
-  /** Each enabled script's text at the last kill (by id). */
-  #sources = /* @__PURE__ */ new Map();
-  /** Script time of the place in the second ending at `now`. */
-  placeUsed(now) {
-    return windowSum(this.#place, now, WINDOW_MS);
-  }
-  /** Match-start time of the place in the start window ending at `now`. */
-  startUsed(now) {
-    return windowSum(this.#starts, now, SCRIPT_LIMITS.startWindowMs);
-  }
-  /** Charges a handler call (or the end-of-call hook) to the place. */
-  chargeCall(at2, ms) {
-    this.#place.push({ at: at2, ms });
-  }
-  /** Charges one script's start (sandbox, prelude and top level) to the place and to the start window. */
-  chargeStart(at2, ms) {
-    this.#place.push({ at: at2, ms });
-    this.#starts.push({ at: at2, ms });
-  }
-  /** Why a script may not start now (the place budget or the start window), or null. */
-  startRefusal(now) {
-    if (this.placeUsed(now) >= SCRIPT_LIMITS.placeMsPerSecond)
-      return `the scripts of this place used their ${SCRIPT_LIMITS.placeMsPerSecond} ms of this second`;
-    if (this.startUsed(now) >= SCRIPT_LIMITS.startMsPerWindow)
-      return `match starts of this place used ${SCRIPT_LIMITS.startMsPerWindow} ms of script time in ${SCRIPT_LIMITS.startWindowMs / 1e3} seconds`;
-    return null;
-  }
-  /** Counts a kill at `now` and remembers the scripts' texts (a changed text may come back sooner). */
-  recordKill(now, scripts) {
-    this.#prune(now);
-    this.#kills.push(now);
-    this.#sources = new Map(scripts.filter((s) => s.enabled).map((s) => [s.id, s.source]));
-    return this.#kills.length;
-  }
-  /** Kills in the window ending at `now`. */
-  kills(now) {
-    this.#prune(now);
-    return this.#kills.length;
-  }
-  /**
-   * Whether the place's scripts are off after too many kills: null when they may start; otherwise when they may
-   * start again by themselves (`until`, budget clock) and, if a changed script may start sooner, from when (`retryAt`;
-   * null while no script changed).
-   */
-  retired(now, scripts) {
-    this.#prune(now);
-    const count = this.#kills.length;
-    if (count < SCRIPT_LIMITS.kills)
-      return null;
-    const last = this.#kills[count - 1];
-    const until = this.#kills[count - SCRIPT_LIMITS.kills] + SCRIPT_LIMITS.killWindowMs;
-    const changed = scripts.some((s) => s.enabled && this.#sources.get(s.id) !== s.source);
-    if (!changed)
-      return { until, retryAt: null };
-    const wait = Math.min(SCRIPT_LIMITS.killWindowMs, SCRIPT_LIMITS.killRetryMs * 2 ** (count - SCRIPT_LIMITS.kills));
-    const retryAt = last + wait;
-    return now >= retryAt ? null : { until, retryAt };
-  }
-  #prune(now) {
-    while (this.#kills.length > 0 && this.#kills[0] <= now - SCRIPT_LIMITS.killWindowMs)
-      this.#kills.shift();
-  }
+// ../core-library/dist/avatar-appearance/_joint-math.js
+var RAD = Math.PI / 180;
+var dot3 = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+var cross3 = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+var scale3 = (a, s) => [a[0] * s, a[1] * s, a[2] * s];
+var sub3 = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
+var unit3 = (a) => {
+  const length = Math.hypot(a[0], a[1], a[2]);
+  return length > 1e-9 ? scale3(a, 1 / length) : [0, 0, 0];
 };
-function windowSum(usage, now, windowMs) {
-  while (usage.length > 0 && usage[0].at <= now - windowMs)
-    usage.shift();
-  let sum = 0;
-  for (const entry of usage)
-    sum += entry.ms;
-  return sum;
+function qMul(a, b) {
+  return [
+    a[3] * b[0] + a[0] * b[3] + a[1] * b[2] - a[2] * b[1],
+    a[3] * b[1] - a[0] * b[2] + a[1] * b[3] + a[2] * b[0],
+    a[3] * b[2] + a[0] * b[1] - a[1] * b[0] + a[2] * b[3],
+    a[3] * b[3] - a[0] * b[0] - a[1] * b[1] - a[2] * b[2]
+  ];
 }
-
-// ../script/dist/runner.js
-var START_LIMITS = Object.freeze({
-  memoryBytes: SCRIPT_LIMITS.memoryBytes,
-  stackBytes: SCRIPT_LIMITS.stackBytes,
-  ticks: SCRIPT_LIMITS.startTicks,
-  wallMs: SCRIPT_LIMITS.startMs
-});
-var HANDLER_LIMITS = Object.freeze({
-  memoryBytes: SCRIPT_LIMITS.memoryBytes,
-  stackBytes: SCRIPT_LIMITS.stackBytes,
-  ticks: SCRIPT_LIMITS.handlerTicks,
-  wallMs: SCRIPT_LIMITS.handlerMs
-});
-var PRELUDE_LIMITS = START_LIMITS;
-var END_OF_CALL = 0;
-var REFUSAL_KEYS = 16;
-var START_RETRY_MS = 1e3;
-var ScriptRunner = class {
-  events;
-  #options;
-  #clock;
-  #scripts;
-  #handles = new Handles();
-  #log = new LogRing();
-  #recording;
-  #api = null;
-  #productContext = null;
-  #productDecisions = /* @__PURE__ */ new Map();
-  #productSession = false;
-  #match = 0;
-  #seed;
-  #call = null;
-  #shed = /* @__PURE__ */ new Set();
-  /** The place's script time (handlers and match starts) and its kills, across games when the room shares it. */
-  #budget;
-  #placeLoggedAt = -Infinity;
-  #disposed = false;
-  /** A kill ended this match's scripts: nothing more starts until the next match. */
-  #killedThisMatch = false;
-  /** This game already said that the place's scripts are off after too many kills. */
-  #retiredNoted = false;
-  /** This match already said that scripts wait to start. */
-  #waitNoted = false;
-  /** Starts the waiting scripts later in the match (after the place's budget, a kill's wait or a worker's start). */
-  #retryTimer = null;
-  constructor(scripts, options) {
-    this.#options = options;
-    this.#clock = options.clock ?? (() => performance.now());
-    this.#budget = options.guard ?? new ScriptGuard();
-    this.#scripts = scripts.filter((script) => script.enabled).map((source, index) => ({
-      source,
-      index,
-      box: null,
-      state: "off",
-      handlers: [],
-      strikes: 0,
-      errors: 0,
-      ticks: 0,
-      usage: [],
-      overBudget: false,
-      refused: /* @__PURE__ */ new Set(),
-      rate: new LogRate(),
-      waiting: false
-    }));
-    this.events = this.#scripts.length > 0 ? SCRIPT_EVENT_TYPES : [];
-    this.#seed = matchSeed(options.placeSeed, 0, options.seed);
-    this.#recording = new Recording(this.#seed);
-  }
-  attach(api) {
-    this.#api = api;
-    this.#guard(() => this.#startMatch());
-  }
-  hear(event, api) {
-    if (this.#disposed)
-      return;
-    this.#api = api;
-    this.#guard(() => this.#deliver(event, api));
-  }
-  /** Host-only capability: the room must obtain the receipt over its authenticated API. */
-  verifyProduct(value, playerId, now) {
-    const parsed = ProductReceipt.safeParse(value);
-    const api = this.#api;
-    if (!parsed.success || !api || this.#disposed || this.#productContext || !Number.isFinite(now) || api.view().phase !== "playing")
-      return false;
-    const receipt = parsed.data;
-    if (receipt.experienceId !== this.#options.placeSeed || !api.view().players.get(playerId)?.present)
-      return false;
-    if (receipt.expiresAt !== null && Date.parse(receipt.expiresAt) <= now)
-      return false;
-    const key = `${playerId}:${receipt.id}`;
-    if (this.#productDecisions.has(key))
-      return this.#productDecisions.get(key);
-    if (this.#productDecisions.size >= 500)
-      return false;
-    this.#handles.sync(api.view().players.keys());
-    const json2 = JSON.stringify(ScriptProductPurchase.parse({
-      type: "product_purchased",
-      actor: this.#handles.handleOf(playerId),
-      productId: receipt.productId,
-      receiptId: receipt.id,
-      mode: receipt.mode,
-      benefit: receipt.benefit,
-      remainingMs: receipt.expiresAt === null ? null : Math.max(0, Date.parse(receipt.expiresAt) - now)
-    }));
-    const context = { receiptId: receipt.id, actorId: playerId, activated: false };
-    let delivered = false;
-    this.#guard(() => {
-      this.#productContext = context;
-      try {
-        for (const s of this.#scripts)
-          for (const handler of s.handlers) {
-            if (handler.name !== `product:${receipt.productId}` || s.state !== "running" || !s.box || !this.#mayRun(s))
-              continue;
-            delivered = true;
-            if (!this.#productSession)
-              this.#write(s, "refused", "Sandbox product callbacks are not included in deterministic match replay; recording is unavailable for this match.");
-            this.#productSession = true;
-            this.#callHandler(s, handler, json2, playerId);
-          }
-      } finally {
-        this.#productContext = null;
-      }
-    });
-    if (delivered)
-      this.#productDecisions.set(key, context.activated);
-    return context.activated;
-  }
-  matchReset() {
-    if (this.#disposed)
-      return;
-    this.#guard(() => {
-      this.#match += 1;
-      this.#seed = matchSeed(this.#options.placeSeed, this.#match, this.#options.seed);
-      this.#recording.restart(this.#seed);
-      this.#startMatch();
-    });
-  }
-  log() {
-    return this.#log.lines();
-  }
-  recording() {
-    if (this.#productSession)
-      return { seed: this.#seed, events: [], at: [], caused: [] };
-    return this.#recording.snapshot();
-  }
-  canReplay() {
-    return !this.#productSession;
-  }
-  status() {
-    const now = this.#clock();
-    return this.#scripts.map((s) => ({
-      id: s.source.id,
-      name: s.source.name,
-      state: s.state,
-      strikes: s.strikes,
-      errors: s.errors,
-      msLastSecond: this.#used(s, now),
-      ticks: s.ticks
-    }));
-  }
-  /** Switches every script off until the next match (the watchdog, or the room shutting scripts down). */
-  switchOff(reason) {
-    let any2 = false;
-    for (const s of this.#scripts)
-      if (s.state === "running") {
-        any2 = true;
-        this.#off(s, reason, false);
-      }
-    if (any2)
-      this.#emitStatus();
-  }
-  dispose() {
-    if (this.#disposed)
-      return;
-    this.#disposed = true;
-    this.#clearRetry();
-    for (const s of this.#scripts)
-      this.#disposeBox(s);
-  }
-  // --- match lifecycle -------------------------------------------------------------------------------------------
-  #clearRetry() {
-    if (this.#retryTimer !== null)
-      clearTimeout(this.#retryTimer);
-    this.#retryTimer = null;
-  }
-  #startMatch() {
-    const api = this.#api;
-    if (!api)
-      return;
-    this.#clearRetry();
-    this.#handles.reset();
-    this.#productDecisions.clear();
-    this.#productSession = false;
-    this.#handles.sync(api.view().players.keys());
-    this.#shed.clear();
-    this.#killedThisMatch = false;
-    this.#waitNoted = false;
-    for (const s of this.#scripts) {
-      this.#disposeBox(s);
-      Object.assign(s, {
-        state: "off",
-        handlers: [],
-        strikes: 0,
-        errors: 0,
-        ticks: 0,
-        usage: [],
-        overBudget: false,
-        waiting: true
-      });
-      s.refused = /* @__PURE__ */ new Set();
-      s.rate = new LogRate();
-    }
-    if (!this.#retiredNow())
-      this.#startWaiting();
-    this.#emitStatus();
-  }
-  /** Whether the place's scripts are off after too many kills (said once per game). */
-  #retiredNow() {
-    const now = this.#clock();
-    const retired = this.#budget.retired(now, this.#sources());
-    if (!retired)
-      return false;
-    if (retired.retryAt !== null)
-      this.#startLater(retired.retryAt - now);
-    if (!this.#retiredNoted) {
-      this.#retiredNoted = true;
-      const minutes = Math.max(1, Math.ceil((retired.until - now) / 6e4));
-      const sooner = retired.retryAt === null ? "or sooner once a script is changed" : `or in ${Math.ceil((retired.retryAt - now) / 1e3)} s with the changed script`;
-      this.#write(null, "off", `scripts of this place stay off: stopped ${SCRIPT_LIMITS.kills} times in ${SCRIPT_LIMITS.killWindowMs / 6e4} minutes; back in ${minutes} min, ${sooner}`);
-    }
-    return true;
-  }
-  /** The enabled scripts as written (the guard compares their texts after a kill). */
-  #sources() {
-    return this.#scripts.map((s) => s.source);
-  }
-  /**
-   * Starts the waiting scripts in list order. Before each one the place's budget is checked (second review, critical
-   * 1): when this second's place time or the start window is used, the rest wait (one line a match) and are tried
-   * again a second later; after a kill nothing else starts this match.
-   */
-  #startWaiting() {
-    if (!this.#scripts.some((s) => s.waiting) || this.#killedThisMatch)
-      return;
-    const module = this.#options.module;
-    if (module.isReady && !module.isReady()) {
-      if (!this.#waitNoted) {
-        this.#waitNoted = true;
-        this.#write(null, "off", "scripts wait: the script worker is starting; they start in a moment");
-      }
-      const match = this.#match;
-      void module.whenReady?.().then((up4) => {
-        if (this.#disposed || this.#match !== match)
-          return;
-        if (up4)
-          this.#startLater(0);
-        else
-          this.#write(null, "off", "the script worker did not start; scripts are off for this match");
-      });
-      return;
-    }
-    const waiting = [];
-    let why = null;
-    for (const s of this.#scripts) {
-      if (!s.waiting)
-        continue;
-      if (this.#killedThisMatch) {
-        s.waiting = false;
-        continue;
-      }
-      why ??= this.#budget.startRefusal(this.#clock());
-      if (why !== null) {
-        waiting.push(s);
-        continue;
-      }
-      s.waiting = false;
-      this.#startScript(s);
-    }
-    if (waiting.length === 0 || this.#killedThisMatch)
-      return;
-    if (!this.#waitNoted) {
-      this.#waitNoted = true;
-      this.#write(null, "off", `not started yet: ${why}; waiting: ${waiting.map((s) => `"${s.source.name}"`).join(", ")}`);
-    }
-    this.#startLater(START_RETRY_MS);
-  }
-  /** Tries the waiting scripts again in `ms` (budget clock), within this match; one timer at a time. */
-  #startLater(ms) {
-    if (this.#retryTimer !== null || this.#disposed)
-      return;
-    const match = this.#match;
-    const timer = setTimeout(() => {
-      this.#retryTimer = null;
-      if (this.#disposed || this.#match !== match || this.#killedThisMatch)
-        return;
-      this.#guard(() => {
-        if (this.#retiredNow())
-          return;
-        this.#startWaiting();
-        this.#emitStatus();
-      });
-    }, Math.max(0, ms));
-    timer.unref?.();
-    this.#retryTimer = timer;
-  }
-  /**
-   * Starts one script and charges all of it (the sandbox, the prelude and the top level: the time the room's thread is
-   * blocked) to the place's budget and the start window (review finding 2, second review critical 1).
-   */
-  #startScript(s) {
-    let box2;
-    try {
-      box2 = this.#options.module.newSandbox(s.source.name);
-    } catch {
-      this.#write(s, "off", "could not start the script sandbox");
-      return;
-    }
-    const start = this.#clock();
-    try {
-      this.#runStart(s, box2);
-    } finally {
-      this.#budget.chargeStart(start, Math.max(0, this.#clock() - start));
-    }
-  }
-  #runStart(s, box2) {
-    s.box = box2;
-    box2.defineHost("__act", (json2) => this.#onAct(s, json2));
-    box2.defineHost("__read", (json2) => this.#onRead(s, json2));
-    box2.defineHost("__log", (text) => this.#onLog(s, text));
-    const ready = box2.run(prelude(scriptSeed(this.#seed, s.source.id)), PRELUDE_LIMITS, PRELUDE_FILE);
-    if (!ready.ok && ready.kind === "killed") {
-      this.#killed(ready.ms, ready.message);
-      return;
-    }
-    if (!ready.ok) {
-      this.#write(s, "off", "could not start the script sandbox");
-      this.#options.onIncident?.(`script prelude failed: ${ready.kind}`);
-      this.#disposeBox(s);
-      return;
-    }
-    s.state = "running";
-    const topStart = this.#clock();
-    const top = this.#within(s, null, true, () => box2.run(s.source.source, START_LIMITS));
-    const topMs = Math.max(0, this.#clock() - topStart);
-    s.ticks += top.ticks;
-    const slow = !(!top.ok && top.kind === "killed") && topMs > SCRIPT_LIMITS.watchdogMs;
-    if (slow)
-      this.#slowTopLevel(topMs);
-    if (top.ok && slow) {
-      this.#off(s, `the top level took ${Math.round(topMs)} ms (over ${SCRIPT_LIMITS.watchdogMs} ms)`, false);
-      return;
-    }
-    if (!top.ok) {
-      if (top.kind === "killed") {
-        this.#killed(top.ms, top.message);
-        return;
-      }
-      if (top.kind === "syntax") {
-        s.state = "not_compiled";
-        this.#write(s, "off", `does not compile: ${top.message}`, top.line);
-        this.#disposeBox(s);
-        return;
-      }
-      const why = top.kind === "overrun" ? `top level over its budget (${SCRIPT_LIMITS.startMs} ms)` : top.kind === "memory" ? "out of memory" : top.message;
-      this.#off(s, `top level failed: ${why}`, false, top.line);
-      return;
-    }
-    this.#endOfCall(s, null);
-    if (s.state === "running")
-      this.#write(s, "start", `running, ${s.handlers.length} handler${s.handlers.length === 1 ? "" : "s"}`);
-  }
-  // --- delivering events -----------------------------------------------------------------------------------------
-  #deliver(event, api) {
-    const actorId = api.actorOf(event);
-    if (this.#mentionsUnknown(event))
-      this.#handles.sync(api.view().players.keys());
-    const scriptEvent = toScriptEvent(event, actorId, this.#handles, api.matchStartedAt());
-    if (!scriptEvent)
-      return;
-    this.#recording.push(scriptEvent, api.now() - api.matchStartedAt(), api.caused(event));
-    const name = scriptEventName(scriptEvent);
-    if (name === null)
-      return;
-    const json2 = JSON.stringify(scriptEvent);
-    if (json2.length > SCRIPT_LIMITS.eventJsonBytes)
-      return;
-    for (const s of this.#scripts) {
-      for (const handler of s.handlers) {
-        if (handler.name !== name)
-          continue;
-        if (s.state !== "running" || !s.box)
-          break;
-        if (!this.#mayRun(s))
-          break;
-        this.#callHandler(s, handler, json2, actorId);
-      }
-    }
-  }
-  /** Whether the event names a player who has no handle yet (handles are given in join order first). */
-  #mentionsUnknown(event) {
-    for (const key of ["id", "victim", "by"]) {
-      const value = event[key];
-      if (typeof value === "string" && this.#handles.peek(value) === void 0)
-        return true;
-    }
-    return false;
-  }
-  #callHandler(s, handler, json2, actorId) {
-    const box2 = s.box;
-    const start = this.#clock();
-    const result = this.#within(s, actorId, false, () => box2.call(handler.handle, json2, HANDLER_LIMITS));
-    const ms = Math.max(0, this.#clock() - start);
-    s.usage.push({ at: start, ms });
-    this.#budget.chargeCall(start, ms);
-    s.ticks += result.ticks;
-    this.#flushDropped(s);
-    if (!result.ok && result.kind === "killed") {
-      this.#killed(ms, result.message);
-      return;
-    }
-    if (ms > SCRIPT_LIMITS.watchdogMs) {
-      this.#overWatchdog(`one handler call took ${Math.round(ms)} ms`);
-      return;
-    }
-    if (!result.ok)
-      this.#failed(s, result);
-    else if (ms > SCRIPT_LIMITS.handlerMs * 2)
-      this.#strike(s, `a handler went over its budget (${SCRIPT_LIMITS.handlerMs} ms)`);
-  }
-  #failed(s, result) {
-    if (result.kind === "memory" || s.box?.disposed) {
-      this.#off(s, result.kind === "overrun" ? result.message : "out of memory", true);
-      return;
-    }
-    if (result.kind === "overrun") {
-      this.#strike(s, `a handler went over its budget (${SCRIPT_LIMITS.handlerMs} ms)`);
-      return;
-    }
-    s.errors += 1;
-    const frames = result.stack && result.stack.length > 1 ? ` (at ${result.stack.join(" < ")})` : "";
-    this.#write(s, "error", `script "${s.source.name}"${result.line ? ` line ${result.line}` : ""}: ${result.message}${frames}`, result.line);
-    if (s.errors >= SCRIPT_LIMITS.errors)
-      this.#off(s, `${SCRIPT_LIMITS.errors} errors in one match`, true);
-  }
-  #strike(s, why) {
-    s.strikes += 1;
-    this.#write(s, "strike", `strike ${s.strikes} of ${SCRIPT_LIMITS.strikes}: ${why}`);
-    if (s.strikes >= SCRIPT_LIMITS.strikes)
-      this.#off(s, `${SCRIPT_LIMITS.strikes} strikes`, true);
-  }
-  /** The per-script and per-place time budgets (spec 5.4) before a handler call. */
-  #mayRun(s) {
-    const now = this.#clock();
-    const used = this.#used(s, now);
-    if (used >= SCRIPT_LIMITS.scriptMsPerSecond) {
-      if (!s.overBudget) {
-        s.overBudget = true;
-        this.#strike(s, `over ${SCRIPT_LIMITS.scriptMsPerSecond} ms in one second; handlers skipped`);
-      }
-      return false;
-    }
-    s.overBudget = false;
-    if (this.#budget.placeUsed(now) < SCRIPT_LIMITS.placeMsPerSecond) {
-      this.#shed.clear();
-      return true;
-    }
-    const next = [...this.#scripts].reverse().find((other) => other.state === "running" && !this.#shed.has(other));
-    if (next)
-      this.#shed.add(next);
-    if (now - this.#placeLoggedAt >= WINDOW_MS) {
-      this.#placeLoggedAt = now;
-      const names = this.#scripts.filter((other) => this.#shed.has(other)).map((other) => `"${other.source.name}"`);
-      this.#write(null, "refused", `scripts of this place over ${SCRIPT_LIMITS.placeMsPerSecond} ms in one second; skipping ${names.join(", ")}`);
-    }
-    return !this.#shed.has(s);
-  }
-  /** Handler ms of a script within the window ending at `now` (old entries dropped). */
-  #used(s, now) {
-    return windowSum(s.usage, now, WINDOW_MS);
-  }
-  /** Runs a sandbox call with `#call` set (the host functions read it), and never lets it leak. */
-  #within(s, actor, top, body) {
-    const outer = this.#call;
-    this.#call = { script: s, top, actor, acts: 0, reads: 0, view: null };
-    try {
-      return body();
-    } finally {
-      this.#call = outer;
-    }
-  }
-  /** The prelude's end-of-call hook after the top level (reports dropped log lines). */
-  #endOfCall(s, actor) {
-    if (!s.box || s.box.disposed)
-      return;
-    const result = this.#within(s, actor, false, () => s.box.call(END_OF_CALL, "{}", HANDLER_LIMITS));
-    this.#flushDropped(s);
-    if (!result.ok && result.kind === "killed")
-      this.#killed(result.ms, result.message);
-    else if (!result.ok)
-      this.#failed(s, result);
-  }
-  /**
-   * A call passed the module's hard deadline (native code that never polled the interrupt) and the worker was
-   * terminated: every sandbox of the place is gone, so every script is off for the match; after
-   * `SCRIPT_LIMITS.kills` kills in `killWindowMs` they stay off (the guard says until when).
-   */
-  #killed(ms, message = "") {
-    const count = this.#recordKill();
-    const final = count >= SCRIPT_LIMITS.kills;
-    const died = message.includes("by itself");
-    this.#options.onIncident?.(died ? `script worker stopped by itself (${count} of ${SCRIPT_LIMITS.kills}); scripts off for the ${final ? "game" : "match"}` : `script hard deadline: a call ran ${Math.round(ms)} ms and its worker was stopped (${count} of ${SCRIPT_LIMITS.kills}); scripts off for the ${final ? "game" : "match"}`);
-    const why = final ? `stopped on the hard deadline ${SCRIPT_LIMITS.kills} times` : died ? "the script worker stopped by itself (too much memory)" : "a call did not end by the hard deadline (code that never yields, such as a loop of big sorts)";
-    for (const s of this.#scripts) {
-      s.box = null;
-      if (s.state !== "running")
-        continue;
-      s.state = "off";
-      this.#write(s, "off", `switched off until the next match: ${why}`);
-    }
-    if (final)
-      this.#retiredNow();
-    this.#emitStatus();
-  }
-  /**
-   * A call (a top level or a handler) took longer than the watchdog and returned (native code that polled the
-   * interrupt too rarely): every script of the place stops for this match, and it counts as a kill.
-   */
-  #overWatchdog(what) {
-    const count = this.#recordKill();
-    this.#options.onIncident?.(`script watchdog: ${what} (${count} of ${SCRIPT_LIMITS.kills}); scripts off for the match`);
-    this.switchOff(`a call took over ${SCRIPT_LIMITS.watchdogMs} ms`);
-    if (count >= SCRIPT_LIMITS.kills)
-      this.#retiredNow();
-  }
-  /** A top level over the watchdog: a kill for the guard; the other running scripts go on, nothing else starts. */
-  #slowTopLevel(ms) {
-    const count = this.#recordKill();
-    this.#options.onIncident?.(`script watchdog: a top level took ${Math.round(ms)} ms (${count} of ${SCRIPT_LIMITS.kills}); nothing more starts this match`);
-    if (count >= SCRIPT_LIMITS.kills)
-      this.#retiredNow();
-  }
-  #recordKill() {
-    this.#killedThisMatch = true;
-    return this.#budget.recordKill(this.#clock(), this.#sources());
-  }
-  // --- host functions (strings in, strings out) -----------------------------------------------------------------
-  #onAct(s, json2) {
-    const call = this.#call;
-    if (!call || call.script !== s)
-      return "false";
-    const api = this.#api;
-    const refuse = (key, why, action2 = null) => {
-      this.#refused(s, key, why);
-      this.#options.onRequest?.({ script: s.source.id, action: action2, actor: null, accepted: false, why });
-      return "false";
-    };
-    if (call.top)
-      return refuse("top", "actions can only be requested from a handler, not the top level");
-    if (this.#productContext)
-      return refuse("rules", "purchase callbacks use activateProduct only; gameplay actions belong in engine handlers");
-    call.acts += 1;
-    if (call.acts > SCRIPT_LIMITS.actsPerHandler)
-      return refuse("acts", `more than ${SCRIPT_LIMITS.actsPerHandler} act or emit calls in one handler`);
-    if (json2.length > SCRIPT_LIMITS.actJsonBytes)
-      return refuse("size", `an action over ${SCRIPT_LIMITS.actJsonBytes} bytes`);
-    let raw;
-    try {
-      raw = JSON.parse(json2);
-    } catch {
-      return refuse("json", "an action that is not JSON");
-    }
-    const message = isRecord(raw) ? raw : {};
-    if ("big" in message)
-      return refuse("size", `an action over ${SCRIPT_LIMITS.actJsonBytes} bytes`);
-    const parsed = Action.safeParse(message.a);
-    if (!parsed.success) {
-      const issue2 = parsed.error.issues[0];
-      const where = issue2 && issue2.path.length > 0 ? ` (${issue2.path.join(".")})` : "";
-      return refuse(`action${cutName(where)}`, `not a valid action${cutName(where)}`, message.a);
-    }
-    const action = parsed.data;
-    let actorId = call.actor;
-    const options = message.o;
-    if (options !== null && options !== void 0) {
-      if (!isRecord(options) || "actor" in options && typeof options.actor !== "string")
-        return refuse("options", "options must be { actor?: handle }", action);
-      if (typeof options.actor === "string") {
-        const id = this.#handles.idOf(options.actor);
-        if (id === void 0 || !this.#view(call).players.has(id))
-          return refuse("actor", `unknown actor "${cutName(options.actor)}"`, action);
-        actorId = id;
-      }
-    }
-    const actor = actorId === null ? null : this.#handles.peek(actorId) ?? null;
-    const counter = action.kind === "add_counter" || action.kind === "set_counter" ? action.name : action.kind === "end_match" && typeof action.winner === "object" && "byCounter" in action.winner ? action.winner.byCounter : null;
-    if (counter !== null && api.counterScope(counter) === null)
-      return refuse("counter", `unknown counter "${cutName(counter)}"`, action);
-    if (action.kind === "teleport_to_zone" && !api.zones().some((zone) => zone.tag === action.tag))
-      return refuse("zone", `no zone tagged "${cutName(action.tag)}"`, action);
-    const accepted = api.act(action, actorId);
-    call.view = null;
-    if (!accepted) {
-      const why = `over the rules' budget (${RULE_LIMITS.actionsPerEvent} actions per event, chain of ${RULE_LIMITS.chain})`;
-      this.#refused(s, "rules", why);
-      this.#options.onRequest?.({ script: s.source.id, action, actor, accepted: false, why });
-      return "false";
-    }
-    this.#options.onRequest?.({ script: s.source.id, action, actor, accepted: true });
-    return "true";
-  }
-  #onRead(s, json2) {
-    const call = this.#call;
-    if (!call || call.script !== s)
-      return "null";
-    if (json2.length > SCRIPT_LIMITS.readJsonBytes) {
-      call.reads += 1;
-      this.#refused(s, "size", `a read over ${SCRIPT_LIMITS.readJsonBytes} bytes`);
-      return "null";
-    }
-    let message;
-    try {
-      const raw = JSON.parse(json2);
-      message = isRecord(raw) ? raw : {};
-    } catch {
-      return "null";
-    }
-    const args = isRecord(message.args) ? message.args : {};
-    if (message.op === "on" || message.op === "onProduct")
-      return JSON.stringify(this.#register(s, call, args, message.op === "onProduct"));
-    call.reads += 1;
-    if (call.reads > SCRIPT_LIMITS.readsPerHandler) {
-      this.#refused(s, "reads", `more than ${SCRIPT_LIMITS.readsPerHandler} reads in one handler`);
-      return "null";
-    }
-    const value = this.#read(call, String(message.op), args);
-    return JSON.stringify(value === void 0 ? null : value);
-  }
-  #register(s, call, args, product = false) {
-    if (!call.top)
-      return "genvr.on is only allowed while the top level runs";
-    const handle = args.handle;
-    const raw = args.name;
-    if (typeof handle !== "number" || !Number.isInteger(handle) || handle <= END_OF_CALL)
-      return "genvr.on was refused";
-    const name = typeof raw === "string" ? raw.trim() : "";
-    if (product) {
-      if (!ProductReceipt.shape.productId.safeParse(name).success)
-        return "onProduct needs a UUID Product ID";
-      s.handlers.push({ name: `product:${name}`, handle });
-      return true;
-    }
-    if (name.length === 0 || name.length > RULE_LIMITS.name)
-      return `genvr.on needs an event name of 1 to ${RULE_LIMITS.name} characters`;
-    s.handlers.push({ name, handle });
-    return true;
-  }
-  #read(call, op, args) {
-    const api = this.#api;
-    switch (op) {
-      case "activateProduct": {
-        const context = this.#productContext;
-        if (!context || call.top || call.actor !== context.actorId || args.receiptId !== context.receiptId)
-          return false;
-        context.activated = true;
-        return true;
-      }
-      case "now":
-        return api.now() - api.matchStartedAt();
-      case "phase":
-        return this.#view(call).phase;
-      case "timeLeft": {
-        const { endsAt } = this.#view(call);
-        return endsAt === null ? null : Math.max(0, (endsAt - api.now()) / 1e3);
-      }
-      case "players": {
-        const view = this.#view(call);
-        this.#handles.sync(view.players.keys());
-        return [...view.players].filter(([, row]) => row.present).map(([id]) => this.#handles.handleOf(id));
-      }
-      case "player": {
-        const id = typeof args.handle === "string" ? this.#handles.idOf(args.handle) : void 0;
-        const row = id === void 0 ? void 0 : this.#view(call).players.get(id);
-        if (id === void 0 || !row)
-          return null;
-        return {
-          team: row.team,
-          health: row.health,
-          alive: row.alive,
-          score: row.score,
-          place: row.place,
-          riding: api.ridingOf(id)?.tag ?? null,
-          present: row.present
-        };
-      }
-      case "counter": {
-        const name = typeof args.name === "string" ? args.name : "";
-        const of = args.of;
-        if (of === null || of === void 0)
-          return api.counter(name, "global");
-        if (of === "red" || of === "blue")
-          return api.counter(name, { team: of });
-        const id = typeof of === "string" ? this.#handles.idOf(of) : void 0;
-        return id === void 0 ? null : api.counter(name, { player: id });
-      }
-      case "zones": {
-        const tag = typeof args.tag === "string" ? args.tag : null;
-        return api.zones().filter((zone) => tag === null || zone.tag === tag).map((zone) => ({ id: zone.id, tag: zone.tag, shape: zone.shape }));
-      }
-      default:
-        return null;
-    }
-  }
-  #view(call) {
-    call.view ??= this.#api.view();
-    return call.view;
-  }
-  #onLog(s, text) {
-    const api = this.#api;
-    if (!api)
-      return "0";
-    if (text.startsWith("D")) {
-      const n = Number(text.slice(1));
-      if (Number.isInteger(n) && n > 0)
-        s.rate.dropped += Math.min(n, 1e9);
-      return "0";
-    }
-    const left2 = s.rate.take(api.now());
-    if (left2 < 0)
-      return "0";
-    this.#write(s, "log", text.slice(1));
-    return String(left2);
-  }
-  #flushDropped(s) {
-    if (s.rate.dropped === 0)
-      return;
-    const n = s.rate.dropped;
-    s.rate.dropped = 0;
-    this.#write(s, "log", `${n} line${n === 1 ? "" : "s"} dropped (at most ${SCRIPT_LIMITS.logPerSecond} a second)`);
-  }
-  // --- bookkeeping ------------------------------------------------------------------------------------------------
-  /**
-   * One log line per kind of refusal per script and match (review finding 3): keyed by a fixed reason, never by the
-   * creator's text (names, handles, tags), so the set stays small; and the line counts toward the script's
-   * `genvr.log` rate, so refusals cannot flood the log past 10 lines a second.
-   */
-  #refused(s, key, why) {
-    if (s.refused.has(key) || s.refused.size >= REFUSAL_KEYS)
-      return;
-    s.refused.add(key);
-    if (s.rate.take(this.#api?.now() ?? 0) < 0)
-      return;
-    this.#write(s, "refused", why);
-  }
-  #off(s, why, status, line) {
-    s.state = "off";
-    this.#write(s, "off", `switched off until the next match: ${why}`, line);
-    this.#disposeBox(s);
-    if (status)
-      this.#emitStatus();
-  }
-  #disposeBox(s) {
-    const box2 = s.box;
-    s.box = null;
-    if (box2 && !box2.disposed) {
-      try {
-        box2.dispose();
-      } catch {
-      }
-    }
-  }
-  #write(s, level, text, line) {
-    const entry = {
-      at: this.#api?.now() ?? 0,
-      script: s ? s.source.name : "",
-      level,
-      text: cutLine(text),
-      ...line === void 0 ? {} : { line }
-    };
-    this.#log.push(entry);
-    this.#options.onLog?.(entry);
-  }
-  #emitStatus() {
-    this.#options.onStatus?.(this.status());
-  }
-  /** A host-side failure switches every script of the place off for the match (spec 6); the room never throws. */
-  #guard(body) {
-    try {
-      body();
-    } catch (error62) {
-      this.#call = null;
-      const kind = error62 instanceof Error ? error62.name : typeof error62;
-      this.#options.onIncident?.(`script runner failed (${kind}); scripts off for the match`);
-      try {
-        this.switchOff("the script host failed");
-      } catch {
-      }
-    }
-  }
+var qInv = (q) => [-q[0], -q[1], -q[2], q[3]];
+var qAxis = (axis, degrees) => {
+  const [x, y, z2] = unit3(axis);
+  const s = Math.sin(degrees * RAD / 2);
+  return [x * s, y * s, z2 * s, Math.cos(degrees * RAD / 2)];
 };
-function isRecord(value) {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
+function qRotate(q, v) {
+  const u = [q[0], q[1], q[2]];
+  const t = scale3(cross3(u, v), 2);
+  return [v[0] + q[3] * t[0] + cross3(u, t)[0], v[1] + q[3] * t[1] + cross3(u, t)[1], v[2] + q[3] * t[2] + cross3(u, t)[2]];
 }
-function cutName(text) {
-  return text.length > RULE_LIMITS.name ? `${text.slice(0, RULE_LIMITS.name)}...` : text;
+function qFromEuler([x, y, z2]) {
+  return qMul(qMul(qAxis([1, 0, 0], x), qAxis([0, 1, 0], y)), qAxis([0, 0, 1], z2));
 }
-
-// ../script/dist/compile.js
-var COMPILE_LIMITS = Object.freeze({
-  memoryBytes: SCRIPT_LIMITS.memoryBytes,
-  stackBytes: SCRIPT_LIMITS.stackBytes,
-  ticks: SCRIPT_LIMITS.startTicks,
-  wallMs: SCRIPT_LIMITS.startMs * 4
-});
-var shared = null;
-async function checker() {
-  shared ??= createScriptModule().catch((error62) => {
-    shared = null;
-    throw error62;
-  });
-  return shared;
+function eulerFromBasis(ex, ey, ez) {
+  const m11 = ex[0], m12 = ey[0], m13 = ez[0];
+  const m22 = ey[1], m23 = ez[1];
+  const m32 = ey[2], m33 = ez[2];
+  const round2 = (r) => Math.round(r / RAD * 100) / 100;
+  const y = Math.asin(Math.max(-1, Math.min(1, m13)));
+  if (Math.abs(m13) < 0.9999999)
+    return [round2(Math.atan2(-m23, m33)), round2(y), round2(Math.atan2(-m12, m11))];
+  return [round2(Math.atan2(m32, m22)), round2(y), 0];
 }
-async function compileCheck(source) {
-  const module = await checker();
-  try {
-    return compileWith(module, source);
-  } catch {
-    shared = null;
-    return compileWith(await checker(), source);
+function eulerFromQ(q) {
+  return eulerFromBasis(qRotate(q, [1, 0, 0]), qRotate(q, [0, 1, 0]), qRotate(q, [0, 0, 1]));
+}
+function swingTwist(q, axis) {
+  const a = unit3(axis);
+  const projection = dot3([q[0], q[1], q[2]], a);
+  let twistQ = [a[0] * projection, a[1] * projection, a[2] * projection, q[3]];
+  const length = Math.hypot(...twistQ);
+  twistQ = length > 1e-9 ? twistQ.map((v) => v / length) : [0, 0, 0, 1];
+  if (twistQ[3] < 0)
+    twistQ = twistQ.map((v) => -v);
+  const twist = 2 * Math.atan2(dot3([twistQ[0], twistQ[1], twistQ[2]], a), twistQ[3]) / RAD;
+  let swingQ = qMul(q, qInv(twistQ));
+  if (swingQ[3] < 0)
+    swingQ = swingQ.map((v) => -v);
+  const swing = 2 * Math.acos(Math.min(1, swingQ[3])) / RAD;
+  return { twist, swingAxis: unit3([swingQ[0], swingQ[1], swingQ[2]]), swing };
+}
+function qBetween(from, to) {
+  const a = unit3(from);
+  const b = unit3(to);
+  const d = dot3(a, b);
+  if (d < -0.999999) {
+    const side3 = Math.abs(a[0]) < 0.9 ? cross3(a, [1, 0, 0]) : cross3(a, [0, 1, 0]);
+    return qAxis(side3, 180);
   }
+  const c = cross3(a, b);
+  const q = [c[0], c[1], c[2], 1 + d];
+  const length = Math.hypot(...q);
+  return q.map((v) => v / length);
 }
-function compileWith(module, source) {
-  const box2 = module.newSandbox("compile");
-  try {
-    const result = box2.compile(source, COMPILE_LIMITS);
-    if (result.ok)
-      return { ok: true };
-    return {
-      ok: false,
-      message: result.kind === "syntax" ? result.message : `the script could not be compiled (${result.kind})`,
-      line: result.line ?? 1,
-      column: result.column ?? 1
-    };
-  } finally {
-    if (!box2.disposed)
-      box2.dispose();
-  }
+function clampTwist(rest, restSide, along, wanted, limit) {
+  const swing = qBetween(rest, along);
+  const neutral = qRotate(swing, restSide);
+  const a = unit3(along);
+  const angle = Math.atan2(dot3(cross3(neutral, wanted), a), dot3(neutral, wanted)) * (180 / Math.PI);
+  const twist = Math.max(-limit, Math.min(limit, angle));
+  return { side: qRotate(qAxis(a, twist), neutral), twist: angle };
 }
 
 // ../core-library/dist/manifest.js
@@ -24032,6 +22982,3172 @@ function coreManifest(input2) {
     trainingConsent: true
   });
 }
+
+// ../core-library/dist/avatar-appearance/_animation.js
+var RELAXED_GRIP = 0.3;
+function defineAnimation(animation8) {
+  return {
+    manifest: coreManifest({
+      id: `genvr.core.animation.${animation8.slug}`,
+      name: animation8.name,
+      type: "animation",
+      category: "avatar-appearance",
+      subcategory: animation8.subcategory,
+      styles: ALL_STYLES
+    }),
+    clip: animation8.clip,
+    kind: animation8.kind,
+    duration: animation8.duration,
+    keys: animation8.keys,
+    ...animation8.grip === void 0 ? {} : { grip: animation8.grip }
+  };
+}
+var RADIANS = Math.PI / 180;
+function armPose(side3, upper, fore, palm) {
+  const u = unit3(upper);
+  const f = unit3(fore);
+  let bend = Math.acos(Math.max(-1, Math.min(1, dot3(u, f)))) / RADIANS;
+  const across = sub3(f, scale3(u, dot3(f, u)));
+  const rest = side3 === "Left" ? [1, 0, 0] : [-1, 0, 0];
+  let wanted;
+  if (Math.hypot(...across) > 1e-3 && bend > 0.5)
+    wanted = unit3(across);
+  else if (palm) {
+    const p = unit3(sub3(palm, scale3(u, dot3(palm, u))));
+    wanted = unit3(cross3(side3 === "Left" ? u : scale3(u, -1), scale3(p, -1)));
+  } else
+    wanted = [0, 0, 1];
+  let { side: ez, twist } = clampTwist(rest, [0, 0, 1], u, unit3(sub3(wanted, scale3(u, dot3(wanted, u)))), UPPER_ARM_TWIST);
+  if (Math.abs(twist) > UPPER_ARM_TWIST && bend < 30) {
+    bend = 0;
+    ({ side: ez } = clampTwist(rest, [0, 0, 1], u, [0, 0, 1], UPPER_ARM_TWIST));
+  }
+  const ex = side3 === "Left" ? u : scale3(u, -1);
+  const ey = cross3(ez, ex);
+  const arm4 = eulerFromBasis(ex, ey, ez);
+  const sign2 = side3 === "Left" ? -1 : 1;
+  const hinge = qAxis([0, 1, 0], sign2 * Math.min(bend, 150));
+  let forearmTwist = 0;
+  if (palm) {
+    const toLocal = qInv(qMul(qFromEuler(arm4), hinge));
+    const local = qRotate(toLocal, unit3(palm));
+    forearmTwist = Math.max(-FOREARM_TWIST, Math.min(FOREARM_TWIST, Math.atan2(-local[2], -local[1]) / RADIANS));
+  }
+  return { arm: arm4, fore: eulerFromQ(qMul(hinge, qAxis([1, 0, 0], forearmTwist))) };
+}
+function arm(side3, upper, fore, palm) {
+  const { arm: a, fore: f } = armPose(side3, upper, fore, palm);
+  return side3 === "Left" ? { LeftArm: a, LeftForeArm: f } : { RightArm: a, RightForeArm: f };
+}
+var mirror = ([x, y, z2]) => [-x, y, z2];
+var bothArms = (upper, fore, palm) => ({
+  ...arm("Left", upper, fore, palm),
+  ...arm("Right", mirror(upper), mirror(fore), mirror(palm))
+});
+var UPPER_ARM_TWIST = 90;
+var THIGH_TWIST = 50;
+var FOREARM_TWIST = 90;
+function legPose(thigh, shin) {
+  const t = unit3(thigh);
+  const s = unit3(shin);
+  let bend = Math.acos(Math.max(-1, Math.min(1, dot3(t, s)))) / RADIANS;
+  const behind = sub3(s, scale3(t, dot3(s, t)));
+  const wanted = Math.hypot(...behind) > 1e-3 && bend > 0.5 ? scale3(unit3(behind), -1) : [0, 0, 1];
+  let { side: ez, twist } = clampTwist([0, -1, 0], [0, 0, 1], t, unit3(sub3(wanted, scale3(t, dot3(wanted, t)))), THIGH_TWIST);
+  if (Math.abs(twist) > THIGH_TWIST && bend < 30) {
+    bend = 0;
+    ({ side: ez } = clampTwist([0, -1, 0], [0, 0, 1], t, [0, 0, 1], THIGH_TWIST));
+  }
+  const ey = scale3(t, -1);
+  const ex = cross3(ey, ez);
+  return { thigh: eulerFromBasis(ex, ey, ez), shin: [Math.round(Math.min(bend, 155) * 100) / 100, 0, 0] };
+}
+function referenceKey(pose, duration3, basePitch = 0) {
+  const left2 = armPose("Left", pose.leftUpperArm, pose.leftForearm, pose.leftPalm);
+  const right2 = armPose("Right", pose.rightUpperArm, pose.rightForearm, pose.rightPalm);
+  const leftLeg = legPose(pose.leftThigh, pose.leftShin);
+  const rightLeg = legPose(pose.rightThigh, pose.rightShin);
+  return [
+    pose.t * duration3,
+    {
+      Hips: [-(pose.bodyPitch - basePitch), -pose.bodyRoll, 0],
+      Spine2: [pose.spineBend, 0, 0],
+      Neck: [pose.headTilt * 0.4, pose.bodyRoll * 0.8 + pose.headTurn * 0.6, 0],
+      Head: [pose.headTilt * 0.6, pose.headTurn * 0.4, 0],
+      LeftArm: left2.arm,
+      LeftForeArm: left2.fore,
+      RightArm: right2.arm,
+      RightForeArm: right2.fore,
+      LeftUpLeg: leftLeg.thigh,
+      LeftLeg: leftLeg.shin,
+      RightUpLeg: rightLeg.thigh,
+      RightLeg: rightLeg.shin,
+      LeftFoot: [pose.footPoint, 0, 0],
+      RightFoot: [pose.footPoint, 0, 0],
+      grip: pose.grip,
+      ...pose.hipsY === void 0 ? {} : { hipsY: pose.hipsY }
+    }
+  ];
+}
+var DOWN = 78;
+var arms = (left2, right2) => ({ LeftArm: left2, RightArm: right2 });
+var REST = {
+  ...arms([0, 0, -DOWN], [0, 0, DOWN]),
+  LeftForeArm: [0, -8, 0],
+  RightForeArm: [0, 8, 0]
+};
+var at = (time3, pose) => [time3, { ...REST, ...pose }];
+var beats = (from, to, count, even, odd) => Array.from({ length: count + 1 }, (_, i) => at(from + (to - from) * i / count, i % 2 === 0 ? even : odd));
+function gait(duration3, o) {
+  const twist = o.twist ?? o.leg * 0.2;
+  const roll = o.roll ?? o.leg * 0.08;
+  const step = (sign2, t) => [
+    t,
+    {
+      Hips: [0, -twist * sign2, 0],
+      LeftUpLeg: [-o.leg * sign2, 0, 0],
+      RightUpLeg: [o.leg * sign2, 0, 0],
+      LeftLeg: [sign2 > 0 ? o.knee * 0.3 : o.knee * 0.15, 0, 0],
+      RightLeg: [sign2 < 0 ? o.knee * 0.3 : o.knee * 0.15, 0, 0],
+      ...arms([o.arm * sign2, 0, -DOWN], [-o.arm * sign2, 0, DOWN]),
+      LeftForeArm: [0, -o.elbow, 0],
+      RightForeArm: [0, o.elbow, 0],
+      Spine: [o.lean, 0, 0],
+      Spine2: [0, twist * 1.8 * sign2, 0],
+      Neck: [0, -twist * 0.8 * sign2, 0],
+      hipsY: -o.bob
+    }
+  ];
+  const pass = (t, leftLifted) => {
+    const side3 = leftLifted ? 1 : -1;
+    return [
+      t,
+      {
+        Hips: [0, 0, -roll * side3],
+        LeftUpLeg: [leftLifted ? -o.leg * 0.4 : o.leg * 0.2, 0, roll * side3],
+        RightUpLeg: [leftLifted ? o.leg * 0.2 : -o.leg * 0.4, 0, roll * side3],
+        LeftLeg: [leftLifted ? o.knee : 0, 0, 0],
+        RightLeg: [leftLifted ? 0 : o.knee, 0, 0],
+        ...arms([0, 0, -DOWN], [0, 0, DOWN]),
+        LeftForeArm: [0, -o.elbow, 0],
+        RightForeArm: [0, o.elbow, 0],
+        Spine: [o.lean, 0, roll * 1.6 * side3],
+        Neck: [0, 0, -roll * 0.6 * side3],
+        hipsY: o.bob
+      }
+    ];
+  };
+  const d = duration3;
+  return [step(1, 0), pass(d * 0.25, false), step(-1, d * 0.5), pass(d * 0.75, true), step(1, d)];
+}
+var hold = (duration3, pose) => [
+  [0, pose],
+  [duration3, pose]
+];
+
+// ../core-library/dist/avatar-appearance/animations/idle.js
+var breathe = (t, amount) => [
+  t,
+  {
+    ...arms([0, 0, -DOWN + amount * 2], [0, 0, DOWN - amount * 2]),
+    LeftForeArm: [0, -8, 0],
+    RightForeArm: [0, 8, 0],
+    Spine2: [-amount * 2, 0, 0],
+    Head: [amount, amount * 2, 0],
+    hipsY: amount * 8e-3,
+    grip: 0.12
+  }
+];
+var idle_default = defineAnimation({
+  slug: "idle",
+  name: "Idle",
+  clip: "Idle",
+  subcategory: "animations",
+  kind: "loop",
+  duration: 2.4,
+  keys: [breathe(0, 0), breathe(1.2, 1), breathe(2.4, 0)]
+});
+
+// ../core-library/dist/avatar-appearance/animations/build.js
+var lifted = { ...arm("Right", [-0.25, 0.65, 0.7], [0, 0.7, -0.7], [1, 0, 0]), Spine2: [0, -6, 0] };
+var struck = { ...arm("Right", [-0.15, -0.2, 0.97], [-0.05, -0.55, 0.83], [1, 0, 0]), Spine2: [0, -10, 0] };
+var build_default = defineAnimation({
+  slug: "build",
+  name: "Build",
+  clip: "Build",
+  subcategory: "animations",
+  kind: "once",
+  duration: 0.35,
+  grip: 0.8,
+  keys: [at(0, {}), at(0.1, lifted), at(0.22, struck), at(0.35, {})]
+});
+
+// ../core-library/dist/avatar-appearance/animations/strike.js
+var raised = { ...arm("Right", [-0.6, 0.75, -0.1], [-0.25, 0.95, 0.15], [1, 0, 0]), Spine2: [0, 15, 0] };
+var swept = { ...arm("Right", [0.35, -0.2, 0.9], [0.6, -0.3, 0.75], [0, -1, 0]), Spine2: [0, -15, 0] };
+var strike_default = defineAnimation({
+  slug: "strike",
+  name: "Strike",
+  clip: "Strike",
+  subcategory: "animations",
+  kind: "once",
+  duration: 0.4,
+  grip: 1,
+  keys: [at(0, {}), at(0.1, raised), at(0.22, swept), at(0.4, {})]
+});
+
+// ../core-library/dist/avatar-appearance/animations/climb.js
+var PALM = [0, 0.2, 1];
+var high = (side3) => armPose(side3, [0.15 * sign(side3), 0.95, 0.3], [0.05 * sign(side3), 1, 0.25], PALM);
+var low = (side3) => armPose(side3, [0.35 * sign(side3), -0.15, 0.9], [0.1 * sign(side3), 0.95, 0.3], PALM);
+function sign(side3) {
+  return side3 === "Left" ? 1 : -1;
+}
+var reach = (t, left2) => {
+  const l = left2 ? high("Left") : low("Left");
+  const r = left2 ? low("Right") : high("Right");
+  return [
+    t,
+    {
+      LeftArm: l.arm,
+      LeftForeArm: l.fore,
+      RightArm: r.arm,
+      RightForeArm: r.fore,
+      LeftUpLeg: [left2 ? -10 : -50, 0, 0],
+      RightUpLeg: [left2 ? -50 : -10, 0, 0],
+      LeftLeg: [left2 ? 15 : 80, 0, 0],
+      RightLeg: [left2 ? 80 : 15, 0, 0],
+      Head: [-10, 0, 0]
+    }
+  ];
+};
+var climb_default = defineAnimation({
+  slug: "climb",
+  name: "Climb",
+  clip: "Climb",
+  subcategory: "animations",
+  kind: "loop",
+  duration: 0.8,
+  grip: 0.85,
+  keys: [reach(0, true), reach(0.4, false), reach(0.8, true)]
+});
+
+// ../core-library/dist/avatar-appearance/animations/jump.js
+var ARMS = bothArms([0.45, -0.55, 0.7], [0.3, 0.1, 0.95], [-0.6, -0.3, 0.3]);
+var air = (t, tuck) => [
+  t,
+  {
+    LeftUpLeg: [-35 - tuck, 0, 0],
+    RightUpLeg: [-20 - tuck, 0, 0],
+    LeftLeg: [55 + tuck, 0, 0],
+    RightLeg: [35 + tuck, 0, 0],
+    ...ARMS
+  }
+];
+var jump_default = defineAnimation({
+  slug: "jump",
+  name: "Jump",
+  clip: "Jump",
+  subcategory: "animations",
+  kind: "loop",
+  duration: 0.8,
+  keys: [air(0, 0), air(0.4, 8), air(0.8, 0)]
+});
+
+// ../core-library/dist/avatar-appearance/animations/run.js
+var run_default = defineAnimation({
+  slug: "run",
+  name: "Run",
+  clip: "Run",
+  subcategory: "animations",
+  kind: "loop",
+  duration: 0.64,
+  keys: gait(0.64, { leg: 45, knee: 90, arm: 28, elbow: 50, lean: 12, bob: 0.06 })
+});
+
+// ../core-library/dist/avatar-appearance/animations/sit-ground.js
+var sit_ground_default = defineAnimation({
+  slug: "sit-ground",
+  name: "Sit on the ground",
+  clip: "SitGround",
+  subcategory: "animations",
+  kind: "loop",
+  duration: 1,
+  grip: 0.05,
+  keys: hold(1, {
+    LeftUpLeg: [-86, 0, 6],
+    RightUpLeg: [-86, 0, -6],
+    LeftLeg: [4, 0, 0],
+    RightLeg: [4, 0, 0],
+    ...bothArms([0.3, -0.9, -0.35], [0.25, -0.95, -0.25], [0, -1, 0]),
+    Spine: [-8, 0, 0],
+    hipsY: -0.72
+  })
+});
+
+// ../core-library/dist/avatar-appearance/animations/swim.js
+var POSES = [
+  {
+    t: 0,
+    leftUpperArm: [0.05, 0.99, 0.1],
+    leftForearm: [0.02, 0.99, 0.12],
+    rightUpperArm: [-0.08, -0.93, 0.36],
+    rightForearm: [-0.03, -0.98, 0.18],
+    leftThigh: [0.02, -0.99, -0.1],
+    leftShin: [0.01, -0.98, -0.2],
+    rightThigh: [-0.02, -0.98, 0.18],
+    rightShin: [-0.01, -0.99, 0.1],
+    bodyRoll: 20,
+    spineBend: 2,
+    headTurn: 0,
+    headTilt: 6,
+    footPoint: 35,
+    bodyPitch: 3,
+    grip: 0.05
+  },
+  {
+    t: 0.125,
+    leftUpperArm: [0.04, 0.99, 0.08],
+    leftForearm: [0.01, 1, 0.04],
+    rightUpperArm: [-0.42, 0.18, -0.89],
+    rightForearm: [-0.3, 0.7, 0.65],
+    leftThigh: [0.02, -0.98, 0.18],
+    leftShin: [0.01, -0.99, 0.08],
+    rightThigh: [-0.02, -0.99, -0.1],
+    rightShin: [-0.01, -0.97, -0.24],
+    bodyRoll: 30,
+    spineBend: 2,
+    headTurn: 0,
+    headTilt: 5,
+    footPoint: 38,
+    bodyPitch: 3,
+    grip: 0.05
+  },
+  {
+    t: 0.25,
+    leftUpperArm: [0.06, 0.94, 0.34],
+    leftForearm: [0.03, 0.42, 0.91],
+    rightUpperArm: [-0.34, 0.55, -0.76],
+    rightForearm: [-0.18, 0.87, 0.46],
+    leftThigh: [0.02, -0.99, -0.08],
+    leftShin: [0.01, -0.96, -0.28],
+    rightThigh: [-0.02, -0.98, 0.18],
+    rightShin: [-0.01, -0.99, 0.09],
+    bodyRoll: 18,
+    spineBend: 2,
+    headTurn: 0,
+    headTilt: 6,
+    footPoint: 38,
+    bodyPitch: 3,
+    grip: 0.08
+  },
+  {
+    t: 0.375,
+    leftUpperArm: [0.08, 0.55, 0.83],
+    leftForearm: [0.03, -0.2, 0.98],
+    rightUpperArm: [-0.05, 0.98, 0.18],
+    rightForearm: [-0.02, 0.99, 0.1],
+    leftThigh: [0.02, -0.98, 0.17],
+    leftShin: [0.01, -0.99, 0.1],
+    rightThigh: [-0.02, -0.99, -0.08],
+    rightShin: [-0.01, -0.96, -0.27],
+    bodyRoll: 5,
+    spineBend: 2,
+    headTurn: 0,
+    headTilt: 5,
+    footPoint: 40,
+    bodyPitch: 2,
+    grip: 0.1
+  },
+  {
+    t: 0.5,
+    leftUpperArm: [0.06, -0.55, 0.83],
+    leftForearm: [0.02, -0.92, 0.39],
+    rightUpperArm: [-0.04, 0.99, 0.1],
+    rightForearm: [-0.01, 1, 0.05],
+    leftThigh: [0.02, -0.99, -0.1],
+    leftShin: [0.01, -0.97, -0.24],
+    rightThigh: [-0.02, -0.98, 0.18],
+    rightShin: [-0.01, -0.99, 0.08],
+    bodyRoll: -20,
+    spineBend: 2,
+    headTurn: 0,
+    headTilt: 5,
+    footPoint: 38,
+    bodyPitch: 3,
+    grip: 0.08
+  },
+  {
+    t: 0.625,
+    leftUpperArm: [0.4, 0.18, -0.9],
+    leftForearm: [0.28, 0.7, 0.66],
+    rightUpperArm: [-0.06, 0.94, 0.34],
+    rightForearm: [-0.03, 0.42, 0.91],
+    leftThigh: [0.02, -0.98, 0.18],
+    leftShin: [0.01, -0.99, 0.08],
+    rightThigh: [-0.02, -0.99, -0.1],
+    rightShin: [-0.01, -0.97, -0.24],
+    bodyRoll: -30,
+    spineBend: 2,
+    headTurn: 0,
+    headTilt: 5,
+    footPoint: 38,
+    bodyPitch: 3,
+    grip: 0.07
+  },
+  {
+    t: 0.75,
+    leftUpperArm: [0.32, 0.57, -0.76],
+    leftForearm: [0.16, 0.88, 0.45],
+    rightUpperArm: [-0.08, 0.55, 0.83],
+    rightForearm: [-0.03, -0.2, 0.98],
+    leftThigh: [0.02, -0.99, -0.08],
+    leftShin: [0.01, -0.96, -0.28],
+    rightThigh: [-0.02, -0.98, 0.17],
+    rightShin: [-0.01, -0.99, 0.09],
+    bodyRoll: -35,
+    spineBend: 3,
+    headTurn: 55,
+    headTilt: -3,
+    footPoint: 40,
+    bodyPitch: 4,
+    grip: 0.1
+  },
+  {
+    t: 0.875,
+    leftUpperArm: [0.05, 0.97, 0.23],
+    leftForearm: [0.02, 0.99, 0.12],
+    rightUpperArm: [-0.07, -0.53, 0.85],
+    rightForearm: [-0.02, -0.91, 0.41],
+    leftThigh: [0.02, -0.98, 0.18],
+    leftShin: [0.01, -0.99, 0.08],
+    rightThigh: [-0.02, -0.99, -0.09],
+    rightShin: [-0.01, -0.96, -0.27],
+    bodyRoll: -12,
+    spineBend: 2,
+    headTurn: 15,
+    headTilt: 4,
+    footPoint: 38,
+    bodyPitch: 3,
+    grip: 0.08
+  }
+];
+var DURATION = 1.4;
+var BASE_PITCH = 3;
+var swim_default = defineAnimation({
+  slug: "swim",
+  name: "Swim",
+  clip: "Swim",
+  subcategory: "animations",
+  kind: "loop",
+  duration: DURATION,
+  keys: [...POSES, { ...POSES[0], t: 1 }].map((pose) => referenceKey(pose, DURATION, BASE_PITCH))
+});
+
+// ../core-library/dist/avatar-appearance/animations/swim-breast.js
+var POSES2 = [
+  {
+    t: 0,
+    leftUpperArm: [0.03, 1, 0],
+    leftForearm: [0.01, 1, 0],
+    rightUpperArm: [-0.03, 1, 0],
+    rightForearm: [-0.01, 1, 0],
+    leftThigh: [0.02, -1, 0],
+    leftShin: [0.01, -1, 0],
+    rightThigh: [-0.02, -1, 0],
+    rightShin: [-0.01, -1, 0],
+    bodyRoll: 0,
+    spineBend: 0,
+    headTurn: 0,
+    headTilt: 8,
+    footPoint: 50,
+    bodyPitch: 2,
+    grip: 0.05
+  },
+  {
+    t: 0.125,
+    leftUpperArm: [0.35, 0.93, 0.08],
+    leftForearm: [0.55, 0.82, 0.15],
+    rightUpperArm: [-0.35, 0.93, 0.08],
+    rightForearm: [-0.55, 0.82, 0.15],
+    leftThigh: [0.02, -1, 0],
+    leftShin: [0.01, -1, 0],
+    rightThigh: [-0.02, -1, 0],
+    rightShin: [-0.01, -1, 0],
+    bodyRoll: 0,
+    spineBend: 2,
+    headTurn: 0,
+    headTilt: 5,
+    footPoint: 48,
+    bodyPitch: 3,
+    grip: 0.05
+  },
+  {
+    t: 0.25,
+    leftUpperArm: [0.62, 0.75, 0.2],
+    leftForearm: [0.38, 0.45, 0.81],
+    rightUpperArm: [-0.62, 0.75, 0.2],
+    rightForearm: [-0.38, 0.45, 0.81],
+    leftThigh: [0.02, -1, 0],
+    leftShin: [0.01, -1, 0],
+    rightThigh: [-0.02, -1, 0],
+    rightShin: [-0.01, -1, 0],
+    bodyRoll: 0,
+    spineBend: -4,
+    headTurn: 0,
+    headTilt: 0,
+    footPoint: 45,
+    bodyPitch: 5,
+    grip: 0.08
+  },
+  {
+    t: 0.375,
+    leftUpperArm: [0.52, 0.45, 0.45],
+    leftForearm: [-0.18, 0.28, 0.94],
+    rightUpperArm: [-0.52, 0.45, 0.45],
+    rightForearm: [0.18, 0.28, 0.94],
+    leftThigh: [0.1, -0.96, 0.15],
+    leftShin: [0.08, -0.75, -0.45],
+    rightThigh: [-0.1, -0.96, 0.15],
+    rightShin: [-0.08, -0.75, -0.45],
+    bodyRoll: 0,
+    spineBend: -10,
+    headTurn: 0,
+    headTilt: -8,
+    footPoint: 35,
+    bodyPitch: 8,
+    grip: 0.08
+  },
+  {
+    t: 0.5,
+    leftUpperArm: [0.22, 0.55, 0.35],
+    leftForearm: [-0.15, 0.62, 0.25],
+    rightUpperArm: [-0.22, 0.55, 0.35],
+    rightForearm: [0.15, 0.62, 0.25],
+    leftThigh: [0.25, -0.78, 0.2],
+    leftShin: [0.35, 0.15, -0.35],
+    rightThigh: [-0.25, -0.78, 0.2],
+    rightShin: [-0.35, 0.15, -0.35],
+    bodyRoll: 0,
+    spineBend: -12,
+    headTurn: 0,
+    headTilt: -12,
+    footPoint: 10,
+    bodyPitch: 10,
+    grip: 0.05
+  },
+  {
+    t: 0.625,
+    leftUpperArm: [0.1, 0.98, 0.05],
+    leftForearm: [0.04, 1, 0.02],
+    rightUpperArm: [-0.1, 0.98, 0.05],
+    rightForearm: [-0.04, 1, 0.02],
+    leftThigh: [0.38, -0.72, 0.15],
+    leftShin: [0.75, -0.35, 0.15],
+    rightThigh: [-0.38, -0.72, 0.15],
+    rightShin: [-0.75, -0.35, 0.15],
+    bodyRoll: 0,
+    spineBend: -5,
+    headTurn: 0,
+    headTilt: 2,
+    footPoint: 12,
+    bodyPitch: 6,
+    grip: 0.03
+  },
+  {
+    t: 0.75,
+    leftUpperArm: [0.03, 1, 0],
+    leftForearm: [0.01, 1, 0],
+    rightUpperArm: [-0.03, 1, 0],
+    rightForearm: [-0.01, 1, 0],
+    leftThigh: [0.3, -0.92, 0.05],
+    leftShin: [0.55, -0.82, -0.05],
+    rightThigh: [-0.3, -0.92, 0.05],
+    rightShin: [-0.55, -0.82, -0.05],
+    bodyRoll: 0,
+    spineBend: 0,
+    headTurn: 0,
+    headTilt: 7,
+    footPoint: 35,
+    bodyPitch: 3,
+    grip: 0.02
+  },
+  {
+    t: 0.875,
+    leftUpperArm: [0.03, 1, 0],
+    leftForearm: [0.01, 1, 0],
+    rightUpperArm: [-0.03, 1, 0],
+    rightForearm: [-0.01, 1, 0],
+    leftThigh: [0.04, -1, 0],
+    leftShin: [0.03, -1, 0],
+    rightThigh: [-0.04, -1, 0],
+    rightShin: [-0.03, -1, 0],
+    bodyRoll: 0,
+    spineBend: 0,
+    headTurn: 0,
+    headTilt: 8,
+    footPoint: 52,
+    bodyPitch: 2,
+    grip: 0.02
+  }
+];
+var DURATION2 = 1.8;
+var BASE_PITCH2 = 5;
+var swim_breast_default = defineAnimation({
+  slug: "swim-breast",
+  name: "Breaststroke",
+  clip: "SwimBreast",
+  subcategory: "animations",
+  kind: "loop",
+  duration: DURATION2,
+  keys: [...POSES2, { ...POSES2[0], t: 1 }].map((pose) => referenceKey(pose, DURATION2, BASE_PITCH2))
+});
+
+// ../core-library/dist/avatar-appearance/animations/walk.js
+var walk_default = defineAnimation({
+  slug: "walk",
+  name: "Walk",
+  clip: "Walk",
+  subcategory: "animations",
+  kind: "loop",
+  duration: 1,
+  keys: gait(1, { leg: 28, knee: 45, arm: 24, elbow: 14, lean: 3, bob: 0.03 })
+});
+
+// ../core-library/dist/avatar-appearance/animations/backpedal.js
+var POSES3 = [
+  // left-support: Left leg supports the body while the right knee lifts; torso stays slightly behind the hips and eyes remain forward.
+  { t: 0, leftUpperArm: [0.04, -0.66, 0.75], leftForearm: [0.02, -0.86, 0.5], rightUpperArm: [-0.04, -0.78, -0.62], rightForearm: [-0.02, -0.95, -0.31], leftThigh: [0.06, -0.92, -0.39], leftShin: [0.03, -0.99, 0.1], rightThigh: [-0.08, -0.55, 0.83], rightShin: [-0.04, -0.78, -0.62], leftPalm: [0.08, 0.03, -0.99], rightPalm: [-0.08, 0.03, -0.99], bodyRoll: 2, spineBend: -3, headTurn: 0, headTilt: 0, footPoint: 8, bodyPitch: 96, grip: 0.16, hipsY: -0.05 },
+  // right-reach-back: Right foot reaches backward for a short controlled step; the character avoids overstriding behind the body.
+  { t: 0.12, leftUpperArm: [0.04, -0.72, 0.69], leftForearm: [0.02, -0.9, 0.43], rightUpperArm: [-0.04, -0.68, -0.73], rightForearm: [-0.02, -0.89, -0.45], leftThigh: [0.05, -0.97, -0.23], leftShin: [0.02, -0.99, 0.08], rightThigh: [-0.08, -0.66, -0.75], rightShin: [-0.04, -0.93, -0.36], leftPalm: [0.08, 0.03, -0.99], rightPalm: [-0.08, 0.03, -0.99], bodyRoll: 1, spineBend: -4, headTurn: 0, headTilt: 0, footPoint: 5, bodyPitch: 97, grip: 0.16, hipsY: -0.07 },
+  // right-contact: Right foot accepts weight behind the body as the left knee lifts; arms counter-swing naturally.
+  { t: 0.24, leftUpperArm: [0.04, -0.78, -0.62], leftForearm: [0.02, -0.95, -0.31], rightUpperArm: [-0.04, -0.66, 0.75], rightForearm: [-0.02, -0.86, 0.5], leftThigh: [0.08, -0.55, 0.83], leftShin: [0.04, -0.78, -0.62], rightThigh: [-0.06, -0.92, -0.39], rightShin: [-0.03, -0.99, 0.1], leftPalm: [0.08, 0.03, -0.99], rightPalm: [-0.08, 0.03, -0.99], bodyRoll: -2, spineBend: -3, headTurn: 0, headTilt: 0, footPoint: 8, bodyPitch: 96, grip: 0.16, hipsY: -0.05 },
+  // right-load: Weight compresses briefly over the right leg; knees stay soft and the torso remains controlled.
+  { t: 0.36, leftUpperArm: [0.04, -0.72, -0.69], leftForearm: [0.02, -0.9, -0.43], rightUpperArm: [-0.04, -0.74, 0.67], rightForearm: [-0.02, -0.91, 0.41], leftThigh: [0.08, -0.48, 0.87], leftShin: [0.04, -0.72, -0.69], rightThigh: [-0.05, -0.97, -0.23], rightShin: [-0.02, -0.99, 0.08], leftPalm: [0.08, 0.03, -0.99], rightPalm: [-0.08, 0.03, -0.99], bodyRoll: -1, spineBend: -4, headTurn: 0, headTilt: 0, footPoint: 6, bodyPitch: 97, grip: 0.16, hipsY: -0.08 },
+  // left-flight: A brief low flight transfers the body backward while the left foot prepares for the next contact.
+  { t: 0.5, leftUpperArm: [0.04, -0.65, 0.76], leftForearm: [0.02, -0.84, 0.54], rightUpperArm: [-0.04, -0.79, -0.61], rightForearm: [-0.02, -0.95, -0.3], leftThigh: [0.08, -0.66, -0.75], leftShin: [0.04, -0.9, -0.43], rightThigh: [-0.06, -0.88, 0.47], rightShin: [-0.03, -0.99, -0.1], leftPalm: [0.08, 0.03, -0.99], rightPalm: [-0.08, 0.03, -0.99], bodyRoll: 0, spineBend: -3, headTurn: 0, headTilt: 0, footPoint: 10, bodyPitch: 96, grip: 0.15, hipsY: -0.03 },
+  // left-reach-back: Left foot reaches backward while the right leg finishes support; steps remain short for stability.
+  { t: 0.62, leftUpperArm: [0.04, -0.68, -0.73], leftForearm: [0.02, -0.89, -0.45], rightUpperArm: [-0.04, -0.72, 0.69], rightForearm: [-0.02, -0.9, 0.43], leftThigh: [0.08, -0.66, -0.75], leftShin: [0.04, -0.93, -0.36], rightThigh: [-0.05, -0.97, -0.23], rightShin: [-0.02, -0.99, 0.08], leftPalm: [0.08, 0.03, -0.99], rightPalm: [-0.08, 0.03, -0.99], bodyRoll: -1, spineBend: -4, headTurn: 0, headTilt: 0, footPoint: 5, bodyPitch: 97, grip: 0.16, hipsY: -0.07 },
+  // left-contact-two: Left foot accepts the next backward step while the right knee comes forward to reset the stride.
+  { t: 0.74, leftUpperArm: [0.04, -0.66, 0.75], leftForearm: [0.02, -0.86, 0.5], rightUpperArm: [-0.04, -0.78, -0.62], rightForearm: [-0.02, -0.95, -0.31], leftThigh: [0.06, -0.92, -0.39], leftShin: [0.03, -0.99, 0.1], rightThigh: [-0.08, -0.55, 0.83], rightShin: [-0.04, -0.78, -0.62], leftPalm: [0.08, 0.03, -0.99], rightPalm: [-0.08, 0.03, -0.99], bodyRoll: 2, spineBend: -3, headTurn: 0, headTilt: 0, footPoint: 8, bodyPitch: 96, grip: 0.16, hipsY: -0.05 },
+  // left-load: Left leg compresses under load while the right knee rises for the next backward placement.
+  { t: 0.86, leftUpperArm: [0.04, -0.74, 0.67], leftForearm: [0.02, -0.91, 0.41], rightUpperArm: [-0.04, -0.72, -0.69], rightForearm: [-0.02, -0.9, -0.43], leftThigh: [0.05, -0.97, -0.23], leftShin: [0.02, -0.99, 0.08], rightThigh: [-0.08, -0.48, 0.87], rightShin: [-0.04, -0.72, -0.69], leftPalm: [0.08, 0.03, -0.99], rightPalm: [-0.08, 0.03, -0.99], bodyRoll: 1, spineBend: -4, headTurn: 0, headTilt: 0, footPoint: 6, bodyPitch: 97, grip: 0.16, hipsY: -0.08 },
+  // cycle-return: The stride settles back toward the opening support pose while the head stays fixed on what is ahead.
+  { t: 0.94, leftUpperArm: [0.04, -0.67, 0.74], leftForearm: [0.02, -0.87, 0.49], rightUpperArm: [-0.04, -0.77, -0.63], rightForearm: [-0.02, -0.94, -0.33], leftThigh: [0.06, -0.93, -0.36], leftShin: [0.03, -0.99, 0.09], rightThigh: [-0.08, -0.54, 0.84], rightShin: [-0.04, -0.77, -0.64], leftPalm: [0.08, 0.03, -0.99], rightPalm: [-0.08, 0.03, -0.99], bodyRoll: 2, spineBend: -3, headTurn: 0, headTilt: 0, footPoint: 8, bodyPitch: 96, grip: 0.16, hipsY: -0.05 },
+  // left-support-loop: Exact opening pose repeated to close the backpedal loop seamlessly.
+  { t: 1, leftUpperArm: [0.04, -0.66, 0.75], leftForearm: [0.02, -0.86, 0.5], rightUpperArm: [-0.04, -0.78, -0.62], rightForearm: [-0.02, -0.95, -0.31], leftThigh: [0.06, -0.92, -0.39], leftShin: [0.03, -0.99, 0.1], rightThigh: [-0.08, -0.55, 0.83], rightShin: [-0.04, -0.78, -0.62], leftPalm: [0.08, 0.03, -0.99], rightPalm: [-0.08, 0.03, -0.99], bodyRoll: 2, spineBend: -3, headTurn: 0, headTilt: 0, footPoint: 8, bodyPitch: 96, grip: 0.16, hipsY: -0.05 }
+];
+var DURATION3 = 0.95;
+var backpedal_default = defineAnimation({
+  slug: "backpedal",
+  name: "Backpedal",
+  clip: "Backpedal",
+  subcategory: "animations",
+  kind: "loop",
+  duration: DURATION3,
+  keys: POSES3.map((pose) => referenceKey(pose, DURATION3, 90))
+});
+
+// ../core-library/dist/avatar-appearance/animations/crouch-idle.js
+var POSES4 = [
+  // neutral-crouch: Balanced low crouch with knees tracking over the feet, relaxed ready arms and steady forward gaze.
+  { t: 0, leftUpperArm: [0.1, -0.82, 0.56], leftForearm: [0.05, -0.73, 0.68], rightUpperArm: [-0.1, -0.82, 0.56], rightForearm: [-0.05, -0.73, 0.68], leftThigh: [0.18, -0.5, 0.85], leftShin: [0.08, -0.79, -0.61], rightThigh: [-0.18, -0.5, 0.85], rightShin: [-0.08, -0.79, -0.61], leftPalm: [0.08, 0.08, -0.99], rightPalm: [-0.08, 0.08, -0.99], bodyRoll: 0, spineBend: 8, headTurn: 0, headTilt: -1, footPoint: 2, bodyPitch: 74, grip: 0.1, hipsY: -0.46 },
+  // inhale: Chest opens slightly on the inhale while the hips remain low and balanced.
+  { t: 0.14, leftUpperArm: [0.1, -0.82, 0.56], leftForearm: [0.05, -0.73, 0.68], rightUpperArm: [-0.1, -0.82, 0.56], rightForearm: [-0.05, -0.73, 0.68], leftThigh: [0.18, -0.5, 0.85], leftShin: [0.08, -0.79, -0.61], rightThigh: [-0.18, -0.5, 0.85], rightShin: [-0.08, -0.79, -0.61], leftPalm: [0.08, 0.08, -0.99], rightPalm: [-0.08, 0.08, -0.99], bodyRoll: 0.8, spineBend: 7.5, headTurn: 1, headTilt: -1, footPoint: 2, bodyPitch: 74, grip: 0.1, hipsY: -0.455 },
+  // weight-left: A very small weight shift moves toward the left leg while the head subtly checks left.
+  { t: 0.29, leftUpperArm: [0.1, -0.82, 0.56], leftForearm: [0.05, -0.73, 0.68], rightUpperArm: [-0.1, -0.82, 0.56], rightForearm: [-0.05, -0.73, 0.68], leftThigh: [0.16, -0.52, 0.84], leftShin: [0.08, -0.79, -0.61], rightThigh: [-0.2, -0.48, 0.85], rightShin: [-0.08, -0.79, -0.61], leftPalm: [0.08, 0.08, -0.99], rightPalm: [-0.08, 0.08, -0.99], bodyRoll: 1.8, spineBend: 8, headTurn: 2, headTilt: -1, footPoint: 2, bodyPitch: 74, grip: 0.1, hipsY: -0.458 },
+  // center: Weight returns to center; knees and elbows remain soft rather than locked.
+  { t: 0.43, leftUpperArm: [0.1, -0.82, 0.56], leftForearm: [0.05, -0.73, 0.68], rightUpperArm: [-0.1, -0.82, 0.56], rightForearm: [-0.05, -0.73, 0.68], leftThigh: [0.18, -0.5, 0.85], leftShin: [0.08, -0.79, -0.61], rightThigh: [-0.18, -0.5, 0.85], rightShin: [-0.08, -0.79, -0.61], leftPalm: [0.08, 0.08, -0.99], rightPalm: [-0.08, 0.08, -0.99], bodyRoll: 0, spineBend: 8.5, headTurn: 0, headTilt: -1, footPoint: 2, bodyPitch: 74, grip: 0.1, hipsY: -0.465 },
+  // exhale: The body settles a few millimetres on the exhale with relaxed shoulders.
+  { t: 0.57, leftUpperArm: [0.1, -0.82, 0.56], leftForearm: [0.05, -0.73, 0.68], rightUpperArm: [-0.1, -0.82, 0.56], rightForearm: [-0.05, -0.73, 0.68], leftThigh: [0.18, -0.5, 0.85], leftShin: [0.08, -0.79, -0.61], rightThigh: [-0.18, -0.5, 0.85], rightShin: [-0.08, -0.79, -0.61], leftPalm: [0.08, 0.08, -0.99], rightPalm: [-0.08, 0.08, -0.99], bodyRoll: -0.8, spineBend: 9, headTurn: -1, headTilt: -1, footPoint: 2, bodyPitch: 74, grip: 0.1, hipsY: -0.472 },
+  // weight-right: A subtle weight shift moves toward the right leg while maintaining the crouched base.
+  { t: 0.71, leftUpperArm: [0.1, -0.82, 0.56], leftForearm: [0.05, -0.73, 0.68], rightUpperArm: [-0.1, -0.82, 0.56], rightForearm: [-0.05, -0.73, 0.68], leftThigh: [0.2, -0.48, 0.85], leftShin: [0.08, -0.79, -0.61], rightThigh: [-0.16, -0.52, 0.84], rightShin: [-0.08, -0.79, -0.61], leftPalm: [0.08, 0.08, -0.99], rightPalm: [-0.08, 0.08, -0.99], bodyRoll: -1.8, spineBend: 8, headTurn: -2, headTilt: -1, footPoint: 2, bodyPitch: 74, grip: 0.1, hipsY: -0.468 },
+  // return: Torso, head and hips ease back toward the neutral crouch for a seamless loop.
+  { t: 0.86, leftUpperArm: [0.1, -0.82, 0.56], leftForearm: [0.05, -0.73, 0.68], rightUpperArm: [-0.1, -0.82, 0.56], rightForearm: [-0.05, -0.73, 0.68], leftThigh: [0.18, -0.5, 0.85], leftShin: [0.08, -0.79, -0.61], rightThigh: [-0.18, -0.5, 0.85], rightShin: [-0.08, -0.79, -0.61], leftPalm: [0.08, 0.08, -0.99], rightPalm: [-0.08, 0.08, -0.99], bodyRoll: -0.5, spineBend: 8.2, headTurn: -0.5, headTilt: -1, footPoint: 2, bodyPitch: 74, grip: 0.1, hipsY: -0.462 },
+  // neutral-crouch: Same body configuration as pose one, closing the crouch-idle loop cleanly.
+  { t: 1, leftUpperArm: [0.1, -0.82, 0.56], leftForearm: [0.05, -0.73, 0.68], rightUpperArm: [-0.1, -0.82, 0.56], rightForearm: [-0.05, -0.73, 0.68], leftThigh: [0.18, -0.5, 0.85], leftShin: [0.08, -0.79, -0.61], rightThigh: [-0.18, -0.5, 0.85], rightShin: [-0.08, -0.79, -0.61], leftPalm: [0.08, 0.08, -0.99], rightPalm: [-0.08, 0.08, -0.99], bodyRoll: 0, spineBend: 8, headTurn: 0, headTilt: -1, footPoint: 2, bodyPitch: 74, grip: 0.1, hipsY: -0.46 }
+];
+var DURATION4 = 2.2;
+var crouch_idle_default = defineAnimation({
+  slug: "crouch-idle",
+  name: "Crouch Idle",
+  clip: "CrouchIdle",
+  subcategory: "animations",
+  kind: "loop",
+  duration: DURATION4,
+  keys: POSES4.map((pose) => referenceKey(pose, DURATION4, 90))
+});
+
+// ../core-library/dist/avatar-appearance/animations/crouch-walk.js
+var POSES5 = [
+  // left-contact: Left foot contacts ahead while the right leg trails; right arm leads and left arm counters behind.
+  { t: 0, leftUpperArm: [0.04, -0.72, -0.69], leftForearm: [0.02, -0.93, -0.36], rightUpperArm: [-0.04, -0.66, 0.75], rightForearm: [-0.02, -0.82, 0.57], leftThigh: [0.1, -0.7, 0.71], leftShin: [0.05, -0.98, -0.18], rightThigh: [-0.1, -0.7, -0.71], rightShin: [-0.05, -0.74, 0.67], leftPalm: [0.08, 0.02, -0.99], rightPalm: [-0.08, 0.02, -0.99], bodyRoll: -2, spineBend: 10, headTurn: 0, headTilt: -2, footPoint: 3, bodyPitch: 72, grip: 0.12, hipsY: -0.43 },
+  // left-load: Weight settles onto the bent left leg; hips stay low while the rear foot begins to unload.
+  { t: 0.11, leftUpperArm: [0.04, -0.76, -0.65], leftForearm: [0.02, -0.95, -0.3], rightUpperArm: [-0.04, -0.7, 0.71], rightForearm: [-0.02, -0.85, 0.53], leftThigh: [0.09, -0.82, 0.56], leftShin: [0.04, -0.93, -0.36], rightThigh: [-0.09, -0.78, -0.62], rightShin: [-0.04, -0.62, 0.78], leftPalm: [0.08, 0.02, -0.99], rightPalm: [-0.08, 0.02, -0.99], bodyRoll: -1, spineBend: 11, headTurn: 0, headTilt: -2, footPoint: 2, bodyPitch: 71, grip: 0.12, hipsY: -0.47 },
+  // left-midstance: Body passes over the left foot as the right knee begins its low forward recovery.
+  { t: 0.22, leftUpperArm: [0.03, -0.82, -0.57], leftForearm: [0.02, -0.97, -0.24], rightUpperArm: [-0.03, -0.77, 0.64], rightForearm: [-0.02, -0.89, 0.46], leftThigh: [0.07, -0.94, 0.34], leftShin: [0.03, -0.99, -0.1], rightThigh: [-0.08, -0.6, 0.8], rightShin: [-0.04, -0.78, 0.62], leftPalm: [0.07, 0.03, -0.99], rightPalm: [-0.07, 0.03, -0.99], bodyRoll: 0, spineBend: 10, headTurn: 1, headTilt: -1, footPoint: 5, bodyPitch: 72, grip: 0.11, hipsY: -0.45 },
+  // right-swing: Right knee advances without lifting high; arms reverse naturally while the left leg pushes the body forward.
+  { t: 0.33, leftUpperArm: [0.04, -0.68, 0.73], leftForearm: [0.02, -0.84, 0.54], rightUpperArm: [-0.04, -0.75, -0.66], rightForearm: [-0.02, -0.94, -0.34], leftThigh: [0.08, -0.78, -0.62], leftShin: [0.03, -0.98, 0.18], rightThigh: [-0.1, -0.55, 0.83], rightShin: [-0.05, -0.72, -0.69], leftPalm: [0.08, 0.02, -0.99], rightPalm: [-0.08, 0.02, -0.99], bodyRoll: 2, spineBend: 10, headTurn: 0, headTilt: -2, footPoint: 8, bodyPitch: 72, grip: 0.12, hipsY: -0.43 },
+  // right-contact: Right foot contacts ahead; left leg trails and the left arm leads as a counter-swing.
+  { t: 0.44, leftUpperArm: [0.04, -0.66, 0.75], leftForearm: [0.02, -0.82, 0.57], rightUpperArm: [-0.04, -0.72, -0.69], rightForearm: [-0.02, -0.93, -0.36], leftThigh: [0.1, -0.7, -0.71], leftShin: [0.05, -0.74, 0.67], rightThigh: [-0.1, -0.7, 0.71], rightShin: [-0.05, -0.98, -0.18], leftPalm: [0.08, 0.02, -0.99], rightPalm: [-0.08, 0.02, -0.99], bodyRoll: 2, spineBend: 10, headTurn: 0, headTilt: -2, footPoint: 3, bodyPitch: 72, grip: 0.12, hipsY: -0.43 },
+  // right-load: Weight settles onto the right leg; the low crouched silhouette stays stable and compact.
+  { t: 0.56, leftUpperArm: [0.04, -0.7, 0.71], leftForearm: [0.02, -0.85, 0.53], rightUpperArm: [-0.04, -0.76, -0.65], rightForearm: [-0.02, -0.95, -0.3], leftThigh: [0.09, -0.78, -0.62], leftShin: [0.04, -0.62, 0.78], rightThigh: [-0.09, -0.82, 0.56], rightShin: [-0.04, -0.93, -0.36], leftPalm: [0.08, 0.02, -0.99], rightPalm: [-0.08, 0.02, -0.99], bodyRoll: 1, spineBend: 11, headTurn: 0, headTilt: -2, footPoint: 2, bodyPitch: 71, grip: 0.12, hipsY: -0.47 },
+  // right-midstance: Body passes over the right foot while the left knee starts its low forward recovery.
+  { t: 0.67, leftUpperArm: [0.03, -0.77, 0.64], leftForearm: [0.02, -0.89, 0.46], rightUpperArm: [-0.03, -0.82, -0.57], rightForearm: [-0.02, -0.97, -0.24], leftThigh: [0.08, -0.6, 0.8], leftShin: [0.04, -0.78, 0.62], rightThigh: [-0.07, -0.94, 0.34], rightShin: [-0.03, -0.99, -0.1], leftPalm: [0.07, 0.03, -0.99], rightPalm: [-0.07, 0.03, -0.99], bodyRoll: 0, spineBend: 10, headTurn: -1, headTilt: -1, footPoint: 5, bodyPitch: 72, grip: 0.11, hipsY: -0.45 },
+  // left-swing: Left knee swings forward close to the ground while the right leg provides the final push.
+  { t: 0.78, leftUpperArm: [0.04, -0.75, -0.66], leftForearm: [0.02, -0.94, -0.34], rightUpperArm: [-0.04, -0.68, 0.73], rightForearm: [-0.02, -0.84, 0.54], leftThigh: [0.1, -0.55, 0.83], leftShin: [0.05, -0.72, -0.69], rightThigh: [-0.08, -0.78, -0.62], rightShin: [-0.03, -0.98, 0.18], leftPalm: [0.08, 0.02, -0.99], rightPalm: [-0.08, 0.02, -0.99], bodyRoll: -2, spineBend: 10, headTurn: 0, headTilt: -2, footPoint: 8, bodyPitch: 72, grip: 0.12, hipsY: -0.43 },
+  // left-reach: Left foot reaches toward the next contact while the torso remains quiet and forward-focused.
+  { t: 0.89, leftUpperArm: [0.04, -0.72, -0.69], leftForearm: [0.02, -0.93, -0.36], rightUpperArm: [-0.04, -0.66, 0.75], rightForearm: [-0.02, -0.82, 0.57], leftThigh: [0.1, -0.64, 0.76], leftShin: [0.05, -0.9, -0.43], rightThigh: [-0.1, -0.75, -0.65], rightShin: [-0.05, -0.88, 0.47], leftPalm: [0.08, 0.02, -0.99], rightPalm: [-0.08, 0.02, -0.99], bodyRoll: -2, spineBend: 10, headTurn: 0, headTilt: -2, footPoint: 4, bodyPitch: 72, grip: 0.12, hipsY: -0.44 },
+  // left-contact-loop: Exact return to the opening left-contact pose for seamless looping.
+  { t: 1, leftUpperArm: [0.04, -0.72, -0.69], leftForearm: [0.02, -0.93, -0.36], rightUpperArm: [-0.04, -0.66, 0.75], rightForearm: [-0.02, -0.82, 0.57], leftThigh: [0.1, -0.7, 0.71], leftShin: [0.05, -0.98, -0.18], rightThigh: [-0.1, -0.7, -0.71], rightShin: [-0.05, -0.74, 0.67], leftPalm: [0.08, 0.02, -0.99], rightPalm: [-0.08, 0.02, -0.99], bodyRoll: -2, spineBend: 10, headTurn: 0, headTilt: -2, footPoint: 3, bodyPitch: 72, grip: 0.12, hipsY: -0.43 }
+];
+var DURATION5 = 1.15;
+var crouch_walk_default = defineAnimation({
+  slug: "crouch-walk",
+  name: "Crouch Walk",
+  clip: "CrouchWalk",
+  subcategory: "animations",
+  kind: "loop",
+  duration: DURATION5,
+  keys: POSES5.map((pose) => referenceKey(pose, DURATION5, 90))
+});
+
+// ../core-library/dist/avatar-appearance/animations/sneak.js
+var POSES6 = [
+  // left-contact: Left foot touches down softly ahead; torso stays low and quiet while the raised left hand balances the stealthy step.
+  { t: 0, leftUpperArm: [0.08, -0.58, 0.81], leftForearm: [0.1, -0.3, 0.95], rightUpperArm: [-0.08, -0.78, -0.62], rightForearm: [-0.06, -0.94, -0.34], leftThigh: [0.08, -0.72, 0.69], leftShin: [0.04, -0.99, -0.12], rightThigh: [-0.08, -0.78, -0.62], rightShin: [-0.04, -0.68, 0.73], leftPalm: [0.1, 0.05, -0.99], rightPalm: [-0.1, 0.05, -0.99], bodyRoll: -2, spineBend: 12, headTurn: 2, headTilt: -3, footPoint: 2, bodyPitch: 70, grip: 0.08, hipsY: -0.28 },
+  // left-load: Weight rolls quietly onto the left leg; knees remain flexed to prevent vertical bounce.
+  { t: 0.12, leftUpperArm: [0.07, -0.62, 0.78], leftForearm: [0.09, -0.34, 0.94], rightUpperArm: [-0.07, -0.82, -0.56], rightForearm: [-0.05, -0.96, -0.27], leftThigh: [0.07, -0.84, 0.54], leftShin: [0.03, -0.95, -0.31], rightThigh: [-0.07, -0.82, -0.56], rightShin: [-0.03, -0.57, 0.82], leftPalm: [0.1, 0.05, -0.99], rightPalm: [-0.1, 0.05, -0.99], bodyRoll: -1, spineBend: 13, headTurn: 1, headTilt: -3, footPoint: 1, bodyPitch: 69, grip: 0.08, hipsY: -0.31 },
+  // left-midstance: Pelvis passes over the planted left foot as the right leg begins a controlled low recovery.
+  { t: 0.24, leftUpperArm: [0.06, -0.7, 0.71], leftForearm: [0.08, -0.43, 0.9], rightUpperArm: [-0.06, -0.75, 0.66], rightForearm: [-0.05, -0.9, 0.43], leftThigh: [0.05, -0.96, 0.27], leftShin: [0.02, -1, -0.05], rightThigh: [-0.07, -0.6, 0.8], rightShin: [-0.04, -0.78, 0.62], leftPalm: [0.08, 0.05, -0.99], rightPalm: [-0.08, 0.05, -0.99], bodyRoll: 0, spineBend: 12, headTurn: 0, headTilt: -2, footPoint: 3, bodyPitch: 70, grip: 0.07, hipsY: -0.29 },
+  // right-reach: Right leg reaches forward with the foot kept close to the floor; right hand rises naturally as the left arm counters.
+  { t: 0.36, leftUpperArm: [0.06, -0.78, -0.62], leftForearm: [0.05, -0.93, -0.36], rightUpperArm: [-0.08, -0.57, 0.82], rightForearm: [-0.1, -0.29, 0.95], leftThigh: [0.07, -0.82, -0.57], leftShin: [0.03, -0.97, 0.24], rightThigh: [-0.08, -0.55, 0.83], rightShin: [-0.04, -0.8, -0.6], leftPalm: [0.08, 0.04, -0.99], rightPalm: [-0.1, 0.05, -0.99], bodyRoll: 2, spineBend: 12, headTurn: -2, headTilt: -3, footPoint: 6, bodyPitch: 70, grip: 0.08, hipsY: -0.27 },
+  // right-contact: Right foot makes a soft controlled contact; left leg trails and the hands remain relaxed rather than clenched.
+  { t: 0.5, leftUpperArm: [0.08, -0.78, -0.62], leftForearm: [0.06, -0.94, -0.34], rightUpperArm: [-0.08, -0.58, 0.81], rightForearm: [-0.1, -0.3, 0.95], leftThigh: [0.08, -0.78, -0.62], leftShin: [0.04, -0.68, 0.73], rightThigh: [-0.08, -0.72, 0.69], rightShin: [-0.04, -0.99, -0.12], leftPalm: [0.1, 0.05, -0.99], rightPalm: [-0.1, 0.05, -0.99], bodyRoll: 2, spineBend: 12, headTurn: -2, headTilt: -3, footPoint: 2, bodyPitch: 70, grip: 0.08, hipsY: -0.28 },
+  // right-load: Weight settles onto the right leg with minimal vertical movement and controlled knee flexion.
+  { t: 0.62, leftUpperArm: [0.07, -0.82, -0.56], leftForearm: [0.05, -0.96, -0.27], rightUpperArm: [-0.07, -0.62, 0.78], rightForearm: [-0.09, -0.34, 0.94], leftThigh: [0.07, -0.82, -0.56], leftShin: [0.03, -0.57, 0.82], rightThigh: [-0.07, -0.84, 0.54], rightShin: [-0.03, -0.95, -0.31], leftPalm: [0.1, 0.05, -0.99], rightPalm: [-0.1, 0.05, -0.99], bodyRoll: 1, spineBend: 13, headTurn: -1, headTilt: -3, footPoint: 1, bodyPitch: 69, grip: 0.08, hipsY: -0.31 },
+  // right-midstance: Pelvis passes over the right foot while the left knee begins its low, quiet recovery.
+  { t: 0.74, leftUpperArm: [0.06, -0.75, 0.66], leftForearm: [0.05, -0.9, 0.43], rightUpperArm: [-0.06, -0.7, 0.71], rightForearm: [-0.08, -0.43, 0.9], leftThigh: [0.07, -0.6, 0.8], leftShin: [0.04, -0.78, 0.62], rightThigh: [-0.05, -0.96, 0.27], rightShin: [-0.02, -1, -0.05], leftPalm: [0.08, 0.05, -0.99], rightPalm: [-0.08, 0.05, -0.99], bodyRoll: 0, spineBend: 12, headTurn: 0, headTilt: -2, footPoint: 3, bodyPitch: 70, grip: 0.07, hipsY: -0.29 },
+  // left-reach: Left foot reaches toward the next quiet contact while the gaze checks slightly toward the direction of travel.
+  { t: 0.86, leftUpperArm: [0.08, -0.57, 0.82], leftForearm: [0.1, -0.29, 0.95], rightUpperArm: [-0.06, -0.78, -0.62], rightForearm: [-0.05, -0.93, -0.36], leftThigh: [0.08, -0.55, 0.83], leftShin: [0.04, -0.8, -0.6], rightThigh: [-0.07, -0.82, -0.57], rightShin: [-0.03, -0.97, 0.24], leftPalm: [0.1, 0.05, -0.99], rightPalm: [-0.08, 0.04, -0.99], bodyRoll: -2, spineBend: 12, headTurn: 2, headTilt: -3, footPoint: 6, bodyPitch: 70, grip: 0.08, hipsY: -0.27 },
+  // left-precontact: Left foot lowers gently toward the floor as the body prepares to repeat the stealth step.
+  { t: 0.94, leftUpperArm: [0.08, -0.59, 0.8], leftForearm: [0.1, -0.31, 0.94], rightUpperArm: [-0.07, -0.79, -0.61], rightForearm: [-0.05, -0.94, -0.33], leftThigh: [0.08, -0.66, 0.75], leftShin: [0.04, -0.93, -0.36], rightThigh: [-0.08, -0.8, -0.59], rightShin: [-0.04, -0.76, 0.65], leftPalm: [0.1, 0.05, -0.99], rightPalm: [-0.09, 0.04, -0.99], bodyRoll: -2, spineBend: 12, headTurn: 2, headTilt: -3, footPoint: 3, bodyPitch: 70, grip: 0.08, hipsY: -0.28 },
+  // left-contact-loop: Exact return to the opening left-contact pose for a seamless sneak loop.
+  { t: 1, leftUpperArm: [0.08, -0.58, 0.81], leftForearm: [0.1, -0.3, 0.95], rightUpperArm: [-0.08, -0.78, -0.62], rightForearm: [-0.06, -0.94, -0.34], leftThigh: [0.08, -0.72, 0.69], leftShin: [0.04, -0.99, -0.12], rightThigh: [-0.08, -0.78, -0.62], rightShin: [-0.04, -0.68, 0.73], leftPalm: [0.1, 0.05, -0.99], rightPalm: [-0.1, 0.05, -0.99], bodyRoll: -2, spineBend: 12, headTurn: 2, headTilt: -3, footPoint: 2, bodyPitch: 70, grip: 0.08, hipsY: -0.28 }
+];
+var DURATION6 = 1.55;
+var sneak_default = defineAnimation({
+  slug: "sneak",
+  name: "Sneak",
+  clip: "Sneak",
+  subcategory: "animations",
+  kind: "loop",
+  duration: DURATION6,
+  keys: POSES6.map((pose) => referenceKey(pose, DURATION6, 90))
+});
+
+// ../core-library/dist/avatar-appearance/animations/strafe-left.js
+var POSES7 = [
+  // left-contact: Left foot plants toward the character's own left; torso stays mostly forward while the right leg prepares to follow.
+  { t: 0, leftUpperArm: [0.18, -0.78, 0.6], leftForearm: [0.12, -0.94, 0.32], rightUpperArm: [-0.14, -0.7, -0.7], rightForearm: [-0.08, -0.91, -0.4], leftThigh: [0.62, -0.77, 0.1], leftShin: [0.24, -0.96, -0.12], rightThigh: [-0.18, -0.91, -0.37], rightShin: [-0.1, -0.75, 0.65], leftPalm: [0.08, 0.04, -0.99], rightPalm: [-0.08, 0.04, -0.99], bodyRoll: 5, spineBend: 3, headTurn: -3, headTilt: 0, footPoint: 5, bodyPitch: 86, grip: 0.14, hipsY: -0.06 },
+  // left-load: Weight compresses over the left leg; pelvis shifts left while the chest remains oriented toward the front.
+  { t: 0.12, leftUpperArm: [0.14, -0.82, 0.55], leftForearm: [0.1, -0.95, 0.29], rightUpperArm: [-0.12, -0.75, -0.65], rightForearm: [-0.07, -0.93, -0.36], leftThigh: [0.42, -0.9, 0.08], leftShin: [0.15, -0.98, -0.1], rightThigh: [0.08, -0.72, 0.69], rightShin: [-0.04, -0.65, -0.76], leftPalm: [0.08, 0.04, -0.99], rightPalm: [-0.08, 0.04, -0.99], bodyRoll: 4, spineBend: 4, headTurn: -2, headTilt: 0, footPoint: 4, bodyPitch: 85, grip: 0.14, hipsY: -0.1 },
+  // right-cross: Right foot travels inward toward the left without crossing excessively; hips lead the lateral movement.
+  { t: 0.24, leftUpperArm: [0.08, -0.88, 0.47], leftForearm: [0.06, -0.97, 0.23], rightUpperArm: [-0.08, -0.82, -0.57], rightForearm: [-0.05, -0.95, -0.31], leftThigh: [0.12, -0.98, 0.12], leftShin: [0.05, -0.99, -0.06], rightThigh: [0.32, -0.73, 0.6], rightShin: [0.12, -0.86, -0.5], leftPalm: [0.07, 0.04, -0.99], rightPalm: [-0.07, 0.04, -0.99], bodyRoll: 2, spineBend: 3, headTurn: 0, headTilt: 0, footPoint: 8, bodyPitch: 87, grip: 0.13, hipsY: -0.05 },
+  // right-contact: Right foot catches the body underneath; the left leg immediately unloads for the next outward step.
+  { t: 0.36, leftUpperArm: [0.1, -0.72, -0.69], leftForearm: [0.06, -0.91, -0.41], rightUpperArm: [-0.14, -0.79, 0.6], rightForearm: [-0.1, -0.95, 0.29], leftThigh: [0.4, -0.88, -0.24], leftShin: [0.14, -0.95, 0.27], rightThigh: [0.06, -0.98, 0.18], rightShin: [0.02, -0.99, -0.08], leftPalm: [0.08, 0.04, -0.99], rightPalm: [-0.08, 0.04, -0.99], bodyRoll: 0, spineBend: 3, headTurn: 1, headTilt: 0, footPoint: 5, bodyPitch: 88, grip: 0.14, hipsY: -0.07 },
+  // left-drive: Left knee drives outward toward +x as the right leg pushes; arms counterbalance without turning the chest sideways.
+  { t: 0.5, leftUpperArm: [0.15, -0.7, 0.7], leftForearm: [0.1, -0.91, 0.4], rightUpperArm: [-0.1, -0.78, -0.62], rightForearm: [-0.06, -0.94, -0.34], leftThigh: [0.55, -0.78, 0.28], leftShin: [0.2, -0.88, -0.43], rightThigh: [-0.08, -0.97, -0.22], rightShin: [-0.04, -0.99, 0.1], leftPalm: [0.08, 0.04, -0.99], rightPalm: [-0.08, 0.04, -0.99], bodyRoll: -1, spineBend: 3, headTurn: 0, headTilt: 0, footPoint: 9, bodyPitch: 87, grip: 0.14, hipsY: -0.03 },
+  // left-reach: Left foot reaches laterally for the next plant while the body remains compact and ready to change direction.
+  { t: 0.62, leftUpperArm: [0.18, -0.76, 0.62], leftForearm: [0.12, -0.93, 0.34], rightUpperArm: [-0.13, -0.72, -0.68], rightForearm: [-0.08, -0.92, -0.39], leftThigh: [0.66, -0.74, 0.1], leftShin: [0.27, -0.95, -0.12], rightThigh: [-0.12, -0.96, -0.24], rightShin: [-0.06, -0.99, 0.08], leftPalm: [0.08, 0.04, -0.99], rightPalm: [-0.08, 0.04, -0.99], bodyRoll: 4, spineBend: 3, headTurn: -2, headTilt: 0, footPoint: 6, bodyPitch: 86, grip: 0.14, hipsY: -0.04 },
+  // left-contact-two: A second left-side plant continues the lateral cadence with the head still watching forward.
+  { t: 0.74, leftUpperArm: [0.18, -0.78, 0.6], leftForearm: [0.12, -0.94, 0.32], rightUpperArm: [-0.14, -0.7, -0.7], rightForearm: [-0.08, -0.91, -0.4], leftThigh: [0.62, -0.77, 0.1], leftShin: [0.24, -0.96, -0.12], rightThigh: [-0.18, -0.91, -0.37], rightShin: [-0.1, -0.75, 0.65], leftPalm: [0.08, 0.04, -0.99], rightPalm: [-0.08, 0.04, -0.99], bodyRoll: 5, spineBend: 3, headTurn: -3, headTilt: 0, footPoint: 5, bodyPitch: 86, grip: 0.14, hipsY: -0.06 },
+  // left-load-two: The body compresses over the left support again, preserving a smooth athletic side-step rhythm.
+  { t: 0.86, leftUpperArm: [0.14, -0.82, 0.55], leftForearm: [0.1, -0.95, 0.29], rightUpperArm: [-0.12, -0.75, -0.65], rightForearm: [-0.07, -0.93, -0.36], leftThigh: [0.42, -0.9, 0.08], leftShin: [0.15, -0.98, -0.1], rightThigh: [0.08, -0.72, 0.69], rightShin: [-0.04, -0.65, -0.76], leftPalm: [0.08, 0.04, -0.99], rightPalm: [-0.08, 0.04, -0.99], bodyRoll: 4, spineBend: 4, headTurn: -2, headTilt: 0, footPoint: 4, bodyPitch: 85, grip: 0.14, hipsY: -0.1 },
+  // cycle-return: The limbs return toward the opening left-support configuration to close the loop cleanly.
+  { t: 0.94, leftUpperArm: [0.17, -0.79, 0.59], leftForearm: [0.11, -0.94, 0.31], rightUpperArm: [-0.14, -0.71, -0.69], rightForearm: [-0.08, -0.91, -0.39], leftThigh: [0.59, -0.79, 0.1], leftShin: [0.22, -0.97, -0.11], rightThigh: [-0.15, -0.92, -0.36], rightShin: [-0.08, -0.76, 0.64], leftPalm: [0.08, 0.04, -0.99], rightPalm: [-0.08, 0.04, -0.99], bodyRoll: 5, spineBend: 3, headTurn: -3, headTilt: 0, footPoint: 5, bodyPitch: 86, grip: 0.14, hipsY: -0.06 },
+  // left-contact-loop: Exact opening pose repeated for a seamless strafe-left loop.
+  { t: 1, leftUpperArm: [0.18, -0.78, 0.6], leftForearm: [0.12, -0.94, 0.32], rightUpperArm: [-0.14, -0.7, -0.7], rightForearm: [-0.08, -0.91, -0.4], leftThigh: [0.62, -0.77, 0.1], leftShin: [0.24, -0.96, -0.12], rightThigh: [-0.18, -0.91, -0.37], rightShin: [-0.1, -0.75, 0.65], leftPalm: [0.08, 0.04, -0.99], rightPalm: [-0.08, 0.04, -0.99], bodyRoll: 5, spineBend: 3, headTurn: -3, headTilt: 0, footPoint: 5, bodyPitch: 86, grip: 0.14, hipsY: -0.06 }
+];
+var DURATION7 = 0.9;
+var strafe_left_default = defineAnimation({
+  slug: "strafe-left",
+  name: "Strafe Left",
+  clip: "StrafeLeft",
+  subcategory: "animations",
+  kind: "loop",
+  duration: DURATION7,
+  keys: POSES7.map((pose) => referenceKey(pose, DURATION7, 90))
+});
+
+// ../core-library/dist/avatar-appearance/animations/strafe-right.js
+var POSES8 = [
+  // right-contact: Right foot plants toward the character's own right; torso stays mostly forward while the left leg prepares to follow.
+  { t: 0, leftUpperArm: [0.14, -0.7, -0.7], leftForearm: [0.08, -0.91, -0.4], rightUpperArm: [-0.18, -0.78, 0.6], rightForearm: [-0.12, -0.94, 0.32], leftThigh: [0.18, -0.91, -0.37], leftShin: [0.1, -0.75, 0.65], rightThigh: [-0.62, -0.77, 0.1], rightShin: [-0.24, -0.96, -0.12], leftPalm: [0.08, 0.04, -0.99], rightPalm: [-0.08, 0.04, -0.99], bodyRoll: -5, spineBend: 3, headTurn: 3, headTilt: 0, footPoint: 5, bodyPitch: 86, grip: 0.14, hipsY: -0.06 },
+  // right-load: Weight compresses over the right leg; pelvis shifts right while the chest remains oriented forward.
+  { t: 0.12, leftUpperArm: [0.12, -0.75, -0.65], leftForearm: [0.07, -0.93, -0.36], rightUpperArm: [-0.14, -0.82, 0.55], rightForearm: [-0.1, -0.95, 0.29], leftThigh: [-0.08, -0.72, 0.69], leftShin: [0.04, -0.65, -0.76], rightThigh: [-0.42, -0.9, 0.08], rightShin: [-0.15, -0.98, -0.1], leftPalm: [0.08, 0.04, -0.99], rightPalm: [-0.08, 0.04, -0.99], bodyRoll: -4, spineBend: 4, headTurn: 2, headTilt: 0, footPoint: 4, bodyPitch: 85, grip: 0.14, hipsY: -0.1 },
+  // left-cross: Left foot travels inward toward the right without excessive crossing; hips lead the lateral movement.
+  { t: 0.24, leftUpperArm: [0.08, -0.82, -0.57], leftForearm: [0.05, -0.95, -0.31], rightUpperArm: [-0.08, -0.88, 0.47], rightForearm: [-0.06, -0.97, 0.23], leftThigh: [-0.32, -0.73, 0.6], leftShin: [-0.12, -0.86, -0.5], rightThigh: [-0.12, -0.98, 0.12], rightShin: [-0.05, -0.99, -0.06], leftPalm: [0.07, 0.04, -0.99], rightPalm: [-0.07, 0.04, -0.99], bodyRoll: -2, spineBend: 3, headTurn: 0, headTilt: 0, footPoint: 8, bodyPitch: 87, grip: 0.13, hipsY: -0.05 },
+  // left-contact: Left foot catches the body underneath; the right leg immediately unloads for the next outward step.
+  { t: 0.36, leftUpperArm: [0.14, -0.79, 0.6], leftForearm: [0.1, -0.95, 0.29], rightUpperArm: [-0.1, -0.72, -0.69], rightForearm: [-0.06, -0.91, -0.41], leftThigh: [-0.06, -0.98, 0.18], leftShin: [-0.02, -0.99, -0.08], rightThigh: [-0.4, -0.88, -0.24], rightShin: [-0.14, -0.95, 0.27], leftPalm: [0.08, 0.04, -0.99], rightPalm: [-0.08, 0.04, -0.99], bodyRoll: 0, spineBend: 3, headTurn: -1, headTilt: 0, footPoint: 5, bodyPitch: 88, grip: 0.14, hipsY: -0.07 },
+  // right-drive: Right knee drives outward toward -x as the left leg pushes; arms counterbalance without turning the chest sideways.
+  { t: 0.5, leftUpperArm: [0.1, -0.78, -0.62], leftForearm: [0.06, -0.94, -0.34], rightUpperArm: [-0.15, -0.7, 0.7], rightForearm: [-0.1, -0.91, 0.4], leftThigh: [0.08, -0.97, -0.22], leftShin: [0.04, -0.99, 0.1], rightThigh: [-0.55, -0.78, 0.28], rightShin: [-0.2, -0.88, -0.43], leftPalm: [0.08, 0.04, -0.99], rightPalm: [-0.08, 0.04, -0.99], bodyRoll: 1, spineBend: 3, headTurn: 0, headTilt: 0, footPoint: 9, bodyPitch: 87, grip: 0.14, hipsY: -0.03 },
+  // right-reach: Right foot reaches laterally for the next plant while the body remains compact and ready to redirect.
+  { t: 0.62, leftUpperArm: [0.13, -0.72, -0.68], leftForearm: [0.08, -0.92, -0.39], rightUpperArm: [-0.18, -0.76, 0.62], rightForearm: [-0.12, -0.93, 0.34], leftThigh: [0.12, -0.96, -0.24], leftShin: [0.06, -0.99, 0.08], rightThigh: [-0.66, -0.74, 0.1], rightShin: [-0.27, -0.95, -0.12], leftPalm: [0.08, 0.04, -0.99], rightPalm: [-0.08, 0.04, -0.99], bodyRoll: -4, spineBend: 3, headTurn: 2, headTilt: 0, footPoint: 6, bodyPitch: 86, grip: 0.14, hipsY: -0.04 },
+  // right-contact-two: A second right-side plant continues the lateral cadence while the head remains mostly forward.
+  { t: 0.74, leftUpperArm: [0.14, -0.7, -0.7], leftForearm: [0.08, -0.91, -0.4], rightUpperArm: [-0.18, -0.78, 0.6], rightForearm: [-0.12, -0.94, 0.32], leftThigh: [0.18, -0.91, -0.37], leftShin: [0.1, -0.75, 0.65], rightThigh: [-0.62, -0.77, 0.1], rightShin: [-0.24, -0.96, -0.12], leftPalm: [0.08, 0.04, -0.99], rightPalm: [-0.08, 0.04, -0.99], bodyRoll: -5, spineBend: 3, headTurn: 3, headTilt: 0, footPoint: 5, bodyPitch: 86, grip: 0.14, hipsY: -0.06 },
+  // right-load-two: The body compresses over the right support again, preserving a smooth athletic side-step rhythm.
+  { t: 0.86, leftUpperArm: [0.12, -0.75, -0.65], leftForearm: [0.07, -0.93, -0.36], rightUpperArm: [-0.14, -0.82, 0.55], rightForearm: [-0.1, -0.95, 0.29], leftThigh: [-0.08, -0.72, 0.69], leftShin: [0.04, -0.65, -0.76], rightThigh: [-0.42, -0.9, 0.08], rightShin: [-0.15, -0.98, -0.1], leftPalm: [0.08, 0.04, -0.99], rightPalm: [-0.08, 0.04, -0.99], bodyRoll: -4, spineBend: 4, headTurn: 2, headTilt: 0, footPoint: 4, bodyPitch: 85, grip: 0.14, hipsY: -0.1 },
+  // cycle-return: The limbs return toward the opening right-support configuration to close the loop cleanly.
+  { t: 0.94, leftUpperArm: [0.14, -0.71, -0.69], leftForearm: [0.08, -0.91, -0.39], rightUpperArm: [-0.17, -0.79, 0.59], rightForearm: [-0.11, -0.94, 0.31], leftThigh: [0.15, -0.92, -0.36], leftShin: [0.08, -0.76, 0.64], rightThigh: [-0.59, -0.79, 0.1], rightShin: [-0.22, -0.97, -0.11], leftPalm: [0.08, 0.04, -0.99], rightPalm: [-0.08, 0.04, -0.99], bodyRoll: -5, spineBend: 3, headTurn: 3, headTilt: 0, footPoint: 5, bodyPitch: 86, grip: 0.14, hipsY: -0.06 },
+  // right-contact-loop: Exact opening pose repeated for a seamless strafe-right loop.
+  { t: 1, leftUpperArm: [0.14, -0.7, -0.7], leftForearm: [0.08, -0.91, -0.4], rightUpperArm: [-0.18, -0.78, 0.6], rightForearm: [-0.12, -0.94, 0.32], leftThigh: [0.18, -0.91, -0.37], leftShin: [0.1, -0.75, 0.65], rightThigh: [-0.62, -0.77, 0.1], rightShin: [-0.24, -0.96, -0.12], leftPalm: [0.08, 0.04, -0.99], rightPalm: [-0.08, 0.04, -0.99], bodyRoll: -5, spineBend: 3, headTurn: 3, headTilt: 0, footPoint: 5, bodyPitch: 86, grip: 0.14, hipsY: -0.06 }
+];
+var DURATION8 = 0.9;
+var strafe_right_default = defineAnimation({
+  slug: "strafe-right",
+  name: "Strafe Right",
+  clip: "StrafeRight",
+  subcategory: "animations",
+  kind: "loop",
+  duration: DURATION8,
+  keys: POSES8.map((pose) => referenceKey(pose, DURATION8, 90))
+});
+
+// ../core-library/dist/avatar-appearance/animations/sprint-start.js
+var POSES9 = [
+  // idle: Neutral start; eyes forward and weight balanced before acceleration.
+  { t: 0, leftUpperArm: [0, -0.96, 0.28], leftForearm: [0, -0.96, 0.28], rightUpperArm: [0, -0.96, 0.28], rightForearm: [0, -0.96, 0.28], leftThigh: [0, -1, 0], leftShin: [0, -1, 0], rightThigh: [0, -1, 0], rightShin: [0, -1, 0], leftPalm: [0, 0, 1], rightPalm: [0, 0, 1], bodyRoll: 0, spineBend: 0, headTurn: 0, headTilt: 0, footPoint: 5, bodyPitch: 90, grip: 0.08, hipsY: 0 },
+  // anticipation: Hips drop and chest leans forward; arms split and the rear leg loads for the first push.
+  { t: 0.1, leftUpperArm: [0, -0.62, 0.78], leftForearm: [0, -0.78, 0.62], rightUpperArm: [0, -0.72, -0.69], rightForearm: [0, -0.92, -0.39], leftThigh: [0, -0.91, 0.42], leftShin: [0, -0.99, 0.12], rightThigh: [0, -0.82, -0.57], rightShin: [0, -0.75, 0.66], leftPalm: [0, 0, 1], rightPalm: [0, 0, 1], bodyRoll: 0, spineBend: 8, headTurn: 0, headTilt: 0, footPoint: 5, bodyPitch: 78, grip: 0.08, hipsY: -0.12 },
+  // load: Forward lean increases; front knee drives while the opposite leg compresses to generate force.
+  { t: 0.22, leftUpperArm: [0, -0.48, 0.88], leftForearm: [0, -0.72, 0.69], rightUpperArm: [0, -0.82, -0.57], rightForearm: [0, -0.97, -0.25], leftThigh: [0, -0.78, 0.63], leftShin: [0, -0.98, 0.18], rightThigh: [0, -0.72, -0.69], rightShin: [0, -0.82, 0.57], leftPalm: [0, 0, 1], rightPalm: [0, 0, 1], bodyRoll: 0, spineBend: 8, headTurn: 0, headTilt: -3, footPoint: 5, bodyPitch: 68, grip: 0.08, hipsY: -0.18 },
+  // first-drive: First powerful drive: right arm comes forward, left arm drives back, and the body projects ahead.
+  { t: 0.36, leftUpperArm: [0, -0.78, -0.63], leftForearm: [0, -0.95, -0.3], rightUpperArm: [0, -0.4, 0.92], rightForearm: [0, -0.72, 0.69], leftThigh: [0, -0.58, 0.82], leftShin: [0, -0.97, 0.24], rightThigh: [0, -0.78, -0.63], rightShin: [0, -0.97, -0.24], leftPalm: [0, 0, 1], rightPalm: [0, 0, 1], bodyRoll: -3, spineBend: 5, headTurn: 0, headTilt: -3, footPoint: 18, bodyPitch: 58, grip: 0.25, hipsY: -0.1 },
+  // first-flight: First flight phase; lead knee rises while the trailing leg extends and the arms counter-swing.
+  { t: 0.5, leftUpperArm: [0, -0.85, -0.53], leftForearm: [0, -0.98, -0.2], rightUpperArm: [0, -0.38, 0.93], rightForearm: [0, -0.73, 0.68], leftThigh: [0, -0.4, 0.92], leftShin: [0, -0.65, -0.76], rightThigh: [0, -0.92, -0.39], rightShin: [0, -0.98, 0.18], leftPalm: [0, 0, 1], rightPalm: [0, 0, 1], bodyRoll: -3, spineBend: 5, headTurn: 0, headTilt: -3, footPoint: 18, bodyPitch: 55, grip: 0.25, hipsY: 0.04 },
+  // second-step: Second step reverses the limbs; cadence increases while the torso remains aggressively forward.
+  { t: 0.65, leftUpperArm: [0, -0.38, 0.93], leftForearm: [0, -0.72, 0.69], rightUpperArm: [0, -0.88, -0.48], rightForearm: [0, -0.98, -0.18], leftThigh: [0, -0.9, -0.44], leftShin: [0, -0.98, 0.18], rightThigh: [0, -0.38, 0.93], rightShin: [0, -0.7, -0.71], leftPalm: [0, 0, 1], rightPalm: [0, 0, 1], bodyRoll: 3, spineBend: 5, headTurn: 0, headTilt: -3, footPoint: 18, bodyPitch: 58, grip: 0.25, hipsY: 0.01 },
+  // accelerate: Stride opens and the torso begins rising toward normal sprint posture without losing forward momentum.
+  { t: 0.82, leftUpperArm: [0, -0.86, -0.51], leftForearm: [0, -0.98, -0.18], rightUpperArm: [0, -0.36, 0.93], rightForearm: [0, -0.7, 0.71], leftThigh: [0, -0.32, 0.95], leftShin: [0, -0.62, -0.78], rightThigh: [0, -0.94, -0.34], rightShin: [0, -0.99, 0.12], leftPalm: [0, 0, 1], rightPalm: [0, 0, 1], bodyRoll: -3, spineBend: 5, headTurn: 0, headTilt: -3, footPoint: 18, bodyPitch: 62, grip: 0.25, hipsY: 0.05 },
+  // full-speed: Reaches the handoff pose for the sprint/run loop; head steady, arms compact and stride fully active.
+  { t: 1, leftUpperArm: [0, -0.34, 0.94], leftForearm: [0, -0.69, 0.72], rightUpperArm: [0, -0.9, -0.44], rightForearm: [0, -0.98, -0.17], leftThigh: [0, -0.92, -0.38], leftShin: [0, -0.99, 0.12], rightThigh: [0, -0.3, 0.95], rightShin: [0, -0.62, -0.78], leftPalm: [0, 0, 1], rightPalm: [0, 0, 1], bodyRoll: 3, spineBend: 5, headTurn: 0, headTilt: -3, footPoint: 18, bodyPitch: 68, grip: 0.25, hipsY: 0.03 }
+];
+var DURATION9 = 0.85;
+var sprint_start_default = defineAnimation({
+  slug: "sprint-start",
+  name: "Sprint Start",
+  clip: "SprintStart",
+  subcategory: "animations",
+  kind: "once",
+  duration: DURATION9,
+  keys: POSES9.map((pose) => referenceKey(pose, DURATION9, 90))
+});
+
+// ../core-library/dist/avatar-appearance/animations/sprint-stop.js
+var POSES10 = [
+  // full-speed: Enters at sprint speed; opposite arm and leg drive while the gaze stays forward.
+  { t: 0, leftUpperArm: [0, -0.35, 0.94], leftForearm: [0, -0.7, 0.71], rightUpperArm: [0, -0.9, -0.44], rightForearm: [0, -0.98, -0.18], leftThigh: [0, -0.92, -0.39], leftShin: [0, -0.99, 0.12], rightThigh: [0, -0.3, 0.95], rightShin: [0, -0.62, -0.78], leftPalm: [0, 0, 1], rightPalm: [0, 0, 1], bodyRoll: 0, spineBend: 3, headTurn: 0, headTilt: -2, footPoint: 18, bodyPitch: 70, grip: 0.18, hipsY: 0.03 },
+  // brake-contact: Lead foot reaches ahead of the hips to brake; arms counterbalance without locking.
+  { t: 0.1, leftUpperArm: [0, -0.82, -0.57], leftForearm: [0, -0.98, -0.18], rightUpperArm: [0, -0.38, 0.93], rightForearm: [0, -0.72, 0.69], leftThigh: [0, -0.45, 0.89], leftShin: [0, -0.88, -0.48], rightThigh: [0, -0.9, -0.44], rightShin: [0, -0.97, 0.24], leftPalm: [0, 0, 1], rightPalm: [0, 0, 1], bodyRoll: -2, spineBend: 5, headTurn: 0, headTilt: -1, footPoint: 12, bodyPitch: 68, grip: 0.18, hipsY: -0.03 },
+  // absorb: Knees and hips flex to absorb speed; torso becomes more upright and arms widen slightly.
+  { t: 0.2, leftUpperArm: [0, -0.7, -0.71], leftForearm: [0, -0.97, -0.24], rightUpperArm: [0, -0.52, 0.85], rightForearm: [0, -0.8, 0.6], leftThigh: [0, -0.58, 0.82], leftShin: [0, -0.82, -0.57], rightThigh: [0, -0.72, -0.69], rightShin: [0, -0.7, 0.71], leftPalm: [0, 0, 1], rightPalm: [0, 0, 1], bodyRoll: 2, spineBend: 8, headTurn: 0, headTilt: 1, footPoint: 8, bodyPitch: 73, grip: 0.18, hipsY: -0.1 },
+  // second-brake: Opposite foot takes a shorter braking step as stride length rapidly decreases.
+  { t: 0.32, leftUpperArm: [0, -0.45, 0.89], leftForearm: [0, -0.78, 0.63], rightUpperArm: [0, -0.82, -0.57], rightForearm: [0, -0.97, -0.24], leftThigh: [0, -0.8, -0.6], leftShin: [0, -0.95, 0.31], rightThigh: [0, -0.5, 0.87], rightShin: [0, -0.84, -0.54], leftPalm: [0, 0, 1], rightPalm: [0, 0, 1], bodyRoll: -2, spineBend: 6, headTurn: 0, headTilt: 0, footPoint: 7, bodyPitch: 76, grip: 0.18, hipsY: -0.08 },
+  // short-step: A compact stabilising step brings the centre of mass back over the feet.
+  { t: 0.44, leftUpperArm: [0, -0.75, -0.66], leftForearm: [0, -0.96, -0.28], rightUpperArm: [0, -0.58, 0.81], rightForearm: [0, -0.86, 0.51], leftThigh: [0, -0.48, 0.88], leftShin: [0, -0.86, -0.51], rightThigh: [0, -0.86, -0.5], rightShin: [0, -0.98, 0.2], leftPalm: [0, 0, 1], rightPalm: [0, 0, 1], bodyRoll: 1, spineBend: 4, headTurn: 0, headTilt: 0, footPoint: 5, bodyPitch: 80, grip: 0.18, hipsY: -0.06 },
+  // settle: Speed is nearly gone; arms reduce their swing and the knees remain soft.
+  { t: 0.56, leftUpperArm: [0, -0.86, -0.5], leftForearm: [0, -0.98, -0.2], rightUpperArm: [0, -0.8, 0.6], rightForearm: [0, -0.96, 0.28], leftThigh: [0, -0.92, -0.38], leftShin: [0, -0.99, 0.1], rightThigh: [0, -0.62, 0.78], rightShin: [0, -0.91, -0.41], leftPalm: [0, 0, 1], rightPalm: [0, 0, 1], bodyRoll: 0, spineBend: 2, headTurn: 0, headTilt: 1, footPoint: 4, bodyPitch: 84, grip: 0.06, hipsY: -0.04 },
+  // balance: Final small step catches balance; chest stacks over pelvis and head remains steady.
+  { t: 0.68, leftUpperArm: [0, -0.93, -0.36], leftForearm: [0, -0.99, -0.1], rightUpperArm: [0, -0.91, 0.41], rightForearm: [0, -0.99, 0.12], leftThigh: [0, -0.98, -0.18], leftShin: [0, -1, 0.02], rightThigh: [0, -0.88, 0.47], rightShin: [0, -0.97, -0.23], leftPalm: [0, 0, 1], rightPalm: [0, 0, 1], bodyRoll: 0, spineBend: 1, headTurn: 0, headTilt: 0, footPoint: 3, bodyPitch: 87, grip: 0.06, hipsY: -0.02 },
+  // recover: Feet draw toward a comfortable stance and the hands relax beside the body.
+  { t: 0.8, leftUpperArm: [0, -0.97, -0.24], leftForearm: [0, -1, -0.04], rightUpperArm: [0, -0.96, 0.28], rightForearm: [0, -1, 0.04], leftThigh: [0, -1, -0.05], leftShin: [0, -1, 0], rightThigh: [0, -0.97, 0.23], rightShin: [0, -0.99, -0.08], leftPalm: [0, 0, 1], rightPalm: [0, 0, 1], bodyRoll: 0, spineBend: 0, headTurn: 0, headTilt: 0, footPoint: 2, bodyPitch: 89, grip: 0.06, hipsY: 0 },
+  // stand: Body reaches a stable standing posture with only residual arm motion.
+  { t: 0.91, leftUpperArm: [0, -0.99, 0.1], leftForearm: [0, -1, 0.02], rightUpperArm: [0, -0.99, 0.1], rightForearm: [0, -1, 0.02], leftThigh: [0, -1, 0], leftShin: [0, -1, 0], rightThigh: [0, -1, 0], rightShin: [0, -1, 0], leftPalm: [0, 0, 1], rightPalm: [0, 0, 1], bodyRoll: 0, spineBend: 0, headTurn: 0, headTilt: 0, footPoint: 0, bodyPitch: 90, grip: 0.06, hipsY: 0 },
+  // idle: Fully stopped in a neutral stance, ready to blend into idle.
+  { t: 1, leftUpperArm: [0, -0.99, 0.08], leftForearm: [0, -1, 0.01], rightUpperArm: [0, -0.99, 0.08], rightForearm: [0, -1, 0.01], leftThigh: [0, -1, 0], leftShin: [0, -1, 0], rightThigh: [0, -1, 0], rightShin: [0, -1, 0], leftPalm: [0, 0, 1], rightPalm: [0, 0, 1], bodyRoll: 0, spineBend: 0, headTurn: 0, headTilt: 0, footPoint: 0, bodyPitch: 90, grip: 0.06, hipsY: 0 }
+];
+var DURATION10 = 1;
+var sprint_stop_default = defineAnimation({
+  slug: "sprint-stop",
+  name: "Sprint Stop",
+  clip: "SprintStop",
+  subcategory: "animations",
+  kind: "once",
+  duration: DURATION10,
+  keys: POSES10.map((pose) => referenceKey(pose, DURATION10, 90))
+});
+
+// ../core-library/dist/avatar-appearance/animations/turn-left-90.js
+var POSES11 = [
+  // ready: Neutral standing start; eyes establish the new direction before the feet begin the turn.
+  { t: 0, leftUpperArm: [0.04, -0.99, 0.1], leftForearm: [0.02, -1, 0.03], rightUpperArm: [-0.04, -0.99, 0.1], rightForearm: [-0.02, -1, 0.03], leftThigh: [0.04, -1, 0.02], leftShin: [0.02, -1, 0], rightThigh: [-0.04, -1, 0.02], rightShin: [-0.02, -1, 0], leftPalm: [0.05, 0.02, -1], rightPalm: [-0.05, 0.02, -1], bodyRoll: 0, spineBend: 0, headTurn: 0, headTilt: 0, footPoint: 0, bodyPitch: 90, grip: 0.05, hipsY: 0 },
+  // look-left: Head and upper chest initiate toward the character's left, creating anticipation before the pelvis follows.
+  { t: 0.1, leftUpperArm: [0.05, -0.98, 0.16], leftForearm: [0.03, -0.99, 0.08], rightUpperArm: [-0.05, -0.99, 0.05], rightForearm: [-0.03, -1, 0], leftThigh: [0.05, -0.99, 0.08], leftShin: [0.02, -1, 0.01], rightThigh: [-0.05, -0.99, -0.06], rightShin: [-0.02, -1, 0.01], leftPalm: [0.05, 0.02, -1], rightPalm: [-0.05, 0.02, -1], bodyRoll: -1, spineBend: 1, headTurn: 28, headTilt: 0, footPoint: 0, bodyPitch: 89, grip: 0.05, hipsY: -0.01 },
+  // load-right: Weight settles mostly onto the right foot; left foot becomes light and ready to step into the turn.
+  { t: 0.22, leftUpperArm: [0.08, -0.95, 0.3], leftForearm: [0.04, -0.99, 0.12], rightUpperArm: [-0.08, -0.96, -0.26], rightForearm: [-0.04, -0.99, -0.1], leftThigh: [0.2, -0.94, 0.27], leftShin: [0.08, -0.99, -0.1], rightThigh: [-0.1, -0.98, -0.16], rightShin: [-0.04, -0.99, 0.08], leftPalm: [0.06, 0.02, -1], rightPalm: [-0.06, 0.02, -1], bodyRoll: -2, spineBend: 3, headTurn: 34, headTilt: 0, footPoint: 2, bodyPitch: 87, grip: 0.07, hipsY: -0.05 },
+  // left-step: Left foot steps into the new heading while the right foot acts as the pivot; arms counter the rotation.
+  { t: 0.36, leftUpperArm: [0.1, -0.9, 0.42], leftForearm: [0.05, -0.98, 0.18], rightUpperArm: [-0.1, -0.92, -0.38], rightForearm: [-0.05, -0.98, -0.16], leftThigh: [0.34, -0.82, 0.46], leftShin: [0.14, -0.94, -0.31], rightThigh: [-0.08, -0.99, -0.08], rightShin: [-0.03, -1, 0.03], leftPalm: [0.06, 0.03, -1], rightPalm: [-0.06, 0.03, -1], bodyRoll: -2, spineBend: 3, headTurn: 26, headTilt: 0, footPoint: 6, bodyPitch: 87, grip: 0.07, hipsY: -0.04 },
+  // pivot: Pelvis passes through the middle of the 90-degree pivot; head is already closer to the destination heading.
+  { t: 0.5, leftUpperArm: [0.08, -0.93, 0.36], leftForearm: [0.04, -0.99, 0.14], rightUpperArm: [-0.08, -0.93, -0.36], rightForearm: [-0.04, -0.99, -0.14], leftThigh: [0.16, -0.96, 0.23], leftShin: [0.06, -0.99, -0.1], rightThigh: [-0.18, -0.94, -0.29], rightShin: [-0.07, -0.98, 0.17], leftPalm: [0.05, 0.03, -1], rightPalm: [-0.05, 0.03, -1], bodyRoll: 0, spineBend: 2, headTurn: 16, headTilt: 0, footPoint: 3, bodyPitch: 88, grip: 0.06, hipsY: -0.03 },
+  // right-follow: Right foot lifts and follows around to square the stance; shoulders settle behind the head.
+  { t: 0.64, leftUpperArm: [0.05, -0.97, 0.23], leftForearm: [0.03, -1, 0.08], rightUpperArm: [-0.06, -0.96, -0.27], rightForearm: [-0.03, -0.99, -0.1], leftThigh: [0.06, -0.99, 0.09], leftShin: [0.02, -1, -0.02], rightThigh: [-0.28, -0.87, 0.4], rightShin: [-0.11, -0.95, -0.29], leftPalm: [0.05, 0.02, -1], rightPalm: [-0.05, 0.02, -1], bodyRoll: 1, spineBend: 2, headTurn: 8, headTilt: 0, footPoint: 5, bodyPitch: 88, grip: 0.05, hipsY: -0.02 },
+  // square-up: Both feet settle into the new direction; residual shoulder and arm motion follows through naturally.
+  { t: 0.78, leftUpperArm: [0.04, -0.99, 0.13], leftForearm: [0.02, -1, 0.04], rightUpperArm: [-0.04, -0.98, 0.16], rightForearm: [-0.02, -1, 0.05], leftThigh: [0.05, -1, 0.03], leftShin: [0.02, -1, 0], rightThigh: [-0.1, -0.98, 0.17], rightShin: [-0.04, -0.99, -0.08], leftPalm: [0.05, 0.02, -1], rightPalm: [-0.05, 0.02, -1], bodyRoll: 1, spineBend: 1, headTurn: 3, headTilt: 0, footPoint: 2, bodyPitch: 89, grip: 0.05, hipsY: -0.01 },
+  // settle: Character finishes facing 90 degrees left in a stable neutral stance with the gaze straight ahead.
+  { t: 0.9, leftUpperArm: [0.04, -0.99, 0.1], leftForearm: [0.02, -1, 0.03], rightUpperArm: [-0.04, -0.99, 0.11], rightForearm: [-0.02, -1, 0.03], leftThigh: [0.04, -1, 0.02], leftShin: [0.02, -1, 0], rightThigh: [-0.05, -1, 0.03], rightShin: [-0.02, -1, 0], leftPalm: [0.05, 0.02, -1], rightPalm: [-0.05, 0.02, -1], bodyRoll: 0, spineBend: 0.5, headTurn: 0, headTilt: 0, footPoint: 0, bodyPitch: 90, grip: 0.05, hipsY: 0 },
+  // finish: Final neutral pose after the root has completed its 90-degree left world-space yaw.
+  { t: 1, leftUpperArm: [0.04, -0.99, 0.1], leftForearm: [0.02, -1, 0.03], rightUpperArm: [-0.04, -0.99, 0.1], rightForearm: [-0.02, -1, 0.03], leftThigh: [0.04, -1, 0.02], leftShin: [0.02, -1, 0], rightThigh: [-0.04, -1, 0.02], rightShin: [-0.02, -1, 0], leftPalm: [0.05, 0.02, -1], rightPalm: [-0.05, 0.02, -1], bodyRoll: 0, spineBend: 0, headTurn: 0, headTilt: 0, footPoint: 0, bodyPitch: 90, grip: 0.05, hipsY: 0 }
+];
+var DURATION11 = 0.72;
+var turn_left_90_default = defineAnimation({
+  slug: "turn-left-90",
+  name: "Turn Left 90",
+  clip: "TurnLeft90",
+  subcategory: "animations",
+  kind: "once",
+  duration: DURATION11,
+  keys: POSES11.map((pose) => referenceKey(pose, DURATION11, 90))
+});
+
+// ../core-library/dist/avatar-appearance/animations/turn-right-90.js
+var POSES12 = [
+  // ready: Neutral start; gaze prepares to lead the turn toward the character's own right.
+  { t: 0, leftUpperArm: [0.04, -0.99, 0.1], leftForearm: [0.02, -1, 0.03], rightUpperArm: [-0.04, -0.99, 0.1], rightForearm: [-0.02, -1, 0.03], leftThigh: [0.04, -1, 0.02], leftShin: [0.02, -1, 0], rightThigh: [-0.04, -1, 0.02], rightShin: [-0.02, -1, 0], leftPalm: [0.05, 0.02, -1], rightPalm: [-0.05, 0.02, -1], bodyRoll: 0, spineBend: 0, headTurn: 0, headTilt: 0, footPoint: 0, bodyPitch: 90, grip: 0.05, hipsY: 0 },
+  // look-right: Head and upper chest initiate right before the pelvis follows.
+  { t: 0.1, leftUpperArm: [0.05, -0.99, 0.05], leftForearm: [0.03, -1, 0], rightUpperArm: [-0.05, -0.98, 0.16], rightForearm: [-0.03, -0.99, 0.08], leftThigh: [0.05, -0.99, -0.06], leftShin: [0.02, -1, 0.01], rightThigh: [-0.05, -0.99, 0.08], rightShin: [-0.02, -1, 0.01], leftPalm: [0.05, 0.02, -1], rightPalm: [-0.05, 0.02, -1], bodyRoll: 1, spineBend: 1, headTurn: -28, headTilt: 0, footPoint: 0, bodyPitch: 89, grip: 0.05, hipsY: -0.01 },
+  // load-left: Weight loads onto the left foot so the right foot can step into the new heading.
+  { t: 0.22, leftUpperArm: [0.08, -0.96, -0.26], leftForearm: [0.04, -0.99, -0.1], rightUpperArm: [-0.08, -0.95, 0.3], rightForearm: [-0.04, -0.99, 0.12], leftThigh: [0.1, -0.98, -0.16], leftShin: [0.04, -0.99, 0.08], rightThigh: [-0.2, -0.94, 0.27], rightShin: [-0.08, -0.99, -0.1], leftPalm: [0.06, 0.02, -1], rightPalm: [-0.06, 0.02, -1], bodyRoll: 2, spineBend: 3, headTurn: -34, headTilt: 0, footPoint: 2, bodyPitch: 87, grip: 0.07, hipsY: -0.05 },
+  // right-step: Right foot steps into the turn while the left foot provides the pivot and the arms counterbalance.
+  { t: 0.36, leftUpperArm: [0.1, -0.92, -0.38], leftForearm: [0.05, -0.98, -0.16], rightUpperArm: [-0.1, -0.9, 0.42], rightForearm: [-0.05, -0.98, 0.18], leftThigh: [0.08, -0.99, -0.08], leftShin: [0.03, -1, 0.03], rightThigh: [-0.34, -0.82, 0.46], rightShin: [-0.14, -0.94, -0.31], leftPalm: [0.06, 0.03, -1], rightPalm: [-0.06, 0.03, -1], bodyRoll: 2, spineBend: 3, headTurn: -26, headTilt: 0, footPoint: 6, bodyPitch: 87, grip: 0.07, hipsY: -0.04 },
+  // pivot: Pelvis passes through the middle of the pivot while the head is already closer to the destination.
+  { t: 0.5, leftUpperArm: [0.08, -0.93, -0.36], leftForearm: [0.04, -0.99, -0.14], rightUpperArm: [-0.08, -0.93, 0.36], rightForearm: [-0.04, -0.99, 0.14], leftThigh: [0.18, -0.94, -0.29], leftShin: [0.07, -0.98, 0.17], rightThigh: [-0.16, -0.96, 0.23], rightShin: [-0.06, -0.99, -0.1], leftPalm: [0.05, 0.03, -1], rightPalm: [-0.05, 0.03, -1], bodyRoll: 0, spineBend: 2, headTurn: -16, headTilt: 0, footPoint: 3, bodyPitch: 88, grip: 0.06, hipsY: -0.03 },
+  // left-follow: Left foot follows around to square the stance; shoulders settle behind the head.
+  { t: 0.64, leftUpperArm: [0.06, -0.96, -0.27], leftForearm: [0.03, -0.99, -0.1], rightUpperArm: [-0.05, -0.97, 0.23], rightForearm: [-0.03, -1, 0.08], leftThigh: [0.28, -0.87, 0.4], leftShin: [0.11, -0.95, -0.29], rightThigh: [-0.06, -0.99, 0.09], rightShin: [-0.02, -1, -0.02], leftPalm: [0.05, 0.02, -1], rightPalm: [-0.05, 0.02, -1], bodyRoll: -1, spineBend: 2, headTurn: -8, headTilt: 0, footPoint: 5, bodyPitch: 88, grip: 0.05, hipsY: -0.02 },
+  // square-up: Both feet settle into the new direction with a small natural follow-through in the shoulders.
+  { t: 0.78, leftUpperArm: [0.04, -0.98, 0.16], leftForearm: [0.02, -1, 0.05], rightUpperArm: [-0.04, -0.99, 0.13], rightForearm: [-0.02, -1, 0.04], leftThigh: [0.1, -0.98, 0.17], leftShin: [0.04, -0.99, -0.08], rightThigh: [-0.05, -1, 0.03], rightShin: [-0.02, -1, 0], leftPalm: [0.05, 0.02, -1], rightPalm: [-0.05, 0.02, -1], bodyRoll: -1, spineBend: 1, headTurn: -3, headTilt: 0, footPoint: 2, bodyPitch: 89, grip: 0.05, hipsY: -0.01 },
+  // settle: Character stabilises after completing the right turn.
+  { t: 0.9, leftUpperArm: [0.04, -0.99, 0.11], leftForearm: [0.02, -1, 0.03], rightUpperArm: [-0.04, -0.99, 0.1], rightForearm: [-0.02, -1, 0.03], leftThigh: [0.05, -1, 0.03], leftShin: [0.02, -1, 0], rightThigh: [-0.04, -1, 0.02], rightShin: [-0.02, -1, 0], leftPalm: [0.05, 0.02, -1], rightPalm: [-0.05, 0.02, -1], bodyRoll: 0, spineBend: 0.5, headTurn: 0, headTilt: 0, footPoint: 0, bodyPitch: 90, grip: 0.05, hipsY: 0 },
+  // finish: Final neutral pose after the root completes a 90-degree right world-space yaw.
+  { t: 1, leftUpperArm: [0.04, -0.99, 0.1], leftForearm: [0.02, -1, 0.03], rightUpperArm: [-0.04, -0.99, 0.1], rightForearm: [-0.02, -1, 0.03], leftThigh: [0.04, -1, 0.02], leftShin: [0.02, -1, 0], rightThigh: [-0.04, -1, 0.02], rightShin: [-0.02, -1, 0], leftPalm: [0.05, 0.02, -1], rightPalm: [-0.05, 0.02, -1], bodyRoll: 0, spineBend: 0, headTurn: 0, headTilt: 0, footPoint: 0, bodyPitch: 90, grip: 0.05, hipsY: 0 }
+];
+var DURATION12 = 0.72;
+var turn_right_90_default = defineAnimation({
+  slug: "turn-right-90",
+  name: "Turn Right 90",
+  clip: "TurnRight90",
+  subcategory: "animations",
+  kind: "once",
+  duration: DURATION12,
+  keys: POSES12.map((pose) => referenceKey(pose, DURATION12, 90))
+});
+
+// ../core-library/dist/avatar-appearance/animations/turn-180.js
+var POSES13 = [
+  // ready: Neutral start; head prepares to lead the 180-degree change of direction.
+  { t: 0, leftUpperArm: [0.04, -0.99, 0.1], leftForearm: [0.02, -1, 0.03], rightUpperArm: [-0.04, -0.99, 0.1], rightForearm: [-0.02, -1, 0.03], leftThigh: [0.04, -1, 0.02], leftShin: [0.02, -1, 0], rightThigh: [-0.04, -1, 0.02], rightShin: [-0.02, -1, 0], leftPalm: [0.05, 0.02, -1], rightPalm: [-0.05, 0.02, -1], bodyRoll: 0, spineBend: 0, headTurn: 0, headTilt: 0, footPoint: 0, bodyPitch: 90, grip: 0.05, hipsY: 0 },
+  // look-left: Eyes and head turn left first, followed by the upper chest; the pelvis deliberately lags behind.
+  { t: 0.09, leftUpperArm: [0.06, -0.97, 0.23], leftForearm: [0.03, -0.99, 0.1], rightUpperArm: [-0.06, -0.98, -0.18], rightForearm: [-0.03, -1, -0.06], leftThigh: [0.08, -0.98, 0.16], leftShin: [0.03, -1, -0.04], rightThigh: [-0.06, -0.99, -0.1], rightShin: [-0.02, -1, 0.03], leftPalm: [0.05, 0.02, -1], rightPalm: [-0.05, 0.02, -1], bodyRoll: -1, spineBend: 2, headTurn: 38, headTilt: 0, footPoint: 0, bodyPitch: 88, grip: 0.06, hipsY: -0.02 },
+  // load-right: Weight compresses onto the right leg; the left foot becomes light for the first turning step.
+  { t: 0.2, leftUpperArm: [0.1, -0.9, 0.43], leftForearm: [0.05, -0.98, 0.19], rightUpperArm: [-0.1, -0.92, -0.38], rightForearm: [-0.05, -0.98, -0.16], leftThigh: [0.24, -0.89, 0.38], leftShin: [0.09, -0.97, -0.22], rightThigh: [-0.08, -0.98, -0.17], rightShin: [-0.03, -0.99, 0.08], leftPalm: [0.06, 0.03, -1], rightPalm: [-0.06, 0.03, -1], bodyRoll: -3, spineBend: 4, headTurn: 42, headTilt: 0, footPoint: 2, bodyPitch: 86, grip: 0.08, hipsY: -0.07 },
+  // left-step: Left foot steps around the body as the right foot pivots; arms counter the rotation to control momentum.
+  { t: 0.32, leftUpperArm: [0.13, -0.82, 0.56], leftForearm: [0.07, -0.95, 0.3], rightUpperArm: [-0.12, -0.88, -0.46], rightForearm: [-0.06, -0.97, -0.23], leftThigh: [0.38, -0.75, 0.54], leftShin: [0.15, -0.9, -0.41], rightThigh: [-0.07, -0.99, -0.1], rightShin: [-0.03, -1, 0.04], leftPalm: [0.06, 0.03, -1], rightPalm: [-0.06, 0.03, -1], bodyRoll: -3, spineBend: 4, headTurn: 34, headTilt: 0, footPoint: 6, bodyPitch: 85, grip: 0.08, hipsY: -0.06 },
+  // first-pivot: Pelvis rotates through roughly the first half of the turn while the head continues tracking the destination.
+  { t: 0.44, leftUpperArm: [0.1, -0.88, 0.46], leftForearm: [0.05, -0.98, 0.2], rightUpperArm: [-0.1, -0.88, -0.46], rightForearm: [-0.05, -0.98, -0.2], leftThigh: [0.18, -0.96, 0.22], leftShin: [0.07, -0.99, -0.1], rightThigh: [-0.2, -0.92, -0.34], rightShin: [-0.08, -0.97, 0.23], leftPalm: [0.05, 0.03, -1], rightPalm: [-0.05, 0.03, -1], bodyRoll: 0, spineBend: 3, headTurn: 26, headTilt: 0, footPoint: 4, bodyPitch: 87, grip: 0.07, hipsY: -0.04 },
+  // right-follow: Right foot swings around to continue the rotation; the body stays low enough to keep the pivot stable.
+  { t: 0.56, leftUpperArm: [0.07, -0.94, 0.34], leftForearm: [0.04, -0.99, 0.14], rightUpperArm: [-0.09, -0.9, -0.42], rightForearm: [-0.05, -0.98, -0.18], leftThigh: [0.08, -0.99, 0.1], leftShin: [0.03, -1, -0.03], rightThigh: [-0.34, -0.8, 0.49], rightShin: [-0.13, -0.92, -0.37], leftPalm: [0.05, 0.03, -1], rightPalm: [-0.05, 0.03, -1], bodyRoll: 2, spineBend: 3, headTurn: 20, headTilt: 0, footPoint: 6, bodyPitch: 87, grip: 0.07, hipsY: -0.03 },
+  // second-pivot: Feet exchange support through the second half of the turn; shoulders follow the pelvis without overtwisting.
+  { t: 0.68, leftUpperArm: [0.07, -0.94, -0.33], leftForearm: [0.04, -0.99, -0.14], rightUpperArm: [-0.07, -0.94, 0.33], rightForearm: [-0.04, -0.99, 0.14], leftThigh: [0.2, -0.92, -0.34], leftShin: [0.08, -0.97, 0.23], rightThigh: [-0.18, -0.96, 0.22], rightShin: [-0.07, -0.99, -0.1], leftPalm: [0.05, 0.03, -1], rightPalm: [-0.05, 0.03, -1], bodyRoll: 0, spineBend: 2, headTurn: 12, headTilt: 0, footPoint: 4, bodyPitch: 88, grip: 0.06, hipsY: -0.03 },
+  // square-up: Feet square toward the opposite direction and the head settles back to neutral relative to the torso.
+  { t: 0.8, leftUpperArm: [0.05, -0.98, 0.18], leftForearm: [0.03, -1, 0.06], rightUpperArm: [-0.05, -0.97, 0.22], rightForearm: [-0.03, -0.99, 0.08], leftThigh: [0.06, -0.99, 0.08], leftShin: [0.02, -1, -0.02], rightThigh: [-0.14, -0.97, 0.2], rightShin: [-0.05, -0.99, -0.09], leftPalm: [0.05, 0.02, -1], rightPalm: [-0.05, 0.02, -1], bodyRoll: 1, spineBend: 1, headTurn: 5, headTilt: 0, footPoint: 2, bodyPitch: 89, grip: 0.05, hipsY: -0.01 },
+  // settle: Residual arm and shoulder motion dies away after the 180-degree pivot.
+  { t: 0.91, leftUpperArm: [0.04, -0.99, 0.11], leftForearm: [0.02, -1, 0.03], rightUpperArm: [-0.04, -0.99, 0.12], rightForearm: [-0.02, -1, 0.04], leftThigh: [0.04, -1, 0.02], leftShin: [0.02, -1, 0], rightThigh: [-0.05, -1, 0.04], rightShin: [-0.02, -1, -0.01], leftPalm: [0.05, 0.02, -1], rightPalm: [-0.05, 0.02, -1], bodyRoll: 0, spineBend: 0.5, headTurn: 0, headTilt: 0, footPoint: 0, bodyPitch: 90, grip: 0.05, hipsY: 0 },
+  // finish: Final neutral pose facing exactly opposite the starting direction after a +180-degree root yaw.
+  { t: 1, leftUpperArm: [0.04, -0.99, 0.1], leftForearm: [0.02, -1, 0.03], rightUpperArm: [-0.04, -0.99, 0.1], rightForearm: [-0.02, -1, 0.03], leftThigh: [0.04, -1, 0.02], leftShin: [0.02, -1, 0], rightThigh: [-0.04, -1, 0.02], rightShin: [-0.02, -1, 0], leftPalm: [0.05, 0.02, -1], rightPalm: [-0.05, 0.02, -1], bodyRoll: 0, spineBend: 0, headTurn: 0, headTilt: 0, footPoint: 0, bodyPitch: 90, grip: 0.05, hipsY: 0 }
+];
+var DURATION13 = 0.92;
+var turn_180_default = defineAnimation({
+  slug: "turn-180",
+  name: "Turn 180",
+  clip: "Turn180",
+  subcategory: "animations",
+  kind: "once",
+  duration: DURATION13,
+  keys: POSES13.map((pose) => referenceKey(pose, DURATION13, 90))
+});
+
+// ../core-library/dist/avatar-appearance/animations/jump-forward.js
+var POSES14 = [
+  // ready: Balanced athletic stance before the forward jump; gaze stays on the landing area.
+  { t: 0, leftUpperArm: [0.04, -0.98, 0.18], leftForearm: [0.02, -1, 0.05], rightUpperArm: [-0.04, -0.98, 0.18], rightForearm: [-0.02, -1, 0.05], leftThigh: [0.05, -0.98, 0.18], leftShin: [0.02, -0.99, -0.08], rightThigh: [-0.05, -0.98, 0.18], rightShin: [-0.02, -0.99, -0.08], leftPalm: [0.05, 0.03, -1], rightPalm: [-0.05, 0.03, -1], bodyRoll: 0, spineBend: 3, headTurn: 0, headTilt: 0, footPoint: 0, bodyPitch: 87, grip: 0.06, hipsY: -0.03 },
+  // countermovement: Hips and knees load together while both arms swing behind the body for a natural countermovement.
+  { t: 0.12, leftUpperArm: [0.05, -0.72, -0.69], leftForearm: [0.03, -0.92, -0.39], rightUpperArm: [-0.05, -0.72, -0.69], rightForearm: [-0.03, -0.92, -0.39], leftThigh: [0.08, -0.64, 0.76], leftShin: [0.03, -0.76, -0.65], rightThigh: [-0.08, -0.64, 0.76], rightShin: [-0.03, -0.76, -0.65], leftPalm: [0.05, 0.04, -1], rightPalm: [-0.05, 0.04, -1], bodyRoll: 0, spineBend: 13, headTurn: 0, headTilt: 1, footPoint: 0, bodyPitch: 73, grip: 0.07, hipsY: -0.22 },
+  // drive: Both legs extend as the arms whip forward; hips lead the body into forward and upward acceleration.
+  { t: 0.24, leftUpperArm: [0.04, -0.18, 0.98], leftForearm: [0.02, -0.56, 0.83], rightUpperArm: [-0.04, -0.18, 0.98], rightForearm: [-0.02, -0.56, 0.83], leftThigh: [0.06, -0.82, 0.57], leftShin: [0.02, -0.96, 0.27], rightThigh: [-0.06, -0.82, 0.57], rightShin: [-0.02, -0.96, 0.27], leftPalm: [0.04, 0.02, -1], rightPalm: [-0.04, 0.02, -1], bodyRoll: 0, spineBend: -2, headTurn: 0, headTilt: -3, footPoint: 18, bodyPitch: 68, grip: 0.08, hipsY: -0.04 },
+  // takeoff: Feet leave the ground together after full extension; arms stay forward to control pitch.
+  { t: 0.34, leftUpperArm: [0.03, 0.16, 0.98], leftForearm: [0.02, -0.28, 0.96], rightUpperArm: [-0.03, 0.16, 0.98], rightForearm: [-0.02, -0.28, 0.96], leftThigh: [0.05, -0.92, -0.39], leftShin: [0.02, -0.99, 0.12], rightThigh: [-0.05, -0.92, -0.39], rightShin: [-0.02, -0.99, 0.12], leftPalm: [0.03, 0, -1], rightPalm: [-0.03, 0, -1], bodyRoll: 0, spineBend: -4, headTurn: 0, headTilt: -3, footPoint: 28, bodyPitch: 58, grip: 0.07, hipsY: 0.08 },
+  // early-flight: Knees come forward modestly during flight while the torso remains controlled and the eyes stay on the landing.
+  { t: 0.47, leftUpperArm: [0.04, 0.24, 0.97], leftForearm: [0.02, -0.16, 0.99], rightUpperArm: [-0.04, 0.24, 0.97], rightForearm: [-0.02, -0.16, 0.99], leftThigh: [0.05, -0.44, 0.9], leftShin: [0.02, -0.76, -0.65], rightThigh: [-0.05, -0.44, 0.9], rightShin: [-0.02, -0.76, -0.65], leftPalm: [0.03, 0, -1], rightPalm: [-0.03, 0, -1], bodyRoll: 0, spineBend: 0, headTurn: 0, headTilt: -1, footPoint: 22, bodyPitch: 48, grip: 0.06, hipsY: 0.2 },
+  // apex: At the apex both feet begin moving ahead of the hips and the arms start lowering for landing balance.
+  { t: 0.6, leftUpperArm: [0.04, 0.08, 1], leftForearm: [0.02, -0.3, 0.95], rightUpperArm: [-0.04, 0.08, 1], rightForearm: [-0.02, -0.3, 0.95], leftThigh: [0.06, -0.26, 0.96], leftShin: [0.02, -0.64, -0.77], rightThigh: [-0.06, -0.26, 0.96], rightShin: [-0.02, -0.64, -0.77], leftPalm: [0.03, 0.02, -1], rightPalm: [-0.03, 0.02, -1], bodyRoll: 0, spineBend: 5, headTurn: 0, headTilt: 0, footPoint: 15, bodyPitch: 47, grip: 0.06, hipsY: 0.24 },
+  // landing-prep: Feet extend forward together and the arms lower as the character prepares for a soft two-foot landing.
+  { t: 0.72, leftUpperArm: [0.04, -0.3, 0.95], leftForearm: [0.02, -0.66, 0.75], rightUpperArm: [-0.04, -0.3, 0.95], rightForearm: [-0.02, -0.66, 0.75], leftThigh: [0.07, -0.18, 0.98], leftShin: [0.03, -0.78, -0.62], rightThigh: [-0.07, -0.18, 0.98], rightShin: [-0.03, -0.78, -0.62], leftPalm: [0.04, 0.03, -1], rightPalm: [-0.04, 0.03, -1], bodyRoll: 0, spineBend: 10, headTurn: 0, headTilt: 1, footPoint: 5, bodyPitch: 54, grip: 0.06, hipsY: 0.14 },
+  // contact: Both feet contact together; knees flex immediately and the torso comes forward over the base of support.
+  { t: 0.83, leftUpperArm: [0.05, -0.64, -0.77], leftForearm: [0.03, -0.9, -0.43], rightUpperArm: [-0.05, -0.64, -0.77], rightForearm: [-0.03, -0.9, -0.43], leftThigh: [0.08, -0.46, 0.88], leftShin: [0.03, -0.72, -0.69], rightThigh: [-0.08, -0.46, 0.88], rightShin: [-0.03, -0.72, -0.69], leftPalm: [0.05, 0.04, -1], rightPalm: [-0.05, 0.04, -1], bodyRoll: 0, spineBend: 15, headTurn: 0, headTilt: 2, footPoint: 0, bodyPitch: 64, grip: 0.06, hipsY: -0.1 },
+  // absorb: Hips sink and knees absorb impact; arms continue backward to prevent the body from tipping behind.
+  { t: 0.92, leftUpperArm: [0.05, -0.84, -0.54], leftForearm: [0.02, -0.97, -0.24], rightUpperArm: [-0.05, -0.84, -0.54], rightForearm: [-0.02, -0.97, -0.24], leftThigh: [0.1, -0.56, 0.82], leftShin: [0.04, -0.64, -0.77], rightThigh: [-0.1, -0.56, 0.82], rightShin: [-0.04, -0.64, -0.77], leftPalm: [0.05, 0.05, -1], rightPalm: [-0.05, 0.05, -1], bodyRoll: 0, spineBend: 17, headTurn: 0, headTilt: 2, footPoint: 0, bodyPitch: 69, grip: 0.06, hipsY: -0.24 },
+  // recover: Character rises into a stable athletic stance, ready to blend into idle, walk or run.
+  { t: 1, leftUpperArm: [0.04, -0.96, 0.27], leftForearm: [0.02, -0.99, 0.1], rightUpperArm: [-0.04, -0.96, 0.27], rightForearm: [-0.02, -0.99, 0.1], leftThigh: [0.06, -0.88, 0.47], leftShin: [0.03, -0.91, -0.41], rightThigh: [-0.06, -0.88, 0.47], rightShin: [-0.03, -0.91, -0.41], leftPalm: [0.04, 0.04, -1], rightPalm: [-0.04, 0.04, -1], bodyRoll: 0, spineBend: 8, headTurn: 0, headTilt: 0, footPoint: 0, bodyPitch: 79, grip: 0.05, hipsY: -0.12 }
+];
+var DURATION14 = 0.95;
+var jump_forward_default = defineAnimation({
+  slug: "jump-forward",
+  name: "Jump Forward",
+  clip: "JumpForward",
+  subcategory: "animations",
+  kind: "once",
+  duration: DURATION14,
+  keys: POSES14.map((pose) => referenceKey(pose, DURATION14, 90))
+});
+
+// ../core-library/dist/avatar-appearance/animations/jump-backward.js
+var POSES15 = [
+  // ready: Balanced start; gaze remains forward while the body prepares to jump backward.
+  { t: 0, leftUpperArm: [0.04, -0.98, 0.18], leftForearm: [0.02, -1, 0.05], rightUpperArm: [-0.04, -0.98, 0.18], rightForearm: [-0.02, -1, 0.05], leftThigh: [0.05, -0.98, 0.18], leftShin: [0.02, -0.99, -0.08], rightThigh: [-0.05, -0.98, 0.18], rightShin: [-0.02, -0.99, -0.08], leftPalm: [0.05, 0.03, -1], rightPalm: [-0.05, 0.03, -1], bodyRoll: 0, spineBend: 2, headTurn: 0, headTilt: 0, footPoint: 0, bodyPitch: 91, grip: 0.07, hipsY: -0.03 },
+  // countermovement: Hips drop and arms move forward so they can sweep backward during the takeoff.
+  { t: 0.12, leftUpperArm: [0.05, -0.28, 0.96], leftForearm: [0.03, -0.62, 0.78], rightUpperArm: [-0.05, -0.28, 0.96], rightForearm: [-0.03, -0.62, 0.78], leftThigh: [0.08, -0.62, 0.78], leftShin: [0.03, -0.74, -0.67], rightThigh: [-0.08, -0.62, 0.78], rightShin: [-0.03, -0.74, -0.67], leftPalm: [0.05, 0.03, -1], rightPalm: [-0.05, 0.03, -1], bodyRoll: 0, spineBend: 8, headTurn: 0, headTilt: 0, footPoint: 0, bodyPitch: 82, grip: 0.08, hipsY: -0.22 },
+  // backward-drive: Both legs extend as the arms sweep behind; hips travel backward while the head stays controlled.
+  { t: 0.24, leftUpperArm: [0.05, -0.76, -0.65], leftForearm: [0.03, -0.94, -0.34], rightUpperArm: [-0.05, -0.76, -0.65], rightForearm: [-0.03, -0.94, -0.34], leftThigh: [0.06, -0.84, 0.54], leftShin: [0.02, -0.96, 0.27], rightThigh: [-0.06, -0.84, 0.54], rightShin: [-0.02, -0.96, 0.27], leftPalm: [0.05, 0.04, -1], rightPalm: [-0.05, 0.04, -1], bodyRoll: 0, spineBend: -3, headTurn: 0, headTilt: 0, footPoint: 18, bodyPitch: 99, grip: 0.08, hipsY: -0.03 },
+  // takeoff: Feet leave the floor together; the body has a small backward lean rather than throwing the head back.
+  { t: 0.34, leftUpperArm: [0.04, -0.88, -0.47], leftForearm: [0.02, -0.98, -0.18], rightUpperArm: [-0.04, -0.88, -0.47], rightForearm: [-0.02, -0.98, -0.18], leftThigh: [0.05, -0.94, -0.34], leftShin: [0.02, -0.99, 0.12], rightThigh: [-0.05, -0.94, -0.34], rightShin: [-0.02, -0.99, 0.12], leftPalm: [0.04, 0.04, -1], rightPalm: [-0.04, 0.04, -1], bodyRoll: 0, spineBend: -5, headTurn: 0, headTilt: 1, footPoint: 28, bodyPitch: 105, grip: 0.07, hipsY: 0.08 },
+  // early-flight: Knees soften in flight and arms remain slightly behind to balance the backward trajectory.
+  { t: 0.47, leftUpperArm: [0.04, -0.64, -0.77], leftForearm: [0.02, -0.9, -0.43], rightUpperArm: [-0.04, -0.64, -0.77], rightForearm: [-0.02, -0.9, -0.43], leftThigh: [0.05, -0.58, 0.81], leftShin: [0.02, -0.8, -0.6], rightThigh: [-0.05, -0.58, 0.81], rightShin: [-0.02, -0.8, -0.6], leftPalm: [0.04, 0.04, -1], rightPalm: [-0.04, 0.04, -1], bodyRoll: 0, spineBend: -2, headTurn: 0, headTilt: 1, footPoint: 20, bodyPitch: 103, grip: 0.06, hipsY: 0.18 },
+  // apex: At the apex the feet begin searching for the floor behind the hips while the torso returns toward upright.
+  { t: 0.6, leftUpperArm: [0.06, -0.46, -0.886], leftForearm: [0.02, -0.8, -0.6], rightUpperArm: [-0.06, -0.46, -0.886], rightForearm: [-0.02, -0.8, -0.6], leftThigh: [0.06, -0.44, 0.9], leftShin: [0.02, -0.72, -0.69], rightThigh: [-0.06, -0.44, 0.9], rightShin: [-0.02, -0.72, -0.69], leftPalm: [0.04, 0.04, -1], rightPalm: [-0.04, 0.04, -1], bodyRoll: 0, spineBend: 1, headTurn: 0, headTilt: 1, footPoint: 14, bodyPitch: 101, grip: 0.06, hipsY: 0.22 },
+  // landing-prep: Arms come forward and feet move beneath the body to prepare for a stable blind-side landing.
+  { t: 0.72, leftUpperArm: [0.04, -0.1, 0.99], leftForearm: [0.02, -0.5, 0.86], rightUpperArm: [-0.04, -0.1, 0.99], rightForearm: [-0.02, -0.5, 0.86], leftThigh: [0.07, -0.7, 0.71], leftShin: [0.03, -0.9, -0.43], rightThigh: [-0.07, -0.7, 0.71], rightShin: [-0.03, -0.9, -0.43], leftPalm: [0.04, 0.03, -1], rightPalm: [-0.04, 0.03, -1], bodyRoll: 0, spineBend: 5, headTurn: 0, headTilt: 0, footPoint: 4, bodyPitch: 96, grip: 0.06, hipsY: 0.12 },
+  // contact: Both feet contact together behind the starting position; knees bend immediately to absorb the landing.
+  { t: 0.83, leftUpperArm: [0.05, -0.24, 0.97], leftForearm: [0.03, -0.6, 0.8], rightUpperArm: [-0.05, -0.24, 0.97], rightForearm: [-0.03, -0.6, 0.8], leftThigh: [0.08, -0.58, 0.81], leftShin: [0.03, -0.68, -0.73], rightThigh: [-0.08, -0.58, 0.81], rightShin: [-0.03, -0.68, -0.73], leftPalm: [0.05, 0.03, -1], rightPalm: [-0.05, 0.03, -1], bodyRoll: 0, spineBend: 10, headTurn: 0, headTilt: 0, footPoint: 0, bodyPitch: 88, grip: 0.06, hipsY: -0.1 },
+  // absorb: Hips sink between the feet while arms move forward as counterbalance and the chest stays controlled.
+  { t: 0.92, leftUpperArm: [0.05, -0.52, 0.85], leftForearm: [0.03, -0.82, 0.57], rightUpperArm: [-0.05, -0.52, 0.85], rightForearm: [-0.03, -0.82, 0.57], leftThigh: [0.1, -0.54, 0.84], leftShin: [0.04, -0.62, -0.78], rightThigh: [-0.1, -0.54, 0.84], rightShin: [-0.04, -0.62, -0.78], leftPalm: [0.05, 0.03, -1], rightPalm: [-0.05, 0.03, -1], bodyRoll: 0, spineBend: 14, headTurn: 0, headTilt: 1, footPoint: 0, bodyPitch: 80, grip: 0.06, hipsY: -0.23 },
+  // recover: Character recovers into a balanced athletic stance while still facing the original direction.
+  { t: 1, leftUpperArm: [0.04, -0.96, 0.27], leftForearm: [0.02, -0.99, 0.1], rightUpperArm: [-0.04, -0.96, 0.27], rightForearm: [-0.02, -0.99, 0.1], leftThigh: [0.06, -0.88, 0.47], leftShin: [0.03, -0.91, -0.41], rightThigh: [-0.06, -0.88, 0.47], rightShin: [-0.03, -0.91, -0.41], leftPalm: [0.04, 0.04, -1], rightPalm: [-0.04, 0.04, -1], bodyRoll: 0, spineBend: 7, headTurn: 0, headTilt: 0, footPoint: 0, bodyPitch: 87, grip: 0.05, hipsY: -0.11 }
+];
+var DURATION15 = 0.92;
+var jump_backward_default = defineAnimation({
+  slug: "jump-backward",
+  name: "Jump Backward",
+  clip: "JumpBackward",
+  subcategory: "animations",
+  kind: "once",
+  duration: DURATION15,
+  keys: POSES15.map((pose) => referenceKey(pose, DURATION15, 90))
+});
+
+// ../core-library/dist/avatar-appearance/animations/long-jump.js
+var POSES16 = [
+  // approach: Fast final approach step; gaze stays ahead while opposite arm and knee prepare the takeoff.
+  { t: 0, leftUpperArm: [0.03, -0.82, -0.57], leftForearm: [0.02, -0.97, -0.24], rightUpperArm: [-0.03, -0.42, 0.91], rightForearm: [-0.02, -0.72, 0.69], leftThigh: [0.05, -0.4, 0.92], leftShin: [0.02, -0.72, -0.69], rightThigh: [-0.04, -0.92, -0.39], rightShin: [-0.02, -0.99, 0.1], leftPalm: [0.05, 0.03, -1], rightPalm: [-0.05, 0.03, -1], bodyRoll: -2, spineBend: 5, headTurn: 0, headTilt: -2, footPoint: 14, bodyPitch: 70, grip: 0.14, hipsY: 0.02 },
+  // penultimate: Penultimate step lowers the hips slightly so horizontal speed can be converted into a controlled upward takeoff.
+  { t: 0.1, leftUpperArm: [0.04, -0.58, 0.81], leftForearm: [0.02, -0.84, 0.54], rightUpperArm: [-0.04, -0.78, -0.63], rightForearm: [-0.02, -0.96, -0.27], leftThigh: [0.05, -0.84, -0.54], leftShin: [0.02, -0.97, 0.24], rightThigh: [-0.05, -0.52, 0.85], rightShin: [-0.02, -0.8, -0.6], leftPalm: [0.05, 0.03, -1], rightPalm: [-0.05, 0.03, -1], bodyRoll: 1, spineBend: 4, headTurn: 0, headTilt: -2, footPoint: 10, bodyPitch: 74, grip: 0.14, hipsY: -0.04 },
+  // takeoff-load: Takeoff leg loads under the hips; free knee and opposite arm drive forward and upward.
+  { t: 0.2, leftUpperArm: [0.04, -0.7, -0.71], leftForearm: [0.02, -0.92, -0.39], rightUpperArm: [-0.04, -0.3, 0.95], rightForearm: [-0.02, -0.62, 0.78], leftThigh: [0.04, -0.93, -0.36], leftShin: [0.02, -0.98, 0.18], rightThigh: [-0.05, -0.38, 0.92], rightShin: [-0.02, -0.7, -0.71], leftPalm: [0.05, 0.03, -1], rightPalm: [-0.05, 0.03, -1], bodyRoll: 0, spineBend: 3, headTurn: 0, headTilt: -3, footPoint: 8, bodyPitch: 78, grip: 0.15, hipsY: -0.08 },
+  // takeoff: Takeoff leg extends powerfully as both arms drive forward; the body leaves the ground with forward momentum.
+  { t: 0.3, leftUpperArm: [0.03, -0.3, 0.95], leftForearm: [0.02, -0.64, 0.77], rightUpperArm: [-0.03, -0.18, 0.98], rightForearm: [-0.02, -0.55, 0.83], leftThigh: [0.04, -0.86, -0.5], leftShin: [0.02, -0.98, 0.18], rightThigh: [-0.05, -0.28, 0.96], rightShin: [-0.02, -0.66, -0.75], leftPalm: [0.04, 0.02, -1], rightPalm: [-0.04, 0.02, -1], bodyRoll: 0, spineBend: -2, headTurn: 0, headTilt: -4, footPoint: 20, bodyPitch: 67, grip: 0.14, hipsY: 0.04 },
+  // early-flight: Arms reach forward as both knees begin coming up; torso stays long instead of folding too early.
+  { t: 0.42, leftUpperArm: [0.04, 0.18, 0.98], leftForearm: [0.02, -0.28, 0.96], rightUpperArm: [-0.04, 0.2, 0.98], rightForearm: [-0.02, -0.26, 0.96], leftThigh: [0.05, -0.35, 0.94], leftShin: [0.02, -0.68, -0.73], rightThigh: [-0.05, -0.3, 0.95], rightShin: [-0.02, -0.66, -0.75], leftPalm: [0.03, 0, -1], rightPalm: [-0.03, 0, -1], bodyRoll: 0, spineBend: -4, headTurn: 0, headTilt: -3, footPoint: 24, bodyPitch: 54, grip: 0.12, hipsY: 0.18 },
+  // flight: At peak flight both thighs advance together; arms remain forward to control rotation and prepare the landing.
+  { t: 0.55, leftUpperArm: [0.04, 0.32, 0.95], leftForearm: [0.02, -0.1, 0.99], rightUpperArm: [-0.04, 0.32, 0.95], rightForearm: [-0.02, -0.1, 0.99], leftThigh: [0.05, -0.16, 0.99], leftShin: [0.02, -0.5, -0.86], rightThigh: [-0.05, -0.16, 0.99], rightShin: [-0.02, -0.5, -0.86], leftPalm: [0.02, -0.02, -1], rightPalm: [-0.02, -0.02, -1], bodyRoll: 0, spineBend: 4, headTurn: 0, headTilt: -1, footPoint: 18, bodyPitch: 43, grip: 0.1, hipsY: 0.27 },
+  // landing-prep: Both legs extend forward together for landing while the arms begin sweeping down and back to prevent backward rotation.
+  { t: 0.68, leftUpperArm: [0.05, -0.05, 0.99], leftForearm: [0.02, -0.4, 0.92], rightUpperArm: [-0.05, -0.05, 0.99], rightForearm: [-0.02, -0.4, 0.92], leftThigh: [0.06, -0.05, 1], leftShin: [0.02, -0.68, -0.73], rightThigh: [-0.06, -0.05, 1], rightShin: [-0.02, -0.68, -0.73], leftPalm: [0.02, 0.02, -1], rightPalm: [-0.02, 0.02, -1], bodyRoll: 0, spineBend: 10, headTurn: 0, headTilt: 1, footPoint: 5, bodyPitch: 48, grip: 0.08, hipsY: 0.2 },
+  // heel-contact: Both feet contact ahead of the hips; knees immediately begin flexing and arms sweep backward to absorb momentum.
+  { t: 0.8, leftUpperArm: [0.05, -0.72, -0.69], leftForearm: [0.02, -0.93, -0.36], rightUpperArm: [-0.05, -0.72, -0.69], rightForearm: [-0.02, -0.93, -0.36], leftThigh: [0.06, -0.36, 0.93], leftShin: [0.02, -0.88, -0.47], rightThigh: [-0.06, -0.36, 0.93], rightShin: [-0.02, -0.88, -0.47], leftPalm: [0.03, 0.05, -1], rightPalm: [-0.03, 0.05, -1], bodyRoll: 0, spineBend: 15, headTurn: 0, headTilt: 2, footPoint: 0, bodyPitch: 58, grip: 0.08, hipsY: -0.02 },
+  // absorb: Deep knee and hip flexion absorbs the landing while the chest comes forward over the feet to keep balance.
+  { t: 0.9, leftUpperArm: [0.05, -0.88, -0.47], leftForearm: [0.02, -0.98, -0.18], rightUpperArm: [-0.05, -0.88, -0.47], rightForearm: [-0.02, -0.98, -0.18], leftThigh: [0.1, -0.52, 0.85], leftShin: [0.04, -0.66, -0.75], rightThigh: [-0.1, -0.52, 0.85], rightShin: [-0.04, -0.66, -0.75], leftPalm: [0.04, 0.05, -1], rightPalm: [-0.04, 0.05, -1], bodyRoll: 0, spineBend: 18, headTurn: 0, headTilt: 3, footPoint: 2, bodyPitch: 66, grip: 0.08, hipsY: -0.25 },
+  // recover: Character recovers from the landing into a balanced athletic stance with the head and eyes forward.
+  { t: 1, leftUpperArm: [0.04, -0.96, 0.27], leftForearm: [0.02, -0.99, 0.1], rightUpperArm: [-0.04, -0.96, 0.27], rightForearm: [-0.02, -0.99, 0.1], leftThigh: [0.06, -0.88, 0.47], leftShin: [0.03, -0.91, -0.41], rightThigh: [-0.06, -0.88, 0.47], rightShin: [-0.03, -0.91, -0.41], leftPalm: [0.04, 0.04, -1], rightPalm: [-0.04, 0.04, -1], bodyRoll: 0, spineBend: 9, headTurn: 0, headTilt: 0, footPoint: 0, bodyPitch: 78, grip: 0.06, hipsY: -0.13 }
+];
+var DURATION16 = 1.25;
+var long_jump_default = defineAnimation({
+  slug: "long-jump",
+  name: "Long Jump",
+  clip: "LongJump",
+  subcategory: "animations",
+  kind: "once",
+  duration: DURATION16,
+  keys: POSES16.map((pose) => referenceKey(pose, DURATION16, 90))
+});
+
+// ../core-library/dist/avatar-appearance/animations/soft-landing.js
+var POSES17 = [
+  // descent: Descending with feet beneath the body; arms are forward for balance and the eyes track the landing.
+  { t: 0, leftUpperArm: [0.08, -0.2, 0.98], leftForearm: [0.04, -0.58, 0.81], rightUpperArm: [-0.08, -0.2, 0.98], rightForearm: [-0.04, -0.58, 0.81], leftThigh: [0.08, -0.78, 0.62], leftShin: [0.03, -0.92, -0.39], rightThigh: [-0.08, -0.78, 0.62], rightShin: [-0.03, -0.92, -0.39], leftPalm: [0.08, 0.03, -0.99], rightPalm: [-0.08, 0.03, -0.99], bodyRoll: 0, spineBend: 5, headTurn: 0, headTilt: 2, footPoint: 8, bodyPitch: 84, grip: 0.05, hipsY: 0.16 },
+  // prepare: Ankles, knees and hips pre-flex before contact instead of landing with locked legs.
+  { t: 0.12, leftUpperArm: [0.1, -0.36, 0.93], leftForearm: [0.05, -0.7, 0.71], rightUpperArm: [-0.1, -0.36, 0.93], rightForearm: [-0.05, -0.7, 0.71], leftThigh: [0.1, -0.66, 0.74], leftShin: [0.04, -0.8, -0.6], rightThigh: [-0.1, -0.66, 0.74], rightShin: [-0.04, -0.8, -0.6], leftPalm: [0.08, 0.04, -0.99], rightPalm: [-0.08, 0.04, -0.99], bodyRoll: 0, spineBend: 8, headTurn: 0, headTilt: 2, footPoint: 4, bodyPitch: 80, grip: 0.05, hipsY: 0.08 },
+  // toe-contact: Forefeet make soft contact first; knees immediately yield and the heels begin lowering.
+  { t: 0.24, leftUpperArm: [0.08, -0.48, 0.87], leftForearm: [0.04, -0.78, 0.62], rightUpperArm: [-0.08, -0.48, 0.87], rightForearm: [-0.04, -0.78, 0.62], leftThigh: [0.1, -0.58, 0.81], leftShin: [0.04, -0.72, -0.69], rightThigh: [-0.1, -0.58, 0.81], rightShin: [-0.04, -0.72, -0.69], leftPalm: [0.07, 0.04, -0.99], rightPalm: [-0.07, 0.04, -0.99], bodyRoll: 0, spineBend: 11, headTurn: 0, headTilt: 2, footPoint: 1, bodyPitch: 76, grip: 0.05, hipsY: -0.02 },
+  // absorb-one: Knees and hips flex progressively while the arms sweep down to control the body's downward momentum.
+  { t: 0.36, leftUpperArm: [0.07, -0.66, 0.75], leftForearm: [0.04, -0.88, 0.47], rightUpperArm: [-0.07, -0.66, 0.75], rightForearm: [-0.04, -0.88, 0.47], leftThigh: [0.12, -0.5, 0.86], leftShin: [0.05, -0.64, -0.77], rightThigh: [-0.12, -0.5, 0.86], rightShin: [-0.05, -0.64, -0.77], leftPalm: [0.07, 0.05, -0.99], rightPalm: [-0.07, 0.05, -0.99], bodyRoll: 0, spineBend: 14, headTurn: 0, headTilt: 2, footPoint: 0, bodyPitch: 72, grip: 0.05, hipsY: -0.15 },
+  // deep-absorb: Lowest point of the soft landing; hips sit back slightly and knees remain aligned with the feet.
+  { t: 0.5, leftUpperArm: [0.06, -0.8, 0.6], leftForearm: [0.03, -0.95, 0.3], rightUpperArm: [-0.06, -0.8, 0.6], rightForearm: [-0.03, -0.95, 0.3], leftThigh: [0.14, -0.47, 0.87], leftShin: [0.06, -0.59, -0.8], rightThigh: [-0.14, -0.47, 0.87], rightShin: [-0.06, -0.59, -0.8], leftPalm: [0.06, 0.05, -0.99], rightPalm: [-0.06, 0.05, -0.99], bodyRoll: 0, spineBend: 16, headTurn: 0, headTilt: 1, footPoint: 0, bodyPitch: 70, grip: 0.05, hipsY: -0.25 },
+  // stabilise: Downward energy is gone; the character holds a compact stable stance before rising.
+  { t: 0.64, leftUpperArm: [0.05, -0.9, 0.43], leftForearm: [0.03, -0.98, 0.18], rightUpperArm: [-0.05, -0.9, 0.43], rightForearm: [-0.03, -0.98, 0.18], leftThigh: [0.1, -0.6, 0.79], leftShin: [0.04, -0.7, -0.71], rightThigh: [-0.1, -0.6, 0.79], rightShin: [-0.04, -0.7, -0.71], leftPalm: [0.06, 0.05, -0.99], rightPalm: [-0.06, 0.05, -0.99], bodyRoll: 0, spineBend: 12, headTurn: 0, headTilt: 0, footPoint: 0, bodyPitch: 75, grip: 0.05, hipsY: -0.2 },
+  // rise: Legs extend smoothly as the chest stacks back over the pelvis; no abrupt snap to standing.
+  { t: 0.78, leftUpperArm: [0.04, -0.95, 0.31], leftForearm: [0.02, -0.99, 0.12], rightUpperArm: [-0.04, -0.95, 0.31], rightForearm: [-0.02, -0.99, 0.12], leftThigh: [0.08, -0.76, 0.65], leftShin: [0.03, -0.84, -0.54], rightThigh: [-0.08, -0.76, 0.65], rightShin: [-0.03, -0.84, -0.54], leftPalm: [0.05, 0.04, -0.99], rightPalm: [-0.05, 0.04, -0.99], bodyRoll: 0, spineBend: 8, headTurn: 0, headTilt: 0, footPoint: 0, bodyPitch: 81, grip: 0.05, hipsY: -0.12 },
+  // recover: The body returns toward neutral while retaining soft knees and a ready posture.
+  { t: 0.9, leftUpperArm: [0.04, -0.98, 0.18], leftForearm: [0.02, -1, 0.05], rightUpperArm: [-0.04, -0.98, 0.18], rightForearm: [-0.02, -1, 0.05], leftThigh: [0.05, -0.92, 0.39], leftShin: [0.02, -0.96, -0.27], rightThigh: [-0.05, -0.92, 0.39], rightShin: [-0.02, -0.96, -0.27], leftPalm: [0.05, 0.03, -0.99], rightPalm: [-0.05, 0.03, -0.99], bodyRoll: 0, spineBend: 4, headTurn: 0, headTilt: 0, footPoint: 0, bodyPitch: 86, grip: 0.05, hipsY: -0.05 },
+  // finish: Stable neutral finish ready to blend into idle, walk or run.
+  { t: 1, leftUpperArm: [0.04, -0.99, 0.1], leftForearm: [0.02, -1, 0.03], rightUpperArm: [-0.04, -0.99, 0.1], rightForearm: [-0.02, -1, 0.03], leftThigh: [0.04, -1, 0.02], leftShin: [0.02, -1, 0], rightThigh: [-0.04, -1, 0.02], rightShin: [-0.02, -1, 0], leftPalm: [0.05, 0.02, -1], rightPalm: [-0.05, 0.02, -1], bodyRoll: 0, spineBend: 0, headTurn: 0, headTilt: 0, footPoint: 0, bodyPitch: 90, grip: 0.05, hipsY: 0 }
+];
+var DURATION17 = 0.72;
+var soft_landing_default = defineAnimation({
+  slug: "soft-landing",
+  name: "Soft Landing",
+  clip: "SoftLanding",
+  subcategory: "animations",
+  kind: "once",
+  duration: DURATION17,
+  keys: POSES17.map((pose) => referenceKey(pose, DURATION17, 90))
+});
+
+// ../core-library/dist/avatar-appearance/animations/hard-landing.js
+var POSES18 = [
+  // fast-descent: Fast descent with feet under the body; arms spread forward and outward to prepare for a heavy impact.
+  { t: 0, leftUpperArm: [0.12, -0.08, 0.99], leftForearm: [0.06, -0.5, 0.86], rightUpperArm: [-0.12, -0.08, 0.99], rightForearm: [-0.06, -0.5, 0.86], leftThigh: [0.1, -0.78, 0.62], leftShin: [0.04, -0.91, -0.41], rightThigh: [-0.1, -0.78, 0.62], rightShin: [-0.04, -0.91, -0.41], leftPalm: [0.1, 0.02, -0.99], rightPalm: [-0.1, 0.02, -0.99], bodyRoll: 0, spineBend: 4, headTurn: 0, headTilt: 3, footPoint: 10, bodyPitch: 83, grip: 0.12, hipsY: 0.24 },
+  // brace: Knees and hips pre-flex before contact while the torso braces without locking the spine.
+  { t: 0.1, leftUpperArm: [0.16, -0.28, 0.95], leftForearm: [0.08, -0.64, 0.76], rightUpperArm: [-0.16, -0.28, 0.95], rightForearm: [-0.08, -0.64, 0.76], leftThigh: [0.12, -0.66, 0.74], leftShin: [0.05, -0.8, -0.6], rightThigh: [-0.12, -0.66, 0.74], rightShin: [-0.05, -0.8, -0.6], leftPalm: [0.12, 0.03, -0.99], rightPalm: [-0.12, 0.03, -0.99], bodyRoll: 0, spineBend: 8, headTurn: 0, headTilt: 3, footPoint: 5, bodyPitch: 78, grip: 0.16, hipsY: 0.1 },
+  // impact: Both feet hit nearly together; ankles, knees and hips immediately yield under the heavy vertical load.
+  { t: 0.2, leftUpperArm: [0.14, -0.52, 0.84], leftForearm: [0.07, -0.8, 0.6], rightUpperArm: [-0.14, -0.52, 0.84], rightForearm: [-0.07, -0.8, 0.6], leftThigh: [0.14, -0.54, 0.83], leftShin: [0.06, -0.69, -0.72], rightThigh: [-0.14, -0.54, 0.83], rightShin: [-0.06, -0.69, -0.72], leftPalm: [0.1, 0.05, -0.99], rightPalm: [-0.1, 0.05, -0.99], bodyRoll: 0, spineBend: 13, headTurn: 0, headTilt: 4, footPoint: 0, bodyPitch: 72, grip: 0.18, hipsY: -0.05 },
+  // collapse: The body drops into a deep squat to dissipate impact; arms swing down and back as the chest comes forward.
+  { t: 0.3, leftUpperArm: [0.1, -0.76, 0.64], leftForearm: [0.05, -0.92, 0.39], rightUpperArm: [-0.1, -0.76, 0.64], rightForearm: [-0.05, -0.92, 0.39], leftThigh: [0.18, -0.42, 0.89], leftShin: [0.08, -0.56, -0.82], rightThigh: [-0.18, -0.42, 0.89], rightShin: [-0.08, -0.56, -0.82], leftPalm: [0.08, 0.07, -0.99], rightPalm: [-0.08, 0.07, -0.99], bodyRoll: 0, spineBend: 20, headTurn: 0, headTilt: 5, footPoint: 0, bodyPitch: 64, grip: 0.2, hipsY: -0.27 },
+  // deep-absorb: Lowest compression point; hips sit back, knees remain aligned over the feet and the spine stays controlled.
+  { t: 0.42, leftUpperArm: [0.08, -0.88, 0.47], leftForearm: [0.04, -0.97, 0.24], rightUpperArm: [-0.08, -0.88, 0.47], rightForearm: [-0.04, -0.97, 0.24], leftThigh: [0.2, -0.38, 0.9], leftShin: [0.09, -0.51, -0.86], rightThigh: [-0.2, -0.38, 0.9], rightShin: [-0.09, -0.51, -0.86], leftPalm: [0.07, 0.08, -0.99], rightPalm: [-0.07, 0.08, -0.99], bodyRoll: 0, spineBend: 23, headTurn: 0, headTilt: 4, footPoint: 0, bodyPitch: 61, grip: 0.18, hipsY: -0.36 },
+  // impact-settle: The rebound is deliberately small; the character stabilises before trying to stand.
+  { t: 0.54, leftUpperArm: [0.07, -0.91, 0.4], leftForearm: [0.03, -0.98, 0.18], rightUpperArm: [-0.07, -0.91, 0.4], rightForearm: [-0.03, -0.98, 0.18], leftThigh: [0.17, -0.45, 0.88], leftShin: [0.07, -0.58, -0.81], rightThigh: [-0.17, -0.45, 0.88], rightShin: [-0.07, -0.58, -0.81], leftPalm: [0.07, 0.07, -0.99], rightPalm: [-0.07, 0.07, -0.99], bodyRoll: 0, spineBend: 20, headTurn: 0, headTilt: 3, footPoint: 0, bodyPitch: 65, grip: 0.14, hipsY: -0.33 },
+  // stabilise: Balance is regained in a low stance; head lifts first to re-establish awareness.
+  { t: 0.66, leftUpperArm: [0.06, -0.92, 0.38], leftForearm: [0.03, -0.98, 0.17], rightUpperArm: [-0.06, -0.92, 0.38], rightForearm: [-0.03, -0.98, 0.17], leftThigh: [0.14, -0.55, 0.82], leftShin: [0.06, -0.66, -0.75], rightThigh: [-0.14, -0.55, 0.82], rightShin: [-0.06, -0.66, -0.75], leftPalm: [0.06, 0.06, -0.99], rightPalm: [-0.06, 0.06, -0.99], bodyRoll: 0, spineBend: 16, headTurn: 0, headTilt: 2, footPoint: 0, bodyPitch: 70, grip: 0.12, hipsY: -0.27 },
+  // rise: Legs extend gradually as the torso stacks over the pelvis; arms return toward a neutral position.
+  { t: 0.78, leftUpperArm: [0.05, -0.95, 0.31], leftForearm: [0.02, -0.99, 0.12], rightUpperArm: [-0.05, -0.95, 0.31], rightForearm: [-0.02, -0.99, 0.12], leftThigh: [0.1, -0.7, 0.71], leftShin: [0.04, -0.78, -0.62], rightThigh: [-0.1, -0.7, 0.71], rightShin: [-0.04, -0.78, -0.62], leftPalm: [0.05, 0.05, -0.99], rightPalm: [-0.05, 0.05, -0.99], bodyRoll: 0, spineBend: 11, headTurn: 0, headTilt: 1, footPoint: 0, bodyPitch: 77, grip: 0.09, hipsY: -0.18 },
+  // recover: The character nearly returns to standing, retaining soft knees after the heavy landing.
+  { t: 0.9, leftUpperArm: [0.04, -0.98, 0.18], leftForearm: [0.02, -1, 0.05], rightUpperArm: [-0.04, -0.98, 0.18], rightForearm: [-0.02, -1, 0.05], leftThigh: [0.06, -0.9, 0.43], leftShin: [0.03, -0.94, -0.34], rightThigh: [-0.06, -0.9, 0.43], rightShin: [-0.03, -0.94, -0.34], leftPalm: [0.05, 0.03, -0.99], rightPalm: [-0.05, 0.03, -0.99], bodyRoll: 0, spineBend: 5, headTurn: 0, headTilt: 0, footPoint: 0, bodyPitch: 85, grip: 0.07, hipsY: -0.07 },
+  // finish: Stable neutral finish, ready to transition to locomotion.
+  { t: 1, leftUpperArm: [0.04, -0.99, 0.1], leftForearm: [0.02, -1, 0.03], rightUpperArm: [-0.04, -0.99, 0.1], rightForearm: [-0.02, -1, 0.03], leftThigh: [0.04, -1, 0.02], leftShin: [0.02, -1, 0], rightThigh: [-0.04, -1, 0.02], rightShin: [-0.02, -1, 0], leftPalm: [0.05, 0.02, -1], rightPalm: [-0.05, 0.02, -1], bodyRoll: 0, spineBend: 0, headTurn: 0, headTilt: 0, footPoint: 0, bodyPitch: 90, grip: 0.05, hipsY: 0 }
+];
+var DURATION18 = 1.05;
+var hard_landing_default = defineAnimation({
+  slug: "hard-landing",
+  name: "Hard Landing",
+  clip: "HardLanding",
+  subcategory: "animations",
+  kind: "once",
+  duration: DURATION18,
+  keys: POSES18.map((pose) => referenceKey(pose, DURATION18, 90))
+});
+
+// ../core-library/dist/avatar-appearance/animations/slide.js
+var POSES19 = [
+  // entry-run: Character enters from a run with the gaze forward and begins preparing to lower the centre of mass.
+  { t: 0, leftUpperArm: [0.04, -0.78, -0.63], leftForearm: [0.02, -0.95, -0.3], rightUpperArm: [-0.04, -0.4, 0.92], rightForearm: [-0.02, -0.72, 0.69], leftThigh: [0.05, -0.86, -0.5], leftShin: [0.02, -0.98, 0.18], rightThigh: [-0.05, -0.38, 0.92], rightShin: [-0.02, -0.7, -0.71], leftPalm: [0.06, 0.03, -0.99], rightPalm: [-0.06, 0.03, -0.99], bodyRoll: -2, spineBend: 5, headTurn: 0, headTilt: -2, footPoint: 14, bodyPitch: 70, grip: 0.12, hipsY: 0.01 },
+  // drop: Hips drop quickly while the torso inclines forward; both knees flex to enter the slide without collapsing.
+  { t: 0.1, leftUpperArm: [0.06, -0.58, -0.81], leftForearm: [0.03, -0.86, -0.5], rightUpperArm: [-0.06, -0.62, 0.78], rightForearm: [-0.03, -0.84, 0.54], leftThigh: [0.08, -0.62, 0.78], leftShin: [0.03, -0.74, -0.67], rightThigh: [-0.08, -0.7, 0.71], rightShin: [-0.03, -0.8, -0.6], leftPalm: [0.07, 0.04, -0.99], rightPalm: [-0.07, 0.04, -0.99], bodyRoll: 0, spineBend: 14, headTurn: 0, headTilt: 0, footPoint: 5, bodyPitch: 61, grip: 0.1, hipsY: -0.22 },
+  // slide-entry: Lead leg extends forward as the trailing leg folds underneath; arms move back and outward to stabilise.
+  { t: 0.2, leftUpperArm: [0.28, -0.42, -0.86], leftForearm: [0.04, -0.74, -0.67], rightUpperArm: [-0.08, -0.5, 0.86], rightForearm: [-0.04, -0.78, 0.62], leftThigh: [0.1, -0.24, 0.97], leftShin: [0.04, -0.82, -0.57], rightThigh: [-0.1, -0.58, 0.81], rightShin: [-0.04, -0.62, -0.78], leftPalm: [0.08, 0.05, -0.99], rightPalm: [-0.08, 0.05, -0.99], bodyRoll: 4, spineBend: 20, headTurn: 0, headTilt: 1, footPoint: 2, bodyPitch: 48, grip: 0.08, hipsY: -0.4 },
+  // full-slide: Character reaches the lowest sliding silhouette: one leg forward, the other folded, chest controlled above the hips.
+  { t: 0.32, leftUpperArm: [0.38, -0.32, -0.86], leftForearm: [0.05, -0.66, -0.75], rightUpperArm: [-0.1, -0.4, 0.91], rightForearm: [-0.05, -0.7, 0.71], leftThigh: [0.1, -0.08, 0.99], leftShin: [0.04, -0.92, -0.39], rightThigh: [-0.14, -0.42, 0.9], rightShin: [-0.06, -0.48, -0.87], leftPalm: [0.09, 0.05, -0.99], rightPalm: [-0.09, 0.05, -0.99], bodyRoll: 5, spineBend: 22, headTurn: 0, headTilt: 1, footPoint: 0, bodyPitch: 39, grip: 0.07, hipsY: -0.53 },
+  // slide-hold: The slide is sustained briefly with minimal vertical movement; head remains up so the player can see ahead.
+  { t: 0.46, leftUpperArm: [0.33, -0.38, -0.86], leftForearm: [0.04, -0.7, -0.71], rightUpperArm: [-0.08, -0.44, 0.89], rightForearm: [-0.04, -0.73, 0.68], leftThigh: [0.09, -0.1, 0.99], leftShin: [0.04, -0.94, -0.34], rightThigh: [-0.13, -0.45, 0.88], rightShin: [-0.05, -0.52, -0.85], leftPalm: [0.08, 0.05, -0.99], rightPalm: [-0.08, 0.05, -0.99], bodyRoll: 3, spineBend: 20, headTurn: 0, headTilt: 0, footPoint: 0, bodyPitch: 41, grip: 0.07, hipsY: -0.54 },
+  // brake: Forward speed drops as the lead foot and folded leg begin preparing to bring the body back underneath the pelvis.
+  { t: 0.6, leftUpperArm: [0.07, -0.5, -0.86], leftForearm: [0.04, -0.78, -0.62], rightUpperArm: [-0.07, -0.54, 0.84], rightForearm: [-0.04, -0.8, 0.6], leftThigh: [0.1, -0.22, 0.97], leftShin: [0.04, -0.88, -0.47], rightThigh: [-0.12, -0.5, 0.86], rightShin: [-0.05, -0.58, -0.81], leftPalm: [0.07, 0.05, -0.99], rightPalm: [-0.07, 0.05, -0.99], bodyRoll: 2, spineBend: 18, headTurn: 0, headTilt: 0, footPoint: 0, bodyPitch: 46, grip: 0.07, hipsY: -0.5 },
+  // leg-recover: Lead foot draws closer and the trailing leg comes underneath, transitioning from the slide into a compact crouch.
+  { t: 0.72, leftUpperArm: [0.06, -0.64, -0.77], leftForearm: [0.03, -0.86, -0.5], rightUpperArm: [-0.06, -0.64, 0.77], rightForearm: [-0.03, -0.86, 0.5], leftThigh: [0.1, -0.44, 0.89], leftShin: [0.04, -0.68, -0.73], rightThigh: [-0.1, -0.54, 0.84], rightShin: [-0.04, -0.62, -0.78], leftPalm: [0.06, 0.05, -0.99], rightPalm: [-0.06, 0.05, -0.99], bodyRoll: 1, spineBend: 16, headTurn: 0, headTilt: 0, footPoint: 0, bodyPitch: 56, grip: 0.07, hipsY: -0.42 },
+  // crouch: Character catches the remaining momentum in a balanced crouch with knees aligned over the feet.
+  { t: 0.84, leftUpperArm: [0.06, -0.76, 0.65], leftForearm: [0.03, -0.92, 0.39], rightUpperArm: [-0.06, -0.76, 0.65], rightForearm: [-0.03, -0.92, 0.39], leftThigh: [0.1, -0.54, 0.84], leftShin: [0.04, -0.64, -0.77], rightThigh: [-0.1, -0.54, 0.84], rightShin: [-0.04, -0.64, -0.77], leftPalm: [0.06, 0.05, -0.99], rightPalm: [-0.06, 0.05, -0.99], bodyRoll: 0, spineBend: 14, headTurn: 0, headTilt: 0, footPoint: 0, bodyPitch: 69, grip: 0.07, hipsY: -0.31 },
+  // rise: Legs begin extending while the torso rises smoothly; the character remains ready to transition back into locomotion.
+  { t: 0.93, leftUpperArm: [0.05, -0.9, 0.43], leftForearm: [0.02, -0.98, 0.18], rightUpperArm: [-0.05, -0.9, 0.43], rightForearm: [-0.02, -0.98, 0.18], leftThigh: [0.08, -0.72, 0.69], leftShin: [0.03, -0.8, -0.6], rightThigh: [-0.08, -0.72, 0.69], rightShin: [-0.03, -0.8, -0.6], leftPalm: [0.05, 0.04, -0.99], rightPalm: [-0.05, 0.04, -0.99], bodyRoll: 0, spineBend: 9, headTurn: 0, headTilt: 0, footPoint: 0, bodyPitch: 78, grip: 0.06, hipsY: -0.18 },
+  // finish: Slide finishes in a low athletic stance that can blend directly into run, crouch or idle.
+  { t: 1, leftUpperArm: [0.04, -0.96, 0.27], leftForearm: [0.02, -0.99, 0.1], rightUpperArm: [-0.04, -0.96, 0.27], rightForearm: [-0.02, -0.99, 0.1], leftThigh: [0.06, -0.88, 0.47], leftShin: [0.03, -0.91, -0.41], rightThigh: [-0.06, -0.88, 0.47], rightShin: [-0.03, -0.91, -0.41], leftPalm: [0.05, 0.04, -0.99], rightPalm: [-0.05, 0.04, -0.99], bodyRoll: 0, spineBend: 7, headTurn: 0, headTilt: 0, footPoint: 0, bodyPitch: 80, grip: 0.05, hipsY: -0.13 }
+];
+var DURATION19 = 1.05;
+var slide_default = defineAnimation({
+  slug: "slide",
+  name: "Slide",
+  clip: "Slide",
+  subcategory: "animations",
+  kind: "once",
+  duration: DURATION19,
+  keys: POSES19.map((pose) => referenceKey(pose, DURATION19, 90))
+});
+
+// ../core-library/dist/avatar-appearance/emotes/cheer.js
+var up = {
+  ...bothArms([0.55, 0.8, 0.15], [0.4, 0.9, 0.15], [0, 0.2, 1]),
+  Head: [-12, 0, 0],
+  Spine2: [-6, 0, 0],
+  hipsY: 0.06
+};
+var down = { ...up, ...bothArms([0.8, 0.5, 0.25], [0.55, 0.8, 0.25], [0, 0.2, 1]), hipsY: -0.03 };
+var cheer_default = defineAnimation({
+  slug: "cheer",
+  name: "Cheer",
+  clip: "Cheer",
+  subcategory: "emotes",
+  kind: "once",
+  duration: 1.6,
+  grip: 0.1,
+  keys: [at(0, {}), ...beats(0.25, 1.25, 4, up, down), at(1.6, {})]
+});
+
+// ../core-library/dist/avatar-appearance/emotes/clap.js
+var open2 = bothArms([0.35, -0.45, 0.82], [0.5, 0.25, 0.83], [-1, 0, 0.1]);
+var shut = bothArms([0.35, -0.45, 0.82], [-0.75, 0.25, 0.6], [-1, 0, 0.1]);
+var clap_default = defineAnimation({
+  slug: "clap",
+  name: "Clap",
+  clip: "Clap",
+  subcategory: "emotes",
+  kind: "once",
+  duration: 1.8,
+  grip: 0.05,
+  keys: [at(0, {}), at(0.25, open2), ...beats(0.4, 1.4, 6, shut, open2), at(1.8, {})]
+});
+
+// ../core-library/dist/avatar-appearance/emotes/dance.js
+var HIGH = [
+  [0.6, 0.6, 0.5],
+  [0.3, 0.9, 0.3]
+];
+var LOW = [
+  [0.3, -0.6, 0.75],
+  [-0.2, 0.35, 0.9]
+];
+var PALM2 = [0, 0, 1];
+var sway = (side3) => {
+  const [left2, right2] = side3 > 0 ? [HIGH, LOW] : [LOW, HIGH];
+  return {
+    Spine: [0, 0, 8 * side3],
+    Spine2: [0, 10 * side3, -4 * side3],
+    Head: [0, -8 * side3, 4 * side3],
+    ...arm("Left", left2[0], left2[1], PALM2),
+    ...arm("Right", mirror(right2[0]), mirror(right2[1]), mirror(PALM2)),
+    LeftLeg: [side3 > 0 ? 18 : 4, 0, 0],
+    RightLeg: [side3 > 0 ? 4 : 18, 0, 0],
+    LeftUpLeg: [side3 > 0 ? -12 : 0, 0, 0],
+    RightUpLeg: [side3 > 0 ? 0 : -12, 0, 0],
+    hipsY: -0.04
+  };
+};
+var middle = { ...sway(1), Spine: [0, 0, 0], Spine2: [0, 0, 0], Head: [0, 0, 0], hipsY: 0.01 };
+var dance_default = defineAnimation({
+  slug: "dance",
+  name: "Dance",
+  clip: "Dance",
+  subcategory: "emotes",
+  kind: "loop",
+  duration: 1.2,
+  grip: 0.2,
+  keys: [at(0, sway(1)), at(0.3, middle), at(0.6, sway(-1)), at(0.9, middle), at(1.2, sway(1))]
+});
+
+// ../core-library/dist/avatar-appearance/emotes/laugh.js
+var hands = bothArms([0.45, -0.85, 0.25], [-0.7, 0.1, 0.7], [0, 0, -1]);
+var rock = (back) => ({
+  ...hands,
+  Spine2: [back ? -12 : 6, 0, 0],
+  Head: [back ? -18 : 4, 0, 0],
+  hipsY: back ? 0.01 : -0.02
+});
+var laugh_default = defineAnimation({
+  slug: "laugh",
+  name: "Laugh",
+  clip: "Laugh",
+  subcategory: "emotes",
+  kind: "once",
+  duration: 1.6,
+  grip: 0.2,
+  keys: [at(0, {}), ...beats(0.2, 1.4, 6, rock(true), rock(false)), at(1.6, {})]
+});
+
+// ../core-library/dist/avatar-appearance/emotes/point.js
+var point2 = {
+  ...arm("Right", [-0.1, 0.05, 1], [-0.1, 0.05, 1], [0, -1, 0]),
+  Head: [-4, -6, 0],
+  Spine2: [0, -8, 0]
+};
+var point_default = defineAnimation({
+  slug: "point",
+  name: "Point",
+  clip: "Point",
+  subcategory: "emotes",
+  kind: "once",
+  duration: 1.6,
+  grip: 0.6,
+  keys: [at(0, {}), at(0.3, point2), at(1.3, point2), at(1.6, {})]
+});
+
+// ../core-library/dist/avatar-appearance/emotes/robot-dance.js
+var DOWN_AHEAD = [
+  [0.15, -0.97, 0.1],
+  [0.05, 0.05, 1],
+  [-1, 0, 0]
+];
+var OUT_UP = [
+  [1, 0.05, 0.1],
+  [0.05, 1, 0.05],
+  [0, 0, 1]
+];
+var robot = (side3) => {
+  const [left2, right2] = side3 > 0 ? [DOWN_AHEAD, OUT_UP] : [OUT_UP, DOWN_AHEAD];
+  return {
+    ...arm("Left", left2[0], left2[1], left2[2]),
+    ...arm("Right", mirror(right2[0]), mirror(right2[1]), mirror(right2[2])),
+    Head: [0, 35 * side3, 0],
+    Spine2: [0, 12 * side3, 0],
+    hipsY: -0.02
+  };
+};
+var robot_dance_default = defineAnimation({
+  slug: "robot-dance",
+  name: "Robot dance",
+  clip: "RobotDance",
+  subcategory: "emotes",
+  kind: "loop",
+  duration: 1.6,
+  grip: 0.1,
+  keys: [
+    at(0, robot(1)),
+    at(0.35, robot(1)),
+    at(0.45, robot(-1)),
+    at(1.15, robot(-1)),
+    at(1.25, robot(1)),
+    at(1.6, robot(1))
+  ]
+});
+
+// ../core-library/dist/avatar-appearance/emotes/salute.js
+var arm2 = armPose("Right", [-0.8, 0.05, 0.6], [0.55, 0.6, 0.15], [-0.2, -0.6, 0.75]);
+var salute = {
+  RightArm: arm2.arm,
+  RightForeArm: arm2.fore,
+  Head: [-3, 0, 0],
+  Spine2: [-3, 0, 0]
+};
+var salute_default = defineAnimation({
+  slug: "salute",
+  name: "Salute",
+  clip: "Salute",
+  subcategory: "emotes",
+  kind: "once",
+  duration: 1.6,
+  keys: [at(0, {}), at(0.35, salute), at(1.25, salute), at(1.6, {})]
+});
+
+// ../core-library/dist/avatar-appearance/emotes/sit.js
+var sit_default = defineAnimation({
+  slug: "sit",
+  name: "Sit",
+  clip: "Sit",
+  subcategory: "emotes",
+  kind: "loop",
+  duration: 1,
+  grip: 0.25,
+  keys: hold(1, {
+    LeftUpLeg: [-88, 0, 0],
+    RightUpLeg: [-88, 0, 0],
+    LeftLeg: [88, 0, 0],
+    RightLeg: [88, 0, 0],
+    ...bothArms([0.15, -0.8, 0.55], [0.05, -0.35, 0.93], [0, -1, 0]),
+    hipsY: -0.38
+  })
+});
+
+// ../core-library/dist/avatar-appearance/emotes/stretch.js
+var arms2 = (left2, palm) => {
+  const l = armPose("Left", left2, left2, palm);
+  const r = armPose("Right", [-left2[0], left2[1], left2[2]], [-left2[0], left2[1], left2[2]], palm);
+  return { LeftArm: l.arm, LeftForeArm: l.fore, RightArm: r.arm, RightForeArm: r.fore };
+};
+var side = arms2([1, 0, 0], [0, -1, 0]);
+var high2 = arms2([0.5, 0.86, 0.05], [0, 0, 1]);
+var up2 = { ...arms2([0.16, 0.98, 0.08], [0, 0, 1]), Head: [-8, 0, 0] };
+var stretch_default = defineAnimation({
+  slug: "stretch",
+  name: "Stretch",
+  clip: "Stretch",
+  subcategory: "emotes",
+  kind: "once",
+  duration: 3,
+  grip: 0.05,
+  keys: [at(0, {}), at(0.7, side), at(1, high2), at(1.3, up2), at(1.7, up2), at(2, high2), at(2.3, side), at(3, {})]
+});
+
+// ../core-library/dist/avatar-appearance/emotes/think.js
+var right = armPose("Right", [-0.2, -0.45, 0.87], [0.35, 0.9, 0.25], [0.3, 0.3, -0.9]);
+var left = armPose("Left", [0.2, -0.9, 0.35], [-0.95, 0.05, 0.3], [0, 1, 0]);
+var think = {
+  RightArm: right.arm,
+  RightForeArm: right.fore,
+  LeftArm: left.arm,
+  LeftForeArm: left.fore,
+  Head: [6, 0, -10]
+};
+var think_default = defineAnimation({
+  slug: "think",
+  name: "Think",
+  clip: "Think",
+  subcategory: "emotes",
+  kind: "once",
+  duration: 2.4,
+  keys: [at(0, {}), at(0.4, think), at(1.2, { ...think, Head: [6, 0, 8] }), at(2, think), at(2.4, {})]
+});
+
+// ../core-library/dist/avatar-appearance/emotes/wave.js
+var raised2 = (fore) => {
+  const arm4 = armPose("Right", [-0.75, 0.55, 0.25], fore, [0, 0, 1]);
+  return { RightArm: arm4.arm, RightForeArm: arm4.fore };
+};
+var up3 = raised2([-0.45, 0.88, 0.15]);
+var side2 = raised2([0.2, 0.97, 0.15]);
+var wave_default = defineAnimation({
+  slug: "wave",
+  name: "Wave",
+  clip: "Wave",
+  subcategory: "emotes",
+  kind: "once",
+  duration: 2,
+  grip: 0.05,
+  keys: [at(0, {}), at(0.3, up3), ...beats(0.45, 1.45, 4, side2, up3), at(2, {})]
+});
+
+// ../core-library/dist/avatar-appearance/_joint-constraints.js
+var HUMAN_JOINT_CONSTRAINTS = {
+  format: "genvr-human-joint-constraints/2",
+  /** Past this share of a range the motion gets stiffer (animation, solvers); the end is a hard clamp. */
+  softLimitStart: 0.85,
+  joints: {
+    /** The lower back (Spine bone): + forward. */
+    lumbar: { flexion: [-20, 50], sideBend: [-20, 20], twist: [-10, 10] },
+    /** The upper back (Spine1 + Spine2 bones). */
+    thoracic: { flexion: [-25, 35], sideBend: [-25, 25], twist: [-35, 35] },
+    /** The neck (C2-C7, Neck bone): + forward (chin down). Shares the turn with the head. */
+    neck: { flexion: [-50, 40], sideBend: [-35, 35], twist: [-35, 35] },
+    /** The head on the neck (C0-C2, Head bone). Together with the neck: flexion 55, extension 75, side 43, turn 80. */
+    head: { flexion: [-25, 15], sideBend: [-8, 8], twist: [-45, 45] },
+    /** The collarbone (Shoulder bone): + up, + forward, + its own backward turn as the arm rises. */
+    clavicle: { elevation: [-10, 35], protraction: [-15, 30], axialRotation: [0, 45] },
+    /** The shoulder blade (no bone in the rig: carried by the collarbone and the corrective shapes). */
+    scapula: { upwardRotation: [-10, 60], protraction: [-20, 35], posteriorTilt: [-10, 30] },
+    /**
+     * The arm against the chest (shoulder joint + shoulder blade together): flexion forward (- behind), abduction to
+     * the side, horizontal adduction across the chest (- back), rotation (+ external). External rotation is 60 with
+     * the arm at the side and 90 with it raised 90 (`shoulderExternalRotation`).
+     */
+    shoulder: { flexion: [-60, 180], abduction: [0, 180], horizontalAdduction: [-45, 130], rotation: [-70, 90] },
+    /** The shoulder joint alone (glenohumeral): what is left once the shoulder blade has turned. */
+    glenohumeral: { flexion: [-60, 120], abduction: [0, 120] },
+    /** Elbow: a hinge; active ~145, 150 pushed; up to 10 backward is normal in teens. */
+    elbow: { flexion: [-10, 150] },
+    /** Forearm: + supination (palm up / forward), - pronation. */
+    forearm: { rotation: [-80, 85] },
+    /** Wrist: + toward the palm; deviation + toward the little finger (ulnar), - toward the thumb (radial). */
+    wrist: { flexion: [-70, 80], deviation: [-20, 35] },
+    thumbCMC: { flexion: [-15, 50], abduction: [0, 60], opposition: [0, 45] },
+    thumbMCP: { flexion: [-15, 55] },
+    thumbIP: { flexion: [-20, 80] },
+    /** Finger knuckles (index to little): + toward the palm; 30 back actively (45 pushed). */
+    fingerMCP: { flexion: [-30, 90] },
+    /** Sideways at the knuckle, + away from the middle finger, per finger. */
+    fingerSpread: { index: [-20, 20], middle: [-10, 10], ring: [-15, 15], little: [-25, 25] },
+    fingerPIP: { flexion: [-5, 110] },
+    fingerDIP: { flexion: [-10, 85] },
+    /** Hip: + forward, abduction (- across), rotation (+ external). 120 forward only with the knee bent. */
+    hip: { flexion: [-30, 120], abduction: [-30, 45], rotation: [-35, 45] },
+    /** Knee: a hinge; active ~135, 150 kneeling or squatting; a little backward; turn only when bent. */
+    knee: { flexion: [-5, 150], rotationFlexed: [-25, 30] },
+    /**
+     * Ankle: + toes down (plantar flexion; table average 50, a flexible teen or a swimmer 55-60 - the breaststroke
+     * kick points them 52), - toes up (dorsiflexion: 20 with the knee bent, 10 straight).
+     */
+    ankle: { flexion: [-20, 55] },
+    /** Below the ankle: + inversion (sole inward), - eversion. */
+    subtalar: { inversion: [-15, 30] },
+    /** Toes (no toe joints in the rig beyond ToeBase): + toward the sole, - up. */
+    toeMTP: { flexion: [-70, 35] },
+    toeIP: { flexion: [0, 45] }
+  },
+  couplings: [
+    "A finger tip (DIP) bends at most 0.8 x its middle joint (PIP) + 30: one tendon pulls both.",
+    "No finger spread with the knuckle bent: the spread shrinks to nothing at 90 degrees knuckle bend.",
+    "Hip flexion with a straight knee stops at ~80 (hamstrings); the full 120 needs the knee bent 90.",
+    "Ankle dorsiflexion is 10 with a straight knee, 20 with it bent (calf).",
+    "With the wrist bent over 50 toward the palm the fingers cannot close fully (tenodesis).",
+    "Shoulder external rotation is 60 with the arm at the side, 90 with it raised 90.",
+    "Above ~30 degrees of arm elevation one third of the raise is the shoulder blade and collarbone (2:1 rhythm).",
+    "Knee rotation is 0 with the knee straight and its full range at 90 degrees bend.",
+    "Wrist deviation halves as the wrist reaches its full bend either way.",
+    "At joint extremes, reduce motion on the other axes rather than allowing all maxima together."
+  ],
+  collisionPairs: [
+    ["hand_L", "forearm_L"],
+    ["hand_R", "forearm_R"],
+    ["forearm_L", "upperArm_L"],
+    ["forearm_R", "upperArm_R"],
+    ["upperArm_L", "torso"],
+    ["upperArm_R", "torso"],
+    ["chin", "chest"],
+    ["calf_L", "thigh_L"],
+    ["calf_R", "thigh_R"],
+    ["thigh_L", "thigh_R"],
+    ["foot_L", "foot_R"]
+  ],
+  correctiveTriggers: [
+    { region: "shoulder", trigger: "elevation > 45", fixes: ["deltoid raise", "armpit volume", "pectoral slide", "lat fold", "scapula shift"] },
+    { region: "elbow", trigger: "flexion > 70", fixes: ["elbow crease", "biceps compress", "triceps stretch"] },
+    { region: "hip", trigger: "flexion > 60", fixes: ["hip crease", "glute stretch", "groin volume"] },
+    { region: "knee", trigger: "flexion > 60", fixes: ["knee crease", "quad compress", "hamstring compress"] }
+  ]
+};
+var J = HUMAN_JOINT_CONSTRAINTS.joints;
+var clamp01 = (x) => Math.max(0, Math.min(1, x));
+var fingerTipMax = (middle2) => Math.min(J.fingerDIP.flexion[1], 0.8 * Math.max(0, middle2) + 30);
+var fingerSpreadShare = (knuckle) => clamp01(1 - Math.max(0, knuckle) / 90);
+var hipFlexionMax = (knee) => 80 + 40 * clamp01(knee / 90);
+var ankleDorsiflexionMax = (knee) => 10 + 10 * clamp01(knee / 45);
+var shoulderExternalRotationMax = (elevation) => 60 + 30 * clamp01(elevation / 90);
+var wristDeviationShare = (bend) => 1 - 0.5 * clamp01((Math.abs(bend) - 40) / 40);
+var knuckleMaxForWrist = (wrist) => J.fingerMCP.flexion[1] - 1.2 * Math.max(0, wrist - 50);
+
+// ../core-library/dist/avatar-appearance/_joint-limits.js
+var C = HUMAN_JOINT_CONSTRAINTS.joints;
+var JOINT_LIMITS = {
+  /** Elbow: a hinge that only bends forward, no sideways bend; the forearm turns the palm at most this far. */
+  elbow: { bend: C.elbow.flexion[1], back: -C.elbow.flexion[0], offHinge: 12, twist: 95 },
+  /** Knee: a hinge that only bends backward, a little turn when bent. */
+  knee: { bend: C.knee.flexion[1], back: -C.knee.flexion[0], offHinge: 12, twist: 25 },
+  /** Wrist: bends up and down, little sideways; it does not twist (the forearm does). */
+  wrist: { swing: C.wrist.flexion[1] + 5, twist: 20 },
+  /** Shoulder joint: the arm cannot point back through the body, nor far behind it, nor twist far. */
+  shoulder: { behind: -0.9, through: 0.25, twist: 120 },
+  /** Hip joint: not far behind the body (a sprinter's back leg reaches about 45), not far across, limited turn. */
+  hip: { behind: -0.75, across: -0.55, twist: 60 },
+  /** Collarbone (Shoulder bone): a small lift and shrug. */
+  collarbone: { swing: Math.round(Math.hypot(C.clavicle.elevation[1], C.clavicle.protraction[1])) },
+  /** Each spine bone, and the neck and head together. */
+  spine: { swing: Math.max(C.lumbar.flexion[1], C.thoracic.flexion[1] + C.thoracic.sideBend[1] / 2) },
+  /** The neck and head together (one budget). */
+  neck: {
+    turn: C.neck.twist[1] + C.head.twist[1],
+    down: C.neck.flexion[1] + C.head.flexion[1],
+    up: -(C.neck.flexion[0] + C.head.flexion[0])
+  },
+  /** Ankle: toes down (positive X) and up, little sideways. */
+  ankle: { down: C.ankle.flexion[1], up: -C.ankle.flexion[0], side: C.subtalar.inversion[1] }
+};
+var X = [1, 0, 0];
+var Y = [0, 1, 0];
+function jointProblems(pose) {
+  const problems = [];
+  const q = (bone) => pose[bone] ? qFromEuler(pose[bone]) : null;
+  const say = (bone, text, value) => problems.push(`${bone}: ${text} (${Math.round(value)})`);
+  for (const side3 of ["Left", "Right"]) {
+    const sign2 = side3 === "Left" ? 1 : -1;
+    const along = [sign2, 0, 0];
+    const fore = q(`${side3}ForeArm`);
+    if (fore) {
+      const { twist, swingAxis, swing } = swingTwist(fore, X);
+      if (Math.abs(twist) > JOINT_LIMITS.elbow.twist)
+        say(`${side3}ForeArm`, "forearm turned too far", twist);
+      if (swing > 3) {
+        const onHinge = dot3(swingAxis, Y) * -sign2;
+        const offHinge = Math.asin(Math.min(1, Math.sqrt(Math.max(0, 1 - onHinge * onHinge)))) * (180 / Math.PI);
+        if (onHinge < 0 && swing > JOINT_LIMITS.elbow.back)
+          say(`${side3}ForeArm`, "elbow bent backward", swing);
+        else if (swing * Math.sin(offHinge * Math.PI / 180) > JOINT_LIMITS.elbow.offHinge)
+          say(`${side3}ForeArm`, "elbow bent sideways", swing * Math.sin(offHinge * Math.PI / 180));
+        if (swing > JOINT_LIMITS.elbow.bend)
+          say(`${side3}ForeArm`, "elbow bent too far", swing);
+      }
+    }
+    const leg = q(`${side3}Leg`);
+    if (leg) {
+      const { twist, swingAxis, swing } = swingTwist(leg, Y);
+      if (Math.abs(twist) > JOINT_LIMITS.knee.twist)
+        say(`${side3}Leg`, "knee turned too far", twist);
+      if (swing > 3) {
+        const onHinge = dot3(swingAxis, X);
+        if (onHinge < 0 && swing > JOINT_LIMITS.knee.back)
+          say(`${side3}Leg`, "knee bent forward", swing);
+        else if (swing * Math.sqrt(Math.max(0, 1 - onHinge * onHinge)) > JOINT_LIMITS.knee.offHinge)
+          say(`${side3}Leg`, "knee bent sideways", swing * Math.sqrt(1 - onHinge * onHinge));
+        if (swing > JOINT_LIMITS.knee.bend)
+          say(`${side3}Leg`, "knee bent too far", swing);
+      }
+    }
+    const hand = q(`${side3}Hand`);
+    if (hand) {
+      const { twist, swing } = swingTwist(hand, along);
+      if (Math.abs(twist) > JOINT_LIMITS.wrist.twist)
+        say(`${side3}Hand`, "wrist twisted (the forearm turns the hand)", twist);
+      if (swing > JOINT_LIMITS.wrist.swing)
+        say(`${side3}Hand`, "wrist bent too far", swing);
+    }
+    const arm4 = q(`${side3}Arm`);
+    if (arm4) {
+      const d = qRotate(arm4, along);
+      if (d[2] < JOINT_LIMITS.shoulder.behind)
+        say(`${side3}Arm`, "arm pointing far behind the back", d[2] * 100);
+      if (d[0] * sign2 < -0.2 && d[2] < JOINT_LIMITS.shoulder.through)
+        say(`${side3}Arm`, "arm pointing through the body", d[0] * sign2 * 100);
+      const { twist } = swingTwist(arm4, along);
+      if (Math.abs(twist) > JOINT_LIMITS.shoulder.twist)
+        say(`${side3}Arm`, "upper arm twisted too far", twist);
+    }
+    const thigh = q(`${side3}UpLeg`);
+    if (thigh) {
+      const d = qRotate(thigh, [0, -1, 0]);
+      if (d[2] < JOINT_LIMITS.hip.behind)
+        say(`${side3}UpLeg`, "leg far behind the body", d[2] * 100);
+      if (d[0] * sign2 < JOINT_LIMITS.hip.across)
+        say(`${side3}UpLeg`, "leg across the other leg", d[0] * sign2 * 100);
+      const { twist } = swingTwist(thigh, [0, -1, 0]);
+      if (Math.abs(twist) > JOINT_LIMITS.hip.twist)
+        say(`${side3}UpLeg`, "thigh twisted too far", twist);
+    }
+    const collar = q(`${side3}Shoulder`);
+    if (collar && swingTwist(collar, along).swing > JOINT_LIMITS.collarbone.swing)
+      say(`${side3}Shoulder`, "collarbone turned too far", swingTwist(collar, along).swing);
+    const foot = pose[`${side3}Foot`];
+    if (foot) {
+      if (foot[0] > JOINT_LIMITS.ankle.down)
+        say(`${side3}Foot`, "toes pointed too far", foot[0]);
+      if (foot[0] < -JOINT_LIMITS.ankle.up)
+        say(`${side3}Foot`, "toes pulled up too far", foot[0]);
+      if (Math.abs(foot[2]) > JOINT_LIMITS.ankle.side)
+        say(`${side3}Foot`, "ankle bent sideways too far", foot[2]);
+    }
+  }
+  for (const bone of ["Spine", "Spine1", "Spine2"]) {
+    const spine = q(bone);
+    if (spine) {
+      const { swing, twist } = swingTwist(spine, Y);
+      if (swing > JOINT_LIMITS.spine.swing)
+        say(bone, "spine bent too far", swing);
+      if (Math.abs(twist) > JOINT_LIMITS.spine.swing)
+        say(bone, "spine twisted too far", twist);
+    }
+  }
+  const neck = pose.Neck ?? [0, 0, 0];
+  const head = pose.Head ?? [0, 0, 0];
+  const turn = neck[1] + head[1];
+  const nod = neck[0] + head[0];
+  if (Math.abs(turn) > JOINT_LIMITS.neck.turn)
+    say("Neck+Head", "head turned too far", turn);
+  if (nod > JOINT_LIMITS.neck.down)
+    say("Neck+Head", "head bent down too far", nod);
+  if (nod < -JOINT_LIMITS.neck.up)
+    say("Neck+Head", "head bent back too far", nod);
+  return problems;
+}
+
+// ../core-library/dist/avatar-appearance/_skin-materials.js
+var SKIN_MATERIALS = [
+  {
+    id: "lava-cracks",
+    name: "Lava Cracks",
+    category: "elemental",
+    base: "#211513",
+    secondary: "#4a2017",
+    pattern: "cracks",
+    patternColor: "#ff4b0a",
+    patternScale: 9,
+    shadow: "#120b0a",
+    emissive: "#ff7200",
+    emissiveStrength: 2.5,
+    roughness: 0.82,
+    metalness: 0,
+    animated: true
+  },
+  {
+    id: "ice-cracks",
+    name: "Frozen Cracks",
+    category: "elemental",
+    base: "#9fe3ff",
+    secondary: "#4fb4e6",
+    pattern: "cracks",
+    patternColor: "#f2fdff",
+    patternScale: 7,
+    shadow: "#3a7fb8",
+    emissive: "#c8f4ff",
+    emissiveStrength: 0.6,
+    roughness: 0.25,
+    metalness: 0.05,
+    animated: false
+  },
+  {
+    id: "galaxy-stars",
+    name: "Galaxy Stars",
+    category: "cosmic",
+    base: "#11142e",
+    secondary: "#542a8a",
+    pattern: "stars",
+    patternColor: "#ffffff",
+    patternScale: 38,
+    shadow: "#0a0b1c",
+    emissive: "#796cff",
+    emissiveStrength: 0.8,
+    roughness: 0.45,
+    metalness: 0.05,
+    animated: true
+  },
+  {
+    id: "moss-stone",
+    name: "Moss Stone",
+    category: "nature",
+    base: "#777568",
+    secondary: "#454a3d",
+    pattern: "cracks",
+    patternColor: "#3c3e34",
+    patternScale: 6,
+    shadow: "#3f4036",
+    overlay: { color: "#769b48", amount: 0.4 },
+    roughness: 0.95,
+    metalness: 0,
+    animated: false
+  },
+  {
+    id: "marble",
+    name: "Marble",
+    category: "nature",
+    base: "#eeebe6",
+    secondary: "#cfcac3",
+    pattern: "marble",
+    patternColor: "#8f8a86",
+    patternScale: 3,
+    shadow: "#a9a4a0",
+    roughness: 0.3,
+    metalness: 0,
+    animated: false
+  },
+  {
+    id: "gold",
+    name: "Gold",
+    category: "mineral",
+    base: "#d9a514",
+    secondary: "#b98a0c",
+    pattern: "marble",
+    patternColor: "#ffd95a",
+    patternScale: 2,
+    shadow: "#805600",
+    emissive: "#fff0a0",
+    emissiveStrength: 0.15,
+    roughness: 0.25,
+    metalness: 1,
+    animated: false
+  },
+  {
+    id: "dragon-scales",
+    name: "Dragon Scales",
+    category: "pattern",
+    base: "#16a66a",
+    secondary: "#0d7a4c",
+    pattern: "scales",
+    patternColor: "#07563a",
+    patternScale: 22,
+    shadow: "#07563a",
+    roughness: 0.55,
+    metalness: 0.1,
+    animated: false
+  },
+  {
+    id: "tiger-stripes",
+    name: "Tiger Stripes",
+    category: "pattern",
+    base: "#e8892e",
+    secondary: "#f2b05c",
+    pattern: "stripes",
+    patternColor: "#1d1410",
+    patternScale: 5,
+    shadow: "#9a4f16",
+    roughness: 0.8,
+    metalness: 0,
+    animated: false
+  },
+  {
+    id: "magic-veins",
+    name: "Magic Veins",
+    category: "magic",
+    base: "#2a1c45",
+    secondary: "#3d2766",
+    pattern: "veins",
+    patternColor: "#b06cff",
+    patternScale: 7,
+    shadow: "#170f28",
+    emissive: "#d7a2ff",
+    emissiveStrength: 1.6,
+    roughness: 0.5,
+    metalness: 0,
+    animated: true
+  },
+  {
+    id: "candy",
+    name: "Candy",
+    category: "fun",
+    base: "#ff8fc8",
+    secondary: "#ffc2e2",
+    pattern: "spots",
+    patternColor: "#ffffff",
+    patternScale: 10,
+    shadow: "#d65b9a",
+    roughness: 0.2,
+    metalness: 0,
+    animated: false
+  },
+  {
+    id: "freckles",
+    name: "Freckles",
+    category: "pattern",
+    base: "#f2c49b",
+    secondary: "#eab58c",
+    pattern: "freckles",
+    patternColor: "#a2603b",
+    patternScale: 40,
+    shadow: "#d39276",
+    roughness: 0.6,
+    metalness: 0,
+    animated: false
+  }
+];
+var findSkinMaterial = (id) => id ? SKIN_MATERIALS.find((material) => material.id === id) : void 0;
+
+// ../core-library/dist/avatar-appearance/bodies/_human-joints.js
+var HUMAN_BOY_JOINTS = [
+  ["Hips", null, [-69e-5, 0.94527, 0.0177]],
+  ["Spine", "Hips", [0, 1.03148, 0.02475]],
+  ["Spine1", "Spine", [0, 1.12664, 871e-5]],
+  ["Spine2", "Spine1", [0, 1.24335, -0.04446]],
+  ["Neck", "Spine2", [0, 1.42289, 0.01352]],
+  ["Head", "Neck", [-269e-5, 1.46996, 0.02424]],
+  ["LeftShoulder", "Spine2", [0.06079, 1.39238, 0.01704]],
+  ["LeftArm", "LeftShoulder", [0.1677, 1.32514, 0.01809], [0, -1213e-6, -0.409984, 0.912092]],
+  ["LeftForeArm", "LeftArm", [0.39075, 1.32514, 0.01809], [0.167409, -0.372142, 0.099011, 0.907569]],
+  ["LeftHand", "LeftForeArm", [0.61824, 1.32514, 0.01809], [0.015849, -0.049242, -268e-6, 0.998661]],
+  ["LeftHandIndex1", "LeftHand", [0.71606, 1.33102, 0.0424]],
+  ["LeftHandIndex2", "LeftHandIndex1", [0.74057, 1.32593, 0.0487]],
+  ["LeftHandIndex3", "LeftHandIndex2", [0.76126, 1.31707, 0.05506]],
+  ["LeftHandMiddle1", "LeftHand", [0.71613, 1.32514, 0.01809]],
+  ["LeftHandMiddle2", "LeftHandMiddle1", [0.74774, 1.31282, 0.01871]],
+  ["LeftHandMiddle3", "LeftHandMiddle2", [0.77093, 1.30093, 0.02192]],
+  ["LeftHandRing1", "LeftHand", [0.71067, 1.31776, 106e-5]],
+  ["LeftHandRing2", "LeftHandRing1", [0.73709, 1.30526, -311e-5]],
+  ["LeftHandRing3", "LeftHandRing2", [0.75808, 1.29387, -372e-5]],
+  ["LeftHandPinky1", "LeftHand", [0.70182, 1.30541, -0.01296]],
+  ["LeftHandPinky2", "LeftHandPinky1", [0.71901, 1.29495, -0.01733]],
+  ["LeftHandPinky3", "LeftHandPinky2", [0.73087, 1.28574, -0.0186]],
+  ["LeftHandThumb1", "LeftHand", [0.65365, 1.33235, 0.03995]],
+  ["LeftHandThumb2", "LeftHandThumb1", [0.66514, 1.32128, 0.06655]],
+  ["LeftHandThumb3", "LeftHandThumb2", [0.6891, 1.31338, 0.09137]],
+  ["RightShoulder", "Spine2", [-0.05703, 1.38282, 0.01547]],
+  ["RightArm", "RightShoulder", [-0.1677, 1.32514, 0.01809], [0, 1213e-6, 0.409984, 0.912092]],
+  ["RightForeArm", "RightArm", [-0.39075, 1.32514, 0.01809], [0.167409, 0.372142, -0.09901, 0.907569]],
+  ["RightHand", "RightForeArm", [-0.61824, 1.32514, 0.01809], [0.015849, 0.049241, 267e-6, 0.998661]],
+  ["RightHandIndex1", "RightHand", [-0.71606, 1.33102, 0.0424]],
+  ["RightHandIndex2", "RightHandIndex1", [-0.74057, 1.32593, 0.0487]],
+  ["RightHandIndex3", "RightHandIndex2", [-0.76126, 1.31707, 0.05506]],
+  ["RightHandMiddle1", "RightHand", [-0.71613, 1.32514, 0.01809]],
+  ["RightHandMiddle2", "RightHandMiddle1", [-0.74774, 1.31282, 0.01871]],
+  ["RightHandMiddle3", "RightHandMiddle2", [-0.77093, 1.30093, 0.02192]],
+  ["RightHandRing1", "RightHand", [-0.71067, 1.31776, 106e-5]],
+  ["RightHandRing2", "RightHandRing1", [-0.73709, 1.30526, -311e-5]],
+  ["RightHandRing3", "RightHandRing2", [-0.75808, 1.29387, -372e-5]],
+  ["RightHandPinky1", "RightHand", [-0.70182, 1.30541, -0.01296]],
+  ["RightHandPinky2", "RightHandPinky1", [-0.71901, 1.29495, -0.01733]],
+  ["RightHandPinky3", "RightHandPinky2", [-0.73087, 1.28574, -0.0186]],
+  ["RightHandThumb1", "RightHand", [-0.65365, 1.33235, 0.03995]],
+  ["RightHandThumb2", "RightHandThumb1", [-0.66514, 1.32128, 0.06655]],
+  ["RightHandThumb3", "RightHandThumb2", [-0.68909, 1.31338, 0.09137]],
+  ["LeftUpLeg", "Hips", [0.09643, 0.91105, -251e-5]],
+  ["LeftLeg", "LeftUpLeg", [0.13575, 0.49802, 0.03708]],
+  ["LeftFoot", "LeftLeg", [0.17859, 0.07062, 0.01605]],
+  ["LeftToeBase", "LeftFoot", [0.17607, 0.03033, 0.13501]],
+  ["RightUpLeg", "Hips", [-0.09643, 0.91105, -251e-5]],
+  ["RightLeg", "RightUpLeg", [-0.13575, 0.49802, 0.03708]],
+  ["RightFoot", "RightLeg", [-0.17859, 0.07062, 0.01605]],
+  ["RightToeBase", "RightFoot", [-0.17607, 0.03033, 0.13501]]
+];
+var HUMAN_FACE_LANDMARKS = {
+  leftEye: [110993, 110994, 110995, 110996, 110997, 110998, 110999, 111e3],
+  rightEye: [111001, 111002, 111003, 111004, 111005, 111006, 111007, 111008],
+  leftUpperLid: [111009, 111010, 111011, 111012, 111013, 111014, 111015, 111016],
+  rightUpperLid: [111017, 111018, 111019, 111020, 111021, 111022, 111023, 111024],
+  leftLowerLid: [111025, 111026, 111027, 111028, 111029, 111030, 111031, 111032],
+  rightLowerLid: [111033, 111034, 111035, 111036, 111037, 111038, 111039, 111040],
+  mouth: [111041, 111042, 111043, 111044, 111045, 111046, 111047, 111048],
+  jaw: [111049, 111050, 111051, 111052, 111053, 111054, 111055, 111056]
+};
+var HUMAN_BOY_TRIANGLES = 222400;
+
+// ../core-library/dist/avatar-appearance/_wearable.js
+function defineWearable(item4) {
+  const clothing = item4.kind === "clothing";
+  return {
+    manifest: coreManifest({
+      id: `genvr.core.${clothing ? "clothing" : "accessory"}.${item4.slug}`,
+      name: item4.name,
+      type: clothing ? "clothing" : "avatar",
+      category: "avatar-appearance",
+      subcategory: clothing ? "clothing" : "accessories",
+      triangles: (item4.parts?.length ?? 0) * 12
+    }),
+    slot: item4.slot,
+    layer: item4.layer ?? "inner",
+    parts: item4.parts ?? [],
+    paint: item4.paint ?? {},
+    large: item4.large ?? false
+  };
+}
+var wearBox = (bone, size, center, color, options = {}) => ({
+  bone,
+  size,
+  center,
+  color,
+  ...options.covered ? { covered: true } : {}
+});
+function pair(bone, size, center, color) {
+  return ["Left", "Right"].map((side3) => wearBox(bone(side3), size, [side3 === "Left" ? center[0] : -center[0], center[1], center[2]], color));
+}
+
+// ../core-library/dist/avatar-appearance/accessories/backpack.js
+var backpack_default = defineWearable({
+  slug: "backpack",
+  name: "Backpack",
+  slot: "back",
+  kind: "accessory",
+  large: true,
+  parts: [
+    wearBox("Spine2", [0.34, 0.36, 0.14], [0, 1.18, -0.21], "#f4a261"),
+    wearBox("Spine2", [0.24, 0.13, 0.04], [0, 1.1, -0.295], "#e76f51"),
+    ...pair(() => "Spine2", [0.05, 0.24, 0.02], [0.13, 1.26, 0.152], "#e76f51")
+  ]
+});
+
+// ../core-library/dist/avatar-appearance/clothing/vest.js
+var VEST = "#6b705c";
+var BUTTON = "#ddd5c4";
+var vest_default = defineWearable({
+  slug: "vest",
+  name: "Vest",
+  slot: "top",
+  layer: "outer",
+  kind: "clothing",
+  paint: { torso: VEST },
+  parts: [
+    wearBox("Spine2", [0.1, 0.08, 0.02], [0, 1.33, 0.146], "shirt"),
+    wearBox("Spine2", [0.025, 0.025, 0.015], [0, 1.24, 0.15], BUTTON),
+    wearBox("Spine1", [0.025, 0.025, 0.015], [0, 1.12, 0.142], BUTTON),
+    wearBox("Spine1", [0.025, 0.025, 0.015], [0, 1, 0.142], BUTTON)
+  ]
+});
+
+// ../core-library/dist/avatar-appearance/accessories/beanie.js
+var beanie_default = defineWearable({
+  slug: "beanie",
+  name: "Beanie",
+  slot: "hat",
+  kind: "accessory",
+  parts: [
+    wearBox("Head", [0.42, 0.15, 0.4], [0, 1.835, -5e-3], "#2a9d8f"),
+    wearBox("Head", [0.43, 0.06, 0.41], [0, 1.77, -5e-3], "#e9f5f3"),
+    wearBox("Head", [0.09, 0.09, 0.09], [0, 1.95, -5e-3], "#e9f5f3")
+  ]
+});
+
+// ../core-library/dist/avatar-appearance/clothing/boots.js
+var LEATHER = "#6b4226";
+var boots_default = defineWearable({
+  slug: "boots",
+  name: "Boots",
+  slot: "shoes",
+  kind: "clothing",
+  paint: { feet: LEATHER },
+  parts: [
+    ...pair((side3) => `${side3}Leg`, [0.2, 0.16, 0.22], [0.12, 0.17, 0], LEATHER),
+    ...pair((side3) => `${side3}Leg`, [0.205, 0.03, 0.225], [0.12, 0.25, 0], "#8b5a3c")
+  ]
+});
+
+// ../core-library/dist/avatar-appearance/clothing/bow-tie.js
+var BOW = "#1d3557";
+var bow_tie_default = defineWearable({
+  slug: "bow-tie",
+  name: "Bow tie",
+  slot: "neck",
+  kind: "clothing",
+  parts: [
+    ...pair(() => "Spine2", [0.07, 0.07, 0.03], [0.045, 1.35, 0.16], BOW),
+    wearBox("Spine2", [0.03, 0.035, 0.035], [0, 1.35, 0.162], BOW)
+  ]
+});
+
+// ../core-library/dist/avatar-appearance/accessories/cap.js
+var cap_default = defineWearable({
+  slug: "cap",
+  name: "Cap",
+  slot: "hat",
+  kind: "accessory",
+  parts: [
+    wearBox("Head", [0.42, 0.12, 0.4], [0, 1.84, -5e-3], "#e63946"),
+    wearBox("Head", [0.34, 0.03, 0.16], [0, 1.795, 0.26], "#e63946"),
+    wearBox("Head", [0.06, 0.03, 0.06], [0, 1.915, 0], "#f1faee")
+  ]
+});
+
+// ../core-library/dist/avatar-appearance/accessories/cape.js
+var CAPE = "#c1121f";
+var cape_default = defineWearable({
+  slug: "cape",
+  name: "Cape",
+  slot: "back",
+  kind: "accessory",
+  large: true,
+  parts: [
+    wearBox("Spine2", [0.46, 0.72, 0.03], [0, 1, -0.165], CAPE),
+    wearBox("Spine2", [0.5, 0.05, 0.31], [0, 1.37, 0], CAPE),
+    wearBox("Spine2", [0.06, 0.06, 0.02], [0, 1.34, 0.16], "#f4c430")
+  ]
+});
+
+// ../core-library/dist/avatar-appearance/accessories/crown.js
+var GOLD = "#f4c430";
+var crown_default = defineWearable({
+  slug: "crown",
+  name: "Crown",
+  slot: "hat",
+  kind: "accessory",
+  parts: [
+    wearBox("Head", [0.3, 0.08, 0.3], [0, 1.87, 0], GOLD),
+    ...[-1, 1].flatMap((x) => [-1, 1].map((z2) => wearBox("Head", [0.06, 0.08, 0.06], [0.12 * x, 1.95, 0.12 * z2], GOLD))),
+    wearBox("Head", [0.06, 0.05, 0.02], [0, 1.87, 0.155], "#d62828")
+  ]
+});
+
+// ../core-library/dist/avatar-appearance/accessories/glasses.js
+var FRAME = "#1c1b2e";
+var glasses_default = defineWearable({
+  slug: "glasses",
+  name: "Glasses",
+  slot: "face",
+  kind: "accessory",
+  parts: [
+    ...[1, -1].flatMap((x) => [
+      wearBox("Head", [0.12, 0.015, 0.015], [0.08 * x, 1.678, 0.195], FRAME),
+      wearBox("Head", [0.12, 0.015, 0.015], [0.08 * x, 1.582, 0.195], FRAME),
+      wearBox("Head", [0.015, 0.1, 0.015], [0.08 * x + 0.053, 1.63, 0.195], FRAME),
+      wearBox("Head", [0.015, 0.1, 0.015], [0.08 * x - 0.053, 1.63, 0.195], FRAME)
+    ]),
+    ...pair(() => "Head", [0.015, 0.015, 0.2], [0.195, 1.66, 0.09], FRAME)
+  ]
+});
+
+// ../core-library/dist/avatar-appearance/clothing/hoodie.js
+var hoodie_default = defineWearable({
+  slug: "hoodie",
+  name: "Hoodie",
+  slot: "top",
+  kind: "clothing",
+  paint: { forearms: "shirt" },
+  parts: [
+    wearBox("Spine2", [0.36, 0.16, 0.08], [0, 1.36, -0.18], "shirt"),
+    wearBox("Spine2", [0.3, 0.05, 0.3], [0, 1.39, 0], "shirt", { covered: true }),
+    ...pair(() => "Spine2", [0.015, 0.12, 0.015], [0.05, 1.3, 0.152], "#f5f5f5"),
+    wearBox("Spine1", [0.3, 0.1, 0.02], [0, 1.04, 0.142], "shirt", { covered: true })
+  ]
+});
+
+// ../core-library/dist/avatar-appearance/clothing/jacket.js
+var JACKET = "#264653";
+var jacket_default = defineWearable({
+  slug: "jacket",
+  name: "Jacket",
+  slot: "top",
+  layer: "outer",
+  kind: "clothing",
+  paint: { torso: JACKET, upperArms: JACKET, forearms: JACKET },
+  parts: [
+    wearBox("Spine2", [0.14, 0.24, 0.02], [0, 1.26, 0.146], "shirt"),
+    wearBox("Spine1", [0.14, 0.2, 0.02], [0, 1.06, 0.136], "shirt"),
+    ...pair(() => "Spine2", [0.1, 0.05, 0.3], [0.1, 1.39, 0], JACKET),
+    ...pair((side3) => `${side3}ForeArm`, [0.04, 0.14, 0.14], [0.64, 1.34, 0], "#e9c46a")
+  ]
+});
+
+// ../core-library/dist/avatar-appearance/accessories/party-hat.js
+var party_hat_default = defineWearable({
+  slug: "party-hat",
+  name: "Party hat",
+  slot: "hat",
+  kind: "accessory",
+  large: true,
+  parts: [
+    wearBox("Head", [0.26, 0.1, 0.26], [0, 1.83, 0], "#ff5d8f"),
+    wearBox("Head", [0.17, 0.1, 0.17], [0, 1.93, 0], "#ffd166"),
+    wearBox("Head", [0.09, 0.1, 0.09], [0, 2.03, 0], "#ff5d8f"),
+    wearBox("Head", [0.07, 0.07, 0.07], [0, 2.11, 0], "#ffffff")
+  ]
+});
+
+// ../core-library/dist/avatar-appearance/clothing/scarf.js
+var RED = "#d62828";
+var scarf_default = defineWearable({
+  slug: "scarf",
+  name: "Scarf",
+  slot: "neck",
+  kind: "clothing",
+  parts: [
+    wearBox("Neck", [0.3, 0.08, 0.3], [0, 1.4, 0], RED),
+    wearBox("Spine2", [0.09, 0.22, 0.03], [0.09, 1.27, 0.16], RED),
+    wearBox("Spine2", [0.09, 0.03, 0.035], [0.09, 1.2, 0.162], "#f1faee")
+  ]
+});
+
+// ../core-library/dist/avatar-appearance/clothing/shorts.js
+var shorts_default = defineWearable({
+  slug: "shorts",
+  name: "Shorts",
+  slot: "bottom",
+  kind: "clothing",
+  paint: { lowerLegs: "skin" }
+});
+
+// ../core-library/dist/avatar-appearance/clothing/skirt.js
+var skirt_default = defineWearable({
+  slug: "skirt",
+  name: "Skirt",
+  slot: "bottom",
+  kind: "clothing",
+  paint: { upperLegs: "skin", lowerLegs: "skin" },
+  parts: [wearBox("Hips", [0.52, 0.26, 0.32], [0, 0.78, 0], "pants")]
+});
+
+// ../core-library/dist/avatar-appearance/accessories/sunglasses.js
+var DARK = "#141414";
+var sunglasses_default = defineWearable({
+  slug: "sunglasses",
+  name: "Sunglasses",
+  slot: "face",
+  kind: "accessory",
+  parts: [
+    ...pair(() => "Head", [0.13, 0.08, 0.02], [0.08, 1.635, 0.196], DARK),
+    wearBox("Head", [0.05, 0.02, 0.015], [0, 1.655, 0.196], DARK),
+    ...pair(() => "Head", [0.015, 0.02, 0.2], [0.195, 1.655, 0.09], DARK)
+  ]
+});
+
+// ../core-library/dist/avatar-appearance/accessories/wings.js
+var wings_default = defineWearable({
+  slug: "wings",
+  name: "Wings",
+  slot: "back",
+  kind: "accessory",
+  large: true,
+  parts: [
+    ...pair(() => "Spine2", [0.3, 0.34, 0.025], [0.2, 1.3, -0.19], "#bde0fe"),
+    ...pair(() => "Spine2", [0.2, 0.2, 0.025], [0.16, 1.04, -0.19], "#cdb4db")
+  ]
+});
+
+// ../core-library/dist/avatar-appearance/_wearables.js
+var CORE_CLOTHING = [
+  hoodie_default,
+  jacket_default,
+  vest_default,
+  shorts_default,
+  skirt_default,
+  boots_default,
+  scarf_default,
+  bow_tie_default
+];
+var CORE_ACCESSORIES = [
+  cap_default,
+  beanie_default,
+  party_hat_default,
+  crown_default,
+  glasses_default,
+  sunglasses_default,
+  backpack_default,
+  cape_default,
+  wings_default
+];
+var CORE_WEARABLES = [...CORE_CLOTHING, ...CORE_ACCESSORIES];
+var byId = new Map(CORE_WEARABLES.map((item4) => [item4.manifest.id, item4]));
+var findWearable = (id) => byId.get(id);
+var place2 = (item4) => `${item4.slot}:${item4.layer}`;
+function wornItems(ids) {
+  const byPlace = /* @__PURE__ */ new Map();
+  for (const id of ids) {
+    const item4 = byId.get(id);
+    if (item4)
+      byPlace.set(place2(item4), item4);
+  }
+  const items = [...byPlace.values()];
+  return [
+    ...items.filter((item4) => item4.layer === "inner"),
+    ...items.filter((item4) => item4.layer === "outer")
+  ];
+}
+
+// ../core-library/dist/avatar-appearance/_body-type.js
+var isItemBodyId = (id) => id.startsWith("user.");
+function defineBody(body) {
+  const { name, triangles, ...rest } = body;
+  return {
+    manifest: coreManifest({
+      id: `genvr.core.body.${body.id}`,
+      name,
+      type: "avatar",
+      category: "avatar-appearance",
+      subcategory: "bodies",
+      styles: ALL_STYLES,
+      triangles: triangles ?? body.parts.length * 12
+    }),
+    ...rest
+  };
+}
+function boundingBox(boxes) {
+  const min2 = [Infinity, Infinity, Infinity];
+  const max2 = [-Infinity, -Infinity, -Infinity];
+  for (const { center, size } of boxes)
+    for (let axis = 0; axis < 3; axis += 1) {
+      min2[axis] = Math.min(min2[axis], center[axis] - size[axis] / 2);
+      max2[axis] = Math.max(max2[axis], center[axis] + size[axis] / 2);
+    }
+  return {
+    center: [0, 1, 2].map((a) => (min2[a] + max2[a]) / 2),
+    size: [0, 1, 2].map((a) => max2[a] - min2[a])
+  };
+}
+function planarAngle(bone, [x, y, z2]) {
+  if (bone === "LeftArm")
+    return x - (z2 + DOWN);
+  if (bone === "RightArm")
+    return x - (DOWN - z2);
+  if (bone === "LeftForeArm")
+    return y;
+  if (bone === "RightForeArm")
+    return -y;
+  return x;
+}
+
+// ../core-library/dist/avatar-appearance/bodies/anime-boy.js
+var JOINTS = [
+  ["Hips", null, [0, 0.64107, -551e-5]],
+  ["Spine", "Hips", [0, 0.74023, -551e-5]],
+  ["Spine1", "Spine", [0, 0.91873, -551e-5]],
+  ["Spine2", "Spine1", [0, 1.09061, -551e-5]],
+  ["Neck", "Spine2", [0, 1.30216, 0.01536]],
+  ["Head", "Neck", [0, 1.34716, 0.01536]],
+  ["LeftShoulder", "Spine2", [0.04, 1.27016, -551e-5]],
+  ["LeftArm", "LeftShoulder", [0.16292, 1.26016, -551e-5]],
+  ["LeftForeArm", "LeftArm", [0.37525, 1.26016, -551e-5]],
+  ["LeftHand", "LeftForeArm", [0.57125, 1.26016, -551e-5]],
+  ["LeftHandIndex1", "LeftHand", [0.64368, 1.2605, 648e-5]],
+  ["LeftHandIndex2", "LeftHandIndex1", [0.66928, 1.2605, 648e-5]],
+  ["LeftHandIndex3", "LeftHandIndex2", [0.69488, 1.2605, 648e-5]],
+  ["LeftHandMiddle1", "LeftHand", [0.6434, 1.26027, -151e-5]],
+  ["LeftHandMiddle2", "LeftHandMiddle1", [0.669, 1.26027, -151e-5]],
+  ["LeftHandMiddle3", "LeftHandMiddle2", [0.69461, 1.26027, -151e-5]],
+  ["LeftHandRing1", "LeftHand", [0.64312, 1.26005, -95e-4]],
+  ["LeftHandRing2", "LeftHandRing1", [0.66872, 1.26005, -95e-4]],
+  ["LeftHandRing3", "LeftHandRing2", [0.69433, 1.26005, -95e-4]],
+  ["LeftHandPinky1", "LeftHand", [0.64284, 1.25982, -0.01749]],
+  ["LeftHandPinky2", "LeftHandPinky1", [0.66845, 1.25982, -0.01749]],
+  ["LeftHandPinky3", "LeftHandPinky2", [0.69405, 1.25982, -0.01749]],
+  ["LeftHandThumb1", "LeftHand", [0.59115, 1.26073, 0.01447]],
+  ["LeftHandThumb2", "LeftHandThumb1", [0.60479, 1.26117, 0.03017]],
+  ["LeftHandThumb3", "LeftHandThumb2", [0.61843, 1.26161, 0.04587]],
+  ["RightShoulder", "Spine2", [-0.04, 1.27016, -551e-5]],
+  ["RightArm", "RightShoulder", [-0.16217, 1.26016, -551e-5]],
+  ["RightForeArm", "RightArm", [-0.37445, 1.26016, -551e-5]],
+  ["RightHand", "RightForeArm", [-0.5704, 1.26016, -551e-5]],
+  ["RightHandIndex1", "RightHand", [-0.64279, 1.26047, 648e-5]],
+  ["RightHandIndex2", "RightHandIndex1", [-0.66839, 1.26047, 648e-5]],
+  ["RightHandIndex3", "RightHandIndex2", [-0.694, 1.26047, 648e-5]],
+  ["RightHandMiddle1", "RightHand", [-0.64254, 1.26026, -151e-5]],
+  ["RightHandMiddle2", "RightHandMiddle1", [-0.66814, 1.26026, -151e-5]],
+  ["RightHandMiddle3", "RightHandMiddle2", [-0.69374, 1.26026, -151e-5]],
+  ["RightHandRing1", "RightHand", [-0.64229, 1.26006, -95e-4]],
+  ["RightHandRing2", "RightHandRing1", [-0.66789, 1.26006, -95e-4]],
+  ["RightHandRing3", "RightHandRing2", [-0.69349, 1.26006, -95e-4]],
+  ["RightHandPinky1", "RightHand", [-0.64203, 1.25985, -0.0175]],
+  ["RightHandPinky2", "RightHandPinky1", [-0.66764, 1.25985, -0.0175]],
+  ["RightHandPinky3", "RightHandPinky2", [-0.69324, 1.25985, -0.0175]],
+  ["RightHandThumb1", "RightHand", [-0.59024, 1.26067, 0.01448]],
+  ["RightHandThumb2", "RightHandThumb1", [-0.60385, 1.26107, 0.0302]],
+  ["RightHandThumb3", "RightHandThumb2", [-0.61746, 1.26148, 0.04593]],
+  ["LeftUpLeg", "Hips", [0.08567, 0.62107, -551e-5]],
+  ["LeftLeg", "LeftUpLeg", [0.10424, 0.35227, -0.04184]],
+  ["LeftFoot", "LeftLeg", [0.08567, 0.08392, -551e-5]],
+  ["LeftToeBase", "LeftFoot", [0.0799, 0.02634, 0.12003]],
+  ["RightUpLeg", "Hips", [-0.09159, 0.62107, -551e-5]],
+  ["RightLeg", "RightUpLeg", [-0.11603, 0.35152, -0.03719]],
+  ["RightFoot", "RightLeg", [-0.09159, 0.08343, -551e-5]],
+  ["RightToeBase", "RightFoot", [-0.08614, 0.02802, 0.12571]]
+];
+var joints = JOINTS.map(([name, parent, at2]) => ({ name, parent, at: at2 }));
+var animation = {};
+var ANIMATED = /^(Hips|Spine|Spine1|Spine2|Neck|Head|(Left|Right)(UpLeg|Leg|Foot|ToeBase|Shoulder|Arm|ForeArm|Hand))$/;
+for (const joint of joints)
+  if (ANIMATED.test(joint.name))
+    animation[joint.name] = [joint.name];
+var anime_boy_default = defineBody({
+  id: "anime-boy",
+  name: "Anime boy",
+  bonePrefix: "mixamorig",
+  joints,
+  parts: [],
+  animation,
+  fit: {},
+  sketchArm: { start: 0.2, axisY: 1.3, hangX: 0.2, topY: 1.3 },
+  model: "/bodies/anime-boy.glb",
+  picture: "/bodies/anime-boy.webp",
+  triangles: 15e3
+});
+
+// ../core-library/dist/avatar-appearance/bodies/warrior.js
+var JOINTS2 = [
+  ["Hips", null, [0, 0.93138, 0.02154]],
+  ["Spine", "Hips", [0, 1.01182, -0.01939]],
+  ["Spine1", "Spine", [0, 1.15662, 619e-5]],
+  ["Spine2", "Spine1", [0, 1.29606, -0.02141]],
+  ["Neck", "Spine2", [0, 1.46767, 0.01692]],
+  ["Head", "Neck", [0, 1.55217, 0.01692]],
+  ["HairTailA1", "Head", [141e-5, 1.71704, -0.0908]],
+  ["HairTailA2", "HairTailA1", [-66e-5, 1.60003, -0.11572]],
+  ["HairTailA3", "HairTailA2", [-0.01454, 1.50194, -0.16184]],
+  ["HairTailA4", "HairTailA3", [-0.0335, 1.39752, -0.16507]],
+  ["HairTailB1", "Head", [0.02539, 1.69975, -0.09479]],
+  ["HairTailB2", "HairTailB1", [0.02296, 1.60002, -0.12411]],
+  ["HairTailB3", "HairTailB2", [0.02225, 1.49591, -0.1473]],
+  ["HairTailC1", "Head", [-0.03457, 1.68928, -0.0731]],
+  ["HairTailC2", "HairTailC1", [-0.0296, 1.57724, -0.11075]],
+  ["HairTailC3", "HairTailC2", [-0.05754, 1.46873, -0.12835]],
+  ["HairTailC4", "HairTailC3", [-0.09431, 1.37854, -0.14722]],
+  ["HairSideLeft1", "Head", [0.06906, 1.66955, 0.05518]],
+  ["HairSideLeft2", "HairSideLeft1", [0.08939, 1.60168, 0.06392]],
+  ["HairSideLeft3", "HairSideLeft2", [0.09566, 1.51199, 0.05215]],
+  ["HairBangLeft1", "Head", [0.02396, 1.69696, 0.07914]],
+  ["HairBangLeft2", "HairBangLeft1", [0.03629, 1.67519, 0.11588]],
+  ["HairSideRight1", "Head", [-0.06675, 1.66825, 0.05621]],
+  ["HairSideRight2", "HairSideRight1", [-0.08542, 1.60109, 0.06452]],
+  ["HairSideRight3", "HairSideRight2", [-0.09256, 1.51411, 0.05447]],
+  ["HairBangRight1", "Head", [-0.02024, 1.69647, 0.08096]],
+  ["HairBangRight2", "HairBangRight1", [-0.03475, 1.67845, 0.11354]],
+  ["LeftShoulder", "Spine2", [0.04376, 1.41963, -0.02216]],
+  ["LeftArm", "LeftShoulder", [0.20581, 1.4099, -0.03188], [0, 0.011629, -0.509301, 0.86051]],
+  ["LeftForeArm", "LeftArm", [0.46241, 1.4099, -0.03188], [0, -0.17973, 0.02774, 0.983325]],
+  ["LeftHand", "LeftForeArm", [0.67861, 1.4099, -0.03188], [0, -0.020361, -0.010544, 0.999737]],
+  ["LeftHandIndex1", "LeftHand", [0.79991, 1.40234, -705e-5]],
+  ["LeftHandIndex2", "LeftHandIndex1", [0.83839, 1.40379, -0.01317]],
+  ["LeftHandIndex3", "LeftHandIndex2", [0.86404, 1.40476, -0.01725]],
+  ["LeftHandMiddle1", "LeftHand", [0.79567, 1.4099, -0.03188]],
+  ["LeftHandMiddle2", "LeftHandMiddle1", [0.83415, 1.41136, -0.038]],
+  ["LeftHandMiddle3", "LeftHandMiddle2", [0.8598, 1.41233, -0.04208]],
+  ["LeftHandRing1", "LeftHand", [0.79186, 1.41458, -0.05474]],
+  ["LeftHandRing2", "LeftHandRing1", [0.83034, 1.41603, -0.06086]],
+  ["LeftHandRing3", "LeftHandRing2", [0.85599, 1.417, -0.06494]],
+  ["LeftHandPinky1", "LeftHand", [0.78824, 1.41349, -0.07776]],
+  ["LeftHandPinky2", "LeftHandPinky1", [0.81999, 1.41469, -0.0828]],
+  ["LeftHandPinky3", "LeftHandPinky2", [0.84115, 1.41549, -0.08617]],
+  ["LeftHandThumb1", "LeftHand", [0.71125, 1.39433, -0.01993]],
+  ["LeftHandThumb2", "LeftHandThumb1", [0.75042, 1.37565, -558e-5]],
+  ["LeftHandThumb3", "LeftHandThumb2", [0.78306, 1.36007, 637e-5]],
+  ["RightShoulder", "Spine2", [-0.04376, 1.41963, -0.02216]],
+  ["RightArm", "RightShoulder", [-0.20581, 1.4099, -0.03188], [0, -0.011629, 0.509301, 0.86051]],
+  ["RightForeArm", "RightArm", [-0.4624, 1.4099, -0.03188], [0, 0.179729, -0.02774, 0.983325]],
+  ["RightHand", "RightForeArm", [-0.67861, 1.4099, -0.03188], [0, 0.020362, 0.010544, 0.999737]],
+  ["RightHandIndex1", "RightHand", [-0.79991, 1.40234, -705e-5]],
+  ["RightHandIndex2", "RightHandIndex1", [-0.83838, 1.40379, -0.01317]],
+  ["RightHandIndex3", "RightHandIndex2", [-0.86404, 1.40476, -0.01725]],
+  ["RightHandMiddle1", "RightHand", [-0.79567, 1.4099, -0.03188]],
+  ["RightHandMiddle2", "RightHandMiddle1", [-0.83415, 1.41136, -0.038]],
+  ["RightHandMiddle3", "RightHandMiddle2", [-0.8598, 1.41233, -0.04208]],
+  ["RightHandRing1", "RightHand", [-0.79186, 1.41458, -0.05474]],
+  ["RightHandRing2", "RightHandRing1", [-0.83034, 1.41603, -0.06086]],
+  ["RightHandRing3", "RightHandRing2", [-0.85599, 1.417, -0.06494]],
+  ["RightHandPinky1", "RightHand", [-0.78824, 1.41349, -0.07776]],
+  ["RightHandPinky2", "RightHandPinky1", [-0.81999, 1.41469, -0.08281]],
+  ["RightHandPinky3", "RightHandPinky2", [-0.84115, 1.41549, -0.08617]],
+  ["RightHandThumb1", "RightHand", [-0.71125, 1.39433, -0.01993]],
+  ["RightHandThumb2", "RightHandThumb1", [-0.75042, 1.37565, -558e-5]],
+  ["RightHandThumb3", "RightHandThumb2", [-0.78306, 1.36007, 637e-5]],
+  ["LeftUpLeg", "Hips", [0.10959, 0.91037, 0.02154], [0.025252, 0, 0.076849, 0.996723]],
+  ["LeftLeg", "LeftUpLeg", [0.10963, 0.48391, 0.03148]],
+  ["LeftFoot", "LeftLeg", [0.10959, 0.0852, 0.02154]],
+  ["LeftToeBase", "LeftFoot", [0.10831, 0.02194, 0.16791]],
+  ["RightUpLeg", "Hips", [-0.10959, 0.91037, 0.02154], [0.025252, 0, -0.076849, 0.996723]],
+  ["RightLeg", "RightUpLeg", [-0.10963, 0.48391, 0.03148]],
+  ["RightFoot", "RightLeg", [-0.10959, 0.0852, 0.02154]],
+  ["RightToeBase", "RightFoot", [-0.10831, 0.02194, 0.16791]],
+  ["CoatLeftFront1", "Hips", [0.15148, 0.92671, 0.14441]],
+  ["CoatLeftFront2", "CoatLeftFront1", [0.18146, 0.72315, 0.17109]],
+  ["CoatLeftFront3", "CoatLeftFront2", [0.15611, 0.52247, 0.15393]],
+  ["CoatLeftBack1", "Hips", [0.1201, 0.93005, -0.06994]],
+  ["CoatLeftBack2", "CoatLeftBack1", [0.12234, 0.72211, -0.1412]],
+  ["CoatLeftBack3", "CoatLeftBack2", [0.12278, 0.52601, -0.20795]],
+  ["TasselLeft1", "Hips", [0.07702, 0.95282, 0.16653]],
+  ["TasselLeft2", "TasselLeft1", [0.0693, 0.77907, 0.16797]],
+  ["CoatRightFront1", "Hips", [-0.15113, 0.926, 0.14506]],
+  ["CoatRightFront2", "CoatRightFront1", [-0.17494, 0.72237, 0.18792]],
+  ["CoatRightFront3", "CoatRightFront2", [-0.15722, 0.52248, 0.15374]],
+  ["CoatRightBack1", "Hips", [-0.11811, 0.92921, -0.06777]],
+  ["CoatRightBack2", "CoatRightBack1", [-0.12194, 0.72149, -0.13935]],
+  ["CoatRightBack3", "CoatRightBack2", [-0.12397, 0.52579, -0.20686]],
+  ["TasselRight1", "Hips", [-0.07866, 0.9534, 0.16492]],
+  ["TasselRight2", "TasselRight1", [-0.06898, 0.77918, 0.16813]],
+  ["HairTailAEnd", "HairTailA4", [-0.07511, 1.30256, -0.15597]],
+  ["HairTailBEnd", "HairTailB3", [606e-5, 1.40149, -0.16235]],
+  ["HairTailCEnd", "HairTailC4", [-0.08994, 1.29972, -0.16036]],
+  ["HairSideLeftEnd", "HairSideLeft3", [0.10266, 1.45335, 0.03595]],
+  ["HairBangLeftEnd", "HairBangLeft2", [0.04995, 1.60828, 0.11986]],
+  ["HairSideRightEnd", "HairSideRight3", [-0.09916, 1.45107, 0.03623]],
+  ["HairBangRightEnd", "HairBangRight2", [-0.04961, 1.60385, 0.11663]],
+  ["CoatLeftFrontEnd", "CoatLeftFront3", [0.16347, 0.35261, 0.133]],
+  ["CoatLeftBackEnd", "CoatLeftBack3", [0.11292, 0.36911, -0.25694]],
+  ["TasselLeftEnd", "TasselLeft2", [0.07458, 0.62172, 0.14493]],
+  ["CoatRightFrontEnd", "CoatRightFront3", [-0.16233, 0.35188, 0.13423]],
+  ["CoatRightBackEnd", "CoatRightBack3", [-0.11599, 0.38544, -0.25075]],
+  ["TasselRightEnd", "TasselRight2", [-0.07465, 0.62157, 0.14677]]
+];
+var joints2 = JOINTS2.map(([name, parent, at2, bind]) => ({
+  name,
+  parent,
+  at: at2,
+  ...bind ? { bind } : {}
+}));
+var animation2 = {};
+var ANIMATED2 = /^(Hips|Spine|Spine1|Spine2|Neck|Head|(Left|Right)(UpLeg|Leg|Foot|ToeBase|Shoulder|Arm|ForeArm|Hand))$/;
+for (const joint of joints2)
+  if (ANIMATED2.test(joint.name))
+    animation2[joint.name] = [joint.name];
+var warrior_default = defineBody({
+  id: "warrior",
+  name: "Warrior",
+  bonePrefix: "mixamorig",
+  joints: joints2,
+  parts: [],
+  animation: animation2,
+  fit: {},
+  sketchArm: { start: 0.2, axisY: 1.4, hangX: 0.2, topY: 1.4 },
+  model: "/bodies/warrior.glb",
+  picture: "/bodies/warrior.webp",
+  triangles: 38607,
+  springs: {
+    chains: [
+      {
+        joints: ["HairTailA1", "HairTailA2", "HairTailA3", "HairTailA4", "HairTailAEnd"],
+        stiffness: 6,
+        drag: 0.25,
+        air: 0.1,
+        gravity: 9.8,
+        radius: 0.02,
+        maxAngle: 60
+      },
+      {
+        joints: ["HairTailB1", "HairTailB2", "HairTailB3", "HairTailBEnd"],
+        stiffness: 6,
+        drag: 0.25,
+        air: 0.1,
+        gravity: 9.8,
+        radius: 0.02,
+        maxAngle: 60
+      },
+      {
+        joints: ["HairTailC1", "HairTailC2", "HairTailC3", "HairTailC4", "HairTailCEnd"],
+        stiffness: 6,
+        drag: 0.25,
+        air: 0.1,
+        gravity: 9.8,
+        radius: 0.02,
+        maxAngle: 60
+      },
+      {
+        joints: ["HairSideLeft1", "HairSideLeft2", "HairSideLeft3", "HairSideLeftEnd"],
+        stiffness: 20,
+        drag: 0.45,
+        air: 0.03,
+        gravity: 5,
+        radius: 0.015,
+        maxAngle: 18
+      },
+      {
+        joints: ["HairBangLeft1", "HairBangLeft2", "HairBangLeftEnd"],
+        stiffness: 25,
+        drag: 0.5,
+        air: 0.02,
+        gravity: 3,
+        radius: 0.012,
+        maxAngle: 10
+      },
+      {
+        joints: ["HairSideRight1", "HairSideRight2", "HairSideRight3", "HairSideRightEnd"],
+        stiffness: 20,
+        drag: 0.45,
+        air: 0.03,
+        gravity: 5,
+        radius: 0.015,
+        maxAngle: 18
+      },
+      {
+        joints: ["HairBangRight1", "HairBangRight2", "HairBangRightEnd"],
+        stiffness: 25,
+        drag: 0.5,
+        air: 0.02,
+        gravity: 3,
+        radius: 0.012,
+        maxAngle: 10
+      },
+      {
+        joints: ["CoatLeftFront1", "CoatLeftFront2", "CoatLeftFront3", "CoatLeftFrontEnd"],
+        stiffness: 8,
+        drag: 0.3,
+        air: 0.05,
+        gravity: 9.8,
+        radius: 0.025,
+        maxAngle: 55
+      },
+      {
+        joints: ["CoatLeftBack1", "CoatLeftBack2", "CoatLeftBack3", "CoatLeftBackEnd"],
+        stiffness: 8,
+        drag: 0.3,
+        air: 0.05,
+        gravity: 9.8,
+        radius: 0.025,
+        maxAngle: 55
+      },
+      {
+        joints: ["TasselLeft1", "TasselLeft2", "TasselLeftEnd"],
+        stiffness: 4,
+        drag: 0.2,
+        air: 0.08,
+        gravity: 9.8,
+        radius: 0.015,
+        maxAngle: 60
+      },
+      {
+        joints: ["CoatRightFront1", "CoatRightFront2", "CoatRightFront3", "CoatRightFrontEnd"],
+        stiffness: 8,
+        drag: 0.3,
+        air: 0.05,
+        gravity: 9.8,
+        radius: 0.025,
+        maxAngle: 55
+      },
+      {
+        joints: ["CoatRightBack1", "CoatRightBack2", "CoatRightBack3", "CoatRightBackEnd"],
+        stiffness: 8,
+        drag: 0.3,
+        air: 0.05,
+        gravity: 9.8,
+        radius: 0.025,
+        maxAngle: 55
+      },
+      {
+        joints: ["TasselRight1", "TasselRight2", "TasselRightEnd"],
+        stiffness: 4,
+        drag: 0.2,
+        air: 0.08,
+        gravity: 9.8,
+        radius: 0.015,
+        maxAngle: 60
+      }
+    ],
+    colliders: [
+      { joint: "Head", offset: [0, 0.09, 0], radius: 0.105 },
+      { joint: "Neck", offset: [0, 0.03, 0], radius: 0.065 },
+      { joint: "Spine2", offset: [0, 0.08, -0.02], radius: 0.13 },
+      { joint: "Spine1", offset: [0, 0, -0.01], radius: 0.13 },
+      { joint: "Hips", offset: [0, -0.02, 0], radius: 0.12 },
+      { joint: "LeftUpLeg", offset: [0, -0.1, 0], radius: 0.11 },
+      { joint: "LeftUpLeg", offset: [0, -0.22, 0.01], radius: 0.105 },
+      { joint: "LeftUpLeg", offset: [0, -0.34, 0.01], radius: 0.1 },
+      { joint: "LeftLeg", offset: [0, -0.08, 0], radius: 0.09 },
+      { joint: "LeftLeg", offset: [0, -0.2, 0], radius: 0.085 },
+      { joint: "RightUpLeg", offset: [0, -0.1, 0], radius: 0.11 },
+      { joint: "RightUpLeg", offset: [0, -0.22, 0.01], radius: 0.105 },
+      { joint: "RightUpLeg", offset: [0, -0.34, 0.01], radius: 0.1 },
+      { joint: "RightLeg", offset: [0, -0.08, 0], radius: 0.09 },
+      { joint: "RightLeg", offset: [0, -0.2, 0], radius: 0.085 }
+    ]
+  }
+});
+
+// ../core-library/dist/avatar-appearance/bodies/human.js
+var joints3 = HUMAN_BOY_JOINTS.map(([name, parent, at2, bind]) => ({
+  name,
+  parent,
+  at: [...at2],
+  // The mesh stays in its own A-pose: the arm bones bind turned into it (as the warrior does).
+  ...bind ? { bind } : {}
+}));
+var animation3 = {};
+var ANIMATED3 = /^(Hips|Spine|Spine1|Spine2|Neck|Head|(Left|Right)(UpLeg|Leg|Foot|ToeBase|Shoulder|Arm|ForeArm|Hand))$/;
+for (const joint of joints3)
+  if (ANIMATED3.test(joint.name))
+    animation3[joint.name] = [joint.name];
+var human_default = defineBody({
+  id: "human",
+  name: "Anime body",
+  bonePrefix: "mixamorig",
+  joints: joints3,
+  parts: [],
+  animation: animation3,
+  fit: {},
+  sketchArm: { start: 0.2, axisY: 1.4, hangX: 0.2, topY: 1.4 },
+  model: "/human/human-base.bin",
+  generated: "human",
+  picture: "/market/genvr.core.body.human.png",
+  triangles: HUMAN_BOY_TRIANGLES
+});
+
+// ../core-library/dist/avatar-appearance/bodies/classic.js
+var joints4 = [
+  { name: "LowerTorso", parent: null, at: [0, 0.9, 0] },
+  { name: "UpperTorso", parent: "LowerTorso", at: [0, 1, 0] },
+  { name: "Head", parent: "UpperTorso", at: [0, 1.42, 0] }
+];
+var parts = [
+  { joint: "LowerTorso", size: [0.62, 0.2, 0.31], center: [0, 0.9, 0], color: "pants" },
+  { joint: "UpperTorso", size: [0.62, 0.42, 0.31], center: [0, 1.21, 0], color: "shirt", area: "torso" },
+  { joint: "Head", size: [0.2, 0.04, 0.2], center: [0, 1.43, 0], color: "skin" },
+  { joint: "Head", size: [0.4, 0.38, 0.38], center: [0, 1.63, 0], color: "skin" },
+  // Hair cap and back of the head.
+  { joint: "Head", size: [0.42, 0.09, 0.4], center: [0, 1.81, -5e-3], color: "hair" },
+  { joint: "Head", size: [0.42, 0.28, 0.08], center: [0, 1.68, -0.165], color: "hair" },
+  // Face (on the front, +z).
+  { joint: "Head", size: [0.07, 0.08, 0.02], center: [0.09, 1.66, 0.195], color: "eyes" },
+  { joint: "Head", size: [0.07, 0.08, 0.02], center: [-0.09, 1.66, 0.195], color: "eyes" },
+  { joint: "Head", size: [0.15, 0.03, 0.02], center: [0, 1.54, 0.195], color: "mouth" }
+];
+var animation4 = {
+  LowerTorso: ["Hips"],
+  UpperTorso: ["Spine", "Spine1", "Spine2"],
+  Head: ["Neck", "Head"]
+};
+var fit = {
+  Hips: { joint: "LowerTorso", box: { center: [0, 0.9, 0], size: [0.62, 0.2, 0.31] } },
+  Spine1: { joint: "UpperTorso", box: { center: [0, 1.095, 0], size: [0.62, 0.19, 0.31] } },
+  Spine2: { joint: "UpperTorso", box: { center: [0, 1.3, 0], size: [0.62, 0.24, 0.31] } },
+  Neck: { joint: "UpperTorso", box: { center: [0, 1.43, 0], size: [0.2, 0.04, 0.2] } }
+};
+for (const side3 of ["Left", "Right"]) {
+  const s = side3 === "Left" ? 1 : -1;
+  const at2 = (x, y, z2) => [x * s, y, z2];
+  joints4.push({ name: `${side3}UpperArm`, parent: "UpperTorso", at: at2(0.31, 1.35, 0) }, { name: `${side3}LowerArm`, parent: `${side3}UpperArm`, at: at2(0.58, 1.27, 0) }, { name: `${side3}Hand`, parent: `${side3}LowerArm`, at: at2(0.82, 1.27, 0) }, { name: `${side3}UpperLeg`, parent: "LowerTorso", at: at2(0.155, 0.8, 0) }, { name: `${side3}LowerLeg`, parent: `${side3}UpperLeg`, at: at2(0.155, 0.42, 0) }, { name: `${side3}Foot`, parent: `${side3}LowerLeg`, at: at2(0.155, 0.12, 0) });
+  const upperArm = { center: at2(0.445, 1.27, 0), size: [0.27, 0.3, 0.3] };
+  const lowerArm = { center: at2(0.7, 1.27, 0), size: [0.24, 0.28, 0.28] };
+  const hand = { center: at2(0.88, 1.27, 0), size: [0.12, 0.26, 0.26] };
+  const upperLeg = { center: at2(0.155, 0.61, 0), size: [0.3, 0.38, 0.3] };
+  const lowerLeg = { center: at2(0.155, 0.27, 0), size: [0.29, 0.3, 0.29] };
+  const foot = { center: at2(0.155, 0.06, 0.03), size: [0.3, 0.12, 0.36] };
+  parts.push({ joint: `${side3}UpperArm`, ...upperArm, color: "shirt", area: "upperArms" }, { joint: `${side3}LowerArm`, ...lowerArm, color: "skin", area: "forearms" }, { joint: `${side3}Hand`, ...hand, color: "skin" }, { joint: `${side3}UpperLeg`, ...upperLeg, color: "pants", area: "upperLegs" }, { joint: `${side3}LowerLeg`, ...lowerLeg, color: "pants", area: "lowerLegs" }, { joint: `${side3}Foot`, ...foot, color: "shoes", area: "feet" });
+  animation4[`${side3}UpperArm`] = [`${side3}Shoulder`, `${side3}Arm`];
+  animation4[`${side3}LowerArm`] = [`${side3}ForeArm`];
+  animation4[`${side3}Hand`] = [`${side3}Hand`];
+  animation4[`${side3}UpperLeg`] = [`${side3}UpLeg`];
+  animation4[`${side3}LowerLeg`] = [`${side3}Leg`];
+  animation4[`${side3}Foot`] = [`${side3}Foot`];
+  fit[`${side3}Shoulder`] = {
+    joint: `${side3}UpperArm`,
+    box: { center: at2(0.35, 1.27, 0), size: [0.08, 0.3, 0.3] }
+  };
+  fit[`${side3}Arm`] = { joint: `${side3}UpperArm`, box: upperArm };
+  fit[`${side3}ForeArm`] = { joint: `${side3}LowerArm`, box: lowerArm };
+  fit[`${side3}Hand`] = { joint: `${side3}Hand`, box: hand };
+  fit[`${side3}UpLeg`] = { joint: `${side3}UpperLeg`, box: upperLeg };
+  fit[`${side3}Leg`] = { joint: `${side3}LowerLeg`, box: lowerLeg };
+  fit[`${side3}Foot`] = { joint: `${side3}Foot`, box: foot };
+}
+fit.Head = { joint: "Head", box: boundingBox(parts.filter((p) => p.joint === "Head" && p.center[1] > 1.44)) };
+var classic_default = defineBody({
+  id: "classic",
+  name: "Classic",
+  bonePrefix: "",
+  joints: joints4,
+  parts,
+  animation: animation4,
+  fit,
+  sketchArm: { start: 0.31, axisY: 1.27, hangX: 0.46, topY: 1.42 }
+});
+
+// ../core-library/dist/avatar-appearance/bodies/flat.js
+var joints5 = [
+  { name: "Hips", parent: null, at: [0, 0.85, 0] },
+  { name: "Chest", parent: "Hips", at: [0, 1, 0] },
+  { name: "Head", parent: "Chest", at: [0, 1.42, 0] }
+];
+var parts2 = [
+  { joint: "Hips", size: [0.12, 0.2, 0.3], center: [0, 0.9, 0], color: "pants" },
+  { joint: "Chest", size: [0.12, 0.42, 0.32], center: [0, 1.21, 0], color: "shirt", area: "torso" },
+  { joint: "Head", size: [0.08, 0.05, 0.12], center: [0, 1.44, 0], color: "skin" },
+  { joint: "Head", size: [0.13, 0.4, 0.4], center: [0, 1.66, 0.01], color: "skin" },
+  // The nose makes the profile.
+  { joint: "Head", size: [0.06, 0.07, 0.05], center: [0, 1.63, 0.235], color: "skin" },
+  // Hair cap and back of the head.
+  { joint: "Head", size: [0.14, 0.09, 0.42], center: [0, 1.85, -0.01], color: "hair" },
+  { joint: "Head", size: [0.14, 0.3, 0.1], center: [0, 1.7, -0.19], color: "hair" },
+  // Eye and mouth go through the head, so both sides show them.
+  { joint: "Head", size: [0.15, 0.08, 0.05], center: [0, 1.71, 0.15], color: "eyes" },
+  { joint: "Head", size: [0.15, 0.03, 0.06], center: [0, 1.55, 0.18], color: "mouth" }
+];
+var animation5 = {
+  Hips: ["Hips"],
+  Chest: ["Spine", "Spine1", "Spine2"],
+  Head: ["Neck", "Head"]
+};
+var fit2 = {
+  Hips: { joint: "Hips", box: { center: [0, 0.9, 0], size: [0.12, 0.2, 0.3] } },
+  Spine1: { joint: "Chest", box: { center: [0, 1.095, 0], size: [0.12, 0.19, 0.32] } },
+  Spine2: { joint: "Chest", box: { center: [0, 1.305, 0], size: [0.12, 0.23, 0.32] } },
+  Neck: { joint: "Chest", box: { center: [0, 1.44, 0], size: [0.08, 0.05, 0.12] } }
+};
+for (const side3 of ["Left", "Right"]) {
+  const s = side3 === "Left" ? 1 : -1;
+  const at2 = (x, y, z2) => [x * s, y, z2];
+  joints5.push({ name: `${side3}UpperArm`, parent: "Chest", at: at2(0.085, 1.38, 0) }, { name: `${side3}LowerArm`, parent: `${side3}UpperArm`, at: at2(0.085, 1.11, 0) }, { name: `${side3}Hand`, parent: `${side3}LowerArm`, at: at2(0.085, 0.85, 0) }, { name: `${side3}UpperLeg`, parent: "Hips", at: at2(0.03, 0.81, 0) }, { name: `${side3}LowerLeg`, parent: `${side3}UpperLeg`, at: at2(0.03, 0.44, 0) }, { name: `${side3}Foot`, parent: `${side3}LowerLeg`, at: at2(0.03, 0.1, 0) });
+  const shoulder = { center: at2(0.085, 1.37, 0), size: [0.04, 0.06, 0.1] };
+  const upperArm = { center: at2(0.085, 1.25, 0), size: [0.04, 0.28, 0.1] };
+  const lowerArm = { center: at2(0.085, 0.98, 0), size: [0.04, 0.26, 0.09] };
+  const hand = { center: at2(0.085, 0.8, 0.01), size: [0.045, 0.1, 0.1] };
+  const upperLeg = { center: at2(0.03, 0.62, 0), size: [0.05, 0.38, 0.14] };
+  const lowerLeg = { center: at2(0.03, 0.27, 0), size: [0.05, 0.34, 0.13] };
+  const foot = { center: at2(0.03, 0.05, 0.05), size: [0.055, 0.1, 0.24] };
+  parts2.push({ joint: `${side3}UpperArm`, ...upperArm, color: "shirt", area: "upperArms" }, { joint: `${side3}LowerArm`, ...lowerArm, color: "skin", area: "forearms" }, { joint: `${side3}Hand`, ...hand, color: "skin" }, { joint: `${side3}UpperLeg`, ...upperLeg, color: "pants", area: "upperLegs" }, { joint: `${side3}LowerLeg`, ...lowerLeg, color: "pants", area: "lowerLegs" }, { joint: `${side3}Foot`, ...foot, color: "shoes", area: "feet" });
+  animation5[`${side3}UpperArm`] = [`${side3}Shoulder`, `${side3}Arm`];
+  animation5[`${side3}LowerArm`] = [`${side3}ForeArm`];
+  animation5[`${side3}Hand`] = [`${side3}Hand`];
+  animation5[`${side3}UpperLeg`] = [`${side3}UpLeg`];
+  animation5[`${side3}LowerLeg`] = [`${side3}Leg`];
+  animation5[`${side3}Foot`] = [`${side3}Foot`];
+  const hanging = [2, side3 === "Left" ? -1 : 1, 3];
+  fit2[`${side3}Shoulder`] = { joint: `${side3}UpperArm`, box: shoulder, axes: hanging };
+  fit2[`${side3}Arm`] = { joint: `${side3}UpperArm`, box: upperArm, axes: hanging };
+  fit2[`${side3}ForeArm`] = { joint: `${side3}LowerArm`, box: lowerArm, axes: hanging };
+  fit2[`${side3}Hand`] = { joint: `${side3}Hand`, box: hand, axes: hanging };
+  fit2[`${side3}UpLeg`] = { joint: `${side3}UpperLeg`, box: upperLeg };
+  fit2[`${side3}Leg`] = { joint: `${side3}LowerLeg`, box: lowerLeg };
+  fit2[`${side3}Foot`] = { joint: `${side3}Foot`, box: foot };
+}
+fit2.Head = { joint: "Head", box: boundingBox(parts2.filter((p) => p.joint === "Head" && p.center[1] > 1.46)) };
+var flat_default = defineBody({
+  id: "flat",
+  name: "2D",
+  bonePrefix: "",
+  joints: joints5,
+  parts: parts2,
+  animation: animation5,
+  fit: fit2,
+  flat: true,
+  // Flat bodies are drawn in profile with their arms already hanging (no T-pose to turn).
+  sketchArm: { start: 0.085, axisY: 1.25, hangX: 0.085, topY: 1.4 }
+});
+
+// ../core-library/dist/avatar-appearance/bodies/simple.js
+var joints6 = [
+  { name: "Torso", parent: null, at: [0, 0.8, 0] },
+  { name: "Head", parent: "Torso", at: [0, 1.4, 0] }
+];
+var parts3 = [
+  // A band of the pants color at the waist, then the shirt.
+  { joint: "Torso", size: [0.6, 0.08, 0.3], center: [0, 0.84, 0], color: "pants" },
+  { joint: "Torso", size: [0.6, 0.52, 0.3], center: [0, 1.14, 0], color: "shirt", area: "torso" },
+  { joint: "Head", size: [0.18, 0.04, 0.18], center: [0, 1.42, 0], color: "skin" },
+  { joint: "Head", size: [0.38, 0.36, 0.36], center: [0, 1.62, 0], color: "skin" },
+  // Hair cap and back of the head.
+  { joint: "Head", size: [0.4, 0.09, 0.38], center: [0, 1.79, -5e-3], color: "hair" },
+  { joint: "Head", size: [0.4, 0.26, 0.08], center: [0, 1.66, -0.155], color: "hair" },
+  // Face (on the front, +z).
+  { joint: "Head", size: [0.065, 0.075, 0.02], center: [0.085, 1.65, 0.185], color: "eyes" },
+  { joint: "Head", size: [0.065, 0.075, 0.02], center: [-0.085, 1.65, 0.185], color: "eyes" },
+  { joint: "Head", size: [0.14, 0.03, 0.02], center: [0, 1.53, 0.185], color: "mouth" }
+];
+var animation6 = {
+  Torso: ["Hips", "Spine", "Spine1", "Spine2"],
+  Head: ["Neck", "Head"]
+};
+var fit3 = {
+  Hips: { joint: "Torso", box: { center: [0, 0.86, 0], size: [0.6, 0.12, 0.3] } },
+  Spine1: { joint: "Torso", box: { center: [0, 1.02, 0], size: [0.6, 0.2, 0.3] } },
+  Spine2: { joint: "Torso", box: { center: [0, 1.26, 0], size: [0.6, 0.28, 0.3] } },
+  Neck: { joint: "Torso", box: { center: [0, 1.42, 0], size: [0.18, 0.04, 0.18] } }
+};
+for (const side3 of ["Left", "Right"]) {
+  const s = side3 === "Left" ? 1 : -1;
+  const at2 = (x, y, z2) => [x * s, y, z2];
+  joints6.push({ name: `${side3}Arm`, parent: "Torso", at: at2(0.3, 1.32, 0) }, { name: `${side3}Leg`, parent: "Torso", at: at2(0.15, 0.8, 0) });
+  const upperArm = { center: at2(0.425, 1.25, 0), size: [0.25, 0.3, 0.3] };
+  const lowerArm = { center: at2(0.675, 1.25, 0), size: [0.25, 0.3, 0.3] };
+  const hand = { center: at2(0.85, 1.25, 0), size: [0.1, 0.28, 0.28] };
+  const upperLeg = { center: at2(0.15, 0.625, 0), size: [0.3, 0.35, 0.3] };
+  const lowerLeg = { center: at2(0.15, 0.285, 0), size: [0.3, 0.33, 0.3] };
+  const foot = { center: at2(0.15, 0.06, 0.02), size: [0.3, 0.12, 0.34] };
+  parts3.push({ joint: `${side3}Arm`, ...upperArm, color: "shirt", area: "upperArms" }, { joint: `${side3}Arm`, ...lowerArm, color: "skin", area: "forearms" }, { joint: `${side3}Arm`, ...hand, color: "skin" }, { joint: `${side3}Leg`, ...upperLeg, color: "pants", area: "upperLegs" }, { joint: `${side3}Leg`, ...lowerLeg, color: "pants", area: "lowerLegs" }, { joint: `${side3}Leg`, ...foot, color: "shoes", area: "feet" });
+  animation6[`${side3}Arm`] = [`${side3}Shoulder`, `${side3}Arm`];
+  animation6[`${side3}Leg`] = [`${side3}UpLeg`];
+  fit3[`${side3}Shoulder`] = {
+    joint: `${side3}Arm`,
+    box: { center: at2(0.34, 1.25, 0), size: [0.08, 0.3, 0.3] }
+  };
+  fit3[`${side3}Arm`] = { joint: `${side3}Arm`, box: upperArm };
+  fit3[`${side3}ForeArm`] = { joint: `${side3}Arm`, box: lowerArm };
+  fit3[`${side3}Hand`] = { joint: `${side3}Arm`, box: hand };
+  fit3[`${side3}UpLeg`] = { joint: `${side3}Leg`, box: upperLeg };
+  fit3[`${side3}Leg`] = { joint: `${side3}Leg`, box: lowerLeg };
+  fit3[`${side3}Foot`] = { joint: `${side3}Leg`, box: foot };
+}
+fit3.Head = { joint: "Head", box: boundingBox(parts3.filter((p) => p.joint === "Head" && p.center[1] > 1.43)) };
+var simple_default = defineBody({
+  id: "simple",
+  name: "Simple",
+  bonePrefix: "",
+  joints: joints6,
+  parts: parts3,
+  animation: animation6,
+  fit: fit3,
+  sketchArm: { start: 0.3, axisY: 1.25, hangX: 0.45, topY: 1.4 }
+});
+
+// ../core-library/dist/avatar-appearance/bodies/starter.js
+var joints7 = [];
+var set2 = (name, parent, at2) => joints7.push({ name, parent, at: at2 });
+set2("Hips", null, [0, 0.84, 0]);
+for (const side3 of ["Left", "Right"]) {
+  const s = side3 === "Left" ? 1 : -1;
+  set2(`${side3}UpLeg`, "Hips", [0.12 * s, 0.84, 0]);
+  set2(`${side3}Leg`, `${side3}UpLeg`, [0.12 * s, 0.44, 0]);
+  set2(`${side3}Foot`, `${side3}Leg`, [0.12 * s, 0.1, 0]);
+  set2(`${side3}ToeBase`, `${side3}Foot`, [0.12 * s, 0.03, 0.12]);
+}
+set2("Spine", "Hips", [0, 0.92, 0]);
+set2("Spine1", "Spine", [0, 1.06, 0]);
+set2("Spine2", "Spine1", [0, 1.2, 0]);
+var arm3 = (side3) => {
+  const s = side3 === "Left" ? 1 : -1;
+  set2(`${side3}Shoulder`, "Spine2", [0.06 * s, 1.34, 0]);
+  set2(`${side3}Arm`, `${side3}Shoulder`, [0.24 * s, 1.34, 0]);
+  set2(`${side3}ForeArm`, `${side3}Arm`, [0.46 * s, 1.34, 0]);
+  set2(`${side3}Hand`, `${side3}ForeArm`, [0.66 * s, 1.34, 0]);
+  for (const [finger, z2] of [
+    ["Index", 0.03],
+    ["Middle", 0.01],
+    ["Pinky", -0.03],
+    ["Ring", -0.01]
+  ]) {
+    set2(`${side3}Hand${finger}1`, `${side3}Hand`, [0.72 * s, 1.34, z2]);
+    set2(`${side3}Hand${finger}2`, `${side3}Hand${finger}1`, [0.745 * s, 1.34, z2]);
+    set2(`${side3}Hand${finger}3`, `${side3}Hand${finger}2`, [0.765 * s, 1.34, z2]);
+  }
+  set2(`${side3}HandThumb1`, `${side3}Hand`, [0.68 * s, 1.32, 0.05]);
+  set2(`${side3}HandThumb2`, `${side3}HandThumb1`, [0.7 * s, 1.32, 0.07]);
+  set2(`${side3}HandThumb3`, `${side3}HandThumb2`, [0.72 * s, 1.32, 0.08]);
+};
+arm3("Left");
+set2("Neck", "Spine2", [0, 1.38, 0]);
+set2("Head", "Neck", [0, 1.42, 0]);
+arm3("Right");
+var parts4 = [
+  { joint: "Hips", size: [0.46, 0.2, 0.27], center: [0, 0.9, 0], color: "pants" },
+  { joint: "Spine1", size: [0.47, 0.2, 0.27], center: [0, 1.06, 0], color: "shirt", area: "torso" },
+  { joint: "Spine2", size: [0.5, 0.24, 0.29], center: [0, 1.26, 0], color: "shirt", area: "torso" },
+  { joint: "Neck", size: [0.14, 0.06, 0.14], center: [0, 1.4, 0], color: "skin" },
+  { joint: "Head", size: [0.38, 0.36, 0.36], center: [0, 1.6, 0], color: "skin" },
+  // Hair cap and back of the head.
+  { joint: "Head", size: [0.4, 0.09, 0.38], center: [0, 1.79, -5e-3], color: "hair" },
+  { joint: "Head", size: [0.4, 0.26, 0.08], center: [0, 1.66, -0.155], color: "hair" },
+  // Face (on the front, +z).
+  { joint: "Head", size: [0.06, 0.07, 0.02], center: [0.08, 1.63, 0.18], color: "eyes" },
+  { joint: "Head", size: [0.06, 0.07, 0.02], center: [-0.08, 1.63, 0.18], color: "eyes" },
+  { joint: "Head", size: [0.14, 0.03, 0.02], center: [0, 1.52, 0.18], color: "mouth" }
+];
+for (const side3 of ["Left", "Right"]) {
+  const s = side3 === "Left" ? 1 : -1;
+  const at2 = (x, y, z2) => [x * s, y, z2];
+  parts4.push({
+    joint: `${side3}Shoulder`,
+    size: [0.1, 0.18, 0.22],
+    center: at2(0.2, 1.3, 0),
+    color: "shirt",
+    area: "upperArms"
+  }, {
+    joint: `${side3}Arm`,
+    size: [0.23, 0.15, 0.15],
+    center: at2(0.35, 1.34, 0),
+    color: "shirt",
+    area: "upperArms"
+  }, {
+    joint: `${side3}ForeArm`,
+    size: [0.2, 0.13, 0.13],
+    center: at2(0.56, 1.34, 0),
+    color: "skin",
+    area: "forearms"
+  }, { joint: `${side3}Hand`, size: [0.11, 0.13, 0.11], center: at2(0.715, 1.34, 0), color: "skin" }, {
+    joint: `${side3}UpLeg`,
+    size: [0.19, 0.42, 0.21],
+    center: at2(0.12, 0.64, 0),
+    color: "pants",
+    area: "upperLegs"
+  }, {
+    joint: `${side3}Leg`,
+    size: [0.17, 0.36, 0.19],
+    center: at2(0.12, 0.27, 0),
+    color: "pants",
+    area: "lowerLegs"
+  }, {
+    joint: `${side3}Foot`,
+    size: [0.19, 0.1, 0.3],
+    center: at2(0.12, 0.05, 0.04),
+    color: "shoes",
+    area: "feet"
+  });
+}
+var animation7 = {};
+var ANIMATED4 = /^(Hips|Spine|Spine1|Spine2|Neck|Head|(Left|Right)(UpLeg|Leg|Foot|ToeBase|Shoulder|Arm|ForeArm|Hand))$/;
+for (const joint of joints7)
+  if (ANIMATED4.test(joint.name))
+    animation7[joint.name] = [joint.name];
+var starter_default = defineBody({
+  id: "starter",
+  name: "Starter",
+  bonePrefix: "mixamorig",
+  joints: joints7,
+  parts: parts4,
+  animation: animation7,
+  fit: {},
+  sketchArm: { start: 0.235, axisY: 1.34, hangX: 0.32, topY: 1.36 }
+});
+
+// ../core-library/dist/avatar-appearance/bodies/robot.js
+var parts5 = [
+  { joint: "Hips", center: [0, 0.86, 0], size: [0.32, 0.13, 0.21], color: "pants" },
+  { joint: "Spine", center: [0, 0.96, 0], size: [0.22, 0.06, 0.17], color: "pants" },
+  { joint: "Spine1", center: [0, 1.06, 0], size: [0.3, 0.12, 0.2], color: "skin", area: "torso" },
+  { joint: "Spine2", center: [0, 1.23, 0], size: [0.38, 0.18, 0.22], color: "skin", area: "torso" },
+  { joint: "Spine2", center: [0, 1.24, 0.116], size: [0.14, 0.045, 0.015], color: "shirt" },
+  { joint: "Neck", center: [0, 1.395, 0], size: [0.1, 0.075, 0.1], color: "pants" },
+  { joint: "Head", center: [0, 1.6, 0], size: [0.36, 0.36, 0.3], color: "skin" }
+];
+for (const side3 of ["Left", "Right"]) {
+  const s = side3 === "Left" ? 1 : -1;
+  parts5.push({ joint: `${side3}Shoulder`, center: [0.17 * s, 1.34, 0], size: [0.12, 0.08, 0.1], color: "pants" }, { joint: `${side3}Arm`, center: [0.24 * s, 1.34, 0], size: [0.075, 0.09, 0.09], color: "shirt" }, { joint: `${side3}Arm`, center: [0.35 * s, 1.34, 0], size: [0.15, 0.115, 0.115], color: "skin", area: "upperArms" }, { joint: `${side3}ForeArm`, center: [0.46 * s, 1.34, 0], size: [0.06, 0.08, 0.08], color: "pants" }, { joint: `${side3}ForeArm`, center: [0.56 * s, 1.34, 0], size: [0.135, 0.1, 0.1], color: "skin", area: "forearms" }, { joint: `${side3}Hand`, center: [0.675 * s, 1.34, 0], size: [0.065, 0.075, 0.09], color: "shirt" }, { joint: `${side3}UpLeg`, center: [0.12 * s, 0.82, 0], size: [0.09, 0.08, 0.09], color: "shirt" }, { joint: `${side3}UpLeg`, center: [0.12 * s, 0.64, 0], size: [0.16, 0.29, 0.17], color: "skin", area: "upperLegs" }, { joint: `${side3}Leg`, center: [0.12 * s, 0.44, 0], size: [0.1, 0.09, 0.1], color: "pants" }, { joint: `${side3}Leg`, center: [0.12 * s, 0.27, 0], size: [0.135, 0.25, 0.14], color: "skin", area: "lowerLegs" }, { joint: `${side3}Foot`, center: [0.12 * s, 0.09, 0], size: [0.085, 0.06, 0.085], color: "pants" }, { joint: `${side3}Foot`, center: [0.12 * s, 0.045, 0.045], size: [0.17, 0.09, 0.27], color: "shoes", area: "feet" });
+  for (const joint of starter_default.joints.filter((joint2) => joint2.name.startsWith(`${side3}Hand`) && /[123]$/.test(joint2.name))) {
+    parts5.push({ joint: joint.name, center: [joint.at[0] + 8e-3 * s, joint.at[1], joint.at[2]], size: [0.018, 0.022, 0.016], color: "skin" });
+  }
+}
+var robot_default = defineBody({
+  id: "robot",
+  name: "Standard robot",
+  bonePrefix: "genvr",
+  joints: starter_default.joints,
+  parts: parts5,
+  animation: starter_default.animation,
+  fit: {},
+  sketchArm: starter_default.sketchArm
+});
+
+// ../core-library/dist/avatar-appearance/_body.js
+var AVATAR_BODIES = [classic_default, simple_default, starter_default, flat_default, anime_boy_default, warrior_default, human_default, robot_default];
+var PLAYER_BODIES = AVATAR_BODIES.filter((body) => !body.flat);
+var bodies = new Map(AVATAR_BODIES.map((body) => [body.id, body]));
+var findBody = (id) => bodies.get(id ?? "classic") ?? classic_default;
+var sized = /* @__PURE__ */ new Map();
+var round = (value) => Math.round(value * 100) / 100;
+function sizedBody(id, scale2 = NORMAL_AVATAR_SCALE) {
+  const base = findBody(id);
+  if (base.model)
+    return base;
+  const h = round(scale2.height);
+  const w = round(scale2.width);
+  const s = round(scale2.head);
+  if (h === 1 && w === 1 && s === 1)
+    return base;
+  const key = `${base.id}:${h}:${w}:${s}`;
+  const cached2 = sized.get(key);
+  if (cached2)
+    return cached2;
+  const grow = (p) => [p[0] * w, p[1] * h, p[2] * w];
+  const growSize = (size) => [size[0] * w, size[1] * h, size[2] * w];
+  const neck = grow(base.joints.find((joint) => joint.name === "Head")?.at ?? [0, 0, 0]);
+  const head = (p) => {
+    const q = grow(p);
+    return [neck[0] + (q[0] - neck[0]) * s, neck[1] + (q[1] - neck[1]) * s, neck[2] + (q[2] - neck[2]) * s];
+  };
+  const place3 = (joint, box2) => joint === "Head" ? { center: head(box2.center), size: growSize(box2.size).map((v) => v * s) } : { center: grow(box2.center), size: growSize(box2.size) };
+  const body = {
+    ...base,
+    scale: { height: h, width: w, head: s },
+    joints: base.joints.map((joint) => ({ ...joint, at: grow(joint.at) })),
+    parts: base.parts.map((part) => ({ ...part, ...place3(part.joint, part) })),
+    fit: Object.fromEntries(Object.entries(base.fit).map(([bone, target]) => [
+      bone,
+      { ...target, box: place3(target.joint, target.box) }
+    ])),
+    sketchArm: {
+      start: base.sketchArm.start * w,
+      axisY: base.sketchArm.axisY * h,
+      hangX: base.sketchArm.hangX * w,
+      topY: base.sketchArm.topY * h
+    }
+  };
+  if (base.id === "starter")
+    body.fit = Object.fromEntries([...STARTER_BOXES].map(([bone, box2]) => [bone, { joint: bone, box: place3(bone, box2) }]));
+  if (sized.size > 64)
+    sized.clear();
+  sized.set(key, body);
+  return body;
+}
+var FACE = { eyes: "#1c1b2e", mouth: "#b5524a" };
+var STARTER_BOXES = new Map([...new Set(starter_default.parts.map((part) => part.joint))].map((joint) => [
+  joint,
+  boundingBox(starter_default.parts.filter((part) => part.joint === joint))
+]));
+function fitPart(body, part) {
+  const target = body.fit[part.bone];
+  if (!target) {
+    const known = body.joints.some((joint) => joint.name === part.bone);
+    return known ? { joint: part.bone, size: part.size, center: part.center } : null;
+  }
+  const source = STARTER_BOXES.get(part.bone);
+  if (!source)
+    return null;
+  const axes = target.axes ?? [1, 2, 3];
+  const from = axes.map((axis) => Math.abs(axis) - 1);
+  const sign2 = axes.map((axis) => Math.sign(axis));
+  const scale2 = [0, 1, 2].map((a) => target.box.size[a] / source.size[from[a]]);
+  return {
+    joint: target.joint,
+    size: [0, 1, 2].map((a) => part.size[from[a]] * scale2[a]),
+    center: [0, 1, 2].map((a) => target.box.center[a] + sign2[a] * (part.center[from[a]] - source.center[from[a]]) * scale2[a])
+  };
+}
+function lookParts(look) {
+  const body = sizedBody(look.body, look.scale);
+  if (body.model)
+    return [];
+  const items = wornItems(look.wear ?? []);
+  const paint = {};
+  for (const item4 of items)
+    Object.assign(paint, item4.paint);
+  const hex3 = (color) => color.startsWith("#") ? color : color === "eyes" || color === "mouth" ? FACE[color] : look[color];
+  const blocks = body.parts.map(({ joint, size, center, color, area }) => ({
+    joint,
+    size,
+    center,
+    color: hex3(area && paint[area] || color),
+    ...area ? { area } : {},
+    ...color === "eyes" || color === "mouth" ? { face: color } : {}
+  }));
+  const covered = new Set(items.filter((item4) => item4.layer === "outer").map((item4) => item4.slot));
+  for (const item4 of items)
+    for (const part of item4.parts) {
+      if (part.covered && item4.layer === "inner" && covered.has(item4.slot))
+        continue;
+      const placed = fitPart(body, part);
+      if (placed)
+        blocks.push({ ...placed, color: hex3(part.color), item: item4.manifest.id });
+    }
+  return blocks;
+}
+function normalizeAvatarLook(saved) {
+  const look = readAvatarLook(saved);
+  return { ...look, wear: wornItems(look.wear).map((item4) => item4.manifest.id) };
+}
+
+// ../core-library/dist/avatar-appearance/_item-body.js
+var CORE_BONES = [
+  "Hips",
+  "Spine",
+  "Spine1",
+  "Spine2",
+  "Neck",
+  "Head",
+  ...["Left", "Right"].flatMap((side3) => ["Shoulder", "Arm", "ForeArm", "Hand", "UpLeg", "Leg", "Foot"].map((bone) => `${side3}${bone}`))
+];
+var ANIMATED5 = /^(Hips|Spine|Spine1|Spine2|Neck|Head|(Left|Right)(UpLeg|Leg|Foot|ToeBase|Shoulder|Arm|ForeArm|Hand))$/;
+function bodyFromItem(manifest, files) {
+  const data = manifest.body;
+  if (!data || !isItemBodyId(manifest.id))
+    return null;
+  const names = new Set(data.joints.map((joint) => joint.name));
+  if (CORE_BONES.some((bone) => !names.has(bone)))
+    return null;
+  const joints8 = data.joints.map(({ name, parent, at: at2 }) => ({ name, parent, at: [...at2] }));
+  const animation8 = {};
+  for (const joint of joints8)
+    if (ANIMATED5.test(joint.name))
+      animation8[joint.name] = [joint.name];
+  return {
+    manifest,
+    id: manifest.id,
+    bonePrefix: "mixamorig",
+    joints: joints8,
+    parts: [],
+    animation: animation8,
+    fit: {},
+    // Body cards show the picture; the flat sketch numbers only matter for block bodies.
+    sketchArm: { start: 0.2, axisY: 1.3, hangX: 0.2, topY: 1.3 },
+    model: files.model,
+    ...files.picture ? { picture: files.picture } : {}
+  };
+}
+
+// ../core-library/dist/avatar-appearance/index.js
+var MOVEMENT_ANIMATIONS = [
+  idle_default,
+  walk_default,
+  run_default,
+  jump_default,
+  swim_default,
+  swim_breast_default,
+  climb_default,
+  sit_ground_default,
+  build_default,
+  strike_default,
+  // The owner's ChatGPT move files (docs/reference/character-anime/moves/), built by tooling/moves/build-moves.ts.
+  backpedal_default,
+  crouch_idle_default,
+  crouch_walk_default,
+  sneak_default,
+  strafe_left_default,
+  strafe_right_default,
+  sprint_start_default,
+  sprint_stop_default,
+  turn_left_90_default,
+  turn_right_90_default,
+  turn_180_default,
+  jump_forward_default,
+  jump_backward_default,
+  long_jump_default,
+  soft_landing_default,
+  hard_landing_default,
+  slide_default
+];
+var CORE_EMOTES = [
+  sit_default,
+  wave_default,
+  clap_default,
+  cheer_default,
+  dance_default,
+  robot_dance_default,
+  point_default,
+  think_default,
+  salute_default,
+  laugh_default,
+  stretch_default
+];
+var CORE_ANIMATIONS = [...MOVEMENT_ANIMATIONS, ...CORE_EMOTES];
+var SIT_ANIMATION_ID = sit_default.manifest.id;
+var MAX_FAVORITE_ANIMATIONS = 8;
+var DEFAULT_FAVORITE_ANIMATIONS = CORE_EMOTES.slice(0, MAX_FAVORITE_ANIMATIONS).map((animation8) => animation8.manifest.id);
+var AVATAR_CLIPS = CORE_ANIMATIONS.map((animation8) => animation8.clip);
+var byId2 = new Map(CORE_ANIMATIONS.map((animation8) => [animation8.manifest.id, animation8]));
+var findAnimation = (id) => byId2.get(id);
 
 // ../core-library/dist/environment/water/tidewater-ocean.js
 var ocean = {
@@ -24106,9 +26222,41 @@ var tidewater_ocean_default = ocean;
 
 // ../core-library/dist/environment/water/index.js
 var OCEAN_RESOURCES = [tidewater_ocean_default];
+var getOceanResource = (id) => OCEAN_RESOURCES.find((item4) => item4.resourceId === id);
+function describeOceanControls(id) {
+  const item4 = getOceanResource(id);
+  return item4 ? {
+    resourceId: item4.resourceId,
+    scope: "world",
+    documentation: item4.documentation,
+    source: item4.source,
+    controls: item4.controls
+  } : null;
+}
 
 // ../core-library/dist/3d-models/_parts.js
 var GENERATED_PARAMS_MAX = 16;
+var isModelLook = (look) => !!look && !Array.isArray(look) && "model" in look;
+var isGeneratedLook = (look) => !!look && !Array.isArray(look) && "generated" in look;
+var itemParts = (item4, style) => {
+  const look = style ? item4.looks?.[style] : void 0;
+  return Array.isArray(look) ? look : item4.parts;
+};
+var itemModelLook = (item4, style) => {
+  const look = style ? item4.looks?.[style] : void 0;
+  return isModelLook(look) ? look : null;
+};
+var itemGeneratedLook = (item4, style) => {
+  const look = style ? item4.looks?.[style] : void 0;
+  return isGeneratedLook(look) ? look : null;
+};
+var anyGeneratedLook = (item4) => {
+  for (const look of Object.values(item4.looks ?? {}))
+    if (isGeneratedLook(look))
+      return look;
+  return null;
+};
+var lookBounds = (look) => isModelLook(look) ? look.model : isGeneratedLook(look) ? look.generated : null;
 var GROUPS = {
   nature: "nature",
   "props-and-decor": "props",
@@ -24162,6 +26310,63 @@ var DARK_LEAF = "#2e7d32";
 var STONE = "#9aa3ad";
 var METAL = "#5b6470";
 var PART = "#ececf0";
+function itemBounds(parts6) {
+  const min2 = [Infinity, Infinity, Infinity];
+  const max2 = [-Infinity, -Infinity, -Infinity];
+  for (const part of parts6) {
+    const turned = part.rotationY ? Math.hypot(part.size[0], part.size[2]) : 0;
+    const hx = (turned || part.size[0]) / 2;
+    const hz = (turned || part.size[2]) / 2;
+    const hy = part.size[1] / 2;
+    const [x, y, z2] = part.position;
+    min2[0] = Math.min(min2[0], x - hx);
+    min2[1] = Math.min(min2[1], y - hy);
+    min2[2] = Math.min(min2[2], z2 - hz);
+    max2[0] = Math.max(max2[0], x + hx);
+    max2[1] = Math.max(max2[1], y + hy);
+    max2[2] = Math.max(max2[2], z2 + hz);
+  }
+  return { min: min2, max: max2 };
+}
+function itemBlocksForStyle(item4, style) {
+  const look = style ? item4.looks?.[style] : void 0;
+  const own2 = lookBounds(look);
+  if (own2)
+    return own2.blocks ?? null;
+  const parts6 = style ? itemParts(item4, style) : item4.parts;
+  if (Number.isFinite(itemBounds(parts6).min[0]) || !item4.looks)
+    return null;
+  for (const fallbackLook of Object.values(item4.looks)) {
+    const fallback = lookBounds(fallbackLook);
+    if (fallback)
+      return fallback.blocks ?? null;
+  }
+  return null;
+}
+function itemFootprint(item4, style) {
+  const { min: min2, max: max2 } = itemBlocksForStyle(item4, style) ?? itemBoundsForStyle(item4, style);
+  return {
+    x: (min2[0] + max2[0]) / 2,
+    z: (min2[2] + max2[2]) / 2,
+    radius: Math.hypot(max2[0] - min2[0], max2[2] - min2[2]) / 2
+  };
+}
+function itemBoundsForStyle(item4, style) {
+  const look = style ? item4.looks?.[style] : void 0;
+  const own2 = lookBounds(look);
+  if (own2)
+    return own2.bounds;
+  const parts6 = style ? itemParts(item4, style) : item4.parts;
+  const bounds = itemBounds(parts6);
+  if (!Number.isFinite(bounds.min[0]) && item4.looks) {
+    for (const fallbackLook of Object.values(item4.looks)) {
+      const fallback = lookBounds(fallbackLook);
+      if (fallback)
+        return fallback.bounds;
+    }
+  }
+  return bounds;
+}
 var REALISTIC_REST = {
   "genvr.core.modular-wooden-pier": { mode: "foundation" },
   "genvr.core.modular-fort-01": { mode: "foundation" },
@@ -24874,11 +27079,11 @@ var LAYERS = [
   [0, false]
 ];
 var cells9 = [];
-LAYERS.forEach(([half, round], y) => {
+LAYERS.forEach(([half, round2], y) => {
   const colors = y === 3 ? VOXEL_COLORS.white : VOXEL_COLORS.cone;
   for (let z2 = -half; z2 <= half; z2 += 1)
     for (let x = -half; x <= half; x += 1)
-      if (!(round && Math.abs(x) === half && Math.abs(z2) === half))
+      if (!(round2 && Math.abs(x) === half && Math.abs(z2) === half))
         cells9.push([x, y, z2, shade(colors, random8)]);
 });
 var cone_default = defineModel({
@@ -26979,2792 +29184,13 @@ var CORE_ITEMS = [
   ...SEALIFE_ITEMS
 ];
 var EXPERIMENTAL_ITEMS = [...TIDEWATER_ITEMS];
-var byId = new Map([...CORE_ITEMS, ...EXPERIMENTAL_ITEMS].map((item4) => [item4.manifest.id, item4]));
-
-// ../core-library/dist/avatar-appearance/_joint-math.js
-var RAD = Math.PI / 180;
-var dot3 = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
-var cross3 = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
-var scale3 = (a, s) => [a[0] * s, a[1] * s, a[2] * s];
-var sub3 = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
-var unit3 = (a) => {
-  const length = Math.hypot(a[0], a[1], a[2]);
-  return length > 1e-9 ? scale3(a, 1 / length) : [0, 0, 0];
-};
-function qMul(a, b) {
-  return [
-    a[3] * b[0] + a[0] * b[3] + a[1] * b[2] - a[2] * b[1],
-    a[3] * b[1] - a[0] * b[2] + a[1] * b[3] + a[2] * b[0],
-    a[3] * b[2] + a[0] * b[1] - a[1] * b[0] + a[2] * b[3],
-    a[3] * b[3] - a[0] * b[0] - a[1] * b[1] - a[2] * b[2]
-  ];
+var byId3 = new Map([...CORE_ITEMS, ...EXPERIMENTAL_ITEMS].map((item4) => [item4.manifest.id, item4]));
+function generatedParamKeys(id) {
+  const item4 = byId3.get(id);
+  const look = item4 ? anyGeneratedLook(item4) : null;
+  return look ? Object.keys(look.generated.params).sort() : [];
 }
-var qInv = (q) => [-q[0], -q[1], -q[2], q[3]];
-var qAxis = (axis, degrees) => {
-  const [x, y, z2] = unit3(axis);
-  const s = Math.sin(degrees * RAD / 2);
-  return [x * s, y * s, z2 * s, Math.cos(degrees * RAD / 2)];
-};
-function qRotate(q, v) {
-  const u = [q[0], q[1], q[2]];
-  const t = scale3(cross3(u, v), 2);
-  return [v[0] + q[3] * t[0] + cross3(u, t)[0], v[1] + q[3] * t[1] + cross3(u, t)[1], v[2] + q[3] * t[2] + cross3(u, t)[2]];
-}
-function qFromEuler([x, y, z2]) {
-  return qMul(qMul(qAxis([1, 0, 0], x), qAxis([0, 1, 0], y)), qAxis([0, 0, 1], z2));
-}
-function eulerFromBasis(ex, ey, ez) {
-  const m11 = ex[0], m12 = ey[0], m13 = ez[0];
-  const m22 = ey[1], m23 = ez[1];
-  const m32 = ey[2], m33 = ez[2];
-  const round = (r) => Math.round(r / RAD * 100) / 100;
-  const y = Math.asin(Math.max(-1, Math.min(1, m13)));
-  if (Math.abs(m13) < 0.9999999)
-    return [round(Math.atan2(-m23, m33)), round(y), round(Math.atan2(-m12, m11))];
-  return [round(Math.atan2(m32, m22)), round(y), 0];
-}
-function eulerFromQ(q) {
-  return eulerFromBasis(qRotate(q, [1, 0, 0]), qRotate(q, [0, 1, 0]), qRotate(q, [0, 0, 1]));
-}
-function qBetween(from, to) {
-  const a = unit3(from);
-  const b = unit3(to);
-  const d = dot3(a, b);
-  if (d < -0.999999) {
-    const side3 = Math.abs(a[0]) < 0.9 ? cross3(a, [1, 0, 0]) : cross3(a, [0, 1, 0]);
-    return qAxis(side3, 180);
-  }
-  const c = cross3(a, b);
-  const q = [c[0], c[1], c[2], 1 + d];
-  const length = Math.hypot(...q);
-  return q.map((v) => v / length);
-}
-function clampTwist(rest, restSide, along, wanted, limit) {
-  const swing = qBetween(rest, along);
-  const neutral = qRotate(swing, restSide);
-  const a = unit3(along);
-  const angle = Math.atan2(dot3(cross3(neutral, wanted), a), dot3(neutral, wanted)) * (180 / Math.PI);
-  const twist = Math.max(-limit, Math.min(limit, angle));
-  return { side: qRotate(qAxis(a, twist), neutral), twist: angle };
-}
-
-// ../core-library/dist/avatar-appearance/_animation.js
-function defineAnimation(animation8) {
-  return {
-    manifest: coreManifest({
-      id: `genvr.core.animation.${animation8.slug}`,
-      name: animation8.name,
-      type: "animation",
-      category: "avatar-appearance",
-      subcategory: animation8.subcategory,
-      styles: ALL_STYLES
-    }),
-    clip: animation8.clip,
-    kind: animation8.kind,
-    duration: animation8.duration,
-    keys: animation8.keys,
-    ...animation8.grip === void 0 ? {} : { grip: animation8.grip }
-  };
-}
-var RADIANS = Math.PI / 180;
-function armPose(side3, upper, fore, palm) {
-  const u = unit3(upper);
-  const f = unit3(fore);
-  let bend = Math.acos(Math.max(-1, Math.min(1, dot3(u, f)))) / RADIANS;
-  const across = sub3(f, scale3(u, dot3(f, u)));
-  const rest = side3 === "Left" ? [1, 0, 0] : [-1, 0, 0];
-  let wanted;
-  if (Math.hypot(...across) > 1e-3 && bend > 0.5)
-    wanted = unit3(across);
-  else if (palm) {
-    const p = unit3(sub3(palm, scale3(u, dot3(palm, u))));
-    wanted = unit3(cross3(side3 === "Left" ? u : scale3(u, -1), scale3(p, -1)));
-  } else
-    wanted = [0, 0, 1];
-  let { side: ez, twist } = clampTwist(rest, [0, 0, 1], u, unit3(sub3(wanted, scale3(u, dot3(wanted, u)))), UPPER_ARM_TWIST);
-  if (Math.abs(twist) > UPPER_ARM_TWIST && bend < 30) {
-    bend = 0;
-    ({ side: ez } = clampTwist(rest, [0, 0, 1], u, [0, 0, 1], UPPER_ARM_TWIST));
-  }
-  const ex = side3 === "Left" ? u : scale3(u, -1);
-  const ey = cross3(ez, ex);
-  const arm4 = eulerFromBasis(ex, ey, ez);
-  const sign2 = side3 === "Left" ? -1 : 1;
-  const hinge = qAxis([0, 1, 0], sign2 * Math.min(bend, 150));
-  let forearmTwist = 0;
-  if (palm) {
-    const toLocal = qInv(qMul(qFromEuler(arm4), hinge));
-    const local2 = qRotate(toLocal, unit3(palm));
-    forearmTwist = Math.max(-FOREARM_TWIST, Math.min(FOREARM_TWIST, Math.atan2(-local2[2], -local2[1]) / RADIANS));
-  }
-  return { arm: arm4, fore: eulerFromQ(qMul(hinge, qAxis([1, 0, 0], forearmTwist))) };
-}
-function arm(side3, upper, fore, palm) {
-  const { arm: a, fore: f } = armPose(side3, upper, fore, palm);
-  return side3 === "Left" ? { LeftArm: a, LeftForeArm: f } : { RightArm: a, RightForeArm: f };
-}
-var mirror = ([x, y, z2]) => [-x, y, z2];
-var bothArms = (upper, fore, palm) => ({
-  ...arm("Left", upper, fore, palm),
-  ...arm("Right", mirror(upper), mirror(fore), mirror(palm))
-});
-var UPPER_ARM_TWIST = 90;
-var THIGH_TWIST = 50;
-var FOREARM_TWIST = 90;
-function legPose(thigh, shin) {
-  const t = unit3(thigh);
-  const s = unit3(shin);
-  let bend = Math.acos(Math.max(-1, Math.min(1, dot3(t, s)))) / RADIANS;
-  const behind = sub3(s, scale3(t, dot3(s, t)));
-  const wanted = Math.hypot(...behind) > 1e-3 && bend > 0.5 ? scale3(unit3(behind), -1) : [0, 0, 1];
-  let { side: ez, twist } = clampTwist([0, -1, 0], [0, 0, 1], t, unit3(sub3(wanted, scale3(t, dot3(wanted, t)))), THIGH_TWIST);
-  if (Math.abs(twist) > THIGH_TWIST && bend < 30) {
-    bend = 0;
-    ({ side: ez } = clampTwist([0, -1, 0], [0, 0, 1], t, [0, 0, 1], THIGH_TWIST));
-  }
-  const ey = scale3(t, -1);
-  const ex = cross3(ey, ez);
-  return { thigh: eulerFromBasis(ex, ey, ez), shin: [Math.round(Math.min(bend, 155) * 100) / 100, 0, 0] };
-}
-function referenceKey(pose, duration3, basePitch = 0) {
-  const left2 = armPose("Left", pose.leftUpperArm, pose.leftForearm, pose.leftPalm);
-  const right2 = armPose("Right", pose.rightUpperArm, pose.rightForearm, pose.rightPalm);
-  const leftLeg = legPose(pose.leftThigh, pose.leftShin);
-  const rightLeg = legPose(pose.rightThigh, pose.rightShin);
-  return [
-    pose.t * duration3,
-    {
-      Hips: [-(pose.bodyPitch - basePitch), -pose.bodyRoll, 0],
-      Spine2: [pose.spineBend, 0, 0],
-      Neck: [pose.headTilt * 0.4, pose.bodyRoll * 0.8 + pose.headTurn * 0.6, 0],
-      Head: [pose.headTilt * 0.6, pose.headTurn * 0.4, 0],
-      LeftArm: left2.arm,
-      LeftForeArm: left2.fore,
-      RightArm: right2.arm,
-      RightForeArm: right2.fore,
-      LeftUpLeg: leftLeg.thigh,
-      LeftLeg: leftLeg.shin,
-      RightUpLeg: rightLeg.thigh,
-      RightLeg: rightLeg.shin,
-      LeftFoot: [pose.footPoint, 0, 0],
-      RightFoot: [pose.footPoint, 0, 0],
-      grip: pose.grip,
-      ...pose.hipsY === void 0 ? {} : { hipsY: pose.hipsY }
-    }
-  ];
-}
-var DOWN = 78;
-var arms = (left2, right2) => ({ LeftArm: left2, RightArm: right2 });
-var REST = {
-  ...arms([0, 0, -DOWN], [0, 0, DOWN]),
-  LeftForeArm: [0, -8, 0],
-  RightForeArm: [0, 8, 0]
-};
-var at = (time3, pose) => [time3, { ...REST, ...pose }];
-var beats = (from, to, count, even, odd) => Array.from({ length: count + 1 }, (_, i) => at(from + (to - from) * i / count, i % 2 === 0 ? even : odd));
-function gait(duration3, o) {
-  const twist = o.twist ?? o.leg * 0.2;
-  const roll = o.roll ?? o.leg * 0.08;
-  const step = (sign2, t) => [
-    t,
-    {
-      Hips: [0, -twist * sign2, 0],
-      LeftUpLeg: [-o.leg * sign2, 0, 0],
-      RightUpLeg: [o.leg * sign2, 0, 0],
-      LeftLeg: [sign2 > 0 ? o.knee * 0.3 : o.knee * 0.15, 0, 0],
-      RightLeg: [sign2 < 0 ? o.knee * 0.3 : o.knee * 0.15, 0, 0],
-      ...arms([o.arm * sign2, 0, -DOWN], [-o.arm * sign2, 0, DOWN]),
-      LeftForeArm: [0, -o.elbow, 0],
-      RightForeArm: [0, o.elbow, 0],
-      Spine: [o.lean, 0, 0],
-      Spine2: [0, twist * 1.8 * sign2, 0],
-      Neck: [0, -twist * 0.8 * sign2, 0],
-      hipsY: -o.bob
-    }
-  ];
-  const pass = (t, leftLifted) => {
-    const side3 = leftLifted ? 1 : -1;
-    return [
-      t,
-      {
-        Hips: [0, 0, -roll * side3],
-        LeftUpLeg: [leftLifted ? -o.leg * 0.4 : o.leg * 0.2, 0, roll * side3],
-        RightUpLeg: [leftLifted ? o.leg * 0.2 : -o.leg * 0.4, 0, roll * side3],
-        LeftLeg: [leftLifted ? o.knee : 0, 0, 0],
-        RightLeg: [leftLifted ? 0 : o.knee, 0, 0],
-        ...arms([0, 0, -DOWN], [0, 0, DOWN]),
-        LeftForeArm: [0, -o.elbow, 0],
-        RightForeArm: [0, o.elbow, 0],
-        Spine: [o.lean, 0, roll * 1.6 * side3],
-        Neck: [0, 0, -roll * 0.6 * side3],
-        hipsY: o.bob
-      }
-    ];
-  };
-  const d = duration3;
-  return [step(1, 0), pass(d * 0.25, false), step(-1, d * 0.5), pass(d * 0.75, true), step(1, d)];
-}
-var hold = (duration3, pose) => [
-  [0, pose],
-  [duration3, pose]
-];
-
-// ../core-library/dist/avatar-appearance/animations/idle.js
-var breathe = (t, amount) => [
-  t,
-  {
-    ...arms([0, 0, -DOWN + amount * 2], [0, 0, DOWN - amount * 2]),
-    LeftForeArm: [0, -8, 0],
-    RightForeArm: [0, 8, 0],
-    Spine2: [-amount * 2, 0, 0],
-    Head: [amount, amount * 2, 0],
-    hipsY: amount * 8e-3,
-    grip: 0.12
-  }
-];
-var idle_default = defineAnimation({
-  slug: "idle",
-  name: "Idle",
-  clip: "Idle",
-  subcategory: "animations",
-  kind: "loop",
-  duration: 2.4,
-  keys: [breathe(0, 0), breathe(1.2, 1), breathe(2.4, 0)]
-});
-
-// ../core-library/dist/avatar-appearance/animations/build.js
-var lifted = { ...arm("Right", [-0.25, 0.65, 0.7], [0, 0.7, -0.7], [1, 0, 0]), Spine2: [0, -6, 0] };
-var struck = { ...arm("Right", [-0.15, -0.2, 0.97], [-0.05, -0.55, 0.83], [1, 0, 0]), Spine2: [0, -10, 0] };
-var build_default = defineAnimation({
-  slug: "build",
-  name: "Build",
-  clip: "Build",
-  subcategory: "animations",
-  kind: "once",
-  duration: 0.35,
-  grip: 0.8,
-  keys: [at(0, {}), at(0.1, lifted), at(0.22, struck), at(0.35, {})]
-});
-
-// ../core-library/dist/avatar-appearance/animations/strike.js
-var raised = { ...arm("Right", [-0.6, 0.75, -0.1], [-0.25, 0.95, 0.15], [1, 0, 0]), Spine2: [0, 15, 0] };
-var swept = { ...arm("Right", [0.35, -0.2, 0.9], [0.6, -0.3, 0.75], [0, -1, 0]), Spine2: [0, -15, 0] };
-var strike_default = defineAnimation({
-  slug: "strike",
-  name: "Strike",
-  clip: "Strike",
-  subcategory: "animations",
-  kind: "once",
-  duration: 0.4,
-  grip: 1,
-  keys: [at(0, {}), at(0.1, raised), at(0.22, swept), at(0.4, {})]
-});
-
-// ../core-library/dist/avatar-appearance/animations/climb.js
-var PALM = [0, 0.2, 1];
-var high = (side3) => armPose(side3, [0.15 * sign(side3), 0.95, 0.3], [0.05 * sign(side3), 1, 0.25], PALM);
-var low = (side3) => armPose(side3, [0.35 * sign(side3), -0.15, 0.9], [0.1 * sign(side3), 0.95, 0.3], PALM);
-function sign(side3) {
-  return side3 === "Left" ? 1 : -1;
-}
-var reach = (t, left2) => {
-  const l = left2 ? high("Left") : low("Left");
-  const r = left2 ? low("Right") : high("Right");
-  return [
-    t,
-    {
-      LeftArm: l.arm,
-      LeftForeArm: l.fore,
-      RightArm: r.arm,
-      RightForeArm: r.fore,
-      LeftUpLeg: [left2 ? -10 : -50, 0, 0],
-      RightUpLeg: [left2 ? -50 : -10, 0, 0],
-      LeftLeg: [left2 ? 15 : 80, 0, 0],
-      RightLeg: [left2 ? 80 : 15, 0, 0],
-      Head: [-10, 0, 0]
-    }
-  ];
-};
-var climb_default = defineAnimation({
-  slug: "climb",
-  name: "Climb",
-  clip: "Climb",
-  subcategory: "animations",
-  kind: "loop",
-  duration: 0.8,
-  grip: 0.85,
-  keys: [reach(0, true), reach(0.4, false), reach(0.8, true)]
-});
-
-// ../core-library/dist/avatar-appearance/animations/jump.js
-var ARMS = bothArms([0.45, -0.55, 0.7], [0.3, 0.1, 0.95], [-0.6, -0.3, 0.3]);
-var air = (t, tuck) => [
-  t,
-  {
-    LeftUpLeg: [-35 - tuck, 0, 0],
-    RightUpLeg: [-20 - tuck, 0, 0],
-    LeftLeg: [55 + tuck, 0, 0],
-    RightLeg: [35 + tuck, 0, 0],
-    ...ARMS
-  }
-];
-var jump_default = defineAnimation({
-  slug: "jump",
-  name: "Jump",
-  clip: "Jump",
-  subcategory: "animations",
-  kind: "loop",
-  duration: 0.8,
-  keys: [air(0, 0), air(0.4, 8), air(0.8, 0)]
-});
-
-// ../core-library/dist/avatar-appearance/animations/run.js
-var run_default = defineAnimation({
-  slug: "run",
-  name: "Run",
-  clip: "Run",
-  subcategory: "animations",
-  kind: "loop",
-  duration: 0.64,
-  keys: gait(0.64, { leg: 45, knee: 90, arm: 28, elbow: 50, lean: 12, bob: 0.06 })
-});
-
-// ../core-library/dist/avatar-appearance/animations/sit-ground.js
-var sit_ground_default = defineAnimation({
-  slug: "sit-ground",
-  name: "Sit on the ground",
-  clip: "SitGround",
-  subcategory: "animations",
-  kind: "loop",
-  duration: 1,
-  grip: 0.05,
-  keys: hold(1, {
-    LeftUpLeg: [-86, 0, 6],
-    RightUpLeg: [-86, 0, -6],
-    LeftLeg: [4, 0, 0],
-    RightLeg: [4, 0, 0],
-    ...bothArms([0.3, -0.9, -0.35], [0.25, -0.95, -0.25], [0, -1, 0]),
-    Spine: [-8, 0, 0],
-    hipsY: -0.72
-  })
-});
-
-// ../core-library/dist/avatar-appearance/animations/swim.js
-var POSES = [
-  {
-    t: 0,
-    leftUpperArm: [0.05, 0.99, 0.1],
-    leftForearm: [0.02, 0.99, 0.12],
-    rightUpperArm: [-0.08, -0.93, 0.36],
-    rightForearm: [-0.03, -0.98, 0.18],
-    leftThigh: [0.02, -0.99, -0.1],
-    leftShin: [0.01, -0.98, -0.2],
-    rightThigh: [-0.02, -0.98, 0.18],
-    rightShin: [-0.01, -0.99, 0.1],
-    bodyRoll: 20,
-    spineBend: 2,
-    headTurn: 0,
-    headTilt: 6,
-    footPoint: 35,
-    bodyPitch: 3,
-    grip: 0.05
-  },
-  {
-    t: 0.125,
-    leftUpperArm: [0.04, 0.99, 0.08],
-    leftForearm: [0.01, 1, 0.04],
-    rightUpperArm: [-0.42, 0.18, -0.89],
-    rightForearm: [-0.3, 0.7, 0.65],
-    leftThigh: [0.02, -0.98, 0.18],
-    leftShin: [0.01, -0.99, 0.08],
-    rightThigh: [-0.02, -0.99, -0.1],
-    rightShin: [-0.01, -0.97, -0.24],
-    bodyRoll: 30,
-    spineBend: 2,
-    headTurn: 0,
-    headTilt: 5,
-    footPoint: 38,
-    bodyPitch: 3,
-    grip: 0.05
-  },
-  {
-    t: 0.25,
-    leftUpperArm: [0.06, 0.94, 0.34],
-    leftForearm: [0.03, 0.42, 0.91],
-    rightUpperArm: [-0.34, 0.55, -0.76],
-    rightForearm: [-0.18, 0.87, 0.46],
-    leftThigh: [0.02, -0.99, -0.08],
-    leftShin: [0.01, -0.96, -0.28],
-    rightThigh: [-0.02, -0.98, 0.18],
-    rightShin: [-0.01, -0.99, 0.09],
-    bodyRoll: 18,
-    spineBend: 2,
-    headTurn: 0,
-    headTilt: 6,
-    footPoint: 38,
-    bodyPitch: 3,
-    grip: 0.08
-  },
-  {
-    t: 0.375,
-    leftUpperArm: [0.08, 0.55, 0.83],
-    leftForearm: [0.03, -0.2, 0.98],
-    rightUpperArm: [-0.05, 0.98, 0.18],
-    rightForearm: [-0.02, 0.99, 0.1],
-    leftThigh: [0.02, -0.98, 0.17],
-    leftShin: [0.01, -0.99, 0.1],
-    rightThigh: [-0.02, -0.99, -0.08],
-    rightShin: [-0.01, -0.96, -0.27],
-    bodyRoll: 5,
-    spineBend: 2,
-    headTurn: 0,
-    headTilt: 5,
-    footPoint: 40,
-    bodyPitch: 2,
-    grip: 0.1
-  },
-  {
-    t: 0.5,
-    leftUpperArm: [0.06, -0.55, 0.83],
-    leftForearm: [0.02, -0.92, 0.39],
-    rightUpperArm: [-0.04, 0.99, 0.1],
-    rightForearm: [-0.01, 1, 0.05],
-    leftThigh: [0.02, -0.99, -0.1],
-    leftShin: [0.01, -0.97, -0.24],
-    rightThigh: [-0.02, -0.98, 0.18],
-    rightShin: [-0.01, -0.99, 0.08],
-    bodyRoll: -20,
-    spineBend: 2,
-    headTurn: 0,
-    headTilt: 5,
-    footPoint: 38,
-    bodyPitch: 3,
-    grip: 0.08
-  },
-  {
-    t: 0.625,
-    leftUpperArm: [0.4, 0.18, -0.9],
-    leftForearm: [0.28, 0.7, 0.66],
-    rightUpperArm: [-0.06, 0.94, 0.34],
-    rightForearm: [-0.03, 0.42, 0.91],
-    leftThigh: [0.02, -0.98, 0.18],
-    leftShin: [0.01, -0.99, 0.08],
-    rightThigh: [-0.02, -0.99, -0.1],
-    rightShin: [-0.01, -0.97, -0.24],
-    bodyRoll: -30,
-    spineBend: 2,
-    headTurn: 0,
-    headTilt: 5,
-    footPoint: 38,
-    bodyPitch: 3,
-    grip: 0.07
-  },
-  {
-    t: 0.75,
-    leftUpperArm: [0.32, 0.57, -0.76],
-    leftForearm: [0.16, 0.88, 0.45],
-    rightUpperArm: [-0.08, 0.55, 0.83],
-    rightForearm: [-0.03, -0.2, 0.98],
-    leftThigh: [0.02, -0.99, -0.08],
-    leftShin: [0.01, -0.96, -0.28],
-    rightThigh: [-0.02, -0.98, 0.17],
-    rightShin: [-0.01, -0.99, 0.09],
-    bodyRoll: -35,
-    spineBend: 3,
-    headTurn: 55,
-    headTilt: -3,
-    footPoint: 40,
-    bodyPitch: 4,
-    grip: 0.1
-  },
-  {
-    t: 0.875,
-    leftUpperArm: [0.05, 0.97, 0.23],
-    leftForearm: [0.02, 0.99, 0.12],
-    rightUpperArm: [-0.07, -0.53, 0.85],
-    rightForearm: [-0.02, -0.91, 0.41],
-    leftThigh: [0.02, -0.98, 0.18],
-    leftShin: [0.01, -0.99, 0.08],
-    rightThigh: [-0.02, -0.99, -0.09],
-    rightShin: [-0.01, -0.96, -0.27],
-    bodyRoll: -12,
-    spineBend: 2,
-    headTurn: 15,
-    headTilt: 4,
-    footPoint: 38,
-    bodyPitch: 3,
-    grip: 0.08
-  }
-];
-var DURATION = 1.4;
-var BASE_PITCH = 3;
-var swim_default = defineAnimation({
-  slug: "swim",
-  name: "Swim",
-  clip: "Swim",
-  subcategory: "animations",
-  kind: "loop",
-  duration: DURATION,
-  keys: [...POSES, { ...POSES[0], t: 1 }].map((pose) => referenceKey(pose, DURATION, BASE_PITCH))
-});
-
-// ../core-library/dist/avatar-appearance/animations/swim-breast.js
-var POSES2 = [
-  {
-    t: 0,
-    leftUpperArm: [0.03, 1, 0],
-    leftForearm: [0.01, 1, 0],
-    rightUpperArm: [-0.03, 1, 0],
-    rightForearm: [-0.01, 1, 0],
-    leftThigh: [0.02, -1, 0],
-    leftShin: [0.01, -1, 0],
-    rightThigh: [-0.02, -1, 0],
-    rightShin: [-0.01, -1, 0],
-    bodyRoll: 0,
-    spineBend: 0,
-    headTurn: 0,
-    headTilt: 8,
-    footPoint: 50,
-    bodyPitch: 2,
-    grip: 0.05
-  },
-  {
-    t: 0.125,
-    leftUpperArm: [0.35, 0.93, 0.08],
-    leftForearm: [0.55, 0.82, 0.15],
-    rightUpperArm: [-0.35, 0.93, 0.08],
-    rightForearm: [-0.55, 0.82, 0.15],
-    leftThigh: [0.02, -1, 0],
-    leftShin: [0.01, -1, 0],
-    rightThigh: [-0.02, -1, 0],
-    rightShin: [-0.01, -1, 0],
-    bodyRoll: 0,
-    spineBend: 2,
-    headTurn: 0,
-    headTilt: 5,
-    footPoint: 48,
-    bodyPitch: 3,
-    grip: 0.05
-  },
-  {
-    t: 0.25,
-    leftUpperArm: [0.62, 0.75, 0.2],
-    leftForearm: [0.38, 0.45, 0.81],
-    rightUpperArm: [-0.62, 0.75, 0.2],
-    rightForearm: [-0.38, 0.45, 0.81],
-    leftThigh: [0.02, -1, 0],
-    leftShin: [0.01, -1, 0],
-    rightThigh: [-0.02, -1, 0],
-    rightShin: [-0.01, -1, 0],
-    bodyRoll: 0,
-    spineBend: -4,
-    headTurn: 0,
-    headTilt: 0,
-    footPoint: 45,
-    bodyPitch: 5,
-    grip: 0.08
-  },
-  {
-    t: 0.375,
-    leftUpperArm: [0.52, 0.45, 0.45],
-    leftForearm: [-0.18, 0.28, 0.94],
-    rightUpperArm: [-0.52, 0.45, 0.45],
-    rightForearm: [0.18, 0.28, 0.94],
-    leftThigh: [0.1, -0.96, 0.15],
-    leftShin: [0.08, -0.75, -0.45],
-    rightThigh: [-0.1, -0.96, 0.15],
-    rightShin: [-0.08, -0.75, -0.45],
-    bodyRoll: 0,
-    spineBend: -10,
-    headTurn: 0,
-    headTilt: -8,
-    footPoint: 35,
-    bodyPitch: 8,
-    grip: 0.08
-  },
-  {
-    t: 0.5,
-    leftUpperArm: [0.22, 0.55, 0.35],
-    leftForearm: [-0.15, 0.62, 0.25],
-    rightUpperArm: [-0.22, 0.55, 0.35],
-    rightForearm: [0.15, 0.62, 0.25],
-    leftThigh: [0.25, -0.78, 0.2],
-    leftShin: [0.35, 0.15, -0.35],
-    rightThigh: [-0.25, -0.78, 0.2],
-    rightShin: [-0.35, 0.15, -0.35],
-    bodyRoll: 0,
-    spineBend: -12,
-    headTurn: 0,
-    headTilt: -12,
-    footPoint: 10,
-    bodyPitch: 10,
-    grip: 0.05
-  },
-  {
-    t: 0.625,
-    leftUpperArm: [0.1, 0.98, 0.05],
-    leftForearm: [0.04, 1, 0.02],
-    rightUpperArm: [-0.1, 0.98, 0.05],
-    rightForearm: [-0.04, 1, 0.02],
-    leftThigh: [0.38, -0.72, 0.15],
-    leftShin: [0.75, -0.35, 0.15],
-    rightThigh: [-0.38, -0.72, 0.15],
-    rightShin: [-0.75, -0.35, 0.15],
-    bodyRoll: 0,
-    spineBend: -5,
-    headTurn: 0,
-    headTilt: 2,
-    footPoint: 12,
-    bodyPitch: 6,
-    grip: 0.03
-  },
-  {
-    t: 0.75,
-    leftUpperArm: [0.03, 1, 0],
-    leftForearm: [0.01, 1, 0],
-    rightUpperArm: [-0.03, 1, 0],
-    rightForearm: [-0.01, 1, 0],
-    leftThigh: [0.3, -0.92, 0.05],
-    leftShin: [0.55, -0.82, -0.05],
-    rightThigh: [-0.3, -0.92, 0.05],
-    rightShin: [-0.55, -0.82, -0.05],
-    bodyRoll: 0,
-    spineBend: 0,
-    headTurn: 0,
-    headTilt: 7,
-    footPoint: 35,
-    bodyPitch: 3,
-    grip: 0.02
-  },
-  {
-    t: 0.875,
-    leftUpperArm: [0.03, 1, 0],
-    leftForearm: [0.01, 1, 0],
-    rightUpperArm: [-0.03, 1, 0],
-    rightForearm: [-0.01, 1, 0],
-    leftThigh: [0.04, -1, 0],
-    leftShin: [0.03, -1, 0],
-    rightThigh: [-0.04, -1, 0],
-    rightShin: [-0.03, -1, 0],
-    bodyRoll: 0,
-    spineBend: 0,
-    headTurn: 0,
-    headTilt: 8,
-    footPoint: 52,
-    bodyPitch: 2,
-    grip: 0.02
-  }
-];
-var DURATION2 = 1.8;
-var BASE_PITCH2 = 5;
-var swim_breast_default = defineAnimation({
-  slug: "swim-breast",
-  name: "Breaststroke",
-  clip: "SwimBreast",
-  subcategory: "animations",
-  kind: "loop",
-  duration: DURATION2,
-  keys: [...POSES2, { ...POSES2[0], t: 1 }].map((pose) => referenceKey(pose, DURATION2, BASE_PITCH2))
-});
-
-// ../core-library/dist/avatar-appearance/animations/walk.js
-var walk_default = defineAnimation({
-  slug: "walk",
-  name: "Walk",
-  clip: "Walk",
-  subcategory: "animations",
-  kind: "loop",
-  duration: 1,
-  keys: gait(1, { leg: 28, knee: 45, arm: 24, elbow: 14, lean: 3, bob: 0.03 })
-});
-
-// ../core-library/dist/avatar-appearance/animations/backpedal.js
-var POSES3 = [
-  // left-support: Left leg supports the body while the right knee lifts; torso stays slightly behind the hips and eyes remain forward.
-  { t: 0, leftUpperArm: [0.04, -0.66, 0.75], leftForearm: [0.02, -0.86, 0.5], rightUpperArm: [-0.04, -0.78, -0.62], rightForearm: [-0.02, -0.95, -0.31], leftThigh: [0.06, -0.92, -0.39], leftShin: [0.03, -0.99, 0.1], rightThigh: [-0.08, -0.55, 0.83], rightShin: [-0.04, -0.78, -0.62], leftPalm: [0.08, 0.03, -0.99], rightPalm: [-0.08, 0.03, -0.99], bodyRoll: 2, spineBend: -3, headTurn: 0, headTilt: 0, footPoint: 8, bodyPitch: 96, grip: 0.16, hipsY: -0.05 },
-  // right-reach-back: Right foot reaches backward for a short controlled step; the character avoids overstriding behind the body.
-  { t: 0.12, leftUpperArm: [0.04, -0.72, 0.69], leftForearm: [0.02, -0.9, 0.43], rightUpperArm: [-0.04, -0.68, -0.73], rightForearm: [-0.02, -0.89, -0.45], leftThigh: [0.05, -0.97, -0.23], leftShin: [0.02, -0.99, 0.08], rightThigh: [-0.08, -0.66, -0.75], rightShin: [-0.04, -0.93, -0.36], leftPalm: [0.08, 0.03, -0.99], rightPalm: [-0.08, 0.03, -0.99], bodyRoll: 1, spineBend: -4, headTurn: 0, headTilt: 0, footPoint: 5, bodyPitch: 97, grip: 0.16, hipsY: -0.07 },
-  // right-contact: Right foot accepts weight behind the body as the left knee lifts; arms counter-swing naturally.
-  { t: 0.24, leftUpperArm: [0.04, -0.78, -0.62], leftForearm: [0.02, -0.95, -0.31], rightUpperArm: [-0.04, -0.66, 0.75], rightForearm: [-0.02, -0.86, 0.5], leftThigh: [0.08, -0.55, 0.83], leftShin: [0.04, -0.78, -0.62], rightThigh: [-0.06, -0.92, -0.39], rightShin: [-0.03, -0.99, 0.1], leftPalm: [0.08, 0.03, -0.99], rightPalm: [-0.08, 0.03, -0.99], bodyRoll: -2, spineBend: -3, headTurn: 0, headTilt: 0, footPoint: 8, bodyPitch: 96, grip: 0.16, hipsY: -0.05 },
-  // right-load: Weight compresses briefly over the right leg; knees stay soft and the torso remains controlled.
-  { t: 0.36, leftUpperArm: [0.04, -0.72, -0.69], leftForearm: [0.02, -0.9, -0.43], rightUpperArm: [-0.04, -0.74, 0.67], rightForearm: [-0.02, -0.91, 0.41], leftThigh: [0.08, -0.48, 0.87], leftShin: [0.04, -0.72, -0.69], rightThigh: [-0.05, -0.97, -0.23], rightShin: [-0.02, -0.99, 0.08], leftPalm: [0.08, 0.03, -0.99], rightPalm: [-0.08, 0.03, -0.99], bodyRoll: -1, spineBend: -4, headTurn: 0, headTilt: 0, footPoint: 6, bodyPitch: 97, grip: 0.16, hipsY: -0.08 },
-  // left-flight: A brief low flight transfers the body backward while the left foot prepares for the next contact.
-  { t: 0.5, leftUpperArm: [0.04, -0.65, 0.76], leftForearm: [0.02, -0.84, 0.54], rightUpperArm: [-0.04, -0.79, -0.61], rightForearm: [-0.02, -0.95, -0.3], leftThigh: [0.08, -0.66, -0.75], leftShin: [0.04, -0.9, -0.43], rightThigh: [-0.06, -0.88, 0.47], rightShin: [-0.03, -0.99, -0.1], leftPalm: [0.08, 0.03, -0.99], rightPalm: [-0.08, 0.03, -0.99], bodyRoll: 0, spineBend: -3, headTurn: 0, headTilt: 0, footPoint: 10, bodyPitch: 96, grip: 0.15, hipsY: -0.03 },
-  // left-reach-back: Left foot reaches backward while the right leg finishes support; steps remain short for stability.
-  { t: 0.62, leftUpperArm: [0.04, -0.68, -0.73], leftForearm: [0.02, -0.89, -0.45], rightUpperArm: [-0.04, -0.72, 0.69], rightForearm: [-0.02, -0.9, 0.43], leftThigh: [0.08, -0.66, -0.75], leftShin: [0.04, -0.93, -0.36], rightThigh: [-0.05, -0.97, -0.23], rightShin: [-0.02, -0.99, 0.08], leftPalm: [0.08, 0.03, -0.99], rightPalm: [-0.08, 0.03, -0.99], bodyRoll: -1, spineBend: -4, headTurn: 0, headTilt: 0, footPoint: 5, bodyPitch: 97, grip: 0.16, hipsY: -0.07 },
-  // left-contact-two: Left foot accepts the next backward step while the right knee comes forward to reset the stride.
-  { t: 0.74, leftUpperArm: [0.04, -0.66, 0.75], leftForearm: [0.02, -0.86, 0.5], rightUpperArm: [-0.04, -0.78, -0.62], rightForearm: [-0.02, -0.95, -0.31], leftThigh: [0.06, -0.92, -0.39], leftShin: [0.03, -0.99, 0.1], rightThigh: [-0.08, -0.55, 0.83], rightShin: [-0.04, -0.78, -0.62], leftPalm: [0.08, 0.03, -0.99], rightPalm: [-0.08, 0.03, -0.99], bodyRoll: 2, spineBend: -3, headTurn: 0, headTilt: 0, footPoint: 8, bodyPitch: 96, grip: 0.16, hipsY: -0.05 },
-  // left-load: Left leg compresses under load while the right knee rises for the next backward placement.
-  { t: 0.86, leftUpperArm: [0.04, -0.74, 0.67], leftForearm: [0.02, -0.91, 0.41], rightUpperArm: [-0.04, -0.72, -0.69], rightForearm: [-0.02, -0.9, -0.43], leftThigh: [0.05, -0.97, -0.23], leftShin: [0.02, -0.99, 0.08], rightThigh: [-0.08, -0.48, 0.87], rightShin: [-0.04, -0.72, -0.69], leftPalm: [0.08, 0.03, -0.99], rightPalm: [-0.08, 0.03, -0.99], bodyRoll: 1, spineBend: -4, headTurn: 0, headTilt: 0, footPoint: 6, bodyPitch: 97, grip: 0.16, hipsY: -0.08 },
-  // cycle-return: The stride settles back toward the opening support pose while the head stays fixed on what is ahead.
-  { t: 0.94, leftUpperArm: [0.04, -0.67, 0.74], leftForearm: [0.02, -0.87, 0.49], rightUpperArm: [-0.04, -0.77, -0.63], rightForearm: [-0.02, -0.94, -0.33], leftThigh: [0.06, -0.93, -0.36], leftShin: [0.03, -0.99, 0.09], rightThigh: [-0.08, -0.54, 0.84], rightShin: [-0.04, -0.77, -0.64], leftPalm: [0.08, 0.03, -0.99], rightPalm: [-0.08, 0.03, -0.99], bodyRoll: 2, spineBend: -3, headTurn: 0, headTilt: 0, footPoint: 8, bodyPitch: 96, grip: 0.16, hipsY: -0.05 },
-  // left-support-loop: Exact opening pose repeated to close the backpedal loop seamlessly.
-  { t: 1, leftUpperArm: [0.04, -0.66, 0.75], leftForearm: [0.02, -0.86, 0.5], rightUpperArm: [-0.04, -0.78, -0.62], rightForearm: [-0.02, -0.95, -0.31], leftThigh: [0.06, -0.92, -0.39], leftShin: [0.03, -0.99, 0.1], rightThigh: [-0.08, -0.55, 0.83], rightShin: [-0.04, -0.78, -0.62], leftPalm: [0.08, 0.03, -0.99], rightPalm: [-0.08, 0.03, -0.99], bodyRoll: 2, spineBend: -3, headTurn: 0, headTilt: 0, footPoint: 8, bodyPitch: 96, grip: 0.16, hipsY: -0.05 }
-];
-var DURATION3 = 0.95;
-var backpedal_default = defineAnimation({
-  slug: "backpedal",
-  name: "Backpedal",
-  clip: "Backpedal",
-  subcategory: "animations",
-  kind: "loop",
-  duration: DURATION3,
-  keys: POSES3.map((pose) => referenceKey(pose, DURATION3, 90))
-});
-
-// ../core-library/dist/avatar-appearance/animations/crouch-idle.js
-var POSES4 = [
-  // neutral-crouch: Balanced low crouch with knees tracking over the feet, relaxed ready arms and steady forward gaze.
-  { t: 0, leftUpperArm: [0.1, -0.82, 0.56], leftForearm: [0.05, -0.73, 0.68], rightUpperArm: [-0.1, -0.82, 0.56], rightForearm: [-0.05, -0.73, 0.68], leftThigh: [0.18, -0.5, 0.85], leftShin: [0.08, -0.79, -0.61], rightThigh: [-0.18, -0.5, 0.85], rightShin: [-0.08, -0.79, -0.61], leftPalm: [0.08, 0.08, -0.99], rightPalm: [-0.08, 0.08, -0.99], bodyRoll: 0, spineBend: 8, headTurn: 0, headTilt: -1, footPoint: 2, bodyPitch: 74, grip: 0.1, hipsY: -0.46 },
-  // inhale: Chest opens slightly on the inhale while the hips remain low and balanced.
-  { t: 0.14, leftUpperArm: [0.1, -0.82, 0.56], leftForearm: [0.05, -0.73, 0.68], rightUpperArm: [-0.1, -0.82, 0.56], rightForearm: [-0.05, -0.73, 0.68], leftThigh: [0.18, -0.5, 0.85], leftShin: [0.08, -0.79, -0.61], rightThigh: [-0.18, -0.5, 0.85], rightShin: [-0.08, -0.79, -0.61], leftPalm: [0.08, 0.08, -0.99], rightPalm: [-0.08, 0.08, -0.99], bodyRoll: 0.8, spineBend: 7.5, headTurn: 1, headTilt: -1, footPoint: 2, bodyPitch: 74, grip: 0.1, hipsY: -0.455 },
-  // weight-left: A very small weight shift moves toward the left leg while the head subtly checks left.
-  { t: 0.29, leftUpperArm: [0.1, -0.82, 0.56], leftForearm: [0.05, -0.73, 0.68], rightUpperArm: [-0.1, -0.82, 0.56], rightForearm: [-0.05, -0.73, 0.68], leftThigh: [0.16, -0.52, 0.84], leftShin: [0.08, -0.79, -0.61], rightThigh: [-0.2, -0.48, 0.85], rightShin: [-0.08, -0.79, -0.61], leftPalm: [0.08, 0.08, -0.99], rightPalm: [-0.08, 0.08, -0.99], bodyRoll: 1.8, spineBend: 8, headTurn: 2, headTilt: -1, footPoint: 2, bodyPitch: 74, grip: 0.1, hipsY: -0.458 },
-  // center: Weight returns to center; knees and elbows remain soft rather than locked.
-  { t: 0.43, leftUpperArm: [0.1, -0.82, 0.56], leftForearm: [0.05, -0.73, 0.68], rightUpperArm: [-0.1, -0.82, 0.56], rightForearm: [-0.05, -0.73, 0.68], leftThigh: [0.18, -0.5, 0.85], leftShin: [0.08, -0.79, -0.61], rightThigh: [-0.18, -0.5, 0.85], rightShin: [-0.08, -0.79, -0.61], leftPalm: [0.08, 0.08, -0.99], rightPalm: [-0.08, 0.08, -0.99], bodyRoll: 0, spineBend: 8.5, headTurn: 0, headTilt: -1, footPoint: 2, bodyPitch: 74, grip: 0.1, hipsY: -0.465 },
-  // exhale: The body settles a few millimetres on the exhale with relaxed shoulders.
-  { t: 0.57, leftUpperArm: [0.1, -0.82, 0.56], leftForearm: [0.05, -0.73, 0.68], rightUpperArm: [-0.1, -0.82, 0.56], rightForearm: [-0.05, -0.73, 0.68], leftThigh: [0.18, -0.5, 0.85], leftShin: [0.08, -0.79, -0.61], rightThigh: [-0.18, -0.5, 0.85], rightShin: [-0.08, -0.79, -0.61], leftPalm: [0.08, 0.08, -0.99], rightPalm: [-0.08, 0.08, -0.99], bodyRoll: -0.8, spineBend: 9, headTurn: -1, headTilt: -1, footPoint: 2, bodyPitch: 74, grip: 0.1, hipsY: -0.472 },
-  // weight-right: A subtle weight shift moves toward the right leg while maintaining the crouched base.
-  { t: 0.71, leftUpperArm: [0.1, -0.82, 0.56], leftForearm: [0.05, -0.73, 0.68], rightUpperArm: [-0.1, -0.82, 0.56], rightForearm: [-0.05, -0.73, 0.68], leftThigh: [0.2, -0.48, 0.85], leftShin: [0.08, -0.79, -0.61], rightThigh: [-0.16, -0.52, 0.84], rightShin: [-0.08, -0.79, -0.61], leftPalm: [0.08, 0.08, -0.99], rightPalm: [-0.08, 0.08, -0.99], bodyRoll: -1.8, spineBend: 8, headTurn: -2, headTilt: -1, footPoint: 2, bodyPitch: 74, grip: 0.1, hipsY: -0.468 },
-  // return: Torso, head and hips ease back toward the neutral crouch for a seamless loop.
-  { t: 0.86, leftUpperArm: [0.1, -0.82, 0.56], leftForearm: [0.05, -0.73, 0.68], rightUpperArm: [-0.1, -0.82, 0.56], rightForearm: [-0.05, -0.73, 0.68], leftThigh: [0.18, -0.5, 0.85], leftShin: [0.08, -0.79, -0.61], rightThigh: [-0.18, -0.5, 0.85], rightShin: [-0.08, -0.79, -0.61], leftPalm: [0.08, 0.08, -0.99], rightPalm: [-0.08, 0.08, -0.99], bodyRoll: -0.5, spineBend: 8.2, headTurn: -0.5, headTilt: -1, footPoint: 2, bodyPitch: 74, grip: 0.1, hipsY: -0.462 },
-  // neutral-crouch: Same body configuration as pose one, closing the crouch-idle loop cleanly.
-  { t: 1, leftUpperArm: [0.1, -0.82, 0.56], leftForearm: [0.05, -0.73, 0.68], rightUpperArm: [-0.1, -0.82, 0.56], rightForearm: [-0.05, -0.73, 0.68], leftThigh: [0.18, -0.5, 0.85], leftShin: [0.08, -0.79, -0.61], rightThigh: [-0.18, -0.5, 0.85], rightShin: [-0.08, -0.79, -0.61], leftPalm: [0.08, 0.08, -0.99], rightPalm: [-0.08, 0.08, -0.99], bodyRoll: 0, spineBend: 8, headTurn: 0, headTilt: -1, footPoint: 2, bodyPitch: 74, grip: 0.1, hipsY: -0.46 }
-];
-var DURATION4 = 2.2;
-var crouch_idle_default = defineAnimation({
-  slug: "crouch-idle",
-  name: "Crouch Idle",
-  clip: "CrouchIdle",
-  subcategory: "animations",
-  kind: "loop",
-  duration: DURATION4,
-  keys: POSES4.map((pose) => referenceKey(pose, DURATION4, 90))
-});
-
-// ../core-library/dist/avatar-appearance/animations/crouch-walk.js
-var POSES5 = [
-  // left-contact: Left foot contacts ahead while the right leg trails; right arm leads and left arm counters behind.
-  { t: 0, leftUpperArm: [0.04, -0.72, -0.69], leftForearm: [0.02, -0.93, -0.36], rightUpperArm: [-0.04, -0.66, 0.75], rightForearm: [-0.02, -0.82, 0.57], leftThigh: [0.1, -0.7, 0.71], leftShin: [0.05, -0.98, -0.18], rightThigh: [-0.1, -0.7, -0.71], rightShin: [-0.05, -0.74, 0.67], leftPalm: [0.08, 0.02, -0.99], rightPalm: [-0.08, 0.02, -0.99], bodyRoll: -2, spineBend: 10, headTurn: 0, headTilt: -2, footPoint: 3, bodyPitch: 72, grip: 0.12, hipsY: -0.43 },
-  // left-load: Weight settles onto the bent left leg; hips stay low while the rear foot begins to unload.
-  { t: 0.11, leftUpperArm: [0.04, -0.76, -0.65], leftForearm: [0.02, -0.95, -0.3], rightUpperArm: [-0.04, -0.7, 0.71], rightForearm: [-0.02, -0.85, 0.53], leftThigh: [0.09, -0.82, 0.56], leftShin: [0.04, -0.93, -0.36], rightThigh: [-0.09, -0.78, -0.62], rightShin: [-0.04, -0.62, 0.78], leftPalm: [0.08, 0.02, -0.99], rightPalm: [-0.08, 0.02, -0.99], bodyRoll: -1, spineBend: 11, headTurn: 0, headTilt: -2, footPoint: 2, bodyPitch: 71, grip: 0.12, hipsY: -0.47 },
-  // left-midstance: Body passes over the left foot as the right knee begins its low forward recovery.
-  { t: 0.22, leftUpperArm: [0.03, -0.82, -0.57], leftForearm: [0.02, -0.97, -0.24], rightUpperArm: [-0.03, -0.77, 0.64], rightForearm: [-0.02, -0.89, 0.46], leftThigh: [0.07, -0.94, 0.34], leftShin: [0.03, -0.99, -0.1], rightThigh: [-0.08, -0.6, 0.8], rightShin: [-0.04, -0.78, 0.62], leftPalm: [0.07, 0.03, -0.99], rightPalm: [-0.07, 0.03, -0.99], bodyRoll: 0, spineBend: 10, headTurn: 1, headTilt: -1, footPoint: 5, bodyPitch: 72, grip: 0.11, hipsY: -0.45 },
-  // right-swing: Right knee advances without lifting high; arms reverse naturally while the left leg pushes the body forward.
-  { t: 0.33, leftUpperArm: [0.04, -0.68, 0.73], leftForearm: [0.02, -0.84, 0.54], rightUpperArm: [-0.04, -0.75, -0.66], rightForearm: [-0.02, -0.94, -0.34], leftThigh: [0.08, -0.78, -0.62], leftShin: [0.03, -0.98, 0.18], rightThigh: [-0.1, -0.55, 0.83], rightShin: [-0.05, -0.72, -0.69], leftPalm: [0.08, 0.02, -0.99], rightPalm: [-0.08, 0.02, -0.99], bodyRoll: 2, spineBend: 10, headTurn: 0, headTilt: -2, footPoint: 8, bodyPitch: 72, grip: 0.12, hipsY: -0.43 },
-  // right-contact: Right foot contacts ahead; left leg trails and the left arm leads as a counter-swing.
-  { t: 0.44, leftUpperArm: [0.04, -0.66, 0.75], leftForearm: [0.02, -0.82, 0.57], rightUpperArm: [-0.04, -0.72, -0.69], rightForearm: [-0.02, -0.93, -0.36], leftThigh: [0.1, -0.7, -0.71], leftShin: [0.05, -0.74, 0.67], rightThigh: [-0.1, -0.7, 0.71], rightShin: [-0.05, -0.98, -0.18], leftPalm: [0.08, 0.02, -0.99], rightPalm: [-0.08, 0.02, -0.99], bodyRoll: 2, spineBend: 10, headTurn: 0, headTilt: -2, footPoint: 3, bodyPitch: 72, grip: 0.12, hipsY: -0.43 },
-  // right-load: Weight settles onto the right leg; the low crouched silhouette stays stable and compact.
-  { t: 0.56, leftUpperArm: [0.04, -0.7, 0.71], leftForearm: [0.02, -0.85, 0.53], rightUpperArm: [-0.04, -0.76, -0.65], rightForearm: [-0.02, -0.95, -0.3], leftThigh: [0.09, -0.78, -0.62], leftShin: [0.04, -0.62, 0.78], rightThigh: [-0.09, -0.82, 0.56], rightShin: [-0.04, -0.93, -0.36], leftPalm: [0.08, 0.02, -0.99], rightPalm: [-0.08, 0.02, -0.99], bodyRoll: 1, spineBend: 11, headTurn: 0, headTilt: -2, footPoint: 2, bodyPitch: 71, grip: 0.12, hipsY: -0.47 },
-  // right-midstance: Body passes over the right foot while the left knee starts its low forward recovery.
-  { t: 0.67, leftUpperArm: [0.03, -0.77, 0.64], leftForearm: [0.02, -0.89, 0.46], rightUpperArm: [-0.03, -0.82, -0.57], rightForearm: [-0.02, -0.97, -0.24], leftThigh: [0.08, -0.6, 0.8], leftShin: [0.04, -0.78, 0.62], rightThigh: [-0.07, -0.94, 0.34], rightShin: [-0.03, -0.99, -0.1], leftPalm: [0.07, 0.03, -0.99], rightPalm: [-0.07, 0.03, -0.99], bodyRoll: 0, spineBend: 10, headTurn: -1, headTilt: -1, footPoint: 5, bodyPitch: 72, grip: 0.11, hipsY: -0.45 },
-  // left-swing: Left knee swings forward close to the ground while the right leg provides the final push.
-  { t: 0.78, leftUpperArm: [0.04, -0.75, -0.66], leftForearm: [0.02, -0.94, -0.34], rightUpperArm: [-0.04, -0.68, 0.73], rightForearm: [-0.02, -0.84, 0.54], leftThigh: [0.1, -0.55, 0.83], leftShin: [0.05, -0.72, -0.69], rightThigh: [-0.08, -0.78, -0.62], rightShin: [-0.03, -0.98, 0.18], leftPalm: [0.08, 0.02, -0.99], rightPalm: [-0.08, 0.02, -0.99], bodyRoll: -2, spineBend: 10, headTurn: 0, headTilt: -2, footPoint: 8, bodyPitch: 72, grip: 0.12, hipsY: -0.43 },
-  // left-reach: Left foot reaches toward the next contact while the torso remains quiet and forward-focused.
-  { t: 0.89, leftUpperArm: [0.04, -0.72, -0.69], leftForearm: [0.02, -0.93, -0.36], rightUpperArm: [-0.04, -0.66, 0.75], rightForearm: [-0.02, -0.82, 0.57], leftThigh: [0.1, -0.64, 0.76], leftShin: [0.05, -0.9, -0.43], rightThigh: [-0.1, -0.75, -0.65], rightShin: [-0.05, -0.88, 0.47], leftPalm: [0.08, 0.02, -0.99], rightPalm: [-0.08, 0.02, -0.99], bodyRoll: -2, spineBend: 10, headTurn: 0, headTilt: -2, footPoint: 4, bodyPitch: 72, grip: 0.12, hipsY: -0.44 },
-  // left-contact-loop: Exact return to the opening left-contact pose for seamless looping.
-  { t: 1, leftUpperArm: [0.04, -0.72, -0.69], leftForearm: [0.02, -0.93, -0.36], rightUpperArm: [-0.04, -0.66, 0.75], rightForearm: [-0.02, -0.82, 0.57], leftThigh: [0.1, -0.7, 0.71], leftShin: [0.05, -0.98, -0.18], rightThigh: [-0.1, -0.7, -0.71], rightShin: [-0.05, -0.74, 0.67], leftPalm: [0.08, 0.02, -0.99], rightPalm: [-0.08, 0.02, -0.99], bodyRoll: -2, spineBend: 10, headTurn: 0, headTilt: -2, footPoint: 3, bodyPitch: 72, grip: 0.12, hipsY: -0.43 }
-];
-var DURATION5 = 1.15;
-var crouch_walk_default = defineAnimation({
-  slug: "crouch-walk",
-  name: "Crouch Walk",
-  clip: "CrouchWalk",
-  subcategory: "animations",
-  kind: "loop",
-  duration: DURATION5,
-  keys: POSES5.map((pose) => referenceKey(pose, DURATION5, 90))
-});
-
-// ../core-library/dist/avatar-appearance/animations/sneak.js
-var POSES6 = [
-  // left-contact: Left foot touches down softly ahead; torso stays low and quiet while the raised left hand balances the stealthy step.
-  { t: 0, leftUpperArm: [0.08, -0.58, 0.81], leftForearm: [0.1, -0.3, 0.95], rightUpperArm: [-0.08, -0.78, -0.62], rightForearm: [-0.06, -0.94, -0.34], leftThigh: [0.08, -0.72, 0.69], leftShin: [0.04, -0.99, -0.12], rightThigh: [-0.08, -0.78, -0.62], rightShin: [-0.04, -0.68, 0.73], leftPalm: [0.1, 0.05, -0.99], rightPalm: [-0.1, 0.05, -0.99], bodyRoll: -2, spineBend: 12, headTurn: 2, headTilt: -3, footPoint: 2, bodyPitch: 70, grip: 0.08, hipsY: -0.28 },
-  // left-load: Weight rolls quietly onto the left leg; knees remain flexed to prevent vertical bounce.
-  { t: 0.12, leftUpperArm: [0.07, -0.62, 0.78], leftForearm: [0.09, -0.34, 0.94], rightUpperArm: [-0.07, -0.82, -0.56], rightForearm: [-0.05, -0.96, -0.27], leftThigh: [0.07, -0.84, 0.54], leftShin: [0.03, -0.95, -0.31], rightThigh: [-0.07, -0.82, -0.56], rightShin: [-0.03, -0.57, 0.82], leftPalm: [0.1, 0.05, -0.99], rightPalm: [-0.1, 0.05, -0.99], bodyRoll: -1, spineBend: 13, headTurn: 1, headTilt: -3, footPoint: 1, bodyPitch: 69, grip: 0.08, hipsY: -0.31 },
-  // left-midstance: Pelvis passes over the planted left foot as the right leg begins a controlled low recovery.
-  { t: 0.24, leftUpperArm: [0.06, -0.7, 0.71], leftForearm: [0.08, -0.43, 0.9], rightUpperArm: [-0.06, -0.75, 0.66], rightForearm: [-0.05, -0.9, 0.43], leftThigh: [0.05, -0.96, 0.27], leftShin: [0.02, -1, -0.05], rightThigh: [-0.07, -0.6, 0.8], rightShin: [-0.04, -0.78, 0.62], leftPalm: [0.08, 0.05, -0.99], rightPalm: [-0.08, 0.05, -0.99], bodyRoll: 0, spineBend: 12, headTurn: 0, headTilt: -2, footPoint: 3, bodyPitch: 70, grip: 0.07, hipsY: -0.29 },
-  // right-reach: Right leg reaches forward with the foot kept close to the floor; right hand rises naturally as the left arm counters.
-  { t: 0.36, leftUpperArm: [0.06, -0.78, -0.62], leftForearm: [0.05, -0.93, -0.36], rightUpperArm: [-0.08, -0.57, 0.82], rightForearm: [-0.1, -0.29, 0.95], leftThigh: [0.07, -0.82, -0.57], leftShin: [0.03, -0.97, 0.24], rightThigh: [-0.08, -0.55, 0.83], rightShin: [-0.04, -0.8, -0.6], leftPalm: [0.08, 0.04, -0.99], rightPalm: [-0.1, 0.05, -0.99], bodyRoll: 2, spineBend: 12, headTurn: -2, headTilt: -3, footPoint: 6, bodyPitch: 70, grip: 0.08, hipsY: -0.27 },
-  // right-contact: Right foot makes a soft controlled contact; left leg trails and the hands remain relaxed rather than clenched.
-  { t: 0.5, leftUpperArm: [0.08, -0.78, -0.62], leftForearm: [0.06, -0.94, -0.34], rightUpperArm: [-0.08, -0.58, 0.81], rightForearm: [-0.1, -0.3, 0.95], leftThigh: [0.08, -0.78, -0.62], leftShin: [0.04, -0.68, 0.73], rightThigh: [-0.08, -0.72, 0.69], rightShin: [-0.04, -0.99, -0.12], leftPalm: [0.1, 0.05, -0.99], rightPalm: [-0.1, 0.05, -0.99], bodyRoll: 2, spineBend: 12, headTurn: -2, headTilt: -3, footPoint: 2, bodyPitch: 70, grip: 0.08, hipsY: -0.28 },
-  // right-load: Weight settles onto the right leg with minimal vertical movement and controlled knee flexion.
-  { t: 0.62, leftUpperArm: [0.07, -0.82, -0.56], leftForearm: [0.05, -0.96, -0.27], rightUpperArm: [-0.07, -0.62, 0.78], rightForearm: [-0.09, -0.34, 0.94], leftThigh: [0.07, -0.82, -0.56], leftShin: [0.03, -0.57, 0.82], rightThigh: [-0.07, -0.84, 0.54], rightShin: [-0.03, -0.95, -0.31], leftPalm: [0.1, 0.05, -0.99], rightPalm: [-0.1, 0.05, -0.99], bodyRoll: 1, spineBend: 13, headTurn: -1, headTilt: -3, footPoint: 1, bodyPitch: 69, grip: 0.08, hipsY: -0.31 },
-  // right-midstance: Pelvis passes over the right foot while the left knee begins its low, quiet recovery.
-  { t: 0.74, leftUpperArm: [0.06, -0.75, 0.66], leftForearm: [0.05, -0.9, 0.43], rightUpperArm: [-0.06, -0.7, 0.71], rightForearm: [-0.08, -0.43, 0.9], leftThigh: [0.07, -0.6, 0.8], leftShin: [0.04, -0.78, 0.62], rightThigh: [-0.05, -0.96, 0.27], rightShin: [-0.02, -1, -0.05], leftPalm: [0.08, 0.05, -0.99], rightPalm: [-0.08, 0.05, -0.99], bodyRoll: 0, spineBend: 12, headTurn: 0, headTilt: -2, footPoint: 3, bodyPitch: 70, grip: 0.07, hipsY: -0.29 },
-  // left-reach: Left foot reaches toward the next quiet contact while the gaze checks slightly toward the direction of travel.
-  { t: 0.86, leftUpperArm: [0.08, -0.57, 0.82], leftForearm: [0.1, -0.29, 0.95], rightUpperArm: [-0.06, -0.78, -0.62], rightForearm: [-0.05, -0.93, -0.36], leftThigh: [0.08, -0.55, 0.83], leftShin: [0.04, -0.8, -0.6], rightThigh: [-0.07, -0.82, -0.57], rightShin: [-0.03, -0.97, 0.24], leftPalm: [0.1, 0.05, -0.99], rightPalm: [-0.08, 0.04, -0.99], bodyRoll: -2, spineBend: 12, headTurn: 2, headTilt: -3, footPoint: 6, bodyPitch: 70, grip: 0.08, hipsY: -0.27 },
-  // left-precontact: Left foot lowers gently toward the floor as the body prepares to repeat the stealth step.
-  { t: 0.94, leftUpperArm: [0.08, -0.59, 0.8], leftForearm: [0.1, -0.31, 0.94], rightUpperArm: [-0.07, -0.79, -0.61], rightForearm: [-0.05, -0.94, -0.33], leftThigh: [0.08, -0.66, 0.75], leftShin: [0.04, -0.93, -0.36], rightThigh: [-0.08, -0.8, -0.59], rightShin: [-0.04, -0.76, 0.65], leftPalm: [0.1, 0.05, -0.99], rightPalm: [-0.09, 0.04, -0.99], bodyRoll: -2, spineBend: 12, headTurn: 2, headTilt: -3, footPoint: 3, bodyPitch: 70, grip: 0.08, hipsY: -0.28 },
-  // left-contact-loop: Exact return to the opening left-contact pose for a seamless sneak loop.
-  { t: 1, leftUpperArm: [0.08, -0.58, 0.81], leftForearm: [0.1, -0.3, 0.95], rightUpperArm: [-0.08, -0.78, -0.62], rightForearm: [-0.06, -0.94, -0.34], leftThigh: [0.08, -0.72, 0.69], leftShin: [0.04, -0.99, -0.12], rightThigh: [-0.08, -0.78, -0.62], rightShin: [-0.04, -0.68, 0.73], leftPalm: [0.1, 0.05, -0.99], rightPalm: [-0.1, 0.05, -0.99], bodyRoll: -2, spineBend: 12, headTurn: 2, headTilt: -3, footPoint: 2, bodyPitch: 70, grip: 0.08, hipsY: -0.28 }
-];
-var DURATION6 = 1.55;
-var sneak_default = defineAnimation({
-  slug: "sneak",
-  name: "Sneak",
-  clip: "Sneak",
-  subcategory: "animations",
-  kind: "loop",
-  duration: DURATION6,
-  keys: POSES6.map((pose) => referenceKey(pose, DURATION6, 90))
-});
-
-// ../core-library/dist/avatar-appearance/animations/strafe-left.js
-var POSES7 = [
-  // left-contact: Left foot plants toward the character's own left; torso stays mostly forward while the right leg prepares to follow.
-  { t: 0, leftUpperArm: [0.18, -0.78, 0.6], leftForearm: [0.12, -0.94, 0.32], rightUpperArm: [-0.14, -0.7, -0.7], rightForearm: [-0.08, -0.91, -0.4], leftThigh: [0.62, -0.77, 0.1], leftShin: [0.24, -0.96, -0.12], rightThigh: [-0.18, -0.91, -0.37], rightShin: [-0.1, -0.75, 0.65], leftPalm: [0.08, 0.04, -0.99], rightPalm: [-0.08, 0.04, -0.99], bodyRoll: 5, spineBend: 3, headTurn: -3, headTilt: 0, footPoint: 5, bodyPitch: 86, grip: 0.14, hipsY: -0.06 },
-  // left-load: Weight compresses over the left leg; pelvis shifts left while the chest remains oriented toward the front.
-  { t: 0.12, leftUpperArm: [0.14, -0.82, 0.55], leftForearm: [0.1, -0.95, 0.29], rightUpperArm: [-0.12, -0.75, -0.65], rightForearm: [-0.07, -0.93, -0.36], leftThigh: [0.42, -0.9, 0.08], leftShin: [0.15, -0.98, -0.1], rightThigh: [0.08, -0.72, 0.69], rightShin: [-0.04, -0.65, -0.76], leftPalm: [0.08, 0.04, -0.99], rightPalm: [-0.08, 0.04, -0.99], bodyRoll: 4, spineBend: 4, headTurn: -2, headTilt: 0, footPoint: 4, bodyPitch: 85, grip: 0.14, hipsY: -0.1 },
-  // right-cross: Right foot travels inward toward the left without crossing excessively; hips lead the lateral movement.
-  { t: 0.24, leftUpperArm: [0.08, -0.88, 0.47], leftForearm: [0.06, -0.97, 0.23], rightUpperArm: [-0.08, -0.82, -0.57], rightForearm: [-0.05, -0.95, -0.31], leftThigh: [0.12, -0.98, 0.12], leftShin: [0.05, -0.99, -0.06], rightThigh: [0.32, -0.73, 0.6], rightShin: [0.12, -0.86, -0.5], leftPalm: [0.07, 0.04, -0.99], rightPalm: [-0.07, 0.04, -0.99], bodyRoll: 2, spineBend: 3, headTurn: 0, headTilt: 0, footPoint: 8, bodyPitch: 87, grip: 0.13, hipsY: -0.05 },
-  // right-contact: Right foot catches the body underneath; the left leg immediately unloads for the next outward step.
-  { t: 0.36, leftUpperArm: [0.1, -0.72, -0.69], leftForearm: [0.06, -0.91, -0.41], rightUpperArm: [-0.14, -0.79, 0.6], rightForearm: [-0.1, -0.95, 0.29], leftThigh: [0.4, -0.88, -0.24], leftShin: [0.14, -0.95, 0.27], rightThigh: [0.06, -0.98, 0.18], rightShin: [0.02, -0.99, -0.08], leftPalm: [0.08, 0.04, -0.99], rightPalm: [-0.08, 0.04, -0.99], bodyRoll: 0, spineBend: 3, headTurn: 1, headTilt: 0, footPoint: 5, bodyPitch: 88, grip: 0.14, hipsY: -0.07 },
-  // left-drive: Left knee drives outward toward +x as the right leg pushes; arms counterbalance without turning the chest sideways.
-  { t: 0.5, leftUpperArm: [0.15, -0.7, 0.7], leftForearm: [0.1, -0.91, 0.4], rightUpperArm: [-0.1, -0.78, -0.62], rightForearm: [-0.06, -0.94, -0.34], leftThigh: [0.55, -0.78, 0.28], leftShin: [0.2, -0.88, -0.43], rightThigh: [-0.08, -0.97, -0.22], rightShin: [-0.04, -0.99, 0.1], leftPalm: [0.08, 0.04, -0.99], rightPalm: [-0.08, 0.04, -0.99], bodyRoll: -1, spineBend: 3, headTurn: 0, headTilt: 0, footPoint: 9, bodyPitch: 87, grip: 0.14, hipsY: -0.03 },
-  // left-reach: Left foot reaches laterally for the next plant while the body remains compact and ready to change direction.
-  { t: 0.62, leftUpperArm: [0.18, -0.76, 0.62], leftForearm: [0.12, -0.93, 0.34], rightUpperArm: [-0.13, -0.72, -0.68], rightForearm: [-0.08, -0.92, -0.39], leftThigh: [0.66, -0.74, 0.1], leftShin: [0.27, -0.95, -0.12], rightThigh: [-0.12, -0.96, -0.24], rightShin: [-0.06, -0.99, 0.08], leftPalm: [0.08, 0.04, -0.99], rightPalm: [-0.08, 0.04, -0.99], bodyRoll: 4, spineBend: 3, headTurn: -2, headTilt: 0, footPoint: 6, bodyPitch: 86, grip: 0.14, hipsY: -0.04 },
-  // left-contact-two: A second left-side plant continues the lateral cadence with the head still watching forward.
-  { t: 0.74, leftUpperArm: [0.18, -0.78, 0.6], leftForearm: [0.12, -0.94, 0.32], rightUpperArm: [-0.14, -0.7, -0.7], rightForearm: [-0.08, -0.91, -0.4], leftThigh: [0.62, -0.77, 0.1], leftShin: [0.24, -0.96, -0.12], rightThigh: [-0.18, -0.91, -0.37], rightShin: [-0.1, -0.75, 0.65], leftPalm: [0.08, 0.04, -0.99], rightPalm: [-0.08, 0.04, -0.99], bodyRoll: 5, spineBend: 3, headTurn: -3, headTilt: 0, footPoint: 5, bodyPitch: 86, grip: 0.14, hipsY: -0.06 },
-  // left-load-two: The body compresses over the left support again, preserving a smooth athletic side-step rhythm.
-  { t: 0.86, leftUpperArm: [0.14, -0.82, 0.55], leftForearm: [0.1, -0.95, 0.29], rightUpperArm: [-0.12, -0.75, -0.65], rightForearm: [-0.07, -0.93, -0.36], leftThigh: [0.42, -0.9, 0.08], leftShin: [0.15, -0.98, -0.1], rightThigh: [0.08, -0.72, 0.69], rightShin: [-0.04, -0.65, -0.76], leftPalm: [0.08, 0.04, -0.99], rightPalm: [-0.08, 0.04, -0.99], bodyRoll: 4, spineBend: 4, headTurn: -2, headTilt: 0, footPoint: 4, bodyPitch: 85, grip: 0.14, hipsY: -0.1 },
-  // cycle-return: The limbs return toward the opening left-support configuration to close the loop cleanly.
-  { t: 0.94, leftUpperArm: [0.17, -0.79, 0.59], leftForearm: [0.11, -0.94, 0.31], rightUpperArm: [-0.14, -0.71, -0.69], rightForearm: [-0.08, -0.91, -0.39], leftThigh: [0.59, -0.79, 0.1], leftShin: [0.22, -0.97, -0.11], rightThigh: [-0.15, -0.92, -0.36], rightShin: [-0.08, -0.76, 0.64], leftPalm: [0.08, 0.04, -0.99], rightPalm: [-0.08, 0.04, -0.99], bodyRoll: 5, spineBend: 3, headTurn: -3, headTilt: 0, footPoint: 5, bodyPitch: 86, grip: 0.14, hipsY: -0.06 },
-  // left-contact-loop: Exact opening pose repeated for a seamless strafe-left loop.
-  { t: 1, leftUpperArm: [0.18, -0.78, 0.6], leftForearm: [0.12, -0.94, 0.32], rightUpperArm: [-0.14, -0.7, -0.7], rightForearm: [-0.08, -0.91, -0.4], leftThigh: [0.62, -0.77, 0.1], leftShin: [0.24, -0.96, -0.12], rightThigh: [-0.18, -0.91, -0.37], rightShin: [-0.1, -0.75, 0.65], leftPalm: [0.08, 0.04, -0.99], rightPalm: [-0.08, 0.04, -0.99], bodyRoll: 5, spineBend: 3, headTurn: -3, headTilt: 0, footPoint: 5, bodyPitch: 86, grip: 0.14, hipsY: -0.06 }
-];
-var DURATION7 = 0.9;
-var strafe_left_default = defineAnimation({
-  slug: "strafe-left",
-  name: "Strafe Left",
-  clip: "StrafeLeft",
-  subcategory: "animations",
-  kind: "loop",
-  duration: DURATION7,
-  keys: POSES7.map((pose) => referenceKey(pose, DURATION7, 90))
-});
-
-// ../core-library/dist/avatar-appearance/animations/strafe-right.js
-var POSES8 = [
-  // right-contact: Right foot plants toward the character's own right; torso stays mostly forward while the left leg prepares to follow.
-  { t: 0, leftUpperArm: [0.14, -0.7, -0.7], leftForearm: [0.08, -0.91, -0.4], rightUpperArm: [-0.18, -0.78, 0.6], rightForearm: [-0.12, -0.94, 0.32], leftThigh: [0.18, -0.91, -0.37], leftShin: [0.1, -0.75, 0.65], rightThigh: [-0.62, -0.77, 0.1], rightShin: [-0.24, -0.96, -0.12], leftPalm: [0.08, 0.04, -0.99], rightPalm: [-0.08, 0.04, -0.99], bodyRoll: -5, spineBend: 3, headTurn: 3, headTilt: 0, footPoint: 5, bodyPitch: 86, grip: 0.14, hipsY: -0.06 },
-  // right-load: Weight compresses over the right leg; pelvis shifts right while the chest remains oriented forward.
-  { t: 0.12, leftUpperArm: [0.12, -0.75, -0.65], leftForearm: [0.07, -0.93, -0.36], rightUpperArm: [-0.14, -0.82, 0.55], rightForearm: [-0.1, -0.95, 0.29], leftThigh: [-0.08, -0.72, 0.69], leftShin: [0.04, -0.65, -0.76], rightThigh: [-0.42, -0.9, 0.08], rightShin: [-0.15, -0.98, -0.1], leftPalm: [0.08, 0.04, -0.99], rightPalm: [-0.08, 0.04, -0.99], bodyRoll: -4, spineBend: 4, headTurn: 2, headTilt: 0, footPoint: 4, bodyPitch: 85, grip: 0.14, hipsY: -0.1 },
-  // left-cross: Left foot travels inward toward the right without excessive crossing; hips lead the lateral movement.
-  { t: 0.24, leftUpperArm: [0.08, -0.82, -0.57], leftForearm: [0.05, -0.95, -0.31], rightUpperArm: [-0.08, -0.88, 0.47], rightForearm: [-0.06, -0.97, 0.23], leftThigh: [-0.32, -0.73, 0.6], leftShin: [-0.12, -0.86, -0.5], rightThigh: [-0.12, -0.98, 0.12], rightShin: [-0.05, -0.99, -0.06], leftPalm: [0.07, 0.04, -0.99], rightPalm: [-0.07, 0.04, -0.99], bodyRoll: -2, spineBend: 3, headTurn: 0, headTilt: 0, footPoint: 8, bodyPitch: 87, grip: 0.13, hipsY: -0.05 },
-  // left-contact: Left foot catches the body underneath; the right leg immediately unloads for the next outward step.
-  { t: 0.36, leftUpperArm: [0.14, -0.79, 0.6], leftForearm: [0.1, -0.95, 0.29], rightUpperArm: [-0.1, -0.72, -0.69], rightForearm: [-0.06, -0.91, -0.41], leftThigh: [-0.06, -0.98, 0.18], leftShin: [-0.02, -0.99, -0.08], rightThigh: [-0.4, -0.88, -0.24], rightShin: [-0.14, -0.95, 0.27], leftPalm: [0.08, 0.04, -0.99], rightPalm: [-0.08, 0.04, -0.99], bodyRoll: 0, spineBend: 3, headTurn: -1, headTilt: 0, footPoint: 5, bodyPitch: 88, grip: 0.14, hipsY: -0.07 },
-  // right-drive: Right knee drives outward toward -x as the left leg pushes; arms counterbalance without turning the chest sideways.
-  { t: 0.5, leftUpperArm: [0.1, -0.78, -0.62], leftForearm: [0.06, -0.94, -0.34], rightUpperArm: [-0.15, -0.7, 0.7], rightForearm: [-0.1, -0.91, 0.4], leftThigh: [0.08, -0.97, -0.22], leftShin: [0.04, -0.99, 0.1], rightThigh: [-0.55, -0.78, 0.28], rightShin: [-0.2, -0.88, -0.43], leftPalm: [0.08, 0.04, -0.99], rightPalm: [-0.08, 0.04, -0.99], bodyRoll: 1, spineBend: 3, headTurn: 0, headTilt: 0, footPoint: 9, bodyPitch: 87, grip: 0.14, hipsY: -0.03 },
-  // right-reach: Right foot reaches laterally for the next plant while the body remains compact and ready to redirect.
-  { t: 0.62, leftUpperArm: [0.13, -0.72, -0.68], leftForearm: [0.08, -0.92, -0.39], rightUpperArm: [-0.18, -0.76, 0.62], rightForearm: [-0.12, -0.93, 0.34], leftThigh: [0.12, -0.96, -0.24], leftShin: [0.06, -0.99, 0.08], rightThigh: [-0.66, -0.74, 0.1], rightShin: [-0.27, -0.95, -0.12], leftPalm: [0.08, 0.04, -0.99], rightPalm: [-0.08, 0.04, -0.99], bodyRoll: -4, spineBend: 3, headTurn: 2, headTilt: 0, footPoint: 6, bodyPitch: 86, grip: 0.14, hipsY: -0.04 },
-  // right-contact-two: A second right-side plant continues the lateral cadence while the head remains mostly forward.
-  { t: 0.74, leftUpperArm: [0.14, -0.7, -0.7], leftForearm: [0.08, -0.91, -0.4], rightUpperArm: [-0.18, -0.78, 0.6], rightForearm: [-0.12, -0.94, 0.32], leftThigh: [0.18, -0.91, -0.37], leftShin: [0.1, -0.75, 0.65], rightThigh: [-0.62, -0.77, 0.1], rightShin: [-0.24, -0.96, -0.12], leftPalm: [0.08, 0.04, -0.99], rightPalm: [-0.08, 0.04, -0.99], bodyRoll: -5, spineBend: 3, headTurn: 3, headTilt: 0, footPoint: 5, bodyPitch: 86, grip: 0.14, hipsY: -0.06 },
-  // right-load-two: The body compresses over the right support again, preserving a smooth athletic side-step rhythm.
-  { t: 0.86, leftUpperArm: [0.12, -0.75, -0.65], leftForearm: [0.07, -0.93, -0.36], rightUpperArm: [-0.14, -0.82, 0.55], rightForearm: [-0.1, -0.95, 0.29], leftThigh: [-0.08, -0.72, 0.69], leftShin: [0.04, -0.65, -0.76], rightThigh: [-0.42, -0.9, 0.08], rightShin: [-0.15, -0.98, -0.1], leftPalm: [0.08, 0.04, -0.99], rightPalm: [-0.08, 0.04, -0.99], bodyRoll: -4, spineBend: 4, headTurn: 2, headTilt: 0, footPoint: 4, bodyPitch: 85, grip: 0.14, hipsY: -0.1 },
-  // cycle-return: The limbs return toward the opening right-support configuration to close the loop cleanly.
-  { t: 0.94, leftUpperArm: [0.14, -0.71, -0.69], leftForearm: [0.08, -0.91, -0.39], rightUpperArm: [-0.17, -0.79, 0.59], rightForearm: [-0.11, -0.94, 0.31], leftThigh: [0.15, -0.92, -0.36], leftShin: [0.08, -0.76, 0.64], rightThigh: [-0.59, -0.79, 0.1], rightShin: [-0.22, -0.97, -0.11], leftPalm: [0.08, 0.04, -0.99], rightPalm: [-0.08, 0.04, -0.99], bodyRoll: -5, spineBend: 3, headTurn: 3, headTilt: 0, footPoint: 5, bodyPitch: 86, grip: 0.14, hipsY: -0.06 },
-  // right-contact-loop: Exact opening pose repeated for a seamless strafe-right loop.
-  { t: 1, leftUpperArm: [0.14, -0.7, -0.7], leftForearm: [0.08, -0.91, -0.4], rightUpperArm: [-0.18, -0.78, 0.6], rightForearm: [-0.12, -0.94, 0.32], leftThigh: [0.18, -0.91, -0.37], leftShin: [0.1, -0.75, 0.65], rightThigh: [-0.62, -0.77, 0.1], rightShin: [-0.24, -0.96, -0.12], leftPalm: [0.08, 0.04, -0.99], rightPalm: [-0.08, 0.04, -0.99], bodyRoll: -5, spineBend: 3, headTurn: 3, headTilt: 0, footPoint: 5, bodyPitch: 86, grip: 0.14, hipsY: -0.06 }
-];
-var DURATION8 = 0.9;
-var strafe_right_default = defineAnimation({
-  slug: "strafe-right",
-  name: "Strafe Right",
-  clip: "StrafeRight",
-  subcategory: "animations",
-  kind: "loop",
-  duration: DURATION8,
-  keys: POSES8.map((pose) => referenceKey(pose, DURATION8, 90))
-});
-
-// ../core-library/dist/avatar-appearance/animations/sprint-start.js
-var POSES9 = [
-  // idle: Neutral start; eyes forward and weight balanced before acceleration.
-  { t: 0, leftUpperArm: [0, -0.96, 0.28], leftForearm: [0, -0.96, 0.28], rightUpperArm: [0, -0.96, 0.28], rightForearm: [0, -0.96, 0.28], leftThigh: [0, -1, 0], leftShin: [0, -1, 0], rightThigh: [0, -1, 0], rightShin: [0, -1, 0], leftPalm: [0, 0, 1], rightPalm: [0, 0, 1], bodyRoll: 0, spineBend: 0, headTurn: 0, headTilt: 0, footPoint: 5, bodyPitch: 90, grip: 0.08, hipsY: 0 },
-  // anticipation: Hips drop and chest leans forward; arms split and the rear leg loads for the first push.
-  { t: 0.1, leftUpperArm: [0, -0.62, 0.78], leftForearm: [0, -0.78, 0.62], rightUpperArm: [0, -0.72, -0.69], rightForearm: [0, -0.92, -0.39], leftThigh: [0, -0.91, 0.42], leftShin: [0, -0.99, 0.12], rightThigh: [0, -0.82, -0.57], rightShin: [0, -0.75, 0.66], leftPalm: [0, 0, 1], rightPalm: [0, 0, 1], bodyRoll: 0, spineBend: 8, headTurn: 0, headTilt: 0, footPoint: 5, bodyPitch: 78, grip: 0.08, hipsY: -0.12 },
-  // load: Forward lean increases; front knee drives while the opposite leg compresses to generate force.
-  { t: 0.22, leftUpperArm: [0, -0.48, 0.88], leftForearm: [0, -0.72, 0.69], rightUpperArm: [0, -0.82, -0.57], rightForearm: [0, -0.97, -0.25], leftThigh: [0, -0.78, 0.63], leftShin: [0, -0.98, 0.18], rightThigh: [0, -0.72, -0.69], rightShin: [0, -0.82, 0.57], leftPalm: [0, 0, 1], rightPalm: [0, 0, 1], bodyRoll: 0, spineBend: 8, headTurn: 0, headTilt: -3, footPoint: 5, bodyPitch: 68, grip: 0.08, hipsY: -0.18 },
-  // first-drive: First powerful drive: right arm comes forward, left arm drives back, and the body projects ahead.
-  { t: 0.36, leftUpperArm: [0, -0.78, -0.63], leftForearm: [0, -0.95, -0.3], rightUpperArm: [0, -0.4, 0.92], rightForearm: [0, -0.72, 0.69], leftThigh: [0, -0.58, 0.82], leftShin: [0, -0.97, 0.24], rightThigh: [0, -0.78, -0.63], rightShin: [0, -0.97, -0.24], leftPalm: [0, 0, 1], rightPalm: [0, 0, 1], bodyRoll: -3, spineBend: 5, headTurn: 0, headTilt: -3, footPoint: 18, bodyPitch: 58, grip: 0.25, hipsY: -0.1 },
-  // first-flight: First flight phase; lead knee rises while the trailing leg extends and the arms counter-swing.
-  { t: 0.5, leftUpperArm: [0, -0.85, -0.53], leftForearm: [0, -0.98, -0.2], rightUpperArm: [0, -0.38, 0.93], rightForearm: [0, -0.73, 0.68], leftThigh: [0, -0.4, 0.92], leftShin: [0, -0.65, -0.76], rightThigh: [0, -0.92, -0.39], rightShin: [0, -0.98, 0.18], leftPalm: [0, 0, 1], rightPalm: [0, 0, 1], bodyRoll: -3, spineBend: 5, headTurn: 0, headTilt: -3, footPoint: 18, bodyPitch: 55, grip: 0.25, hipsY: 0.04 },
-  // second-step: Second step reverses the limbs; cadence increases while the torso remains aggressively forward.
-  { t: 0.65, leftUpperArm: [0, -0.38, 0.93], leftForearm: [0, -0.72, 0.69], rightUpperArm: [0, -0.88, -0.48], rightForearm: [0, -0.98, -0.18], leftThigh: [0, -0.9, -0.44], leftShin: [0, -0.98, 0.18], rightThigh: [0, -0.38, 0.93], rightShin: [0, -0.7, -0.71], leftPalm: [0, 0, 1], rightPalm: [0, 0, 1], bodyRoll: 3, spineBend: 5, headTurn: 0, headTilt: -3, footPoint: 18, bodyPitch: 58, grip: 0.25, hipsY: 0.01 },
-  // accelerate: Stride opens and the torso begins rising toward normal sprint posture without losing forward momentum.
-  { t: 0.82, leftUpperArm: [0, -0.86, -0.51], leftForearm: [0, -0.98, -0.18], rightUpperArm: [0, -0.36, 0.93], rightForearm: [0, -0.7, 0.71], leftThigh: [0, -0.32, 0.95], leftShin: [0, -0.62, -0.78], rightThigh: [0, -0.94, -0.34], rightShin: [0, -0.99, 0.12], leftPalm: [0, 0, 1], rightPalm: [0, 0, 1], bodyRoll: -3, spineBend: 5, headTurn: 0, headTilt: -3, footPoint: 18, bodyPitch: 62, grip: 0.25, hipsY: 0.05 },
-  // full-speed: Reaches the handoff pose for the sprint/run loop; head steady, arms compact and stride fully active.
-  { t: 1, leftUpperArm: [0, -0.34, 0.94], leftForearm: [0, -0.69, 0.72], rightUpperArm: [0, -0.9, -0.44], rightForearm: [0, -0.98, -0.17], leftThigh: [0, -0.92, -0.38], leftShin: [0, -0.99, 0.12], rightThigh: [0, -0.3, 0.95], rightShin: [0, -0.62, -0.78], leftPalm: [0, 0, 1], rightPalm: [0, 0, 1], bodyRoll: 3, spineBend: 5, headTurn: 0, headTilt: -3, footPoint: 18, bodyPitch: 68, grip: 0.25, hipsY: 0.03 }
-];
-var DURATION9 = 0.85;
-var sprint_start_default = defineAnimation({
-  slug: "sprint-start",
-  name: "Sprint Start",
-  clip: "SprintStart",
-  subcategory: "animations",
-  kind: "once",
-  duration: DURATION9,
-  keys: POSES9.map((pose) => referenceKey(pose, DURATION9, 90))
-});
-
-// ../core-library/dist/avatar-appearance/animations/sprint-stop.js
-var POSES10 = [
-  // full-speed: Enters at sprint speed; opposite arm and leg drive while the gaze stays forward.
-  { t: 0, leftUpperArm: [0, -0.35, 0.94], leftForearm: [0, -0.7, 0.71], rightUpperArm: [0, -0.9, -0.44], rightForearm: [0, -0.98, -0.18], leftThigh: [0, -0.92, -0.39], leftShin: [0, -0.99, 0.12], rightThigh: [0, -0.3, 0.95], rightShin: [0, -0.62, -0.78], leftPalm: [0, 0, 1], rightPalm: [0, 0, 1], bodyRoll: 0, spineBend: 3, headTurn: 0, headTilt: -2, footPoint: 18, bodyPitch: 70, grip: 0.18, hipsY: 0.03 },
-  // brake-contact: Lead foot reaches ahead of the hips to brake; arms counterbalance without locking.
-  { t: 0.1, leftUpperArm: [0, -0.82, -0.57], leftForearm: [0, -0.98, -0.18], rightUpperArm: [0, -0.38, 0.93], rightForearm: [0, -0.72, 0.69], leftThigh: [0, -0.45, 0.89], leftShin: [0, -0.88, -0.48], rightThigh: [0, -0.9, -0.44], rightShin: [0, -0.97, 0.24], leftPalm: [0, 0, 1], rightPalm: [0, 0, 1], bodyRoll: -2, spineBend: 5, headTurn: 0, headTilt: -1, footPoint: 12, bodyPitch: 68, grip: 0.18, hipsY: -0.03 },
-  // absorb: Knees and hips flex to absorb speed; torso becomes more upright and arms widen slightly.
-  { t: 0.2, leftUpperArm: [0, -0.7, -0.71], leftForearm: [0, -0.97, -0.24], rightUpperArm: [0, -0.52, 0.85], rightForearm: [0, -0.8, 0.6], leftThigh: [0, -0.58, 0.82], leftShin: [0, -0.82, -0.57], rightThigh: [0, -0.72, -0.69], rightShin: [0, -0.7, 0.71], leftPalm: [0, 0, 1], rightPalm: [0, 0, 1], bodyRoll: 2, spineBend: 8, headTurn: 0, headTilt: 1, footPoint: 8, bodyPitch: 73, grip: 0.18, hipsY: -0.1 },
-  // second-brake: Opposite foot takes a shorter braking step as stride length rapidly decreases.
-  { t: 0.32, leftUpperArm: [0, -0.45, 0.89], leftForearm: [0, -0.78, 0.63], rightUpperArm: [0, -0.82, -0.57], rightForearm: [0, -0.97, -0.24], leftThigh: [0, -0.8, -0.6], leftShin: [0, -0.95, 0.31], rightThigh: [0, -0.5, 0.87], rightShin: [0, -0.84, -0.54], leftPalm: [0, 0, 1], rightPalm: [0, 0, 1], bodyRoll: -2, spineBend: 6, headTurn: 0, headTilt: 0, footPoint: 7, bodyPitch: 76, grip: 0.18, hipsY: -0.08 },
-  // short-step: A compact stabilising step brings the centre of mass back over the feet.
-  { t: 0.44, leftUpperArm: [0, -0.75, -0.66], leftForearm: [0, -0.96, -0.28], rightUpperArm: [0, -0.58, 0.81], rightForearm: [0, -0.86, 0.51], leftThigh: [0, -0.48, 0.88], leftShin: [0, -0.86, -0.51], rightThigh: [0, -0.86, -0.5], rightShin: [0, -0.98, 0.2], leftPalm: [0, 0, 1], rightPalm: [0, 0, 1], bodyRoll: 1, spineBend: 4, headTurn: 0, headTilt: 0, footPoint: 5, bodyPitch: 80, grip: 0.18, hipsY: -0.06 },
-  // settle: Speed is nearly gone; arms reduce their swing and the knees remain soft.
-  { t: 0.56, leftUpperArm: [0, -0.86, -0.5], leftForearm: [0, -0.98, -0.2], rightUpperArm: [0, -0.8, 0.6], rightForearm: [0, -0.96, 0.28], leftThigh: [0, -0.92, -0.38], leftShin: [0, -0.99, 0.1], rightThigh: [0, -0.62, 0.78], rightShin: [0, -0.91, -0.41], leftPalm: [0, 0, 1], rightPalm: [0, 0, 1], bodyRoll: 0, spineBend: 2, headTurn: 0, headTilt: 1, footPoint: 4, bodyPitch: 84, grip: 0.06, hipsY: -0.04 },
-  // balance: Final small step catches balance; chest stacks over pelvis and head remains steady.
-  { t: 0.68, leftUpperArm: [0, -0.93, -0.36], leftForearm: [0, -0.99, -0.1], rightUpperArm: [0, -0.91, 0.41], rightForearm: [0, -0.99, 0.12], leftThigh: [0, -0.98, -0.18], leftShin: [0, -1, 0.02], rightThigh: [0, -0.88, 0.47], rightShin: [0, -0.97, -0.23], leftPalm: [0, 0, 1], rightPalm: [0, 0, 1], bodyRoll: 0, spineBend: 1, headTurn: 0, headTilt: 0, footPoint: 3, bodyPitch: 87, grip: 0.06, hipsY: -0.02 },
-  // recover: Feet draw toward a comfortable stance and the hands relax beside the body.
-  { t: 0.8, leftUpperArm: [0, -0.97, -0.24], leftForearm: [0, -1, -0.04], rightUpperArm: [0, -0.96, 0.28], rightForearm: [0, -1, 0.04], leftThigh: [0, -1, -0.05], leftShin: [0, -1, 0], rightThigh: [0, -0.97, 0.23], rightShin: [0, -0.99, -0.08], leftPalm: [0, 0, 1], rightPalm: [0, 0, 1], bodyRoll: 0, spineBend: 0, headTurn: 0, headTilt: 0, footPoint: 2, bodyPitch: 89, grip: 0.06, hipsY: 0 },
-  // stand: Body reaches a stable standing posture with only residual arm motion.
-  { t: 0.91, leftUpperArm: [0, -0.99, 0.1], leftForearm: [0, -1, 0.02], rightUpperArm: [0, -0.99, 0.1], rightForearm: [0, -1, 0.02], leftThigh: [0, -1, 0], leftShin: [0, -1, 0], rightThigh: [0, -1, 0], rightShin: [0, -1, 0], leftPalm: [0, 0, 1], rightPalm: [0, 0, 1], bodyRoll: 0, spineBend: 0, headTurn: 0, headTilt: 0, footPoint: 0, bodyPitch: 90, grip: 0.06, hipsY: 0 },
-  // idle: Fully stopped in a neutral stance, ready to blend into idle.
-  { t: 1, leftUpperArm: [0, -0.99, 0.08], leftForearm: [0, -1, 0.01], rightUpperArm: [0, -0.99, 0.08], rightForearm: [0, -1, 0.01], leftThigh: [0, -1, 0], leftShin: [0, -1, 0], rightThigh: [0, -1, 0], rightShin: [0, -1, 0], leftPalm: [0, 0, 1], rightPalm: [0, 0, 1], bodyRoll: 0, spineBend: 0, headTurn: 0, headTilt: 0, footPoint: 0, bodyPitch: 90, grip: 0.06, hipsY: 0 }
-];
-var DURATION10 = 1;
-var sprint_stop_default = defineAnimation({
-  slug: "sprint-stop",
-  name: "Sprint Stop",
-  clip: "SprintStop",
-  subcategory: "animations",
-  kind: "once",
-  duration: DURATION10,
-  keys: POSES10.map((pose) => referenceKey(pose, DURATION10, 90))
-});
-
-// ../core-library/dist/avatar-appearance/animations/turn-left-90.js
-var POSES11 = [
-  // ready: Neutral standing start; eyes establish the new direction before the feet begin the turn.
-  { t: 0, leftUpperArm: [0.04, -0.99, 0.1], leftForearm: [0.02, -1, 0.03], rightUpperArm: [-0.04, -0.99, 0.1], rightForearm: [-0.02, -1, 0.03], leftThigh: [0.04, -1, 0.02], leftShin: [0.02, -1, 0], rightThigh: [-0.04, -1, 0.02], rightShin: [-0.02, -1, 0], leftPalm: [0.05, 0.02, -1], rightPalm: [-0.05, 0.02, -1], bodyRoll: 0, spineBend: 0, headTurn: 0, headTilt: 0, footPoint: 0, bodyPitch: 90, grip: 0.05, hipsY: 0 },
-  // look-left: Head and upper chest initiate toward the character's left, creating anticipation before the pelvis follows.
-  { t: 0.1, leftUpperArm: [0.05, -0.98, 0.16], leftForearm: [0.03, -0.99, 0.08], rightUpperArm: [-0.05, -0.99, 0.05], rightForearm: [-0.03, -1, 0], leftThigh: [0.05, -0.99, 0.08], leftShin: [0.02, -1, 0.01], rightThigh: [-0.05, -0.99, -0.06], rightShin: [-0.02, -1, 0.01], leftPalm: [0.05, 0.02, -1], rightPalm: [-0.05, 0.02, -1], bodyRoll: -1, spineBend: 1, headTurn: 28, headTilt: 0, footPoint: 0, bodyPitch: 89, grip: 0.05, hipsY: -0.01 },
-  // load-right: Weight settles mostly onto the right foot; left foot becomes light and ready to step into the turn.
-  { t: 0.22, leftUpperArm: [0.08, -0.95, 0.3], leftForearm: [0.04, -0.99, 0.12], rightUpperArm: [-0.08, -0.96, -0.26], rightForearm: [-0.04, -0.99, -0.1], leftThigh: [0.2, -0.94, 0.27], leftShin: [0.08, -0.99, -0.1], rightThigh: [-0.1, -0.98, -0.16], rightShin: [-0.04, -0.99, 0.08], leftPalm: [0.06, 0.02, -1], rightPalm: [-0.06, 0.02, -1], bodyRoll: -2, spineBend: 3, headTurn: 34, headTilt: 0, footPoint: 2, bodyPitch: 87, grip: 0.07, hipsY: -0.05 },
-  // left-step: Left foot steps into the new heading while the right foot acts as the pivot; arms counter the rotation.
-  { t: 0.36, leftUpperArm: [0.1, -0.9, 0.42], leftForearm: [0.05, -0.98, 0.18], rightUpperArm: [-0.1, -0.92, -0.38], rightForearm: [-0.05, -0.98, -0.16], leftThigh: [0.34, -0.82, 0.46], leftShin: [0.14, -0.94, -0.31], rightThigh: [-0.08, -0.99, -0.08], rightShin: [-0.03, -1, 0.03], leftPalm: [0.06, 0.03, -1], rightPalm: [-0.06, 0.03, -1], bodyRoll: -2, spineBend: 3, headTurn: 26, headTilt: 0, footPoint: 6, bodyPitch: 87, grip: 0.07, hipsY: -0.04 },
-  // pivot: Pelvis passes through the middle of the 90-degree pivot; head is already closer to the destination heading.
-  { t: 0.5, leftUpperArm: [0.08, -0.93, 0.36], leftForearm: [0.04, -0.99, 0.14], rightUpperArm: [-0.08, -0.93, -0.36], rightForearm: [-0.04, -0.99, -0.14], leftThigh: [0.16, -0.96, 0.23], leftShin: [0.06, -0.99, -0.1], rightThigh: [-0.18, -0.94, -0.29], rightShin: [-0.07, -0.98, 0.17], leftPalm: [0.05, 0.03, -1], rightPalm: [-0.05, 0.03, -1], bodyRoll: 0, spineBend: 2, headTurn: 16, headTilt: 0, footPoint: 3, bodyPitch: 88, grip: 0.06, hipsY: -0.03 },
-  // right-follow: Right foot lifts and follows around to square the stance; shoulders settle behind the head.
-  { t: 0.64, leftUpperArm: [0.05, -0.97, 0.23], leftForearm: [0.03, -1, 0.08], rightUpperArm: [-0.06, -0.96, -0.27], rightForearm: [-0.03, -0.99, -0.1], leftThigh: [0.06, -0.99, 0.09], leftShin: [0.02, -1, -0.02], rightThigh: [-0.28, -0.87, 0.4], rightShin: [-0.11, -0.95, -0.29], leftPalm: [0.05, 0.02, -1], rightPalm: [-0.05, 0.02, -1], bodyRoll: 1, spineBend: 2, headTurn: 8, headTilt: 0, footPoint: 5, bodyPitch: 88, grip: 0.05, hipsY: -0.02 },
-  // square-up: Both feet settle into the new direction; residual shoulder and arm motion follows through naturally.
-  { t: 0.78, leftUpperArm: [0.04, -0.99, 0.13], leftForearm: [0.02, -1, 0.04], rightUpperArm: [-0.04, -0.98, 0.16], rightForearm: [-0.02, -1, 0.05], leftThigh: [0.05, -1, 0.03], leftShin: [0.02, -1, 0], rightThigh: [-0.1, -0.98, 0.17], rightShin: [-0.04, -0.99, -0.08], leftPalm: [0.05, 0.02, -1], rightPalm: [-0.05, 0.02, -1], bodyRoll: 1, spineBend: 1, headTurn: 3, headTilt: 0, footPoint: 2, bodyPitch: 89, grip: 0.05, hipsY: -0.01 },
-  // settle: Character finishes facing 90 degrees left in a stable neutral stance with the gaze straight ahead.
-  { t: 0.9, leftUpperArm: [0.04, -0.99, 0.1], leftForearm: [0.02, -1, 0.03], rightUpperArm: [-0.04, -0.99, 0.11], rightForearm: [-0.02, -1, 0.03], leftThigh: [0.04, -1, 0.02], leftShin: [0.02, -1, 0], rightThigh: [-0.05, -1, 0.03], rightShin: [-0.02, -1, 0], leftPalm: [0.05, 0.02, -1], rightPalm: [-0.05, 0.02, -1], bodyRoll: 0, spineBend: 0.5, headTurn: 0, headTilt: 0, footPoint: 0, bodyPitch: 90, grip: 0.05, hipsY: 0 },
-  // finish: Final neutral pose after the root has completed its 90-degree left world-space yaw.
-  { t: 1, leftUpperArm: [0.04, -0.99, 0.1], leftForearm: [0.02, -1, 0.03], rightUpperArm: [-0.04, -0.99, 0.1], rightForearm: [-0.02, -1, 0.03], leftThigh: [0.04, -1, 0.02], leftShin: [0.02, -1, 0], rightThigh: [-0.04, -1, 0.02], rightShin: [-0.02, -1, 0], leftPalm: [0.05, 0.02, -1], rightPalm: [-0.05, 0.02, -1], bodyRoll: 0, spineBend: 0, headTurn: 0, headTilt: 0, footPoint: 0, bodyPitch: 90, grip: 0.05, hipsY: 0 }
-];
-var DURATION11 = 0.72;
-var turn_left_90_default = defineAnimation({
-  slug: "turn-left-90",
-  name: "Turn Left 90",
-  clip: "TurnLeft90",
-  subcategory: "animations",
-  kind: "once",
-  duration: DURATION11,
-  keys: POSES11.map((pose) => referenceKey(pose, DURATION11, 90))
-});
-
-// ../core-library/dist/avatar-appearance/animations/turn-right-90.js
-var POSES12 = [
-  // ready: Neutral start; gaze prepares to lead the turn toward the character's own right.
-  { t: 0, leftUpperArm: [0.04, -0.99, 0.1], leftForearm: [0.02, -1, 0.03], rightUpperArm: [-0.04, -0.99, 0.1], rightForearm: [-0.02, -1, 0.03], leftThigh: [0.04, -1, 0.02], leftShin: [0.02, -1, 0], rightThigh: [-0.04, -1, 0.02], rightShin: [-0.02, -1, 0], leftPalm: [0.05, 0.02, -1], rightPalm: [-0.05, 0.02, -1], bodyRoll: 0, spineBend: 0, headTurn: 0, headTilt: 0, footPoint: 0, bodyPitch: 90, grip: 0.05, hipsY: 0 },
-  // look-right: Head and upper chest initiate right before the pelvis follows.
-  { t: 0.1, leftUpperArm: [0.05, -0.99, 0.05], leftForearm: [0.03, -1, 0], rightUpperArm: [-0.05, -0.98, 0.16], rightForearm: [-0.03, -0.99, 0.08], leftThigh: [0.05, -0.99, -0.06], leftShin: [0.02, -1, 0.01], rightThigh: [-0.05, -0.99, 0.08], rightShin: [-0.02, -1, 0.01], leftPalm: [0.05, 0.02, -1], rightPalm: [-0.05, 0.02, -1], bodyRoll: 1, spineBend: 1, headTurn: -28, headTilt: 0, footPoint: 0, bodyPitch: 89, grip: 0.05, hipsY: -0.01 },
-  // load-left: Weight loads onto the left foot so the right foot can step into the new heading.
-  { t: 0.22, leftUpperArm: [0.08, -0.96, -0.26], leftForearm: [0.04, -0.99, -0.1], rightUpperArm: [-0.08, -0.95, 0.3], rightForearm: [-0.04, -0.99, 0.12], leftThigh: [0.1, -0.98, -0.16], leftShin: [0.04, -0.99, 0.08], rightThigh: [-0.2, -0.94, 0.27], rightShin: [-0.08, -0.99, -0.1], leftPalm: [0.06, 0.02, -1], rightPalm: [-0.06, 0.02, -1], bodyRoll: 2, spineBend: 3, headTurn: -34, headTilt: 0, footPoint: 2, bodyPitch: 87, grip: 0.07, hipsY: -0.05 },
-  // right-step: Right foot steps into the turn while the left foot provides the pivot and the arms counterbalance.
-  { t: 0.36, leftUpperArm: [0.1, -0.92, -0.38], leftForearm: [0.05, -0.98, -0.16], rightUpperArm: [-0.1, -0.9, 0.42], rightForearm: [-0.05, -0.98, 0.18], leftThigh: [0.08, -0.99, -0.08], leftShin: [0.03, -1, 0.03], rightThigh: [-0.34, -0.82, 0.46], rightShin: [-0.14, -0.94, -0.31], leftPalm: [0.06, 0.03, -1], rightPalm: [-0.06, 0.03, -1], bodyRoll: 2, spineBend: 3, headTurn: -26, headTilt: 0, footPoint: 6, bodyPitch: 87, grip: 0.07, hipsY: -0.04 },
-  // pivot: Pelvis passes through the middle of the pivot while the head is already closer to the destination.
-  { t: 0.5, leftUpperArm: [0.08, -0.93, -0.36], leftForearm: [0.04, -0.99, -0.14], rightUpperArm: [-0.08, -0.93, 0.36], rightForearm: [-0.04, -0.99, 0.14], leftThigh: [0.18, -0.94, -0.29], leftShin: [0.07, -0.98, 0.17], rightThigh: [-0.16, -0.96, 0.23], rightShin: [-0.06, -0.99, -0.1], leftPalm: [0.05, 0.03, -1], rightPalm: [-0.05, 0.03, -1], bodyRoll: 0, spineBend: 2, headTurn: -16, headTilt: 0, footPoint: 3, bodyPitch: 88, grip: 0.06, hipsY: -0.03 },
-  // left-follow: Left foot follows around to square the stance; shoulders settle behind the head.
-  { t: 0.64, leftUpperArm: [0.06, -0.96, -0.27], leftForearm: [0.03, -0.99, -0.1], rightUpperArm: [-0.05, -0.97, 0.23], rightForearm: [-0.03, -1, 0.08], leftThigh: [0.28, -0.87, 0.4], leftShin: [0.11, -0.95, -0.29], rightThigh: [-0.06, -0.99, 0.09], rightShin: [-0.02, -1, -0.02], leftPalm: [0.05, 0.02, -1], rightPalm: [-0.05, 0.02, -1], bodyRoll: -1, spineBend: 2, headTurn: -8, headTilt: 0, footPoint: 5, bodyPitch: 88, grip: 0.05, hipsY: -0.02 },
-  // square-up: Both feet settle into the new direction with a small natural follow-through in the shoulders.
-  { t: 0.78, leftUpperArm: [0.04, -0.98, 0.16], leftForearm: [0.02, -1, 0.05], rightUpperArm: [-0.04, -0.99, 0.13], rightForearm: [-0.02, -1, 0.04], leftThigh: [0.1, -0.98, 0.17], leftShin: [0.04, -0.99, -0.08], rightThigh: [-0.05, -1, 0.03], rightShin: [-0.02, -1, 0], leftPalm: [0.05, 0.02, -1], rightPalm: [-0.05, 0.02, -1], bodyRoll: -1, spineBend: 1, headTurn: -3, headTilt: 0, footPoint: 2, bodyPitch: 89, grip: 0.05, hipsY: -0.01 },
-  // settle: Character stabilises after completing the right turn.
-  { t: 0.9, leftUpperArm: [0.04, -0.99, 0.11], leftForearm: [0.02, -1, 0.03], rightUpperArm: [-0.04, -0.99, 0.1], rightForearm: [-0.02, -1, 0.03], leftThigh: [0.05, -1, 0.03], leftShin: [0.02, -1, 0], rightThigh: [-0.04, -1, 0.02], rightShin: [-0.02, -1, 0], leftPalm: [0.05, 0.02, -1], rightPalm: [-0.05, 0.02, -1], bodyRoll: 0, spineBend: 0.5, headTurn: 0, headTilt: 0, footPoint: 0, bodyPitch: 90, grip: 0.05, hipsY: 0 },
-  // finish: Final neutral pose after the root completes a 90-degree right world-space yaw.
-  { t: 1, leftUpperArm: [0.04, -0.99, 0.1], leftForearm: [0.02, -1, 0.03], rightUpperArm: [-0.04, -0.99, 0.1], rightForearm: [-0.02, -1, 0.03], leftThigh: [0.04, -1, 0.02], leftShin: [0.02, -1, 0], rightThigh: [-0.04, -1, 0.02], rightShin: [-0.02, -1, 0], leftPalm: [0.05, 0.02, -1], rightPalm: [-0.05, 0.02, -1], bodyRoll: 0, spineBend: 0, headTurn: 0, headTilt: 0, footPoint: 0, bodyPitch: 90, grip: 0.05, hipsY: 0 }
-];
-var DURATION12 = 0.72;
-var turn_right_90_default = defineAnimation({
-  slug: "turn-right-90",
-  name: "Turn Right 90",
-  clip: "TurnRight90",
-  subcategory: "animations",
-  kind: "once",
-  duration: DURATION12,
-  keys: POSES12.map((pose) => referenceKey(pose, DURATION12, 90))
-});
-
-// ../core-library/dist/avatar-appearance/animations/turn-180.js
-var POSES13 = [
-  // ready: Neutral start; head prepares to lead the 180-degree change of direction.
-  { t: 0, leftUpperArm: [0.04, -0.99, 0.1], leftForearm: [0.02, -1, 0.03], rightUpperArm: [-0.04, -0.99, 0.1], rightForearm: [-0.02, -1, 0.03], leftThigh: [0.04, -1, 0.02], leftShin: [0.02, -1, 0], rightThigh: [-0.04, -1, 0.02], rightShin: [-0.02, -1, 0], leftPalm: [0.05, 0.02, -1], rightPalm: [-0.05, 0.02, -1], bodyRoll: 0, spineBend: 0, headTurn: 0, headTilt: 0, footPoint: 0, bodyPitch: 90, grip: 0.05, hipsY: 0 },
-  // look-left: Eyes and head turn left first, followed by the upper chest; the pelvis deliberately lags behind.
-  { t: 0.09, leftUpperArm: [0.06, -0.97, 0.23], leftForearm: [0.03, -0.99, 0.1], rightUpperArm: [-0.06, -0.98, -0.18], rightForearm: [-0.03, -1, -0.06], leftThigh: [0.08, -0.98, 0.16], leftShin: [0.03, -1, -0.04], rightThigh: [-0.06, -0.99, -0.1], rightShin: [-0.02, -1, 0.03], leftPalm: [0.05, 0.02, -1], rightPalm: [-0.05, 0.02, -1], bodyRoll: -1, spineBend: 2, headTurn: 38, headTilt: 0, footPoint: 0, bodyPitch: 88, grip: 0.06, hipsY: -0.02 },
-  // load-right: Weight compresses onto the right leg; the left foot becomes light for the first turning step.
-  { t: 0.2, leftUpperArm: [0.1, -0.9, 0.43], leftForearm: [0.05, -0.98, 0.19], rightUpperArm: [-0.1, -0.92, -0.38], rightForearm: [-0.05, -0.98, -0.16], leftThigh: [0.24, -0.89, 0.38], leftShin: [0.09, -0.97, -0.22], rightThigh: [-0.08, -0.98, -0.17], rightShin: [-0.03, -0.99, 0.08], leftPalm: [0.06, 0.03, -1], rightPalm: [-0.06, 0.03, -1], bodyRoll: -3, spineBend: 4, headTurn: 42, headTilt: 0, footPoint: 2, bodyPitch: 86, grip: 0.08, hipsY: -0.07 },
-  // left-step: Left foot steps around the body as the right foot pivots; arms counter the rotation to control momentum.
-  { t: 0.32, leftUpperArm: [0.13, -0.82, 0.56], leftForearm: [0.07, -0.95, 0.3], rightUpperArm: [-0.12, -0.88, -0.46], rightForearm: [-0.06, -0.97, -0.23], leftThigh: [0.38, -0.75, 0.54], leftShin: [0.15, -0.9, -0.41], rightThigh: [-0.07, -0.99, -0.1], rightShin: [-0.03, -1, 0.04], leftPalm: [0.06, 0.03, -1], rightPalm: [-0.06, 0.03, -1], bodyRoll: -3, spineBend: 4, headTurn: 34, headTilt: 0, footPoint: 6, bodyPitch: 85, grip: 0.08, hipsY: -0.06 },
-  // first-pivot: Pelvis rotates through roughly the first half of the turn while the head continues tracking the destination.
-  { t: 0.44, leftUpperArm: [0.1, -0.88, 0.46], leftForearm: [0.05, -0.98, 0.2], rightUpperArm: [-0.1, -0.88, -0.46], rightForearm: [-0.05, -0.98, -0.2], leftThigh: [0.18, -0.96, 0.22], leftShin: [0.07, -0.99, -0.1], rightThigh: [-0.2, -0.92, -0.34], rightShin: [-0.08, -0.97, 0.23], leftPalm: [0.05, 0.03, -1], rightPalm: [-0.05, 0.03, -1], bodyRoll: 0, spineBend: 3, headTurn: 26, headTilt: 0, footPoint: 4, bodyPitch: 87, grip: 0.07, hipsY: -0.04 },
-  // right-follow: Right foot swings around to continue the rotation; the body stays low enough to keep the pivot stable.
-  { t: 0.56, leftUpperArm: [0.07, -0.94, 0.34], leftForearm: [0.04, -0.99, 0.14], rightUpperArm: [-0.09, -0.9, -0.42], rightForearm: [-0.05, -0.98, -0.18], leftThigh: [0.08, -0.99, 0.1], leftShin: [0.03, -1, -0.03], rightThigh: [-0.34, -0.8, 0.49], rightShin: [-0.13, -0.92, -0.37], leftPalm: [0.05, 0.03, -1], rightPalm: [-0.05, 0.03, -1], bodyRoll: 2, spineBend: 3, headTurn: 20, headTilt: 0, footPoint: 6, bodyPitch: 87, grip: 0.07, hipsY: -0.03 },
-  // second-pivot: Feet exchange support through the second half of the turn; shoulders follow the pelvis without overtwisting.
-  { t: 0.68, leftUpperArm: [0.07, -0.94, -0.33], leftForearm: [0.04, -0.99, -0.14], rightUpperArm: [-0.07, -0.94, 0.33], rightForearm: [-0.04, -0.99, 0.14], leftThigh: [0.2, -0.92, -0.34], leftShin: [0.08, -0.97, 0.23], rightThigh: [-0.18, -0.96, 0.22], rightShin: [-0.07, -0.99, -0.1], leftPalm: [0.05, 0.03, -1], rightPalm: [-0.05, 0.03, -1], bodyRoll: 0, spineBend: 2, headTurn: 12, headTilt: 0, footPoint: 4, bodyPitch: 88, grip: 0.06, hipsY: -0.03 },
-  // square-up: Feet square toward the opposite direction and the head settles back to neutral relative to the torso.
-  { t: 0.8, leftUpperArm: [0.05, -0.98, 0.18], leftForearm: [0.03, -1, 0.06], rightUpperArm: [-0.05, -0.97, 0.22], rightForearm: [-0.03, -0.99, 0.08], leftThigh: [0.06, -0.99, 0.08], leftShin: [0.02, -1, -0.02], rightThigh: [-0.14, -0.97, 0.2], rightShin: [-0.05, -0.99, -0.09], leftPalm: [0.05, 0.02, -1], rightPalm: [-0.05, 0.02, -1], bodyRoll: 1, spineBend: 1, headTurn: 5, headTilt: 0, footPoint: 2, bodyPitch: 89, grip: 0.05, hipsY: -0.01 },
-  // settle: Residual arm and shoulder motion dies away after the 180-degree pivot.
-  { t: 0.91, leftUpperArm: [0.04, -0.99, 0.11], leftForearm: [0.02, -1, 0.03], rightUpperArm: [-0.04, -0.99, 0.12], rightForearm: [-0.02, -1, 0.04], leftThigh: [0.04, -1, 0.02], leftShin: [0.02, -1, 0], rightThigh: [-0.05, -1, 0.04], rightShin: [-0.02, -1, -0.01], leftPalm: [0.05, 0.02, -1], rightPalm: [-0.05, 0.02, -1], bodyRoll: 0, spineBend: 0.5, headTurn: 0, headTilt: 0, footPoint: 0, bodyPitch: 90, grip: 0.05, hipsY: 0 },
-  // finish: Final neutral pose facing exactly opposite the starting direction after a +180-degree root yaw.
-  { t: 1, leftUpperArm: [0.04, -0.99, 0.1], leftForearm: [0.02, -1, 0.03], rightUpperArm: [-0.04, -0.99, 0.1], rightForearm: [-0.02, -1, 0.03], leftThigh: [0.04, -1, 0.02], leftShin: [0.02, -1, 0], rightThigh: [-0.04, -1, 0.02], rightShin: [-0.02, -1, 0], leftPalm: [0.05, 0.02, -1], rightPalm: [-0.05, 0.02, -1], bodyRoll: 0, spineBend: 0, headTurn: 0, headTilt: 0, footPoint: 0, bodyPitch: 90, grip: 0.05, hipsY: 0 }
-];
-var DURATION13 = 0.92;
-var turn_180_default = defineAnimation({
-  slug: "turn-180",
-  name: "Turn 180",
-  clip: "Turn180",
-  subcategory: "animations",
-  kind: "once",
-  duration: DURATION13,
-  keys: POSES13.map((pose) => referenceKey(pose, DURATION13, 90))
-});
-
-// ../core-library/dist/avatar-appearance/animations/jump-forward.js
-var POSES14 = [
-  // ready: Balanced athletic stance before the forward jump; gaze stays on the landing area.
-  { t: 0, leftUpperArm: [0.04, -0.98, 0.18], leftForearm: [0.02, -1, 0.05], rightUpperArm: [-0.04, -0.98, 0.18], rightForearm: [-0.02, -1, 0.05], leftThigh: [0.05, -0.98, 0.18], leftShin: [0.02, -0.99, -0.08], rightThigh: [-0.05, -0.98, 0.18], rightShin: [-0.02, -0.99, -0.08], leftPalm: [0.05, 0.03, -1], rightPalm: [-0.05, 0.03, -1], bodyRoll: 0, spineBend: 3, headTurn: 0, headTilt: 0, footPoint: 0, bodyPitch: 87, grip: 0.06, hipsY: -0.03 },
-  // countermovement: Hips and knees load together while both arms swing behind the body for a natural countermovement.
-  { t: 0.12, leftUpperArm: [0.05, -0.72, -0.69], leftForearm: [0.03, -0.92, -0.39], rightUpperArm: [-0.05, -0.72, -0.69], rightForearm: [-0.03, -0.92, -0.39], leftThigh: [0.08, -0.64, 0.76], leftShin: [0.03, -0.76, -0.65], rightThigh: [-0.08, -0.64, 0.76], rightShin: [-0.03, -0.76, -0.65], leftPalm: [0.05, 0.04, -1], rightPalm: [-0.05, 0.04, -1], bodyRoll: 0, spineBend: 13, headTurn: 0, headTilt: 1, footPoint: 0, bodyPitch: 73, grip: 0.07, hipsY: -0.22 },
-  // drive: Both legs extend as the arms whip forward; hips lead the body into forward and upward acceleration.
-  { t: 0.24, leftUpperArm: [0.04, -0.18, 0.98], leftForearm: [0.02, -0.56, 0.83], rightUpperArm: [-0.04, -0.18, 0.98], rightForearm: [-0.02, -0.56, 0.83], leftThigh: [0.06, -0.82, 0.57], leftShin: [0.02, -0.96, 0.27], rightThigh: [-0.06, -0.82, 0.57], rightShin: [-0.02, -0.96, 0.27], leftPalm: [0.04, 0.02, -1], rightPalm: [-0.04, 0.02, -1], bodyRoll: 0, spineBend: -2, headTurn: 0, headTilt: -3, footPoint: 18, bodyPitch: 68, grip: 0.08, hipsY: -0.04 },
-  // takeoff: Feet leave the ground together after full extension; arms stay forward to control pitch.
-  { t: 0.34, leftUpperArm: [0.03, 0.16, 0.98], leftForearm: [0.02, -0.28, 0.96], rightUpperArm: [-0.03, 0.16, 0.98], rightForearm: [-0.02, -0.28, 0.96], leftThigh: [0.05, -0.92, -0.39], leftShin: [0.02, -0.99, 0.12], rightThigh: [-0.05, -0.92, -0.39], rightShin: [-0.02, -0.99, 0.12], leftPalm: [0.03, 0, -1], rightPalm: [-0.03, 0, -1], bodyRoll: 0, spineBend: -4, headTurn: 0, headTilt: -3, footPoint: 28, bodyPitch: 58, grip: 0.07, hipsY: 0.08 },
-  // early-flight: Knees come forward modestly during flight while the torso remains controlled and the eyes stay on the landing.
-  { t: 0.47, leftUpperArm: [0.04, 0.24, 0.97], leftForearm: [0.02, -0.16, 0.99], rightUpperArm: [-0.04, 0.24, 0.97], rightForearm: [-0.02, -0.16, 0.99], leftThigh: [0.05, -0.44, 0.9], leftShin: [0.02, -0.76, -0.65], rightThigh: [-0.05, -0.44, 0.9], rightShin: [-0.02, -0.76, -0.65], leftPalm: [0.03, 0, -1], rightPalm: [-0.03, 0, -1], bodyRoll: 0, spineBend: 0, headTurn: 0, headTilt: -1, footPoint: 22, bodyPitch: 48, grip: 0.06, hipsY: 0.2 },
-  // apex: At the apex both feet begin moving ahead of the hips and the arms start lowering for landing balance.
-  { t: 0.6, leftUpperArm: [0.04, 0.08, 1], leftForearm: [0.02, -0.3, 0.95], rightUpperArm: [-0.04, 0.08, 1], rightForearm: [-0.02, -0.3, 0.95], leftThigh: [0.06, -0.26, 0.96], leftShin: [0.02, -0.64, -0.77], rightThigh: [-0.06, -0.26, 0.96], rightShin: [-0.02, -0.64, -0.77], leftPalm: [0.03, 0.02, -1], rightPalm: [-0.03, 0.02, -1], bodyRoll: 0, spineBend: 5, headTurn: 0, headTilt: 0, footPoint: 15, bodyPitch: 47, grip: 0.06, hipsY: 0.24 },
-  // landing-prep: Feet extend forward together and the arms lower as the character prepares for a soft two-foot landing.
-  { t: 0.72, leftUpperArm: [0.04, -0.3, 0.95], leftForearm: [0.02, -0.66, 0.75], rightUpperArm: [-0.04, -0.3, 0.95], rightForearm: [-0.02, -0.66, 0.75], leftThigh: [0.07, -0.18, 0.98], leftShin: [0.03, -0.78, -0.62], rightThigh: [-0.07, -0.18, 0.98], rightShin: [-0.03, -0.78, -0.62], leftPalm: [0.04, 0.03, -1], rightPalm: [-0.04, 0.03, -1], bodyRoll: 0, spineBend: 10, headTurn: 0, headTilt: 1, footPoint: 5, bodyPitch: 54, grip: 0.06, hipsY: 0.14 },
-  // contact: Both feet contact together; knees flex immediately and the torso comes forward over the base of support.
-  { t: 0.83, leftUpperArm: [0.05, -0.64, -0.77], leftForearm: [0.03, -0.9, -0.43], rightUpperArm: [-0.05, -0.64, -0.77], rightForearm: [-0.03, -0.9, -0.43], leftThigh: [0.08, -0.46, 0.88], leftShin: [0.03, -0.72, -0.69], rightThigh: [-0.08, -0.46, 0.88], rightShin: [-0.03, -0.72, -0.69], leftPalm: [0.05, 0.04, -1], rightPalm: [-0.05, 0.04, -1], bodyRoll: 0, spineBend: 15, headTurn: 0, headTilt: 2, footPoint: 0, bodyPitch: 64, grip: 0.06, hipsY: -0.1 },
-  // absorb: Hips sink and knees absorb impact; arms continue backward to prevent the body from tipping behind.
-  { t: 0.92, leftUpperArm: [0.05, -0.84, -0.54], leftForearm: [0.02, -0.97, -0.24], rightUpperArm: [-0.05, -0.84, -0.54], rightForearm: [-0.02, -0.97, -0.24], leftThigh: [0.1, -0.56, 0.82], leftShin: [0.04, -0.64, -0.77], rightThigh: [-0.1, -0.56, 0.82], rightShin: [-0.04, -0.64, -0.77], leftPalm: [0.05, 0.05, -1], rightPalm: [-0.05, 0.05, -1], bodyRoll: 0, spineBend: 17, headTurn: 0, headTilt: 2, footPoint: 0, bodyPitch: 69, grip: 0.06, hipsY: -0.24 },
-  // recover: Character rises into a stable athletic stance, ready to blend into idle, walk or run.
-  { t: 1, leftUpperArm: [0.04, -0.96, 0.27], leftForearm: [0.02, -0.99, 0.1], rightUpperArm: [-0.04, -0.96, 0.27], rightForearm: [-0.02, -0.99, 0.1], leftThigh: [0.06, -0.88, 0.47], leftShin: [0.03, -0.91, -0.41], rightThigh: [-0.06, -0.88, 0.47], rightShin: [-0.03, -0.91, -0.41], leftPalm: [0.04, 0.04, -1], rightPalm: [-0.04, 0.04, -1], bodyRoll: 0, spineBend: 8, headTurn: 0, headTilt: 0, footPoint: 0, bodyPitch: 79, grip: 0.05, hipsY: -0.12 }
-];
-var DURATION14 = 0.95;
-var jump_forward_default = defineAnimation({
-  slug: "jump-forward",
-  name: "Jump Forward",
-  clip: "JumpForward",
-  subcategory: "animations",
-  kind: "once",
-  duration: DURATION14,
-  keys: POSES14.map((pose) => referenceKey(pose, DURATION14, 90))
-});
-
-// ../core-library/dist/avatar-appearance/animations/jump-backward.js
-var POSES15 = [
-  // ready: Balanced start; gaze remains forward while the body prepares to jump backward.
-  { t: 0, leftUpperArm: [0.04, -0.98, 0.18], leftForearm: [0.02, -1, 0.05], rightUpperArm: [-0.04, -0.98, 0.18], rightForearm: [-0.02, -1, 0.05], leftThigh: [0.05, -0.98, 0.18], leftShin: [0.02, -0.99, -0.08], rightThigh: [-0.05, -0.98, 0.18], rightShin: [-0.02, -0.99, -0.08], leftPalm: [0.05, 0.03, -1], rightPalm: [-0.05, 0.03, -1], bodyRoll: 0, spineBend: 2, headTurn: 0, headTilt: 0, footPoint: 0, bodyPitch: 91, grip: 0.07, hipsY: -0.03 },
-  // countermovement: Hips drop and arms move forward so they can sweep backward during the takeoff.
-  { t: 0.12, leftUpperArm: [0.05, -0.28, 0.96], leftForearm: [0.03, -0.62, 0.78], rightUpperArm: [-0.05, -0.28, 0.96], rightForearm: [-0.03, -0.62, 0.78], leftThigh: [0.08, -0.62, 0.78], leftShin: [0.03, -0.74, -0.67], rightThigh: [-0.08, -0.62, 0.78], rightShin: [-0.03, -0.74, -0.67], leftPalm: [0.05, 0.03, -1], rightPalm: [-0.05, 0.03, -1], bodyRoll: 0, spineBend: 8, headTurn: 0, headTilt: 0, footPoint: 0, bodyPitch: 82, grip: 0.08, hipsY: -0.22 },
-  // backward-drive: Both legs extend as the arms sweep behind; hips travel backward while the head stays controlled.
-  { t: 0.24, leftUpperArm: [0.05, -0.76, -0.65], leftForearm: [0.03, -0.94, -0.34], rightUpperArm: [-0.05, -0.76, -0.65], rightForearm: [-0.03, -0.94, -0.34], leftThigh: [0.06, -0.84, 0.54], leftShin: [0.02, -0.96, 0.27], rightThigh: [-0.06, -0.84, 0.54], rightShin: [-0.02, -0.96, 0.27], leftPalm: [0.05, 0.04, -1], rightPalm: [-0.05, 0.04, -1], bodyRoll: 0, spineBend: -3, headTurn: 0, headTilt: 0, footPoint: 18, bodyPitch: 99, grip: 0.08, hipsY: -0.03 },
-  // takeoff: Feet leave the floor together; the body has a small backward lean rather than throwing the head back.
-  { t: 0.34, leftUpperArm: [0.04, -0.88, -0.47], leftForearm: [0.02, -0.98, -0.18], rightUpperArm: [-0.04, -0.88, -0.47], rightForearm: [-0.02, -0.98, -0.18], leftThigh: [0.05, -0.94, -0.34], leftShin: [0.02, -0.99, 0.12], rightThigh: [-0.05, -0.94, -0.34], rightShin: [-0.02, -0.99, 0.12], leftPalm: [0.04, 0.04, -1], rightPalm: [-0.04, 0.04, -1], bodyRoll: 0, spineBend: -5, headTurn: 0, headTilt: 1, footPoint: 28, bodyPitch: 105, grip: 0.07, hipsY: 0.08 },
-  // early-flight: Knees soften in flight and arms remain slightly behind to balance the backward trajectory.
-  { t: 0.47, leftUpperArm: [0.04, -0.64, -0.77], leftForearm: [0.02, -0.9, -0.43], rightUpperArm: [-0.04, -0.64, -0.77], rightForearm: [-0.02, -0.9, -0.43], leftThigh: [0.05, -0.58, 0.81], leftShin: [0.02, -0.8, -0.6], rightThigh: [-0.05, -0.58, 0.81], rightShin: [-0.02, -0.8, -0.6], leftPalm: [0.04, 0.04, -1], rightPalm: [-0.04, 0.04, -1], bodyRoll: 0, spineBend: -2, headTurn: 0, headTilt: 1, footPoint: 20, bodyPitch: 103, grip: 0.06, hipsY: 0.18 },
-  // apex: At the apex the feet begin searching for the floor behind the hips while the torso returns toward upright.
-  { t: 0.6, leftUpperArm: [0.06, -0.46, -0.886], leftForearm: [0.02, -0.8, -0.6], rightUpperArm: [-0.06, -0.46, -0.886], rightForearm: [-0.02, -0.8, -0.6], leftThigh: [0.06, -0.44, 0.9], leftShin: [0.02, -0.72, -0.69], rightThigh: [-0.06, -0.44, 0.9], rightShin: [-0.02, -0.72, -0.69], leftPalm: [0.04, 0.04, -1], rightPalm: [-0.04, 0.04, -1], bodyRoll: 0, spineBend: 1, headTurn: 0, headTilt: 1, footPoint: 14, bodyPitch: 101, grip: 0.06, hipsY: 0.22 },
-  // landing-prep: Arms come forward and feet move beneath the body to prepare for a stable blind-side landing.
-  { t: 0.72, leftUpperArm: [0.04, -0.1, 0.99], leftForearm: [0.02, -0.5, 0.86], rightUpperArm: [-0.04, -0.1, 0.99], rightForearm: [-0.02, -0.5, 0.86], leftThigh: [0.07, -0.7, 0.71], leftShin: [0.03, -0.9, -0.43], rightThigh: [-0.07, -0.7, 0.71], rightShin: [-0.03, -0.9, -0.43], leftPalm: [0.04, 0.03, -1], rightPalm: [-0.04, 0.03, -1], bodyRoll: 0, spineBend: 5, headTurn: 0, headTilt: 0, footPoint: 4, bodyPitch: 96, grip: 0.06, hipsY: 0.12 },
-  // contact: Both feet contact together behind the starting position; knees bend immediately to absorb the landing.
-  { t: 0.83, leftUpperArm: [0.05, -0.24, 0.97], leftForearm: [0.03, -0.6, 0.8], rightUpperArm: [-0.05, -0.24, 0.97], rightForearm: [-0.03, -0.6, 0.8], leftThigh: [0.08, -0.58, 0.81], leftShin: [0.03, -0.68, -0.73], rightThigh: [-0.08, -0.58, 0.81], rightShin: [-0.03, -0.68, -0.73], leftPalm: [0.05, 0.03, -1], rightPalm: [-0.05, 0.03, -1], bodyRoll: 0, spineBend: 10, headTurn: 0, headTilt: 0, footPoint: 0, bodyPitch: 88, grip: 0.06, hipsY: -0.1 },
-  // absorb: Hips sink between the feet while arms move forward as counterbalance and the chest stays controlled.
-  { t: 0.92, leftUpperArm: [0.05, -0.52, 0.85], leftForearm: [0.03, -0.82, 0.57], rightUpperArm: [-0.05, -0.52, 0.85], rightForearm: [-0.03, -0.82, 0.57], leftThigh: [0.1, -0.54, 0.84], leftShin: [0.04, -0.62, -0.78], rightThigh: [-0.1, -0.54, 0.84], rightShin: [-0.04, -0.62, -0.78], leftPalm: [0.05, 0.03, -1], rightPalm: [-0.05, 0.03, -1], bodyRoll: 0, spineBend: 14, headTurn: 0, headTilt: 1, footPoint: 0, bodyPitch: 80, grip: 0.06, hipsY: -0.23 },
-  // recover: Character recovers into a balanced athletic stance while still facing the original direction.
-  { t: 1, leftUpperArm: [0.04, -0.96, 0.27], leftForearm: [0.02, -0.99, 0.1], rightUpperArm: [-0.04, -0.96, 0.27], rightForearm: [-0.02, -0.99, 0.1], leftThigh: [0.06, -0.88, 0.47], leftShin: [0.03, -0.91, -0.41], rightThigh: [-0.06, -0.88, 0.47], rightShin: [-0.03, -0.91, -0.41], leftPalm: [0.04, 0.04, -1], rightPalm: [-0.04, 0.04, -1], bodyRoll: 0, spineBend: 7, headTurn: 0, headTilt: 0, footPoint: 0, bodyPitch: 87, grip: 0.05, hipsY: -0.11 }
-];
-var DURATION15 = 0.92;
-var jump_backward_default = defineAnimation({
-  slug: "jump-backward",
-  name: "Jump Backward",
-  clip: "JumpBackward",
-  subcategory: "animations",
-  kind: "once",
-  duration: DURATION15,
-  keys: POSES15.map((pose) => referenceKey(pose, DURATION15, 90))
-});
-
-// ../core-library/dist/avatar-appearance/animations/long-jump.js
-var POSES16 = [
-  // approach: Fast final approach step; gaze stays ahead while opposite arm and knee prepare the takeoff.
-  { t: 0, leftUpperArm: [0.03, -0.82, -0.57], leftForearm: [0.02, -0.97, -0.24], rightUpperArm: [-0.03, -0.42, 0.91], rightForearm: [-0.02, -0.72, 0.69], leftThigh: [0.05, -0.4, 0.92], leftShin: [0.02, -0.72, -0.69], rightThigh: [-0.04, -0.92, -0.39], rightShin: [-0.02, -0.99, 0.1], leftPalm: [0.05, 0.03, -1], rightPalm: [-0.05, 0.03, -1], bodyRoll: -2, spineBend: 5, headTurn: 0, headTilt: -2, footPoint: 14, bodyPitch: 70, grip: 0.14, hipsY: 0.02 },
-  // penultimate: Penultimate step lowers the hips slightly so horizontal speed can be converted into a controlled upward takeoff.
-  { t: 0.1, leftUpperArm: [0.04, -0.58, 0.81], leftForearm: [0.02, -0.84, 0.54], rightUpperArm: [-0.04, -0.78, -0.63], rightForearm: [-0.02, -0.96, -0.27], leftThigh: [0.05, -0.84, -0.54], leftShin: [0.02, -0.97, 0.24], rightThigh: [-0.05, -0.52, 0.85], rightShin: [-0.02, -0.8, -0.6], leftPalm: [0.05, 0.03, -1], rightPalm: [-0.05, 0.03, -1], bodyRoll: 1, spineBend: 4, headTurn: 0, headTilt: -2, footPoint: 10, bodyPitch: 74, grip: 0.14, hipsY: -0.04 },
-  // takeoff-load: Takeoff leg loads under the hips; free knee and opposite arm drive forward and upward.
-  { t: 0.2, leftUpperArm: [0.04, -0.7, -0.71], leftForearm: [0.02, -0.92, -0.39], rightUpperArm: [-0.04, -0.3, 0.95], rightForearm: [-0.02, -0.62, 0.78], leftThigh: [0.04, -0.93, -0.36], leftShin: [0.02, -0.98, 0.18], rightThigh: [-0.05, -0.38, 0.92], rightShin: [-0.02, -0.7, -0.71], leftPalm: [0.05, 0.03, -1], rightPalm: [-0.05, 0.03, -1], bodyRoll: 0, spineBend: 3, headTurn: 0, headTilt: -3, footPoint: 8, bodyPitch: 78, grip: 0.15, hipsY: -0.08 },
-  // takeoff: Takeoff leg extends powerfully as both arms drive forward; the body leaves the ground with forward momentum.
-  { t: 0.3, leftUpperArm: [0.03, -0.3, 0.95], leftForearm: [0.02, -0.64, 0.77], rightUpperArm: [-0.03, -0.18, 0.98], rightForearm: [-0.02, -0.55, 0.83], leftThigh: [0.04, -0.86, -0.5], leftShin: [0.02, -0.98, 0.18], rightThigh: [-0.05, -0.28, 0.96], rightShin: [-0.02, -0.66, -0.75], leftPalm: [0.04, 0.02, -1], rightPalm: [-0.04, 0.02, -1], bodyRoll: 0, spineBend: -2, headTurn: 0, headTilt: -4, footPoint: 20, bodyPitch: 67, grip: 0.14, hipsY: 0.04 },
-  // early-flight: Arms reach forward as both knees begin coming up; torso stays long instead of folding too early.
-  { t: 0.42, leftUpperArm: [0.04, 0.18, 0.98], leftForearm: [0.02, -0.28, 0.96], rightUpperArm: [-0.04, 0.2, 0.98], rightForearm: [-0.02, -0.26, 0.96], leftThigh: [0.05, -0.35, 0.94], leftShin: [0.02, -0.68, -0.73], rightThigh: [-0.05, -0.3, 0.95], rightShin: [-0.02, -0.66, -0.75], leftPalm: [0.03, 0, -1], rightPalm: [-0.03, 0, -1], bodyRoll: 0, spineBend: -4, headTurn: 0, headTilt: -3, footPoint: 24, bodyPitch: 54, grip: 0.12, hipsY: 0.18 },
-  // flight: At peak flight both thighs advance together; arms remain forward to control rotation and prepare the landing.
-  { t: 0.55, leftUpperArm: [0.04, 0.32, 0.95], leftForearm: [0.02, -0.1, 0.99], rightUpperArm: [-0.04, 0.32, 0.95], rightForearm: [-0.02, -0.1, 0.99], leftThigh: [0.05, -0.16, 0.99], leftShin: [0.02, -0.5, -0.86], rightThigh: [-0.05, -0.16, 0.99], rightShin: [-0.02, -0.5, -0.86], leftPalm: [0.02, -0.02, -1], rightPalm: [-0.02, -0.02, -1], bodyRoll: 0, spineBend: 4, headTurn: 0, headTilt: -1, footPoint: 18, bodyPitch: 43, grip: 0.1, hipsY: 0.27 },
-  // landing-prep: Both legs extend forward together for landing while the arms begin sweeping down and back to prevent backward rotation.
-  { t: 0.68, leftUpperArm: [0.05, -0.05, 0.99], leftForearm: [0.02, -0.4, 0.92], rightUpperArm: [-0.05, -0.05, 0.99], rightForearm: [-0.02, -0.4, 0.92], leftThigh: [0.06, -0.05, 1], leftShin: [0.02, -0.68, -0.73], rightThigh: [-0.06, -0.05, 1], rightShin: [-0.02, -0.68, -0.73], leftPalm: [0.02, 0.02, -1], rightPalm: [-0.02, 0.02, -1], bodyRoll: 0, spineBend: 10, headTurn: 0, headTilt: 1, footPoint: 5, bodyPitch: 48, grip: 0.08, hipsY: 0.2 },
-  // heel-contact: Both feet contact ahead of the hips; knees immediately begin flexing and arms sweep backward to absorb momentum.
-  { t: 0.8, leftUpperArm: [0.05, -0.72, -0.69], leftForearm: [0.02, -0.93, -0.36], rightUpperArm: [-0.05, -0.72, -0.69], rightForearm: [-0.02, -0.93, -0.36], leftThigh: [0.06, -0.36, 0.93], leftShin: [0.02, -0.88, -0.47], rightThigh: [-0.06, -0.36, 0.93], rightShin: [-0.02, -0.88, -0.47], leftPalm: [0.03, 0.05, -1], rightPalm: [-0.03, 0.05, -1], bodyRoll: 0, spineBend: 15, headTurn: 0, headTilt: 2, footPoint: 0, bodyPitch: 58, grip: 0.08, hipsY: -0.02 },
-  // absorb: Deep knee and hip flexion absorbs the landing while the chest comes forward over the feet to keep balance.
-  { t: 0.9, leftUpperArm: [0.05, -0.88, -0.47], leftForearm: [0.02, -0.98, -0.18], rightUpperArm: [-0.05, -0.88, -0.47], rightForearm: [-0.02, -0.98, -0.18], leftThigh: [0.1, -0.52, 0.85], leftShin: [0.04, -0.66, -0.75], rightThigh: [-0.1, -0.52, 0.85], rightShin: [-0.04, -0.66, -0.75], leftPalm: [0.04, 0.05, -1], rightPalm: [-0.04, 0.05, -1], bodyRoll: 0, spineBend: 18, headTurn: 0, headTilt: 3, footPoint: 2, bodyPitch: 66, grip: 0.08, hipsY: -0.25 },
-  // recover: Character recovers from the landing into a balanced athletic stance with the head and eyes forward.
-  { t: 1, leftUpperArm: [0.04, -0.96, 0.27], leftForearm: [0.02, -0.99, 0.1], rightUpperArm: [-0.04, -0.96, 0.27], rightForearm: [-0.02, -0.99, 0.1], leftThigh: [0.06, -0.88, 0.47], leftShin: [0.03, -0.91, -0.41], rightThigh: [-0.06, -0.88, 0.47], rightShin: [-0.03, -0.91, -0.41], leftPalm: [0.04, 0.04, -1], rightPalm: [-0.04, 0.04, -1], bodyRoll: 0, spineBend: 9, headTurn: 0, headTilt: 0, footPoint: 0, bodyPitch: 78, grip: 0.06, hipsY: -0.13 }
-];
-var DURATION16 = 1.25;
-var long_jump_default = defineAnimation({
-  slug: "long-jump",
-  name: "Long Jump",
-  clip: "LongJump",
-  subcategory: "animations",
-  kind: "once",
-  duration: DURATION16,
-  keys: POSES16.map((pose) => referenceKey(pose, DURATION16, 90))
-});
-
-// ../core-library/dist/avatar-appearance/animations/soft-landing.js
-var POSES17 = [
-  // descent: Descending with feet beneath the body; arms are forward for balance and the eyes track the landing.
-  { t: 0, leftUpperArm: [0.08, -0.2, 0.98], leftForearm: [0.04, -0.58, 0.81], rightUpperArm: [-0.08, -0.2, 0.98], rightForearm: [-0.04, -0.58, 0.81], leftThigh: [0.08, -0.78, 0.62], leftShin: [0.03, -0.92, -0.39], rightThigh: [-0.08, -0.78, 0.62], rightShin: [-0.03, -0.92, -0.39], leftPalm: [0.08, 0.03, -0.99], rightPalm: [-0.08, 0.03, -0.99], bodyRoll: 0, spineBend: 5, headTurn: 0, headTilt: 2, footPoint: 8, bodyPitch: 84, grip: 0.05, hipsY: 0.16 },
-  // prepare: Ankles, knees and hips pre-flex before contact instead of landing with locked legs.
-  { t: 0.12, leftUpperArm: [0.1, -0.36, 0.93], leftForearm: [0.05, -0.7, 0.71], rightUpperArm: [-0.1, -0.36, 0.93], rightForearm: [-0.05, -0.7, 0.71], leftThigh: [0.1, -0.66, 0.74], leftShin: [0.04, -0.8, -0.6], rightThigh: [-0.1, -0.66, 0.74], rightShin: [-0.04, -0.8, -0.6], leftPalm: [0.08, 0.04, -0.99], rightPalm: [-0.08, 0.04, -0.99], bodyRoll: 0, spineBend: 8, headTurn: 0, headTilt: 2, footPoint: 4, bodyPitch: 80, grip: 0.05, hipsY: 0.08 },
-  // toe-contact: Forefeet make soft contact first; knees immediately yield and the heels begin lowering.
-  { t: 0.24, leftUpperArm: [0.08, -0.48, 0.87], leftForearm: [0.04, -0.78, 0.62], rightUpperArm: [-0.08, -0.48, 0.87], rightForearm: [-0.04, -0.78, 0.62], leftThigh: [0.1, -0.58, 0.81], leftShin: [0.04, -0.72, -0.69], rightThigh: [-0.1, -0.58, 0.81], rightShin: [-0.04, -0.72, -0.69], leftPalm: [0.07, 0.04, -0.99], rightPalm: [-0.07, 0.04, -0.99], bodyRoll: 0, spineBend: 11, headTurn: 0, headTilt: 2, footPoint: 1, bodyPitch: 76, grip: 0.05, hipsY: -0.02 },
-  // absorb-one: Knees and hips flex progressively while the arms sweep down to control the body's downward momentum.
-  { t: 0.36, leftUpperArm: [0.07, -0.66, 0.75], leftForearm: [0.04, -0.88, 0.47], rightUpperArm: [-0.07, -0.66, 0.75], rightForearm: [-0.04, -0.88, 0.47], leftThigh: [0.12, -0.5, 0.86], leftShin: [0.05, -0.64, -0.77], rightThigh: [-0.12, -0.5, 0.86], rightShin: [-0.05, -0.64, -0.77], leftPalm: [0.07, 0.05, -0.99], rightPalm: [-0.07, 0.05, -0.99], bodyRoll: 0, spineBend: 14, headTurn: 0, headTilt: 2, footPoint: 0, bodyPitch: 72, grip: 0.05, hipsY: -0.15 },
-  // deep-absorb: Lowest point of the soft landing; hips sit back slightly and knees remain aligned with the feet.
-  { t: 0.5, leftUpperArm: [0.06, -0.8, 0.6], leftForearm: [0.03, -0.95, 0.3], rightUpperArm: [-0.06, -0.8, 0.6], rightForearm: [-0.03, -0.95, 0.3], leftThigh: [0.14, -0.47, 0.87], leftShin: [0.06, -0.59, -0.8], rightThigh: [-0.14, -0.47, 0.87], rightShin: [-0.06, -0.59, -0.8], leftPalm: [0.06, 0.05, -0.99], rightPalm: [-0.06, 0.05, -0.99], bodyRoll: 0, spineBend: 16, headTurn: 0, headTilt: 1, footPoint: 0, bodyPitch: 70, grip: 0.05, hipsY: -0.25 },
-  // stabilise: Downward energy is gone; the character holds a compact stable stance before rising.
-  { t: 0.64, leftUpperArm: [0.05, -0.9, 0.43], leftForearm: [0.03, -0.98, 0.18], rightUpperArm: [-0.05, -0.9, 0.43], rightForearm: [-0.03, -0.98, 0.18], leftThigh: [0.1, -0.6, 0.79], leftShin: [0.04, -0.7, -0.71], rightThigh: [-0.1, -0.6, 0.79], rightShin: [-0.04, -0.7, -0.71], leftPalm: [0.06, 0.05, -0.99], rightPalm: [-0.06, 0.05, -0.99], bodyRoll: 0, spineBend: 12, headTurn: 0, headTilt: 0, footPoint: 0, bodyPitch: 75, grip: 0.05, hipsY: -0.2 },
-  // rise: Legs extend smoothly as the chest stacks back over the pelvis; no abrupt snap to standing.
-  { t: 0.78, leftUpperArm: [0.04, -0.95, 0.31], leftForearm: [0.02, -0.99, 0.12], rightUpperArm: [-0.04, -0.95, 0.31], rightForearm: [-0.02, -0.99, 0.12], leftThigh: [0.08, -0.76, 0.65], leftShin: [0.03, -0.84, -0.54], rightThigh: [-0.08, -0.76, 0.65], rightShin: [-0.03, -0.84, -0.54], leftPalm: [0.05, 0.04, -0.99], rightPalm: [-0.05, 0.04, -0.99], bodyRoll: 0, spineBend: 8, headTurn: 0, headTilt: 0, footPoint: 0, bodyPitch: 81, grip: 0.05, hipsY: -0.12 },
-  // recover: The body returns toward neutral while retaining soft knees and a ready posture.
-  { t: 0.9, leftUpperArm: [0.04, -0.98, 0.18], leftForearm: [0.02, -1, 0.05], rightUpperArm: [-0.04, -0.98, 0.18], rightForearm: [-0.02, -1, 0.05], leftThigh: [0.05, -0.92, 0.39], leftShin: [0.02, -0.96, -0.27], rightThigh: [-0.05, -0.92, 0.39], rightShin: [-0.02, -0.96, -0.27], leftPalm: [0.05, 0.03, -0.99], rightPalm: [-0.05, 0.03, -0.99], bodyRoll: 0, spineBend: 4, headTurn: 0, headTilt: 0, footPoint: 0, bodyPitch: 86, grip: 0.05, hipsY: -0.05 },
-  // finish: Stable neutral finish ready to blend into idle, walk or run.
-  { t: 1, leftUpperArm: [0.04, -0.99, 0.1], leftForearm: [0.02, -1, 0.03], rightUpperArm: [-0.04, -0.99, 0.1], rightForearm: [-0.02, -1, 0.03], leftThigh: [0.04, -1, 0.02], leftShin: [0.02, -1, 0], rightThigh: [-0.04, -1, 0.02], rightShin: [-0.02, -1, 0], leftPalm: [0.05, 0.02, -1], rightPalm: [-0.05, 0.02, -1], bodyRoll: 0, spineBend: 0, headTurn: 0, headTilt: 0, footPoint: 0, bodyPitch: 90, grip: 0.05, hipsY: 0 }
-];
-var DURATION17 = 0.72;
-var soft_landing_default = defineAnimation({
-  slug: "soft-landing",
-  name: "Soft Landing",
-  clip: "SoftLanding",
-  subcategory: "animations",
-  kind: "once",
-  duration: DURATION17,
-  keys: POSES17.map((pose) => referenceKey(pose, DURATION17, 90))
-});
-
-// ../core-library/dist/avatar-appearance/animations/hard-landing.js
-var POSES18 = [
-  // fast-descent: Fast descent with feet under the body; arms spread forward and outward to prepare for a heavy impact.
-  { t: 0, leftUpperArm: [0.12, -0.08, 0.99], leftForearm: [0.06, -0.5, 0.86], rightUpperArm: [-0.12, -0.08, 0.99], rightForearm: [-0.06, -0.5, 0.86], leftThigh: [0.1, -0.78, 0.62], leftShin: [0.04, -0.91, -0.41], rightThigh: [-0.1, -0.78, 0.62], rightShin: [-0.04, -0.91, -0.41], leftPalm: [0.1, 0.02, -0.99], rightPalm: [-0.1, 0.02, -0.99], bodyRoll: 0, spineBend: 4, headTurn: 0, headTilt: 3, footPoint: 10, bodyPitch: 83, grip: 0.12, hipsY: 0.24 },
-  // brace: Knees and hips pre-flex before contact while the torso braces without locking the spine.
-  { t: 0.1, leftUpperArm: [0.16, -0.28, 0.95], leftForearm: [0.08, -0.64, 0.76], rightUpperArm: [-0.16, -0.28, 0.95], rightForearm: [-0.08, -0.64, 0.76], leftThigh: [0.12, -0.66, 0.74], leftShin: [0.05, -0.8, -0.6], rightThigh: [-0.12, -0.66, 0.74], rightShin: [-0.05, -0.8, -0.6], leftPalm: [0.12, 0.03, -0.99], rightPalm: [-0.12, 0.03, -0.99], bodyRoll: 0, spineBend: 8, headTurn: 0, headTilt: 3, footPoint: 5, bodyPitch: 78, grip: 0.16, hipsY: 0.1 },
-  // impact: Both feet hit nearly together; ankles, knees and hips immediately yield under the heavy vertical load.
-  { t: 0.2, leftUpperArm: [0.14, -0.52, 0.84], leftForearm: [0.07, -0.8, 0.6], rightUpperArm: [-0.14, -0.52, 0.84], rightForearm: [-0.07, -0.8, 0.6], leftThigh: [0.14, -0.54, 0.83], leftShin: [0.06, -0.69, -0.72], rightThigh: [-0.14, -0.54, 0.83], rightShin: [-0.06, -0.69, -0.72], leftPalm: [0.1, 0.05, -0.99], rightPalm: [-0.1, 0.05, -0.99], bodyRoll: 0, spineBend: 13, headTurn: 0, headTilt: 4, footPoint: 0, bodyPitch: 72, grip: 0.18, hipsY: -0.05 },
-  // collapse: The body drops into a deep squat to dissipate impact; arms swing down and back as the chest comes forward.
-  { t: 0.3, leftUpperArm: [0.1, -0.76, 0.64], leftForearm: [0.05, -0.92, 0.39], rightUpperArm: [-0.1, -0.76, 0.64], rightForearm: [-0.05, -0.92, 0.39], leftThigh: [0.18, -0.42, 0.89], leftShin: [0.08, -0.56, -0.82], rightThigh: [-0.18, -0.42, 0.89], rightShin: [-0.08, -0.56, -0.82], leftPalm: [0.08, 0.07, -0.99], rightPalm: [-0.08, 0.07, -0.99], bodyRoll: 0, spineBend: 20, headTurn: 0, headTilt: 5, footPoint: 0, bodyPitch: 64, grip: 0.2, hipsY: -0.27 },
-  // deep-absorb: Lowest compression point; hips sit back, knees remain aligned over the feet and the spine stays controlled.
-  { t: 0.42, leftUpperArm: [0.08, -0.88, 0.47], leftForearm: [0.04, -0.97, 0.24], rightUpperArm: [-0.08, -0.88, 0.47], rightForearm: [-0.04, -0.97, 0.24], leftThigh: [0.2, -0.38, 0.9], leftShin: [0.09, -0.51, -0.86], rightThigh: [-0.2, -0.38, 0.9], rightShin: [-0.09, -0.51, -0.86], leftPalm: [0.07, 0.08, -0.99], rightPalm: [-0.07, 0.08, -0.99], bodyRoll: 0, spineBend: 23, headTurn: 0, headTilt: 4, footPoint: 0, bodyPitch: 61, grip: 0.18, hipsY: -0.36 },
-  // impact-settle: The rebound is deliberately small; the character stabilises before trying to stand.
-  { t: 0.54, leftUpperArm: [0.07, -0.91, 0.4], leftForearm: [0.03, -0.98, 0.18], rightUpperArm: [-0.07, -0.91, 0.4], rightForearm: [-0.03, -0.98, 0.18], leftThigh: [0.17, -0.45, 0.88], leftShin: [0.07, -0.58, -0.81], rightThigh: [-0.17, -0.45, 0.88], rightShin: [-0.07, -0.58, -0.81], leftPalm: [0.07, 0.07, -0.99], rightPalm: [-0.07, 0.07, -0.99], bodyRoll: 0, spineBend: 20, headTurn: 0, headTilt: 3, footPoint: 0, bodyPitch: 65, grip: 0.14, hipsY: -0.33 },
-  // stabilise: Balance is regained in a low stance; head lifts first to re-establish awareness.
-  { t: 0.66, leftUpperArm: [0.06, -0.92, 0.38], leftForearm: [0.03, -0.98, 0.17], rightUpperArm: [-0.06, -0.92, 0.38], rightForearm: [-0.03, -0.98, 0.17], leftThigh: [0.14, -0.55, 0.82], leftShin: [0.06, -0.66, -0.75], rightThigh: [-0.14, -0.55, 0.82], rightShin: [-0.06, -0.66, -0.75], leftPalm: [0.06, 0.06, -0.99], rightPalm: [-0.06, 0.06, -0.99], bodyRoll: 0, spineBend: 16, headTurn: 0, headTilt: 2, footPoint: 0, bodyPitch: 70, grip: 0.12, hipsY: -0.27 },
-  // rise: Legs extend gradually as the torso stacks over the pelvis; arms return toward a neutral position.
-  { t: 0.78, leftUpperArm: [0.05, -0.95, 0.31], leftForearm: [0.02, -0.99, 0.12], rightUpperArm: [-0.05, -0.95, 0.31], rightForearm: [-0.02, -0.99, 0.12], leftThigh: [0.1, -0.7, 0.71], leftShin: [0.04, -0.78, -0.62], rightThigh: [-0.1, -0.7, 0.71], rightShin: [-0.04, -0.78, -0.62], leftPalm: [0.05, 0.05, -0.99], rightPalm: [-0.05, 0.05, -0.99], bodyRoll: 0, spineBend: 11, headTurn: 0, headTilt: 1, footPoint: 0, bodyPitch: 77, grip: 0.09, hipsY: -0.18 },
-  // recover: The character nearly returns to standing, retaining soft knees after the heavy landing.
-  { t: 0.9, leftUpperArm: [0.04, -0.98, 0.18], leftForearm: [0.02, -1, 0.05], rightUpperArm: [-0.04, -0.98, 0.18], rightForearm: [-0.02, -1, 0.05], leftThigh: [0.06, -0.9, 0.43], leftShin: [0.03, -0.94, -0.34], rightThigh: [-0.06, -0.9, 0.43], rightShin: [-0.03, -0.94, -0.34], leftPalm: [0.05, 0.03, -0.99], rightPalm: [-0.05, 0.03, -0.99], bodyRoll: 0, spineBend: 5, headTurn: 0, headTilt: 0, footPoint: 0, bodyPitch: 85, grip: 0.07, hipsY: -0.07 },
-  // finish: Stable neutral finish, ready to transition to locomotion.
-  { t: 1, leftUpperArm: [0.04, -0.99, 0.1], leftForearm: [0.02, -1, 0.03], rightUpperArm: [-0.04, -0.99, 0.1], rightForearm: [-0.02, -1, 0.03], leftThigh: [0.04, -1, 0.02], leftShin: [0.02, -1, 0], rightThigh: [-0.04, -1, 0.02], rightShin: [-0.02, -1, 0], leftPalm: [0.05, 0.02, -1], rightPalm: [-0.05, 0.02, -1], bodyRoll: 0, spineBend: 0, headTurn: 0, headTilt: 0, footPoint: 0, bodyPitch: 90, grip: 0.05, hipsY: 0 }
-];
-var DURATION18 = 1.05;
-var hard_landing_default = defineAnimation({
-  slug: "hard-landing",
-  name: "Hard Landing",
-  clip: "HardLanding",
-  subcategory: "animations",
-  kind: "once",
-  duration: DURATION18,
-  keys: POSES18.map((pose) => referenceKey(pose, DURATION18, 90))
-});
-
-// ../core-library/dist/avatar-appearance/animations/slide.js
-var POSES19 = [
-  // entry-run: Character enters from a run with the gaze forward and begins preparing to lower the centre of mass.
-  { t: 0, leftUpperArm: [0.04, -0.78, -0.63], leftForearm: [0.02, -0.95, -0.3], rightUpperArm: [-0.04, -0.4, 0.92], rightForearm: [-0.02, -0.72, 0.69], leftThigh: [0.05, -0.86, -0.5], leftShin: [0.02, -0.98, 0.18], rightThigh: [-0.05, -0.38, 0.92], rightShin: [-0.02, -0.7, -0.71], leftPalm: [0.06, 0.03, -0.99], rightPalm: [-0.06, 0.03, -0.99], bodyRoll: -2, spineBend: 5, headTurn: 0, headTilt: -2, footPoint: 14, bodyPitch: 70, grip: 0.12, hipsY: 0.01 },
-  // drop: Hips drop quickly while the torso inclines forward; both knees flex to enter the slide without collapsing.
-  { t: 0.1, leftUpperArm: [0.06, -0.58, -0.81], leftForearm: [0.03, -0.86, -0.5], rightUpperArm: [-0.06, -0.62, 0.78], rightForearm: [-0.03, -0.84, 0.54], leftThigh: [0.08, -0.62, 0.78], leftShin: [0.03, -0.74, -0.67], rightThigh: [-0.08, -0.7, 0.71], rightShin: [-0.03, -0.8, -0.6], leftPalm: [0.07, 0.04, -0.99], rightPalm: [-0.07, 0.04, -0.99], bodyRoll: 0, spineBend: 14, headTurn: 0, headTilt: 0, footPoint: 5, bodyPitch: 61, grip: 0.1, hipsY: -0.22 },
-  // slide-entry: Lead leg extends forward as the trailing leg folds underneath; arms move back and outward to stabilise.
-  { t: 0.2, leftUpperArm: [0.28, -0.42, -0.86], leftForearm: [0.04, -0.74, -0.67], rightUpperArm: [-0.08, -0.5, 0.86], rightForearm: [-0.04, -0.78, 0.62], leftThigh: [0.1, -0.24, 0.97], leftShin: [0.04, -0.82, -0.57], rightThigh: [-0.1, -0.58, 0.81], rightShin: [-0.04, -0.62, -0.78], leftPalm: [0.08, 0.05, -0.99], rightPalm: [-0.08, 0.05, -0.99], bodyRoll: 4, spineBend: 20, headTurn: 0, headTilt: 1, footPoint: 2, bodyPitch: 48, grip: 0.08, hipsY: -0.4 },
-  // full-slide: Character reaches the lowest sliding silhouette: one leg forward, the other folded, chest controlled above the hips.
-  { t: 0.32, leftUpperArm: [0.38, -0.32, -0.86], leftForearm: [0.05, -0.66, -0.75], rightUpperArm: [-0.1, -0.4, 0.91], rightForearm: [-0.05, -0.7, 0.71], leftThigh: [0.1, -0.08, 0.99], leftShin: [0.04, -0.92, -0.39], rightThigh: [-0.14, -0.42, 0.9], rightShin: [-0.06, -0.48, -0.87], leftPalm: [0.09, 0.05, -0.99], rightPalm: [-0.09, 0.05, -0.99], bodyRoll: 5, spineBend: 22, headTurn: 0, headTilt: 1, footPoint: 0, bodyPitch: 39, grip: 0.07, hipsY: -0.53 },
-  // slide-hold: The slide is sustained briefly with minimal vertical movement; head remains up so the player can see ahead.
-  { t: 0.46, leftUpperArm: [0.33, -0.38, -0.86], leftForearm: [0.04, -0.7, -0.71], rightUpperArm: [-0.08, -0.44, 0.89], rightForearm: [-0.04, -0.73, 0.68], leftThigh: [0.09, -0.1, 0.99], leftShin: [0.04, -0.94, -0.34], rightThigh: [-0.13, -0.45, 0.88], rightShin: [-0.05, -0.52, -0.85], leftPalm: [0.08, 0.05, -0.99], rightPalm: [-0.08, 0.05, -0.99], bodyRoll: 3, spineBend: 20, headTurn: 0, headTilt: 0, footPoint: 0, bodyPitch: 41, grip: 0.07, hipsY: -0.54 },
-  // brake: Forward speed drops as the lead foot and folded leg begin preparing to bring the body back underneath the pelvis.
-  { t: 0.6, leftUpperArm: [0.07, -0.5, -0.86], leftForearm: [0.04, -0.78, -0.62], rightUpperArm: [-0.07, -0.54, 0.84], rightForearm: [-0.04, -0.8, 0.6], leftThigh: [0.1, -0.22, 0.97], leftShin: [0.04, -0.88, -0.47], rightThigh: [-0.12, -0.5, 0.86], rightShin: [-0.05, -0.58, -0.81], leftPalm: [0.07, 0.05, -0.99], rightPalm: [-0.07, 0.05, -0.99], bodyRoll: 2, spineBend: 18, headTurn: 0, headTilt: 0, footPoint: 0, bodyPitch: 46, grip: 0.07, hipsY: -0.5 },
-  // leg-recover: Lead foot draws closer and the trailing leg comes underneath, transitioning from the slide into a compact crouch.
-  { t: 0.72, leftUpperArm: [0.06, -0.64, -0.77], leftForearm: [0.03, -0.86, -0.5], rightUpperArm: [-0.06, -0.64, 0.77], rightForearm: [-0.03, -0.86, 0.5], leftThigh: [0.1, -0.44, 0.89], leftShin: [0.04, -0.68, -0.73], rightThigh: [-0.1, -0.54, 0.84], rightShin: [-0.04, -0.62, -0.78], leftPalm: [0.06, 0.05, -0.99], rightPalm: [-0.06, 0.05, -0.99], bodyRoll: 1, spineBend: 16, headTurn: 0, headTilt: 0, footPoint: 0, bodyPitch: 56, grip: 0.07, hipsY: -0.42 },
-  // crouch: Character catches the remaining momentum in a balanced crouch with knees aligned over the feet.
-  { t: 0.84, leftUpperArm: [0.06, -0.76, 0.65], leftForearm: [0.03, -0.92, 0.39], rightUpperArm: [-0.06, -0.76, 0.65], rightForearm: [-0.03, -0.92, 0.39], leftThigh: [0.1, -0.54, 0.84], leftShin: [0.04, -0.64, -0.77], rightThigh: [-0.1, -0.54, 0.84], rightShin: [-0.04, -0.64, -0.77], leftPalm: [0.06, 0.05, -0.99], rightPalm: [-0.06, 0.05, -0.99], bodyRoll: 0, spineBend: 14, headTurn: 0, headTilt: 0, footPoint: 0, bodyPitch: 69, grip: 0.07, hipsY: -0.31 },
-  // rise: Legs begin extending while the torso rises smoothly; the character remains ready to transition back into locomotion.
-  { t: 0.93, leftUpperArm: [0.05, -0.9, 0.43], leftForearm: [0.02, -0.98, 0.18], rightUpperArm: [-0.05, -0.9, 0.43], rightForearm: [-0.02, -0.98, 0.18], leftThigh: [0.08, -0.72, 0.69], leftShin: [0.03, -0.8, -0.6], rightThigh: [-0.08, -0.72, 0.69], rightShin: [-0.03, -0.8, -0.6], leftPalm: [0.05, 0.04, -0.99], rightPalm: [-0.05, 0.04, -0.99], bodyRoll: 0, spineBend: 9, headTurn: 0, headTilt: 0, footPoint: 0, bodyPitch: 78, grip: 0.06, hipsY: -0.18 },
-  // finish: Slide finishes in a low athletic stance that can blend directly into run, crouch or idle.
-  { t: 1, leftUpperArm: [0.04, -0.96, 0.27], leftForearm: [0.02, -0.99, 0.1], rightUpperArm: [-0.04, -0.96, 0.27], rightForearm: [-0.02, -0.99, 0.1], leftThigh: [0.06, -0.88, 0.47], leftShin: [0.03, -0.91, -0.41], rightThigh: [-0.06, -0.88, 0.47], rightShin: [-0.03, -0.91, -0.41], leftPalm: [0.05, 0.04, -0.99], rightPalm: [-0.05, 0.04, -0.99], bodyRoll: 0, spineBend: 7, headTurn: 0, headTilt: 0, footPoint: 0, bodyPitch: 80, grip: 0.05, hipsY: -0.13 }
-];
-var DURATION19 = 1.05;
-var slide_default = defineAnimation({
-  slug: "slide",
-  name: "Slide",
-  clip: "Slide",
-  subcategory: "animations",
-  kind: "once",
-  duration: DURATION19,
-  keys: POSES19.map((pose) => referenceKey(pose, DURATION19, 90))
-});
-
-// ../core-library/dist/avatar-appearance/emotes/cheer.js
-var up = {
-  ...bothArms([0.55, 0.8, 0.15], [0.4, 0.9, 0.15], [0, 0.2, 1]),
-  Head: [-12, 0, 0],
-  Spine2: [-6, 0, 0],
-  hipsY: 0.06
-};
-var down = { ...up, ...bothArms([0.8, 0.5, 0.25], [0.55, 0.8, 0.25], [0, 0.2, 1]), hipsY: -0.03 };
-var cheer_default = defineAnimation({
-  slug: "cheer",
-  name: "Cheer",
-  clip: "Cheer",
-  subcategory: "emotes",
-  kind: "once",
-  duration: 1.6,
-  grip: 0.1,
-  keys: [at(0, {}), ...beats(0.25, 1.25, 4, up, down), at(1.6, {})]
-});
-
-// ../core-library/dist/avatar-appearance/emotes/clap.js
-var open2 = bothArms([0.35, -0.45, 0.82], [0.5, 0.25, 0.83], [-1, 0, 0.1]);
-var shut = bothArms([0.35, -0.45, 0.82], [-0.75, 0.25, 0.6], [-1, 0, 0.1]);
-var clap_default = defineAnimation({
-  slug: "clap",
-  name: "Clap",
-  clip: "Clap",
-  subcategory: "emotes",
-  kind: "once",
-  duration: 1.8,
-  grip: 0.05,
-  keys: [at(0, {}), at(0.25, open2), ...beats(0.4, 1.4, 6, shut, open2), at(1.8, {})]
-});
-
-// ../core-library/dist/avatar-appearance/emotes/dance.js
-var HIGH = [
-  [0.6, 0.6, 0.5],
-  [0.3, 0.9, 0.3]
-];
-var LOW = [
-  [0.3, -0.6, 0.75],
-  [-0.2, 0.35, 0.9]
-];
-var PALM2 = [0, 0, 1];
-var sway = (side3) => {
-  const [left2, right2] = side3 > 0 ? [HIGH, LOW] : [LOW, HIGH];
-  return {
-    Spine: [0, 0, 8 * side3],
-    Spine2: [0, 10 * side3, -4 * side3],
-    Head: [0, -8 * side3, 4 * side3],
-    ...arm("Left", left2[0], left2[1], PALM2),
-    ...arm("Right", mirror(right2[0]), mirror(right2[1]), mirror(PALM2)),
-    LeftLeg: [side3 > 0 ? 18 : 4, 0, 0],
-    RightLeg: [side3 > 0 ? 4 : 18, 0, 0],
-    LeftUpLeg: [side3 > 0 ? -12 : 0, 0, 0],
-    RightUpLeg: [side3 > 0 ? 0 : -12, 0, 0],
-    hipsY: -0.04
-  };
-};
-var middle = { ...sway(1), Spine: [0, 0, 0], Spine2: [0, 0, 0], Head: [0, 0, 0], hipsY: 0.01 };
-var dance_default = defineAnimation({
-  slug: "dance",
-  name: "Dance",
-  clip: "Dance",
-  subcategory: "emotes",
-  kind: "loop",
-  duration: 1.2,
-  grip: 0.2,
-  keys: [at(0, sway(1)), at(0.3, middle), at(0.6, sway(-1)), at(0.9, middle), at(1.2, sway(1))]
-});
-
-// ../core-library/dist/avatar-appearance/emotes/laugh.js
-var hands = bothArms([0.45, -0.85, 0.25], [-0.7, 0.1, 0.7], [0, 0, -1]);
-var rock = (back) => ({
-  ...hands,
-  Spine2: [back ? -12 : 6, 0, 0],
-  Head: [back ? -18 : 4, 0, 0],
-  hipsY: back ? 0.01 : -0.02
-});
-var laugh_default = defineAnimation({
-  slug: "laugh",
-  name: "Laugh",
-  clip: "Laugh",
-  subcategory: "emotes",
-  kind: "once",
-  duration: 1.6,
-  grip: 0.2,
-  keys: [at(0, {}), ...beats(0.2, 1.4, 6, rock(true), rock(false)), at(1.6, {})]
-});
-
-// ../core-library/dist/avatar-appearance/emotes/point.js
-var point2 = {
-  ...arm("Right", [-0.1, 0.05, 1], [-0.1, 0.05, 1], [0, -1, 0]),
-  Head: [-4, -6, 0],
-  Spine2: [0, -8, 0]
-};
-var point_default = defineAnimation({
-  slug: "point",
-  name: "Point",
-  clip: "Point",
-  subcategory: "emotes",
-  kind: "once",
-  duration: 1.6,
-  grip: 0.6,
-  keys: [at(0, {}), at(0.3, point2), at(1.3, point2), at(1.6, {})]
-});
-
-// ../core-library/dist/avatar-appearance/emotes/robot-dance.js
-var DOWN_AHEAD = [
-  [0.15, -0.97, 0.1],
-  [0.05, 0.05, 1],
-  [-1, 0, 0]
-];
-var OUT_UP = [
-  [1, 0.05, 0.1],
-  [0.05, 1, 0.05],
-  [0, 0, 1]
-];
-var robot = (side3) => {
-  const [left2, right2] = side3 > 0 ? [DOWN_AHEAD, OUT_UP] : [OUT_UP, DOWN_AHEAD];
-  return {
-    ...arm("Left", left2[0], left2[1], left2[2]),
-    ...arm("Right", mirror(right2[0]), mirror(right2[1]), mirror(right2[2])),
-    Head: [0, 35 * side3, 0],
-    Spine2: [0, 12 * side3, 0],
-    hipsY: -0.02
-  };
-};
-var robot_dance_default = defineAnimation({
-  slug: "robot-dance",
-  name: "Robot dance",
-  clip: "RobotDance",
-  subcategory: "emotes",
-  kind: "loop",
-  duration: 1.6,
-  grip: 0.1,
-  keys: [
-    at(0, robot(1)),
-    at(0.35, robot(1)),
-    at(0.45, robot(-1)),
-    at(1.15, robot(-1)),
-    at(1.25, robot(1)),
-    at(1.6, robot(1))
-  ]
-});
-
-// ../core-library/dist/avatar-appearance/emotes/salute.js
-var arm2 = armPose("Right", [-0.8, 0.05, 0.6], [0.55, 0.6, 0.15], [-0.2, -0.6, 0.75]);
-var salute = {
-  RightArm: arm2.arm,
-  RightForeArm: arm2.fore,
-  Head: [-3, 0, 0],
-  Spine2: [-3, 0, 0]
-};
-var salute_default = defineAnimation({
-  slug: "salute",
-  name: "Salute",
-  clip: "Salute",
-  subcategory: "emotes",
-  kind: "once",
-  duration: 1.6,
-  keys: [at(0, {}), at(0.35, salute), at(1.25, salute), at(1.6, {})]
-});
-
-// ../core-library/dist/avatar-appearance/emotes/sit.js
-var sit_default = defineAnimation({
-  slug: "sit",
-  name: "Sit",
-  clip: "Sit",
-  subcategory: "emotes",
-  kind: "loop",
-  duration: 1,
-  grip: 0.25,
-  keys: hold(1, {
-    LeftUpLeg: [-88, 0, 0],
-    RightUpLeg: [-88, 0, 0],
-    LeftLeg: [88, 0, 0],
-    RightLeg: [88, 0, 0],
-    ...bothArms([0.15, -0.8, 0.55], [0.05, -0.35, 0.93], [0, -1, 0]),
-    hipsY: -0.38
-  })
-});
-
-// ../core-library/dist/avatar-appearance/emotes/stretch.js
-var arms2 = (left2, palm) => {
-  const l = armPose("Left", left2, left2, palm);
-  const r = armPose("Right", [-left2[0], left2[1], left2[2]], [-left2[0], left2[1], left2[2]], palm);
-  return { LeftArm: l.arm, LeftForeArm: l.fore, RightArm: r.arm, RightForeArm: r.fore };
-};
-var side = arms2([1, 0, 0], [0, -1, 0]);
-var high2 = arms2([0.5, 0.86, 0.05], [0, 0, 1]);
-var up2 = { ...arms2([0.16, 0.98, 0.08], [0, 0, 1]), Head: [-8, 0, 0] };
-var stretch_default = defineAnimation({
-  slug: "stretch",
-  name: "Stretch",
-  clip: "Stretch",
-  subcategory: "emotes",
-  kind: "once",
-  duration: 3,
-  grip: 0.05,
-  keys: [at(0, {}), at(0.7, side), at(1, high2), at(1.3, up2), at(1.7, up2), at(2, high2), at(2.3, side), at(3, {})]
-});
-
-// ../core-library/dist/avatar-appearance/emotes/think.js
-var right = armPose("Right", [-0.2, -0.45, 0.87], [0.35, 0.9, 0.25], [0.3, 0.3, -0.9]);
-var left = armPose("Left", [0.2, -0.9, 0.35], [-0.95, 0.05, 0.3], [0, 1, 0]);
-var think = {
-  RightArm: right.arm,
-  RightForeArm: right.fore,
-  LeftArm: left.arm,
-  LeftForeArm: left.fore,
-  Head: [6, 0, -10]
-};
-var think_default = defineAnimation({
-  slug: "think",
-  name: "Think",
-  clip: "Think",
-  subcategory: "emotes",
-  kind: "once",
-  duration: 2.4,
-  keys: [at(0, {}), at(0.4, think), at(1.2, { ...think, Head: [6, 0, 8] }), at(2, think), at(2.4, {})]
-});
-
-// ../core-library/dist/avatar-appearance/emotes/wave.js
-var raised2 = (fore) => {
-  const arm4 = armPose("Right", [-0.75, 0.55, 0.25], fore, [0, 0, 1]);
-  return { RightArm: arm4.arm, RightForeArm: arm4.fore };
-};
-var up3 = raised2([-0.45, 0.88, 0.15]);
-var side2 = raised2([0.2, 0.97, 0.15]);
-var wave_default = defineAnimation({
-  slug: "wave",
-  name: "Wave",
-  clip: "Wave",
-  subcategory: "emotes",
-  kind: "once",
-  duration: 2,
-  grip: 0.05,
-  keys: [at(0, {}), at(0.3, up3), ...beats(0.45, 1.45, 4, side2, up3), at(2, {})]
-});
-
-// ../core-library/dist/avatar-appearance/_joint-constraints.js
-var HUMAN_JOINT_CONSTRAINTS = {
-  format: "genvr-human-joint-constraints/2",
-  /** Past this share of a range the motion gets stiffer (animation, solvers); the end is a hard clamp. */
-  softLimitStart: 0.85,
-  joints: {
-    /** The lower back (Spine bone): + forward. */
-    lumbar: { flexion: [-20, 50], sideBend: [-20, 20], twist: [-10, 10] },
-    /** The upper back (Spine1 + Spine2 bones). */
-    thoracic: { flexion: [-25, 35], sideBend: [-25, 25], twist: [-35, 35] },
-    /** The neck (C2-C7, Neck bone): + forward (chin down). Shares the turn with the head. */
-    neck: { flexion: [-50, 40], sideBend: [-35, 35], twist: [-35, 35] },
-    /** The head on the neck (C0-C2, Head bone). Together with the neck: flexion 55, extension 75, side 43, turn 80. */
-    head: { flexion: [-25, 15], sideBend: [-8, 8], twist: [-45, 45] },
-    /** The collarbone (Shoulder bone): + up, + forward, + its own backward turn as the arm rises. */
-    clavicle: { elevation: [-10, 35], protraction: [-15, 30], axialRotation: [0, 45] },
-    /** The shoulder blade (no bone in the rig: carried by the collarbone and the corrective shapes). */
-    scapula: { upwardRotation: [-10, 60], protraction: [-20, 35], posteriorTilt: [-10, 30] },
-    /**
-     * The arm against the chest (shoulder joint + shoulder blade together): flexion forward (- behind), abduction to
-     * the side, horizontal adduction across the chest (- back), rotation (+ external). External rotation is 60 with
-     * the arm at the side and 90 with it raised 90 (`shoulderExternalRotation`).
-     */
-    shoulder: { flexion: [-60, 180], abduction: [0, 180], horizontalAdduction: [-45, 130], rotation: [-70, 90] },
-    /** The shoulder joint alone (glenohumeral): what is left once the shoulder blade has turned. */
-    glenohumeral: { flexion: [-60, 120], abduction: [0, 120] },
-    /** Elbow: a hinge; active ~145, 150 pushed; up to 10 backward is normal in teens. */
-    elbow: { flexion: [-10, 150] },
-    /** Forearm: + supination (palm up / forward), - pronation. */
-    forearm: { rotation: [-80, 85] },
-    /** Wrist: + toward the palm; deviation + toward the little finger (ulnar), - toward the thumb (radial). */
-    wrist: { flexion: [-70, 80], deviation: [-20, 35] },
-    thumbCMC: { flexion: [-15, 50], abduction: [0, 60], opposition: [0, 45] },
-    thumbMCP: { flexion: [-15, 55] },
-    thumbIP: { flexion: [-20, 80] },
-    /** Finger knuckles (index to little): + toward the palm; 30 back actively (45 pushed). */
-    fingerMCP: { flexion: [-30, 90] },
-    /** Sideways at the knuckle, + away from the middle finger, per finger. */
-    fingerSpread: { index: [-20, 20], middle: [-10, 10], ring: [-15, 15], little: [-25, 25] },
-    fingerPIP: { flexion: [-5, 110] },
-    fingerDIP: { flexion: [-10, 85] },
-    /** Hip: + forward, abduction (- across), rotation (+ external). 120 forward only with the knee bent. */
-    hip: { flexion: [-30, 120], abduction: [-30, 45], rotation: [-35, 45] },
-    /** Knee: a hinge; active ~135, 150 kneeling or squatting; a little backward; turn only when bent. */
-    knee: { flexion: [-5, 150], rotationFlexed: [-25, 30] },
-    /**
-     * Ankle: + toes down (plantar flexion; table average 50, a flexible teen or a swimmer 55-60 - the breaststroke
-     * kick points them 52), - toes up (dorsiflexion: 20 with the knee bent, 10 straight).
-     */
-    ankle: { flexion: [-20, 55] },
-    /** Below the ankle: + inversion (sole inward), - eversion. */
-    subtalar: { inversion: [-15, 30] },
-    /** Toes (no toe joints in the rig beyond ToeBase): + toward the sole, - up. */
-    toeMTP: { flexion: [-70, 35] },
-    toeIP: { flexion: [0, 45] }
-  },
-  couplings: [
-    "A finger tip (DIP) bends at most 0.8 x its middle joint (PIP) + 30: one tendon pulls both.",
-    "No finger spread with the knuckle bent: the spread shrinks to nothing at 90 degrees knuckle bend.",
-    "Hip flexion with a straight knee stops at ~80 (hamstrings); the full 120 needs the knee bent 90.",
-    "Ankle dorsiflexion is 10 with a straight knee, 20 with it bent (calf).",
-    "With the wrist bent over 50 toward the palm the fingers cannot close fully (tenodesis).",
-    "Shoulder external rotation is 60 with the arm at the side, 90 with it raised 90.",
-    "Above ~30 degrees of arm elevation one third of the raise is the shoulder blade and collarbone (2:1 rhythm).",
-    "Knee rotation is 0 with the knee straight and its full range at 90 degrees bend.",
-    "Wrist deviation halves as the wrist reaches its full bend either way.",
-    "At joint extremes, reduce motion on the other axes rather than allowing all maxima together."
-  ],
-  collisionPairs: [
-    ["hand_L", "forearm_L"],
-    ["hand_R", "forearm_R"],
-    ["forearm_L", "upperArm_L"],
-    ["forearm_R", "upperArm_R"],
-    ["upperArm_L", "torso"],
-    ["upperArm_R", "torso"],
-    ["chin", "chest"],
-    ["calf_L", "thigh_L"],
-    ["calf_R", "thigh_R"],
-    ["thigh_L", "thigh_R"],
-    ["foot_L", "foot_R"]
-  ],
-  correctiveTriggers: [
-    { region: "shoulder", trigger: "elevation > 45", fixes: ["deltoid raise", "armpit volume", "pectoral slide", "lat fold", "scapula shift"] },
-    { region: "elbow", trigger: "flexion > 70", fixes: ["elbow crease", "biceps compress", "triceps stretch"] },
-    { region: "hip", trigger: "flexion > 60", fixes: ["hip crease", "glute stretch", "groin volume"] },
-    { region: "knee", trigger: "flexion > 60", fixes: ["knee crease", "quad compress", "hamstring compress"] }
-  ]
-};
-var J = HUMAN_JOINT_CONSTRAINTS.joints;
-
-// ../core-library/dist/avatar-appearance/_joint-limits.js
-var C = HUMAN_JOINT_CONSTRAINTS.joints;
-var JOINT_LIMITS = {
-  /** Elbow: a hinge that only bends forward, no sideways bend; the forearm turns the palm at most this far. */
-  elbow: { bend: C.elbow.flexion[1], back: -C.elbow.flexion[0], offHinge: 12, twist: 95 },
-  /** Knee: a hinge that only bends backward, a little turn when bent. */
-  knee: { bend: C.knee.flexion[1], back: -C.knee.flexion[0], offHinge: 12, twist: 25 },
-  /** Wrist: bends up and down, little sideways; it does not twist (the forearm does). */
-  wrist: { swing: C.wrist.flexion[1] + 5, twist: 20 },
-  /** Shoulder joint: the arm cannot point back through the body, nor far behind it, nor twist far. */
-  shoulder: { behind: -0.9, through: 0.25, twist: 120 },
-  /** Hip joint: not far behind the body (a sprinter's back leg reaches about 45), not far across, limited turn. */
-  hip: { behind: -0.75, across: -0.55, twist: 60 },
-  /** Collarbone (Shoulder bone): a small lift and shrug. */
-  collarbone: { swing: Math.round(Math.hypot(C.clavicle.elevation[1], C.clavicle.protraction[1])) },
-  /** Each spine bone, and the neck and head together. */
-  spine: { swing: Math.max(C.lumbar.flexion[1], C.thoracic.flexion[1] + C.thoracic.sideBend[1] / 2) },
-  /** The neck and head together (one budget). */
-  neck: {
-    turn: C.neck.twist[1] + C.head.twist[1],
-    down: C.neck.flexion[1] + C.head.flexion[1],
-    up: -(C.neck.flexion[0] + C.head.flexion[0])
-  },
-  /** Ankle: toes down (positive X) and up, little sideways. */
-  ankle: { down: C.ankle.flexion[1], up: -C.ankle.flexion[0], side: C.subtalar.inversion[1] }
-};
-
-// ../core-library/dist/avatar-appearance/bodies/_human-joints.js
-var HUMAN_BOY_JOINTS = [
-  ["Hips", null, [-69e-5, 0.94527, 0.0177]],
-  ["Spine", "Hips", [0, 1.03148, 0.02475]],
-  ["Spine1", "Spine", [0, 1.12664, 871e-5]],
-  ["Spine2", "Spine1", [0, 1.24335, -0.04446]],
-  ["Neck", "Spine2", [0, 1.42289, 0.01352]],
-  ["Head", "Neck", [-269e-5, 1.46996, 0.02424]],
-  ["LeftShoulder", "Spine2", [0.06079, 1.39238, 0.01704]],
-  ["LeftArm", "LeftShoulder", [0.1677, 1.32514, 0.01809], [0, -1213e-6, -0.409984, 0.912092]],
-  ["LeftForeArm", "LeftArm", [0.39075, 1.32514, 0.01809], [0.167409, -0.372142, 0.099011, 0.907569]],
-  ["LeftHand", "LeftForeArm", [0.61824, 1.32514, 0.01809], [0.015849, -0.049242, -268e-6, 0.998661]],
-  ["LeftHandIndex1", "LeftHand", [0.71606, 1.33102, 0.0424]],
-  ["LeftHandIndex2", "LeftHandIndex1", [0.74057, 1.32593, 0.0487]],
-  ["LeftHandIndex3", "LeftHandIndex2", [0.76126, 1.31707, 0.05506]],
-  ["LeftHandMiddle1", "LeftHand", [0.71613, 1.32514, 0.01809]],
-  ["LeftHandMiddle2", "LeftHandMiddle1", [0.74774, 1.31282, 0.01871]],
-  ["LeftHandMiddle3", "LeftHandMiddle2", [0.77093, 1.30093, 0.02192]],
-  ["LeftHandRing1", "LeftHand", [0.71067, 1.31776, 106e-5]],
-  ["LeftHandRing2", "LeftHandRing1", [0.73709, 1.30526, -311e-5]],
-  ["LeftHandRing3", "LeftHandRing2", [0.75808, 1.29387, -372e-5]],
-  ["LeftHandPinky1", "LeftHand", [0.70182, 1.30541, -0.01296]],
-  ["LeftHandPinky2", "LeftHandPinky1", [0.71901, 1.29495, -0.01733]],
-  ["LeftHandPinky3", "LeftHandPinky2", [0.73087, 1.28574, -0.0186]],
-  ["LeftHandThumb1", "LeftHand", [0.65365, 1.33235, 0.03995]],
-  ["LeftHandThumb2", "LeftHandThumb1", [0.66514, 1.32128, 0.06655]],
-  ["LeftHandThumb3", "LeftHandThumb2", [0.6891, 1.31338, 0.09137]],
-  ["RightShoulder", "Spine2", [-0.05703, 1.38282, 0.01547]],
-  ["RightArm", "RightShoulder", [-0.1677, 1.32514, 0.01809], [0, 1213e-6, 0.409984, 0.912092]],
-  ["RightForeArm", "RightArm", [-0.39075, 1.32514, 0.01809], [0.167409, 0.372142, -0.09901, 0.907569]],
-  ["RightHand", "RightForeArm", [-0.61824, 1.32514, 0.01809], [0.015849, 0.049241, 267e-6, 0.998661]],
-  ["RightHandIndex1", "RightHand", [-0.71606, 1.33102, 0.0424]],
-  ["RightHandIndex2", "RightHandIndex1", [-0.74057, 1.32593, 0.0487]],
-  ["RightHandIndex3", "RightHandIndex2", [-0.76126, 1.31707, 0.05506]],
-  ["RightHandMiddle1", "RightHand", [-0.71613, 1.32514, 0.01809]],
-  ["RightHandMiddle2", "RightHandMiddle1", [-0.74774, 1.31282, 0.01871]],
-  ["RightHandMiddle3", "RightHandMiddle2", [-0.77093, 1.30093, 0.02192]],
-  ["RightHandRing1", "RightHand", [-0.71067, 1.31776, 106e-5]],
-  ["RightHandRing2", "RightHandRing1", [-0.73709, 1.30526, -311e-5]],
-  ["RightHandRing3", "RightHandRing2", [-0.75808, 1.29387, -372e-5]],
-  ["RightHandPinky1", "RightHand", [-0.70182, 1.30541, -0.01296]],
-  ["RightHandPinky2", "RightHandPinky1", [-0.71901, 1.29495, -0.01733]],
-  ["RightHandPinky3", "RightHandPinky2", [-0.73087, 1.28574, -0.0186]],
-  ["RightHandThumb1", "RightHand", [-0.65365, 1.33235, 0.03995]],
-  ["RightHandThumb2", "RightHandThumb1", [-0.66514, 1.32128, 0.06655]],
-  ["RightHandThumb3", "RightHandThumb2", [-0.68909, 1.31338, 0.09137]],
-  ["LeftUpLeg", "Hips", [0.09643, 0.91105, -251e-5]],
-  ["LeftLeg", "LeftUpLeg", [0.13575, 0.49802, 0.03708]],
-  ["LeftFoot", "LeftLeg", [0.17859, 0.07062, 0.01605]],
-  ["LeftToeBase", "LeftFoot", [0.17607, 0.03033, 0.13501]],
-  ["RightUpLeg", "Hips", [-0.09643, 0.91105, -251e-5]],
-  ["RightLeg", "RightUpLeg", [-0.13575, 0.49802, 0.03708]],
-  ["RightFoot", "RightLeg", [-0.17859, 0.07062, 0.01605]],
-  ["RightToeBase", "RightFoot", [-0.17607, 0.03033, 0.13501]]
-];
-var HUMAN_BOY_TRIANGLES = 222400;
-
-// ../core-library/dist/avatar-appearance/_wearable.js
-function defineWearable(item4) {
-  const clothing = item4.kind === "clothing";
-  return {
-    manifest: coreManifest({
-      id: `genvr.core.${clothing ? "clothing" : "accessory"}.${item4.slug}`,
-      name: item4.name,
-      type: clothing ? "clothing" : "avatar",
-      category: "avatar-appearance",
-      subcategory: clothing ? "clothing" : "accessories",
-      triangles: (item4.parts?.length ?? 0) * 12
-    }),
-    slot: item4.slot,
-    layer: item4.layer ?? "inner",
-    parts: item4.parts ?? [],
-    paint: item4.paint ?? {},
-    large: item4.large ?? false
-  };
-}
-var wearBox = (bone, size, center, color, options = {}) => ({
-  bone,
-  size,
-  center,
-  color,
-  ...options.covered ? { covered: true } : {}
-});
-function pair(bone, size, center, color) {
-  return ["Left", "Right"].map((side3) => wearBox(bone(side3), size, [side3 === "Left" ? center[0] : -center[0], center[1], center[2]], color));
-}
-
-// ../core-library/dist/avatar-appearance/accessories/backpack.js
-var backpack_default = defineWearable({
-  slug: "backpack",
-  name: "Backpack",
-  slot: "back",
-  kind: "accessory",
-  large: true,
-  parts: [
-    wearBox("Spine2", [0.34, 0.36, 0.14], [0, 1.18, -0.21], "#f4a261"),
-    wearBox("Spine2", [0.24, 0.13, 0.04], [0, 1.1, -0.295], "#e76f51"),
-    ...pair(() => "Spine2", [0.05, 0.24, 0.02], [0.13, 1.26, 0.152], "#e76f51")
-  ]
-});
-
-// ../core-library/dist/avatar-appearance/clothing/vest.js
-var VEST = "#6b705c";
-var BUTTON = "#ddd5c4";
-var vest_default = defineWearable({
-  slug: "vest",
-  name: "Vest",
-  slot: "top",
-  layer: "outer",
-  kind: "clothing",
-  paint: { torso: VEST },
-  parts: [
-    wearBox("Spine2", [0.1, 0.08, 0.02], [0, 1.33, 0.146], "shirt"),
-    wearBox("Spine2", [0.025, 0.025, 0.015], [0, 1.24, 0.15], BUTTON),
-    wearBox("Spine1", [0.025, 0.025, 0.015], [0, 1.12, 0.142], BUTTON),
-    wearBox("Spine1", [0.025, 0.025, 0.015], [0, 1, 0.142], BUTTON)
-  ]
-});
-
-// ../core-library/dist/avatar-appearance/accessories/beanie.js
-var beanie_default = defineWearable({
-  slug: "beanie",
-  name: "Beanie",
-  slot: "hat",
-  kind: "accessory",
-  parts: [
-    wearBox("Head", [0.42, 0.15, 0.4], [0, 1.835, -5e-3], "#2a9d8f"),
-    wearBox("Head", [0.43, 0.06, 0.41], [0, 1.77, -5e-3], "#e9f5f3"),
-    wearBox("Head", [0.09, 0.09, 0.09], [0, 1.95, -5e-3], "#e9f5f3")
-  ]
-});
-
-// ../core-library/dist/avatar-appearance/clothing/boots.js
-var LEATHER = "#6b4226";
-var boots_default = defineWearable({
-  slug: "boots",
-  name: "Boots",
-  slot: "shoes",
-  kind: "clothing",
-  paint: { feet: LEATHER },
-  parts: [
-    ...pair((side3) => `${side3}Leg`, [0.2, 0.16, 0.22], [0.12, 0.17, 0], LEATHER),
-    ...pair((side3) => `${side3}Leg`, [0.205, 0.03, 0.225], [0.12, 0.25, 0], "#8b5a3c")
-  ]
-});
-
-// ../core-library/dist/avatar-appearance/clothing/bow-tie.js
-var BOW = "#1d3557";
-var bow_tie_default = defineWearable({
-  slug: "bow-tie",
-  name: "Bow tie",
-  slot: "neck",
-  kind: "clothing",
-  parts: [
-    ...pair(() => "Spine2", [0.07, 0.07, 0.03], [0.045, 1.35, 0.16], BOW),
-    wearBox("Spine2", [0.03, 0.035, 0.035], [0, 1.35, 0.162], BOW)
-  ]
-});
-
-// ../core-library/dist/avatar-appearance/accessories/cap.js
-var cap_default = defineWearable({
-  slug: "cap",
-  name: "Cap",
-  slot: "hat",
-  kind: "accessory",
-  parts: [
-    wearBox("Head", [0.42, 0.12, 0.4], [0, 1.84, -5e-3], "#e63946"),
-    wearBox("Head", [0.34, 0.03, 0.16], [0, 1.795, 0.26], "#e63946"),
-    wearBox("Head", [0.06, 0.03, 0.06], [0, 1.915, 0], "#f1faee")
-  ]
-});
-
-// ../core-library/dist/avatar-appearance/accessories/cape.js
-var CAPE = "#c1121f";
-var cape_default = defineWearable({
-  slug: "cape",
-  name: "Cape",
-  slot: "back",
-  kind: "accessory",
-  large: true,
-  parts: [
-    wearBox("Spine2", [0.46, 0.72, 0.03], [0, 1, -0.165], CAPE),
-    wearBox("Spine2", [0.5, 0.05, 0.31], [0, 1.37, 0], CAPE),
-    wearBox("Spine2", [0.06, 0.06, 0.02], [0, 1.34, 0.16], "#f4c430")
-  ]
-});
-
-// ../core-library/dist/avatar-appearance/accessories/crown.js
-var GOLD = "#f4c430";
-var crown_default = defineWearable({
-  slug: "crown",
-  name: "Crown",
-  slot: "hat",
-  kind: "accessory",
-  parts: [
-    wearBox("Head", [0.3, 0.08, 0.3], [0, 1.87, 0], GOLD),
-    ...[-1, 1].flatMap((x) => [-1, 1].map((z2) => wearBox("Head", [0.06, 0.08, 0.06], [0.12 * x, 1.95, 0.12 * z2], GOLD))),
-    wearBox("Head", [0.06, 0.05, 0.02], [0, 1.87, 0.155], "#d62828")
-  ]
-});
-
-// ../core-library/dist/avatar-appearance/accessories/glasses.js
-var FRAME = "#1c1b2e";
-var glasses_default = defineWearable({
-  slug: "glasses",
-  name: "Glasses",
-  slot: "face",
-  kind: "accessory",
-  parts: [
-    ...[1, -1].flatMap((x) => [
-      wearBox("Head", [0.12, 0.015, 0.015], [0.08 * x, 1.678, 0.195], FRAME),
-      wearBox("Head", [0.12, 0.015, 0.015], [0.08 * x, 1.582, 0.195], FRAME),
-      wearBox("Head", [0.015, 0.1, 0.015], [0.08 * x + 0.053, 1.63, 0.195], FRAME),
-      wearBox("Head", [0.015, 0.1, 0.015], [0.08 * x - 0.053, 1.63, 0.195], FRAME)
-    ]),
-    ...pair(() => "Head", [0.015, 0.015, 0.2], [0.195, 1.66, 0.09], FRAME)
-  ]
-});
-
-// ../core-library/dist/avatar-appearance/clothing/hoodie.js
-var hoodie_default = defineWearable({
-  slug: "hoodie",
-  name: "Hoodie",
-  slot: "top",
-  kind: "clothing",
-  paint: { forearms: "shirt" },
-  parts: [
-    wearBox("Spine2", [0.36, 0.16, 0.08], [0, 1.36, -0.18], "shirt"),
-    wearBox("Spine2", [0.3, 0.05, 0.3], [0, 1.39, 0], "shirt", { covered: true }),
-    ...pair(() => "Spine2", [0.015, 0.12, 0.015], [0.05, 1.3, 0.152], "#f5f5f5"),
-    wearBox("Spine1", [0.3, 0.1, 0.02], [0, 1.04, 0.142], "shirt", { covered: true })
-  ]
-});
-
-// ../core-library/dist/avatar-appearance/clothing/jacket.js
-var JACKET = "#264653";
-var jacket_default = defineWearable({
-  slug: "jacket",
-  name: "Jacket",
-  slot: "top",
-  layer: "outer",
-  kind: "clothing",
-  paint: { torso: JACKET, upperArms: JACKET, forearms: JACKET },
-  parts: [
-    wearBox("Spine2", [0.14, 0.24, 0.02], [0, 1.26, 0.146], "shirt"),
-    wearBox("Spine1", [0.14, 0.2, 0.02], [0, 1.06, 0.136], "shirt"),
-    ...pair(() => "Spine2", [0.1, 0.05, 0.3], [0.1, 1.39, 0], JACKET),
-    ...pair((side3) => `${side3}ForeArm`, [0.04, 0.14, 0.14], [0.64, 1.34, 0], "#e9c46a")
-  ]
-});
-
-// ../core-library/dist/avatar-appearance/accessories/party-hat.js
-var party_hat_default = defineWearable({
-  slug: "party-hat",
-  name: "Party hat",
-  slot: "hat",
-  kind: "accessory",
-  large: true,
-  parts: [
-    wearBox("Head", [0.26, 0.1, 0.26], [0, 1.83, 0], "#ff5d8f"),
-    wearBox("Head", [0.17, 0.1, 0.17], [0, 1.93, 0], "#ffd166"),
-    wearBox("Head", [0.09, 0.1, 0.09], [0, 2.03, 0], "#ff5d8f"),
-    wearBox("Head", [0.07, 0.07, 0.07], [0, 2.11, 0], "#ffffff")
-  ]
-});
-
-// ../core-library/dist/avatar-appearance/clothing/scarf.js
-var RED = "#d62828";
-var scarf_default = defineWearable({
-  slug: "scarf",
-  name: "Scarf",
-  slot: "neck",
-  kind: "clothing",
-  parts: [
-    wearBox("Neck", [0.3, 0.08, 0.3], [0, 1.4, 0], RED),
-    wearBox("Spine2", [0.09, 0.22, 0.03], [0.09, 1.27, 0.16], RED),
-    wearBox("Spine2", [0.09, 0.03, 0.035], [0.09, 1.2, 0.162], "#f1faee")
-  ]
-});
-
-// ../core-library/dist/avatar-appearance/clothing/shorts.js
-var shorts_default = defineWearable({
-  slug: "shorts",
-  name: "Shorts",
-  slot: "bottom",
-  kind: "clothing",
-  paint: { lowerLegs: "skin" }
-});
-
-// ../core-library/dist/avatar-appearance/clothing/skirt.js
-var skirt_default = defineWearable({
-  slug: "skirt",
-  name: "Skirt",
-  slot: "bottom",
-  kind: "clothing",
-  paint: { upperLegs: "skin", lowerLegs: "skin" },
-  parts: [wearBox("Hips", [0.52, 0.26, 0.32], [0, 0.78, 0], "pants")]
-});
-
-// ../core-library/dist/avatar-appearance/accessories/sunglasses.js
-var DARK = "#141414";
-var sunglasses_default = defineWearable({
-  slug: "sunglasses",
-  name: "Sunglasses",
-  slot: "face",
-  kind: "accessory",
-  parts: [
-    ...pair(() => "Head", [0.13, 0.08, 0.02], [0.08, 1.635, 0.196], DARK),
-    wearBox("Head", [0.05, 0.02, 0.015], [0, 1.655, 0.196], DARK),
-    ...pair(() => "Head", [0.015, 0.02, 0.2], [0.195, 1.655, 0.09], DARK)
-  ]
-});
-
-// ../core-library/dist/avatar-appearance/accessories/wings.js
-var wings_default = defineWearable({
-  slug: "wings",
-  name: "Wings",
-  slot: "back",
-  kind: "accessory",
-  large: true,
-  parts: [
-    ...pair(() => "Spine2", [0.3, 0.34, 0.025], [0.2, 1.3, -0.19], "#bde0fe"),
-    ...pair(() => "Spine2", [0.2, 0.2, 0.025], [0.16, 1.04, -0.19], "#cdb4db")
-  ]
-});
-
-// ../core-library/dist/avatar-appearance/_wearables.js
-var CORE_CLOTHING = [
-  hoodie_default,
-  jacket_default,
-  vest_default,
-  shorts_default,
-  skirt_default,
-  boots_default,
-  scarf_default,
-  bow_tie_default
-];
-var CORE_ACCESSORIES = [
-  cap_default,
-  beanie_default,
-  party_hat_default,
-  crown_default,
-  glasses_default,
-  sunglasses_default,
-  backpack_default,
-  cape_default,
-  wings_default
-];
-var CORE_WEARABLES = [...CORE_CLOTHING, ...CORE_ACCESSORIES];
-var byId2 = new Map(CORE_WEARABLES.map((item4) => [item4.manifest.id, item4]));
-
-// ../core-library/dist/avatar-appearance/_body-type.js
-function defineBody(body) {
-  const { name, triangles, ...rest } = body;
-  return {
-    manifest: coreManifest({
-      id: `genvr.core.body.${body.id}`,
-      name,
-      type: "avatar",
-      category: "avatar-appearance",
-      subcategory: "bodies",
-      styles: ALL_STYLES,
-      triangles: triangles ?? body.parts.length * 12
-    }),
-    ...rest
-  };
-}
-function boundingBox(boxes) {
-  const min2 = [Infinity, Infinity, Infinity];
-  const max2 = [-Infinity, -Infinity, -Infinity];
-  for (const { center, size } of boxes)
-    for (let axis = 0; axis < 3; axis += 1) {
-      min2[axis] = Math.min(min2[axis], center[axis] - size[axis] / 2);
-      max2[axis] = Math.max(max2[axis], center[axis] + size[axis] / 2);
-    }
-  return {
-    center: [0, 1, 2].map((a) => (min2[a] + max2[a]) / 2),
-    size: [0, 1, 2].map((a) => max2[a] - min2[a])
-  };
-}
-
-// ../core-library/dist/avatar-appearance/bodies/anime-boy.js
-var JOINTS = [
-  ["Hips", null, [0, 0.64107, -551e-5]],
-  ["Spine", "Hips", [0, 0.74023, -551e-5]],
-  ["Spine1", "Spine", [0, 0.91873, -551e-5]],
-  ["Spine2", "Spine1", [0, 1.09061, -551e-5]],
-  ["Neck", "Spine2", [0, 1.30216, 0.01536]],
-  ["Head", "Neck", [0, 1.34716, 0.01536]],
-  ["LeftShoulder", "Spine2", [0.04, 1.27016, -551e-5]],
-  ["LeftArm", "LeftShoulder", [0.16292, 1.26016, -551e-5]],
-  ["LeftForeArm", "LeftArm", [0.37525, 1.26016, -551e-5]],
-  ["LeftHand", "LeftForeArm", [0.57125, 1.26016, -551e-5]],
-  ["LeftHandIndex1", "LeftHand", [0.64368, 1.2605, 648e-5]],
-  ["LeftHandIndex2", "LeftHandIndex1", [0.66928, 1.2605, 648e-5]],
-  ["LeftHandIndex3", "LeftHandIndex2", [0.69488, 1.2605, 648e-5]],
-  ["LeftHandMiddle1", "LeftHand", [0.6434, 1.26027, -151e-5]],
-  ["LeftHandMiddle2", "LeftHandMiddle1", [0.669, 1.26027, -151e-5]],
-  ["LeftHandMiddle3", "LeftHandMiddle2", [0.69461, 1.26027, -151e-5]],
-  ["LeftHandRing1", "LeftHand", [0.64312, 1.26005, -95e-4]],
-  ["LeftHandRing2", "LeftHandRing1", [0.66872, 1.26005, -95e-4]],
-  ["LeftHandRing3", "LeftHandRing2", [0.69433, 1.26005, -95e-4]],
-  ["LeftHandPinky1", "LeftHand", [0.64284, 1.25982, -0.01749]],
-  ["LeftHandPinky2", "LeftHandPinky1", [0.66845, 1.25982, -0.01749]],
-  ["LeftHandPinky3", "LeftHandPinky2", [0.69405, 1.25982, -0.01749]],
-  ["LeftHandThumb1", "LeftHand", [0.59115, 1.26073, 0.01447]],
-  ["LeftHandThumb2", "LeftHandThumb1", [0.60479, 1.26117, 0.03017]],
-  ["LeftHandThumb3", "LeftHandThumb2", [0.61843, 1.26161, 0.04587]],
-  ["RightShoulder", "Spine2", [-0.04, 1.27016, -551e-5]],
-  ["RightArm", "RightShoulder", [-0.16217, 1.26016, -551e-5]],
-  ["RightForeArm", "RightArm", [-0.37445, 1.26016, -551e-5]],
-  ["RightHand", "RightForeArm", [-0.5704, 1.26016, -551e-5]],
-  ["RightHandIndex1", "RightHand", [-0.64279, 1.26047, 648e-5]],
-  ["RightHandIndex2", "RightHandIndex1", [-0.66839, 1.26047, 648e-5]],
-  ["RightHandIndex3", "RightHandIndex2", [-0.694, 1.26047, 648e-5]],
-  ["RightHandMiddle1", "RightHand", [-0.64254, 1.26026, -151e-5]],
-  ["RightHandMiddle2", "RightHandMiddle1", [-0.66814, 1.26026, -151e-5]],
-  ["RightHandMiddle3", "RightHandMiddle2", [-0.69374, 1.26026, -151e-5]],
-  ["RightHandRing1", "RightHand", [-0.64229, 1.26006, -95e-4]],
-  ["RightHandRing2", "RightHandRing1", [-0.66789, 1.26006, -95e-4]],
-  ["RightHandRing3", "RightHandRing2", [-0.69349, 1.26006, -95e-4]],
-  ["RightHandPinky1", "RightHand", [-0.64203, 1.25985, -0.0175]],
-  ["RightHandPinky2", "RightHandPinky1", [-0.66764, 1.25985, -0.0175]],
-  ["RightHandPinky3", "RightHandPinky2", [-0.69324, 1.25985, -0.0175]],
-  ["RightHandThumb1", "RightHand", [-0.59024, 1.26067, 0.01448]],
-  ["RightHandThumb2", "RightHandThumb1", [-0.60385, 1.26107, 0.0302]],
-  ["RightHandThumb3", "RightHandThumb2", [-0.61746, 1.26148, 0.04593]],
-  ["LeftUpLeg", "Hips", [0.08567, 0.62107, -551e-5]],
-  ["LeftLeg", "LeftUpLeg", [0.10424, 0.35227, -0.04184]],
-  ["LeftFoot", "LeftLeg", [0.08567, 0.08392, -551e-5]],
-  ["LeftToeBase", "LeftFoot", [0.0799, 0.02634, 0.12003]],
-  ["RightUpLeg", "Hips", [-0.09159, 0.62107, -551e-5]],
-  ["RightLeg", "RightUpLeg", [-0.11603, 0.35152, -0.03719]],
-  ["RightFoot", "RightLeg", [-0.09159, 0.08343, -551e-5]],
-  ["RightToeBase", "RightFoot", [-0.08614, 0.02802, 0.12571]]
-];
-var joints = JOINTS.map(([name, parent, at2]) => ({ name, parent, at: at2 }));
-var animation = {};
-var ANIMATED = /^(Hips|Spine|Spine1|Spine2|Neck|Head|(Left|Right)(UpLeg|Leg|Foot|ToeBase|Shoulder|Arm|ForeArm|Hand))$/;
-for (const joint of joints)
-  if (ANIMATED.test(joint.name))
-    animation[joint.name] = [joint.name];
-var anime_boy_default = defineBody({
-  id: "anime-boy",
-  name: "Anime boy",
-  bonePrefix: "mixamorig",
-  joints,
-  parts: [],
-  animation,
-  fit: {},
-  sketchArm: { start: 0.2, axisY: 1.3, hangX: 0.2, topY: 1.3 },
-  model: "/bodies/anime-boy.glb",
-  picture: "/bodies/anime-boy.webp",
-  triangles: 15e3
-});
-
-// ../core-library/dist/avatar-appearance/bodies/warrior.js
-var JOINTS2 = [
-  ["Hips", null, [0, 0.93138, 0.02154]],
-  ["Spine", "Hips", [0, 1.01182, -0.01939]],
-  ["Spine1", "Spine", [0, 1.15662, 619e-5]],
-  ["Spine2", "Spine1", [0, 1.29606, -0.02141]],
-  ["Neck", "Spine2", [0, 1.46767, 0.01692]],
-  ["Head", "Neck", [0, 1.55217, 0.01692]],
-  ["HairTailA1", "Head", [141e-5, 1.71704, -0.0908]],
-  ["HairTailA2", "HairTailA1", [-66e-5, 1.60003, -0.11572]],
-  ["HairTailA3", "HairTailA2", [-0.01454, 1.50194, -0.16184]],
-  ["HairTailA4", "HairTailA3", [-0.0335, 1.39752, -0.16507]],
-  ["HairTailB1", "Head", [0.02539, 1.69975, -0.09479]],
-  ["HairTailB2", "HairTailB1", [0.02296, 1.60002, -0.12411]],
-  ["HairTailB3", "HairTailB2", [0.02225, 1.49591, -0.1473]],
-  ["HairTailC1", "Head", [-0.03457, 1.68928, -0.0731]],
-  ["HairTailC2", "HairTailC1", [-0.0296, 1.57724, -0.11075]],
-  ["HairTailC3", "HairTailC2", [-0.05754, 1.46873, -0.12835]],
-  ["HairTailC4", "HairTailC3", [-0.09431, 1.37854, -0.14722]],
-  ["HairSideLeft1", "Head", [0.06906, 1.66955, 0.05518]],
-  ["HairSideLeft2", "HairSideLeft1", [0.08939, 1.60168, 0.06392]],
-  ["HairSideLeft3", "HairSideLeft2", [0.09566, 1.51199, 0.05215]],
-  ["HairBangLeft1", "Head", [0.02396, 1.69696, 0.07914]],
-  ["HairBangLeft2", "HairBangLeft1", [0.03629, 1.67519, 0.11588]],
-  ["HairSideRight1", "Head", [-0.06675, 1.66825, 0.05621]],
-  ["HairSideRight2", "HairSideRight1", [-0.08542, 1.60109, 0.06452]],
-  ["HairSideRight3", "HairSideRight2", [-0.09256, 1.51411, 0.05447]],
-  ["HairBangRight1", "Head", [-0.02024, 1.69647, 0.08096]],
-  ["HairBangRight2", "HairBangRight1", [-0.03475, 1.67845, 0.11354]],
-  ["LeftShoulder", "Spine2", [0.04376, 1.41963, -0.02216]],
-  ["LeftArm", "LeftShoulder", [0.20581, 1.4099, -0.03188], [0, 0.011629, -0.509301, 0.86051]],
-  ["LeftForeArm", "LeftArm", [0.46241, 1.4099, -0.03188], [0, -0.17973, 0.02774, 0.983325]],
-  ["LeftHand", "LeftForeArm", [0.67861, 1.4099, -0.03188], [0, -0.020361, -0.010544, 0.999737]],
-  ["LeftHandIndex1", "LeftHand", [0.79991, 1.40234, -705e-5]],
-  ["LeftHandIndex2", "LeftHandIndex1", [0.83839, 1.40379, -0.01317]],
-  ["LeftHandIndex3", "LeftHandIndex2", [0.86404, 1.40476, -0.01725]],
-  ["LeftHandMiddle1", "LeftHand", [0.79567, 1.4099, -0.03188]],
-  ["LeftHandMiddle2", "LeftHandMiddle1", [0.83415, 1.41136, -0.038]],
-  ["LeftHandMiddle3", "LeftHandMiddle2", [0.8598, 1.41233, -0.04208]],
-  ["LeftHandRing1", "LeftHand", [0.79186, 1.41458, -0.05474]],
-  ["LeftHandRing2", "LeftHandRing1", [0.83034, 1.41603, -0.06086]],
-  ["LeftHandRing3", "LeftHandRing2", [0.85599, 1.417, -0.06494]],
-  ["LeftHandPinky1", "LeftHand", [0.78824, 1.41349, -0.07776]],
-  ["LeftHandPinky2", "LeftHandPinky1", [0.81999, 1.41469, -0.0828]],
-  ["LeftHandPinky3", "LeftHandPinky2", [0.84115, 1.41549, -0.08617]],
-  ["LeftHandThumb1", "LeftHand", [0.71125, 1.39433, -0.01993]],
-  ["LeftHandThumb2", "LeftHandThumb1", [0.75042, 1.37565, -558e-5]],
-  ["LeftHandThumb3", "LeftHandThumb2", [0.78306, 1.36007, 637e-5]],
-  ["RightShoulder", "Spine2", [-0.04376, 1.41963, -0.02216]],
-  ["RightArm", "RightShoulder", [-0.20581, 1.4099, -0.03188], [0, -0.011629, 0.509301, 0.86051]],
-  ["RightForeArm", "RightArm", [-0.4624, 1.4099, -0.03188], [0, 0.179729, -0.02774, 0.983325]],
-  ["RightHand", "RightForeArm", [-0.67861, 1.4099, -0.03188], [0, 0.020362, 0.010544, 0.999737]],
-  ["RightHandIndex1", "RightHand", [-0.79991, 1.40234, -705e-5]],
-  ["RightHandIndex2", "RightHandIndex1", [-0.83838, 1.40379, -0.01317]],
-  ["RightHandIndex3", "RightHandIndex2", [-0.86404, 1.40476, -0.01725]],
-  ["RightHandMiddle1", "RightHand", [-0.79567, 1.4099, -0.03188]],
-  ["RightHandMiddle2", "RightHandMiddle1", [-0.83415, 1.41136, -0.038]],
-  ["RightHandMiddle3", "RightHandMiddle2", [-0.8598, 1.41233, -0.04208]],
-  ["RightHandRing1", "RightHand", [-0.79186, 1.41458, -0.05474]],
-  ["RightHandRing2", "RightHandRing1", [-0.83034, 1.41603, -0.06086]],
-  ["RightHandRing3", "RightHandRing2", [-0.85599, 1.417, -0.06494]],
-  ["RightHandPinky1", "RightHand", [-0.78824, 1.41349, -0.07776]],
-  ["RightHandPinky2", "RightHandPinky1", [-0.81999, 1.41469, -0.08281]],
-  ["RightHandPinky3", "RightHandPinky2", [-0.84115, 1.41549, -0.08617]],
-  ["RightHandThumb1", "RightHand", [-0.71125, 1.39433, -0.01993]],
-  ["RightHandThumb2", "RightHandThumb1", [-0.75042, 1.37565, -558e-5]],
-  ["RightHandThumb3", "RightHandThumb2", [-0.78306, 1.36007, 637e-5]],
-  ["LeftUpLeg", "Hips", [0.10959, 0.91037, 0.02154], [0.025252, 0, 0.076849, 0.996723]],
-  ["LeftLeg", "LeftUpLeg", [0.10963, 0.48391, 0.03148]],
-  ["LeftFoot", "LeftLeg", [0.10959, 0.0852, 0.02154]],
-  ["LeftToeBase", "LeftFoot", [0.10831, 0.02194, 0.16791]],
-  ["RightUpLeg", "Hips", [-0.10959, 0.91037, 0.02154], [0.025252, 0, -0.076849, 0.996723]],
-  ["RightLeg", "RightUpLeg", [-0.10963, 0.48391, 0.03148]],
-  ["RightFoot", "RightLeg", [-0.10959, 0.0852, 0.02154]],
-  ["RightToeBase", "RightFoot", [-0.10831, 0.02194, 0.16791]],
-  ["CoatLeftFront1", "Hips", [0.15148, 0.92671, 0.14441]],
-  ["CoatLeftFront2", "CoatLeftFront1", [0.18146, 0.72315, 0.17109]],
-  ["CoatLeftFront3", "CoatLeftFront2", [0.15611, 0.52247, 0.15393]],
-  ["CoatLeftBack1", "Hips", [0.1201, 0.93005, -0.06994]],
-  ["CoatLeftBack2", "CoatLeftBack1", [0.12234, 0.72211, -0.1412]],
-  ["CoatLeftBack3", "CoatLeftBack2", [0.12278, 0.52601, -0.20795]],
-  ["TasselLeft1", "Hips", [0.07702, 0.95282, 0.16653]],
-  ["TasselLeft2", "TasselLeft1", [0.0693, 0.77907, 0.16797]],
-  ["CoatRightFront1", "Hips", [-0.15113, 0.926, 0.14506]],
-  ["CoatRightFront2", "CoatRightFront1", [-0.17494, 0.72237, 0.18792]],
-  ["CoatRightFront3", "CoatRightFront2", [-0.15722, 0.52248, 0.15374]],
-  ["CoatRightBack1", "Hips", [-0.11811, 0.92921, -0.06777]],
-  ["CoatRightBack2", "CoatRightBack1", [-0.12194, 0.72149, -0.13935]],
-  ["CoatRightBack3", "CoatRightBack2", [-0.12397, 0.52579, -0.20686]],
-  ["TasselRight1", "Hips", [-0.07866, 0.9534, 0.16492]],
-  ["TasselRight2", "TasselRight1", [-0.06898, 0.77918, 0.16813]],
-  ["HairTailAEnd", "HairTailA4", [-0.07511, 1.30256, -0.15597]],
-  ["HairTailBEnd", "HairTailB3", [606e-5, 1.40149, -0.16235]],
-  ["HairTailCEnd", "HairTailC4", [-0.08994, 1.29972, -0.16036]],
-  ["HairSideLeftEnd", "HairSideLeft3", [0.10266, 1.45335, 0.03595]],
-  ["HairBangLeftEnd", "HairBangLeft2", [0.04995, 1.60828, 0.11986]],
-  ["HairSideRightEnd", "HairSideRight3", [-0.09916, 1.45107, 0.03623]],
-  ["HairBangRightEnd", "HairBangRight2", [-0.04961, 1.60385, 0.11663]],
-  ["CoatLeftFrontEnd", "CoatLeftFront3", [0.16347, 0.35261, 0.133]],
-  ["CoatLeftBackEnd", "CoatLeftBack3", [0.11292, 0.36911, -0.25694]],
-  ["TasselLeftEnd", "TasselLeft2", [0.07458, 0.62172, 0.14493]],
-  ["CoatRightFrontEnd", "CoatRightFront3", [-0.16233, 0.35188, 0.13423]],
-  ["CoatRightBackEnd", "CoatRightBack3", [-0.11599, 0.38544, -0.25075]],
-  ["TasselRightEnd", "TasselRight2", [-0.07465, 0.62157, 0.14677]]
-];
-var joints2 = JOINTS2.map(([name, parent, at2, bind]) => ({
-  name,
-  parent,
-  at: at2,
-  ...bind ? { bind } : {}
-}));
-var animation2 = {};
-var ANIMATED2 = /^(Hips|Spine|Spine1|Spine2|Neck|Head|(Left|Right)(UpLeg|Leg|Foot|ToeBase|Shoulder|Arm|ForeArm|Hand))$/;
-for (const joint of joints2)
-  if (ANIMATED2.test(joint.name))
-    animation2[joint.name] = [joint.name];
-var warrior_default = defineBody({
-  id: "warrior",
-  name: "Warrior",
-  bonePrefix: "mixamorig",
-  joints: joints2,
-  parts: [],
-  animation: animation2,
-  fit: {},
-  sketchArm: { start: 0.2, axisY: 1.4, hangX: 0.2, topY: 1.4 },
-  model: "/bodies/warrior.glb",
-  picture: "/bodies/warrior.webp",
-  triangles: 38607,
-  springs: {
-    chains: [
-      {
-        joints: ["HairTailA1", "HairTailA2", "HairTailA3", "HairTailA4", "HairTailAEnd"],
-        stiffness: 6,
-        drag: 0.25,
-        air: 0.1,
-        gravity: 9.8,
-        radius: 0.02,
-        maxAngle: 60
-      },
-      {
-        joints: ["HairTailB1", "HairTailB2", "HairTailB3", "HairTailBEnd"],
-        stiffness: 6,
-        drag: 0.25,
-        air: 0.1,
-        gravity: 9.8,
-        radius: 0.02,
-        maxAngle: 60
-      },
-      {
-        joints: ["HairTailC1", "HairTailC2", "HairTailC3", "HairTailC4", "HairTailCEnd"],
-        stiffness: 6,
-        drag: 0.25,
-        air: 0.1,
-        gravity: 9.8,
-        radius: 0.02,
-        maxAngle: 60
-      },
-      {
-        joints: ["HairSideLeft1", "HairSideLeft2", "HairSideLeft3", "HairSideLeftEnd"],
-        stiffness: 20,
-        drag: 0.45,
-        air: 0.03,
-        gravity: 5,
-        radius: 0.015,
-        maxAngle: 18
-      },
-      {
-        joints: ["HairBangLeft1", "HairBangLeft2", "HairBangLeftEnd"],
-        stiffness: 25,
-        drag: 0.5,
-        air: 0.02,
-        gravity: 3,
-        radius: 0.012,
-        maxAngle: 10
-      },
-      {
-        joints: ["HairSideRight1", "HairSideRight2", "HairSideRight3", "HairSideRightEnd"],
-        stiffness: 20,
-        drag: 0.45,
-        air: 0.03,
-        gravity: 5,
-        radius: 0.015,
-        maxAngle: 18
-      },
-      {
-        joints: ["HairBangRight1", "HairBangRight2", "HairBangRightEnd"],
-        stiffness: 25,
-        drag: 0.5,
-        air: 0.02,
-        gravity: 3,
-        radius: 0.012,
-        maxAngle: 10
-      },
-      {
-        joints: ["CoatLeftFront1", "CoatLeftFront2", "CoatLeftFront3", "CoatLeftFrontEnd"],
-        stiffness: 8,
-        drag: 0.3,
-        air: 0.05,
-        gravity: 9.8,
-        radius: 0.025,
-        maxAngle: 55
-      },
-      {
-        joints: ["CoatLeftBack1", "CoatLeftBack2", "CoatLeftBack3", "CoatLeftBackEnd"],
-        stiffness: 8,
-        drag: 0.3,
-        air: 0.05,
-        gravity: 9.8,
-        radius: 0.025,
-        maxAngle: 55
-      },
-      {
-        joints: ["TasselLeft1", "TasselLeft2", "TasselLeftEnd"],
-        stiffness: 4,
-        drag: 0.2,
-        air: 0.08,
-        gravity: 9.8,
-        radius: 0.015,
-        maxAngle: 60
-      },
-      {
-        joints: ["CoatRightFront1", "CoatRightFront2", "CoatRightFront3", "CoatRightFrontEnd"],
-        stiffness: 8,
-        drag: 0.3,
-        air: 0.05,
-        gravity: 9.8,
-        radius: 0.025,
-        maxAngle: 55
-      },
-      {
-        joints: ["CoatRightBack1", "CoatRightBack2", "CoatRightBack3", "CoatRightBackEnd"],
-        stiffness: 8,
-        drag: 0.3,
-        air: 0.05,
-        gravity: 9.8,
-        radius: 0.025,
-        maxAngle: 55
-      },
-      {
-        joints: ["TasselRight1", "TasselRight2", "TasselRightEnd"],
-        stiffness: 4,
-        drag: 0.2,
-        air: 0.08,
-        gravity: 9.8,
-        radius: 0.015,
-        maxAngle: 60
-      }
-    ],
-    colliders: [
-      { joint: "Head", offset: [0, 0.09, 0], radius: 0.105 },
-      { joint: "Neck", offset: [0, 0.03, 0], radius: 0.065 },
-      { joint: "Spine2", offset: [0, 0.08, -0.02], radius: 0.13 },
-      { joint: "Spine1", offset: [0, 0, -0.01], radius: 0.13 },
-      { joint: "Hips", offset: [0, -0.02, 0], radius: 0.12 },
-      { joint: "LeftUpLeg", offset: [0, -0.1, 0], radius: 0.11 },
-      { joint: "LeftUpLeg", offset: [0, -0.22, 0.01], radius: 0.105 },
-      { joint: "LeftUpLeg", offset: [0, -0.34, 0.01], radius: 0.1 },
-      { joint: "LeftLeg", offset: [0, -0.08, 0], radius: 0.09 },
-      { joint: "LeftLeg", offset: [0, -0.2, 0], radius: 0.085 },
-      { joint: "RightUpLeg", offset: [0, -0.1, 0], radius: 0.11 },
-      { joint: "RightUpLeg", offset: [0, -0.22, 0.01], radius: 0.105 },
-      { joint: "RightUpLeg", offset: [0, -0.34, 0.01], radius: 0.1 },
-      { joint: "RightLeg", offset: [0, -0.08, 0], radius: 0.09 },
-      { joint: "RightLeg", offset: [0, -0.2, 0], radius: 0.085 }
-    ]
-  }
-});
-
-// ../core-library/dist/avatar-appearance/bodies/human.js
-var joints3 = HUMAN_BOY_JOINTS.map(([name, parent, at2, bind]) => ({
-  name,
-  parent,
-  at: [...at2],
-  // The mesh stays in its own A-pose: the arm bones bind turned into it (as the warrior does).
-  ...bind ? { bind } : {}
-}));
-var animation3 = {};
-var ANIMATED3 = /^(Hips|Spine|Spine1|Spine2|Neck|Head|(Left|Right)(UpLeg|Leg|Foot|ToeBase|Shoulder|Arm|ForeArm|Hand))$/;
-for (const joint of joints3)
-  if (ANIMATED3.test(joint.name))
-    animation3[joint.name] = [joint.name];
-var human_default = defineBody({
-  id: "human",
-  name: "Anime body",
-  bonePrefix: "mixamorig",
-  joints: joints3,
-  parts: [],
-  animation: animation3,
-  fit: {},
-  sketchArm: { start: 0.2, axisY: 1.4, hangX: 0.2, topY: 1.4 },
-  model: "/human/human-base.bin",
-  generated: "human",
-  picture: "/market/genvr.core.body.human.png",
-  triangles: HUMAN_BOY_TRIANGLES
-});
-
-// ../core-library/dist/avatar-appearance/bodies/classic.js
-var joints4 = [
-  { name: "LowerTorso", parent: null, at: [0, 0.9, 0] },
-  { name: "UpperTorso", parent: "LowerTorso", at: [0, 1, 0] },
-  { name: "Head", parent: "UpperTorso", at: [0, 1.42, 0] }
-];
-var parts = [
-  { joint: "LowerTorso", size: [0.62, 0.2, 0.31], center: [0, 0.9, 0], color: "pants" },
-  { joint: "UpperTorso", size: [0.62, 0.42, 0.31], center: [0, 1.21, 0], color: "shirt", area: "torso" },
-  { joint: "Head", size: [0.2, 0.04, 0.2], center: [0, 1.43, 0], color: "skin" },
-  { joint: "Head", size: [0.4, 0.38, 0.38], center: [0, 1.63, 0], color: "skin" },
-  // Hair cap and back of the head.
-  { joint: "Head", size: [0.42, 0.09, 0.4], center: [0, 1.81, -5e-3], color: "hair" },
-  { joint: "Head", size: [0.42, 0.28, 0.08], center: [0, 1.68, -0.165], color: "hair" },
-  // Face (on the front, +z).
-  { joint: "Head", size: [0.07, 0.08, 0.02], center: [0.09, 1.66, 0.195], color: "eyes" },
-  { joint: "Head", size: [0.07, 0.08, 0.02], center: [-0.09, 1.66, 0.195], color: "eyes" },
-  { joint: "Head", size: [0.15, 0.03, 0.02], center: [0, 1.54, 0.195], color: "mouth" }
-];
-var animation4 = {
-  LowerTorso: ["Hips"],
-  UpperTorso: ["Spine", "Spine1", "Spine2"],
-  Head: ["Neck", "Head"]
-};
-var fit = {
-  Hips: { joint: "LowerTorso", box: { center: [0, 0.9, 0], size: [0.62, 0.2, 0.31] } },
-  Spine1: { joint: "UpperTorso", box: { center: [0, 1.095, 0], size: [0.62, 0.19, 0.31] } },
-  Spine2: { joint: "UpperTorso", box: { center: [0, 1.3, 0], size: [0.62, 0.24, 0.31] } },
-  Neck: { joint: "UpperTorso", box: { center: [0, 1.43, 0], size: [0.2, 0.04, 0.2] } }
-};
-for (const side3 of ["Left", "Right"]) {
-  const s = side3 === "Left" ? 1 : -1;
-  const at2 = (x, y, z2) => [x * s, y, z2];
-  joints4.push({ name: `${side3}UpperArm`, parent: "UpperTorso", at: at2(0.31, 1.35, 0) }, { name: `${side3}LowerArm`, parent: `${side3}UpperArm`, at: at2(0.58, 1.27, 0) }, { name: `${side3}Hand`, parent: `${side3}LowerArm`, at: at2(0.82, 1.27, 0) }, { name: `${side3}UpperLeg`, parent: "LowerTorso", at: at2(0.155, 0.8, 0) }, { name: `${side3}LowerLeg`, parent: `${side3}UpperLeg`, at: at2(0.155, 0.42, 0) }, { name: `${side3}Foot`, parent: `${side3}LowerLeg`, at: at2(0.155, 0.12, 0) });
-  const upperArm = { center: at2(0.445, 1.27, 0), size: [0.27, 0.3, 0.3] };
-  const lowerArm = { center: at2(0.7, 1.27, 0), size: [0.24, 0.28, 0.28] };
-  const hand = { center: at2(0.88, 1.27, 0), size: [0.12, 0.26, 0.26] };
-  const upperLeg = { center: at2(0.155, 0.61, 0), size: [0.3, 0.38, 0.3] };
-  const lowerLeg = { center: at2(0.155, 0.27, 0), size: [0.29, 0.3, 0.29] };
-  const foot = { center: at2(0.155, 0.06, 0.03), size: [0.3, 0.12, 0.36] };
-  parts.push({ joint: `${side3}UpperArm`, ...upperArm, color: "shirt", area: "upperArms" }, { joint: `${side3}LowerArm`, ...lowerArm, color: "skin", area: "forearms" }, { joint: `${side3}Hand`, ...hand, color: "skin" }, { joint: `${side3}UpperLeg`, ...upperLeg, color: "pants", area: "upperLegs" }, { joint: `${side3}LowerLeg`, ...lowerLeg, color: "pants", area: "lowerLegs" }, { joint: `${side3}Foot`, ...foot, color: "shoes", area: "feet" });
-  animation4[`${side3}UpperArm`] = [`${side3}Shoulder`, `${side3}Arm`];
-  animation4[`${side3}LowerArm`] = [`${side3}ForeArm`];
-  animation4[`${side3}Hand`] = [`${side3}Hand`];
-  animation4[`${side3}UpperLeg`] = [`${side3}UpLeg`];
-  animation4[`${side3}LowerLeg`] = [`${side3}Leg`];
-  animation4[`${side3}Foot`] = [`${side3}Foot`];
-  fit[`${side3}Shoulder`] = {
-    joint: `${side3}UpperArm`,
-    box: { center: at2(0.35, 1.27, 0), size: [0.08, 0.3, 0.3] }
-  };
-  fit[`${side3}Arm`] = { joint: `${side3}UpperArm`, box: upperArm };
-  fit[`${side3}ForeArm`] = { joint: `${side3}LowerArm`, box: lowerArm };
-  fit[`${side3}Hand`] = { joint: `${side3}Hand`, box: hand };
-  fit[`${side3}UpLeg`] = { joint: `${side3}UpperLeg`, box: upperLeg };
-  fit[`${side3}Leg`] = { joint: `${side3}LowerLeg`, box: lowerLeg };
-  fit[`${side3}Foot`] = { joint: `${side3}Foot`, box: foot };
-}
-fit.Head = { joint: "Head", box: boundingBox(parts.filter((p) => p.joint === "Head" && p.center[1] > 1.44)) };
-var classic_default = defineBody({
-  id: "classic",
-  name: "Classic",
-  bonePrefix: "",
-  joints: joints4,
-  parts,
-  animation: animation4,
-  fit,
-  sketchArm: { start: 0.31, axisY: 1.27, hangX: 0.46, topY: 1.42 }
-});
-
-// ../core-library/dist/avatar-appearance/bodies/flat.js
-var joints5 = [
-  { name: "Hips", parent: null, at: [0, 0.85, 0] },
-  { name: "Chest", parent: "Hips", at: [0, 1, 0] },
-  { name: "Head", parent: "Chest", at: [0, 1.42, 0] }
-];
-var parts2 = [
-  { joint: "Hips", size: [0.12, 0.2, 0.3], center: [0, 0.9, 0], color: "pants" },
-  { joint: "Chest", size: [0.12, 0.42, 0.32], center: [0, 1.21, 0], color: "shirt", area: "torso" },
-  { joint: "Head", size: [0.08, 0.05, 0.12], center: [0, 1.44, 0], color: "skin" },
-  { joint: "Head", size: [0.13, 0.4, 0.4], center: [0, 1.66, 0.01], color: "skin" },
-  // The nose makes the profile.
-  { joint: "Head", size: [0.06, 0.07, 0.05], center: [0, 1.63, 0.235], color: "skin" },
-  // Hair cap and back of the head.
-  { joint: "Head", size: [0.14, 0.09, 0.42], center: [0, 1.85, -0.01], color: "hair" },
-  { joint: "Head", size: [0.14, 0.3, 0.1], center: [0, 1.7, -0.19], color: "hair" },
-  // Eye and mouth go through the head, so both sides show them.
-  { joint: "Head", size: [0.15, 0.08, 0.05], center: [0, 1.71, 0.15], color: "eyes" },
-  { joint: "Head", size: [0.15, 0.03, 0.06], center: [0, 1.55, 0.18], color: "mouth" }
-];
-var animation5 = {
-  Hips: ["Hips"],
-  Chest: ["Spine", "Spine1", "Spine2"],
-  Head: ["Neck", "Head"]
-};
-var fit2 = {
-  Hips: { joint: "Hips", box: { center: [0, 0.9, 0], size: [0.12, 0.2, 0.3] } },
-  Spine1: { joint: "Chest", box: { center: [0, 1.095, 0], size: [0.12, 0.19, 0.32] } },
-  Spine2: { joint: "Chest", box: { center: [0, 1.305, 0], size: [0.12, 0.23, 0.32] } },
-  Neck: { joint: "Chest", box: { center: [0, 1.44, 0], size: [0.08, 0.05, 0.12] } }
-};
-for (const side3 of ["Left", "Right"]) {
-  const s = side3 === "Left" ? 1 : -1;
-  const at2 = (x, y, z2) => [x * s, y, z2];
-  joints5.push({ name: `${side3}UpperArm`, parent: "Chest", at: at2(0.085, 1.38, 0) }, { name: `${side3}LowerArm`, parent: `${side3}UpperArm`, at: at2(0.085, 1.11, 0) }, { name: `${side3}Hand`, parent: `${side3}LowerArm`, at: at2(0.085, 0.85, 0) }, { name: `${side3}UpperLeg`, parent: "Hips", at: at2(0.03, 0.81, 0) }, { name: `${side3}LowerLeg`, parent: `${side3}UpperLeg`, at: at2(0.03, 0.44, 0) }, { name: `${side3}Foot`, parent: `${side3}LowerLeg`, at: at2(0.03, 0.1, 0) });
-  const shoulder = { center: at2(0.085, 1.37, 0), size: [0.04, 0.06, 0.1] };
-  const upperArm = { center: at2(0.085, 1.25, 0), size: [0.04, 0.28, 0.1] };
-  const lowerArm = { center: at2(0.085, 0.98, 0), size: [0.04, 0.26, 0.09] };
-  const hand = { center: at2(0.085, 0.8, 0.01), size: [0.045, 0.1, 0.1] };
-  const upperLeg = { center: at2(0.03, 0.62, 0), size: [0.05, 0.38, 0.14] };
-  const lowerLeg = { center: at2(0.03, 0.27, 0), size: [0.05, 0.34, 0.13] };
-  const foot = { center: at2(0.03, 0.05, 0.05), size: [0.055, 0.1, 0.24] };
-  parts2.push({ joint: `${side3}UpperArm`, ...upperArm, color: "shirt", area: "upperArms" }, { joint: `${side3}LowerArm`, ...lowerArm, color: "skin", area: "forearms" }, { joint: `${side3}Hand`, ...hand, color: "skin" }, { joint: `${side3}UpperLeg`, ...upperLeg, color: "pants", area: "upperLegs" }, { joint: `${side3}LowerLeg`, ...lowerLeg, color: "pants", area: "lowerLegs" }, { joint: `${side3}Foot`, ...foot, color: "shoes", area: "feet" });
-  animation5[`${side3}UpperArm`] = [`${side3}Shoulder`, `${side3}Arm`];
-  animation5[`${side3}LowerArm`] = [`${side3}ForeArm`];
-  animation5[`${side3}Hand`] = [`${side3}Hand`];
-  animation5[`${side3}UpperLeg`] = [`${side3}UpLeg`];
-  animation5[`${side3}LowerLeg`] = [`${side3}Leg`];
-  animation5[`${side3}Foot`] = [`${side3}Foot`];
-  const hanging = [2, side3 === "Left" ? -1 : 1, 3];
-  fit2[`${side3}Shoulder`] = { joint: `${side3}UpperArm`, box: shoulder, axes: hanging };
-  fit2[`${side3}Arm`] = { joint: `${side3}UpperArm`, box: upperArm, axes: hanging };
-  fit2[`${side3}ForeArm`] = { joint: `${side3}LowerArm`, box: lowerArm, axes: hanging };
-  fit2[`${side3}Hand`] = { joint: `${side3}Hand`, box: hand, axes: hanging };
-  fit2[`${side3}UpLeg`] = { joint: `${side3}UpperLeg`, box: upperLeg };
-  fit2[`${side3}Leg`] = { joint: `${side3}LowerLeg`, box: lowerLeg };
-  fit2[`${side3}Foot`] = { joint: `${side3}Foot`, box: foot };
-}
-fit2.Head = { joint: "Head", box: boundingBox(parts2.filter((p) => p.joint === "Head" && p.center[1] > 1.46)) };
-var flat_default = defineBody({
-  id: "flat",
-  name: "2D",
-  bonePrefix: "",
-  joints: joints5,
-  parts: parts2,
-  animation: animation5,
-  fit: fit2,
-  flat: true,
-  // Flat bodies are drawn in profile with their arms already hanging (no T-pose to turn).
-  sketchArm: { start: 0.085, axisY: 1.25, hangX: 0.085, topY: 1.4 }
-});
-
-// ../core-library/dist/avatar-appearance/bodies/simple.js
-var joints6 = [
-  { name: "Torso", parent: null, at: [0, 0.8, 0] },
-  { name: "Head", parent: "Torso", at: [0, 1.4, 0] }
-];
-var parts3 = [
-  // A band of the pants color at the waist, then the shirt.
-  { joint: "Torso", size: [0.6, 0.08, 0.3], center: [0, 0.84, 0], color: "pants" },
-  { joint: "Torso", size: [0.6, 0.52, 0.3], center: [0, 1.14, 0], color: "shirt", area: "torso" },
-  { joint: "Head", size: [0.18, 0.04, 0.18], center: [0, 1.42, 0], color: "skin" },
-  { joint: "Head", size: [0.38, 0.36, 0.36], center: [0, 1.62, 0], color: "skin" },
-  // Hair cap and back of the head.
-  { joint: "Head", size: [0.4, 0.09, 0.38], center: [0, 1.79, -5e-3], color: "hair" },
-  { joint: "Head", size: [0.4, 0.26, 0.08], center: [0, 1.66, -0.155], color: "hair" },
-  // Face (on the front, +z).
-  { joint: "Head", size: [0.065, 0.075, 0.02], center: [0.085, 1.65, 0.185], color: "eyes" },
-  { joint: "Head", size: [0.065, 0.075, 0.02], center: [-0.085, 1.65, 0.185], color: "eyes" },
-  { joint: "Head", size: [0.14, 0.03, 0.02], center: [0, 1.53, 0.185], color: "mouth" }
-];
-var animation6 = {
-  Torso: ["Hips", "Spine", "Spine1", "Spine2"],
-  Head: ["Neck", "Head"]
-};
-var fit3 = {
-  Hips: { joint: "Torso", box: { center: [0, 0.86, 0], size: [0.6, 0.12, 0.3] } },
-  Spine1: { joint: "Torso", box: { center: [0, 1.02, 0], size: [0.6, 0.2, 0.3] } },
-  Spine2: { joint: "Torso", box: { center: [0, 1.26, 0], size: [0.6, 0.28, 0.3] } },
-  Neck: { joint: "Torso", box: { center: [0, 1.42, 0], size: [0.18, 0.04, 0.18] } }
-};
-for (const side3 of ["Left", "Right"]) {
-  const s = side3 === "Left" ? 1 : -1;
-  const at2 = (x, y, z2) => [x * s, y, z2];
-  joints6.push({ name: `${side3}Arm`, parent: "Torso", at: at2(0.3, 1.32, 0) }, { name: `${side3}Leg`, parent: "Torso", at: at2(0.15, 0.8, 0) });
-  const upperArm = { center: at2(0.425, 1.25, 0), size: [0.25, 0.3, 0.3] };
-  const lowerArm = { center: at2(0.675, 1.25, 0), size: [0.25, 0.3, 0.3] };
-  const hand = { center: at2(0.85, 1.25, 0), size: [0.1, 0.28, 0.28] };
-  const upperLeg = { center: at2(0.15, 0.625, 0), size: [0.3, 0.35, 0.3] };
-  const lowerLeg = { center: at2(0.15, 0.285, 0), size: [0.3, 0.33, 0.3] };
-  const foot = { center: at2(0.15, 0.06, 0.02), size: [0.3, 0.12, 0.34] };
-  parts3.push({ joint: `${side3}Arm`, ...upperArm, color: "shirt", area: "upperArms" }, { joint: `${side3}Arm`, ...lowerArm, color: "skin", area: "forearms" }, { joint: `${side3}Arm`, ...hand, color: "skin" }, { joint: `${side3}Leg`, ...upperLeg, color: "pants", area: "upperLegs" }, { joint: `${side3}Leg`, ...lowerLeg, color: "pants", area: "lowerLegs" }, { joint: `${side3}Leg`, ...foot, color: "shoes", area: "feet" });
-  animation6[`${side3}Arm`] = [`${side3}Shoulder`, `${side3}Arm`];
-  animation6[`${side3}Leg`] = [`${side3}UpLeg`];
-  fit3[`${side3}Shoulder`] = {
-    joint: `${side3}Arm`,
-    box: { center: at2(0.34, 1.25, 0), size: [0.08, 0.3, 0.3] }
-  };
-  fit3[`${side3}Arm`] = { joint: `${side3}Arm`, box: upperArm };
-  fit3[`${side3}ForeArm`] = { joint: `${side3}Arm`, box: lowerArm };
-  fit3[`${side3}Hand`] = { joint: `${side3}Arm`, box: hand };
-  fit3[`${side3}UpLeg`] = { joint: `${side3}Leg`, box: upperLeg };
-  fit3[`${side3}Leg`] = { joint: `${side3}Leg`, box: lowerLeg };
-  fit3[`${side3}Foot`] = { joint: `${side3}Leg`, box: foot };
-}
-fit3.Head = { joint: "Head", box: boundingBox(parts3.filter((p) => p.joint === "Head" && p.center[1] > 1.43)) };
-var simple_default = defineBody({
-  id: "simple",
-  name: "Simple",
-  bonePrefix: "",
-  joints: joints6,
-  parts: parts3,
-  animation: animation6,
-  fit: fit3,
-  sketchArm: { start: 0.3, axisY: 1.25, hangX: 0.45, topY: 1.4 }
-});
-
-// ../core-library/dist/avatar-appearance/bodies/starter.js
-var joints7 = [];
-var set2 = (name, parent, at2) => joints7.push({ name, parent, at: at2 });
-set2("Hips", null, [0, 0.84, 0]);
-for (const side3 of ["Left", "Right"]) {
-  const s = side3 === "Left" ? 1 : -1;
-  set2(`${side3}UpLeg`, "Hips", [0.12 * s, 0.84, 0]);
-  set2(`${side3}Leg`, `${side3}UpLeg`, [0.12 * s, 0.44, 0]);
-  set2(`${side3}Foot`, `${side3}Leg`, [0.12 * s, 0.1, 0]);
-  set2(`${side3}ToeBase`, `${side3}Foot`, [0.12 * s, 0.03, 0.12]);
-}
-set2("Spine", "Hips", [0, 0.92, 0]);
-set2("Spine1", "Spine", [0, 1.06, 0]);
-set2("Spine2", "Spine1", [0, 1.2, 0]);
-var arm3 = (side3) => {
-  const s = side3 === "Left" ? 1 : -1;
-  set2(`${side3}Shoulder`, "Spine2", [0.06 * s, 1.34, 0]);
-  set2(`${side3}Arm`, `${side3}Shoulder`, [0.24 * s, 1.34, 0]);
-  set2(`${side3}ForeArm`, `${side3}Arm`, [0.46 * s, 1.34, 0]);
-  set2(`${side3}Hand`, `${side3}ForeArm`, [0.66 * s, 1.34, 0]);
-  for (const [finger, z2] of [
-    ["Index", 0.03],
-    ["Middle", 0.01],
-    ["Pinky", -0.03],
-    ["Ring", -0.01]
-  ]) {
-    set2(`${side3}Hand${finger}1`, `${side3}Hand`, [0.72 * s, 1.34, z2]);
-    set2(`${side3}Hand${finger}2`, `${side3}Hand${finger}1`, [0.745 * s, 1.34, z2]);
-    set2(`${side3}Hand${finger}3`, `${side3}Hand${finger}2`, [0.765 * s, 1.34, z2]);
-  }
-  set2(`${side3}HandThumb1`, `${side3}Hand`, [0.68 * s, 1.32, 0.05]);
-  set2(`${side3}HandThumb2`, `${side3}HandThumb1`, [0.7 * s, 1.32, 0.07]);
-  set2(`${side3}HandThumb3`, `${side3}HandThumb2`, [0.72 * s, 1.32, 0.08]);
-};
-arm3("Left");
-set2("Neck", "Spine2", [0, 1.38, 0]);
-set2("Head", "Neck", [0, 1.42, 0]);
-arm3("Right");
-var parts4 = [
-  { joint: "Hips", size: [0.46, 0.2, 0.27], center: [0, 0.9, 0], color: "pants" },
-  { joint: "Spine1", size: [0.47, 0.2, 0.27], center: [0, 1.06, 0], color: "shirt", area: "torso" },
-  { joint: "Spine2", size: [0.5, 0.24, 0.29], center: [0, 1.26, 0], color: "shirt", area: "torso" },
-  { joint: "Neck", size: [0.14, 0.06, 0.14], center: [0, 1.4, 0], color: "skin" },
-  { joint: "Head", size: [0.38, 0.36, 0.36], center: [0, 1.6, 0], color: "skin" },
-  // Hair cap and back of the head.
-  { joint: "Head", size: [0.4, 0.09, 0.38], center: [0, 1.79, -5e-3], color: "hair" },
-  { joint: "Head", size: [0.4, 0.26, 0.08], center: [0, 1.66, -0.155], color: "hair" },
-  // Face (on the front, +z).
-  { joint: "Head", size: [0.06, 0.07, 0.02], center: [0.08, 1.63, 0.18], color: "eyes" },
-  { joint: "Head", size: [0.06, 0.07, 0.02], center: [-0.08, 1.63, 0.18], color: "eyes" },
-  { joint: "Head", size: [0.14, 0.03, 0.02], center: [0, 1.52, 0.18], color: "mouth" }
-];
-for (const side3 of ["Left", "Right"]) {
-  const s = side3 === "Left" ? 1 : -1;
-  const at2 = (x, y, z2) => [x * s, y, z2];
-  parts4.push({
-    joint: `${side3}Shoulder`,
-    size: [0.1, 0.18, 0.22],
-    center: at2(0.2, 1.3, 0),
-    color: "shirt",
-    area: "upperArms"
-  }, {
-    joint: `${side3}Arm`,
-    size: [0.23, 0.15, 0.15],
-    center: at2(0.35, 1.34, 0),
-    color: "shirt",
-    area: "upperArms"
-  }, {
-    joint: `${side3}ForeArm`,
-    size: [0.2, 0.13, 0.13],
-    center: at2(0.56, 1.34, 0),
-    color: "skin",
-    area: "forearms"
-  }, { joint: `${side3}Hand`, size: [0.11, 0.13, 0.11], center: at2(0.715, 1.34, 0), color: "skin" }, {
-    joint: `${side3}UpLeg`,
-    size: [0.19, 0.42, 0.21],
-    center: at2(0.12, 0.64, 0),
-    color: "pants",
-    area: "upperLegs"
-  }, {
-    joint: `${side3}Leg`,
-    size: [0.17, 0.36, 0.19],
-    center: at2(0.12, 0.27, 0),
-    color: "pants",
-    area: "lowerLegs"
-  }, {
-    joint: `${side3}Foot`,
-    size: [0.19, 0.1, 0.3],
-    center: at2(0.12, 0.05, 0.04),
-    color: "shoes",
-    area: "feet"
-  });
-}
-var animation7 = {};
-var ANIMATED4 = /^(Hips|Spine|Spine1|Spine2|Neck|Head|(Left|Right)(UpLeg|Leg|Foot|ToeBase|Shoulder|Arm|ForeArm|Hand))$/;
-for (const joint of joints7)
-  if (ANIMATED4.test(joint.name))
-    animation7[joint.name] = [joint.name];
-var starter_default = defineBody({
-  id: "starter",
-  name: "Starter",
-  bonePrefix: "mixamorig",
-  joints: joints7,
-  parts: parts4,
-  animation: animation7,
-  fit: {},
-  sketchArm: { start: 0.235, axisY: 1.34, hangX: 0.32, topY: 1.36 }
-});
-
-// ../core-library/dist/avatar-appearance/bodies/robot.js
-var parts5 = [
-  { joint: "Hips", center: [0, 0.86, 0], size: [0.32, 0.13, 0.21], color: "pants" },
-  { joint: "Spine", center: [0, 0.96, 0], size: [0.22, 0.06, 0.17], color: "pants" },
-  { joint: "Spine1", center: [0, 1.06, 0], size: [0.3, 0.12, 0.2], color: "skin", area: "torso" },
-  { joint: "Spine2", center: [0, 1.23, 0], size: [0.38, 0.18, 0.22], color: "skin", area: "torso" },
-  { joint: "Spine2", center: [0, 1.24, 0.116], size: [0.14, 0.045, 0.015], color: "shirt" },
-  { joint: "Neck", center: [0, 1.395, 0], size: [0.1, 0.075, 0.1], color: "pants" },
-  { joint: "Head", center: [0, 1.6, 0], size: [0.36, 0.36, 0.3], color: "skin" }
-];
-for (const side3 of ["Left", "Right"]) {
-  const s = side3 === "Left" ? 1 : -1;
-  parts5.push({ joint: `${side3}Shoulder`, center: [0.17 * s, 1.34, 0], size: [0.12, 0.08, 0.1], color: "pants" }, { joint: `${side3}Arm`, center: [0.24 * s, 1.34, 0], size: [0.075, 0.09, 0.09], color: "shirt" }, { joint: `${side3}Arm`, center: [0.35 * s, 1.34, 0], size: [0.15, 0.115, 0.115], color: "skin", area: "upperArms" }, { joint: `${side3}ForeArm`, center: [0.46 * s, 1.34, 0], size: [0.06, 0.08, 0.08], color: "pants" }, { joint: `${side3}ForeArm`, center: [0.56 * s, 1.34, 0], size: [0.135, 0.1, 0.1], color: "skin", area: "forearms" }, { joint: `${side3}Hand`, center: [0.675 * s, 1.34, 0], size: [0.065, 0.075, 0.09], color: "shirt" }, { joint: `${side3}UpLeg`, center: [0.12 * s, 0.82, 0], size: [0.09, 0.08, 0.09], color: "shirt" }, { joint: `${side3}UpLeg`, center: [0.12 * s, 0.64, 0], size: [0.16, 0.29, 0.17], color: "skin", area: "upperLegs" }, { joint: `${side3}Leg`, center: [0.12 * s, 0.44, 0], size: [0.1, 0.09, 0.1], color: "pants" }, { joint: `${side3}Leg`, center: [0.12 * s, 0.27, 0], size: [0.135, 0.25, 0.14], color: "skin", area: "lowerLegs" }, { joint: `${side3}Foot`, center: [0.12 * s, 0.09, 0], size: [0.085, 0.06, 0.085], color: "pants" }, { joint: `${side3}Foot`, center: [0.12 * s, 0.045, 0.045], size: [0.17, 0.09, 0.27], color: "shoes", area: "feet" });
-  for (const joint of starter_default.joints.filter((joint2) => joint2.name.startsWith(`${side3}Hand`) && /[123]$/.test(joint2.name))) {
-    parts5.push({ joint: joint.name, center: [joint.at[0] + 8e-3 * s, joint.at[1], joint.at[2]], size: [0.018, 0.022, 0.016], color: "skin" });
-  }
-}
-var robot_default = defineBody({
-  id: "robot",
-  name: "Standard robot",
-  bonePrefix: "genvr",
-  joints: starter_default.joints,
-  parts: parts5,
-  animation: starter_default.animation,
-  fit: {},
-  sketchArm: starter_default.sketchArm
-});
-
-// ../core-library/dist/avatar-appearance/_body.js
-var AVATAR_BODIES = [classic_default, simple_default, starter_default, flat_default, anime_boy_default, warrior_default, human_default, robot_default];
-var PLAYER_BODIES = AVATAR_BODIES.filter((body) => !body.flat);
-var bodies = new Map(AVATAR_BODIES.map((body) => [body.id, body]));
-var STARTER_BOXES = new Map([...new Set(starter_default.parts.map((part) => part.joint))].map((joint) => [
-  joint,
-  boundingBox(starter_default.parts.filter((part) => part.joint === joint))
-]));
-
-// ../core-library/dist/avatar-appearance/_item-body.js
-var CORE_BONES = [
-  "Hips",
-  "Spine",
-  "Spine1",
-  "Spine2",
-  "Neck",
-  "Head",
-  ...["Left", "Right"].flatMap((side3) => ["Shoulder", "Arm", "ForeArm", "Hand", "UpLeg", "Leg", "Foot"].map((bone) => `${side3}${bone}`))
-];
-
-// ../core-library/dist/avatar-appearance/index.js
-var MOVEMENT_ANIMATIONS = [
-  idle_default,
-  walk_default,
-  run_default,
-  jump_default,
-  swim_default,
-  swim_breast_default,
-  climb_default,
-  sit_ground_default,
-  build_default,
-  strike_default,
-  // The owner's ChatGPT move files (docs/reference/character-anime/moves/), built by tooling/moves/build-moves.ts.
-  backpedal_default,
-  crouch_idle_default,
-  crouch_walk_default,
-  sneak_default,
-  strafe_left_default,
-  strafe_right_default,
-  sprint_start_default,
-  sprint_stop_default,
-  turn_left_90_default,
-  turn_right_90_default,
-  turn_180_default,
-  jump_forward_default,
-  jump_backward_default,
-  long_jump_default,
-  soft_landing_default,
-  hard_landing_default,
-  slide_default
-];
-var CORE_EMOTES = [
-  sit_default,
-  wave_default,
-  clap_default,
-  cheer_default,
-  dance_default,
-  robot_dance_default,
-  point_default,
-  think_default,
-  salute_default,
-  laugh_default,
-  stretch_default
-];
-var CORE_ANIMATIONS = [...MOVEMENT_ANIMATIONS, ...CORE_EMOTES];
-var SIT_ANIMATION_ID = sit_default.manifest.id;
-var MAX_FAVORITE_ANIMATIONS = 8;
-var DEFAULT_FAVORITE_ANIMATIONS = CORE_EMOTES.slice(0, MAX_FAVORITE_ANIMATIONS).map((animation8) => animation8.manifest.id);
-var AVATAR_CLIPS = CORE_ANIMATIONS.map((animation8) => animation8.clip);
-var byId3 = new Map(CORE_ANIMATIONS.map((animation8) => [animation8.manifest.id, animation8]));
+var getCoreItem = (id) => byId3.get(id);
 
 // ../core-library/dist/drawn.js
 function defineDrawn(item4) {
@@ -30129,6 +29555,7 @@ var CORE_BLOCKS = [
   planks_default,
   cobble_default
 ];
+var getBlock = (key) => CORE_BLOCKS.find((block) => block.key === key);
 
 // ../core-library/dist/environment/ground/_ground.js
 function defineGround(ground) {
@@ -30153,6 +29580,9 @@ function defineGround(ground) {
     },
     ...rest
   };
+}
+function groundRef(material) {
+  return { id: material.manifest.id, soil: material.soil };
 }
 
 // ../core-library/dist/environment/ground/tidewater-beach-sand.js
@@ -31470,6 +30900,31 @@ var GROUND_MATERIALS = [
   tidewater_rubble_default,
   tidewater_seagrass_default
 ];
+var DEFAULT_GROUND = {
+  grass: "grass-004",
+  dirt: "ground-103",
+  sand: "ground-080",
+  rock: "rock-051",
+  snow: "snow-006",
+  mud: "ground-106"
+};
+var STARTER_GROUND = {
+  valley: { grass: "grass-001" },
+  island: { grass: "grass-005", sand: "ground-054" },
+  plain: {},
+  mountains: { grass: "grass-008", rock: "rock-063", dirt: "ground-110" }
+};
+function starterGroundMaterials(kind) {
+  const slots = {};
+  for (const [soil, name] of Object.entries(STARTER_GROUND[kind])) {
+    const material = getGround(name);
+    if (!material || material.soil !== soil)
+      throw new Error(`${name} is not a ${soil} ground material`);
+    slots[String(SoilName.options.indexOf(soil))] = groundRef(material);
+  }
+  return slots;
+}
+var getGround = (idOrName) => GROUND_MATERIALS.find((material) => material.manifest.id === idOrName || material.name === idOrName);
 
 // ../core-library/dist/environment/roads/_road.js
 function defineRoad(road) {
@@ -31511,6 +30966,7 @@ var lane_default = defineRoad({ id: "genvr.core.road.lane", name: "Local Street"
 var ROAD_TYPES = [street_default, lane_default, dirt_default2, tram_default, rail_default, fantasy_default, path_default2];
 var DEFAULT_ROAD_TYPE = ROAD_TYPES[0];
 var byId4 = new Map(ROAD_TYPES.map((type) => [type.id, type]));
+var getRoadType = (id) => (id ? byId4.get(id) : void 0) ?? DEFAULT_ROAD_TYPE;
 
 // ../core-library/dist/environment/sky/_sky.js
 function defineSky(sky) {
@@ -31626,6 +31082,7 @@ var tropical_default = defineSky({
 
 // ../core-library/dist/environment/sky/index.js
 var CORE_SKIES = [day_default, sunset_default, night_default, storm_default, tropical_default];
+var getSky = (preset) => CORE_SKIES.find((sky) => sky.preset === preset);
 
 // ../core-library/dist/environment/surfaces/_surface.js
 function defineSurface(surface) {
@@ -31687,6 +31144,7 @@ var neon_default = defineSurface({
 
 // ../core-library/dist/environment/surfaces/index.js
 var CORE_SURFACES = [plastic_default, wood_default, stone_default2, metal_default, glass_default, neon_default];
+var getSurface = (key) => CORE_SURFACES.find((surface) => surface.key === key) ?? CORE_SURFACES[0];
 
 // ../core-library/dist/environment/weather/_weather.js
 function defineWeather(weather) {
@@ -31797,8 +31255,10 @@ var sandstorm_default = defineWeather({
 
 // ../core-library/dist/environment/weather/index.js
 var CORE_WEATHER = [clear_default, rain_default, snow_default2, storm_default2, fog_default, sandstorm_default];
+var getWeather = (preset) => CORE_WEATHER.find((weather) => weather.preset === preset);
 
 // ../core-library/dist/styles/style-packs/_style-pack.js
+var SKY_SHAPES = { sun: "none", moon: "round", clouds: "none", drops: "thin" };
 function defineStylePack(pack) {
   return {
     manifest: coreManifest({
@@ -31897,6 +31357,34 @@ var LIBRARY = [
   ...CORE_WEARABLES,
   ...AVATAR_BODIES
 ];
+function queryLibrary(filter = {}, entries = LIBRARY) {
+  const types = filter.type === void 0 ? null : [].concat(filter.type);
+  const words2 = (filter.text ?? "").toLowerCase().split(/\s+/).filter(Boolean);
+  return entries.filter(({ manifest }) => {
+    if (types && !types.includes(manifest.type))
+      return false;
+    if (filter.category && manifest.category !== filter.category)
+      return false;
+    const subcategories = filter.subcategory === void 0 ? null : [].concat(filter.subcategory);
+    if (subcategories && !subcategories.includes(manifest.subcategory))
+      return false;
+    if (filter.style && !manifest.styles.includes(filter.style))
+      return false;
+    if (filter.price && manifest.price.type === "free" !== (filter.price === "free"))
+      return false;
+    if (filter.source && manifest.source !== filter.source)
+      return false;
+    const haystack = `${manifest.name} ${manifest.id}`.toLowerCase();
+    return words2.every((word) => haystack.includes(word));
+  });
+}
+function priceLabel(manifest) {
+  if (manifest.price.type === "free")
+    return "Free";
+  if (manifest.price.type === "subscription")
+    return "Plus";
+  return `${manifest.price.coins} coins`;
+}
 var byId5 = new Map(LIBRARY.map((entry) => [entry.manifest.id, entry]));
 var getLibraryItem = (id) => byId5.get(id);
 
@@ -31939,1872 +31427,343 @@ var ITEM_TAG_VOCABULARY = new Set([
 var ALL_STYLES_ORDER = ["blocky", "voxel", "anime", "realistic"];
 var exceptVoxel = ALL_STYLES_ORDER.filter((style) => style !== "voxel");
 
-// ../script/dist/place.js
-function spawnSpots(doc) {
-  const placed = doc.instances.filter((i) => i.itemId === SPAWN_POINT_ID).map((i) => {
-    const team = i.params.team === "red" || i.params.team === "blue" ? i.params.team : "any";
-    const [x2, y2, z3] = i.transform.position;
-    return { x: x2, y: y2, z: z3, team };
-  });
-  if (placed.length > 0)
-    return placed;
-  const [x, y, z2] = doc.spawn.position;
-  return [{ x, y, z: z2, team: "any" }];
-}
-var yawOf = (q) => 2 * Math.atan2(q[1] ?? 0, q[3] ?? 1);
-function zonesOf(doc) {
-  return doc.instances.flatMap((i) => {
-    const zone = zoneFromParams(i.params, zoneShapeOfItem(i.itemId));
-    if (!zone)
-      return [];
-    const [x, y, z2] = i.transform.position;
-    return [
-      {
-        id: i.instanceId,
-        shape: zone.shape,
-        tag: zone.tag,
-        x,
-        y,
-        z: z2,
-        yaw: yawOf(i.transform.rotation),
-        ...zoneSize(zone.shape, i.transform.scale)
-      }
-    ];
-  });
-}
-
-// ../game/dist/events.js
-var EventBus = class {
-  #handlers = /* @__PURE__ */ new Map();
-  #queue = [];
-  #traces = /* @__PURE__ */ new WeakMap();
-  /** The trace of the event being delivered; null outside a delivery. */
-  #current = null;
-  #followUp = false;
-  #flushing = false;
-  on(type, handler) {
-    const list = this.#handlers.get(type) ?? [];
-    list.push(handler);
-    this.#handlers.set(type, list);
-  }
-  emit(event) {
-    const cause = this.#current;
-    this.#traces.set(event, cause ? { root: cause.root, depth: cause.depth + (this.#followUp ? 1 : 0) } : { root: event, depth: 0 });
-    this.#queue.push(event);
-  }
-  /** The trace of the event being delivered now; null outside a delivery. */
-  current() {
-    return this.#current;
-  }
-  /** The top-level event behind `event` and its follow-up depth (itself and 0 when unknown). */
-  traceOf(event) {
-    return this.#traces.get(event) ?? { root: event, depth: 0 };
-  }
-  /**
-   * Runs `raise`; every event it emits (also through other components) counts one follow-up hop
-   * deeper than the event being delivered. The rules interpreter uses it to bound its chains.
-   */
-  followUp(raise) {
-    const before = this.#followUp;
-    this.#followUp = true;
-    try {
-      raise();
-    } finally {
-      this.#followUp = before;
-    }
-  }
-  /** Delivers the queued events, oldest first, until none are left. */
-  flush() {
-    if (this.#flushing)
-      return;
-    this.#flushing = true;
-    try {
-      for (let event = this.#queue.shift(); event; event = this.#queue.shift()) {
-        this.#current = this.traceOf(event);
-        for (const handler of this.#handlers.get(event.type) ?? [])
-          handler(event);
-      }
-    } finally {
-      this.#current = null;
-      this.#flushing = false;
-    }
-  }
-};
-
-// ../game/dist/components/counters.js
-var CountersComponent = class {
-  #ctx;
-  #team = { red: {}, blue: {} };
-  #global = {};
-  /** Messages already reported, so a rule that keeps misfiring logs once. */
-  #reported = /* @__PURE__ */ new Set();
-  constructor(ctx) {
-    this.#ctx = ctx;
-    const { bus } = ctx;
-    this.#resetShared();
-    bus.on("player_joined", (event) => {
-      const row = ctx.players.get(event.id);
-      if (!row || event.returning)
-        return;
-      row.counters = this.#playerStarts();
-    });
-    bus.on("match_reset", () => {
-      this.#resetShared();
-      for (const row of ctx.players.values())
-        row.counters = this.#playerStarts();
-    });
-  }
-  get(name, who) {
-    return this.#slot(name, who)?.[name] ?? 0;
-  }
-  add(name, by, who) {
-    const slot = this.#slot(name, who);
-    if (slot)
-      this.#write(slot, name, slot[name] + by, who);
-  }
-  set(name, to, who) {
-    const slot = this.#slot(name, who);
-    if (slot)
-      this.#write(slot, name, to, who);
-  }
-  /** Copies of the team and global values; changing them changes nothing here. */
-  teamValues() {
-    return { red: { ...this.#team.red }, blue: { ...this.#team.blue } };
-  }
-  globalValues() {
-    return { ...this.#global };
-  }
-  #declared(scope) {
-    return (this.#ctx.game.counters ?? []).filter((c) => c.scope === scope);
-  }
-  #playerStarts() {
-    return Object.fromEntries(this.#declared("player").map((c) => [c.name, c.start]));
-  }
-  #resetShared() {
-    const teamStarts = Object.fromEntries(this.#declared("team").map((c) => [c.name, c.start]));
-    this.#team = { red: { ...teamStarts }, blue: { ...teamStarts } };
-    this.#global = Object.fromEntries(this.#declared("global").map((c) => [c.name, c.start]));
-  }
-  /** The record holding this counter's value for `who`, or null (reported once) when there is none. */
-  #slot(name, who) {
-    const decl = (this.#ctx.game.counters ?? []).find((c) => c.name === name);
-    if (!decl)
-      return this.#report(`unknown counter "${name}"`);
-    const kind = who === "global" ? "global" : "player" in who ? "player" : "team";
-    if (decl.scope !== kind)
-      return this.#report(`counter "${name}" has scope ${decl.scope}, used as ${kind}`);
-    if (who === "global")
-      return this.#global;
-    if ("team" in who)
-      return this.#team[who.team] ?? this.#report(`counter "${name}": unknown team`);
-    return this.#ctx.players.get(who.player)?.counters ?? null;
-  }
-  #write(slot, name, value, who) {
-    if (slot[name] === value)
-      return;
-    slot[name] = value;
-    const id = who !== "global" && "player" in who ? who.player : null;
-    this.#ctx.bus.emit({ type: "counter_changed", name, value, id });
-  }
-  #report(message) {
-    if (!this.#reported.has(message)) {
-      this.#reported.add(message);
-      this.#ctx.log(message);
-    }
+// ../core-library/dist/rest-rules.js
+var LIES_DOWN = /(^|[.-])(rock|rocks|stone|boulder|log|pebble)s?([.-]|$)/;
+function trunk2(bounds) {
+  if (!Number.isFinite(bounds.min[0]) || !Number.isFinite(bounds.max[0]))
     return null;
-  }
-};
-
-// ../game/dist/components/health.js
-var HealthComponent = class {
-  #ctx;
-  constructor(ctx) {
-    this.#ctx = ctx;
-    const { bus } = ctx;
-    bus.on("player_joined", (event) => {
-      if (!event.returning)
-        this.#heal(event.id);
-    });
-    bus.on("respawned", (event) => this.#heal(event.id));
-    bus.on("match_reset", () => {
-      for (const [id, row] of ctx.players) {
-        this.#heal(id);
-        row.deaths = 0;
-      }
-    });
-  }
-  get #max() {
-    return this.#ctx.game.health?.max ?? 0;
-  }
-  /**
-   * Takes `amount` from a present, up, unprotected player during play. `by` is the attacker, or
-   * null for harm without one (zones, falls later).
-   */
-  damage(victimId, amount, by) {
-    const ctx = this.#ctx;
-    if (ctx.phase !== "playing" || !ctx.game.health)
-      return;
-    const victim = ctx.players.get(victimId);
-    if (!victim || !victim.present || !victim.alive || ctx.now < victim.protectedUntil || victimId === by)
-      return;
-    victim.health = Math.max(0, victim.health - amount);
-    ctx.bus.emit({ type: "hit", victim: victimId, by, damage: amount, health: victim.health });
-    if (victim.health > 0)
-      return;
-    victim.alive = false;
-    victim.deaths += 1;
-    ctx.bus.emit({ type: "died", victim: victimId, by });
-  }
-  /** Gives `amount` back to a present, up player during play, never above the maximum. */
-  heal(id, amount) {
-    const ctx = this.#ctx;
-    if (ctx.phase !== "playing" || !ctx.game.health)
-      return;
-    const row = ctx.players.get(id);
-    if (!row || !row.present || !row.alive)
-      return;
-    row.health = Math.min(this.#max, row.health + amount);
-  }
-  #heal(id) {
-    const row = this.#ctx.players.get(id);
-    if (!row)
-      return;
-    row.alive = true;
-    row.health = this.#max;
-  }
-};
-
-// ../game/dist/components/loadout.js
-var LoadoutComponent = class {
-  #ctx;
-  /** When each player last used their tool (server ms). */
-  #lastUse = /* @__PURE__ */ new Map();
-  constructor(ctx) {
-    this.#ctx = ctx;
-    const { bus } = ctx;
-    bus.on("player_joined", (event) => {
-      if (!event.returning)
-        this.#equip(event.id);
-    });
-    bus.on("respawned", (event) => this.#equip(event.id));
-    bus.on("match_reset", () => {
-      this.#lastUse.clear();
-      for (const id of ctx.players.keys())
-        this.#equip(id);
-    });
-  }
-  /** The tool in a player's hand, or null (none, or not a tool). */
-  toolOf(id) {
-    const itemId = this.#ctx.players.get(id)?.tool;
-    return itemId ? this.#ctx.tools(itemId) : null;
-  }
-  /** Uses the tool in hand once: refused while it cools down. */
-  use(id, tool) {
-    const now = this.#ctx.now;
-    if (now - (this.#lastUse.get(id) ?? -Infinity) < tool.cooldownSec * 1e3)
-      return "cooldown";
-    this.#lastUse.set(id, now);
-    return "ok";
-  }
-  #equip(id) {
-    const row = this.#ctx.players.get(id);
-    if (!row)
-      return;
-    row.items = (this.#ctx.game.loadout?.items ?? []).filter((item4) => this.#ctx.tools(item4) !== null);
-    row.tool = row.items[0] ?? "";
-  }
-};
-
-// ../game/dist/spawn.js
-function pickSpawn(spots, team, opponents) {
-  const own2 = team ? spots.filter((s) => s.team === team) : [];
-  const pool = own2.length > 0 ? own2 : spots.filter((s) => s.team === "any");
-  const candidates = pool.length > 0 ? pool : spots;
-  let best = null;
-  let bestDistance = -1;
-  for (const spot of candidates) {
-    const nearest = opponents.length === 0 ? Number.POSITIVE_INFINITY : Math.min(...opponents.map((o) => Math.hypot(o.x - spot.x, o.z - spot.z)));
-    if (nearest > bestDistance) {
-      best = spot;
-      bestDistance = nearest;
+  const cx = (bounds.min[0] + bounds.max[0]) / 2;
+  const cz = (bounds.min[2] + bounds.max[2]) / 2;
+  const half = Math.min(0.3, 0.15 * Math.min(bounds.max[0] - bounds.min[0], bounds.max[2] - bounds.min[2]));
+  return { min: [cx - half, cz - half], max: [cx + half, cz + half] };
+}
+function restRule(item4, bounds) {
+  const manifest = item4.manifest;
+  if (manifest.physics?.floats)
+    return { mode: "float" };
+  const written = manifest.placement?.rest;
+  if (written)
+    return written;
+  if (item4.grid != null || item4.resizable)
+    return { mode: "upright", sink: 0 };
+  if (item4.group === "buildings")
+    return { mode: "grade" };
+  if (item4.group === "nature") {
+    if (LIES_DOWN.test(manifest.id)) {
+      return { mode: "tilt", sink: 0.1 };
     }
+    const base = trunk2(bounds);
+    return base ? { mode: "upright", sink: 0.3, base } : { mode: "upright", sink: 0.3 };
   }
-  return best;
+  return { mode: "upright", sink: 0.05 };
+}
+function packageRestRule(manifest) {
+  if (manifest.physics?.floats)
+    return { mode: "float" };
+  return manifest.placement?.rest ?? { mode: "upright", sink: 0.05 };
 }
 
-// ../game/dist/context.js
-function presentIds(ctx) {
-  return [...ctx.players].filter(([, p]) => p.present).map(([id]) => id);
-}
-function newRow() {
-  return {
-    team: null,
-    health: 0,
-    alive: true,
-    deaths: 0,
-    protectedUntil: 0,
-    respawnAt: null,
-    score: 0,
-    kills: 0,
-    items: [],
-    tool: "",
-    present: true,
-    place: 0,
-    counters: {}
-  };
-}
-function spotFor(ctx, id, taken = []) {
-  const team = ctx.players.get(id)?.team ?? null;
-  const rival = (other) => team === null || other !== team;
-  const opponents = [...ctx.players].filter(([other, p]) => other !== id && p.present && p.alive && rival(p.team)).filter(([other]) => !taken.some((spot) => spot.id === other)).flatMap(([other]) => {
-    const at2 = ctx.positions(other);
-    return at2 ? [{ x: at2.x, z: at2.z }] : [];
-  });
-  for (const spot of taken)
-    if (rival(spot.team))
-      opponents.push({ x: spot.x, z: spot.z });
-  return pickSpawn(ctx.spawns, team, opponents) ?? { x: 0, y: 0, z: 0, team: "any" };
-}
-
-// ../game/dist/components/match.js
-function phaseSteps(game) {
-  const { match } = game;
-  return [
-    { phase: "waiting", ms: null, gathering: true, end: "next" },
-    { phase: "countdown", ms: match.countdownSec * 1e3, gathering: true, end: "next" },
-    { phase: "playing", ms: match.durationSec * 1e3, gathering: false, end: "time_up" },
-    { phase: "results", ms: match.resultsSec * 1e3, gathering: false, end: "next" }
-  ];
-}
-var MatchComponent = class {
-  #ctx;
-  #steps;
-  #index = 0;
-  /**
-   * Play must end but nobody named a winner yet (the clock ran out, or everyone left). Checked on
-   * the next tick, so the components and rule chains that decide on it finish their own flush first.
-   */
-  #undecided = null;
-  /** Who wins a match the clock ended when nothing named a winner (nobody by default). */
-  #clockWinner;
-  constructor(ctx, clockWinner = () => null) {
-    this.#ctx = ctx;
-    this.#clockWinner = clockWinner;
-    this.#steps = phaseSteps(ctx.game);
-    ctx.phase = this.#steps[0].phase;
-    ctx.endsAt = null;
-    const { bus } = ctx;
-    bus.on("player_joined", () => this.#evaluate());
-    bus.on("player_left", () => {
-      this.#evaluate();
-      if (this.#step.end === "time_up" && presentIds(ctx).length === 0)
-        this.#undecided ??= "empty";
-    });
-    bus.on("solo_changed", () => this.#evaluate());
-    bus.on("match_won", () => {
-      if (this.#step.end === "time_up")
-        this.#next();
-    });
-  }
-  get #step() {
-    return this.#steps[this.#index];
-  }
-  get #minPlayers() {
-    return this.#ctx.solo ? 1 : this.#ctx.game.match.minPlayers;
-  }
-  /** Called once the session exists (and on every tick): moves on when the phase's time is up. */
-  start() {
-    this.#evaluate();
-  }
-  tick() {
-    const { endsAt, now } = this.#ctx;
-    if (this.#undecided === "empty" && presentIds(this.#ctx).length > 0)
-      this.#undecided = null;
-    if (this.#undecided !== null && this.#step.end === "time_up" && !this.#ctx.decided) {
-      const winner = this.#undecided === "clock" ? this.#clockWinner() : null;
-      this.#undecided = null;
-      this.#ctx.decided = true;
-      this.#ctx.bus.emit({ type: "match_won", winner });
-      return;
-    }
-    if (endsAt === null || now < endsAt)
-      return;
-    if (this.#step.end === "time_up") {
-      this.#ctx.endsAt = null;
-      this.#undecided = "clock";
-      this.#ctx.bus.emit({ type: "time_up" });
-    } else
-      this.#next();
-  }
-  /** Gathering phases follow the number of players: enough moves on, too few goes back to the start. */
-  #evaluate() {
-    if (!this.#step.gathering)
-      return;
-    const enough = presentIds(this.#ctx).length >= this.#minPlayers;
-    if (!enough) {
-      if (this.#index !== 0)
-        this.#enter(0);
-    } else if (this.#step.ms === null)
-      this.#next();
-  }
-  #next() {
-    if (this.#index + 1 < this.#steps.length) {
-      this.#enter(this.#index + 1);
-      return;
-    }
-    this.#ctx.bus.emit({ type: "match_reset" });
-    this.#enter(0);
-    this.#evaluate();
-  }
-  #enter(index) {
-    this.#index = index;
-    this.#undecided = null;
-    const step = this.#step;
-    this.#ctx.phase = step.phase;
-    this.#ctx.endsAt = step.ms === null ? null : this.#ctx.now + step.ms;
-    this.#ctx.bus.emit({ type: "phase_changed", phase: step.phase, endsAt: this.#ctx.endsAt });
-  }
-};
-
-// ../game/dist/components/placement.js
-var PlacementComponent = class {
-  #ctx;
-  /** When each player was last placed, so one change of the session places them once. */
-  #placedAt = /* @__PURE__ */ new Map();
-  constructor(ctx) {
-    this.#ctx = ctx;
-    const { bus } = ctx;
-    bus.on("phase_changed", (event) => {
-      if (event.phase === "playing")
-        this.#place(presentIds(ctx));
-    });
-    bus.on("player_joined", (event) => {
-      if (!event.returning && ctx.phase === "playing")
-        this.#place([event.id]);
-    });
-    bus.on("team_changed", (event) => {
-      if (ctx.phase === "playing" && this.#placedAt.get(event.id) !== ctx.now)
-        this.#place([event.id]);
-    });
-    bus.on("player_left", (event) => this.#placedAt.delete(event.id));
-  }
-  /** Places players one after another, each away from the spots the opponents already got. */
-  #place(ids) {
-    const ctx = this.#ctx;
-    const taken = [];
-    for (const id of ids) {
-      const row = ctx.players.get(id);
-      if (!row?.present)
-        continue;
-      const at2 = spotFor(ctx, id, taken);
-      taken.push({ id, x: at2.x, z: at2.z, team: row.team });
-      this.#placedAt.set(id, ctx.now);
-      ctx.bus.emit({ type: "placed", id, at: at2 });
-    }
-  }
-};
-
-// ../game/dist/components/ranking.js
-var RankingComponent = class {
-  #ctx;
-  #by;
-  #then;
-  #high;
-  /** Per player, per counter name: when the current value was reached. */
-  #reached = /* @__PURE__ */ new Map();
-  /** Join order (first join only; a returning player keeps theirs). */
-  #joined = /* @__PURE__ */ new Map();
-  #joinSeq = 0;
-  constructor(ctx) {
-    this.#ctx = ctx;
-    const ranking = ctx.game.ranking;
-    this.#high = ranking.order === "high";
-    this.#by = this.#playerCounter(ranking.by);
-    this.#then = ranking.then === void 0 ? null : this.#playerCounter(ranking.then);
-    const { bus } = ctx;
-    bus.on("player_joined", (event) => {
-      if (!this.#joined.has(event.id))
-        this.#joined.set(event.id, this.#joinSeq++);
-      if (!event.returning && ctx.phase === "playing")
-        this.#stampJoin(event.id);
-      this.#update();
-    });
-    bus.on("player_left", (event) => {
-      if (!ctx.players.has(event.id))
-        this.#forget(event.id);
-      this.#update();
-    });
-    bus.on("counter_changed", (event) => {
-      if (event.id !== null && (event.name === this.#by?.name || event.name === this.#then?.name))
-        this.#update();
-    });
-    bus.on("phase_changed", (event) => {
-      if (event.phase === "playing")
-        this.#update();
-    });
-    bus.on("match_reset", () => {
-      this.#reached = /* @__PURE__ */ new Map();
-      for (const id of this.#joined.keys())
-        if (!ctx.players.has(id))
-          this.#forget(id);
-      for (const row of ctx.players.values())
-        row.place = 0;
-    });
-  }
-  /** Player ids best first (present and absent); empty when the ranking counter is unusable. */
-  rankedPlayers() {
-    const by = this.#by;
-    if (!by)
-      return [];
-    const then = this.#then;
-    const rows = [...this.#ctx.players.keys()].map((id) => {
-      const byNow = this.#stamp(id, by);
-      const thenNow = then ? this.#stamp(id, then) : null;
-      return {
-        id,
-        by: byNow.value,
-        then: thenNow?.value ?? 0,
-        // The current pair of values was reached when the later of the two was.
-        at: Math.max(byNow.at, thenNow?.at ?? -Infinity),
-        joined: this.#joined.get(id) ?? Infinity
-      };
-    });
-    const sign2 = this.#high ? -1 : 1;
-    rows.sort((a, b) => sign2 * (a.by - b.by) || sign2 * (a.then - b.then) || compare(a.at, b.at) || compare(a.joined, b.joined));
-    return rows.map((row) => row.id);
-  }
-  /**
-   * The winner by this ranking (the clock's fallback, and `end_match` by the ranking's own counter
-   * and order): the first-ranked player if anyone moved (any player's `by` or `then` value differs
-   * from its start: `then` orders players too); else nobody.
-   */
-  leader() {
-    const by = this.#by;
-    const [first] = this.rankedPlayers();
-    if (!by || first === void 0)
-      return null;
-    const used = this.#then ? [by, this.#then] : [by];
-    const moved = [...this.#ctx.players.values()].some((row) => used.some((counter) => (row.counters[counter.name] ?? counter.start) !== counter.start));
-    return moved ? { kind: "player", id: first } : null;
-  }
-  /** Whether `end_match` by this counter and order should use this ranking's tie-breaks. */
-  decides(counter, order) {
-    return this.#by !== null && this.#by.name === counter && this.#high === (order === "high");
-  }
-  #update() {
-    const ranked = this.rankedPlayers();
-    ranked.forEach((id, index) => {
-      this.#ctx.players.get(id).place = index + 1;
-    });
-  }
-  /** The value a player has now and when they reached it (a change is stamped with the session clock). */
-  #stamp(id, counter) {
-    const value = this.#ctx.players.get(id)?.counters[counter.name] ?? counter.start;
-    let mine = this.#reached.get(id);
-    if (!mine)
-      this.#reached.set(id, mine = /* @__PURE__ */ new Map());
-    const known = mine.get(counter.name);
-    if (known && known.value === value)
-      return known;
-    const fresh = { value, at: !known && value === counter.start ? -Infinity : this.#ctx.now };
-    mine.set(counter.name, fresh);
-    return fresh;
-  }
-  #stampJoin(id) {
-    const mine = /* @__PURE__ */ new Map();
-    for (const counter of [this.#by, this.#then]) {
-      if (!counter)
-        continue;
-      const value = this.#ctx.players.get(id)?.counters[counter.name] ?? counter.start;
-      mine.set(counter.name, { value, at: this.#ctx.now });
-    }
-    this.#reached.set(id, mine);
-  }
-  #forget(id) {
-    this.#reached.delete(id);
-    this.#joined.delete(id);
-  }
-  #playerCounter(name) {
-    const decl = (this.#ctx.game.counters ?? []).find((c) => c.name === name);
-    if (decl?.scope === "player")
-      return decl;
-    this.#ctx.log(decl ? `ranking: counter "${name}" has scope ${decl.scope}, a ranking needs a player counter` : `ranking: unknown counter "${name}"`);
+// ../core-library/dist/generated-controls.js
+function describeGeneratedControls(itemId) {
+  const item4 = getCoreItem(itemId), look = item4 ? anyGeneratedLook(item4) : null;
+  if (!look)
     return null;
-  }
-};
-function compare(a, b) {
-  return a < b ? -1 : a > b ? 1 : 0;
+  return describeGeneratedLookControls(look);
 }
-
-// ../game/dist/components/respawn.js
-var RespawnComponent = class {
-  #ctx;
-  constructor(ctx) {
-    this.#ctx = ctx;
-    const { bus } = ctx;
-    bus.on("died", (event) => {
-      const row = ctx.players.get(event.victim);
-      if (row && ctx.game.respawn)
-        row.respawnAt = ctx.now + ctx.game.respawn.delaySec * 1e3;
-    });
-    bus.on("placed", (event) => this.#protect(event.id));
-    bus.on("match_reset", () => {
-      for (const row of ctx.players.values()) {
-        row.respawnAt = null;
-        row.protectedUntil = 0;
-      }
-    });
-  }
-  /** Brings back the knocked-out whose time has come, during play. */
-  tick() {
-    const ctx = this.#ctx;
-    if (ctx.phase !== "playing" || !ctx.game.respawn)
-      return;
-    for (const [id, row] of ctx.players) {
-      if (row.respawnAt === null || ctx.now < row.respawnAt || !row.present)
-        continue;
-      row.respawnAt = null;
-      this.#protect(id);
-      ctx.bus.emit({ type: "respawned", id, at: spotFor(ctx, id) });
-    }
-  }
-  #protect(id) {
-    const row = this.#ctx.players.get(id);
-    const seconds = this.#ctx.game.respawn?.protectSec ?? 0;
-    if (row)
-      row.protectedUntil = seconds > 0 ? this.#ctx.now + seconds * 1e3 : 0;
-  }
-};
-
-// ../game/dist/components/riding.js
-var RidingComponent = class {
-  #ctx;
-  constructor(ctx) {
-    this.#ctx = ctx;
-    const { bus } = ctx;
-    bus.on("player_left", (event) => ctx.riding.delete(event.id));
-    bus.on("match_reset", () => ctx.riding.clear());
-  }
-  /** Only a player who is here gets on; one riding something else gets off it first. */
-  mount(id, item4, tag, seat) {
-    if (!this.#ctx.players.get(id)?.present)
-      return;
-    const current = this.#ctx.riding.get(id);
-    if (current?.item === item4)
-      return;
-    if (current)
-      this.dismount(id);
-    this.#ctx.riding.set(id, { item: item4, tag });
-    this.#ctx.bus.emit({ type: "mounted", id, item: item4, tag, seat });
-  }
-  dismount(id) {
-    const current = this.#ctx.riding.get(id);
-    if (!current)
-      return;
-    this.#ctx.riding.delete(id);
-    this.#ctx.bus.emit({ type: "dismounted", id, item: current.item, tag: current.tag });
-  }
-};
-
-// ../game/dist/components/actions.js
-function actorOf(event) {
-  if (event.type === "hit" || event.type === "died")
-    return event.by;
-  return "id" in event ? event.id : null;
-}
-var ActionRunner = class {
-  #ctx;
-  #counters;
-  #health;
-  #ranking;
-  /** Actions already run per top-level event. */
-  #spent = /* @__PURE__ */ new WeakMap();
-  /** Top-level events whose limit was already logged. */
-  #limited = /* @__PURE__ */ new WeakSet();
-  /** Problems with the game's data already logged. */
-  #reported = /* @__PURE__ */ new Set();
-  #timers = [];
-  #timerSeq = 0;
-  constructor(ctx, parts6) {
-    this.#ctx = ctx;
-    this.#counters = parts6.counters;
-    this.#health = parts6.health;
-    this.#ranking = parts6.ranking;
-    ctx.bus.on("match_won", () => {
-      this.#timers = [];
-    });
-    ctx.bus.on("match_reset", () => {
-      this.#timers = [];
-    });
-  }
-  /** Whether `event` may still run rules or scripts: not deeper than `RULE_LIMITS.chain` follow-up hops. */
-  allowed(event) {
-    const { root, depth } = this.#ctx.bus.traceOf(event);
-    if (depth <= RULE_LIMITS.chain)
-      return true;
-    this.#limit(root, `rules: stopped a chain of more than ${RULE_LIMITS.chain} events`);
-    return false;
-  }
-  /**
-   * Runs one action for `actor` as a follow-up of the event being delivered. False when the top-level event's budget
-   * is spent, or when no event is being delivered (an action always belongs to one).
-   */
-  run(action, actor) {
-    const { bus } = this.#ctx;
-    const current = bus.current();
-    if (!current)
-      return false;
-    const { root } = current;
-    const spent = this.#spent.get(root) ?? 0;
-    if (spent >= RULE_LIMITS.actionsPerEvent) {
-      this.#limit(root, `rules: stopped after ${RULE_LIMITS.actionsPerEvent} actions for one event`);
-      return false;
-    }
-    this.#spent.set(root, spent + 1);
-    bus.followUp(() => this.#act(action, actor));
-    return true;
-  }
-  /** A counter's value: the actor's own (their team's, or the global one), a player's, a team's; null when none. */
-  read(name, target, actor) {
-    const decl = this.#declared(name);
-    if (!decl)
-      return null;
-    if (target === "actor") {
-      const [who] = this.#counterTargets(decl, "actor", actor);
-      return who === void 0 ? null : this.#counters.get(name, who);
-    }
-    if (target === "global")
-      return decl.scope === "global" ? this.#counters.get(name, "global") : null;
-    if ("team" in target)
-      return decl.scope === "team" ? this.#counters.get(name, { team: target.team }) : null;
-    if (decl.scope !== "player" || !this.#ctx.players.has(target.player))
-      return null;
-    return this.#counters.get(name, { player: target.player });
-  }
-  /** Raises `timer_fired` for every timer whose time has come, earliest first. */
-  tick() {
-    const now = this.#ctx.now;
-    const due = this.#timers.filter((t) => t.at <= now).sort((a, b) => a.at - b.at || a.seq - b.seq);
-    if (due.length === 0)
-      return;
-    this.#timers = this.#timers.filter((t) => t.at > now);
-    for (const t of due)
-      this.#ctx.bus.emit({ type: "timer_fired", name: t.name, id: t.id });
-  }
-  #act(action, actor) {
-    const ctx = this.#ctx;
-    switch (action.kind) {
-      case "add_counter":
-      case "set_counter": {
-        const decl = this.#declared(action.name);
-        if (!decl)
-          return;
-        for (const who of this.#counterTargets(decl, action.who, actor))
-          if (action.kind === "add_counter")
-            this.#counters.add(action.name, action.by, who);
-          else
-            this.#counters.set(action.name, action.to, who);
-        return;
-      }
-      case "add_score":
-        if (action.by === 0)
-          return;
-        for (const id of this.#players(action.who, actor)) {
-          const row = ctx.players.get(id);
-          row.score += action.by;
-          ctx.bus.emit({ type: "score_changed", id, score: row.score });
-        }
-        return;
-      case "end_match":
-        if (ctx.phase !== "playing" || ctx.decided)
-          return;
-        ctx.decided = true;
-        ctx.bus.emit({ type: "match_won", winner: this.#pickWinner(action.winner, actor) });
-        return;
-      case "start_timer": {
-        const { name } = action;
-        this.#timers = this.#timers.filter((t) => !(t.name === name && t.id === actor));
-        this.#timers.push({ name, id: actor, at: ctx.now + action.seconds * 1e3, seq: this.#timerSeq++ });
-        return;
-      }
-      case "damage":
-        for (const id of this.#players(action.who, actor))
-          this.#health.damage(id, action.amount, null);
-        return;
-      case "heal":
-        for (const id of this.#players(action.who, actor))
-          this.#health.heal(id, action.amount);
-        return;
-      case "teleport_to_zone": {
-        const zone = ctx.zones.find((z2) => z2.tag === action.tag);
-        if (!zone) {
-          this.#report(`rules: no zone tagged "${action.tag}"`);
-          return;
-        }
-        for (const id of this.#players(action.who, actor))
-          if (ctx.players.get(id).present) {
-            if (ctx.riding.has(id))
-              ctx.bus.emit({ type: "dismount_requested", id });
-            ctx.bus.emit({ type: "placed", id, at: { x: zone.x, y: zone.y, z: zone.z, team: "any" } });
-          }
-        return;
-      }
-      case "show_message":
-        if (action.who === "everyone")
-          ctx.bus.emit({ type: "message", id: null, text: action.text });
-        else
-          for (const id of this.#players(action.who, actor))
-            ctx.bus.emit({ type: "message", id, text: action.text });
-        return;
-      case "emit":
-        ctx.bus.emit({ type: "custom", name: action.event, id: actor });
-        return;
-      case "say":
-        if (!action.line)
-          return;
-        for (const id of this.#players(action.who, actor))
-          if (ctx.players.get(id).present)
-            ctx.bus.emit({ type: "said", id, line: action.line });
-        return;
-      case "dismount":
-        for (const id of this.#players(action.who, actor))
-          ctx.bus.emit({ type: "dismount_requested", id });
-        return;
-      case "set_speed": {
-        const until = ctx.now + action.seconds * 1e3;
-        for (const id of this.#players(action.who, actor))
-          ctx.bus.emit({ type: "speed_requested", id, factor: action.factor, until });
-        return;
-      }
-    }
-  }
-  /** The players an action reaches (ids with a row). */
-  #players(who, actor) {
-    const ctx = this.#ctx;
-    if (who === "everyone")
-      return presentIds(ctx);
-    if (actor === null || !ctx.players.has(actor))
-      return [];
-    if (who === "actor")
-      return [actor];
-    const team = ctx.players.get(actor).team;
-    if (team === null)
-      return [actor];
-    return presentIds(ctx).filter((id) => ctx.players.get(id).team === team);
-  }
-  /** Whose value of a counter an action (or a condition, as `actor`) reaches, by the counter's scope. */
-  #counterTargets(decl, who, actor) {
-    if (decl.scope === "global")
-      return ["global"];
-    if (decl.scope === "player")
-      return this.#players(who, actor).map((player) => ({ player }));
-    if (who === "everyone")
-      return [{ team: "red" }, { team: "blue" }];
-    const team = actor === null ? null : this.#ctx.players.get(actor)?.team ?? null;
-    return team === null ? [] : [{ team }];
-  }
-  #pickWinner(winner, actor) {
-    if (winner === "nobody")
-      return null;
-    if ("player" in winner)
-      return actor !== null && this.#ctx.players.has(actor) ? { kind: "player", id: actor } : null;
-    if ("team" in winner)
-      return { kind: "team", team: winner.team };
-    const decl = this.#declared(winner.byCounter);
-    if (!decl)
-      return null;
-    if (decl.scope === "player" && this.#ranking?.decides(decl.name, winner.order))
-      return this.#ranking.leader();
-    const better = (a, b) => winner.order === "high" ? a > b : a < b;
-    let entries;
-    if (decl.scope === "player")
-      entries = [...this.#ctx.players].map(([id, row]) => [{ kind: "player", id }, row.counters[decl.name] ?? decl.start]);
-    else if (decl.scope === "team")
-      entries = ["red", "blue"].map((team) => [{ kind: "team", team }, this.#counters.get(decl.name, { team })]);
-    else {
-      this.#report(`rules: counter "${decl.name}" is global and cannot pick a winner`);
-      return null;
-    }
-    if (entries.length === 0)
-      return null;
-    const best = entries.reduce((top, entry) => better(entry[1], top[1]) ? entry : top);
-    return entries.filter((entry) => entry[1] === best[1]).length > 1 ? null : best[0];
-  }
-  #declared(name) {
-    const decl = (this.#ctx.game.counters ?? []).find((c) => c.name === name);
-    if (!decl)
-      this.#report(`rules: unknown counter "${name}"`);
-    return decl ?? null;
-  }
-  #limit(root, message) {
-    if (this.#limited.has(root))
-      return;
-    this.#limited.add(root);
-    this.#ctx.log(message);
-  }
-  #report(message) {
-    if (this.#reported.has(message))
-      return;
-    this.#reported.add(message);
-    this.#ctx.log(message);
-  }
-};
-
-// ../game/dist/components/rules.js
-var ENGINE_EVENTS2 = new Set(GameEventName.options);
-var RulesComponent = class {
-  #ctx;
-  #runner;
-  #rules;
-  constructor(ctx, runner) {
-    this.#ctx = ctx;
-    this.#runner = runner;
-    this.#rules = ctx.game.rules ?? [];
-    const { bus } = ctx;
-    const types = new Set(this.#rules.map((rule) => ENGINE_EVENTS2.has(rule.when.event) ? rule.when.event : "custom"));
-    for (const type of types)
-      bus.on(type, (event) => this.#hear(event));
-  }
-  #hear(event) {
-    const matching = this.#rules.filter((rule) => this.#matches(rule, event));
-    if (matching.length === 0)
-      return;
-    if (!this.#runner.allowed(event))
-      return;
-    const actor = actorOf(event);
-    for (const rule of matching) {
-      if (!rule.if.every((condition) => this.#holds(condition, actor)))
-        continue;
-      for (const action of rule.do)
-        if (!this.#runner.run(action, actor))
-          return;
-    }
-  }
-  #matches(rule, event) {
-    const { when } = rule;
-    const name = event.type === "custom" ? ENGINE_EVENTS2.has(event.name) ? null : event.name : event.type;
-    if (name !== when.event)
-      return false;
-    if (when.tag !== void 0 && !("tag" in event && event.tag === when.tag))
-      return false;
-    if (when.counter !== void 0 && !(event.type === "counter_changed" && event.name === when.counter))
-      return false;
-    return true;
-  }
-  #holds(condition, actor) {
-    const ctx = this.#ctx;
-    switch (condition.kind) {
-      case "phase":
-        return ctx.phase === condition.is;
-      case "team":
-        return actor !== null && ctx.players.get(actor)?.team === condition.is;
-      case "riding": {
-        const riding = actor === null ? void 0 : ctx.riding.get(actor);
-        const rides = riding !== void 0 && (condition.tag === void 0 || riding.tag === condition.tag);
-        return rides === condition.is;
-      }
-      case "counter": {
-        const left2 = this.#runner.read(condition.name, "actor", actor);
-        const right2 = typeof condition.value === "number" ? condition.value : this.#runner.read(condition.value.counter, "actor", actor);
-        if (left2 === null || right2 === null)
-          return false;
-        switch (condition.op) {
-          case "=":
-            return left2 === right2;
-          case "!=":
-            return left2 !== right2;
-          case "<":
-            return left2 < right2;
-          case "<=":
-            return left2 <= right2;
-          case ">":
-            return left2 > right2;
-          case ">=":
-            return left2 >= right2;
-        }
-      }
-    }
-  }
-};
-
-// ../game/dist/components/score.js
-var ScoreComponent = class {
-  constructor(ctx) {
-    const { bus } = ctx;
-    bus.on("died", (event) => {
-      const score = ctx.game.score;
-      if (!score || event.by === null || event.by === event.victim)
-        return;
-      const killer = ctx.players.get(event.by);
-      const victim = ctx.players.get(event.victim);
-      if (!killer || !victim)
-        return;
-      if (victim.team !== null && victim.team === killer.team)
-        return;
-      killer.kills += 1;
-      if (score.from !== "kills")
-        return;
-      killer.score += 1;
-      bus.emit({ type: "score_changed", id: event.by, score: killer.score });
-    });
-    bus.on("match_reset", () => {
-      for (const row of ctx.players.values()) {
-        row.score = 0;
-        row.kills = 0;
-      }
-    });
-  }
-};
-
-// ../game/dist/components/teams.js
-var TeamsComponent = class {
-  #ctx;
-  constructor(ctx) {
-    this.#ctx = ctx;
-    ctx.bus.on("phase_changed", (event) => {
-      if (event.phase === "playing")
-        this.#balance();
-    });
-  }
-  get #on() {
-    return this.#ctx.game.teams?.mode === "two";
-  }
-  /** Puts a new player on the team with fewer present players (red on a tie). */
-  assign(id) {
-    const row = this.#ctx.players.get(id);
-    if (!row || !this.#on)
-      return;
-    const count = (team) => [...this.#ctx.players.values()].filter((p) => p.present && p.team === team).length;
-    row.team = count("blue") < count("red") ? "blue" : "red";
-  }
-  /** Whether `by` may hurt `victim`: never teammates, unless friendly fire is on. */
-  canHurt(by, victim) {
-    const teams = this.#ctx.game.teams;
-    if (!this.#on || teams?.friendlyFire)
-      return true;
-    const a = this.#ctx.players.get(by)?.team ?? null;
-    return a === null || a !== (this.#ctx.players.get(victim)?.team ?? null);
-  }
-  /** Moves the latest joiners from the bigger team to the smaller until they differ by at most one. */
-  #balance() {
-    if (!this.#on)
-      return;
-    const members2 = (team) => [...this.#ctx.players].filter(([, p]) => p.present && p.team === team);
-    for (; ; ) {
-      const red = members2("red");
-      const blue = members2("blue");
-      if (Math.abs(red.length - blue.length) <= 1)
-        return;
-      const [from, to] = red.length > blue.length ? [red, "blue"] : [blue, "red"];
-      const [id, row] = from[from.length - 1];
-      row.team = to;
-      this.#ctx.bus.emit({ type: "team_changed", id, team: to });
-    }
-  }
-};
-
-// ../game/dist/components/win.js
-function teamScores(ctx) {
-  const scores = { red: 0, blue: 0 };
-  for (const player of ctx.players.values())
-    if (player.team)
-      scores[player.team] += player.score;
-  return scores;
-}
-var WinComponent = class {
-  #ctx;
-  #winner = null;
-  /** When to look again at who is left (a leave within the grace); null for no check pending. */
-  #standingCheckAt = null;
-  constructor(ctx) {
-    this.#ctx = ctx;
-    const { bus } = ctx;
-    bus.on("time_up", () => this.#decide(this.#leader()));
-    bus.on("score_changed", () => {
-      const goal = ctx.game.score?.goal;
-      if (goal !== void 0 && this.#reached(goal))
-        this.#decide(this.#leader());
-    });
-    bus.on("player_left", () => this.#checkStanding());
-    bus.on("solo_changed", () => this.#checkStanding());
-    bus.on("match_reset", () => {
-      this.#winner = null;
-      this.#standingCheckAt = null;
-    });
-  }
-  get winner() {
-    return this.#winner;
-  }
-  tick() {
-    if (this.#standingCheckAt === null || this.#ctx.now < this.#standingCheckAt)
-      return;
-    this.#standingCheckAt = null;
-    const winner = this.#lastStanding();
-    if (winner !== void 0)
-      this.#decide(winner);
-  }
-  #decide(winner) {
-    if (this.#ctx.phase !== "playing" || this.#ctx.decided)
-      return;
-    this.#ctx.decided = true;
-    this.#winner = winner;
-    this.#standingCheckAt = null;
-    this.#ctx.bus.emit({ type: "match_won", winner });
-  }
-  #checkStanding() {
-    const ctx = this.#ctx;
-    if (ctx.phase !== "playing")
-      return;
-    const winner = this.#lastStanding();
-    if (winner === void 0)
-      return;
-    if (ctx.leaveGraceMs === 0 || presentIds(ctx).length === 0)
-      this.#decide(winner);
-    else
-      this.#standingCheckAt ??= ctx.now + ctx.leaveGraceMs;
-  }
-  /** The winner when play must end because of who is left; undefined while the match goes on. */
-  #lastStanding() {
-    const ctx = this.#ctx;
-    const present = presentIds(ctx);
-    if (present.length === 0)
-      return null;
-    if (ctx.solo)
-      return void 0;
-    if (ctx.game.teams?.mode === "two") {
-      const teams = new Set(present.map((id) => ctx.players.get(id).team));
-      return teams.size === 1 ? { kind: "team", team: [...teams][0] } : void 0;
-    }
-    return present.length === 1 ? { kind: "player", id: present[0] } : void 0;
-  }
-  #reached(goal) {
-    const scores = this.#ctx.game.teams?.mode === "two" ? Object.values(teamScores(this.#ctx)) : [...this.#ctx.players.values()].map((p) => p.score);
-    return scores.some((score) => score >= goal);
-  }
-  /** Highest score wins, among the players who are here (or the teams); a tie has no winner. */
-  #leader() {
-    const ctx = this.#ctx;
-    if (ctx.game.teams?.mode === "two") {
-      const { red, blue } = teamScores(ctx);
-      return red === blue ? null : { kind: "team", team: red > blue ? "red" : "blue" };
-    }
-    const ranked = [...ctx.players].filter(([, p]) => p.present).sort(([, a], [, b]) => b.score - a.score);
-    if (ranked.length === 0 || ranked[1] && ranked[1][1].score === ranked[0][1].score)
-      return null;
-    return { kind: "player", id: ranked[0][0] };
-  }
-};
-
-// ../game/dist/components/zones.js
-var ZONE_HEIGHT = 8;
-function local(zone, p) {
-  const dx = p.x - zone.x;
-  const dz = p.z - zone.z;
-  return {
-    across: dx * Math.cos(zone.yaw) - dz * Math.sin(zone.yaw),
-    along: dx * Math.sin(zone.yaw) + dz * Math.cos(zone.yaw),
-    dy: p.y - zone.y
-  };
-}
-function crossesZoneGate(from, to, zone) {
-  const a = local(zone, from);
-  const b = local(zone, to);
-  if (a.along >= 0 || b.along < 0)
-    return false;
-  const t = a.along / (a.along - b.along);
-  if (Math.abs(a.dy + (b.dy - a.dy) * t) > ZONE_HEIGHT)
-    return false;
-  return Math.abs(a.across + (b.across - a.across) * t) <= zone.width / 2;
-}
-function insideZoneArea(p, zone) {
-  const l = local(zone, p);
-  return Math.abs(l.across) <= zone.width / 2 && Math.abs(l.along) <= zone.depth / 2 && Math.abs(l.dy) <= ZONE_HEIGHT;
-}
-function segmentTouchesArea(from, to, zone) {
-  const a = local(zone, from);
-  const b = local(zone, to);
-  let t0 = 0;
-  let t1 = 1;
-  const slabs = [
-    [a.across, b.across, zone.width / 2],
-    [a.along, b.along, zone.depth / 2],
-    [a.dy, b.dy, ZONE_HEIGHT]
-  ];
-  for (const [start, end, half] of slabs) {
-    const delta = end - start;
-    if (delta === 0) {
-      if (Math.abs(start) > half)
-        return false;
-      continue;
-    }
-    let near = (-half - start) / delta;
-    let far = (half - start) / delta;
-    if (near > far)
-      [near, far] = [far, near];
-    t0 = Math.max(t0, near);
-    t1 = Math.min(t1, far);
-    if (t0 > t1)
-      return false;
-  }
-  return true;
-}
-var ZonesComponent = class {
-  #ctx;
-  /** The last trusted position per player; absent right after a jump (no event is judged across it). */
-  #last = /* @__PURE__ */ new Map();
-  constructor(ctx) {
-    this.#ctx = ctx;
-    const { bus } = ctx;
-    bus.on("phase_changed", () => this.#last.clear());
-    bus.on("player_joined", (event) => {
-      if (event.returning)
-        this.#last.delete(event.id);
-    });
-    bus.on("player_left", (event) => this.#last.delete(event.id));
-    bus.on("placed", (event) => this.#last.delete(event.id));
-    bus.on("respawned", (event) => this.#last.delete(event.id));
-    bus.on("relocated", (event) => this.#last.delete(event.id));
-    bus.on("match_reset", () => this.#last.clear());
-  }
-  /** Judges every present player's move since the last tick against every zone. */
-  tick() {
-    const ctx = this.#ctx;
-    if (ctx.phase !== "playing" || ctx.zones.length === 0)
-      return;
-    for (const id of presentIds(ctx)) {
-      const at2 = ctx.positions(id);
-      if (!at2) {
-        this.#last.delete(id);
-        continue;
-      }
-      const from = this.#last.get(id);
-      this.#last.set(id, at2);
-      if (from)
-        for (const zone of ctx.zones)
-          this.#judge(id, zone, from, at2);
-    }
-  }
-  #judge(id, zone, from, to) {
-    const bus = this.#ctx.bus;
-    const base = { id, zone: zone.id, tag: zone.tag };
-    if (zone.shape === "gate") {
-      if (crossesZoneGate(from, to, zone))
-        bus.emit({ type: "zone_crossed", ...base });
-      return;
-    }
-    const wasIn = insideZoneArea(from, zone);
-    const isIn = insideZoneArea(to, zone);
-    const touches = !wasIn && !isIn && segmentTouchesArea(from, to, zone);
-    if (!wasIn && (isIn || touches))
-      bus.emit({ type: "zone_entered", ...base });
-    if (!isIn && (wasIn || touches))
-      bus.emit({ type: "zone_exited", ...base });
-  }
-};
-
-// ../game/dist/session.js
-var anyTool = () => ({ damage: 0, reach: 0, arcDeg: 0, cooldownSec: 0 });
-var GameSession = class {
-  #ctx;
-  #match;
-  #teams;
-  #health;
-  #respawn;
-  #loadout;
-  #zones;
-  #counters;
-  #ranking;
-  #win;
-  /** The rules' and scripts' actions, budgets and timers; null with neither rules nor scripts. */
-  #actions;
-  #riding;
-  /** Server ms when the current match began. */
-  #matchStartedAt;
-  /** The winner of this match (every decider raises `match_won` at most once per match). */
-  #winner = null;
-  constructor(game, spawns, now, options = {}) {
-    const bus = new EventBus();
-    this.#ctx = {
-      game,
-      bus,
-      players: /* @__PURE__ */ new Map(),
-      positions: options.positions ?? (() => null),
-      tools: options.tools ?? anyTool,
-      leaveGraceMs: options.leaveGraceMs ?? 0,
-      log: options.log ?? ((message) => console.warn(message)),
-      now,
-      phase: "waiting",
-      endsAt: null,
-      decided: false,
-      solo: false,
-      spawns,
-      zones: options.zones ?? [],
-      riding: /* @__PURE__ */ new Map()
-    };
-    this.#matchStartedAt = now;
-    bus.on("match_reset", () => {
-      this.#matchStartedAt = this.#ctx.now;
-      for (const [id, row] of this.#ctx.players)
-        if (!row.present)
-          this.#ctx.players.delete(id);
-      this.#ctx.decided = false;
-      this.#winner = null;
-    });
-    bus.on("phase_changed", (event) => {
-      if (event.phase === "playing") {
-        this.#ctx.decided = false;
-        this.#winner = null;
-      }
-    });
-    bus.on("match_won", (event) => {
-      this.#winner = event.winner;
-    });
-    this.#match = new MatchComponent(this.#ctx, () => this.#ranking?.leader() ?? null);
-    this.#teams = new TeamsComponent(this.#ctx);
-    this.#health = new HealthComponent(this.#ctx);
-    this.#respawn = new RespawnComponent(this.#ctx);
-    new PlacementComponent(this.#ctx);
-    this.#loadout = new LoadoutComponent(this.#ctx);
-    this.#zones = new ZonesComponent(this.#ctx);
-    this.#counters = new CountersComponent(this.#ctx);
-    this.#riding = new RidingComponent(this.#ctx);
-    this.#ranking = game.ranking ? new RankingComponent(this.#ctx) : null;
-    new ScoreComponent(this.#ctx);
-    this.#win = game.win ? new WinComponent(this.#ctx) : null;
-    const rules = Boolean(game.rules?.length);
-    this.#actions = rules || options.scripts ? new ActionRunner(this.#ctx, { counters: this.#counters, health: this.#health, ranking: this.#ranking }) : null;
-    if (rules)
-      new RulesComponent(this.#ctx, this.#actions);
-    if (options.scripts)
-      this.#attachScripts(options.scripts, this.#actions);
-    this.#run(now, () => this.#match.start());
-  }
-  get bus() {
-    return this.#ctx.bus;
-  }
-  /** A player already here is left alone; one who left mid-match comes back to their row. */
-  join(id, now) {
-    this.#run(now, () => {
-      const existing = this.#ctx.players.get(id);
-      if (existing?.present)
-        return;
-      if (existing)
-        existing.present = true;
-      else {
-        this.#ctx.players.set(id, newRow());
-        this.#teams.assign(id);
-      }
-      this.bus.emit({ type: "player_joined", id, team: this.#ctx.players.get(id).team, returning: Boolean(existing) });
-    });
-  }
-  /** During play and the results a leaver keeps their row (score, winner, place) until the next match. */
-  leave(id, now) {
-    this.#run(now, () => {
-      const player = this.#ctx.players.get(id);
-      if (!player)
-        return;
-      if (this.#ctx.phase === "playing" || this.#ctx.phase === "results")
-        player.present = false;
-      else
-        this.#ctx.players.delete(id);
-      this.bus.emit({ type: "player_left", id });
-    });
-  }
-  setSolo(on, now) {
-    this.#run(now, () => {
-      if (this.#ctx.solo === on)
-        return;
-      this.#ctx.solo = on;
-      this.bus.emit({ type: "solo_changed", on });
-    });
-  }
-  tick(now) {
-    this.#run(now, () => this.#respawn.tick());
-    this.#run(now, () => this.#win?.tick());
-    this.#run(now, () => this.#zones.tick());
-    this.#run(now, () => this.#actions?.tick());
-    this.#run(now, () => this.#match.tick());
-  }
-  /**
-   * A strike of the tool in hand reaching `targets` (the caller finds them from the positions it
-   * trusts). Each target is one change: a goal reached by the first ends the match before the next.
-   */
-  attack(id, tool, targets, now) {
-    this.#ctx.now = now;
-    const attacker = this.#ctx.players.get(id);
-    if (this.#ctx.phase !== "playing" || !attacker?.present)
-      return "not_playing";
-    if (!attacker.alive)
-      return "dead";
-    if (!attacker.tool)
-      return "no_tool";
-    const result = this.#loadout.use(id, tool);
-    if (result !== "ok")
-      return result;
-    this.#run(now, () => this.bus.emit({ type: "struck", id }));
-    for (const target of targets)
-      this.#run(now, () => {
-        if (this.#teams.canHurt(id, target))
-          this.#health.damage(target, tool.damage, id);
-      });
-    return "ok";
-  }
-  /** Harm without a strike (zones, falls later); `by` is null when nobody caused it. */
-  damage(victim, amount, by, now) {
-    this.#run(now, () => this.#health.damage(victim, amount, by));
-  }
-  /** The counters of this game (the rules interpreter reads and changes them). */
-  get counters() {
-    return this.#counters;
-  }
-  /** The tool in a player's hand, or null (none, or the item is not a tool). */
-  toolOf(id) {
-    return this.#loadout.toolOf(id);
-  }
-  /** The place's spawn points changed (a builder moved one): later spawns use the new ones. */
-  setSpawns(spawns) {
-    this.#ctx.spawns = spawns;
-  }
-  /** The place's zones changed (a builder moved one): they are judged as given from the next tick. */
-  setZones(zones) {
-    this.#ctx.zones = zones;
-  }
-  /** Where a player would come back, away from the given opponent positions. */
-  respawnSpot(id, opponents) {
-    return pickSpawn(this.#ctx.spawns, this.#ctx.players.get(id)?.team ?? null, opponents);
-  }
-  /** Whether a player is knocked out during play (a cheap check, without copying the view). */
-  isDown(id) {
-    const row = this.#ctx.players.get(id);
-    return this.#ctx.phase === "playing" && row !== void 0 && row.present && !row.alive;
-  }
-  /**
-   * A player got on a rideable item (the room checked it): `item` is its instance id, `tag` its ride
-   * tag ('' for none), `seat` from 1. Only for a player who is here.
-   */
-  mount(id, item4, tag, seat, now) {
-    this.#run(now, () => this.#riding.mount(id, item4, tag, seat));
-  }
-  /** A player got off what they ride (nothing when they ride nothing). */
-  dismount(id, now) {
-    this.#run(now, () => this.#riding.dismount(id));
-  }
-  /** The room moved a player's body itself (a seat, an exit spot, a correction): no zone judges the jump. */
-  relocated(id, now) {
-    this.#run(now, () => this.bus.emit({ type: "relocated", id }));
-  }
-  /** What a player rides (instance id and ride tag), or null. */
-  ridingOf(id) {
-    const riding = this.#ctx.riding.get(id);
-    return riding ? { ...riding } : null;
-  }
-  /** A copy of the state; changing it changes nothing here. */
-  view() {
-    const players = new Map([...this.#ctx.players].map(([id, row]) => [id, { ...row, items: [...row.items], counters: { ...row.counters } }]));
+function describeGeneratedLookControls(look) {
+  const { generator, source, params, limits, controls: metadata } = look.generated;
+  return { generator, source, controls: Object.entries(params).map(([key, value]) => {
+    const limit = limits[key] ?? {};
+    const docs = metadata?.[key];
+    const label = key.replace(/([a-z])([A-Z])/g, "$1 $2").replace(/[_-]/g, " ");
+    const range = typeof value === "number" ? ` Allowed range: ${limit.min ?? "unbounded"} to ${limit.max ?? "unbounded"}.` : limit.values ? ` Choices: ${limit.values.join(", ")}.` : "";
     return {
-      phase: this.#ctx.phase,
-      endsAt: this.#ctx.endsAt,
-      players,
-      teamScores: teamScores(this.#ctx),
-      winner: this.#winner,
-      teamCounters: this.#counters.teamValues(),
-      globalCounters: this.#counters.globalValues()
+      key,
+      label: docs?.label ?? label.charAt(0).toUpperCase() + label.slice(1),
+      type: typeof value,
+      default: value,
+      group: docs?.group ?? "general",
+      description: `${docs?.help ?? `Generator setting ${key}.`} Default: ${String(value)}.${range}`,
+      ...docs?.unit ? { unit: docs.unit } : {},
+      ...limit.min !== void 0 ? { min: limit.min } : {},
+      ...limit.max !== void 0 ? { max: limit.max } : {},
+      ...limit.values ? { values: [...limit.values] } : {}
     };
+  }) };
+}
+function generatedControlValueError(control, value) {
+  if (typeof value !== control.type)
+    return `${control.key} must be a ${control.type}.`;
+  if (typeof value === "number") {
+    if (!Number.isFinite(value))
+      return `${control.key} must be a finite number.`;
+    if (control.min !== void 0 && value < control.min || control.max !== void 0 && value > control.max)
+      return `${control.key} must be from ${control.min ?? "-inf"} to ${control.max ?? "inf"} (got ${value}).`;
   }
-  /** Subscribes a script host after the rules; it hears only events within the rules' chain limit. */
-  #attachScripts(host, actions) {
-    const ctx = this.#ctx;
-    const api = {
-      act: (action, actor) => actions.run(action, actor),
-      view: () => this.view(),
-      now: () => ctx.now,
-      zones: () => ctx.zones.map((zone) => ({ ...zone })),
-      ridingOf: (id) => this.ridingOf(id),
-      actorOf,
-      matchStartedAt: () => this.#matchStartedAt,
-      counter: (name, of) => actions.read(name, of, null),
-      counterScope: (name) => (ctx.game.counters ?? []).find((c) => c.name === name)?.scope ?? null,
-      caused: (event) => ctx.bus.traceOf(event).root !== event
-    };
-    host.attach?.(api);
-    for (const type of new Set(host.events))
-      ctx.bus.on(type, (event) => {
-        if (actions.allowed(event))
-          host.hear(event, api);
-      });
-    ctx.bus.on("match_reset", () => host.matchReset());
-  }
-  /** Applies one change at time `now`, then delivers the events it raised. */
-  #run(now, change) {
-    this.#ctx.now = now;
-    change();
-    this.#ctx.bus.flush();
-  }
+  if (typeof value === "string" && control.values && !control.values.includes(value))
+    return `${control.key} must be one of ${control.values.join(", ")} (got ${value}).`;
+  return null;
+}
+
+// ../core-library/dist/terrain-surface.js
+var INPUTS = {
+  "beach-sand": ["coverage"],
+  "seabed-sand": [],
+  rock: ["coverage", "scarp"],
+  grass: ["coverage"],
+  dirt: ["coverage"],
+  seagrass: ["coverage"],
+  rubble: ["coverage"]
 };
-
-// ../script/dist/dry-run.js
-var TICK = 100;
-var MAX_TICKS = 36e3;
-var STEP = 2;
-var MAX_PLAYERS = 8;
-var ENGINE_RAISED = /* @__PURE__ */ new Set([
-  "phase_changed",
-  "time_up",
-  "counter_changed",
-  "timer_fired",
-  "respawned"
-]);
-async function dryRun(input2) {
-  const recorded = input2.recording;
-  const events = recorded ? recorded.events.map((event, i) => ({
-    ...event,
-    ...recorded.at?.[i] === void 0 ? {} : { at: recorded.at[i] },
-    ...recorded.caused?.[i] ? { caused: true } : {}
-  })) : input2.events ?? [];
-  if (!recorded && events.length > SCRIPT_LIMITS.testEvents)
-    throw new Error(`a dry run takes at most ${SCRIPT_LIMITS.testEvents} events`);
-  const game = input2.game ?? input2.doc?.game;
-  if (!game)
-    throw new Error("the place has no game; scripts run only in places with a game");
-  const place = {
-    game,
-    zones: input2.zones ?? (input2.doc ? zonesOf(input2.doc) : []),
-    spawns: input2.spawns ?? (input2.doc ? spawnSpots(input2.doc) : [])
-  };
-  const players = input2.players ?? 2;
-  if (!Number.isInteger(players) || players < 1 || players > MAX_PLAYERS)
-    throw new Error(`a dry run has 1 to ${MAX_PLAYERS} players`);
-  const scripts = input2.only ? input2.scripts.filter((s) => s.id === input2.only).map((s) => ({ ...s, enabled: true })) : input2.scripts;
-  if (input2.only && scripts.length === 0)
-    throw new Error(`no script ${input2.only}`);
-  const seed = recorded?.seed ?? input2.seed ?? 1;
-  const module = input2.module ?? await createScriptModule();
-  const log = [];
-  const requested = [];
-  const runner = new ScriptRunner(scripts, {
-    placeSeed: "dry-run",
-    seed,
-    module,
-    onLog: (line) => log.push(line),
-    onRequest: (request) => requested.push(request)
+function resolveTerrainSurface(descriptor, surface) {
+  const d = TerrainFieldDescriptor.parse(descriptor), s = TerrainActiveSurface.parse(surface);
+  const size = d.width * d.spacing;
+  const height = d.channels.find((c) => c.id === d.heightBinding?.channel);
+  if (!height?.range || !d.heightBinding || height.range[0] + d.heightBinding.offset < -150 || height.range[1] + d.heightBinding.offset > 450)
+    throw new Error("Native height requires a declared range within world height bounds after offset");
+  const levels = Math.log2(size / 8) + 1;
+  if (!Number.isInteger(levels) || levels < 1 || levels > 16)
+    throw new Error("Native terrain requires 1 to 16 LOD levels");
+  if (s.setId !== d.id || !d.heightBinding || d.channels.find((c) => c.id === d.heightBinding.channel)?.encoding !== "f32le")
+    throw new Error("Native surface requires a bound Float32 height channel");
+  if (d.width !== d.height || d.origin[0] !== d.origin[1] || d.origin.some((v) => v % 8 !== 0) || d.sampling !== "cell-center" || d.width < 8 || (d.width & d.width - 1) !== 0 || size < 8 || !Number.isInteger(Math.log2(size / 8)))
+    throw new Error("Native surface requires square power-of-two cell centres, equal 8m-aligned origins and 8m power-of-two domain");
+  if (!s.materialBindings?.length)
+    throw new Error("Native surface requires explicit Ground material bindings");
+  const seen = /* @__PURE__ */ new Set();
+  const bindings = s.materialBindings.map((binding) => {
+    const resource = getGround(binding.itemId);
+    if (!resource?.procedural || resource.procedural.generator !== "tidewater-ground")
+      throw new Error("Unsupported native Ground resource");
+    const variant = resource.procedural.variant;
+    if (seen.has(variant))
+      throw new Error("Duplicate native Ground binding");
+    seen.add(variant);
+    if (Object.keys(binding.inputs).some((key) => !INPUTS[variant].includes(key)))
+      throw new Error("Unsupported native Ground input");
+    if (variant !== "seabed-sand" && !binding.inputs.coverage)
+      throw new Error("Ground binding requires explicit coverage");
+    for (const input2 of Object.values(binding.inputs)) {
+      if (!d.channels.some((c) => c.id === input2.channel))
+        throw new Error("Undeclared Ground channel");
+      if (input2.scale < 0)
+        throw new Error("Ground scale must be nonnegative");
+    }
+    return { variant, soil: resource.soil, inputs: binding.inputs };
   });
-  try {
-    return replay(place, Boolean(recorded), events, players, runner, {
-      log,
-      requested,
-      wallMs: input2.wallMs ?? SCRIPT_LIMITS.dryRunMs
-    });
-  } finally {
-    runner.dispose();
-    if (!input2.module)
-      module.dispose();
+  return { size, levels, bindings };
+}
+function terrainSurfaceSoil(profile, sample, height, seaLevel, x, z2) {
+  let soil = height <= seaLevel ? "sand" : "grass";
+  let strongest = 0.5;
+  for (const binding of profile.bindings) {
+    let coverage = 0;
+    for (const input2 of Object.values(binding.inputs)) {
+      const raw = sample(input2.channel, x, z2);
+      if (raw !== null && Number.isFinite(raw))
+        coverage = Math.max(coverage, Math.min(1, Math.max(0, raw * input2.scale)));
+    }
+    if (coverage > strongest) {
+      strongest = coverage;
+      soil = binding.soil;
+    }
   }
-}
-function replay(input2, fromRecording, events, players, runner, out) {
-  const deadline = performance.now() + out.wallMs;
-  let stopped;
-  const overCap = () => {
-    if (stopped !== void 0)
-      return true;
-    if (performance.now() <= deadline)
-      return false;
-    stopped = `the dry run stopped after ${out.wallMs} ms of wall time (at ${(now / 1e3).toFixed(1)} s of the match clock); test fewer events or a shorter time`;
-    runner.switchOff("the dry run stopped on its time limit");
-    out.log.push({ at: now, script: "", level: "off", text: stopped });
-    return true;
-  };
-  const positions = /* @__PURE__ */ new Map();
-  const spawns = input2.spawns.length ? input2.spawns : [{ x: 0, y: 0, z: 0, team: "any" }];
-  const start = spawns[0];
-  let now = 0;
-  let ticks = 0;
-  const session = new GameSession(input2.game, spawns, now, {
-    positions: (id) => positions.get(id) ?? null,
-    tools: (itemId) => getLibraryItem(itemId)?.manifest.tool ?? null,
-    leaveGraceMs: 0,
-    zones: input2.zones,
-    log: () => {
-    },
-    scripts: runner
-  });
-  const bus = session.bus;
-  const move = (event) => positions.set(event.id, { x: event.at.x, y: event.at.y, z: event.at.z });
-  bus.on("placed", move);
-  bus.on("respawned", move);
-  const getOff = (id) => {
-    if (session.ridingOf(id))
-      session.dismount(id, now);
-  };
-  bus.on("died", (event) => getOff(event.victim));
-  bus.on("dismount_requested", (event) => getOff(event.id));
-  const zoneEvents = [];
-  for (const type of ["zone_entered", "zone_exited", "zone_crossed"])
-    bus.on(type, (event) => zoneEvents.push(event));
-  const ids = [];
-  const idOf = (handle) => {
-    if (!handle)
-      return void 0;
-    const n = /^p(\d+)$/.exec(handle);
-    return n ? ids[Number(n[1]) - 1] : void 0;
-  };
-  const present = (id) => session.view().players.get(id)?.present === true;
-  const tick = () => {
-    if (ticks >= MAX_TICKS || overCap())
-      return false;
-    ticks += 1;
-    now += TICK;
-    session.tick(now);
-    return true;
-  };
-  const advanceTo = (at2) => {
-    if (at2 === void 0)
-      return;
-    while (now + TICK <= at2 && tick())
-      ;
-    if (now < at2 && ticks < MAX_TICKS && stopped === void 0)
-      now = at2;
-  };
-  const join = (id) => {
-    if (!positions.has(id))
-      positions.set(id, { x: start.x, y: start.y, z: start.z });
-    session.join(id, now);
-  };
-  const joins = events.some((event) => event.type === "player_joined" && !event.caused);
-  if (!joins)
-    for (let k = 1; k <= players; k += 1) {
-      ids.push(`dry-${k}`);
-      join(`dry-${k}`);
-    }
-  const expected = joins ? new Set(events.flatMap((e) => e.type === "player_joined" ? [e.id] : [])).size : players;
-  if (expected < input2.game.match.minPlayers)
-    session.setSolo(true, now);
-  const timed = events.some((event) => event.at !== void 0);
-  let playing = timed;
-  const ensurePlaying = () => {
-    if (playing)
-      return;
-    playing = true;
-    for (let i = 0; i < 1e3 && session.view().phase !== "playing"; i += 1)
-      if (!tick())
-        break;
-  };
-  const skipped = [];
-  events.forEach((event, index) => {
-    const refuse = (why) => skipped.push({ index, type: event.type, why });
-    if (event.caused || overCap())
-      return;
-    if (ENGINE_RAISED.has(event.type)) {
-      if (!fromRecording)
-        refuse("the engine raises this event itself; give later times (at) and let the clock raise it");
-      return;
-    }
-    if (event.type !== "player_joined")
-      ensurePlaying();
-    const known = (handle, what = "player") => {
-      const id = idOf(handle);
-      if (id === void 0)
-        refuse(`unknown ${what} handle "${handle}" (players here: ${handles(ids)})`);
-      return id;
-    };
-    switch (event.type) {
-      case "player_joined": {
-        advanceTo(event.at);
-        const id = idOf(event.id);
-        if (id === void 0) {
-          const next = `p${ids.length + 1}`;
-          if (event.id !== next)
-            return refuse(`handles are given in join order: the next new player is ${next}`);
-          ids.push(`dry-${ids.length + 1}`);
-          join(ids[ids.length - 1]);
-          return;
-        }
-        if (present(id))
-          return refuse(`${event.id} is already here`);
-        join(id);
-        return;
-      }
-      case "player_left": {
-        const id = known(event.id);
-        if (id === void 0)
-          return;
-        advanceTo(event.at);
-        if (!present(id))
-          return refuse(`${event.id} is not here`);
-        session.leave(id, now);
-        return;
-      }
-      case "zone_entered":
-      case "zone_exited":
-      case "zone_crossed": {
-        const id = known(event.id);
-        if (id === void 0)
-          return;
-        if (!present(id))
-          return refuse(`${event.id} is not here`);
-        const shape2 = event.type === "zone_crossed" ? "gate" : "area";
-        const zone = input2.zones.find((z2) => z2.id === event.zone && z2.shape === shape2) ?? input2.zones.find((z2) => z2.tag === event.tag && z2.shape === shape2);
-        if (!zone)
-          return refuse(`the place has no zone ${shape2} "${event.zone}" or with the tag "${event.tag}"`);
-        if (event.at !== void 0)
-          advanceTo(event.at - 2 * TICK);
-        const [from, to] = passage(zone, event.type);
-        positions.set(id, from);
-        session.relocated(id, now);
-        tick();
-        zoneEvents.length = 0;
-        positions.set(id, to);
-        tick();
-        const happened = zoneEvents.some((z2) => z2.type === event.type && "id" in z2 && z2.id === id && "zone" in z2 && z2.zone === zone.id);
-        if (!happened)
-          refuse(`the zone did not count the move (zones are judged while playing; the phase is ${session.view().phase})`);
-        return;
-      }
-      case "hit":
-      case "died": {
-        const victim = known(event.victim);
-        if (victim === void 0)
-          return;
-        const by = event.by === null ? null : known(event.by);
-        if (by === void 0)
-          return;
-        advanceTo(event.at);
-        const row = session.view().players.get(victim);
-        if (!row?.present)
-          return refuse(`${event.victim} is not here`);
-        if (!row.alive) {
-          if (event.type === "died" && fromRecording)
-            return;
-          return refuse(`${event.victim} is already knocked out`);
-        }
-        session.damage(victim, event.type === "hit" ? event.damage : row.health, by, now);
-        return;
-      }
-      case "mounted": {
-        const id = known(event.id);
-        if (id === void 0)
-          return;
-        advanceTo(event.at);
-        if (!present(id))
-          return refuse(`${event.id} is not here`);
-        session.mount(id, event.item, event.tag, event.seat, now);
-        return;
-      }
-      case "dismounted": {
-        const id = known(event.id);
-        if (id === void 0)
-          return;
-        advanceTo(event.at);
-        if (!session.ridingOf(id))
-          return refuse(`${event.id} rides nothing`);
-        session.dismount(id, now);
-        return;
-      }
-      case "custom": {
-        const id = event.id === null ? null : known(event.id);
-        if (id === void 0)
-          return;
-        advanceTo(event.at);
-        bus.emit({ type: "custom", name: event.name, id });
-        bus.flush();
-        return;
-      }
-    }
-  });
-  const view = session.view();
-  const handleOf = (id) => `p${ids.indexOf(id) + 1}`;
-  const status = runner.status();
-  return {
-    requested: out.requested,
-    skipped,
-    counters: {
-      players: Object.fromEntries([...view.players].map(([id, row]) => [handleOf(id), { ...row.counters }])),
-      teams: { red: { ...view.teamCounters.red }, blue: { ...view.teamCounters.blue } },
-      global: { ...view.globalCounters }
-    },
-    players: ids.map(handleOf),
-    phase: view.phase,
-    now,
-    log: out.log,
-    ticks: status.reduce((sum, s) => sum + s.ticks, 0),
-    status,
-    ...stopped === void 0 ? {} : { stopped }
-  };
-}
-var handles = (ids) => ids.length ? ids.map((_, i) => `p${i + 1}`).join(", ") : "none";
-function passage(zone, type) {
-  const fx = Math.sin(zone.yaw);
-  const fz = Math.cos(zone.yaw);
-  const at2 = (d) => ({ x: zone.x + fx * d, y: zone.y, z: zone.z + fz * d });
-  if (type === "zone_crossed")
-    return [at2(-STEP), at2(STEP)];
-  const outside = at2(-(zone.depth / 2 + STEP));
-  const inside = at2(0);
-  return type === "zone_entered" ? [outside, inside] : [inside, outside];
+  return soil;
 }
 
-// ../script/dist/review.js
-function reviewFixture() {
-  const game = newGame();
-  const doc = WorldDocument.parse({
-    schemaVersion: 1,
-    experienceId: "exp-review-example",
-    version: 0,
-    style: { base: "blocky" },
-    sizeTier: "small",
-    access: { mode: "private" },
-    environment: { sky: { preset: "day" }, weather: { preset: "clear" } },
-    terrain: {},
-    spawn: { position: [0, 1, 0] },
-    instances: [
-      { instanceId: "spawn-1", itemId: SPAWN_POINT_ID, transform: { position: [-2, 0, 0] } },
-      { instanceId: "spawn-2", itemId: SPAWN_POINT_ID, transform: { position: [2, 0, 0] } },
-      {
-        instanceId: "gate-1",
-        itemId: ZONE_GATE_ID,
-        transform: { position: [0, 0, 10] },
-        params: { zoneTag: "line" }
-      }
-    ],
-    game: { ...game, match: { ...game.match, countdownSec: 0 } }
-  });
-  const events = [
-    { type: "player_joined", id: "p1", team: null, returning: false, at: 0 },
-    { type: "player_joined", id: "p2", team: null, returning: false, at: 0 },
-    { type: "zone_crossed", id: "p1", zone: "gate-1", tag: "line", at: 1e3 },
-    { type: "zone_crossed", id: "p2", zone: "gate-1", tag: "line", at: 2e3 },
-    { type: "player_left", id: "p2", at: 8e3 }
-  ];
-  return { doc, events };
-}
 export {
-  ENGINE_EVENTS,
-  HANDLER_TICKS,
-  HEAP_CHECK_EVERY,
-  Handles,
-  LogRing,
-  MODULE_MEMORY,
-  PRELUDE_FILE,
-  QUICKJS_WASM_SHA256,
-  Recording,
-  SANDBOX_DEFAULTS,
-  SCRIPT_EVENT_TYPES,
-  START_DEFAULTS,
-  START_TICKS,
-  ScriptGuard,
-  ScriptRunner,
-  compileCheck,
-  createScriptModule,
-  cutLine,
-  dryRun,
-  hash32,
-  matchSeed,
-  mulberry32,
-  prelude,
-  reviewFixture,
-  scriptEventName,
-  scriptSeed,
-  spawnSpots,
-  toScriptEvent,
-  zonesOf
+  external_exports,
+  Style,
+  SIZE_TIERS,
+  MUSCLE_GROUPS,
+  MUSCLE_ZONE_COLORS,
+  MUSCLE_PARTS,
+  MUSCLE_PART_COLOURS,
+  FAT_REGIONS,
+  FACE_PARTS,
+  MAX_BODY_FAT,
+  HUMAN_HAIR_STYLES,
+  HUMAN_BROW_STYLES,
+  HUMAN_BEARD_STYLES,
+  AvatarLook,
+  DEFAULT_AVATAR_LOOK,
+  MOUTH_SHAPES,
+  mouthAt,
+  RIDE_LIMITS,
+  RideModel,
+  Ride,
+  RIDE_PRESETS,
+  RIDE_PARAMS,
+  rideFromParams,
+  rideToParams,
+  BuilderModelKind,
+  GenvrManifest,
+  SceneLight,
+  RULE_LIMITS,
+  GameEventName,
+  Counter,
+  Condition,
+  Action,
+  Rule,
+  Ranking,
+  HudBinding,
+  ZONE_PARAMS,
+  zoneSize,
+  zoneFromParams,
+  GAME_LIMITS,
+  Game,
+  isLegacyGateTag,
+  newGame,
+  ProductReceipt,
+  ScriptProductPurchase,
+  SCRIPT_LIMITS,
+  SCRIPT_API_VERSION,
+  ScriptId,
+  PlaceScript,
+  PlaceScriptBody,
+  scriptChars,
+  PlaceScripts,
+  ScriptTestEvent,
+  scriptApiDts,
+  scriptApiText,
+  FilmCamera,
+  FilmPhoto,
+  FilmVideo,
+  FilmCueVoice,
+  FilmStudioOperation,
+  FilmStudioResult,
+  FilmCommand,
+  TerrainActiveSurface,
+  TERRAIN_FIELD_TILE_SIZE,
+  TERRAIN_FIELD_TILE_MAX_BYTES,
+  TerrainFieldId,
+  TerrainFieldDescriptor,
+  TerrainFieldTile,
+  TerrainFieldSetMetadata,
+  TerrainFieldSets,
+  MAX_TERRAIN_SLOPE,
+  GROUND_SLOTS,
+  SkyPreset,
+  readSkySettings,
+  WeatherPreset,
+  SeaSwell,
+  Sea,
+  RIVER_LIMITS,
+  WorldSeed,
+  WORLD_GENERATOR,
+  WorldDocument,
+  HEIGHT_TILE_MAX,
+  PAINT_RULE_MAX_BOX,
+  CommandPayload,
+  PLAY_DEVICES,
+  normalizeMoves,
+  PlaySettings,
+  normalizeDevices,
+  defaultPlaySettings,
+  PLAYER_BLOCKS,
+  DEFAULT_PLAYER_SETTINGS,
+  readPlayerSettings,
+  CHARACTER_RECIPE_VERSION,
+  CHARACTER_SHAPE_LIMITS,
+  NORMAL_CHARACTER_SHAPE,
+  fatForWeight,
+  weightForFat,
+  DEFAULT_CHARACTER_RECIPE,
+  parseCharacterRecipe,
+  readCharacterRecipe,
+  recipeLook,
+  WORLD_PACKAGE_BYTES,
+  WorldPackage,
+  AVAILABLE_WORLD_STYLES,
+  supportsWorldStarter,
+  StudioShareRequest,
+  LAB_STEP,
+  LAB_KEEP_RUNS,
+  LabObstacle,
+  LAB_OBSTACLE_KINDS,
+  LAB_LATER_KINDS,
+  LabStreet,
+  LabCar,
+  LabCourse,
+  LabRunSettings,
+  LabProjectData,
+  LAB_OVERLAYS,
+  MotionLabOperation,
+  MOTION_LAB_KINDS,
+  getOceanResource,
+  describeOceanControls,
+  GENERATED_PARAMS_MAX,
+  itemParts,
+  itemModelLook,
+  itemGeneratedLook,
+  itemBounds,
+  itemBlocksForStyle,
+  itemFootprint,
+  itemBoundsForStyle,
+  SPAWN_POINT_ID,
+  ZONE_AREA_ID,
+  ZONE_GATE_ID,
+  zoneShapeOfItem,
+  CORE_ITEMS,
+  generatedParamKeys,
+  getCoreItem,
+  RELAXED_GRIP,
+  HUMAN_JOINT_CONSTRAINTS,
+  fingerTipMax,
+  fingerSpreadShare,
+  hipFlexionMax,
+  ankleDorsiflexionMax,
+  shoulderExternalRotationMax,
+  wristDeviationShare,
+  knuckleMaxForWrist,
+  jointProblems,
+  SKIN_MATERIALS,
+  findSkinMaterial,
+  HUMAN_FACE_LANDMARKS,
+  CORE_WEARABLES,
+  findWearable,
+  isItemBodyId,
+  planarAngle,
+  AVATAR_BODIES,
+  PLAYER_BODIES,
+  findBody,
+  sizedBody,
+  lookParts,
+  normalizeAvatarLook,
+  bodyFromItem,
+  CORE_EMOTES,
+  CORE_ANIMATIONS,
+  SIT_ANIMATION_ID,
+  findAnimation,
+  DRAWN_ITEMS,
+  BLOCK_PIXELS,
+  CORE_BLOCKS,
+  getBlock,
+  groundRef,
+  GROUND_MATERIALS,
+  DEFAULT_GROUND,
+  starterGroundMaterials,
+  getGround,
+  ROAD_TYPES,
+  DEFAULT_ROAD_TYPE,
+  getRoadType,
+  CORE_SKIES,
+  getSky,
+  CORE_SURFACES,
+  getSurface,
+  CORE_WEATHER,
+  getWeather,
+  SKY_SHAPES,
+  STYLE_PACKS,
+  LIBRARY,
+  queryLibrary,
+  priceLabel,
+  getLibraryItem,
+  restRule,
+  packageRestRule,
+  describeGeneratedControls,
+  generatedControlValueError,
+  resolveTerrainSurface,
+  terrainSurfaceSoil
 };
-//# sourceMappingURL=dist-AVKFZU6Z.js.map
+//# sourceMappingURL=chunk-VBIWJRXF.js.map

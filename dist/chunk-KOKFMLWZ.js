@@ -41,6 +41,7 @@ import {
   VOXEL_MIN_Y,
   VOXEL_ROAD_BLOCKS,
   VOXEL_WATER_LEVEL,
+  WALL_SURFACES,
   airCeiling,
   chunkGeometryArrays,
   chunkKey,
@@ -119,7 +120,7 @@ import {
   worldBox,
   zoneFromParams,
   zoneShapeOfItem
-} from "./chunk-L6ZVLN4D.js";
+} from "./chunk-ALQEDJO3.js";
 
 // ../../../../../genvr/node_modules/.pnpm/three@0.186.1/node_modules/three/build/three.core.js
 var REVISION = "186";
@@ -90600,6 +90601,8 @@ var TransformGizmo = class {
   group = new Group();
   #handles = /* @__PURE__ */ new Map();
   #size = 1;
+  #mode = "all";
+  #resize = true;
   constructor() {
     this.group.name = "gizmo";
     this.group.visible = false;
@@ -90654,12 +90657,27 @@ var TransformGizmo = class {
     this.group.visible = at !== null;
     if (!at)
       return;
-    for (const child of this.group.children)
-      if (child.name === "gizmo:size")
-        child.visible = at.resize ?? true;
+    this.#resize = at.resize ?? true;
+    this.#showHandles();
     this.#size = Math.max(1.2, at.size * 0.75);
     this.group.position.set(at.x, at.y, at.z);
     this.group.scale.setScalar(this.#size);
+  }
+  get mode() {
+    return this.#mode;
+  }
+  setMode(mode) {
+    this.#mode = mode;
+    this.#showHandles();
+  }
+  #showHandles() {
+    for (const child of this.group.children) {
+      const handle = child.name.startsWith("gizmo:") ? child.name.slice(6) : null;
+      if (!handle)
+        continue;
+      const wanted = this.#mode === "all" || this.#mode === "move" && (handle === "x" || handle === "y" || handle === "z") || this.#mode === handle;
+      child.visible = wanted && (handle !== "size" || this.#resize);
+    }
   }
   /** Every mesh that can be grabbed (for raycasting). */
   get targets() {
@@ -90711,6 +90729,8 @@ var ItemTools = class {
   #placeItemId = null;
   #snap = { ...DEFAULT_SNAP };
   #yaw = 0;
+  /** Size, colour and material the next placed items get (ITEMS-I1); empty = as the item is made. */
+  #placeOptions = {};
   #selected = [];
   #moving = false;
   #ghost = null;
@@ -90935,6 +90955,34 @@ var ItemTools = class {
     this.#drag = null;
     this.options.endGroup?.();
   }
+  /** Which handles the selection shows (ITEMS-I2): all, or only move, size or turn. */
+  get handleMode() {
+    return this.#gizmo.mode;
+  }
+  setHandleMode(mode) {
+    this.#gizmo.setMode(mode);
+  }
+  get placeOptions() {
+    return { ...this.#placeOptions, turn: Math.round(this.#yaw * 180 / Math.PI % 360) };
+  }
+  /** What the next placed items look like (ITEMS-I1): size 0.2–10, a colour, a material; null clears one. */
+  setPlaceOptions(options) {
+    const next2 = { ...this.#placeOptions };
+    for (const key of ["size", "color", "material"]) {
+      const value = options[key];
+      if (value === null)
+        delete next2[key];
+      else if (value !== void 0)
+        next2[key] = key === "size" ? Math.min(10, Math.max(0.2, value)) : value;
+    }
+    this.#placeOptions = next2;
+    if (options.turn !== void 0)
+      this.#yaw = (options.turn % 360 + 360) % 360 * (Math.PI / 180);
+    if (this.#ghost) {
+      this.#ghost.rotation.y = this.#yaw;
+      this.#ghost.scale.setScalar(next2.size ?? 1);
+    }
+  }
   get placeItemId() {
     return this.#placeItemId;
   }
@@ -91034,6 +91082,8 @@ var ItemTools = class {
         itemId,
         position: spot,
         rotation: turn2(this.#yaw),
+        ...this.#placeOptions.size && this.#placeOptions.size !== 1 ? { scale: [this.#placeOptions.size, this.#placeOptions.size, this.#placeOptions.size] } : {},
+        ...this.#placeOptions.color || this.#placeOptions.material ? { itemParams: { ...this.#placeOptions.color ? { color: this.#placeOptions.color } : {}, ...this.#placeOptions.material ? { material: this.#placeOptions.material } : {} } } : {},
         ...restFlag(asksForRest(this.options.items.model(itemId).grid))
       }
     });
@@ -91281,6 +91331,7 @@ var ItemTools = class {
     this.#hideGhost();
     this.#ghost = this.options.items.previewMesh(itemId, this.#ghostMaterial);
     this.#ghostItemId = itemId;
+    this.#ghost.scale.setScalar(this.#placeOptions.size ?? 1);
     this.#ghost.userData.helper = true;
     this.options.scene.add(this.#ghost);
   }
@@ -96181,13 +96232,15 @@ var TerrainTools = class {
     options.scene.add(this.#ring);
   }
   get radius() {
-    return BRUSH_RADIUS[this.settings.size];
+    const exact = this.settings.radius;
+    return exact !== void 0 ? Math.min(100, Math.max(1, exact)) : BRUSH_RADIUS[this.settings.size];
   }
   get stroking() {
     return this.#stroke !== null;
   }
   setSettings(settings) {
-    this.settings = { ...this.settings, ...settings };
+    const preset = settings.size !== void 0 && settings.radius === void 0 ? { radius: void 0 } : {};
+    this.settings = { ...this.settings, ...preset, ...settings };
   }
   /** Shows the brush ring under the pointer (mouse hover and while dragging). */
   hover(clientX, clientY) {
@@ -96252,7 +96305,7 @@ var TerrainTools = class {
       params: {
         area: area2,
         operation: mode,
-        strength: STRENGTH[mode],
+        strength: Math.round(STRENGTH[mode] * Math.min(1, Math.max(0.1, this.settings.strength ?? 1)) * 1e3) / 1e3,
         soft: true,
         ...mode === "flatten" ? { targetHeight: Math.round(this.#stroke.target * 100) / 100 } : {}
       }
@@ -96298,6 +96351,11 @@ var TerrainTools = class {
 
 // ../runtime/dist/build-tools.js
 var DEFAULT_RIVER = { width: 8, widen: 1.3, flow: 1.5 };
+var DEFAULT_WALL = {
+  height: 3,
+  door: { width: OPENING_PRESETS.door.width, height: OPENING_PRESETS.door.height },
+  window: { ...OPENING_PRESETS.window }
+};
 var BRUSH_TOOLS = /* @__PURE__ */ new Set(["terrain", "cover"]);
 var SNAP = 0.5;
 var CLOSE_DISTANCE = 1.5;
@@ -96307,6 +96365,10 @@ var snap = (v2) => Math.round(v2 / SNAP) * SNAP;
 var BuildTools = class {
   options;
   #tool = null;
+  #eraseTarget = null;
+  /** Red box round what the eraser would remove (BUILD-B8). */
+  #eraseBox = null;
+  #wall = { ...DEFAULT_WALL, door: { ...DEFAULT_WALL.door }, window: { ...DEFAULT_WALL.window } };
   #points = [];
   #hover = null;
   #message = null;
@@ -96407,6 +96469,11 @@ var BuildTools = class {
       this.setTool("road");
     this.#refresh();
   }
+  /** Height and look of new walls, and the size of new doors and windows (BUILD-B6). */
+  setWall(settings) {
+    this.#wall = { ...this.#wall, ...settings };
+    this.#refresh();
+  }
   /** Lanes and direction of the streets the road tool draws (R2g). */
   setRoad(settings) {
     this.#road = { ...this.#road, ...settings };
@@ -96501,6 +96568,16 @@ var BuildTools = class {
     return this.#tool === "select" && this.#items.hasSelection;
   }
   /** Chooses an item from the library and switches to the place tool. */
+  /** Show all handles on the selection, or only move, size or turn (ITEMS-I2). */
+  setHandleMode(mode) {
+    this.#items.setHandleMode(mode);
+    this.#emit();
+  }
+  /** Turn, size, colour and material of the next placed items (ITEMS-I1). */
+  setPlaceOptions(options) {
+    this.#items.setPlaceOptions(options);
+    this.#emit();
+  }
   setPlaceItem(itemId) {
     this.setTool("place");
     this.#items.setPlaceItem(itemId);
@@ -96517,6 +96594,7 @@ var BuildTools = class {
   /** One turn step of the item being placed or moved, or of the selected item. */
   rotateItem() {
     this.#items.rotate();
+    this.#emit();
   }
   moveItem() {
     this.#items.startMove();
@@ -96553,6 +96631,10 @@ var BuildTools = class {
   setTool(tool) {
     if (tool !== this.#tool)
       this.#items.reset();
+    if (tool !== "eraser") {
+      this.#eraseTarget = null;
+      this.#showEraseBox(null);
+    }
     if (!BRUSH_TOOLS.has(tool))
       this.#terrain.hideRing();
     if (tool === "cover")
@@ -96590,7 +96672,7 @@ var BuildTools = class {
       if (error2)
         return this.#fail(error2);
       const type = getRoadType(this.#roadType);
-      const road = { roadId: newId3("road"), points, width: type.width, materialId: type.id, ...this.#markings(type.look) };
+      const road = { roadId: newId3("road"), points, width: this.#road.width ?? type.width, materialId: type.id, ...this.#markings(type.look), ...this.#sidewalk() };
       if (!this.options.apply({ type: "draw_road", params: road }))
         return this.#fail("The road cannot go there.");
     } else if (this.#tool === "river" && points.length >= 2) {
@@ -96614,7 +96696,9 @@ var BuildTools = class {
       const error2 = wallShapeError(points, closed);
       if (error2)
         return this.#fail(error2);
-      if (!this.options.apply({ type: "draw_wall", params: { wallId: newId3("wall"), points, closed } }))
+      const look = this.#wall.surface ? { materialId: WALL_SURFACES[this.#wall.surface] } : {};
+      const params = { wallId: newId3("wall"), points, closed, height: this.#wall.height, ...look };
+      if (!this.options.apply({ type: "draw_wall", params }))
         return this.#fail("The wall cannot go there.");
     } else {
       return false;
@@ -96625,7 +96709,8 @@ var BuildTools = class {
     return true;
   }
   /** A tap or click (no drag) at a screen position. */
-  tap(clientX, clientY, add3 = false) {
+  /** A tap with the tool; `secondary` is the right mouse button (the blocks way digs with it, ITEMS-I3). */
+  tap(clientX, clientY, add3 = false, secondary = false) {
     const tool = this.#tool;
     if (!tool)
       return;
@@ -96648,7 +96733,15 @@ var BuildTools = class {
     if (tool === "terrain" || tool === "cover")
       return;
     if (tool === "blocks") {
-      const problem = this.#blocks ? this.#blocks.tap(clientX, clientY) : "This place has no blocks.";
+      let problem = "This place has no blocks.";
+      if (this.#blocks) {
+        const mode = this.#blocks.settings.mode;
+        if (secondary)
+          this.#blocks.set({ mode: "dig" });
+        problem = this.#blocks.tap(clientX, clientY);
+        if (secondary)
+          this.#blocks.set({ mode });
+      }
       if (problem)
         this.#fail(problem);
       else if (this.#message) {
@@ -96696,6 +96789,8 @@ var BuildTools = class {
       return;
     }
     if (tool === "eraser") {
+      this.#eraseTarget = null;
+      this.#showEraseBox(null);
       const item = this.#items.pickItem(clientX, clientY);
       if (item) {
         this.options.apply({ type: "remove_item", params: { instanceId: item } });
@@ -96770,6 +96865,15 @@ var BuildTools = class {
   }
   /** Mouse hover: shows where the next point would go. */
   hover(clientX, clientY) {
+    if (this.#tool === "eraser") {
+      const next2 = this.#eraseTargetAt(clientX, clientY);
+      if (next2?.kind !== this.#eraseTarget?.kind || next2?.id !== this.#eraseTarget?.id) {
+        this.#eraseTarget = next2;
+        this.#showEraseBox(next2 ? this.#eraseBounds(next2, clientX, clientY) : null);
+        this.#emit();
+      }
+      return;
+    }
     if (this.#tool === "place" || this.#tool === "select") {
       this.#items.hover(clientX, clientY);
       return;
@@ -96787,14 +96891,94 @@ var BuildTools = class {
     this.#hover = this.#groundPoint(clientX, clientY);
     this.#refreshPreview();
   }
+  /** The space the eraser's target takes, from the world (items, roads, walls) or its mesh (water, rivers). */
+  #eraseBounds(target2, clientX, clientY) {
+    const world = this.options.world();
+    const box = new Box3();
+    const span = (points, pad, low, high) => {
+      for (const [x2, z2] of points) {
+        const y3 = this.options.heightAt(x2, z2);
+        box.expandByPoint(new Vector3(x2 - pad, y3 + low, z2 - pad));
+        box.expandByPoint(new Vector3(x2 + pad, y3 + high, z2 + pad));
+      }
+      return box;
+    };
+    if (target2.kind === "item") {
+      const instance3 = world.instances.find((i2) => i2.instanceId === target2.id);
+      if (!instance3)
+        return null;
+      const { min: min12, max: max23 } = this.options.items.model(instance3.itemId).bounds;
+      const [sx, sy, sz] = instance3.transform.scale;
+      const [x2, y3, z2] = instance3.transform.position;
+      const reach = Math.max(Math.abs(min12[0]) * sx, Math.abs(max23[0]) * sx, Math.abs(min12[2]) * sz, Math.abs(max23[2]) * sz);
+      return box.set(new Vector3(x2 - reach, y3 + min12[1] * sy, z2 - reach), new Vector3(x2 + reach, y3 + max23[1] * sy, z2 + reach));
+    }
+    if (target2.kind === "road") {
+      const road = world.roads.find((r2) => r2.id === target2.id);
+      return road ? span(road.points, road.width / 2, -0.2, 0.6) : null;
+    }
+    if (target2.kind === "wall") {
+      const wall = world.walls.find((w4) => w4.id === target2.id);
+      return wall ? span(wall.points, 0.3, 0, wall.height) : null;
+    }
+    const hit = this.#cast(clientX, clientY, [this.options.water, this.options.rivers])[0];
+    return hit ? box.setFromObject(hit.object) : null;
+  }
+  #showEraseBox(box) {
+    if (this.#eraseBox) {
+      this.options.scene.remove(this.#eraseBox);
+      this.#eraseBox.geometry.dispose();
+      this.#eraseBox = null;
+    }
+    if (!box || box.isEmpty())
+      return;
+    const size = box.getSize(new Vector3());
+    const geometry = new EdgesGeometry(new BoxGeometry(Math.max(size.x, 0.2), Math.max(size.y, 0.2), Math.max(size.z, 0.2)));
+    const lines = new LineSegments(geometry, this.#eraseMaterial);
+    lines.position.copy(box.getCenter(new Vector3()));
+    lines.renderOrder = 1e3;
+    lines.userData.helper = true;
+    this.options.scene.add(lines);
+    this.#eraseBox = lines;
+  }
+  #eraseMaterial = new LineBasicMaterial({ color: 15680580, depthTest: false, transparent: true, opacity: 0.95 });
+  /** What a click of the eraser would remove at this point, in the same order as the click itself. */
+  #eraseTargetAt(clientX, clientY) {
+    const world = this.options.world();
+    const item = this.#items.pickItem(clientX, clientY);
+    if (item) {
+      const instance3 = world.instances.find((i2) => i2.instanceId === item);
+      return { kind: "item", id: item, name: instance3?.name ?? (instance3 ? getCoreItem(instance3.itemId)?.manifest.name ?? this.options.items.model(instance3.itemId).name : "Item") };
+    }
+    const hit = this.#cast(clientX, clientY, [this.options.structures, this.options.water, this.options.rivers])[0];
+    const [kind, id] = (hit?.object.name ?? "").split(":");
+    if (id && kind === "water")
+      return { kind: "water", id, name: world.environment.water.find((w4) => w4.id === id)?.name ?? "Water" };
+    if (id && kind === "river") {
+      const river = world.environment.rivers.find((r2) => r2.id === id);
+      return { kind: "river", id, name: river?.name ?? `River \xB7 ${river?.width ?? ""} m` };
+    }
+    const structure = this.#pickStructure(clientX, clientY);
+    const [skind, sid] = (structure?.name ?? "").split(":");
+    if (sid && skind === "road") {
+      const road = world.roads.find((r2) => r2.id === sid);
+      return { kind: "road", id: sid, name: road?.name ?? `${getRoadType(road?.materialId ?? DEFAULT_ROAD_TYPE.id).name} \xB7 ${road?.width ?? ""} m` };
+    }
+    if (sid && (skind === "wall" || skind === "floor")) {
+      const wall = world.walls.find((w4) => w4.id === sid);
+      return { kind: "wall", id: sid, name: wall?.name ?? (wall?.closed ? "Room" : "Wall") };
+    }
+    return null;
+  }
   #addOpening(wall, kind, x2, z2) {
     const { segment, offset } = nearestWallPosition(wall, x2, z2);
+    const size = kind === "door" ? { ...this.#wall.door, bottom: 0 } : this.#wall.window;
     const opening2 = {
       id: newId3(kind),
       kind,
       segment,
       offset: Math.round(offset * 10) / 10,
-      ...OPENING_PRESETS[kind]
+      ...size
     };
     const error2 = openingError(wall, opening2);
     if (error2) {
@@ -96851,16 +97035,26 @@ var BuildTools = class {
       canFinish: this.#points.length >= needed,
       message: this.#message,
       placeItemId: this.#items.placeItemId,
+      place: this.#items.placeOptions,
+      handles: this.#items.handleMode,
       selected: this.#items.selection,
       moving: this.#items.moving,
       brush: { ...this.#terrain.settings },
       roadType: this.#roadType,
       road: { ...this.#road },
       river: { ...this.#river },
+      wall: { ...this.#wall, door: { ...this.#wall.door }, window: { ...this.#wall.window } },
       water: this.#water ? { ...this.#water } : null,
       blocks: this.#blocks?.settings ?? null,
-      mapSpot: this.#mapSpot ? { ...this.#mapSpot } : null
+      mapSpot: this.#mapSpot ? { ...this.#mapSpot } : null,
+      length: Math.round(this.#points.reduce((sum, point, i2) => i2 ? sum + Math.hypot(point[0] - this.#points[i2 - 1][0], point[1] - this.#points[i2 - 1][1]) : 0, 0) * 10) / 10,
+      eraseTarget: this.#eraseTarget
     });
+  }
+  /** The sidewalk of a new road (R2h), when one is chosen. */
+  #sidewalk() {
+    const { sidewalk, sidewalkSide } = this.#road;
+    return sidewalk ? { sidewalk, ...sidewalkSide && sidewalkSide !== "both" ? { sidewalkSide } : {} } : {};
   }
   /** Lanes and direction for a new road: streets only (other looks have no lane lines). */
   #markings(look) {
@@ -96894,7 +97088,7 @@ var BuildTools = class {
       if (this.#tool === "road" && !roadShapeError(points)) {
         const type = getRoadType(this.#roadType);
         const samples = roadProfile({ heightAt }, points, this.options.world().environment.water);
-        const built = buildRoad({ id: "preview", width: type.width, materialId: type.id, ...this.#markings(type.look) }, samples, heightAt, this.options.roadMaterials, { ghost: true, lift: 0.25 });
+        const built = buildRoad({ id: "preview", width: this.#road.width ?? type.width, materialId: type.id, ...this.#markings(type.look), ...this.#sidewalk() }, samples, heightAt, this.options.roadMaterials, { ghost: true, lift: 0.25 });
         for (const mesh of built.meshes)
           this.#preview.add(mesh);
       } else if (this.#tool === "river" && !riverShapeError(points)) {
@@ -96913,7 +97107,7 @@ var BuildTools = class {
           }
         }
       } else if (this.#tool === "wall" && !wallShapeError(points, Boolean(closing))) {
-        const wall = { id: "preview", points, height: 3, closed: Boolean(closing), openings: [] };
+        const wall = { id: "preview", points, height: this.#wall.height, closed: Boolean(closing), openings: [], ...this.#wall.surface ? { materialId: WALL_SURFACES[this.#wall.surface] } : {} };
         for (const mesh of buildWallMeshes(wall, heightAt, this.#ghost).meshes)
           this.#preview.add(mesh);
       }
@@ -98551,8 +98745,8 @@ function needsReselect(last, x2, z2) {
   return !last || Math.hypot(x2 - last.x, z2 - last.z) > RESELECT;
 }
 function builtOver(surfaces, x2, z2) {
-  const { groundAt, waterAt } = surfaces.options;
-  const base = Math.max(groundAt(x2, z2), waterAt?.(x2, z2) ?? -Infinity);
+  const { groundAt: groundAt2, waterAt } = surfaces.options;
+  const base = Math.max(groundAt2(x2, z2), waterAt?.(x2, z2) ?? -Infinity);
   return surfaces.below(x2, z2, Infinity) > base + 0.05;
 }
 function preImage(doc, command) {
@@ -105292,6 +105486,8 @@ var EnvironmentView = class {
   #signature = "";
   #environment = null;
   #weather = null;
+  /** How much rain, snow or sand falls (WORLD-W4): `weather.params.strength`, 0.2–2 of the preset's own. */
+  #strength = 1;
   #particles = null;
   #offsets = new Float32Array(0);
   #baseLight = { hemisphere: 1, sun: 1 };
@@ -105444,10 +105640,12 @@ var EnvironmentView = class {
     this.#environment = environment;
     const cycle = Number(environment.sky.params.cycle ?? 0);
     this.#cycle = Number.isFinite(cycle) && cycle > 0 ? cycle : 0;
-    const signature = `${environment.sky.preset}/${environment.weather.preset}/${JSON.stringify(environment.sky.params)}`;
+    const signature = `${environment.sky.preset}/${environment.weather.preset}/${JSON.stringify(environment.sky.params)}/${JSON.stringify(environment.weather.params ?? {})}`;
     if (signature === this.#signature)
       return;
     this.#signature = signature;
+    const strength = Number(environment.weather.params?.strength ?? 1);
+    this.#strength = Number.isFinite(strength) ? Math.min(2, Math.max(0.2, strength)) : 1;
     this.#weather = getWeather(environment.weather.preset).look;
     this.#showSky(this.#skyNow());
     this.#setWeather(this.#weather);
@@ -105588,7 +105786,7 @@ var EnvironmentView = class {
       this.#particles.material.dispose();
       this.#particles = null;
     }
-    const count2 = Math.round(weather2.count * this.quality);
+    const count2 = Math.round(weather2.count * this.quality * this.#strength);
     if (weather2.particles === "none" || count2 === 0)
       return;
     const pixel = this.#shapes.drops === "pixel";
@@ -105786,6 +105984,10 @@ var WorldAudio = class {
     this.target = target2;
     target2.addEventListener("pointerdown", this.#start, { once: false });
     target2.addEventListener("keydown", this.#start, { once: false });
+  }
+  /** The loudness now set (FILM-C3: a scene's own sound is applied for a take, then this is restored). */
+  volumes() {
+    return { ...this.#volumes };
   }
   setVolumes(volumes) {
     this.#volumes = volumes;
@@ -113192,7 +113394,7 @@ function scenePose(base, motion, time10) {
     pose.roll = (base.roll ?? 0) + Math.sin(beat) * 0.2;
   return pose;
 }
-function travelPose(start, spots, speed, time10, groundAt, lift) {
+function travelPose(start, spots, speed, time10, groundAt2, lift) {
   let left = Math.max(0, time10) * Math.max(0, speed), x2 = start.x, z2 = start.z, yaw = start.yaw;
   for (const spot of spots) {
     const dx = spot.x - x2, dz = spot.z - z2, length11 = Math.hypot(dx, dz);
@@ -113208,7 +113410,7 @@ function travelPose(start, spots, speed, time10, groundAt, lift) {
     x2 = spot.x;
     z2 = spot.z;
   }
-  return { ...start, x: x2, z: z2, yaw, y: groundAt(x2, z2) + lift };
+  return { ...start, x: x2, z: z2, yaw, y: groundAt2(x2, z2) + lift };
 }
 
 // ../runtime/dist/terrain-physics.js
@@ -116645,7 +116847,7 @@ async function createRuntime({ onFilmFrame, onRendered, container, world, terrai
       return;
     const moved2 = Math.hypot(event.clientX - press.x, event.clientY - press.y);
     if (moved2 < 8 && performance.now() - press.time < 600)
-      tools.tap(event.clientX, event.clientY, event.shiftKey || event.ctrlKey || event.metaKey);
+      tools.tap(event.clientX, event.clientY, event.shiftKey || event.ctrlKey || event.metaKey, event.button === 2);
   };
   const onHover = (event) => {
     if (event.pointerType === "mouse" && event.buttons === 0)
@@ -117699,9 +117901,12 @@ async function createRuntime({ onFilmFrame, onRendered, container, world, terrai
     setRoadType: (typeId) => tools?.setRoadType(typeId),
     setRiver: (settings) => tools?.setRiver(settings),
     setRoad: (settings) => tools?.setRoad(settings),
+    setWall: (settings) => tools?.setWall(settings),
     setBrush: (settings) => tools?.setBrush(settings),
     setBlockTool: (settings) => tools?.setBlockTool(settings),
     setPlaceItem: (itemId) => tools?.setPlaceItem(itemId),
+    setPlaceOptions: (options) => tools?.setPlaceOptions(options),
+    setHandleMode: (mode) => tools?.setHandleMode(mode),
     rotateItem: () => tools?.rotateItem(),
     setSnap: (settings) => tools?.setSnap(settings),
     moveItem: () => tools?.moveItem(),
@@ -118037,6 +118242,7 @@ async function createRuntime({ onFilmFrame, onRendered, container, world, terrai
     },
     setVoiceRecordingStream: (stream) => audio.setVoiceRecordingStream(stream),
     setAudioVolumes: (volumes) => audio.setVolumes(volumes),
+    audioVolumes: () => audio.volumes(),
     setPresentationBackdrop: (on2, navigation = false) => {
       presentationBackdrop = on2;
       presentationNavigation = navigation;
@@ -118483,7 +118689,7 @@ function buildClam(input, level) {
     const s2 = Math.sin(angle);
     return [p2[0], p2[1] * c2 - p2[2] * s2, p2[1] * s2 + p2[2] * c2];
   };
-  const gapAt = (psi) => turn3(valve(psi, 1, 1), gape / 2)[2] - turn3(valve(psi, 1, -1), -gape / 2)[2];
+  const gapAt2 = (psi) => turn3(valve(psi, 1, 1), gape / 2)[2] - turn3(valve(psi, 1, -1), -gape / 2)[2];
   const mesh = new SeaMesh();
   const growthLines = 9;
   for (const side of [1, -1]) {
@@ -118521,7 +118727,7 @@ function buildClam(input, level) {
       for (let a2 = 0; a2 <= lod.around; a2++) {
         const psi = END + span * a2 / lod.around;
         const lip = valve(psi, 1, side);
-        const inward = Math.min(thick, gapAt(psi) / 6);
+        const inward = Math.min(thick, gapAt2(psi) / 6);
         const p2 = [lip[0], lip[1] - thick * 1.5 * h2 * h2, lip[2] - side * inward * Math.sin(h2 * Math.PI / 2)];
         row.push(shellPoint(psi, 1, p2, 1));
       }
@@ -119239,4 +119445,4 @@ three/build/three.tsl.js:
    * SPDX-License-Identifier: MIT
    *)
 */
-//# sourceMappingURL=chunk-HOCADOQG.js.map
+//# sourceMappingURL=chunk-KOKFMLWZ.js.map

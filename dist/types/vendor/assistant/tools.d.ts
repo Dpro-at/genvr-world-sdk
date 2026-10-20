@@ -251,6 +251,183 @@ export declare const TOOL_ARGS: {
             kind: z.ZodLiteral<"clear">;
         }, z.core.$strict>], "kind">;
     }, z.core.$strict>;
+    /**
+     * The Avatar tab (AV-01, Avatar design A0–A9): read and change the character itself — body, shape, muscle, fat,
+     * face controls, colours, hair — the view mode (skeleton, muscles, fat…), a held facial expression, a move, and
+     * save / export the recipe. `recipe` parts merge into the current recipe and are checked by the recipe schema.
+     */
+    readonly avatar_studio: z.ZodObject<{
+        action: z.ZodEnum<{
+            undo: "undo";
+            redo: "redo";
+            set: "set";
+            expression: "expression";
+            inspect: "inspect";
+            play: "play";
+            view: "view";
+            save: "save";
+            export: "export";
+            reset_shape: "reset_shape";
+        }>;
+        recipe: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
+        view: z.ZodOptional<z.ZodEnum<{
+            normal: "normal";
+            fat: "fat";
+            "first-person": "first-person";
+            skeleton: "skeleton";
+            "skeleton-mesh": "skeleton-mesh";
+            wireframe: "wireframe";
+            clay: "clay";
+            normals: "normals";
+            muscles: "muscles";
+        }>>;
+        shading: z.ZodOptional<z.ZodEnum<{
+            smooth: "smooth";
+            flat: "flat";
+        }>>;
+        expression: z.ZodOptional<z.ZodEnum<{
+            neutral: "neutral";
+            smile: "smile";
+            angry: "angry";
+            sad: "sad";
+            surprised: "surprised";
+            thinking: "thinking";
+        }>>;
+        clip: z.ZodOptional<z.ZodString>;
+    }, z.core.$strict>;
+    /**
+     * The Lab area of a motion lab project (MOTION-LAB L1 + L2): build a measured course, run the lab robot,
+     * read scores and keep motion versions. One operation per call; the owner gates live in the lab controller.
+     */
+    readonly motion_lab: z.ZodObject<{
+        operation: z.ZodDiscriminatedUnion<[z.ZodObject<{
+            kind: z.ZodLiteral<"inspect">;
+        }, z.core.$strict>, z.ZodObject<{
+            kind: z.ZodLiteral<"commands">;
+        }, z.core.$strict>, z.ZodObject<{
+            kind: z.ZodLiteral<"course_get">;
+        }, z.core.$strict>, z.ZodObject<{
+            kind: z.ZodLiteral<"course_set">;
+            course: z.ZodUnknown;
+        }, z.core.$strict>, z.ZodObject<{
+            kind: z.ZodLiteral<"obstacle_add">;
+            obstacle: z.ZodUnknown;
+        }, z.core.$strict>, z.ZodObject<{
+            kind: z.ZodLiteral<"obstacle_set">;
+            id: z.ZodString;
+            set: z.ZodObject<{
+                z: z.ZodOptional<z.ZodNumber>;
+                x: z.ZodOptional<z.ZodNumber>;
+                hidden: z.ZodOptional<z.ZodBoolean>;
+                height: z.ZodOptional<z.ZodNumber>;
+                depth: z.ZodOptional<z.ZodNumber>;
+                width: z.ZodOptional<z.ZodNumber>;
+                rise: z.ZodOptional<z.ZodNumber>;
+                length: z.ZodOptional<z.ZodNumber>;
+                top: z.ZodOptional<z.ZodNumber>;
+                landing: z.ZodOptional<z.ZodNumber>;
+                landing_depth: z.ZodOptional<z.ZodNumber>;
+                lane: z.ZodOptional<z.ZodNumber>;
+                thickness: z.ZodOptional<z.ZodNumber>;
+                sill: z.ZodOptional<z.ZodNumber>;
+                opening_width: z.ZodOptional<z.ZodNumber>;
+                opening_height: z.ZodOptional<z.ZodNumber>;
+                wall_height: z.ZodOptional<z.ZodNumber>;
+                wall_width: z.ZodOptional<z.ZodNumber>;
+            }, z.core.$strict>;
+        }, z.core.$strict>, z.ZodObject<{
+            kind: z.ZodLiteral<"obstacle_remove">;
+            id: z.ZodString;
+        }, z.core.$strict>, z.ZodObject<{
+            kind: z.ZodLiteral<"course_from_seed">;
+            seed: z.ZodNumber;
+            obstacles: z.ZodDefault<z.ZodNumber>;
+            hardness: z.ZodDefault<z.ZodNumber>;
+            street: z.ZodDefault<z.ZodBoolean>;
+        }, z.core.$strict>, z.ZodObject<{
+            kind: z.ZodLiteral<"traffic_set">;
+            street: z.ZodOptional<z.ZodNullable<z.ZodObject<{
+                z: z.ZodDefault<z.ZodNumber>;
+                lanes: z.ZodDefault<z.ZodNumber>;
+                lane_width: z.ZodDefault<z.ZodNumber>;
+                crossing: z.ZodDefault<z.ZodBoolean>;
+                light: z.ZodDefault<z.ZodObject<{
+                    cycle_s: z.ZodDefault<z.ZodNumber>;
+                    red_s: z.ZodDefault<z.ZodNumber>;
+                }, z.core.$strict>>;
+            }, z.core.$strict>>>;
+            cars: z.ZodOptional<z.ZodArray<z.ZodObject<{
+                id: z.ZodString;
+                lane: z.ZodDefault<z.ZodNumber>;
+                speed: z.ZodDefault<z.ZodNumber>;
+                offset_s: z.ZodDefault<z.ZodNumber>;
+                runs_red: z.ZodDefault<z.ZodBoolean>;
+            }, z.core.$strict>>>;
+        }, z.core.$strict>, z.ZodObject<{
+            kind: z.ZodLiteral<"settings_set">;
+            settings: z.ZodObject<{
+                motion: z.ZodOptional<z.ZodString>;
+                character: z.ZodOptional<z.ZodString>;
+                speed: z.ZodOptional<z.ZodNumber>;
+                stride: z.ZodOptional<z.ZodNumber>;
+                step_height: z.ZodOptional<z.ZodNumber>;
+                jump_timing_ms: z.ZodOptional<z.ZodNumber>;
+                blend_s: z.ZodOptional<z.ZodNumber>;
+                lean_deg: z.ZodOptional<z.ZodNumber>;
+                wait_for_green: z.ZodOptional<z.ZodBoolean>;
+            }, z.core.$strict>;
+        }, z.core.$strict>, z.ZodObject<{
+            kind: z.ZodLiteral<"run">;
+            settings: z.ZodOptional<z.ZodObject<{
+                motion: z.ZodOptional<z.ZodString>;
+                character: z.ZodOptional<z.ZodString>;
+                speed: z.ZodOptional<z.ZodNumber>;
+                stride: z.ZodOptional<z.ZodNumber>;
+                step_height: z.ZodOptional<z.ZodNumber>;
+                jump_timing_ms: z.ZodOptional<z.ZodNumber>;
+                blend_s: z.ZodOptional<z.ZodNumber>;
+                lean_deg: z.ZodOptional<z.ZodNumber>;
+                wait_for_green: z.ZodOptional<z.ZodBoolean>;
+            }, z.core.$strict>>;
+            version: z.ZodOptional<z.ZodString>;
+        }, z.core.$strict>, z.ZodObject<{
+            kind: z.ZodLiteral<"runs_list">;
+        }, z.core.$strict>, z.ZodObject<{
+            kind: z.ZodLiteral<"scores">;
+            run: z.ZodOptional<z.ZodString>;
+        }, z.core.$strict>, z.ZodObject<{
+            kind: z.ZodLiteral<"frame">;
+            run: z.ZodOptional<z.ZodString>;
+            t: z.ZodNumber;
+        }, z.core.$strict>, z.ZodObject<{
+            kind: z.ZodLiteral<"view_set">;
+            overlays: z.ZodOptional<z.ZodArray<z.ZodEnum<{
+                speed: "speed";
+                balance: "balance";
+                feet: "feet";
+                skeleton: "skeleton";
+                ghost: "ghost";
+                measures: "measures";
+            }>>>;
+            speed: z.ZodOptional<z.ZodUnion<readonly [z.ZodLiteral<0.25>, z.ZodLiteral<0.5>, z.ZodLiteral<1>, z.ZodLiteral<2>]>>;
+        }, z.core.$strict>, z.ZodObject<{
+            kind: z.ZodLiteral<"versions">;
+        }, z.core.$strict>, z.ZodObject<{
+            kind: z.ZodLiteral<"save_version">;
+            run: z.ZodOptional<z.ZodString>;
+            note: z.ZodOptional<z.ZodString>;
+        }, z.core.$strict>, z.ZodObject<{
+            kind: z.ZodLiteral<"save_best">;
+            version: z.ZodString;
+        }, z.core.$strict>, z.ZodObject<{
+            kind: z.ZodLiteral<"rollback">;
+            version: z.ZodString;
+        }, z.core.$strict>, z.ZodObject<{
+            kind: z.ZodLiteral<"version_delete">;
+            version: z.ZodString;
+            confirm: z.ZodLiteral<true>;
+        }, z.core.$strict>], "kind">;
+    }, z.core.$strict>;
     readonly get_resource_controls: z.ZodObject<{
         item_id: z.ZodString;
     }, z.core.$strip>;
@@ -277,6 +454,14 @@ export declare const TOOL_ARGS: {
         stretch: z.ZodOptional<z.ZodTuple<[z.ZodNumber, z.ZodNumber, z.ZodNumber], null>>;
         on: z.ZodOptional<z.ZodString>;
         color: z.ZodOptional<z.ZodString>;
+        material: z.ZodOptional<z.ZodEnum<{
+            stone: "stone";
+            wood: "wood";
+            metal: "metal";
+            plastic: "plastic";
+            glass: "glass";
+            neon: "neon";
+        }>>;
     }, z.core.$strip>;
     readonly scatter_items: z.ZodObject<{
         itemIds: z.ZodArray<z.ZodString>;
@@ -306,6 +491,100 @@ export declare const TOOL_ARGS: {
     }, z.core.$strip>;
     readonly remove_items: z.ZodObject<{
         instanceIds: z.ZodArray<z.ZodString>;
+    }, z.core.$strip>;
+    readonly list_library: z.ZodObject<{
+        kind: z.ZodEnum<{
+            water: "water";
+            game: "game";
+            ground: "ground";
+            models: "models";
+            roads: "roads";
+            walls: "walls";
+            sky: "sky";
+            moves: "moves";
+            effects: "effects";
+        }>;
+        group: z.ZodOptional<z.ZodEnum<{
+            parts: "parts";
+            nature: "nature";
+            "props-and-decor": "props-and-decor";
+            structures: "structures";
+            "building-blocks": "building-blocks";
+        }>>;
+        offset: z.ZodOptional<z.ZodNumber>;
+        limit: z.ZodOptional<z.ZodNumber>;
+    }, z.core.$strip>;
+    readonly set_item_look: z.ZodObject<{
+        instanceIds: z.ZodArray<z.ZodString>;
+        color: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+        material: z.ZodOptional<z.ZodNullable<z.ZodEnum<{
+            stone: "stone";
+            wood: "wood";
+            metal: "metal";
+            plastic: "plastic";
+            glass: "glass";
+            neon: "neon";
+        }>>>;
+    }, z.core.$strip>;
+    readonly name_items: z.ZodObject<{
+        instanceIds: z.ZodArray<z.ZodString>;
+        name: z.ZodNullable<z.ZodString>;
+    }, z.core.$strip>;
+    readonly group_items: z.ZodObject<{
+        instanceIds: z.ZodArray<z.ZodString>;
+        name: z.ZodOptional<z.ZodString>;
+    }, z.core.$strip>;
+    readonly ungroup_items: z.ZodObject<{
+        groupId: z.ZodString;
+    }, z.core.$strip>;
+    readonly set_item_flags: z.ZodObject<{
+        instanceIds: z.ZodArray<z.ZodString>;
+        anchored: z.ZodOptional<z.ZodBoolean>;
+        floats: z.ZodOptional<z.ZodNullable<z.ZodBoolean>>;
+    }, z.core.$strip>;
+    readonly settle_items: z.ZodObject<{
+        instanceIds: z.ZodArray<z.ZodString>;
+    }, z.core.$strip>;
+    readonly edit_river: z.ZodObject<{
+        riverId: z.ZodString;
+        points: z.ZodOptional<z.ZodArray<z.ZodTuple<[z.ZodNumber, z.ZodNumber], null>>>;
+        width: z.ZodOptional<z.ZodNumber>;
+        widen: z.ZodOptional<z.ZodNumber>;
+        flow: z.ZodOptional<z.ZodNumber>;
+    }, z.core.$strip>;
+    readonly add_opening: z.ZodObject<{
+        wallId: z.ZodString;
+        kind: z.ZodEnum<{
+            door: "door";
+            window: "window";
+        }>;
+        at: z.ZodTuple<[z.ZodNumber, z.ZodNumber], null>;
+        width: z.ZodOptional<z.ZodNumber>;
+        height: z.ZodOptional<z.ZodNumber>;
+        bottom: z.ZodOptional<z.ZodNumber>;
+    }, z.core.$strip>;
+    readonly remove_parts: z.ZodObject<{
+        parts: z.ZodArray<z.ZodObject<{
+            kind: z.ZodEnum<{
+                water: "water";
+                river: "river";
+                road: "road";
+                wall: "wall";
+                opening: "opening";
+                paving: "paving";
+            }>;
+            id: z.ZodString;
+            wallId: z.ZodOptional<z.ZodString>;
+        }, z.core.$strip>>;
+    }, z.core.$strip>;
+    readonly lock_items: z.ZodObject<{
+        instanceIds: z.ZodArray<z.ZodString>;
+    }, z.core.$strip>;
+    readonly world_history: z.ZodObject<{
+        action: z.ZodEnum<{
+            undo: "undo";
+            redo: "redo";
+        }>;
     }, z.core.$strip>;
     readonly fill_blocks: z.ZodObject<{
         block: z.ZodEnum<{
@@ -384,6 +663,13 @@ export declare const TOOL_ARGS: {
         }>>;
         lanes: z.ZodOptional<z.ZodNumber>;
         oneway: z.ZodOptional<z.ZodBoolean>;
+        width: z.ZodOptional<z.ZodNumber>;
+        sidewalk: z.ZodOptional<z.ZodNumber>;
+        sidewalkSide: z.ZodOptional<z.ZodEnum<{
+            both: "both";
+            left: "left";
+            right: "right";
+        }>>;
     }, z.core.$strip>;
     readonly pave_area: z.ZodObject<{
         points: z.ZodArray<z.ZodTuple<[z.ZodNumber, z.ZodNumber], null>>;
@@ -446,6 +732,7 @@ export declare const TOOL_ARGS: {
         points: z.ZodArray<z.ZodTuple<[z.ZodNumber, z.ZodNumber], null>>;
         width: z.ZodOptional<z.ZodNumber>;
         flow: z.ZodOptional<z.ZodNumber>;
+        widen: z.ZodOptional<z.ZodNumber>;
     }, z.core.$strip>;
     readonly set_sea: z.ZodObject<{
         level: z.ZodNullable<z.ZodNumber>;
@@ -575,8 +862,42 @@ export declare const TOOL_ARGS: {
             fog: "fog";
             sandstorm: "sandstorm";
         }>;
+        strength: z.ZodOptional<z.ZodNumber>;
     }, z.core.$strip>;
     /** The place's scroll story (SCROLL-02): every call replaces all stops. */
+    readonly set_lights: z.ZodObject<{
+        action: z.ZodEnum<{
+            remove: "remove";
+            list: "list";
+            add: "add";
+            update: "update";
+            three_point: "three_point";
+        }>;
+        id: z.ZodOptional<z.ZodString>;
+        name: z.ZodOptional<z.ZodString>;
+        enabled: z.ZodOptional<z.ZodBoolean>;
+        color: z.ZodOptional<z.ZodString>;
+        intensity: z.ZodOptional<z.ZodNumber>;
+        angle: z.ZodOptional<z.ZodNumber>;
+        softness: z.ZodOptional<z.ZodNumber>;
+        distance: z.ZodOptional<z.ZodNumber>;
+        follows: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+        position: z.ZodOptional<z.ZodTuple<[z.ZodNumber, z.ZodNumber, z.ZodNumber], null>>;
+        aim: z.ZodOptional<z.ZodTuple<[z.ZodNumber, z.ZodNumber, z.ZodNumber], null>>;
+    }, z.core.$strip>;
+    readonly set_spawn: z.ZodObject<{
+        x: z.ZodNumber;
+        z: z.ZodNumber;
+        turn: z.ZodOptional<z.ZodNumber>;
+    }, z.core.$strip>;
+    readonly set_water_look: z.ZodObject<{
+        clarity: z.ZodOptional<z.ZodNumber>;
+        waves: z.ZodOptional<z.ZodEnum<{
+            calm: "calm";
+            normal: "normal";
+            rough: "rough";
+        }>>;
+    }, z.core.$strip>;
     readonly set_story: z.ZodObject<{
         title: z.ZodOptional<z.ZodString>;
         stops: z.ZodNullable<z.ZodArray<z.ZodObject<{
@@ -1219,7 +1540,7 @@ export declare const MCP_BULK_TOOLS: readonly ToolName[];
 export declare const TOOL_DEFINITIONS: {
     type: "function";
     function: {
-        name: "place_item" | "set_style" | "set_sky" | "set_weather" | "sculpt_terrain" | "paint_terrain" | "add_water" | "draw_road" | "draw_river" | "set_game" | "set_story" | "set_script" | "set_sea" | "draw_wall" | "share_studio" | "avatar_voice" | "user_avatar_library" | "present_avatar" | "get_resource_controls" | "set_resource_params" | "get_world_summary" | "get_game" | "search_catalog" | "scatter_items" | "build_platforms" | "move_item" | "remove_items" | "fill_blocks" | "block_line" | "block_floor" | "dig_blocks" | "pave_area" | "build_house" | "make_world" | "cover_ground" | "set_ground_heights" | "place_items" | "paint_ground_rule" | "set_rules" | "set_zone" | "set_ride" | "get_script_api" | "get_scripts" | "test_script" | "get_script_logs" | "ask_user";
+        name: "set_spawn" | "place_item" | "set_item_flags" | "group_items" | "ungroup_items" | "set_style" | "set_sky" | "set_weather" | "sculpt_terrain" | "paint_terrain" | "add_water" | "draw_road" | "draw_river" | "edit_river" | "set_game" | "set_story" | "set_script" | "set_sea" | "draw_wall" | "share_studio" | "avatar_voice" | "user_avatar_library" | "present_avatar" | "avatar_studio" | "motion_lab" | "get_resource_controls" | "set_resource_params" | "get_world_summary" | "get_game" | "search_catalog" | "scatter_items" | "build_platforms" | "move_item" | "remove_items" | "list_library" | "set_item_look" | "name_items" | "settle_items" | "add_opening" | "remove_parts" | "lock_items" | "world_history" | "fill_blocks" | "block_line" | "block_floor" | "dig_blocks" | "pave_area" | "build_house" | "make_world" | "cover_ground" | "set_ground_heights" | "place_items" | "paint_ground_rule" | "set_lights" | "set_water_look" | "set_rules" | "set_zone" | "set_ride" | "get_script_api" | "get_scripts" | "test_script" | "get_script_logs" | "ask_user";
         description: string;
         parameters: Record<string, unknown>;
     };
@@ -1233,7 +1554,7 @@ export declare function toolDefinitions(place: {
 }): {
     type: "function";
     function: {
-        name: "place_item" | "set_style" | "set_sky" | "set_weather" | "sculpt_terrain" | "paint_terrain" | "add_water" | "draw_road" | "draw_river" | "set_game" | "set_story" | "set_script" | "set_sea" | "draw_wall" | "share_studio" | "avatar_voice" | "user_avatar_library" | "present_avatar" | "get_resource_controls" | "set_resource_params" | "get_world_summary" | "get_game" | "search_catalog" | "scatter_items" | "build_platforms" | "move_item" | "remove_items" | "fill_blocks" | "block_line" | "block_floor" | "dig_blocks" | "pave_area" | "build_house" | "make_world" | "cover_ground" | "set_ground_heights" | "place_items" | "paint_ground_rule" | "set_rules" | "set_zone" | "set_ride" | "get_script_api" | "get_scripts" | "test_script" | "get_script_logs" | "ask_user";
+        name: "set_spawn" | "place_item" | "set_item_flags" | "group_items" | "ungroup_items" | "set_style" | "set_sky" | "set_weather" | "sculpt_terrain" | "paint_terrain" | "add_water" | "draw_road" | "draw_river" | "edit_river" | "set_game" | "set_story" | "set_script" | "set_sea" | "draw_wall" | "share_studio" | "avatar_voice" | "user_avatar_library" | "present_avatar" | "avatar_studio" | "motion_lab" | "get_resource_controls" | "set_resource_params" | "get_world_summary" | "get_game" | "search_catalog" | "scatter_items" | "build_platforms" | "move_item" | "remove_items" | "list_library" | "set_item_look" | "name_items" | "settle_items" | "add_opening" | "remove_parts" | "lock_items" | "world_history" | "fill_blocks" | "block_line" | "block_floor" | "dig_blocks" | "pave_area" | "build_house" | "make_world" | "cover_ground" | "set_ground_heights" | "place_items" | "paint_ground_rule" | "set_lights" | "set_water_look" | "set_rules" | "set_zone" | "set_ride" | "get_script_api" | "get_scripts" | "test_script" | "get_script_logs" | "ask_user";
         description: string;
         parameters: Record<string, unknown>;
     };

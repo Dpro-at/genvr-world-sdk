@@ -1,6 +1,6 @@
 ---
 name: genvr-avatar-presentation
-description: Control Genvr SDK avatar gestures, facial expressions, imported GLB motions, screen effects and right-side notification or rich cards through the existing Studio tools and present_avatar executor. Use when animating an existing character, coordinating presentation with a reply, or integrating a host event stream.
+description: Control Genvr SDK avatar gestures, facial expressions, imported GLB motions, screen effects and right-side notification or rich cards through the existing Studio tools and present_avatar executor, and edit the character itself (body, height, muscle, fat, face shape, colours, view modes such as skeleton, muscles and fat) with avatar_studio. Use when animating or editing an existing character, coordinating presentation with a reply, or integrating a host event stream.
 ---
 
 # Genvr avatar presentation
@@ -25,7 +25,10 @@ Use the existing character, its skeleton and the current Studio workspace. Do no
 | Screen effects | Items → Effects |
 | Notification previews | Items → Notifications |
 | Rich card previews | Items → UI cards |
-| Body, face shape, hair, clothing | Existing Avatar character controls and recipe |
+| Body, height, muscle, fat, face shape, hair | Avatar → Look, Shape, Face; MCP `avatar_studio` set |
+| Colours | Avatar → Colours; MCP `avatar_studio` set colors |
+| Skeleton, muscles, fat and other views | Avatar → View ▾ on the stage, right-click the avatar; MCP `avatar_studio` view |
+| Favourite moves, idle | Avatar → Moves (★, Use as idle) |
 
 Notifications and cards enter from the right of the room/background viewport. They are screen-space displays, not objects attached to the character's head. Keep the original card styling while using the existing category docks for controls.
 
@@ -65,7 +68,30 @@ Use `Import GLB motion` to load a self-contained motion-only GLB, at most 16 MB 
 
 Verify rest posture, shoulders/elbows, finger direction, hip height, foot contact and transitions on the current body. A motion can be structurally compatible yet need artistic correction. Reimport after changing to another viewport or rebuilding the target body; an ID alone does not transfer the loaded clip. Keep character geometry, clothing and motion data as distinct assets.
 
-Character construction and saved recipe editing are separate from this presentation tool. The full character creation MCP proposal in the original project is not an implemented creation API in this standalone SDK. Do not claim that `present_avatar` creates meshes, designs clothes or runs a 3D generation model.
+Character recipe editing is separate from this presentation tool: use `avatar_studio` (below). Do not claim that `present_avatar` or `avatar_studio` creates new meshes, designs clothes or runs a 3D generation model.
+
+## Edit the character: avatar_studio
+
+`avatar_studio` changes the same character a person edits in the Avatar tab (tabs Look · Shape · Face · Colours · Voice · Saved). It needs a live Studio; the call opens the Avatar tab. Always start with `{"action":"inspect"}`: it returns the current recipe, view, shading, playing clip, facts (height in metres, bones, current expression, `expressionSupported`) and the saved characters.
+
+- `set` merges `recipe` parts into the current recipe (one level deep inside objects, so `{"shape":{"muscles":{"biceps":0.5}}}` keeps the other muscles). The result is validated; out-of-range values are refused with the reason.
+- Shape: `height` 0.85–1.15, `weight` 0.75–1.35, `scale` 0.6–1.6, `anime` 0–1, `muscle` −1–1 (overall), `fat` 0–0.85 (healthy range only), `fatPattern` −1 (lower body) .. 1 (belly), `definition` 0–1.
+- `shape.muscles` (each −1–1): neck, shoulders, chest, traps, lats, biceps, triceps, forearms, abs, obliques, waist, lowerBack, hips, glutes, quads, hamstrings, calves, hands.
+- `shape.fatRegions` (each −1–1): belly, waist, hips, buttocks, thighs, upperArms, forearms, calves, face, chin.
+- `shape.face` (each −1–1, generated human bodies only): eyes eyeSize, eyeOpen, eyeSpacing, eyeHeight, eyeTilt, eyeFold, eyeDepth; brows browHeight, browAngle; nose noseSize, noseWidth, noseLength, noseBridge, noseTip, nostrils, noseDepth; mouth mouthWidth, mouthHeight, upperLip, lowerLip, mouthCorners; cheeks cheekVolume, cheekBones, cheekInner; jaw chinWidth, chinHeight, chinForward, jawWidth; head headWidth, headLength.
+- `colors` (skin, hair, top, bottom, shoes…), `hair`, `body` and `animations` (`idle` = the move it stands with, `emotes` = up to 16 favourite moves, the ★ list in Avatar → Moves).
+- `view` shows the body as `normal`, `first-person`, `skeleton`, `skeleton-mesh`, `muscles` (red), `fat` (yellow), `wireframe`, `clay` or `normals`; `shading` is `smooth` or `flat`. Views change only the display, not the recipe.
+- `expression` shows `neutral`, `smile`, `angry`, `sad`, `surprised` or `thinking` on the face. It is refused when the body has no face controls; say so instead of claiming it worked.
+- `play` plays a move id (from `list_avatar_motions`); `reset_shape` returns the shape to normal; `save` keeps the character in this browser; `export` returns the recipe JSON.
+- `undo` / `redo` step through the character's edits (a slider drag is one step), the same as Ctrl+Z / Ctrl+Y on the Avatar tab.
+
+```json
+{"action":"set","recipe":{"shape":{"muscle":0.4,"fat":0.1,"muscles":{"shoulders":0.6},"face":{"eyeSize":0.3}}}}
+{"action":"view","view":"muscles"}
+{"action":"expression","expression":"smile"}
+```
+
+Show the change to the person (a view or the face close-up) and describe what changed; do not save or overwrite their saved character unless they asked.
 
 
 ## Existing filming MCP

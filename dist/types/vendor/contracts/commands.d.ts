@@ -443,9 +443,9 @@ export declare const CommandPayload: z.ZodDiscriminatedUnion<[z.ZodObject<{
         oneway: z.ZodOptional<z.ZodBoolean>;
         sidewalk: z.ZodOptional<z.ZodNumber>;
         sidewalkSide: z.ZodOptional<z.ZodEnum<{
+            both: "both";
             left: "left";
             right: "right";
-            both: "both";
         }>>;
         grade: z.ZodOptional<z.ZodBoolean>;
         terrain: z.ZodOptional<z.ZodArray<z.ZodString>>;
@@ -1339,9 +1339,9 @@ export declare const Command: z.ZodIntersection<z.ZodObject<{
         oneway: z.ZodOptional<z.ZodBoolean>;
         sidewalk: z.ZodOptional<z.ZodNumber>;
         sidewalkSide: z.ZodOptional<z.ZodEnum<{
+            both: "both";
             left: "left";
             right: "right";
-            both: "both";
         }>>;
         grade: z.ZodOptional<z.ZodBoolean>;
         terrain: z.ZodOptional<z.ZodArray<z.ZodString>>;

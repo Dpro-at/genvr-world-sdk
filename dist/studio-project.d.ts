@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { type Style, type WorldSeed } from '@genvr/contracts';
+import { LabProjectData, type Style, type WorldSeed } from '@genvr/contracts';
 export declare const STUDIO_PROJECT_BYTES: number;
 export declare const StudioProject: z.ZodObject<{
     format: z.ZodLiteral<"genvr-studio">;
@@ -796,9 +796,9 @@ export declare const StudioProject: z.ZodObject<{
             oneway: z.ZodOptional<z.ZodBoolean>;
             sidewalk: z.ZodOptional<z.ZodNumber>;
             sidewalkSide: z.ZodOptional<z.ZodEnum<{
+                both: "both";
                 left: "left";
                 right: "right";
-                both: "both";
             }>>;
         }, z.core.$strip>>>;
         walls: z.ZodDefault<z.ZodArray<z.ZodObject<{
@@ -1236,11 +1236,271 @@ export declare const StudioProject: z.ZodObject<{
             data: z.ZodString;
         }, z.core.$strict>>;
     }, z.core.$strict>>>;
+    lab: z.ZodOptional<z.ZodObject<{
+        format: z.ZodDefault<z.ZodLiteral<1>>;
+        course: z.ZodDefault<z.ZodObject<{
+            format: z.ZodDefault<z.ZodLiteral<1>>;
+            seed: z.ZodDefault<z.ZodNumber>;
+            obstacles: z.ZodDefault<z.ZodArray<z.ZodDiscriminatedUnion<[z.ZodObject<{
+                kind: z.ZodLiteral<"step">;
+                height: z.ZodDefault<z.ZodNumber>;
+                depth: z.ZodDefault<z.ZodNumber>;
+                width: z.ZodDefault<z.ZodNumber>;
+                id: z.ZodString;
+                z: z.ZodNumber;
+                x: z.ZodDefault<z.ZodNumber>;
+                hidden: z.ZodDefault<z.ZodBoolean>;
+            }, z.core.$strict>, z.ZodObject<{
+                kind: z.ZodLiteral<"ramp">;
+                rise: z.ZodDefault<z.ZodNumber>;
+                length: z.ZodDefault<z.ZodNumber>;
+                top: z.ZodDefault<z.ZodNumber>;
+                width: z.ZodDefault<z.ZodNumber>;
+                id: z.ZodString;
+                z: z.ZodNumber;
+                x: z.ZodDefault<z.ZodNumber>;
+                hidden: z.ZodDefault<z.ZodBoolean>;
+            }, z.core.$strict>, z.ZodObject<{
+                kind: z.ZodLiteral<"gap">;
+                width: z.ZodDefault<z.ZodNumber>;
+                height: z.ZodDefault<z.ZodNumber>;
+                landing: z.ZodDefault<z.ZodNumber>;
+                landing_depth: z.ZodDefault<z.ZodNumber>;
+                lane: z.ZodDefault<z.ZodNumber>;
+                id: z.ZodString;
+                z: z.ZodNumber;
+                x: z.ZodDefault<z.ZodNumber>;
+                hidden: z.ZodDefault<z.ZodBoolean>;
+            }, z.core.$strict>, z.ZodObject<{
+                kind: z.ZodLiteral<"low_wall">;
+                height: z.ZodDefault<z.ZodNumber>;
+                thickness: z.ZodDefault<z.ZodNumber>;
+                width: z.ZodDefault<z.ZodNumber>;
+                id: z.ZodString;
+                z: z.ZodNumber;
+                x: z.ZodDefault<z.ZodNumber>;
+                hidden: z.ZodDefault<z.ZodBoolean>;
+            }, z.core.$strict>, z.ZodObject<{
+                kind: z.ZodLiteral<"window">;
+                sill: z.ZodDefault<z.ZodNumber>;
+                opening_width: z.ZodDefault<z.ZodNumber>;
+                opening_height: z.ZodDefault<z.ZodNumber>;
+                wall_height: z.ZodDefault<z.ZodNumber>;
+                wall_width: z.ZodDefault<z.ZodNumber>;
+                thickness: z.ZodDefault<z.ZodNumber>;
+                id: z.ZodString;
+                z: z.ZodNumber;
+                x: z.ZodDefault<z.ZodNumber>;
+                hidden: z.ZodDefault<z.ZodBoolean>;
+            }, z.core.$strict>], "kind">>>;
+            street: z.ZodDefault<z.ZodNullable<z.ZodObject<{
+                z: z.ZodDefault<z.ZodNumber>;
+                lanes: z.ZodDefault<z.ZodNumber>;
+                lane_width: z.ZodDefault<z.ZodNumber>;
+                crossing: z.ZodDefault<z.ZodBoolean>;
+                light: z.ZodDefault<z.ZodObject<{
+                    cycle_s: z.ZodDefault<z.ZodNumber>;
+                    red_s: z.ZodDefault<z.ZodNumber>;
+                }, z.core.$strict>>;
+            }, z.core.$strict>>>;
+            cars: z.ZodDefault<z.ZodArray<z.ZodObject<{
+                id: z.ZodString;
+                lane: z.ZodDefault<z.ZodNumber>;
+                speed: z.ZodDefault<z.ZodNumber>;
+                offset_s: z.ZodDefault<z.ZodNumber>;
+                runs_red: z.ZodDefault<z.ZodBoolean>;
+            }, z.core.$strict>>>;
+            finish_z: z.ZodDefault<z.ZodNumber>;
+        }, z.core.$strict>>;
+        settings: z.ZodDefault<z.ZodObject<{
+            motion: z.ZodDefault<z.ZodString>;
+            character: z.ZodDefault<z.ZodString>;
+            speed: z.ZodDefault<z.ZodNumber>;
+            stride: z.ZodDefault<z.ZodNumber>;
+            step_height: z.ZodDefault<z.ZodNumber>;
+            jump_timing_ms: z.ZodDefault<z.ZodNumber>;
+            blend_s: z.ZodDefault<z.ZodNumber>;
+            lean_deg: z.ZodDefault<z.ZodNumber>;
+            wait_for_green: z.ZodDefault<z.ZodBoolean>;
+        }, z.core.$strict>>;
+        runs: z.ZodDefault<z.ZodArray<z.ZodObject<{
+            id: z.ZodString;
+            at: z.ZodString;
+            seed: z.ZodNumber;
+            settings: z.ZodObject<{
+                motion: z.ZodDefault<z.ZodString>;
+                character: z.ZodDefault<z.ZodString>;
+                speed: z.ZodDefault<z.ZodNumber>;
+                stride: z.ZodDefault<z.ZodNumber>;
+                step_height: z.ZodDefault<z.ZodNumber>;
+                jump_timing_ms: z.ZodDefault<z.ZodNumber>;
+                blend_s: z.ZodDefault<z.ZodNumber>;
+                lean_deg: z.ZodDefault<z.ZodNumber>;
+                wait_for_green: z.ZodDefault<z.ZodBoolean>;
+            }, z.core.$strict>;
+            course: z.ZodObject<{
+                format: z.ZodDefault<z.ZodLiteral<1>>;
+                seed: z.ZodDefault<z.ZodNumber>;
+                obstacles: z.ZodDefault<z.ZodArray<z.ZodDiscriminatedUnion<[z.ZodObject<{
+                    kind: z.ZodLiteral<"step">;
+                    height: z.ZodDefault<z.ZodNumber>;
+                    depth: z.ZodDefault<z.ZodNumber>;
+                    width: z.ZodDefault<z.ZodNumber>;
+                    id: z.ZodString;
+                    z: z.ZodNumber;
+                    x: z.ZodDefault<z.ZodNumber>;
+                    hidden: z.ZodDefault<z.ZodBoolean>;
+                }, z.core.$strict>, z.ZodObject<{
+                    kind: z.ZodLiteral<"ramp">;
+                    rise: z.ZodDefault<z.ZodNumber>;
+                    length: z.ZodDefault<z.ZodNumber>;
+                    top: z.ZodDefault<z.ZodNumber>;
+                    width: z.ZodDefault<z.ZodNumber>;
+                    id: z.ZodString;
+                    z: z.ZodNumber;
+                    x: z.ZodDefault<z.ZodNumber>;
+                    hidden: z.ZodDefault<z.ZodBoolean>;
+                }, z.core.$strict>, z.ZodObject<{
+                    kind: z.ZodLiteral<"gap">;
+                    width: z.ZodDefault<z.ZodNumber>;
+                    height: z.ZodDefault<z.ZodNumber>;
+                    landing: z.ZodDefault<z.ZodNumber>;
+                    landing_depth: z.ZodDefault<z.ZodNumber>;
+                    lane: z.ZodDefault<z.ZodNumber>;
+                    id: z.ZodString;
+                    z: z.ZodNumber;
+                    x: z.ZodDefault<z.ZodNumber>;
+                    hidden: z.ZodDefault<z.ZodBoolean>;
+                }, z.core.$strict>, z.ZodObject<{
+                    kind: z.ZodLiteral<"low_wall">;
+                    height: z.ZodDefault<z.ZodNumber>;
+                    thickness: z.ZodDefault<z.ZodNumber>;
+                    width: z.ZodDefault<z.ZodNumber>;
+                    id: z.ZodString;
+                    z: z.ZodNumber;
+                    x: z.ZodDefault<z.ZodNumber>;
+                    hidden: z.ZodDefault<z.ZodBoolean>;
+                }, z.core.$strict>, z.ZodObject<{
+                    kind: z.ZodLiteral<"window">;
+                    sill: z.ZodDefault<z.ZodNumber>;
+                    opening_width: z.ZodDefault<z.ZodNumber>;
+                    opening_height: z.ZodDefault<z.ZodNumber>;
+                    wall_height: z.ZodDefault<z.ZodNumber>;
+                    wall_width: z.ZodDefault<z.ZodNumber>;
+                    thickness: z.ZodDefault<z.ZodNumber>;
+                    id: z.ZodString;
+                    z: z.ZodNumber;
+                    x: z.ZodDefault<z.ZodNumber>;
+                    hidden: z.ZodDefault<z.ZodBoolean>;
+                }, z.core.$strict>], "kind">>>;
+                street: z.ZodDefault<z.ZodNullable<z.ZodObject<{
+                    z: z.ZodDefault<z.ZodNumber>;
+                    lanes: z.ZodDefault<z.ZodNumber>;
+                    lane_width: z.ZodDefault<z.ZodNumber>;
+                    crossing: z.ZodDefault<z.ZodBoolean>;
+                    light: z.ZodDefault<z.ZodObject<{
+                        cycle_s: z.ZodDefault<z.ZodNumber>;
+                        red_s: z.ZodDefault<z.ZodNumber>;
+                    }, z.core.$strict>>;
+                }, z.core.$strict>>>;
+                cars: z.ZodDefault<z.ZodArray<z.ZodObject<{
+                    id: z.ZodString;
+                    lane: z.ZodDefault<z.ZodNumber>;
+                    speed: z.ZodDefault<z.ZodNumber>;
+                    offset_s: z.ZodDefault<z.ZodNumber>;
+                    runs_red: z.ZodDefault<z.ZodBoolean>;
+                }, z.core.$strict>>>;
+                finish_z: z.ZodDefault<z.ZodNumber>;
+            }, z.core.$strict>;
+            score: z.ZodObject<{
+                foot_slide_cm: z.ZodNumber;
+                penetration_cm: z.ZodNumber;
+                fell: z.ZodBoolean;
+                car_hit: z.ZodBoolean;
+                finished: z.ZodBoolean;
+                time_s: z.ZodNumber;
+                smoothness: z.ZodNumber;
+                total: z.ZodNumber;
+            }, z.core.$strict>;
+            events: z.ZodArray<z.ZodObject<{
+                t: z.ZodNumber;
+                kind: z.ZodEnum<{
+                    start: "start";
+                    finish: "finish";
+                    window: "window";
+                    step: "step";
+                    ramp: "ramp";
+                    crossing: "crossing";
+                    car_hit: "car_hit";
+                    gap_jump: "gap_jump";
+                    land: "land";
+                    vault: "vault";
+                    wait: "wait";
+                    car_near: "car_near";
+                    fall: "fall";
+                    slide: "slide";
+                    blocked: "blocked";
+                }>;
+                label: z.ZodString;
+                obstacle: z.ZodOptional<z.ZodString>;
+            }, z.core.$strict>>;
+            version: z.ZodOptional<z.ZodString>;
+            by: z.ZodDefault<z.ZodEnum<{
+                person: "person";
+                agent: "agent";
+            }>>;
+        }, z.core.$strict>>>;
+        versions: z.ZodDefault<z.ZodArray<z.ZodObject<{
+            id: z.ZodString;
+            motion: z.ZodString;
+            n: z.ZodNumber;
+            note: z.ZodDefault<z.ZodString>;
+            settings: z.ZodObject<{
+                motion: z.ZodDefault<z.ZodString>;
+                character: z.ZodDefault<z.ZodString>;
+                speed: z.ZodDefault<z.ZodNumber>;
+                stride: z.ZodDefault<z.ZodNumber>;
+                step_height: z.ZodDefault<z.ZodNumber>;
+                jump_timing_ms: z.ZodDefault<z.ZodNumber>;
+                blend_s: z.ZodDefault<z.ZodNumber>;
+                lean_deg: z.ZodDefault<z.ZodNumber>;
+                wait_for_green: z.ZodDefault<z.ZodBoolean>;
+            }, z.core.$strict>;
+            score: z.ZodObject<{
+                foot_slide_cm: z.ZodNumber;
+                penetration_cm: z.ZodNumber;
+                fell: z.ZodBoolean;
+                car_hit: z.ZodBoolean;
+                finished: z.ZodBoolean;
+                time_s: z.ZodNumber;
+                smoothness: z.ZodNumber;
+                total: z.ZodNumber;
+            }, z.core.$strict>;
+            run: z.ZodString;
+            best: z.ZodDefault<z.ZodBoolean>;
+            by: z.ZodDefault<z.ZodEnum<{
+                person: "person";
+                agent: "agent";
+            }>>;
+            at: z.ZodString;
+        }, z.core.$strict>>>;
+        best_pending: z.ZodDefault<z.ZodNullable<z.ZodObject<{
+            version: z.ZodString;
+            by: z.ZodString;
+        }, z.core.$strict>>>;
+    }, z.core.$strict>>;
 }, z.core.$strict>;
 export type StudioProject = z.infer<typeof StudioProject>;
 /** Local snapshots never enter the platform's format-1 command-journal import API. */
 export declare function readStudioProject(input: unknown): StudioProject;
 export declare function createStudioProject(style: Style, kind: WorldSeed['kind'] | 'empty' | 'small', play?: {
+    orientation: "any" | "landscape" | "portrait";
+    view: "side" | "free";
+    moves: ("dash" | "double-jump" | "wall-jump")[];
+    devices: ("phone" | "tablet" | "computer" | "tv" | "vr")[];
+}): StudioProject;
+/** A motion lab is its own project (Q-LAB-1): an empty flat world and the lab part; it never changes a real world. */
+export declare function createLabProject(lab: LabProjectData, play?: {
     orientation: "any" | "landscape" | "portrait";
     view: "side" | "free";
     moves: ("dash" | "double-jump" | "wall-jump")[];

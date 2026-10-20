@@ -24,7 +24,7 @@ import {
   shoulderExternalRotationMax,
   sizedBody,
   wristDeviationShare
-} from "./chunk-OOWEURE5.js";
+} from "./chunk-VBIWJRXF.js";
 
 // ../../../../../genvr/node_modules/.pnpm/three@0.186.1/node_modules/three/build/three.core.js
 var REVISION = "186";
@@ -94368,6 +94368,15 @@ async function createCharacterStage({ container, recipe: firstRecipe, colors: fi
     resetView,
     focusFace,
     lookFrom,
+    setOrbit(azimuth, elevation, distance2) {
+      const d = Math.max(controls.minDistance, distance2);
+      controls.maxDistance = Math.max(controls.maxDistance, d * 1.5);
+      camera.far = Math.max(camera.far, d * 10);
+      camera.updateProjectionMatrix();
+      const a = azimuth * Math.PI / 180, e = Math.max(-89, Math.min(89, elevation)) * Math.PI / 180;
+      camera.position.set(controls.target.x + Math.sin(a) * Math.cos(e) * d, controls.target.y + Math.sin(e) * d, controls.target.z + Math.cos(a) * Math.cos(e) * d);
+      controls.update();
+    },
     async startPaint(paint) {
       painting?.dispose();
       painting = await startMusclePaint({ scene, camera, controls, canvas: renderer.domElement, paint });
@@ -94620,4 +94629,4 @@ three/build/three.module.js:
    * SPDX-License-Identifier: MIT
    *)
 */
-//# sourceMappingURL=chunk-DGPEIZEL.js.map
+//# sourceMappingURL=chunk-F334SVVK.js.map

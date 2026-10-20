@@ -31,3 +31,4 @@ export * from './world-package.js';
 export * from './world-presets.js';
 export * from './lighting.js';
 export * from './studio-sharing.js';
+export * from './motion-lab.js';

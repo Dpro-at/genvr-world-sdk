@@ -1,5 +1,6 @@
 import type { CommandPayload, ItemInstance, WorldDocument } from '../contracts/index.js';
 import { type Intersection, type Object3D, type Ray } from 'three/webgpu';
+import { type GizmoMode } from './gizmo.js';
 import { type ItemsView } from './items.js';
 /** The items currently selected (one item, or every member of a group). */
 export interface ItemSelection {
@@ -61,6 +62,12 @@ export declare function asksForRest(grid: number | null, axis?: number): boolean
  * selected items can be turned, moved, duplicated, repeated in a row, or deleted. Every change
  * is a normal world command (undo, saving, and multiplayer just work).
  */
+/** How the next placed items look (ITEMS-I1). */
+export interface PlaceOptions {
+    size?: number;
+    color?: string;
+    material?: string;
+}
 export declare class ItemTools {
     #private;
     private readonly options;
@@ -85,6 +92,19 @@ export declare class ItemTools {
      */
     selectInRect(left: number, top: number, right: number, bottom: number, add: boolean): void;
     endGizmo(pointerId: number): void;
+    /** Which handles the selection shows (ITEMS-I2): all, or only move, size or turn. */
+    get handleMode(): GizmoMode;
+    setHandleMode(mode: GizmoMode): void;
+    get placeOptions(): PlaceOptions & {
+        turn: number;
+    };
+    /** What the next placed items look like (ITEMS-I1): size 0.2–10, a colour, a material; null clears one. */
+    setPlaceOptions(options: {
+        size?: number | null;
+        color?: string | null;
+        material?: string | null;
+        turn?: number;
+    }): void;
     get placeItemId(): string | null;
     get moving(): boolean;
     get selection(): ItemSelection | null;

@@ -1,5 +1,6 @@
 import {
   BLOCKS,
+  LabProjectData,
   PlaySettings,
   SIZE_TIERS,
   VOXEL_CHUNK,
@@ -23,7 +24,7 @@ import {
   starterGroundMaterials,
   starterWorldCommands,
   supportsWorldStarter
-} from "./chunk-L6ZVLN4D.js";
+} from "./chunk-ALQEDJO3.js";
 
 // src/studio-project.ts
 var STUDIO_PROJECT_BYTES = 64 * 1024 * 1024;
@@ -36,7 +37,9 @@ var StudioProject = external_exports.object({
   world: WorldDocument,
   avatarBodies: external_exports.record(external_exports.string().min(1).max(120), external_exports.enum(["robot", "human", "classic", "simple", "starter"])).optional(),
   terrainChunks: external_exports.array(external_exports.string().max(16 * 1024 * 1024)).max(4096),
-  assets: WorldPackage.shape.assets
+  assets: WorldPackage.shape.assets,
+  /** A motion lab project (MOTION-LAB): its course, run settings, last runs and motion versions. */
+  lab: LabProjectData.optional()
 }).strict();
 function readStudioProject(input) {
   const text = typeof input === "string" ? input : JSON.stringify(input);
@@ -132,6 +135,10 @@ function createStudioProject(style, kind, play = defaultPlaySettings()) {
   }
   return fromState(state, "My place", play);
 }
+function createLabProject(lab, play = defaultPlaySettings()) {
+  const project = createStudioProject("blocky", "empty", play);
+  return readStudioProject({ ...project, title: "Motion lab", lab });
+}
 function importStudioProject(text) {
   if (new TextEncoder().encode(text).length > STUDIO_PROJECT_BYTES) throw new Error("Studio project exceeds 64 MB.");
   const parsed = JSON.parse(text);
@@ -171,6 +178,7 @@ export {
   STUDIO_PROJECT_BYTES,
   StudioProject,
   browserStudioStorage,
+  createLabProject,
   createStudioProject,
   importStudioProject,
   readStudioProject

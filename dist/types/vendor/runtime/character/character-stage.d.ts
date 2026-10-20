@@ -63,6 +63,11 @@ export interface CharacterStage {
     /** Close-up on the face from the front (face work: eyes, mouth, lines). */
     focusFace(): void;
     lookFrom(face: ViewFace): void;
+    /**
+     * Put the camera on an orbit round what it looks at (the motion lab shows the course ahead): `azimuth` degrees
+     * from +z toward +x, `elevation` degrees above the ground, `distance` metres.
+     */
+    setOrbit(azimuth: number, elevation: number, distance: number): void;
     onChange(listener: (info: CharacterStageInfo) => void): () => void;
     /**
      * The muscle paint tool (generated bodies): the character is replaced by the default boy, static, to paint

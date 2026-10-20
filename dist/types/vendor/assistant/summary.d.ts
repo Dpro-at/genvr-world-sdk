@@ -9,12 +9,6 @@ export declare const WORLD_SUMMARY_PAGE = 100;
 export declare const WORLD_SUMMARY_CHARS = 6500;
 /** How the summary's compass words map to the place's axes (shown when the place has zones). */
 export declare const DIRECTIONS_LINE = "Directions: north is -z, east is +x; turn 0\u00B0 faces south (+z).";
-/**
- * Compact description of a world for the model's prompt (task P4-03 grows this): size, look,
- * and the objects with ids and ground positions. `maxItems` limits the item list; `fromItem`
- * starts it later (a page), and a cut list ends with `more_items_from: N`, the next page's start.
- * A page also ends early when it would pass `WORLD_SUMMARY_CHARS` (its first item is always shown).
- */
 export declare function worldSummary(world: WorldDocument, maxItems: number, fromItem?: number): string;
 /**
  * The game in a few words (P9-12), from the generic parts it has: "5 min, two teams, highest
