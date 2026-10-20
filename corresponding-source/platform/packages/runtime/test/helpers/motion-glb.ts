@@ -10,25 +10,29 @@ const joints: Array<[name: string, parent: string | null, at: [number, number, n
   ['RightUpLeg', 'Hips', [-0.1, -0.05, 0]], ['RightLeg', 'RightUpLeg', [0, -0.42, 0]], ['RightFoot', 'RightLeg', [0, -0.42, 0]], ['RightToeBase', 'RightFoot', [0, -0.05, 0.12]],
 ];
 
-/** `armRollDeg` turns both upper arms about their own bone axis at rest, as rigs with other bone axes do. */
-export function motionGlb(prefix = 'mixamorig:', swingDeg = 20, armRollDeg = 0): ArrayBuffer {
+/**
+ * `armRollDeg` turns both upper arms about their own bone axis at rest, as rigs with other bone axes do. `unit` scales
+ * every length (100: a rig in centimetres) and `hipBobM` moves the hips down and up by that many metres over the loop.
+ */
+export function motionGlb(prefix = 'mixamorig:', swingDeg = 20, armRollDeg = 0, { unit = 1, hipBobM = 0 } = {}): ArrayBuffer {
   const times = [0, 0.25, 0.5, 0.75, 1];
   const quat = (deg: number) => { const a = (deg * Math.PI) / 360; return [Math.sin(a), 0, 0, Math.cos(a)]; };
   const swing = (sign: number) => times.flatMap((t) => quat(sign * swingDeg * Math.sin(2 * Math.PI * t)));
-  const floats = [...times, ...swing(1), ...swing(-1)];
+  const bob = times.flatMap((t) => [0, (1 - hipBobM * (1 - Math.cos(2 * Math.PI * t)) / 2) * unit, 0]);
+  const floats = [...times, ...swing(1), ...swing(-1), ...bob];
   const bin = new Float32Array(floats);
   const index = (name: string) => joints.findIndex(([n]) => n === name);
   const json = {
     asset: { version: '2.0' },
     scene: 0, scenes: [{ nodes: [0] }],
-    nodes: joints.map(([name, , at]) => ({ name: prefix + name, translation: at, ...(armRollDeg && name.endsWith('Arm') && !name.includes('Fore') ? { rotation: quat(armRollDeg) } : {}), children: joints.flatMap(([, parent], i) => (parent === name ? [i] : [])) }))
+    nodes: joints.map(([name, , at]) => ({ name: prefix + name, translation: at.map((v) => v * unit), ...(armRollDeg && name.endsWith('Arm') && !name.includes('Fore') ? { rotation: quat(armRollDeg) } : {}), children: joints.flatMap(([, parent], i) => (parent === name ? [i] : [])) }))
       .map(({ children, ...node }) => (children.length ? { ...node, children } : node)),
     buffers: [{ byteLength: bin.byteLength }],
-    bufferViews: [{ buffer: 0, byteOffset: 0, byteLength: times.length * 4 }, { buffer: 0, byteOffset: times.length * 4, byteLength: times.length * 16 }, { buffer: 0, byteOffset: times.length * 20, byteLength: times.length * 16 }],
+    bufferViews: [{ buffer: 0, byteOffset: 0, byteLength: times.length * 4 }, { buffer: 0, byteOffset: times.length * 4, byteLength: times.length * 16 }, { buffer: 0, byteOffset: times.length * 20, byteLength: times.length * 16 }, { buffer: 0, byteOffset: times.length * 36, byteLength: times.length * 12 }],
     accessors: [{ bufferView: 0, componentType: 5126, count: times.length, type: 'SCALAR', min: [0], max: [1] },
-      { bufferView: 1, componentType: 5126, count: times.length, type: 'VEC4' }, { bufferView: 2, componentType: 5126, count: times.length, type: 'VEC4' }],
-    animations: [{ name: 'Swing', samplers: [{ input: 0, output: 1, interpolation: 'LINEAR' }, { input: 0, output: 2, interpolation: 'LINEAR' }],
-      channels: [{ sampler: 0, target: { node: index('LeftUpLeg'), path: 'rotation' } }, { sampler: 1, target: { node: index('RightUpLeg'), path: 'rotation' } }] }],
+      { bufferView: 1, componentType: 5126, count: times.length, type: 'VEC4' }, { bufferView: 2, componentType: 5126, count: times.length, type: 'VEC4' }, { bufferView: 3, componentType: 5126, count: times.length, type: 'VEC3' }],
+    animations: [{ name: 'Swing', samplers: [{ input: 0, output: 1, interpolation: 'LINEAR' }, { input: 0, output: 2, interpolation: 'LINEAR' }, { input: 0, output: 3, interpolation: 'LINEAR' }],
+      channels: [{ sampler: 0, target: { node: index('LeftUpLeg'), path: 'rotation' } }, { sampler: 1, target: { node: index('RightUpLeg'), path: 'rotation' } }, { sampler: 2, target: { node: index('Hips'), path: 'translation' } }] }],
   };
   const text = new TextEncoder().encode(JSON.stringify(json));
   const jsonLength = Math.ceil(text.length / 4) * 4, binLength = Math.ceil(bin.byteLength / 4) * 4;

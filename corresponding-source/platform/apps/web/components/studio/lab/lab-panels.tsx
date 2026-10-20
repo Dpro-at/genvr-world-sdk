@@ -181,7 +181,7 @@ function StationProperties({ lab, st }: { lab: LabController; st: LabStation }) 
           {props.map((p) => <li key={p.id} className="flex h-7 items-center gap-2 rounded px-1 hover:bg-ink/5"><span className="flex-1 truncate">{p.name}</span><span className="font-mono text-[11px] text-ink/50">{p.mass_kg} kg · {p.grip}</span>
             <button type="button" className="rounded p-0.5 text-coral hover:bg-ink/10" aria-label={`Remove ${p.id}`} onClick={() => tryRun(() => lab.removeProp(p.id), setError)}><X className="size-3" /></button></li>)}
         </ul></> : null}
-      {runnable ? <button type="button" className="flex h-9 items-center justify-center gap-2 rounded-lg bg-ink text-sm font-bold text-on-brand" onClick={() => tryRun(() => { lab.runOn(st.id); lab.select(null); lab.run({}, PERSON); }, setError)}><Play className="size-4" />Run here</button>
+      {runnable ? <button type="button" className="flex h-9 items-center justify-center gap-2 rounded-lg bg-ink text-sm font-bold text-on-brand" onClick={() => { setError(null); lab.runOn(st.id); lab.select(null); void lab.runPrepared({}, PERSON).catch((e: unknown) => setError(e instanceof Error ? e.message : String(e))); }}><Play className="size-4" />Run here</button>
         : <p className="text-[11px] text-ink/50">Placed and drawn. Runs on the {STATION_NAMES[st.kind].toLowerCase()} come in a later phase of board M18.</p>}
       <Problem text={error} />
     </section>
@@ -412,7 +412,7 @@ function LabCourseBar({ lab }: { lab: LabController }) {
       if (target?.closest('input, textarea, select, [contenteditable="true"]') || event.ctrlKey || event.metaKey || event.altKey) return;
       const key = event.key.toLowerCase();
       const overlay = OVERLAY_BUTTONS.find(([, , k]) => k === key);
-      if (key === 'r') { event.preventDefault(); tryRun(() => lab.run({}, PERSON), setError); }
+      if (key === 'r') { event.preventDefault(); setError(null); void lab.runPrepared({}, PERSON).catch((e: unknown) => setError(e instanceof Error ? e.message : String(e))); }
       else if (key === ' ') { event.preventDefault(); lab.setPlaying(!lab.view.playing); }
       else if (key === ',') { event.preventDefault(); lab.step(-1); }
       else if (key === '.') { event.preventDefault(); lab.step(1); }
@@ -425,7 +425,7 @@ function LabCourseBar({ lab }: { lab: LabController }) {
   const on = lab.view.overlays;
   return (
     <div role="toolbar" aria-label="Run bar" className="pointer-events-auto absolute inset-x-0 top-0 z-20 flex flex-wrap items-center justify-center gap-1 border-b border-ink/10 bg-surface/95 px-2 py-1 text-xs">
-      <button type="button" className="flex h-7 items-center gap-1.5 rounded-lg bg-ink px-2.5 font-bold text-on-brand" onClick={() => tryRun(() => lab.run({}, PERSON), setError)} title="Run the motion through the course once (R)"><Play className="size-3.5" />Run<kbd className="font-mono text-[10px] opacity-70">R</kbd></button>
+      <button type="button" className="flex h-7 items-center gap-1.5 rounded-lg bg-ink px-2.5 font-bold text-on-brand" onClick={() => { setError(null); void lab.runPrepared({}, PERSON).catch((e: unknown) => setError(e instanceof Error ? e.message : String(e))); }} title="Run the motion through the course once (R)"><Play className="size-3.5" />Run<kbd className="font-mono text-[10px] opacity-70">R</kbd></button>
       <button type="button" className="rounded-lg p-1.5 hover:bg-ink/10 disabled:opacity-40" disabled={!lab.view.run} title={lab.view.playing ? 'Pause (Space)' : 'Play (Space)'} aria-label={lab.view.playing ? 'Pause' : 'Play'} onClick={() => lab.setPlaying(!lab.view.playing)}>{lab.view.playing ? <Square className="size-3.5" /> : <Play className="size-3.5" />}</button>
       <span className="mx-1 h-5 w-px bg-ink/15" />
       {OVERLAY_BUTTONS.map(([id, name, key, icon]) => (

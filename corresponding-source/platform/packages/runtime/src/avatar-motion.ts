@@ -3,7 +3,7 @@ import { AnimationClip, AnimationMixer, LoopOnce, Object3D, QuaternionKeyframeTr
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { findBody } from '@genvr/core-library';
 import { clone } from 'three/examples/jsm/utils/SkeletonUtils.js';
-import type { GenvrAvatar } from './avatar.js';
+import { settleClip, type GenvrAvatar } from './avatar.js';
 
 /** Import supplied motion data without downloading a model or changing the avatar's geometry. */
 export async function retargetAvatarMotion(data: ArrayBuffer, avatar: { root: Object3D; body: GenvrAvatar['body'] }, name: string): Promise<AnimationClip> {
@@ -48,17 +48,26 @@ export function retargetMotionScene(scene: Object3D, clip: AnimationClip, avatar
     if (!track.name.endsWith('.position')) continue;
     const firstY = track.values[1] ?? 0;
     const sourceHeight = sourceRestHeight;
-    const scale = Math.max(.1, Math.min(10, Math.abs(rest.y) / sourceHeight));
+    // Source files are often in centimetres (hips near 96) and ours in metres: a 1/100 scale is normal here.
+    const scale = Math.max(.001, Math.min(10, Math.abs(rest.y) / sourceHeight));
     for (let i = 0; i < track.values.length; i += 3) {
       track.values[i] = rest.x; track.values[i + 1] = rest.y + ((track.values[i + 1] ?? 0) - firstY) * scale; track.values[i + 2] = rest.z;
     }
   }
   if (motion.tracks.some(track => Array.from(track.values).some(v => !Number.isFinite(v)))) throw new Error('Motion contains invalid transforms.');
   motion.name = name;
-  return motion;
+  // On this body's own legs: down to the floor when it never touches it, and never under it.
+  return settleClip(motion, body);
 }
 
 const MOTION_FPS = 30;
+/**
+ * The child that continues each joint's chain, for lining up rest poses: the hips point up the spine, not to a leg
+ * (rigs put the leg joints level with the hips or below them, which would tilt the whole pelvis).
+ */
+const CHAIN: Record<string, string> = { Hips: 'Spine', Spine: 'Spine1', Spine1: 'Spine2', Spine2: 'Neck', Neck: 'Head',
+  ...Object.fromEntries(['Left', 'Right'].flatMap(side => [[`${side}Shoulder`, `${side}Arm`], [`${side}Arm`, `${side}ForeArm`], [`${side}ForeArm`, `${side}Hand`],
+    [`${side}Hand`, `${side}HandMiddle1`], [`${side}UpLeg`, `${side}Leg`], [`${side}Leg`, `${side}Foot`], [`${side}Foot`, `${side}ToeBase`]])) };
 const worldQuat = (node: Object3D) => node.getWorldQuaternion(new Quaternion());
 const worldPos = (node: Object3D) => node.getWorldPosition(new Vector3());
 
@@ -81,7 +90,9 @@ function sampleBindRelative(target: SkinnedMesh, targetRoot: Object3D, names: Re
     const source = byName.get(names[bone.name] ?? '');
     if (!source) return { bone, source: undefined, sourceBindInverse: new Quaternion(), aligned: new Quaternion() };
     // Rest alignment: turn the target's rest bone direction onto the source's rest bone direction.
-    const targetChild = bone.children.find(child => (child as Bone).isBone && byName.has(names[child.name] ?? ''));
+    const next = CHAIN[canonicalBoneName(source.name)];
+    const mapped = bone.children.filter(child => (child as Bone).isBone && byName.has(names[child.name] ?? ''));
+    const targetChild = mapped.find(child => canonicalBoneName(names[child.name]!) === next) ?? mapped[0];
     const sourceChild = targetChild ? byName.get(names[targetChild.name]!) : undefined;
     const align = new Quaternion();
     if (targetChild && sourceChild) {

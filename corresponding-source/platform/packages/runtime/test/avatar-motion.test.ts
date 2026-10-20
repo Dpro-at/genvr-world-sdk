@@ -54,6 +54,18 @@ describe('legacy motion import', () => {
     }
     avatar.dispose();
   });
+  it('a rig in centimetres keeps its hips movement in scale (board M20)', async () => {
+    const avatar = createGenvrAvatar({ ...DEFAULT_LOOK, body: 'robot' });
+    // The hips rise 5 cm and come back (the floor fix leaves rises alone): the same in metres or in centimetres.
+    const heights = await Promise.all([1, 100].map(async unit => {
+      const clip = await retargetAvatarMotion(motionGlb('mixamorig:', 20, 0, { unit, hipBobM: -0.05 }), avatar, 'bob');
+      return Array.from(clip.tracks.find(track => track.name.endsWith('Hips.position'))!.values).filter((_, i) => i % 3 === 1);
+    }));
+    expect(Math.max(...heights[0]!) - Math.min(...heights[0]!)).toBeGreaterThan(0.03);
+    expect(Math.max(...heights[0]!) - Math.min(...heights[0]!)).toBeLessThan(0.06);
+    heights[1]!.forEach((y, i) => expect(y).toBeCloseTo(heights[0]![i]!, 3));
+    avatar.dispose();
+  });
   it('rejects invalid and oversized motion buffers', async () => {
     const avatar = createGenvrAvatar();
     await expect(retargetAvatarMotion(new ArrayBuffer(17 * 1024 * 1024), avatar, 'motion:test')).rejects.toThrow(/16 MB/);

@@ -1328,6 +1328,34 @@ export function groundClip(clip: AnimationClip, body: AvatarBody): AnimationClip
   return new AnimationClip(clip.name, clip.duration, tracks);
 }
 
+/**
+ * Board M20: an imported motion made for another skeleton may never touch the floor on this body (other leg lengths).
+ * When no sole reaches the floor in any key, the whole motion comes down by the smallest gap; then `groundClip` lifts
+ * any key that would sink. A motion that touches the floor somewhere (a jump) keeps its heights.
+ */
+export function settleClip(clip: AnimationClip, body: AvatarBody): AnimationClip {
+  const soles = SOLE_JOINTS.flatMap((name) => body.joints.filter((joint) => joint.name === name));
+  const hipsName = `${nodeName(body, body.joints[0]!.name)}.position`, position = clip.tracks.find((track) => track.name === hipsName);
+  if (!soles.length || !position || SWIM_CLIPS.has(clip.name)) return groundClip(clip, body);
+  const { root } = buildSkeleton(body);
+  const bones = soles.map((joint) => root.getObjectByName(nodeName(body, joint.name))!);
+  const mixer = new AnimationMixer(root), action = mixer.clipAction(clip);
+  action.setLoop(LoopOnce, 1); action.clampWhenFinished = true; action.play();
+  const at = new Vector3();
+  let gap = Infinity;
+  for (const time of position.times) {
+    mixer.setTime(Math.min(time, clip.duration)); root.updateMatrixWorld(true);
+    gap = Math.min(gap, ...bones.map((bone, i) => bone.getWorldPosition(at).y - soles[i]!.at[1]));
+  }
+  mixer.stopAllAction(); mixer.uncacheRoot(root);
+  if (!(gap > 0.005)) return groundClip(clip, body);
+  const values = Float32Array.from(position.values);
+  for (let i = 1; i < values.length; i += 3) values[i] = values[i]! - gap;
+  const tracks = clip.tracks.filter((track) => track !== position);
+  tracks.push(new VectorKeyframeTrack(hipsName, Array.from(position.times), Array.from(values)));
+  return groundClip(new AnimationClip(clip.name, clip.duration, tracks), body);
+}
+
 /** A sole point touches the floor below this height (m) when it is not moving up or down fast (as the motion check). */
 const PLANT_HEIGHT = 0.03, PLANT_VERTICAL_SPEED = 0.2, LOCK_RELEASE_FRAMES = 6;
 /** A planted foot's small twists are removed; past this (radians) the move means a pivot on the ball of the foot. */
