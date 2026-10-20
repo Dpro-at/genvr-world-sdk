@@ -33,6 +33,10 @@ describe('the owner\'s private motion library in the local Studio', () => {
     expect((await fetch(`${base}/private-motions/index.json`)).status).toBe(200);
     expect((await fetch(`${base}/private-motions/Idle/idle.json`)).status).toBe(200);
     for (const path of ['/private-motions/..%2f..%2fetc%2fpasswd', '/private-motions/../package.json']) expect((await fetch(base + path)).status).not.toBe(200);
+    // A page on another name that resolves here (DNS rebinding) is refused.
+    const { request } = await import('node:http');
+    const status = await new Promise<number>((resolve, reject) => { const req = request(`${base}/private-motions/index.json`, { headers: { Host: 'evil.example:80' } }, res => { res.resume(); resolve(res.statusCode ?? 0); }); req.on('error', reject); req.end(); });
+    expect(status).toBe(403);
     const plain = `http://127.0.0.1:${(server.address() as { port: number }).port}`;
     expect((await fetch(`${plain}/private-motions/index.json`)).status).not.toBe(200);
   });

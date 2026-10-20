@@ -14,6 +14,7 @@ const types = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/ja
  * the package, never copied into dist, so it cannot ship. GENVR_PRIVATE_MOTIONS, or the source tree's .local-runtime.
  */
 const PRIVATE_MOTIONS = '/private-motions/';
+const LOCAL_HOST = /^((127\.0\.0\.1|localhost)(:\d+)?|\[::1\](:\d+)?)$/;
 export function createStudioServer({ bridge, privateMotions } = {}) {
   return createServer(async (req, res) => {
     if (bridge && await bridge.handle(req, res)) return;
@@ -24,6 +25,8 @@ export function createStudioServer({ bridge, privateMotions } = {}) {
       const url = new URL(req.url, 'http://127.0.0.1');
       const path = decodeURIComponent(url.pathname);
       const own = Boolean(privateMotions && path.startsWith(PRIVATE_MOTIONS)), base = own ? privateMotions : dist;
+      // Private files answer only this machine's own address (a rebound DNS name must not read them).
+      if (own && !LOCAL_HOST.test(req.headers.host ?? '')) { res.writeHead(403); res.end(); return; }
       const file = own ? resolve(privateMotions, '.' + path.slice(PRIVATE_MOTIONS.length - 1)) : path === '/' ? resolve(dist, 'studio.html') : path.startsWith('/dist/') ? resolve(root, '.' + path) : resolve(dist, 'studio-assets', '.' + path);
       const actual = await realpath(file), inside = relative(await realpath(base), actual);
       if (inside.startsWith('..') || isAbsolute(inside)) { res.writeHead(403); res.end(); return; }
