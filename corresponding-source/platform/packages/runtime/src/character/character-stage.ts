@@ -53,7 +53,7 @@ import {
   type BodyJoint,
 } from '@genvr/core-library';
 import type { RigBone } from '@genvr/core-library';
-import { clipFromAnimation, clipTilt, createGenvrAvatar, type GenvrAvatar } from '../avatar.js';
+import { clipFromAnimation, clipTilt, createGenvrAvatar, groundClip, type GenvrAvatar } from '../avatar.js';
 import { FACE_DIRECTIONS, ViewCube, type ViewFace } from '../view-cube.js';
 import { boneRoles, shapedBody, shapeSkin, type BoneRole, type ShapeBone } from './shape.js';
 import { startMusclePaint, type MusclePaintMode } from './muscle-paint-mode.js';
@@ -453,7 +453,7 @@ export async function createCharacterStage({
     });
     // Clips on the shaped body: the Hips drop of sitting follows the new size.
     const shaped = shapedBody(base.body, out.rest, recipe.shape);
-    clips = CORE_ANIMATIONS.map((animation) => clipFromAnimation(animation, shaped));
+    clips = CORE_ANIMATIONS.map((animation) => groundClip(clipFromAnimation(animation, shaped), shaped));
     restart(clipName, action?.time ?? 0);
   };
 
