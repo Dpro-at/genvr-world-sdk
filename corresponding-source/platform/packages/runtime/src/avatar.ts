@@ -1330,14 +1330,17 @@ export function groundClip(clip: AnimationClip, body: AvatarBody): AnimationClip
 
 /** A sole point touches the floor below this height (m) when it is not moving up or down fast (as the motion check). */
 const PLANT_HEIGHT = 0.03, PLANT_VERTICAL_SPEED = 0.2, LOCK_RELEASE_FRAMES = 6;
+/** A planted foot's small twists are removed; past this (radians) the move means a pivot on the ball of the foot. */
+const LOCK_MAX_TURN = 10 * Math.PI / 180;
 /**
  * Board M16 (fix the base, "feet locked while planted"): while a heel or toe touches the floor it stays on one spot of
- * the ground; the thigh and shin bend to reach it (two-bone IK, the knee keeps its own side) and the foot keeps its own
+ * the ground (the ball of the foot when both touch, so turns pivot on it) and does not twist past LOCK_MAX_TURN; the thigh
+ * and shin bend to reach it (two-bone IK, the knee keeps its own side) and the foot keeps its own
  * angle. A ground move travels forward at its Lab speed, another looping move at the speed its planted feet imply, a
  * one-off move stays in place. The correction
  * eases out over a few frames after lift-off. Baked on this body's own skeleton at 1/60 s; swims are left alone.
  */
-export function lockFeet(clip: AnimationClip, body: AvatarBody, loop: boolean, speed?: number): AnimationClip {
+export function lockFeet(clip: AnimationClip, body: AvatarBody, loop: boolean, speed?: number, hipsShift?: readonly Vector3[]): AnimationClip {
   const sides = (['Left', 'Right'] as const).map((side) => ({ side, joints: ['UpLeg', 'Leg', 'Foot', 'ToeBase'].map((part) => body.joints.find((joint) => joint.name === `${side}${part}`)) }));
   if (SWIM_CLIPS.has(clip.name) || sides.some((leg) => leg.joints.some((joint) => !joint)) || !clip.tracks.length) return clip;
   const { root } = buildSkeleton(body);
@@ -1382,7 +1385,7 @@ export function lockFeet(clip: AnimationClip, body: AvatarBody, loop: boolean, s
     const current = new Vector3();
     for (let k = 0; k < unique; k++) {
       const i = loop ? (start + k) % unique : k, lap = loop && start + k >= unique ? clip.duration : 0;
-      const point = planted(leg, 'heel', i) ? 'heel' : planted(leg, 'toe', i) ? 'toe' : null;
+      const point = planted(leg, 'toe', i) ? 'toe' : planted(leg, 'heel', i) ? 'heel' : null;
       if (!point) {
         anchor = null;
         if (left > 0) { current.multiplyScalar((left - 1) / left); turn *= (left - 1) / left; left--; } else { current.set(0, 0, 0); turn = 0; }
@@ -1390,7 +1393,9 @@ export function lockFeet(clip: AnimationClip, body: AvatarBody, loop: boolean, s
       }
       const l = frames[i]!.legs[leg]!;
       if (!anchor || anchor.point !== point) anchor = { point, at: new Vector3(), heading: headingOf(l) + turn };
+      // A deliberate pivot moves the held heading along, so only small twists are removed.
       turn = wrap(anchor.heading - headingOf(l));
+      if (Math.abs(turn) > LOCK_MAX_TURN) { turn = Math.sign(turn) * LOCK_MAX_TURN; anchor.heading = headingOf(l) + turn; }
       // The planted point after the heading fix (the foot turns about its ankle), on the ground the body travels over.
       const here = l[point].clone().sub(l.ankle).applyAxisAngle(UP, turn).add(l.ankle).addScaledVector(velocity, times[i]! + lap).setY(0);
       if (anchor.at.lengthSq() === 0) anchor.at.copy(here).add(current);
@@ -1399,6 +1404,8 @@ export function lockFeet(clip: AnimationClip, body: AvatarBody, loop: boolean, s
     if (loop) { out[count - 1]!.move.copy(out[0]!.move); out[count - 1]!.turn = out[0]!.turn; }
     return out;
   });
+  // Hips moved for balance: the feet stay where they were.
+  if (hipsShift) corrections.forEach((rows) => rows.forEach((row, i) => { const shift = hipsShift[i]; if (shift) row.move.sub(shift); }));
   if (corrections.every((rows) => rows.every((row) => row.move.lengthSq() < 1e-6 && Math.abs(row.turn) < 1e-4))) return clip;
   // Two-bone IK per frame; the new joint rotations replace the leg tracks at 1/60 s.
   const values = new Map<string, number[]>();
@@ -1425,10 +1432,81 @@ export function lockFeet(clip: AnimationClip, body: AvatarBody, loop: boolean, s
   return new AnimationClip(clip.name, clip.duration, tracks);
 }
 
-/** A Core move on this body with its base fixed (board M16): feet on the floor and locked while planted. */
-export const fixedClip = (animation: (typeof CORE_ANIMATIONS)[number], body: AvatarBody): AnimationClip =>
-  groundClip(lockFeet(groundClip(clipFromAnimation(animation, body), body), body, animation.kind === 'loop',
-    Object.values(LAB_GROUND_MOVES).find((move) => move.clip.replace(/ /g, '') === animation.clip)?.speed), body);
+/** Carried by a seat, a wall or the air: their weight is not over the feet. */
+const CARRIED_CLIPS = new Set(['Sit', 'SitGround', 'Climb', 'Jump']);
+/** Rough body-segment weights (the motion check uses the same): [joint, second joint for a segment's middle, weight]. */
+const MASS_PARTS: ReadonlyArray<readonly [string, string | null, number]> = [['Spine2', null, 0.3], ['Hips', null, 0.15], ['Head', null, 0.08],
+  ['LeftUpLeg', 'LeftLeg', 0.1], ['RightUpLeg', 'RightLeg', 0.1], ['LeftLeg', 'LeftFoot', 0.06], ['RightLeg', 'RightFoot', 0.06], ['LeftForeArm', null, 0.05], ['RightForeArm', null, 0.05]];
+/** How far inside the feet the weight is brought (m), and how far outside it may be before anything moves. */
+const BALANCE_MARGIN = 0.04, BALANCE_SMOOTH_FRAMES = 6;
+
+/** Nearest point of the feet's support area (the planted sole points and the shape between them) to `p` on the floor. */
+function nearestSupport(p: Vector3, points: Vector3[]): Vector3 {
+  const flat = points.map((q) => new Vector3(q.x, 0, q.z)), at = new Vector3(p.x, 0, p.z);
+  if (flat.length >= 3) {
+    const c = flat.reduce((sum, q) => sum.add(q), new Vector3()).divideScalar(flat.length);
+    const ring = [...flat].sort((a, b) => Math.atan2(a.z - c.z, a.x - c.x) - Math.atan2(b.z - c.z, b.x - c.x));
+    if (ring.every((a, i) => { const b = ring[(i + 1) % ring.length]!; return (b.x - a.x) * (at.z - a.z) - (b.z - a.z) * (at.x - a.x) >= 0; })) return at;
+  }
+  let best = flat[0]!.clone(), distance = Infinity;
+  for (const a of flat) for (const b of flat) {
+    const ab = b.clone().sub(a), t = Math.max(0, Math.min(1, at.clone().sub(a).dot(ab) / (ab.lengthSq() || 1)));
+    const q = a.clone().addScaledVector(ab, t);
+    if (q.distanceTo(at) < distance) { distance = q.distanceTo(at); best = q; }
+  }
+  return best;
+}
+
+/**
+ * Board M16 (fix the base, "weight over the feet"): while a body stands still on planted feet, its centre of mass may not
+ * stay outside them; the hips move along the floor just enough (smoothed) and the foot lock that follows keeps the feet
+ * in place (the shifts go to lockFeet, which keeps every foot where it was). Moves that travel, sit, climb, jump or swim
+ * are left alone.
+ */
+export function balanceClip(clip: AnimationClip, body: AvatarBody): { clip: AnimationClip; shifts?: Vector3[] } {
+  const names = new Set(body.joints.map((joint) => joint.name));
+  if (SWIM_CLIPS.has(clip.name) || CARRIED_CLIPS.has(clip.name) || !clip.tracks.length || MASS_PARTS.some(([a, b]) => !names.has(a) || (b && !names.has(b)))) return { clip };
+  const soles = SOLE_JOINTS.flatMap((name) => body.joints.filter((joint) => joint.name === name));
+  if (soles.length < 4) return { clip };
+  const rootJoint = body.joints[0]!, hipsName = `${nodeName(body, rootJoint.name)}.position`;
+  const { root } = buildSkeleton(body);
+  const bone = (name: string) => root.getObjectByName(nodeName(body, name))!;
+  const count = Math.max(2, Math.floor(clip.duration * 60) + 1), times = Array.from({ length: count }, (_, i) => Math.min(clip.duration, i / 60));
+  const mixer = new AnimationMixer(root), action = mixer.clipAction(clip);
+  action.setLoop(LoopOnce, 1); action.clampWhenFinished = true; action.play();
+  const at = (name: string) => bone(name).getWorldPosition(new Vector3());
+  const frames = times.map((time) => {
+    mixer.setTime(time); root.updateMatrixWorld(true);
+    const mass = MASS_PARTS.reduce((sum, [a, b, w]) => sum.addScaledVector(b ? at(a).add(at(b)).multiplyScalar(0.5) : at(a), w), new Vector3()).divideScalar(MASS_PARTS.reduce((sum, [, , w]) => sum + w, 0));
+    return { hips: root.position.clone(), mass, soles: soles.map((joint) => { const p = at(joint.name); return p.setY(p.y - joint.at[1]); }) };
+  });
+  mixer.stopAllAction(); mixer.uncacheRoot(root);
+  // A move whose planted soles travel under it is walking somewhere: leave it.
+  const travel: number[] = [];
+  for (let i = 1; i < count; i++) frames[i]!.soles.forEach((p, k) => { const q = frames[i - 1]!.soles[k]!; if (p.y < PLANT_HEIGHT && q.y < PLANT_HEIGHT) travel.push(Math.hypot(p.x - q.x, p.z - q.z) * 60); });
+  if (travel.length && [...travel].sort((a, b) => a - b)[Math.floor(travel.length / 2)]! > 0.2) return { clip };
+  const raw = frames.map((frame, i) => {
+    const still = frame.hips.distanceTo(frames[Math.min(count - 1, i + 1)]!.hips) * 60 < 0.2 && frame.hips.distanceTo(frames[Math.max(0, i - 1)]!.hips) * 60 < 0.2;
+    const support = frame.soles.filter((p) => p.y < PLANT_HEIGHT);
+    if (!still || !support.length) return new Vector3();
+    const near = nearestSupport(frame.mass, support), gap = new Vector3(near.x - frame.mass.x, 0, near.z - frame.mass.z);
+    // Outside by more than the margin: bring the weight to the margin inside the edge.
+    return gap.length() > BALANCE_MARGIN ? gap.clone().setLength(gap.length() + BALANCE_MARGIN) : new Vector3();
+  });
+  if (raw.every((shift) => shift.lengthSq() < 2.5e-5)) return { clip };
+  const shifts = raw.map((_, i) => { const sum = new Vector3(); let n = 0; for (let k = -BALANCE_SMOOTH_FRAMES; k <= BALANCE_SMOOTH_FRAMES; k++) { const j = i + k; if (j >= 0 && j < count) { sum.add(raw[j]!); n++; } } return sum.divideScalar(n); });
+  const values = frames.flatMap((frame, i) => [frame.hips.x + shifts[i]!.x, frame.hips.y, frame.hips.z + shifts[i]!.z]);
+  const tracks = clip.tracks.filter((track) => track.name !== hipsName);
+  tracks.push(new VectorKeyframeTrack(hipsName, times, values));
+  return { clip: new AnimationClip(clip.name, clip.duration, tracks), shifts };
+}
+
+/** A Core move on this body with its base fixed (board M16): feet on the floor, weight over them, locked while planted. */
+export function fixedClip(animation: (typeof CORE_ANIMATIONS)[number], body: AvatarBody): AnimationClip {
+  const balanced = balanceClip(groundClip(clipFromAnimation(animation, body), body), body);
+  const speed = Object.values(LAB_GROUND_MOVES).find((move) => move.clip.replace(/ /g, '') === animation.clip)?.speed;
+  return groundClip(lockFeet(balanced.clip, body, animation.kind === 'loop', speed, balanced.shifts), body);
+}
 
 /** Every Core animation as clips of a body type (Classic when not given). */
 export const createAvatarClips = (body?: AvatarBodyType): AnimationClip[] => avatarClips(findBody(body));

@@ -107,12 +107,14 @@ describe('board M16 · headless run on the Standard robot', () => {
       const lowest = Math.min(...move.frames.flatMap(f => f.feet.flatMap(foot => [foot.heel[1], foot.toe[1]])));
       expect(lowest, move.move).toBeGreaterThan(-0.01);
     }
-    // Feet locked while planted: walking, crouch walking and backing up score at least 90 and slide at most 2 cm.
+    // Feet locked while planted: walking, crouch walking, backing up and landings score at least 90 and slide at most 3 cm
+    // (a heel coming down within 3 cm of the floor already counts as planted); turns and the sprint stop score at least 85.
     const cells = checkAllMoves(undefined, ['realistic']);
+    for (const move of ['TurnLeft90', 'TurnRight90', 'Turn180', 'SprintStop']) expect(cells.find(row => row.move === move)!.score, move).toBeGreaterThanOrEqual(85);
     for (const move of ['Walk', 'CrouchWalk', 'Sneak', 'Backpedal', 'SoftLanding', 'HardLanding']) {
       const cell = cells.find(row => row.move === move)!;
       expect(cell.score, move).toBeGreaterThanOrEqual(90);
-      expect(Math.max(0, ...cell.issues.filter(issue => issue.check === 'foot_slide').map(issue => issue.value)), move).toBeLessThanOrEqual(2);
+      expect(Math.max(0, ...cell.issues.filter(issue => issue.check === 'foot_slide').map(issue => issue.value)), move).toBeLessThanOrEqual(3);
     }
     // Crouch walk travels at its Lab speed.
     expect(sampleMoves(undefined, ['CrouchWalk'])[0]!.velocity).toEqual([0, 0.9]);
