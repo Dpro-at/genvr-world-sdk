@@ -24,7 +24,7 @@ import {
   shoulderExternalRotationMax,
   sizedBody,
   wristDeviationShare
-} from "./chunk-VBIWJRXF.js";
+} from "./chunk-N6K3JADY.js";
 
 // ../../../../../genvr/node_modules/.pnpm/three@0.186.1/node_modules/three/build/three.core.js
 var REVISION = "186";
@@ -94629,4 +94629,4 @@ three/build/three.module.js:
    * SPDX-License-Identifier: MIT
    *)
 */
-//# sourceMappingURL=chunk-F334SVVK.js.map
+//# sourceMappingURL=chunk-ASQNW6ZY.js.map

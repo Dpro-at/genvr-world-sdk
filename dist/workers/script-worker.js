@@ -27,6 +27,6 @@ function engineHandler(post, load) {
 var scope = self;
 scope.onmessage = engineHandler(
   (reply) => scope.postMessage(reply),
-  () => import("./dist-5SSNZAVH.js")
+  () => import("./dist-MMLQKKXQ.js")
 );
 //# sourceMappingURL=script-worker.js.map

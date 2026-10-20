@@ -120,7 +120,7 @@ import {
   worldBox,
   zoneFromParams,
   zoneShapeOfItem
-} from "./chunk-ALQEDJO3.js";
+} from "./chunk-VKKWKE3N.js";
 
 // ../../../../../genvr/node_modules/.pnpm/three@0.186.1/node_modules/three/build/three.core.js
 var REVISION = "186";
@@ -119445,4 +119445,4 @@ three/build/three.tsl.js:
    * SPDX-License-Identifier: MIT
    *)
 */
-//# sourceMappingURL=chunk-KOKFMLWZ.js.map
+//# sourceMappingURL=chunk-4QDXME6N.js.map

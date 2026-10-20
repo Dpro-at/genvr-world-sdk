@@ -1,2 +1,2 @@
-23f694f0a1f2c56598c03234fdea8e73ec291d631d108087c4e419c6dff35dd4  corresponding-source/platform/packages/world-sdk/dist/3d-world-sdk-0.3.0-preview.14.tgz
-9e322c123c70502d2fe4bb723553446383c61e53f3503d0c7e05a88ef8f09166  corresponding-source/platform/packages/world-sdk/dist/3d-world-sdk-0.3.0-preview.14-source.tgz
+834637043df2c90366c8e0a04dc24bb0abb2af3cd85d79f912fd15302790bb5e  corresponding-source/platform/packages/world-sdk/dist/3d-world-sdk-0.3.0-preview.15.tgz
+d95b7926111abdd795f4c47eb4a0dc6d89384c3dec4eb5a52c737073a8c0ebfe  corresponding-source/platform/packages/world-sdk/dist/3d-world-sdk-0.3.0-preview.15-source.tgz

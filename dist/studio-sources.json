@@ -2077,6 +2077,7 @@
   "../../apps/web/components/studio/generated-controls.tsx",
   "../../apps/web/components/studio/items-side-panel.tsx",
   "../../apps/web/components/studio/lab/lab-panels.tsx",
+  "../../apps/web/components/studio/lab/lab-share.tsx",
   "../../apps/web/components/studio/lab/lab-stage.tsx",
   "../../apps/web/components/studio/layout.ts",
   "../../apps/web/components/studio/library-panel.tsx",

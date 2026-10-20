@@ -460,6 +460,52 @@ export declare const MotionVersion: z.ZodObject<{
     at: z.ZodString;
 }, z.core.$strict>;
 export type MotionVersion = z.infer<typeof MotionVersion>;
+/**
+ * Sharing a motion with the GenVR community (board M14). A version is first only on this device; sharing publishes it,
+ * so an agent can only prepare a share (`pending`) and the owner confirms each one; the owner (or an agent, with
+ * `confirm`) can stop sharing at any time. Never shareable: motions not made from a GenVR library move (for example
+ * from Mixamo, Q-MIXAMO) or from a video the owner has no rights to.
+ */
+export declare const MOTION_SHARE_LICENCE: {
+    readonly id: "genvr-community-1";
+    readonly name: "GenVR community licence";
+    /** Q-LAB-3, chosen by the owner on 2026-10-20. */
+    readonly text: "Free to use in GenVR worlds and films, also commercially. Credit the creator. Do not sell or re-share the motion file on its own.";
+};
+export declare const MotionShareTag: z.ZodString;
+export declare const MotionShare: z.ZodObject<{
+    version: z.ZodString;
+    state: z.ZodEnum<{
+        pending: "pending";
+        shared: "shared";
+        stopped: "stopped";
+    }>;
+    name: z.ZodString;
+    description: z.ZodDefault<z.ZodString>;
+    tags: z.ZodDefault<z.ZodArray<z.ZodString>>;
+    character: z.ZodString;
+    score: z.ZodNumber;
+    preview_s: z.ZodDefault<z.ZodNumber>;
+    licence: z.ZodDefault<z.ZodLiteral<"genvr-community-1">>;
+    prepared_by: z.ZodString;
+    prepared_at: z.ZodString;
+    shared_at: z.ZodOptional<z.ZodString>;
+    stopped_at: z.ZodOptional<z.ZodString>;
+    where: z.ZodOptional<z.ZodEnum<{
+        "local-preview": "local-preview";
+        platform: "platform";
+    }>>;
+    url: z.ZodOptional<z.ZodString>;
+}, z.core.$strict>;
+export type MotionShare = z.infer<typeof MotionShare>;
+/** What a share shows; the rest (character, score, licence) comes from the version. */
+export declare const MotionShareDraft: z.ZodObject<{
+    name: z.ZodString;
+    description: z.ZodOptional<z.ZodString>;
+    tags: z.ZodOptional<z.ZodArray<z.ZodString>>;
+    preview_s: z.ZodOptional<z.ZodNumber>;
+}, z.core.$strict>;
+export type MotionShareDraft = z.infer<typeof MotionShareDraft>;
 /** The lab part of a lab project. An agent's "make best" waits in `best_pending` until the owner confirms. */
 export declare const LabProjectData: z.ZodObject<{
     format: z.ZodDefault<z.ZodLiteral<1>>;
@@ -713,6 +759,30 @@ export declare const LabProjectData: z.ZodObject<{
         version: z.ZodString;
         by: z.ZodString;
     }, z.core.$strict>>>;
+    shares: z.ZodDefault<z.ZodArray<z.ZodObject<{
+        version: z.ZodString;
+        state: z.ZodEnum<{
+            pending: "pending";
+            shared: "shared";
+            stopped: "stopped";
+        }>;
+        name: z.ZodString;
+        description: z.ZodDefault<z.ZodString>;
+        tags: z.ZodDefault<z.ZodArray<z.ZodString>>;
+        character: z.ZodString;
+        score: z.ZodNumber;
+        preview_s: z.ZodDefault<z.ZodNumber>;
+        licence: z.ZodDefault<z.ZodLiteral<"genvr-community-1">>;
+        prepared_by: z.ZodString;
+        prepared_at: z.ZodString;
+        shared_at: z.ZodOptional<z.ZodString>;
+        stopped_at: z.ZodOptional<z.ZodString>;
+        where: z.ZodOptional<z.ZodEnum<{
+            "local-preview": "local-preview";
+            platform: "platform";
+        }>>;
+        url: z.ZodOptional<z.ZodString>;
+    }, z.core.$strict>>>;
 }, z.core.$strict>;
 export type LabProjectData = z.infer<typeof LabProjectData>;
 export declare const LAB_OVERLAYS: readonly ["skeleton", "feet", "balance", "speed", "ghost", "measures"];
@@ -853,6 +923,28 @@ export declare const MotionLabOperation: z.ZodDiscriminatedUnion<[z.ZodObject<{
     kind: z.ZodLiteral<"version_delete">;
     version: z.ZodString;
     confirm: z.ZodLiteral<true>;
+}, z.core.$strict>, z.ZodObject<{
+    kind: z.ZodLiteral<"motions_mine">;
+}, z.core.$strict>, z.ZodObject<{
+    kind: z.ZodLiteral<"motion_similar">;
+    version: z.ZodString;
+}, z.core.$strict>, z.ZodObject<{
+    kind: z.ZodLiteral<"share_prepare">;
+    version: z.ZodString;
+    share: z.ZodObject<{
+        name: z.ZodString;
+        description: z.ZodOptional<z.ZodString>;
+        tags: z.ZodOptional<z.ZodArray<z.ZodString>>;
+        preview_s: z.ZodOptional<z.ZodNumber>;
+    }, z.core.$strict>;
+}, z.core.$strict>, z.ZodObject<{
+    kind: z.ZodLiteral<"share">;
+    version: z.ZodString;
+    confirm: z.ZodLiteral<true>;
+}, z.core.$strict>, z.ZodObject<{
+    kind: z.ZodLiteral<"unshare">;
+    version: z.ZodString;
+    confirm: z.ZodLiteral<true>;
 }, z.core.$strict>], "kind">;
 export type MotionLabOperation = z.infer<typeof MotionLabOperation>;
-export declare const MOTION_LAB_KINDS: ("inspect" | "commands" | "frame" | "run" | "versions" | "course_get" | "course_set" | "obstacle_add" | "obstacle_set" | "obstacle_remove" | "course_from_seed" | "traffic_set" | "settings_set" | "runs_list" | "scores" | "view_set" | "save_version" | "save_best" | "rollback" | "version_delete")[];
+export declare const MOTION_LAB_KINDS: ("inspect" | "commands" | "frame" | "share" | "run" | "versions" | "course_get" | "course_set" | "obstacle_add" | "obstacle_set" | "obstacle_remove" | "course_from_seed" | "traffic_set" | "settings_set" | "runs_list" | "scores" | "view_set" | "save_version" | "save_best" | "rollback" | "version_delete" | "motions_mine" | "motion_similar" | "share_prepare" | "unshare")[];

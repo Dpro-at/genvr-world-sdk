@@ -104,9 +104,13 @@ at once instead of building on it.
 | Blocks way: place and break blocks | `fill_blocks`, `block_line`, `block_floor`, `dig_blocks` |
 | Moves, faces, screen effects, notifications, UI cards | `present_avatar`, `list_avatar_motions`, `user_avatar_library` |
 
-## World tab parity
+## Build → World parity
 
-| World tab | Your tool |
+The world's parts (lighting, sky, weather and ground, water and sea, style and place) are the **World** panel of the
+Build left dock (Tools · World · Explorer); there is no separate World tab. The picked part opens in the right panel.
+Your tools work the same whichever tab or panel the person has open.
+
+| Build → World | Your tool |
 |---|---|
 | Lighting: lights, presets (key, fill, back, three-point), colour, brightness, beam, soft edge, reach, follows, where | `set_lights` (list, add, update, remove, three_point; at most 4) |
 | Sky look, time of day, sun path, wind, day and night cycle | `set_sky` (preset, time_of_day, sun_azimuth, wind_direction, wind_speed, cycle_minutes); a preset keeps the others |

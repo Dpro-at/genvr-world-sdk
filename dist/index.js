@@ -2,7 +2,7 @@ import {
   avatarMotionEntries,
   avatarMotionEntry,
   motionCategories
-} from "./chunk-KOKFMLWZ.js";
+} from "./chunk-4QDXME6N.js";
 import {
   AvatarLiveDisplay,
   AvatarLook,
@@ -27,7 +27,7 @@ import {
   readWorldPackage,
   replayWorldPackage,
   streamingChatModel
-} from "./chunk-ALQEDJO3.js";
+} from "./chunk-VKKWKE3N.js";
 
 // src/storage.ts
 function browserStorage(storage, prefix2 = "genvr.world.") {

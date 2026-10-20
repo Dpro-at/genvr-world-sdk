@@ -1488,6 +1488,30 @@ export declare const StudioProject: z.ZodObject<{
             version: z.ZodString;
             by: z.ZodString;
         }, z.core.$strict>>>;
+        shares: z.ZodDefault<z.ZodArray<z.ZodObject<{
+            version: z.ZodString;
+            state: z.ZodEnum<{
+                pending: "pending";
+                shared: "shared";
+                stopped: "stopped";
+            }>;
+            name: z.ZodString;
+            description: z.ZodDefault<z.ZodString>;
+            tags: z.ZodDefault<z.ZodArray<z.ZodString>>;
+            character: z.ZodString;
+            score: z.ZodNumber;
+            preview_s: z.ZodDefault<z.ZodNumber>;
+            licence: z.ZodDefault<z.ZodLiteral<"genvr-community-1">>;
+            prepared_by: z.ZodString;
+            prepared_at: z.ZodString;
+            shared_at: z.ZodOptional<z.ZodString>;
+            stopped_at: z.ZodOptional<z.ZodString>;
+            where: z.ZodOptional<z.ZodEnum<{
+                "local-preview": "local-preview";
+                platform: "platform";
+            }>>;
+            url: z.ZodOptional<z.ZodString>;
+        }, z.core.$strict>>>;
     }, z.core.$strict>>;
 }, z.core.$strict>;
 export type StudioProject = z.infer<typeof StudioProject>;

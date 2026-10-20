@@ -29876,13 +29876,48 @@ var MotionVersion = external_exports.object({
   by: external_exports.enum(["person", "agent"]).default("person"),
   at: external_exports.string().max(40)
 }).strict();
+var MOTION_SHARE_LICENCE = {
+  id: "genvr-community-1",
+  name: "GenVR community licence",
+  /** Q-LAB-3, chosen by the owner on 2026-10-20. */
+  text: "Free to use in GenVR worlds and films, also commercially. Credit the creator. Do not sell or re-share the motion file on its own."
+};
+var MotionShareTag = external_exports.string().regex(/^[a-z0-9][a-z0-9-]{0,23}$/, "Tags: lower-case letters, digits and dashes, up to 24.");
+var MotionShare = external_exports.object({
+  version: labId,
+  /** `pending`: prepared, waits for the owner's OK. `shared`: the owner confirmed. `stopped`: the owner stopped sharing. */
+  state: external_exports.enum(["pending", "shared", "stopped"]),
+  name: external_exports.string().trim().min(1).max(80),
+  description: external_exports.string().max(400).default(""),
+  tags: external_exports.array(MotionShareTag).max(8).default([]),
+  character: external_exports.string().min(1).max(60),
+  score: external_exports.number().min(0).max(100),
+  /** Seconds of the version's run shown as the preview clip. */
+  preview_s: metres2(2, 10).default(4),
+  licence: external_exports.literal(MOTION_SHARE_LICENCE.id).default(MOTION_SHARE_LICENCE.id),
+  prepared_by: external_exports.string().min(1).max(80),
+  prepared_at: external_exports.string().max(40),
+  shared_at: external_exports.string().max(40).optional(),
+  stopped_at: external_exports.string().max(40).optional(),
+  /** Where the share went: `local-preview` when no GenVR hosting is connected (nothing left the device). */
+  where: external_exports.enum(["local-preview", "platform"]).optional(),
+  url: external_exports.string().url().max(300).optional()
+}).strict();
+var MotionShareDraft = external_exports.object({
+  name: external_exports.string().trim().min(1).max(80),
+  description: external_exports.string().max(400).optional(),
+  tags: external_exports.array(MotionShareTag).max(8).optional(),
+  preview_s: metres2(2, 10).optional()
+}).strict();
 var LabProjectData = external_exports.object({
   format: external_exports.literal(LAB_FORMAT).default(LAB_FORMAT),
   course: LabCourse.default(() => LabCourse.parse({})),
   settings: LabRunSettings.default(() => LabRunSettings.parse({})),
   runs: external_exports.array(LabRun).max(LAB_KEEP_RUNS).default([]),
   versions: external_exports.array(MotionVersion).max(500).default([]),
-  best_pending: external_exports.object({ version: labId, by: external_exports.string().max(80) }).strict().nullable().default(null)
+  best_pending: external_exports.object({ version: labId, by: external_exports.string().max(80) }).strict().nullable().default(null),
+  /** Board M14: shares of versions with the GenVR community (one per version). */
+  shares: external_exports.array(MotionShare).max(500).default([])
 }).strict();
 var LAB_OVERLAYS = ["skeleton", "feet", "balance", "speed", "ghost", "measures"];
 var LabOverlay = external_exports.enum(LAB_OVERLAYS);
@@ -29934,7 +29969,18 @@ var MotionLabOperation = external_exports.discriminatedUnion("kind", [
   /** A person makes a version the best at once; an agent's request waits for the owner (`best_pending`). */
   external_exports.object({ kind: external_exports.literal("save_best"), version: labId }).strict(),
   external_exports.object({ kind: external_exports.literal("rollback"), version: labId }).strict(),
-  external_exports.object({ kind: external_exports.literal("version_delete"), version: labId, confirm: external_exports.literal(true) }).strict()
+  external_exports.object({ kind: external_exports.literal("version_delete"), version: labId, confirm: external_exports.literal(true) }).strict(),
+  // ---- sharing (board M14)
+  /** My motions: every version with its share state and the rights checks. */
+  external_exports.object({ kind: external_exports.literal("motions_mine") }).strict(),
+  /** Motions we already have that are like this version (GenVR library moves and my shared versions). */
+  external_exports.object({ kind: external_exports.literal("motion_similar"), version: labId }).strict(),
+  /** Prepare a share (name, description, tags, preview). It waits for the owner's OK; nothing is published. */
+  external_exports.object({ kind: external_exports.literal("share_prepare"), version: labId, share: MotionShareDraft }).strict(),
+  /** Publish a prepared share. Owner only: an agent's call is refused and the share keeps waiting for the owner. */
+  external_exports.object({ kind: external_exports.literal("share"), version: labId, confirm: external_exports.literal(true) }).strict(),
+  /** Stop sharing (or drop a prepared share). */
+  external_exports.object({ kind: external_exports.literal("unshare"), version: labId, confirm: external_exports.literal(true) }).strict()
 ]);
 var MOTION_LAB_KINDS = MotionLabOperation.options.map((o) => o.shape.kind.value);
 
@@ -42972,7 +43018,7 @@ var DESCRIPTIONS = {
   share_studio: "Inspect sharing capability, open the separate Share dialog, or create a host-authorized world/Avatar Live link. Creating requires explicit user authorization and an attached platform sharing service; local SDK cannot publish private data. Password enforcement belongs to the host server.",
   avatar_studio: "Avatar tab: inspect the character (recipe, view, bones, height, whether the face can move); set merges recipe parts (name, body, shape {height, weight, scale, anime, muscle, fat, fatPattern, definition, muscles {group: -1..1}, fatRegions {region: -1..1}, face {feature: -1..1}}, colors {skin, hair, top, bottom, shoes}, hair); view sets the view mode (skeleton, muscles, fat\u2026) and shading; expression holds a facial expression; play a move by id; save the character to My characters; export the recipe JSON; reset_shape back to the normal shape; undo / redo step through the character edits. Works on the live Studio only.",
   present_avatar: "Use kind display to open/configure Avatar Live layouts (large, desktop, browser, compact, banner, circle, watch), background and framing. For saved world backgrounds, use worldId from inspect_studio.availableWorlds and optional worldSpot {position,target,player} XYZ coordinates; set worldId/worldSpot to null for the current live world view. Optionally show a gesture, facial expression, visual effect, notification or rich card when useful. Transient, never saves the world. target is self or a host agent ID. Use only available Core animation IDs. Never invent live app or stock data. No action permissions are granted by a card.",
-  motion_lab: "Motion lab (only in a motion lab project): { operation: { kind } }. Kinds: commands (list with help), inspect, course_get, course_set, obstacle_add {obstacle: {kind step|ramp|gap|low_wall|window, z, sizes in metres}}, obstacle_set {id, set}, obstacle_remove {id}, course_from_seed {seed, obstacles?, hardness?, street?}, traffic_set {street?, cars?}, settings_set {settings}, run {settings?, version?} (fixed step + seed, returns score and events), runs_list, scores {run?}, frame {run?, t}, view_set {overlays?, speed?}, versions, save_version {run?, note?}, save_best {version} (only asks: the owner confirms it in the Lab), rollback {version}, version_delete {version, confirm: true} (only versions an agent made, never the best). Read inspect before changing the course.",
+  motion_lab: "Motion lab (only in a motion lab project): { operation: { kind } }. Kinds: commands (list with help), inspect, course_get, course_set, obstacle_add {obstacle: {kind step|ramp|gap|low_wall|window, z, sizes in metres}}, obstacle_set {id, set}, obstacle_remove {id}, course_from_seed {seed, obstacles?, hardness?, street?}, traffic_set {street?, cars?}, settings_set {settings}, run {settings?, version?} (fixed step + seed, returns score and events), runs_list, scores {run?}, frame {run?, t}, view_set {overlays?, speed?}, versions, save_version {run?, note?}, save_best {version} (only asks: the owner confirms it in the Lab), rollback {version}, version_delete {version, confirm: true} (only versions an agent made, never the best). Sharing with the GenVR community (publishing): motions_mine (share state, rights), motion_similar {version}, share_prepare {version, share: {name, description?, tags?, preview_s?}} (prepares only), share {version, confirm: true} (owner only: you are refused, the owner confirms in the Lab), unshare {version, confirm: true}. Never prepare a share the owner did not ask for. Read inspect before changing the course.",
   get_resource_controls: "Read supported controls, scope, source defaults and documentation for a Core model or ocean resource. Models use instance-scoped set_resource_params; oceans use world-scoped set_sea. Empty model controls means no generated settings; creator package controls are not described.",
   set_resource_params: "Change supported generated controls on one placed Core item. Use keys and ranges from get_resource_controls; null removes an instance override and restores its resource default. Saved as a normal undoable change. Does not change world defaults or arbitrary script parameters.",
   get_world_summary: "Describe the place now: size, style, sky, items with ids and positions, roads, walls, water, rivers, and the sea. Items come 100 at a time; more_items_from names the from_item of the next page.",
@@ -45731,7 +45777,7 @@ async function runAssistant({ model: model2, host, history, prompt, onEvent, max
 var CORRECTION_WINDOW_MS = 10 * 60 * 1e3;
 
 // src/session.ts
-var SDK_VERSION = "0.3.0-preview.14";
+var SDK_VERSION = "0.3.0-preview.15";
 var PACKAGE_WORK_BUDGET = 5e6;
 function readWorldPackage(input2) {
   const text = typeof input2 === "string" ? input2 : JSON.stringify(input2);
@@ -94333,7 +94379,7 @@ var localTools = [
   { name: "save_world_local", description: "Save the current world in the configured local folder.", inputSchema: { type: "object", properties: {}, additionalProperties: false } },
   { name: "open_world_local", description: "Open a saved world by ID in the configured local folder.", inputSchema: { type: "object", properties: { id: { type: "string" } }, required: ["id"], additionalProperties: false } },
   // MOTION-LAB: the Lab area of a motion lab project in the live Studio (same owner gates as the page).
-  { name: "motion_lab", description: 'Motion lab in the live Studio (open a motion lab project first): build a measured course (step, ramp, gap, low wall, window, street with box cars), run the lab robot through it (fixed step + seed), read scores, keep motion versions. One operation per call; `{ operation: { kind: "commands" } }` lists them. Making a version the best waits for the owner. Read get_motion_lab_guide first.', inputSchema: { type: "object", properties: { operation: { type: "object", properties: { kind: { type: "string", enum: [...MOTION_LAB_KINDS] } }, required: ["kind"] } }, required: ["operation"], additionalProperties: false } },
+  { name: "motion_lab", description: 'Motion lab in the live Studio (open a motion lab project first): build a measured course (step, ramp, gap, low wall, window, street with box cars), run the lab robot through it (fixed step + seed), read scores, keep motion versions, share a version with the GenVR community (share_prepare only prepares; share is owner only and refused for agents; unshare stops sharing). One operation per call; `{ operation: { kind: "commands" } }` lists them. Making a version the best waits for the owner. Read get_motion_lab_guide first.', inputSchema: { type: "object", properties: { operation: { type: "object", properties: { kind: { type: "string", enum: [...MOTION_LAB_KINDS] } }, required: ["kind"] } }, required: ["operation"], additionalProperties: false } },
   { name: "get_motion_lab_guide", description: "Read the motion lab skill: course sizes, runs, scores and how they are measured, versions and owner gates.", inputSchema: { type: "object", properties: {}, additionalProperties: false } }
 ];
 server.setRequestHandler(ListToolsRequestSchema, async () => ({ tools: [

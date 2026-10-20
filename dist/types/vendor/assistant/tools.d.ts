@@ -426,6 +426,28 @@ export declare const TOOL_ARGS: {
             kind: z.ZodLiteral<"version_delete">;
             version: z.ZodString;
             confirm: z.ZodLiteral<true>;
+        }, z.core.$strict>, z.ZodObject<{
+            kind: z.ZodLiteral<"motions_mine">;
+        }, z.core.$strict>, z.ZodObject<{
+            kind: z.ZodLiteral<"motion_similar">;
+            version: z.ZodString;
+        }, z.core.$strict>, z.ZodObject<{
+            kind: z.ZodLiteral<"share_prepare">;
+            version: z.ZodString;
+            share: z.ZodObject<{
+                name: z.ZodString;
+                description: z.ZodOptional<z.ZodString>;
+                tags: z.ZodOptional<z.ZodArray<z.ZodString>>;
+                preview_s: z.ZodOptional<z.ZodNumber>;
+            }, z.core.$strict>;
+        }, z.core.$strict>, z.ZodObject<{
+            kind: z.ZodLiteral<"share">;
+            version: z.ZodString;
+            confirm: z.ZodLiteral<true>;
+        }, z.core.$strict>, z.ZodObject<{
+            kind: z.ZodLiteral<"unshare">;
+            version: z.ZodString;
+            confirm: z.ZodLiteral<true>;
         }, z.core.$strict>], "kind">;
     }, z.core.$strict>;
     readonly get_resource_controls: z.ZodObject<{

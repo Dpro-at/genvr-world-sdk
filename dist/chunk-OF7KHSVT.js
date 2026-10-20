@@ -177,7 +177,7 @@ import {
   resolveAvatarLibraryMotion,
   retargetAvatarMotion,
   subscribeAvatarMotionLibrary
-} from "./chunk-F334SVVK.js";
+} from "./chunk-ASQNW6ZY.js";
 import {
   AVAILABLE_WORLD_STYLES,
   AVATAR_BODIES,
@@ -225,6 +225,7 @@ import {
   HUMAN_BROW_STYLES,
   HUMAN_HAIR_STYLES,
   HudBinding,
+  LAB_CHARACTER,
   LAB_KEEP_RUNS,
   LAB_LATER_KINDS,
   LAB_OBSTACLE_KINDS,
@@ -240,9 +241,12 @@ import {
   MAX_BODY_FAT,
   MAX_TERRAIN_SLOPE,
   MOTION_LAB_KINDS,
+  MOTION_SHARE_LICENCE,
   MUSCLE_GROUPS,
   MUSCLE_ZONE_COLORS,
   MotionLabOperation,
+  MotionShare,
+  MotionShareDraft,
   NORMAL_CHARACTER_SHAPE,
   PAINT_RULE_MAX_BOX,
   PLAYER_BLOCKS,
@@ -352,7 +356,7 @@ import {
   zoneFromParams,
   zoneShapeOfItem,
   zoneSize
-} from "./chunk-VBIWJRXF.js";
+} from "./chunk-N6K3JADY.js";
 import {
   __commonJS,
   __export,
@@ -15354,8 +15358,20 @@ var __iconData16 = {
 __iconData16.node;
 var AudioWaveform = createLucideIcon(__iconData16);
 
-// ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/banknote.mjs
+// ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/ban.mjs
 var __iconData17 = {
+  name: "ban",
+  size: 24,
+  node: [
+    ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }],
+    ["path", { d: "M4.929 4.929 19.07 19.071", key: "196cmz" }]
+  ]
+};
+__iconData17.node;
+var Ban = createLucideIcon(__iconData17);
+
+// ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/banknote.mjs
+var __iconData18 = {
   name: "banknote",
   size: 24,
   node: [
@@ -15364,11 +15380,11 @@ var __iconData17 = {
     ["path", { d: "M6 12h.01M18 12h.01", key: "113zkx" }]
   ]
 };
-__iconData17.node;
-var Banknote = createLucideIcon(__iconData17);
+__iconData18.node;
+var Banknote = createLucideIcon(__iconData18);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/bell.mjs
-var __iconData18 = {
+var __iconData19 = {
   name: "bell",
   size: 24,
   node: [
@@ -15382,11 +15398,11 @@ var __iconData18 = {
     ]
   ]
 };
-__iconData18.node;
-var Bell = createLucideIcon(__iconData18);
+__iconData19.node;
+var Bell = createLucideIcon(__iconData19);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/blocks.mjs
-var __iconData19 = {
+var __iconData20 = {
   name: "blocks",
   size: 24,
   node: [
@@ -15400,11 +15416,11 @@ var __iconData19 = {
     ["rect", { x: "14", y: "2", width: "8", height: "8", rx: "1", key: "88lufb" }]
   ]
 };
-__iconData19.node;
-var Blocks = createLucideIcon(__iconData19);
+__iconData20.node;
+var Blocks = createLucideIcon(__iconData20);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/bone.mjs
-var __iconData20 = {
+var __iconData21 = {
   name: "bone",
   size: 24,
   node: [
@@ -15417,11 +15433,11 @@ var __iconData20 = {
     ]
   ]
 };
-__iconData20.node;
-var Bone2 = createLucideIcon(__iconData20);
+__iconData21.node;
+var Bone2 = createLucideIcon(__iconData21);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/book-open.mjs
-var __iconData21 = {
+var __iconData22 = {
   name: "book-open",
   size: 24,
   node: [
@@ -15435,11 +15451,11 @@ var __iconData21 = {
     ]
   ]
 };
-__iconData21.node;
-var BookOpen = createLucideIcon(__iconData21);
+__iconData22.node;
+var BookOpen = createLucideIcon(__iconData22);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/bookmark.mjs
-var __iconData22 = {
+var __iconData23 = {
   name: "bookmark",
   size: 24,
   node: [
@@ -15452,11 +15468,11 @@ var __iconData22 = {
     ]
   ]
 };
-__iconData22.node;
-var Bookmark = createLucideIcon(__iconData22);
+__iconData23.node;
+var Bookmark = createLucideIcon(__iconData23);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/bot.mjs
-var __iconData23 = {
+var __iconData24 = {
   name: "bot",
   size: 24,
   node: [
@@ -15468,11 +15484,11 @@ var __iconData23 = {
     ["path", { d: "M9 13v2", key: "rq6x2g" }]
   ]
 };
-__iconData23.node;
-var Bot = createLucideIcon(__iconData23);
+__iconData24.node;
+var Bot = createLucideIcon(__iconData24);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/box.mjs
-var __iconData24 = {
+var __iconData25 = {
   name: "box",
   size: 24,
   node: [
@@ -15487,11 +15503,11 @@ var __iconData24 = {
     ["path", { d: "M12 22V12", key: "d0xqtd" }]
   ]
 };
-__iconData24.node;
-var Box = createLucideIcon(__iconData24);
+__iconData25.node;
+var Box = createLucideIcon(__iconData25);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/boxes.mjs
-var __iconData25 = {
+var __iconData26 = {
   name: "boxes",
   size: 24,
   node: [
@@ -15527,11 +15543,11 @@ var __iconData25 = {
     ["path", { d: "M12 13.5V8", key: "1io7kd" }]
   ]
 };
-__iconData25.node;
-var Boxes = createLucideIcon(__iconData25);
+__iconData26.node;
+var Boxes = createLucideIcon(__iconData26);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/brain.mjs
-var __iconData26 = {
+var __iconData27 = {
   name: "brain",
   size: 24,
   node: [
@@ -15545,11 +15561,11 @@ var __iconData26 = {
     ["path", { d: "M6.003 5.125a4 4 0 0 0-2.526 5.77", key: "q97ue3" }]
   ]
 };
-__iconData26.node;
-var Brain = createLucideIcon(__iconData26);
+__iconData27.node;
+var Brain = createLucideIcon(__iconData27);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/brick-wall.mjs
-var __iconData27 = {
+var __iconData28 = {
   name: "brick-wall",
   size: 24,
   node: [
@@ -15563,11 +15579,11 @@ var __iconData27 = {
     ["path", { d: "M8 3v6", key: "vlvjmk" }]
   ]
 };
-__iconData27.node;
-var BrickWall = createLucideIcon(__iconData27);
+__iconData28.node;
+var BrickWall = createLucideIcon(__iconData28);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/calendar.mjs
-var __iconData28 = {
+var __iconData29 = {
   name: "calendar",
   size: 24,
   node: [
@@ -15577,11 +15593,11 @@ var __iconData28 = {
     ["path", { d: "M3 9h18", key: "1pudct" }]
   ]
 };
-__iconData28.node;
-var Calendar = createLucideIcon(__iconData28);
+__iconData29.node;
+var Calendar = createLucideIcon(__iconData29);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/camera.mjs
-var __iconData29 = {
+var __iconData30 = {
   name: "camera",
   size: 24,
   node: [
@@ -15595,11 +15611,11 @@ var __iconData29 = {
     ["circle", { cx: "12", cy: "13", r: "3", key: "1vg3eu" }]
   ]
 };
-__iconData29.node;
-var Camera = createLucideIcon(__iconData29);
+__iconData30.node;
+var Camera = createLucideIcon(__iconData30);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/captions.mjs
-var __iconData30 = {
+var __iconData31 = {
   name: "captions",
   size: 24,
   node: [
@@ -15608,11 +15624,11 @@ var __iconData30 = {
   ],
   aliases: ["subtitles"]
 };
-__iconData30.node;
-var Captions = createLucideIcon(__iconData30);
+__iconData31.node;
+var Captions = createLucideIcon(__iconData31);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/car.mjs
-var __iconData31 = {
+var __iconData32 = {
   name: "car",
   size: 24,
   node: [
@@ -15628,11 +15644,11 @@ var __iconData31 = {
     ["circle", { cx: "17", cy: "17", r: "2", key: "axvx0g" }]
   ]
 };
-__iconData31.node;
-var Car = createLucideIcon(__iconData31);
+__iconData32.node;
+var Car = createLucideIcon(__iconData32);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/chart-column.mjs
-var __iconData32 = {
+var __iconData33 = {
   name: "chart-column",
   size: 24,
   node: [
@@ -15643,11 +15659,11 @@ var __iconData32 = {
   ],
   aliases: ["bar-chart-3"]
 };
-__iconData32.node;
-var ChartColumn = createLucideIcon(__iconData32);
+__iconData33.node;
+var ChartColumn = createLucideIcon(__iconData33);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/chart-line.mjs
-var __iconData33 = {
+var __iconData34 = {
   name: "chart-line",
   size: 24,
   node: [
@@ -15656,56 +15672,56 @@ var __iconData33 = {
   ],
   aliases: ["line-chart"]
 };
-__iconData33.node;
-var ChartLine = createLucideIcon(__iconData33);
+__iconData34.node;
+var ChartLine = createLucideIcon(__iconData34);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/check.mjs
-var __iconData34 = {
+var __iconData35 = {
   name: "check",
   size: 24,
   node: [["path", { d: "M20 6 9 17l-5-5", key: "1gmf2c" }]]
 };
-__iconData34.node;
-var Check = createLucideIcon(__iconData34);
+__iconData35.node;
+var Check = createLucideIcon(__iconData35);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/chevron-down.mjs
-var __iconData35 = {
+var __iconData36 = {
   name: "chevron-down",
   size: 24,
   node: [["path", { d: "m6 9 6 6 6-6", key: "qrunsl" }]]
 };
-__iconData35.node;
-var ChevronDown = createLucideIcon(__iconData35);
+__iconData36.node;
+var ChevronDown = createLucideIcon(__iconData36);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/chevron-left.mjs
-var __iconData36 = {
+var __iconData37 = {
   name: "chevron-left",
   size: 24,
   node: [["path", { d: "m15 18-6-6 6-6", key: "1wnfg3" }]]
 };
-__iconData36.node;
-var ChevronLeft = createLucideIcon(__iconData36);
+__iconData37.node;
+var ChevronLeft = createLucideIcon(__iconData37);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/chevron-right.mjs
-var __iconData37 = {
+var __iconData38 = {
   name: "chevron-right",
   size: 24,
   node: [["path", { d: "m9 18 6-6-6-6", key: "mthhwq" }]]
 };
-__iconData37.node;
-var ChevronRight = createLucideIcon(__iconData37);
+__iconData38.node;
+var ChevronRight = createLucideIcon(__iconData38);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/chevron-up.mjs
-var __iconData38 = {
+var __iconData39 = {
   name: "chevron-up",
   size: 24,
   node: [["path", { d: "m18 15-6-6-6 6", key: "153udz" }]]
 };
-__iconData38.node;
-var ChevronUp = createLucideIcon(__iconData38);
+__iconData39.node;
+var ChevronUp = createLucideIcon(__iconData39);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/chevrons-down-up.mjs
-var __iconData39 = {
+var __iconData40 = {
   name: "chevrons-down-up",
   size: 24,
   node: [
@@ -15713,11 +15729,11 @@ var __iconData39 = {
     ["path", { d: "m7 4 5 5 5-5", key: "1kwcof" }]
   ]
 };
-__iconData39.node;
-var ChevronsDownUp = createLucideIcon(__iconData39);
+__iconData40.node;
+var ChevronsDownUp = createLucideIcon(__iconData40);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/chevrons-right.mjs
-var __iconData40 = {
+var __iconData41 = {
   name: "chevrons-right",
   size: 24,
   node: [
@@ -15725,11 +15741,11 @@ var __iconData40 = {
     ["path", { d: "m13 17 5-5-5-5", key: "17xmmf" }]
   ]
 };
-__iconData40.node;
-var ChevronsRight = createLucideIcon(__iconData40);
+__iconData41.node;
+var ChevronsRight = createLucideIcon(__iconData41);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/chevrons-up.mjs
-var __iconData41 = {
+var __iconData42 = {
   name: "chevrons-up",
   size: 24,
   node: [
@@ -15737,11 +15753,11 @@ var __iconData41 = {
     ["path", { d: "m17 18-5-5-5 5", key: "2avn1x" }]
   ]
 };
-__iconData41.node;
-var ChevronsUp = createLucideIcon(__iconData41);
+__iconData42.node;
+var ChevronsUp = createLucideIcon(__iconData42);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/circle-check.mjs
-var __iconData42 = {
+var __iconData43 = {
   name: "circle-check",
   size: 24,
   node: [
@@ -15750,11 +15766,11 @@ var __iconData42 = {
   ],
   aliases: ["check-circle-2"]
 };
-__iconData42.node;
-var CircleCheck = createLucideIcon(__iconData42);
+__iconData43.node;
+var CircleCheck = createLucideIcon(__iconData43);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/circle-dot.mjs
-var __iconData43 = {
+var __iconData44 = {
   name: "circle-dot",
   size: 24,
   node: [
@@ -15762,11 +15778,11 @@ var __iconData43 = {
     ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }]
   ]
 };
-__iconData43.node;
-var CircleDot = createLucideIcon(__iconData43);
+__iconData44.node;
+var CircleDot = createLucideIcon(__iconData44);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/circle-question-mark.mjs
-var __iconData44 = {
+var __iconData45 = {
   name: "circle-question-mark",
   size: 24,
   node: [
@@ -15776,20 +15792,20 @@ var __iconData44 = {
   ],
   aliases: ["help-circle", "circle-help"]
 };
-__iconData44.node;
-var CircleQuestionMark = createLucideIcon(__iconData44);
+__iconData45.node;
+var CircleQuestionMark = createLucideIcon(__iconData45);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/circle.mjs
-var __iconData45 = {
+var __iconData46 = {
   name: "circle",
   size: 24,
   node: [["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }]]
 };
-__iconData45.node;
-var Circle = createLucideIcon(__iconData45);
+__iconData46.node;
+var Circle = createLucideIcon(__iconData46);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/clapperboard.mjs
-var __iconData46 = {
+var __iconData47 = {
   name: "clapperboard",
   size: 24,
   node: [
@@ -15805,11 +15821,11 @@ var __iconData46 = {
     ["path", { d: "m6.18 5.276 3.1 3.899", key: "zjj9t3" }]
   ]
 };
-__iconData46.node;
-var Clapperboard = createLucideIcon(__iconData46);
+__iconData47.node;
+var Clapperboard = createLucideIcon(__iconData47);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/clock.mjs
-var __iconData47 = {
+var __iconData48 = {
   name: "clock",
   size: 24,
   node: [
@@ -15817,11 +15833,11 @@ var __iconData47 = {
     ["path", { d: "M12 6v6l4 2", key: "mmk7yg" }]
   ]
 };
-__iconData47.node;
-var Clock = createLucideIcon(__iconData47);
+__iconData48.node;
+var Clock = createLucideIcon(__iconData48);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/cloud-fog.mjs
-var __iconData48 = {
+var __iconData49 = {
   name: "cloud-fog",
   size: 24,
   node: [
@@ -15830,11 +15846,11 @@ var __iconData48 = {
     ["path", { d: "M17 21H9", key: "1u2q02" }]
   ]
 };
-__iconData48.node;
-var CloudFog = createLucideIcon(__iconData48);
+__iconData49.node;
+var CloudFog = createLucideIcon(__iconData49);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/cloud-lightning.mjs
-var __iconData49 = {
+var __iconData50 = {
   name: "cloud-lightning",
   size: 24,
   node: [
@@ -15842,11 +15858,11 @@ var __iconData49 = {
     ["path", { d: "m13 12-3 5h4l-3 5", key: "1t22er" }]
   ]
 };
-__iconData49.node;
-var CloudLightning = createLucideIcon(__iconData49);
+__iconData50.node;
+var CloudLightning = createLucideIcon(__iconData50);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/cloud-rain.mjs
-var __iconData50 = {
+var __iconData51 = {
   name: "cloud-rain",
   size: 24,
   node: [
@@ -15856,11 +15872,11 @@ var __iconData50 = {
     ["path", { d: "M12 16v6", key: "c8a4gj" }]
   ]
 };
-__iconData50.node;
-var CloudRain = createLucideIcon(__iconData50);
+__iconData51.node;
+var CloudRain = createLucideIcon(__iconData51);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/cloud-snow.mjs
-var __iconData51 = {
+var __iconData52 = {
   name: "cloud-snow",
   size: 24,
   node: [
@@ -15873,11 +15889,11 @@ var __iconData51 = {
     ["path", { d: "M16 19h.01", key: "1vcnzz" }]
   ]
 };
-__iconData51.node;
-var CloudSnow = createLucideIcon(__iconData51);
+__iconData52.node;
+var CloudSnow = createLucideIcon(__iconData52);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/cloud-sun.mjs
-var __iconData52 = {
+var __iconData53 = {
   name: "cloud-sun",
   size: 24,
   node: [
@@ -15889,20 +15905,20 @@ var __iconData52 = {
     ["path", { d: "M13 22H7a5 5 0 1 1 4.9-6H13a3 3 0 0 1 0 6Z", key: "s09mg5" }]
   ]
 };
-__iconData52.node;
-var CloudSun = createLucideIcon(__iconData52);
+__iconData53.node;
+var CloudSun = createLucideIcon(__iconData53);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/cloud.mjs
-var __iconData53 = {
+var __iconData54 = {
   name: "cloud",
   size: 24,
   node: [["path", { d: "M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z", key: "p7xjir" }]]
 };
-__iconData53.node;
-var Cloud = createLucideIcon(__iconData53);
+__iconData54.node;
+var Cloud = createLucideIcon(__iconData54);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/code-xml.mjs
-var __iconData54 = {
+var __iconData55 = {
   name: "code-xml",
   size: 24,
   node: [
@@ -15912,11 +15928,11 @@ var __iconData54 = {
   ],
   aliases: ["code-2"]
 };
-__iconData54.node;
-var CodeXml = createLucideIcon(__iconData54);
+__iconData55.node;
+var CodeXml = createLucideIcon(__iconData55);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/code.mjs
-var __iconData55 = {
+var __iconData56 = {
   name: "code",
   size: 24,
   node: [
@@ -15924,11 +15940,11 @@ var __iconData55 = {
     ["path", { d: "m8 6-6 6 6 6", key: "ppft3o" }]
   ]
 };
-__iconData55.node;
-var Code = createLucideIcon(__iconData55);
+__iconData56.node;
+var Code = createLucideIcon(__iconData56);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/columns-2.mjs
-var __iconData56 = {
+var __iconData57 = {
   name: "columns-2",
   size: 24,
   node: [
@@ -15937,11 +15953,11 @@ var __iconData56 = {
   ],
   aliases: ["columns"]
 };
-__iconData56.node;
-var Columns2 = createLucideIcon(__iconData56);
+__iconData57.node;
+var Columns2 = createLucideIcon(__iconData57);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/columns-3.mjs
-var __iconData57 = {
+var __iconData58 = {
   name: "columns-3",
   size: 24,
   node: [
@@ -15951,11 +15967,11 @@ var __iconData57 = {
   ],
   aliases: ["panels-left-right"]
 };
-__iconData57.node;
-var Columns3 = createLucideIcon(__iconData57);
+__iconData58.node;
+var Columns3 = createLucideIcon(__iconData58);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/contrast.mjs
-var __iconData58 = {
+var __iconData59 = {
   name: "contrast",
   size: 24,
   node: [
@@ -15963,11 +15979,11 @@ var __iconData58 = {
     ["path", { d: "M12 18a6 6 0 0 0 0-12v12z", key: "j4l70d" }]
   ]
 };
-__iconData58.node;
-var Contrast = createLucideIcon(__iconData58);
+__iconData59.node;
+var Contrast = createLucideIcon(__iconData59);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/copy.mjs
-var __iconData59 = {
+var __iconData60 = {
   name: "copy",
   size: 24,
   node: [
@@ -15975,11 +15991,11 @@ var __iconData59 = {
     ["path", { d: "M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2", key: "zix9uf" }]
   ]
 };
-__iconData59.node;
-var Copy = createLucideIcon(__iconData59);
+__iconData60.node;
+var Copy = createLucideIcon(__iconData60);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/cpu.mjs
-var __iconData60 = {
+var __iconData61 = {
   name: "cpu",
   size: 24,
   node: [
@@ -15999,11 +16015,11 @@ var __iconData60 = {
     ["rect", { x: "8", y: "8", width: "8", height: "8", rx: "1", key: "z9xiuo" }]
   ]
 };
-__iconData60.node;
-var Cpu = createLucideIcon(__iconData60);
+__iconData61.node;
+var Cpu = createLucideIcon(__iconData61);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/credit-card.mjs
-var __iconData61 = {
+var __iconData62 = {
   name: "credit-card",
   size: 24,
   node: [
@@ -16012,11 +16028,11 @@ var __iconData61 = {
     ["path", { d: "M6 14h2", key: "mk7k0u" }]
   ]
 };
-__iconData61.node;
-var CreditCard = createLucideIcon(__iconData61);
+__iconData62.node;
+var CreditCard = createLucideIcon(__iconData62);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/crosshair.mjs
-var __iconData62 = {
+var __iconData63 = {
   name: "crosshair",
   size: 24,
   node: [
@@ -16027,11 +16043,11 @@ var __iconData62 = {
     ["line", { x1: "12", x2: "12", y1: "22", y2: "18", key: "15g9kq" }]
   ]
 };
-__iconData62.node;
-var Crosshair = createLucideIcon(__iconData62);
+__iconData63.node;
+var Crosshair = createLucideIcon(__iconData63);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/cylinder.mjs
-var __iconData63 = {
+var __iconData64 = {
   name: "cylinder",
   size: 24,
   node: [
@@ -16039,11 +16055,11 @@ var __iconData63 = {
     ["path", { d: "M3 5v14a9 3 0 0 0 18 0V5", key: "aqi0yr" }]
   ]
 };
-__iconData63.node;
-var Cylinder = createLucideIcon(__iconData63);
+__iconData64.node;
+var Cylinder = createLucideIcon(__iconData64);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/delete.mjs
-var __iconData64 = {
+var __iconData65 = {
   name: "delete",
   size: 24,
   node: [
@@ -16058,11 +16074,11 @@ var __iconData64 = {
     ["path", { d: "m18 9-6 6", key: "1fp51s" }]
   ]
 };
-__iconData64.node;
-var Delete = createLucideIcon(__iconData64);
+__iconData65.node;
+var Delete = createLucideIcon(__iconData65);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/diamond.mjs
-var __iconData65 = {
+var __iconData66 = {
   name: "diamond",
   size: 24,
   node: [
@@ -16075,11 +16091,11 @@ var __iconData65 = {
     ]
   ]
 };
-__iconData65.node;
-var Diamond = createLucideIcon(__iconData65);
+__iconData66.node;
+var Diamond = createLucideIcon(__iconData66);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/dices.mjs
-var __iconData66 = {
+var __iconData67 = {
   name: "dices",
   size: 24,
   node: [
@@ -16097,11 +16113,11 @@ var __iconData66 = {
     ["path", { d: "M18 9h.01", key: "2061c0" }]
   ]
 };
-__iconData66.node;
-var Dices = createLucideIcon(__iconData66);
+__iconData67.node;
+var Dices = createLucideIcon(__iconData67);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/door-open.mjs
-var __iconData67 = {
+var __iconData68 = {
   name: "door-open",
   size: 24,
   node: [
@@ -16118,11 +16134,11 @@ var __iconData67 = {
     ["path", { d: "M22 21h-3", key: "1ec3tr" }]
   ]
 };
-__iconData67.node;
-var DoorOpen = createLucideIcon(__iconData67);
+__iconData68.node;
+var DoorOpen = createLucideIcon(__iconData68);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/download.mjs
-var __iconData68 = {
+var __iconData69 = {
   name: "download",
   size: 24,
   node: [
@@ -16131,11 +16147,11 @@ var __iconData68 = {
     ["path", { d: "m7 10 5 5 5-5", key: "brsn70" }]
   ]
 };
-__iconData68.node;
-var Download = createLucideIcon(__iconData68);
+__iconData69.node;
+var Download = createLucideIcon(__iconData69);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/drone.mjs
-var __iconData69 = {
+var __iconData70 = {
   name: "drone",
   size: 24,
   node: [
@@ -16150,11 +16166,11 @@ var __iconData69 = {
     ["rect", { x: "10", y: "8", width: "4", height: "8", rx: "1", key: "phrjt1" }]
   ]
 };
-__iconData69.node;
-var Drone = createLucideIcon(__iconData69);
+__iconData70.node;
+var Drone = createLucideIcon(__iconData70);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/droplet.mjs
-var __iconData70 = {
+var __iconData71 = {
   name: "droplet",
   size: 24,
   node: [
@@ -16167,11 +16183,11 @@ var __iconData70 = {
     ]
   ]
 };
-__iconData70.node;
-var Droplet = createLucideIcon(__iconData70);
+__iconData71.node;
+var Droplet = createLucideIcon(__iconData71);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/droplets.mjs
-var __iconData71 = {
+var __iconData72 = {
   name: "droplets",
   size: 24,
   node: [
@@ -16191,11 +16207,11 @@ var __iconData71 = {
     ]
   ]
 };
-__iconData71.node;
-var Droplets = createLucideIcon(__iconData71);
+__iconData72.node;
+var Droplets = createLucideIcon(__iconData72);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/earth.mjs
-var __iconData72 = {
+var __iconData73 = {
   name: "earth",
   size: 24,
   node: [
@@ -16215,11 +16231,11 @@ var __iconData72 = {
   ],
   aliases: ["globe-2"]
 };
-__iconData72.node;
-var Earth = createLucideIcon(__iconData72);
+__iconData73.node;
+var Earth = createLucideIcon(__iconData73);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/ellipsis.mjs
-var __iconData73 = {
+var __iconData74 = {
   name: "ellipsis",
   size: 24,
   node: [
@@ -16229,11 +16245,11 @@ var __iconData73 = {
   ],
   aliases: ["more-horizontal"]
 };
-__iconData73.node;
-var Ellipsis = createLucideIcon(__iconData73);
+__iconData74.node;
+var Ellipsis = createLucideIcon(__iconData74);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/equal.mjs
-var __iconData74 = {
+var __iconData75 = {
   name: "equal",
   size: 24,
   node: [
@@ -16241,11 +16257,11 @@ var __iconData74 = {
     ["line", { x1: "5", x2: "19", y1: "15", y2: "15", key: "g8yjpy" }]
   ]
 };
-__iconData74.node;
-var Equal = createLucideIcon(__iconData74);
+__iconData75.node;
+var Equal = createLucideIcon(__iconData75);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/eraser.mjs
-var __iconData75 = {
+var __iconData76 = {
   name: "eraser",
   size: 24,
   node: [
@@ -16259,11 +16275,11 @@ var __iconData75 = {
     ["path", { d: "m5.082 11.09 8.828 8.828", key: "1wx5vj" }]
   ]
 };
-__iconData75.node;
-var Eraser = createLucideIcon(__iconData75);
+__iconData76.node;
+var Eraser = createLucideIcon(__iconData76);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/external-link.mjs
-var __iconData76 = {
+var __iconData77 = {
   name: "external-link",
   size: 24,
   node: [
@@ -16272,11 +16288,11 @@ var __iconData76 = {
     ["path", { d: "M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6", key: "a6xqqp" }]
   ]
 };
-__iconData76.node;
-var ExternalLink = createLucideIcon(__iconData76);
+__iconData77.node;
+var ExternalLink = createLucideIcon(__iconData77);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/eye-off.mjs
-var __iconData77 = {
+var __iconData78 = {
   name: "eye-off",
   size: 24,
   node: [
@@ -16298,11 +16314,11 @@ var __iconData77 = {
     ["path", { d: "m2 2 20 20", key: "1ooewy" }]
   ]
 };
-__iconData77.node;
-var EyeOff = createLucideIcon(__iconData77);
+__iconData78.node;
+var EyeOff = createLucideIcon(__iconData78);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/eye.mjs
-var __iconData78 = {
+var __iconData79 = {
   name: "eye",
   size: 24,
   node: [
@@ -16316,11 +16332,11 @@ var __iconData78 = {
     ["circle", { cx: "12", cy: "12", r: "3", key: "1v7zrd" }]
   ]
 };
-__iconData78.node;
-var Eye = createLucideIcon(__iconData78);
+__iconData79.node;
+var Eye = createLucideIcon(__iconData79);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/face-angry.mjs
-var __iconData79 = {
+var __iconData80 = {
   name: "face-angry",
   size: 24,
   node: [
@@ -16333,11 +16349,11 @@ var __iconData79 = {
   ],
   aliases: ["angry"]
 };
-__iconData79.node;
-var FaceAngry = createLucideIcon(__iconData79);
+__iconData80.node;
+var FaceAngry = createLucideIcon(__iconData80);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/face-grinning.mjs
-var __iconData80 = {
+var __iconData81 = {
   name: "face-grinning",
   size: 24,
   node: [
@@ -16354,11 +16370,11 @@ var __iconData80 = {
   ],
   aliases: ["laugh"]
 };
-__iconData80.node;
-var FaceGrinning = createLucideIcon(__iconData80);
+__iconData81.node;
+var FaceGrinning = createLucideIcon(__iconData81);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/face-neutral.mjs
-var __iconData81 = {
+var __iconData82 = {
   name: "face-neutral",
   size: 24,
   node: [
@@ -16369,11 +16385,11 @@ var __iconData81 = {
   ],
   aliases: ["meh"]
 };
-__iconData81.node;
-var FaceNeutral = createLucideIcon(__iconData81);
+__iconData82.node;
+var FaceNeutral = createLucideIcon(__iconData82);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/face-slightly-frowning.mjs
-var __iconData82 = {
+var __iconData83 = {
   name: "face-slightly-frowning",
   size: 24,
   node: [
@@ -16384,11 +16400,11 @@ var __iconData82 = {
   ],
   aliases: ["frown"]
 };
-__iconData82.node;
-var FaceSlightlyFrowning = createLucideIcon(__iconData82);
+__iconData83.node;
+var FaceSlightlyFrowning = createLucideIcon(__iconData83);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/face-slightly-smiling.mjs
-var __iconData83 = {
+var __iconData84 = {
   name: "face-slightly-smiling",
   size: 24,
   node: [
@@ -16399,11 +16415,11 @@ var __iconData83 = {
   ],
   aliases: ["smile"]
 };
-__iconData83.node;
-var FaceSlightlySmiling = createLucideIcon(__iconData83);
+__iconData84.node;
+var FaceSlightlySmiling = createLucideIcon(__iconData84);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/fast-forward.mjs
-var __iconData84 = {
+var __iconData85 = {
   name: "fast-forward",
   size: 24,
   node: [
@@ -16420,11 +16436,11 @@ var __iconData84 = {
     ]
   ]
 };
-__iconData84.node;
-var FastForward = createLucideIcon(__iconData84);
+__iconData85.node;
+var FastForward = createLucideIcon(__iconData85);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/fence.mjs
-var __iconData85 = {
+var __iconData86 = {
   name: "fence",
   size: 24,
   node: [
@@ -16437,11 +16453,11 @@ var __iconData85 = {
     ["path", { d: "m20 3-2 2v15c0 .6.4 1 1 1h2c.6 0 1-.4 1-1V5Z", key: "dfd4e2" }]
   ]
 };
-__iconData85.node;
-var Fence = createLucideIcon(__iconData85);
+__iconData86.node;
+var Fence = createLucideIcon(__iconData86);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/file-up.mjs
-var __iconData86 = {
+var __iconData87 = {
   name: "file-up",
   size: 24,
   node: [
@@ -16457,11 +16473,11 @@ var __iconData86 = {
     ["path", { d: "m15 15-3-3-3 3", key: "15xj92" }]
   ]
 };
-__iconData86.node;
-var FileUp = createLucideIcon(__iconData86);
+__iconData87.node;
+var FileUp = createLucideIcon(__iconData87);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/film.mjs
-var __iconData87 = {
+var __iconData88 = {
   name: "film",
   size: 24,
   node: [
@@ -16475,11 +16491,11 @@ var __iconData87 = {
     ["path", { d: "M17 16.5h4", key: "go4c1d" }]
   ]
 };
-__iconData87.node;
-var Film = createLucideIcon(__iconData87);
+__iconData88.node;
+var Film = createLucideIcon(__iconData88);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/flag.mjs
-var __iconData88 = {
+var __iconData89 = {
   name: "flag",
   size: 24,
   node: [
@@ -16492,11 +16508,11 @@ var __iconData88 = {
     ]
   ]
 };
-__iconData88.node;
-var Flag = createLucideIcon(__iconData88);
+__iconData89.node;
+var Flag = createLucideIcon(__iconData89);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/flame.mjs
-var __iconData89 = {
+var __iconData90 = {
   name: "flame",
   size: 24,
   node: [
@@ -16509,11 +16525,11 @@ var __iconData89 = {
     ]
   ]
 };
-__iconData89.node;
-var Flame = createLucideIcon(__iconData89);
+__iconData90.node;
+var Flame = createLucideIcon(__iconData90);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/flask-conical.mjs
-var __iconData90 = {
+var __iconData91 = {
   name: "flask-conical",
   size: 24,
   node: [
@@ -16528,11 +16544,11 @@ var __iconData90 = {
     ["path", { d: "M8.5 2h7", key: "csnxdl" }]
   ]
 };
-__iconData90.node;
-var FlaskConical = createLucideIcon(__iconData90);
+__iconData91.node;
+var FlaskConical = createLucideIcon(__iconData91);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/flower-2.mjs
-var __iconData91 = {
+var __iconData92 = {
   name: "flower-2",
   size: 24,
   node: [
@@ -16549,11 +16565,11 @@ var __iconData91 = {
     ["path", { d: "M12 22c-4.2 0-7-1.667-7-5 4.2 0 7 1.667 7 5Z", key: "ufn41s" }]
   ]
 };
-__iconData91.node;
-var Flower2 = createLucideIcon(__iconData91);
+__iconData92.node;
+var Flower2 = createLucideIcon(__iconData92);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/focus.mjs
-var __iconData92 = {
+var __iconData93 = {
   name: "focus",
   size: 24,
   node: [
@@ -16564,11 +16580,11 @@ var __iconData92 = {
     ["path", { d: "M7 21H5a2 2 0 0 1-2-2v-2", key: "ioqczr" }]
   ]
 };
-__iconData92.node;
-var Focus = createLucideIcon(__iconData92);
+__iconData93.node;
+var Focus = createLucideIcon(__iconData93);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/folder-input.mjs
-var __iconData93 = {
+var __iconData94 = {
   name: "folder-input",
   size: 24,
   node: [
@@ -16583,11 +16599,11 @@ var __iconData93 = {
     ["path", { d: "m9 16 3-3-3-3", key: "6m91ic" }]
   ]
 };
-__iconData93.node;
-var FolderInput = createLucideIcon(__iconData93);
+__iconData94.node;
+var FolderInput = createLucideIcon(__iconData94);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/folder-open.mjs
-var __iconData94 = {
+var __iconData95 = {
   name: "folder-open",
   size: 24,
   node: [
@@ -16600,11 +16616,11 @@ var __iconData94 = {
     ]
   ]
 };
-__iconData94.node;
-var FolderOpen = createLucideIcon(__iconData94);
+__iconData95.node;
+var FolderOpen = createLucideIcon(__iconData95);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/folder.mjs
-var __iconData95 = {
+var __iconData96 = {
   name: "folder",
   size: 24,
   node: [
@@ -16617,11 +16633,11 @@ var __iconData95 = {
     ]
   ]
 };
-__iconData95.node;
-var Folder = createLucideIcon(__iconData95);
+__iconData96.node;
+var Folder = createLucideIcon(__iconData96);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/footprints.mjs
-var __iconData96 = {
+var __iconData97 = {
   name: "footprints",
   size: 24,
   node: [
@@ -16643,11 +16659,11 @@ var __iconData96 = {
     ["path", { d: "M4 13h4", key: "1bwh8b" }]
   ]
 };
-__iconData96.node;
-var Footprints = createLucideIcon(__iconData96);
+__iconData97.node;
+var Footprints = createLucideIcon(__iconData97);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/gauge.mjs
-var __iconData97 = {
+var __iconData98 = {
   name: "gauge",
   size: 24,
   node: [
@@ -16655,11 +16671,11 @@ var __iconData97 = {
     ["path", { d: "M3.34 19a10 10 0 1 1 17.32 0", key: "19p75a" }]
   ]
 };
-__iconData97.node;
-var Gauge = createLucideIcon(__iconData97);
+__iconData98.node;
+var Gauge = createLucideIcon(__iconData98);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/ghost.mjs
-var __iconData98 = {
+var __iconData99 = {
   name: "ghost",
   size: 24,
   node: [
@@ -16674,11 +16690,11 @@ var __iconData98 = {
     ["path", { d: "M9 10v1", key: "1e14fa" }]
   ]
 };
-__iconData98.node;
-var Ghost = createLucideIcon(__iconData98);
+__iconData99.node;
+var Ghost = createLucideIcon(__iconData99);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/glasses.mjs
-var __iconData99 = {
+var __iconData100 = {
   name: "glasses",
   size: 24,
   node: [
@@ -16689,11 +16705,11 @@ var __iconData99 = {
     ["path", { d: "M21.5 13 19 7c-.7-1.3-1.5-2-3-2", key: "1r31ai" }]
   ]
 };
-__iconData99.node;
-var Glasses = createLucideIcon(__iconData99);
+__iconData100.node;
+var Glasses = createLucideIcon(__iconData100);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/globe.mjs
-var __iconData100 = {
+var __iconData101 = {
   name: "globe",
   size: 24,
   node: [
@@ -16702,11 +16718,11 @@ var __iconData100 = {
     ["path", { d: "M2 12h20", key: "9i4pu4" }]
   ]
 };
-__iconData100.node;
-var Globe = createLucideIcon(__iconData100);
+__iconData101.node;
+var Globe = createLucideIcon(__iconData101);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/grid-2x2.mjs
-var __iconData101 = {
+var __iconData102 = {
   name: "grid-2x2",
   size: 24,
   node: [
@@ -16716,11 +16732,11 @@ var __iconData101 = {
   ],
   aliases: ["grid-2-x-2"]
 };
-__iconData101.node;
-var Grid2x2 = createLucideIcon(__iconData101);
+__iconData102.node;
+var Grid2x2 = createLucideIcon(__iconData102);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/grid-3x3.mjs
-var __iconData102 = {
+var __iconData103 = {
   name: "grid-3x3",
   size: 24,
   node: [
@@ -16732,11 +16748,11 @@ var __iconData102 = {
   ],
   aliases: ["grid", "grid-3-x-3"]
 };
-__iconData102.node;
-var Grid3x3 = createLucideIcon(__iconData102);
+__iconData103.node;
+var Grid3x3 = createLucideIcon(__iconData103);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/grip-vertical.mjs
-var __iconData103 = {
+var __iconData104 = {
   name: "grip-vertical",
   size: 24,
   node: [
@@ -16748,11 +16764,11 @@ var __iconData103 = {
     ["circle", { cx: "15", cy: "19", r: "1", key: "f4zoj3" }]
   ]
 };
-__iconData103.node;
-var GripVertical = createLucideIcon(__iconData103);
+__iconData104.node;
+var GripVertical = createLucideIcon(__iconData104);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/grip.mjs
-var __iconData104 = {
+var __iconData105 = {
   name: "grip",
   size: 24,
   node: [
@@ -16767,11 +16783,11 @@ var __iconData104 = {
     ["circle", { cx: "5", cy: "19", r: "1", key: "bfqh0e" }]
   ]
 };
-__iconData104.node;
-var Grip = createLucideIcon(__iconData104);
+__iconData105.node;
+var Grip = createLucideIcon(__iconData105);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/group.mjs
-var __iconData105 = {
+var __iconData106 = {
   name: "group",
   size: 24,
   node: [
@@ -16783,11 +16799,11 @@ var __iconData105 = {
     ["rect", { width: "7", height: "5", x: "10", y: "12", rx: "1", key: "1qlmkx" }]
   ]
 };
-__iconData105.node;
-var Group2 = createLucideIcon(__iconData105);
+__iconData106.node;
+var Group2 = createLucideIcon(__iconData106);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/hammer.mjs
-var __iconData106 = {
+var __iconData107 = {
   name: "hammer",
   size: 24,
   node: [
@@ -16802,11 +16818,11 @@ var __iconData106 = {
     ]
   ]
 };
-__iconData106.node;
-var Hammer = createLucideIcon(__iconData106);
+__iconData107.node;
+var Hammer = createLucideIcon(__iconData107);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/hand-heart.mjs
-var __iconData107 = {
+var __iconData108 = {
   name: "hand-heart",
   size: 24,
   node: [
@@ -16828,11 +16844,11 @@ var __iconData107 = {
     ]
   ]
 };
-__iconData107.node;
-var HandHeart = createLucideIcon(__iconData107);
+__iconData108.node;
+var HandHeart = createLucideIcon(__iconData108);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/hand.mjs
-var __iconData108 = {
+var __iconData109 = {
   name: "hand",
   size: 24,
   node: [
@@ -16848,11 +16864,11 @@ var __iconData108 = {
     ]
   ]
 };
-__iconData108.node;
-var Hand = createLucideIcon(__iconData108);
+__iconData109.node;
+var Hand = createLucideIcon(__iconData109);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/hash.mjs
-var __iconData109 = {
+var __iconData110 = {
   name: "hash",
   size: 24,
   node: [
@@ -16862,11 +16878,11 @@ var __iconData109 = {
     ["line", { x1: "16", x2: "14", y1: "3", y2: "21", key: "weycgp" }]
   ]
 };
-__iconData109.node;
-var Hash = createLucideIcon(__iconData109);
+__iconData110.node;
+var Hash = createLucideIcon(__iconData110);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/heart-pulse.mjs
-var __iconData110 = {
+var __iconData111 = {
   name: "heart-pulse",
   size: 24,
   node: [
@@ -16880,11 +16896,11 @@ var __iconData110 = {
     ["path", { d: "M3.22 13H9.5l.5-1 2 4.5 2-7 1.5 3.5h5.27", key: "auskq0" }]
   ]
 };
-__iconData110.node;
-var HeartPulse = createLucideIcon(__iconData110);
+__iconData111.node;
+var HeartPulse = createLucideIcon(__iconData111);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/house.mjs
-var __iconData111 = {
+var __iconData112 = {
   name: "house",
   size: 24,
   node: [
@@ -16899,11 +16915,11 @@ var __iconData111 = {
   ],
   aliases: ["home"]
 };
-__iconData111.node;
-var House = createLucideIcon(__iconData111);
+__iconData112.node;
+var House = createLucideIcon(__iconData112);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/image.mjs
-var __iconData112 = {
+var __iconData113 = {
   name: "image",
   size: 24,
   node: [
@@ -16912,11 +16928,11 @@ var __iconData112 = {
     ["path", { d: "m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21", key: "1xmnt7" }]
   ]
 };
-__iconData112.node;
-var Image2 = createLucideIcon(__iconData112);
+__iconData113.node;
+var Image2 = createLucideIcon(__iconData113);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/info.mjs
-var __iconData113 = {
+var __iconData114 = {
   name: "info",
   size: 24,
   node: [
@@ -16925,11 +16941,11 @@ var __iconData113 = {
     ["path", { d: "M12 8h.01", key: "e9boi3" }]
   ]
 };
-__iconData113.node;
-var Info = createLucideIcon(__iconData113);
+__iconData114.node;
+var Info = createLucideIcon(__iconData114);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/key-round.mjs
-var __iconData114 = {
+var __iconData115 = {
   name: "key-round",
   size: 24,
   node: [
@@ -16943,11 +16959,11 @@ var __iconData114 = {
     ["circle", { cx: "16.5", cy: "7.5", r: ".5", fill: "currentColor", key: "w0ekpg" }]
   ]
 };
-__iconData114.node;
-var KeyRound = createLucideIcon(__iconData114);
+__iconData115.node;
+var KeyRound = createLucideIcon(__iconData115);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/lamp-floor.mjs
-var __iconData115 = {
+var __iconData116 = {
   name: "lamp-floor",
   size: 24,
   node: [
@@ -16962,11 +16978,11 @@ var __iconData115 = {
     ["path", { d: "M9 22h6", key: "1rlq3v" }]
   ]
 };
-__iconData115.node;
-var LampFloor = createLucideIcon(__iconData115);
+__iconData116.node;
+var LampFloor = createLucideIcon(__iconData116);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/languages.mjs
-var __iconData116 = {
+var __iconData117 = {
   name: "languages",
   size: 24,
   node: [
@@ -16978,11 +16994,11 @@ var __iconData116 = {
     ["path", { d: "M14 18h6", key: "1m8k6r" }]
   ]
 };
-__iconData116.node;
-var Languages = createLucideIcon(__iconData116);
+__iconData117.node;
+var Languages = createLucideIcon(__iconData117);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/layers.mjs
-var __iconData117 = {
+var __iconData118 = {
   name: "layers",
   size: 24,
   node: [
@@ -17010,11 +17026,11 @@ var __iconData117 = {
   ],
   aliases: ["layers-3"]
 };
-__iconData117.node;
-var Layers = createLucideIcon(__iconData117);
+__iconData118.node;
+var Layers = createLucideIcon(__iconData118);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/layout-grid.mjs
-var __iconData118 = {
+var __iconData119 = {
   name: "layout-grid",
   size: 24,
   node: [
@@ -17024,11 +17040,11 @@ var __iconData118 = {
     ["rect", { width: "7", height: "7", x: "3", y: "14", rx: "1", key: "1bb6yr" }]
   ]
 };
-__iconData118.node;
-var LayoutGrid = createLucideIcon(__iconData118);
+__iconData119.node;
+var LayoutGrid = createLucideIcon(__iconData119);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/leaf.mjs
-var __iconData119 = {
+var __iconData120 = {
   name: "leaf",
   size: 24,
   node: [
@@ -17042,11 +17058,11 @@ var __iconData119 = {
     ["path", { d: "M2 21a5 5 0 012.911-4.544C7.613 15.212 8.351 15.24 11 13", key: "c1ejpn" }]
   ]
 };
-__iconData119.node;
-var Leaf = createLucideIcon(__iconData119);
+__iconData120.node;
+var Leaf = createLucideIcon(__iconData120);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/library.mjs
-var __iconData120 = {
+var __iconData121 = {
   name: "library",
   size: 24,
   node: [
@@ -17056,11 +17072,11 @@ var __iconData120 = {
     ["path", { d: "M4 4v16", key: "6qkkli" }]
   ]
 };
-__iconData120.node;
-var Library = createLucideIcon(__iconData120);
+__iconData121.node;
+var Library = createLucideIcon(__iconData121);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/lightbulb.mjs
-var __iconData121 = {
+var __iconData122 = {
   name: "lightbulb",
   size: 24,
   node: [
@@ -17075,11 +17091,11 @@ var __iconData121 = {
     ["path", { d: "M10 22h4", key: "ceow96" }]
   ]
 };
-__iconData121.node;
-var Lightbulb = createLucideIcon(__iconData121);
+__iconData122.node;
+var Lightbulb = createLucideIcon(__iconData122);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/link-2.mjs
-var __iconData122 = {
+var __iconData123 = {
   name: "link-2",
   size: 24,
   node: [
@@ -17088,11 +17104,11 @@ var __iconData122 = {
     ["line", { x1: "8", x2: "16", y1: "12", y2: "12", key: "1jonct" }]
   ]
 };
-__iconData122.node;
-var Link2 = createLucideIcon(__iconData122);
+__iconData123.node;
+var Link2 = createLucideIcon(__iconData123);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/list-checks.mjs
-var __iconData123 = {
+var __iconData124 = {
   name: "list-checks",
   size: 24,
   node: [
@@ -17103,11 +17119,11 @@ var __iconData123 = {
     ["path", { d: "m3 7 2 2 4-4", key: "1obspn" }]
   ]
 };
-__iconData123.node;
-var ListChecks = createLucideIcon(__iconData123);
+__iconData124.node;
+var ListChecks = createLucideIcon(__iconData124);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/list-ordered.mjs
-var __iconData124 = {
+var __iconData125 = {
   name: "list-ordered",
   size: 24,
   node: [
@@ -17119,21 +17135,21 @@ var __iconData124 = {
     ["path", { d: "M6.5 20H3.4c0-1 2.6-1.925 2.6-3.5a1.5 1.5 0 0 0-2.6-1.02", key: "xtkcd5" }]
   ]
 };
-__iconData124.node;
-var ListOrdered = createLucideIcon(__iconData124);
+__iconData125.node;
+var ListOrdered = createLucideIcon(__iconData125);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/loader-circle.mjs
-var __iconData125 = {
+var __iconData126 = {
   name: "loader-circle",
   size: 24,
   node: [["path", { d: "M21 12a9 9 0 1 1-6.219-8.56", key: "13zald" }]],
   aliases: ["loader-2"]
 };
-__iconData125.node;
-var LoaderCircle = createLucideIcon(__iconData125);
+__iconData126.node;
+var LoaderCircle = createLucideIcon(__iconData126);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/locate-fixed.mjs
-var __iconData126 = {
+var __iconData127 = {
   name: "locate-fixed",
   size: 24,
   node: [
@@ -17145,11 +17161,11 @@ var __iconData126 = {
     ["circle", { cx: "12", cy: "12", r: "3", key: "1v7zrd" }]
   ]
 };
-__iconData126.node;
-var LocateFixed = createLucideIcon(__iconData126);
+__iconData127.node;
+var LocateFixed = createLucideIcon(__iconData127);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/lock-keyhole.mjs
-var __iconData127 = {
+var __iconData128 = {
   name: "lock-keyhole",
   size: 24,
   node: [
@@ -17158,11 +17174,11 @@ var __iconData127 = {
     ["path", { d: "M7 10V7a5 5 0 0 1 10 0v3", key: "1pqi11" }]
   ]
 };
-__iconData127.node;
-var LockKeyhole = createLucideIcon(__iconData127);
+__iconData128.node;
+var LockKeyhole = createLucideIcon(__iconData128);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/lock-open.mjs
-var __iconData128 = {
+var __iconData129 = {
   name: "lock-open",
   size: 24,
   node: [
@@ -17171,11 +17187,11 @@ var __iconData128 = {
   ],
   aliases: ["unlock"]
 };
-__iconData128.node;
-var LockOpen = createLucideIcon(__iconData128);
+__iconData129.node;
+var LockOpen = createLucideIcon(__iconData129);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/lock.mjs
-var __iconData129 = {
+var __iconData130 = {
   name: "lock",
   size: 24,
   node: [
@@ -17183,11 +17199,11 @@ var __iconData129 = {
     ["path", { d: "M7 11V7a5 5 0 0 1 10 0v4", key: "fwvmzm" }]
   ]
 };
-__iconData129.node;
-var Lock = createLucideIcon(__iconData129);
+__iconData130.node;
+var Lock = createLucideIcon(__iconData130);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/log-in.mjs
-var __iconData130 = {
+var __iconData131 = {
   name: "log-in",
   size: 24,
   node: [
@@ -17196,11 +17212,11 @@ var __iconData130 = {
     ["path", { d: "M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4", key: "u53s6r" }]
   ]
 };
-__iconData130.node;
-var LogIn = createLucideIcon(__iconData130);
+__iconData131.node;
+var LogIn = createLucideIcon(__iconData131);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/log-out.mjs
-var __iconData131 = {
+var __iconData132 = {
   name: "log-out",
   size: 24,
   node: [
@@ -17209,11 +17225,11 @@ var __iconData131 = {
     ["path", { d: "M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4", key: "1uf3rs" }]
   ]
 };
-__iconData131.node;
-var LogOut = createLucideIcon(__iconData131);
+__iconData132.node;
+var LogOut = createLucideIcon(__iconData132);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/magnet.mjs
-var __iconData132 = {
+var __iconData133 = {
   name: "magnet",
   size: 24,
   node: [
@@ -17228,11 +17244,11 @@ var __iconData132 = {
     ["path", { d: "m5 8 4 4", key: "j6kj7e" }]
   ]
 };
-__iconData132.node;
-var Magnet = createLucideIcon(__iconData132);
+__iconData133.node;
+var Magnet = createLucideIcon(__iconData133);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/mail.mjs
-var __iconData133 = {
+var __iconData134 = {
   name: "mail",
   size: 24,
   node: [
@@ -17240,11 +17256,11 @@ var __iconData133 = {
     ["rect", { x: "2", y: "4", width: "20", height: "16", rx: "2", key: "izxlao" }]
   ]
 };
-__iconData133.node;
-var Mail = createLucideIcon(__iconData133);
+__iconData134.node;
+var Mail = createLucideIcon(__iconData134);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/map-pin.mjs
-var __iconData134 = {
+var __iconData135 = {
   name: "map-pin",
   size: 24,
   node: [
@@ -17258,11 +17274,11 @@ var __iconData134 = {
     ["circle", { cx: "12", cy: "10", r: "3", key: "ilqhr7" }]
   ]
 };
-__iconData134.node;
-var MapPin = createLucideIcon(__iconData134);
+__iconData135.node;
+var MapPin = createLucideIcon(__iconData135);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/map.mjs
-var __iconData135 = {
+var __iconData136 = {
   name: "map",
   size: 24,
   node: [
@@ -17277,11 +17293,11 @@ var __iconData135 = {
     ["path", { d: "M9 3.236v15", key: "1uimfh" }]
   ]
 };
-__iconData135.node;
-var Map2 = createLucideIcon(__iconData135);
+__iconData136.node;
+var Map2 = createLucideIcon(__iconData136);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/maximize-2.mjs
-var __iconData136 = {
+var __iconData137 = {
   name: "maximize-2",
   size: 24,
   node: [
@@ -17291,11 +17307,11 @@ var __iconData136 = {
     ["path", { d: "M9 21H3v-6", key: "wtvkvv" }]
   ]
 };
-__iconData136.node;
-var Maximize2 = createLucideIcon(__iconData136);
+__iconData137.node;
+var Maximize2 = createLucideIcon(__iconData137);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/medal.mjs
-var __iconData137 = {
+var __iconData138 = {
   name: "medal",
   size: 24,
   node: [
@@ -17313,11 +17329,11 @@ var __iconData137 = {
     ["path", { d: "M12 18v-2h-.5", key: "fawc4q" }]
   ]
 };
-__iconData137.node;
-var Medal = createLucideIcon(__iconData137);
+__iconData138.node;
+var Medal = createLucideIcon(__iconData138);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/message-circle.mjs
-var __iconData138 = {
+var __iconData139 = {
   name: "message-circle",
   size: 24,
   node: [
@@ -17330,11 +17346,11 @@ var __iconData138 = {
     ]
   ]
 };
-__iconData138.node;
-var MessageCircle = createLucideIcon(__iconData138);
+__iconData139.node;
+var MessageCircle = createLucideIcon(__iconData139);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/message-square.mjs
-var __iconData139 = {
+var __iconData140 = {
   name: "message-square",
   size: 24,
   node: [
@@ -17347,11 +17363,11 @@ var __iconData139 = {
     ]
   ]
 };
-__iconData139.node;
-var MessageSquare = createLucideIcon(__iconData139);
+__iconData140.node;
+var MessageSquare = createLucideIcon(__iconData140);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/mic.mjs
-var __iconData140 = {
+var __iconData141 = {
   name: "mic",
   size: 24,
   node: [
@@ -17360,11 +17376,11 @@ var __iconData140 = {
     ["rect", { x: "9", y: "2", width: "6", height: "13", rx: "3", key: "s6n7sd" }]
   ]
 };
-__iconData140.node;
-var Mic = createLucideIcon(__iconData140);
+__iconData141.node;
+var Mic = createLucideIcon(__iconData141);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/minimize-2.mjs
-var __iconData141 = {
+var __iconData142 = {
   name: "minimize-2",
   size: 24,
   node: [
@@ -17374,20 +17390,20 @@ var __iconData141 = {
     ["path", { d: "M4 14h6v6", key: "rmj7iw" }]
   ]
 };
-__iconData141.node;
-var Minimize2 = createLucideIcon(__iconData141);
+__iconData142.node;
+var Minimize2 = createLucideIcon(__iconData142);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/minus.mjs
-var __iconData142 = {
+var __iconData143 = {
   name: "minus",
   size: 24,
   node: [["path", { d: "M5 12h14", key: "1ays0h" }]]
 };
-__iconData142.node;
-var Minus = createLucideIcon(__iconData142);
+__iconData143.node;
+var Minus = createLucideIcon(__iconData143);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/monitor.mjs
-var __iconData143 = {
+var __iconData144 = {
   name: "monitor",
   size: 24,
   node: [
@@ -17396,11 +17412,11 @@ var __iconData143 = {
     ["line", { x1: "12", x2: "12", y1: "17", y2: "21", key: "vw1qmm" }]
   ]
 };
-__iconData143.node;
-var Monitor = createLucideIcon(__iconData143);
+__iconData144.node;
+var Monitor = createLucideIcon(__iconData144);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/moon.mjs
-var __iconData144 = {
+var __iconData145 = {
   name: "moon",
   size: 24,
   node: [
@@ -17413,20 +17429,20 @@ var __iconData144 = {
     ]
   ]
 };
-__iconData144.node;
-var Moon = createLucideIcon(__iconData144);
+__iconData145.node;
+var Moon = createLucideIcon(__iconData145);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/mountain.mjs
-var __iconData145 = {
+var __iconData146 = {
   name: "mountain",
   size: 24,
   node: [["path", { d: "m8 3 4 8 5-5 5 15H2L8 3z", key: "otkl63" }]]
 };
-__iconData145.node;
-var Mountain = createLucideIcon(__iconData145);
+__iconData146.node;
+var Mountain = createLucideIcon(__iconData146);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/mouse-pointer-2.mjs
-var __iconData146 = {
+var __iconData147 = {
   name: "mouse-pointer-2",
   size: 24,
   node: [
@@ -17439,11 +17455,11 @@ var __iconData146 = {
     ]
   ]
 };
-__iconData146.node;
-var MousePointer2 = createLucideIcon(__iconData146);
+__iconData147.node;
+var MousePointer2 = createLucideIcon(__iconData147);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/move-horizontal.mjs
-var __iconData147 = {
+var __iconData148 = {
   name: "move-horizontal",
   size: 24,
   node: [
@@ -17452,11 +17468,11 @@ var __iconData147 = {
     ["path", { d: "m6 8-4 4 4 4", key: "15zrgr" }]
   ]
 };
-__iconData147.node;
-var MoveHorizontal = createLucideIcon(__iconData147);
+__iconData148.node;
+var MoveHorizontal = createLucideIcon(__iconData148);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/move.mjs
-var __iconData148 = {
+var __iconData149 = {
   name: "move",
   size: 24,
   node: [
@@ -17468,11 +17484,11 @@ var __iconData148 = {
     ["path", { d: "m9 5 3-3 3 3", key: "l8vdw6" }]
   ]
 };
-__iconData148.node;
-var Move = createLucideIcon(__iconData148);
+__iconData149.node;
+var Move = createLucideIcon(__iconData149);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/music-2.mjs
-var __iconData149 = {
+var __iconData150 = {
   name: "music-2",
   size: 24,
   node: [
@@ -17480,11 +17496,11 @@ var __iconData149 = {
     ["path", { d: "M12 18V2l7 4", key: "g04rme" }]
   ]
 };
-__iconData149.node;
-var Music2 = createLucideIcon(__iconData149);
+__iconData150.node;
+var Music2 = createLucideIcon(__iconData150);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/music.mjs
-var __iconData150 = {
+var __iconData151 = {
   name: "music",
   size: 24,
   node: [
@@ -17493,11 +17509,11 @@ var __iconData150 = {
     ["circle", { cx: "18", cy: "16", r: "3", key: "1hluhg" }]
   ]
 };
-__iconData150.node;
-var Music = createLucideIcon(__iconData150);
+__iconData151.node;
+var Music = createLucideIcon(__iconData151);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/orbit.mjs
-var __iconData151 = {
+var __iconData152 = {
   name: "orbit",
   size: 24,
   node: [
@@ -17508,11 +17524,11 @@ var __iconData151 = {
     ["circle", { cx: "5", cy: "19", r: "2", key: "v8kfzx" }]
   ]
 };
-__iconData151.node;
-var Orbit = createLucideIcon(__iconData151);
+__iconData152.node;
+var Orbit = createLucideIcon(__iconData152);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/package.mjs
-var __iconData152 = {
+var __iconData153 = {
   name: "package",
   size: 24,
   node: [
@@ -17528,11 +17544,11 @@ var __iconData152 = {
     ["path", { d: "m7.5 4.27 9 5.15", key: "1c824w" }]
   ]
 };
-__iconData152.node;
-var Package = createLucideIcon(__iconData152);
+__iconData153.node;
+var Package = createLucideIcon(__iconData153);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/paintbrush.mjs
-var __iconData153 = {
+var __iconData154 = {
   name: "paintbrush",
   size: 24,
   node: [
@@ -17553,11 +17569,11 @@ var __iconData153 = {
     ]
   ]
 };
-__iconData153.node;
-var Paintbrush = createLucideIcon(__iconData153);
+__iconData154.node;
+var Paintbrush = createLucideIcon(__iconData154);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/palette.mjs
-var __iconData154 = {
+var __iconData155 = {
   name: "palette",
   size: 24,
   node: [
@@ -17574,11 +17590,11 @@ var __iconData154 = {
     ["circle", { cx: "8.5", cy: "7.5", r: ".5", fill: "currentColor", key: "fotxhn" }]
   ]
 };
-__iconData154.node;
-var Palette = createLucideIcon(__iconData154);
+__iconData155.node;
+var Palette = createLucideIcon(__iconData155);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/panel-left-close.mjs
-var __iconData155 = {
+var __iconData156 = {
   name: "panel-left-close",
   size: 24,
   node: [
@@ -17588,11 +17604,11 @@ var __iconData155 = {
   ],
   aliases: ["sidebar-close"]
 };
-__iconData155.node;
-var PanelLeftClose = createLucideIcon(__iconData155);
+__iconData156.node;
+var PanelLeftClose = createLucideIcon(__iconData156);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/panel-right.mjs
-var __iconData156 = {
+var __iconData157 = {
   name: "panel-right",
   size: 24,
   node: [
@@ -17600,11 +17616,11 @@ var __iconData156 = {
     ["path", { d: "M15 3v18", key: "14nvp0" }]
   ]
 };
-__iconData156.node;
-var PanelRight = createLucideIcon(__iconData156);
+__iconData157.node;
+var PanelRight = createLucideIcon(__iconData157);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/panels-top-left.mjs
-var __iconData157 = {
+var __iconData158 = {
   name: "panels-top-left",
   size: 24,
   node: [
@@ -17614,11 +17630,11 @@ var __iconData157 = {
   ],
   aliases: ["layout"]
 };
-__iconData157.node;
-var PanelsTopLeft = createLucideIcon(__iconData157);
+__iconData158.node;
+var PanelsTopLeft = createLucideIcon(__iconData158);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/party-popper.mjs
-var __iconData158 = {
+var __iconData159 = {
   name: "party-popper",
   size: 24,
   node: [
@@ -17651,11 +17667,11 @@ var __iconData158 = {
     ]
   ]
 };
-__iconData158.node;
-var PartyPopper = createLucideIcon(__iconData158);
+__iconData159.node;
+var PartyPopper = createLucideIcon(__iconData159);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/pause.mjs
-var __iconData159 = {
+var __iconData160 = {
   name: "pause",
   size: 24,
   node: [
@@ -17663,11 +17679,11 @@ var __iconData159 = {
     ["rect", { x: "5", y: "3", width: "5", height: "18", rx: "1", key: "1wsw3u" }]
   ]
 };
-__iconData159.node;
-var Pause = createLucideIcon(__iconData159);
+__iconData160.node;
+var Pause = createLucideIcon(__iconData160);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/pen-line.mjs
-var __iconData160 = {
+var __iconData161 = {
   name: "pen-line",
   size: 24,
   node: [
@@ -17682,11 +17698,11 @@ var __iconData160 = {
   ],
   aliases: ["edit-3"]
 };
-__iconData160.node;
-var PenLine = createLucideIcon(__iconData160);
+__iconData161.node;
+var PenLine = createLucideIcon(__iconData161);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/person-standing.mjs
-var __iconData161 = {
+var __iconData162 = {
   name: "person-standing",
   size: 24,
   node: [
@@ -17696,11 +17712,11 @@ var __iconData161 = {
     ["path", { d: "M12 10v4", key: "1kjpxc" }]
   ]
 };
-__iconData161.node;
-var PersonStanding = createLucideIcon(__iconData161);
+__iconData162.node;
+var PersonStanding = createLucideIcon(__iconData162);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/pickaxe.mjs
-var __iconData162 = {
+var __iconData163 = {
   name: "pickaxe",
   size: 24,
   node: [
@@ -17728,11 +17744,11 @@ var __iconData162 = {
     ]
   ]
 };
-__iconData162.node;
-var Pickaxe = createLucideIcon(__iconData162);
+__iconData163.node;
+var Pickaxe = createLucideIcon(__iconData163);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/pipette.mjs
-var __iconData163 = {
+var __iconData164 = {
   name: "pipette",
   size: 24,
   node: [
@@ -17753,11 +17769,11 @@ var __iconData163 = {
     ["path", { d: "m2 22 .414-.414", key: "jhxm08" }]
   ]
 };
-__iconData163.node;
-var Pipette = createLucideIcon(__iconData163);
+__iconData164.node;
+var Pipette = createLucideIcon(__iconData164);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/play.mjs
-var __iconData164 = {
+var __iconData165 = {
   name: "play",
   size: 24,
   node: [
@@ -17770,11 +17786,11 @@ var __iconData164 = {
     ]
   ]
 };
-__iconData164.node;
-var Play = createLucideIcon(__iconData164);
+__iconData165.node;
+var Play = createLucideIcon(__iconData165);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/plus.mjs
-var __iconData165 = {
+var __iconData166 = {
   name: "plus",
   size: 24,
   node: [
@@ -17782,11 +17798,11 @@ var __iconData165 = {
     ["path", { d: "M12 5v14", key: "s699le" }]
   ]
 };
-__iconData165.node;
-var Plus = createLucideIcon(__iconData165);
+__iconData166.node;
+var Plus = createLucideIcon(__iconData166);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/pointer.mjs
-var __iconData166 = {
+var __iconData167 = {
   name: "pointer",
   size: 24,
   node: [
@@ -17803,11 +17819,11 @@ var __iconData166 = {
     ]
   ]
 };
-__iconData166.node;
-var Pointer = createLucideIcon(__iconData166);
+__iconData167.node;
+var Pointer = createLucideIcon(__iconData167);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/rabbit.mjs
-var __iconData167 = {
+var __iconData168 = {
   name: "rabbit",
   size: 24,
   node: [
@@ -17824,11 +17840,11 @@ var __iconData167 = {
     ["path", { d: "M7.612 12.524a3 3 0 1 0-1.6 4.3", key: "1e33i0" }]
   ]
 };
-__iconData167.node;
-var Rabbit = createLucideIcon(__iconData167);
+__iconData168.node;
+var Rabbit = createLucideIcon(__iconData168);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/radio.mjs
-var __iconData168 = {
+var __iconData169 = {
   name: "radio",
   size: 24,
   node: [
@@ -17839,29 +17855,29 @@ var __iconData168 = {
     ["circle", { cx: "12", cy: "12", r: "2", key: "1c9p78" }]
   ]
 };
-__iconData168.node;
-var Radio = createLucideIcon(__iconData168);
+__iconData169.node;
+var Radio = createLucideIcon(__iconData169);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/rectangle-horizontal.mjs
-var __iconData169 = {
+var __iconData170 = {
   name: "rectangle-horizontal",
   size: 24,
   node: [["rect", { width: "20", height: "12", x: "2", y: "6", rx: "2", key: "9lu3g6" }]]
 };
-__iconData169.node;
-var RectangleHorizontal = createLucideIcon(__iconData169);
+__iconData170.node;
+var RectangleHorizontal = createLucideIcon(__iconData170);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/rectangle-vertical.mjs
-var __iconData170 = {
+var __iconData171 = {
   name: "rectangle-vertical",
   size: 24,
   node: [["rect", { width: "12", height: "20", x: "6", y: "2", rx: "2", key: "1oxtiu" }]]
 };
-__iconData170.node;
-var RectangleVertical = createLucideIcon(__iconData170);
+__iconData171.node;
+var RectangleVertical = createLucideIcon(__iconData171);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/redo-2.mjs
-var __iconData171 = {
+var __iconData172 = {
   name: "redo-2",
   size: 24,
   node: [
@@ -17869,11 +17885,11 @@ var __iconData171 = {
     ["path", { d: "M20 9H9.5A5.5 5.5 0 0 0 4 14.5A5.5 5.5 0 0 0 9.5 20H13", key: "6uklza" }]
   ]
 };
-__iconData171.node;
-var Redo2 = createLucideIcon(__iconData171);
+__iconData172.node;
+var Redo2 = createLucideIcon(__iconData172);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/refresh-cw.mjs
-var __iconData172 = {
+var __iconData173 = {
   name: "refresh-cw",
   size: 24,
   node: [
@@ -17883,11 +17899,11 @@ var __iconData172 = {
     ["path", { d: "M8 16H3v5", key: "1cv678" }]
   ]
 };
-__iconData172.node;
-var RefreshCw = createLucideIcon(__iconData172);
+__iconData173.node;
+var RefreshCw = createLucideIcon(__iconData173);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/repeat.mjs
-var __iconData173 = {
+var __iconData174 = {
   name: "repeat",
   size: 24,
   node: [
@@ -17897,11 +17913,11 @@ var __iconData173 = {
     ["path", { d: "M21 13v1a4 4 0 0 1-4 4H3", key: "1rx37r" }]
   ]
 };
-__iconData173.node;
-var Repeat = createLucideIcon(__iconData173);
+__iconData174.node;
+var Repeat = createLucideIcon(__iconData174);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/rewind.mjs
-var __iconData174 = {
+var __iconData175 = {
   name: "rewind",
   size: 24,
   node: [
@@ -17921,11 +17937,11 @@ var __iconData174 = {
     ]
   ]
 };
-__iconData174.node;
-var Rewind = createLucideIcon(__iconData174);
+__iconData175.node;
+var Rewind = createLucideIcon(__iconData175);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/rotate-ccw-clock.mjs
-var __iconData175 = {
+var __iconData176 = {
   name: "rotate-ccw-clock",
   size: 24,
   node: [
@@ -17935,11 +17951,11 @@ var __iconData175 = {
   ],
   aliases: ["history"]
 };
-__iconData175.node;
-var RotateCcwClock = createLucideIcon(__iconData175);
+__iconData176.node;
+var RotateCcwClock = createLucideIcon(__iconData176);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/rotate-ccw.mjs
-var __iconData176 = {
+var __iconData177 = {
   name: "rotate-ccw",
   size: 24,
   node: [
@@ -17947,11 +17963,11 @@ var __iconData176 = {
     ["path", { d: "M3 3v5h5", key: "1xhq8a" }]
   ]
 };
-__iconData176.node;
-var RotateCcw = createLucideIcon(__iconData176);
+__iconData177.node;
+var RotateCcw = createLucideIcon(__iconData177);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/rotate-cw.mjs
-var __iconData177 = {
+var __iconData178 = {
   name: "rotate-cw",
   size: 24,
   node: [
@@ -17959,11 +17975,11 @@ var __iconData177 = {
     ["path", { d: "M21 3v5h-5", key: "1q7to0" }]
   ]
 };
-__iconData177.node;
-var RotateCw = createLucideIcon(__iconData177);
+__iconData178.node;
+var RotateCw = createLucideIcon(__iconData178);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/route.mjs
-var __iconData178 = {
+var __iconData179 = {
   name: "route",
   size: 24,
   node: [
@@ -17972,11 +17988,11 @@ var __iconData178 = {
     ["circle", { cx: "18", cy: "5", r: "3", key: "gq8acd" }]
   ]
 };
-__iconData178.node;
-var Route = createLucideIcon(__iconData178);
+__iconData179.node;
+var Route = createLucideIcon(__iconData179);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/ruler.mjs
-var __iconData179 = {
+var __iconData180 = {
   name: "ruler",
   size: 24,
   node: [
@@ -17993,11 +18009,11 @@ var __iconData179 = {
     ["path", { d: "m17.5 15.5 2-2", key: "wo5hmg" }]
   ]
 };
-__iconData179.node;
-var Ruler = createLucideIcon(__iconData179);
+__iconData180.node;
+var Ruler = createLucideIcon(__iconData180);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/save.mjs
-var __iconData180 = {
+var __iconData181 = {
   name: "save",
   size: 24,
   node: [
@@ -18012,11 +18028,11 @@ var __iconData180 = {
     ["path", { d: "M7 3v4a1 1 0 0 0 1 1h7", key: "t51u73" }]
   ]
 };
-__iconData180.node;
-var Save = createLucideIcon(__iconData180);
+__iconData181.node;
+var Save = createLucideIcon(__iconData181);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/scale.mjs
-var __iconData181 = {
+var __iconData182 = {
   name: "scale",
   size: 24,
   node: [
@@ -18027,11 +18043,11 @@ var __iconData181 = {
     ["path", { d: "M7 21h10", key: "1b0cd5" }]
   ]
 };
-__iconData181.node;
-var Scale = createLucideIcon(__iconData181);
+__iconData182.node;
+var Scale = createLucideIcon(__iconData182);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/scan-eye.mjs
-var __iconData182 = {
+var __iconData183 = {
   name: "scan-eye",
   size: 24,
   node: [
@@ -18049,11 +18065,11 @@ var __iconData182 = {
     ]
   ]
 };
-__iconData182.node;
-var ScanEye = createLucideIcon(__iconData182);
+__iconData183.node;
+var ScanEye = createLucideIcon(__iconData183);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/scan-face.mjs
-var __iconData183 = {
+var __iconData184 = {
   name: "scan-face",
   size: 24,
   node: [
@@ -18066,11 +18082,11 @@ var __iconData183 = {
     ["path", { d: "M15 9h.01", key: "x1ddxp" }]
   ]
 };
-__iconData183.node;
-var ScanFace = createLucideIcon(__iconData183);
+__iconData184.node;
+var ScanFace = createLucideIcon(__iconData184);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/scissors.mjs
-var __iconData184 = {
+var __iconData185 = {
   name: "scissors",
   size: 24,
   node: [
@@ -18081,11 +18097,11 @@ var __iconData184 = {
     ["path", { d: "M14.8 14.8 20 20", key: "ptml3r" }]
   ]
 };
-__iconData184.node;
-var Scissors = createLucideIcon(__iconData184);
+__iconData185.node;
+var Scissors = createLucideIcon(__iconData185);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/search.mjs
-var __iconData185 = {
+var __iconData186 = {
   name: "search",
   size: 24,
   node: [
@@ -18093,11 +18109,11 @@ var __iconData185 = {
     ["circle", { cx: "11", cy: "11", r: "8", key: "4ej97u" }]
   ]
 };
-__iconData185.node;
-var Search = createLucideIcon(__iconData185);
+__iconData186.node;
+var Search = createLucideIcon(__iconData186);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/send.mjs
-var __iconData186 = {
+var __iconData187 = {
   name: "send",
   size: 24,
   node: [
@@ -18111,11 +18127,11 @@ var __iconData186 = {
     ["path", { d: "m21.854 2.147-10.94 10.939", key: "12cjpa" }]
   ]
 };
-__iconData186.node;
-var Send = createLucideIcon(__iconData186);
+__iconData187.node;
+var Send = createLucideIcon(__iconData187);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/settings-2.mjs
-var __iconData187 = {
+var __iconData188 = {
   name: "settings-2",
   size: 24,
   node: [
@@ -18125,11 +18141,11 @@ var __iconData187 = {
     ["circle", { cx: "7", cy: "7", r: "3", key: "dfmy0x" }]
   ]
 };
-__iconData187.node;
-var Settings2 = createLucideIcon(__iconData187);
+__iconData188.node;
+var Settings2 = createLucideIcon(__iconData188);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/settings.mjs
-var __iconData188 = {
+var __iconData189 = {
   name: "settings",
   size: 24,
   node: [
@@ -18143,11 +18159,11 @@ var __iconData188 = {
     ["circle", { cx: "12", cy: "12", r: "3", key: "1v7zrd" }]
   ]
 };
-__iconData188.node;
-var Settings = createLucideIcon(__iconData188);
+__iconData189.node;
+var Settings = createLucideIcon(__iconData189);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/shapes.mjs
-var __iconData189 = {
+var __iconData190 = {
   name: "shapes",
   size: 24,
   node: [
@@ -18162,11 +18178,11 @@ var __iconData189 = {
     ["circle", { cx: "17.5", cy: "17.5", r: "3.5", key: "w3z12y" }]
   ]
 };
-__iconData189.node;
-var Shapes = createLucideIcon(__iconData189);
+__iconData190.node;
+var Shapes = createLucideIcon(__iconData190);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/share-2.mjs
-var __iconData190 = {
+var __iconData191 = {
   name: "share-2",
   size: 24,
   node: [
@@ -18177,11 +18193,11 @@ var __iconData190 = {
     ["line", { x1: "15.41", x2: "8.59", y1: "6.51", y2: "10.49", key: "1n3mei" }]
   ]
 };
-__iconData190.node;
-var Share2 = createLucideIcon(__iconData190);
+__iconData191.node;
+var Share2 = createLucideIcon(__iconData191);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/shield-check.mjs
-var __iconData191 = {
+var __iconData192 = {
   name: "shield-check",
   size: 24,
   node: [
@@ -18195,11 +18211,11 @@ var __iconData191 = {
     ["path", { d: "m9 12 2 2 4-4", key: "dzmm74" }]
   ]
 };
-__iconData191.node;
-var ShieldCheck = createLucideIcon(__iconData191);
+__iconData192.node;
+var ShieldCheck = createLucideIcon(__iconData192);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/shrub.mjs
-var __iconData192 = {
+var __iconData193 = {
   name: "shrub",
   size: 24,
   node: [
@@ -18211,11 +18227,11 @@ var __iconData192 = {
     ]
   ]
 };
-__iconData192.node;
-var Shrub = createLucideIcon(__iconData192);
+__iconData193.node;
+var Shrub = createLucideIcon(__iconData193);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/shuffle.mjs
-var __iconData193 = {
+var __iconData194 = {
   name: "shuffle",
   size: 24,
   node: [
@@ -18226,11 +18242,11 @@ var __iconData193 = {
     ["path", { d: "M22 18h-6.041a4 4 0 0 1-3.3-1.8l-.359-.45", key: "os18l9" }]
   ]
 };
-__iconData193.node;
-var Shuffle = createLucideIcon(__iconData193);
+__iconData194.node;
+var Shuffle = createLucideIcon(__iconData194);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/skip-forward.mjs
-var __iconData194 = {
+var __iconData195 = {
   name: "skip-forward",
   size: 24,
   node: [
@@ -18244,11 +18260,11 @@ var __iconData194 = {
     ]
   ]
 };
-__iconData194.node;
-var SkipForward = createLucideIcon(__iconData194);
+__iconData195.node;
+var SkipForward = createLucideIcon(__iconData195);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/sliders-horizontal.mjs
-var __iconData195 = {
+var __iconData196 = {
   name: "sliders-horizontal",
   size: 24,
   node: [
@@ -18263,11 +18279,11 @@ var __iconData195 = {
     ["path", { d: "M8 12H3", key: "a7s4jb" }]
   ]
 };
-__iconData195.node;
-var SlidersHorizontal = createLucideIcon(__iconData195);
+__iconData196.node;
+var SlidersHorizontal = createLucideIcon(__iconData196);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/smartphone.mjs
-var __iconData196 = {
+var __iconData197 = {
   name: "smartphone",
   size: 24,
   node: [
@@ -18275,11 +18291,11 @@ var __iconData196 = {
     ["path", { d: "M12 18h.01", key: "mhygvu" }]
   ]
 };
-__iconData196.node;
-var Smartphone = createLucideIcon(__iconData196);
+__iconData197.node;
+var Smartphone = createLucideIcon(__iconData197);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/snowflake.mjs
-var __iconData197 = {
+var __iconData198 = {
   name: "snowflake",
   size: 24,
   node: [
@@ -18297,11 +18313,11 @@ var __iconData197 = {
     ["path", { d: "m7 3 3 6h4", key: "1otusx" }]
   ]
 };
-__iconData197.node;
-var Snowflake = createLucideIcon(__iconData197);
+__iconData198.node;
+var Snowflake = createLucideIcon(__iconData198);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/sparkle.mjs
-var __iconData198 = {
+var __iconData199 = {
   name: "sparkle",
   size: 24,
   node: [
@@ -18314,11 +18330,11 @@ var __iconData198 = {
     ]
   ]
 };
-__iconData198.node;
-var Sparkle = createLucideIcon(__iconData198);
+__iconData199.node;
+var Sparkle = createLucideIcon(__iconData199);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/sparkles.mjs
-var __iconData199 = {
+var __iconData200 = {
   name: "sparkles",
   size: 24,
   node: [
@@ -18335,11 +18351,11 @@ var __iconData199 = {
   ],
   aliases: ["stars"]
 };
-__iconData199.node;
-var Sparkles = createLucideIcon(__iconData199);
+__iconData200.node;
+var Sparkles = createLucideIcon(__iconData200);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/spline.mjs
-var __iconData200 = {
+var __iconData201 = {
   name: "spline",
   size: 24,
   node: [
@@ -18348,11 +18364,11 @@ var __iconData200 = {
     ["path", { d: "M5 17A12 12 0 0 1 17 5", key: "1okkup" }]
   ]
 };
-__iconData200.node;
-var Spline = createLucideIcon(__iconData200);
+__iconData201.node;
+var Spline = createLucideIcon(__iconData201);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/sprout.mjs
-var __iconData201 = {
+var __iconData202 = {
   name: "sprout",
   size: 24,
   node: [
@@ -18367,11 +18383,11 @@ var __iconData201 = {
     ["path", { d: "M5 21h14", key: "11awu3" }]
   ]
 };
-__iconData201.node;
-var Sprout = createLucideIcon(__iconData201);
+__iconData202.node;
+var Sprout = createLucideIcon(__iconData202);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/square-check-big.mjs
-var __iconData202 = {
+var __iconData203 = {
   name: "square-check-big",
   size: 24,
   node: [
@@ -18383,11 +18399,11 @@ var __iconData202 = {
   ],
   aliases: ["check-square"]
 };
-__iconData202.node;
-var SquareCheckBig = createLucideIcon(__iconData202);
+__iconData203.node;
+var SquareCheckBig = createLucideIcon(__iconData203);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/square-dashed.mjs
-var __iconData203 = {
+var __iconData204 = {
   name: "square-dashed",
   size: 24,
   node: [
@@ -18406,20 +18422,20 @@ var __iconData203 = {
   ],
   aliases: ["box-select"]
 };
-__iconData203.node;
-var SquareDashed = createLucideIcon(__iconData203);
+__iconData204.node;
+var SquareDashed = createLucideIcon(__iconData204);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/square.mjs
-var __iconData204 = {
+var __iconData205 = {
   name: "square",
   size: 24,
   node: [["rect", { width: "18", height: "18", x: "3", y: "3", rx: "2", key: "afitv7" }]]
 };
-__iconData204.node;
-var Square = createLucideIcon(__iconData204);
+__iconData205.node;
+var Square = createLucideIcon(__iconData205);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/star.mjs
-var __iconData205 = {
+var __iconData206 = {
   name: "star",
   size: 24,
   node: [
@@ -18432,11 +18448,11 @@ var __iconData205 = {
     ]
   ]
 };
-__iconData205.node;
-var Star = createLucideIcon(__iconData205);
+__iconData206.node;
+var Star = createLucideIcon(__iconData206);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/step-back.mjs
-var __iconData206 = {
+var __iconData207 = {
   name: "step-back",
   size: 24,
   node: [
@@ -18450,11 +18466,11 @@ var __iconData206 = {
     ["path", { d: "M21 20V4", key: "cb8qj8" }]
   ]
 };
-__iconData206.node;
-var StepBack = createLucideIcon(__iconData206);
+__iconData207.node;
+var StepBack = createLucideIcon(__iconData207);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/step-forward.mjs
-var __iconData207 = {
+var __iconData208 = {
   name: "step-forward",
   size: 24,
   node: [
@@ -18468,11 +18484,11 @@ var __iconData207 = {
     ["path", { d: "M3 4v16", key: "1ph11n" }]
   ]
 };
-__iconData207.node;
-var StepForward = createLucideIcon(__iconData207);
+__iconData208.node;
+var StepForward = createLucideIcon(__iconData208);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/sun-medium.mjs
-var __iconData208 = {
+var __iconData209 = {
   name: "sun-medium",
   size: 24,
   node: [
@@ -18487,11 +18503,11 @@ var __iconData208 = {
     ["path", { d: "m17.657 17.657.707.707", key: "vl76zb" }]
   ]
 };
-__iconData208.node;
-var SunMedium = createLucideIcon(__iconData208);
+__iconData209.node;
+var SunMedium = createLucideIcon(__iconData209);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/sun-moon.mjs
-var __iconData209 = {
+var __iconData210 = {
   name: "sun-moon",
   size: 24,
   node: [
@@ -18508,11 +18524,11 @@ var __iconData209 = {
     ["path", { d: "M20 12h2", key: "1q8mjw" }]
   ]
 };
-__iconData209.node;
-var SunMoon = createLucideIcon(__iconData209);
+__iconData210.node;
+var SunMoon = createLucideIcon(__iconData210);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/sun.mjs
-var __iconData210 = {
+var __iconData211 = {
   name: "sun",
   size: 24,
   node: [
@@ -18527,11 +18543,11 @@ var __iconData210 = {
     ["path", { d: "m19.07 4.93-1.41 1.41", key: "1shlcs" }]
   ]
 };
-__iconData210.node;
-var Sun = createLucideIcon(__iconData210);
+__iconData211.node;
+var Sun = createLucideIcon(__iconData211);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/sunset.mjs
-var __iconData211 = {
+var __iconData212 = {
   name: "sunset",
   size: 24,
   node: [
@@ -18545,11 +18561,11 @@ var __iconData211 = {
     ["path", { d: "M16 18a4 4 0 0 0-8 0", key: "1lzouq" }]
   ]
 };
-__iconData211.node;
-var Sunset = createLucideIcon(__iconData211);
+__iconData212.node;
+var Sunset = createLucideIcon(__iconData212);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/swords.mjs
-var __iconData212 = {
+var __iconData213 = {
   name: "swords",
   size: 24,
   node: [
@@ -18575,11 +18591,11 @@ var __iconData212 = {
     ["path", { d: "M7.5 16.5 4 20", key: "14nozp" }]
   ]
 };
-__iconData212.node;
-var Swords = createLucideIcon(__iconData212);
+__iconData213.node;
+var Swords = createLucideIcon(__iconData213);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/table-2.mjs
-var __iconData213 = {
+var __iconData214 = {
   name: "table-2",
   size: 24,
   node: [
@@ -18588,11 +18604,11 @@ var __iconData213 = {
     ["rect", { x: "3", y: "3", width: "18", height: "18", rx: "2", key: "h1oib" }]
   ]
 };
-__iconData213.node;
-var Table2 = createLucideIcon(__iconData213);
+__iconData214.node;
+var Table2 = createLucideIcon(__iconData214);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/tablet.mjs
-var __iconData214 = {
+var __iconData215 = {
   name: "tablet",
   size: 24,
   node: [
@@ -18600,11 +18616,11 @@ var __iconData214 = {
     ["line", { x1: "12", x2: "12.01", y1: "18", y2: "18", key: "1dp563" }]
   ]
 };
-__iconData214.node;
-var Tablet = createLucideIcon(__iconData214);
+__iconData215.node;
+var Tablet = createLucideIcon(__iconData215);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/terminal.mjs
-var __iconData215 = {
+var __iconData216 = {
   name: "terminal",
   size: 24,
   node: [
@@ -18612,11 +18628,11 @@ var __iconData215 = {
     ["path", { d: "m4 17 6-6-6-6", key: "1yngyt" }]
   ]
 };
-__iconData215.node;
-var Terminal = createLucideIcon(__iconData215);
+__iconData216.node;
+var Terminal = createLucideIcon(__iconData216);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/text-align-center.mjs
-var __iconData216 = {
+var __iconData217 = {
   name: "text-align-center",
   size: 24,
   node: [
@@ -18626,11 +18642,11 @@ var __iconData216 = {
   ],
   aliases: ["align-center"]
 };
-__iconData216.node;
-var TextAlignCenter = createLucideIcon(__iconData216);
+__iconData217.node;
+var TextAlignCenter = createLucideIcon(__iconData217);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/text-align-end.mjs
-var __iconData217 = {
+var __iconData218 = {
   name: "text-align-end",
   size: 24,
   node: [
@@ -18640,11 +18656,11 @@ var __iconData217 = {
   ],
   aliases: ["align-right"]
 };
-__iconData217.node;
-var TextAlignEnd = createLucideIcon(__iconData217);
+__iconData218.node;
+var TextAlignEnd = createLucideIcon(__iconData218);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/text-align-start.mjs
-var __iconData218 = {
+var __iconData219 = {
   name: "text-align-start",
   size: 24,
   node: [
@@ -18654,11 +18670,11 @@ var __iconData218 = {
   ],
   aliases: ["text", "align-left"]
 };
-__iconData218.node;
-var TextAlignStart = createLucideIcon(__iconData218);
+__iconData219.node;
+var TextAlignStart = createLucideIcon(__iconData219);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/text-cursor-input.mjs
-var __iconData219 = {
+var __iconData220 = {
   name: "text-cursor-input",
   size: 24,
   node: [
@@ -18669,11 +18685,11 @@ var __iconData219 = {
     ["path", { d: "M9 6v12", key: "velyjx" }]
   ]
 };
-__iconData219.node;
-var TextCursorInput = createLucideIcon(__iconData219);
+__iconData220.node;
+var TextCursorInput = createLucideIcon(__iconData220);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/timer.mjs
-var __iconData220 = {
+var __iconData221 = {
   name: "timer",
   size: 24,
   node: [
@@ -18682,11 +18698,11 @@ var __iconData220 = {
     ["circle", { cx: "12", cy: "14", r: "8", key: "1e1u0o" }]
   ]
 };
-__iconData220.node;
-var Timer2 = createLucideIcon(__iconData220);
+__iconData221.node;
+var Timer2 = createLucideIcon(__iconData221);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/traffic-cone.mjs
-var __iconData221 = {
+var __iconData222 = {
   name: "traffic-cone",
   size: 24,
   node: [
@@ -18702,11 +18718,11 @@ var __iconData221 = {
     ["path", { d: "M9.194 6.57a5 2.5 0 0 0 5.61 0", key: "15hn5c" }]
   ]
 };
-__iconData221.node;
-var TrafficCone = createLucideIcon(__iconData221);
+__iconData222.node;
+var TrafficCone = createLucideIcon(__iconData222);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/trash.mjs
-var __iconData222 = {
+var __iconData223 = {
   name: "trash",
   size: 24,
   node: [
@@ -18718,11 +18734,11 @@ var __iconData222 = {
   ],
   aliases: ["trash-2"]
 };
-__iconData222.node;
-var Trash = createLucideIcon(__iconData222);
+__iconData223.node;
+var Trash = createLucideIcon(__iconData223);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/tree-deciduous.mjs
-var __iconData223 = {
+var __iconData224 = {
   name: "tree-deciduous",
   size: 24,
   node: [
@@ -18736,11 +18752,11 @@ var __iconData223 = {
     ["path", { d: "M12 19v3", key: "npa21l" }]
   ]
 };
-__iconData223.node;
-var TreeDeciduous = createLucideIcon(__iconData223);
+__iconData224.node;
+var TreeDeciduous = createLucideIcon(__iconData224);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/tree-palm.mjs
-var __iconData224 = {
+var __iconData225 = {
   name: "tree-palm",
   size: 24,
   node: [
@@ -18760,11 +18776,11 @@ var __iconData224 = {
   ],
   aliases: ["palmtree"]
 };
-__iconData224.node;
-var TreePalm = createLucideIcon(__iconData224);
+__iconData225.node;
+var TreePalm = createLucideIcon(__iconData225);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/tree-pine.mjs
-var __iconData225 = {
+var __iconData226 = {
   name: "tree-pine",
   size: 24,
   node: [
@@ -18778,11 +18794,11 @@ var __iconData225 = {
     ["path", { d: "M12 22v-3", key: "kmzjlo" }]
   ]
 };
-__iconData225.node;
-var TreePine = createLucideIcon(__iconData225);
+__iconData226.node;
+var TreePine = createLucideIcon(__iconData226);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/trees.mjs
-var __iconData226 = {
+var __iconData227 = {
   name: "trees",
   size: 24,
   node: [
@@ -18801,11 +18817,11 @@ var __iconData226 = {
     ]
   ]
 };
-__iconData226.node;
-var Trees = createLucideIcon(__iconData226);
+__iconData227.node;
+var Trees = createLucideIcon(__iconData227);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/trending-up.mjs
-var __iconData227 = {
+var __iconData228 = {
   name: "trending-up",
   size: 24,
   node: [
@@ -18813,11 +18829,11 @@ var __iconData227 = {
     ["path", { d: "m22 7-8.5 8.5-5-5L2 17", key: "1t1m79" }]
   ]
 };
-__iconData227.node;
-var TrendingUp = createLucideIcon(__iconData227);
+__iconData228.node;
+var TrendingUp = createLucideIcon(__iconData228);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/triangle-alert.mjs
-var __iconData228 = {
+var __iconData229 = {
   name: "triangle-alert",
   size: 24,
   node: [
@@ -18833,11 +18849,11 @@ var __iconData228 = {
   ],
   aliases: ["alert-triangle"]
 };
-__iconData228.node;
-var TriangleAlert = createLucideIcon(__iconData228);
+__iconData229.node;
+var TriangleAlert = createLucideIcon(__iconData229);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/tv.mjs
-var __iconData229 = {
+var __iconData230 = {
   name: "tv",
   size: 24,
   node: [
@@ -18845,11 +18861,11 @@ var __iconData229 = {
     ["rect", { width: "20", height: "15", x: "2", y: "7", rx: "2", key: "1e6viu" }]
   ]
 };
-__iconData229.node;
-var Tv = createLucideIcon(__iconData229);
+__iconData230.node;
+var Tv = createLucideIcon(__iconData230);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/type.mjs
-var __iconData230 = {
+var __iconData231 = {
   name: "type",
   size: 24,
   node: [
@@ -18858,11 +18874,11 @@ var __iconData230 = {
     ["path", { d: "M9 20h6", key: "s66wpe" }]
   ]
 };
-__iconData230.node;
-var Type = createLucideIcon(__iconData230);
+__iconData231.node;
+var Type = createLucideIcon(__iconData231);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/undo-2.mjs
-var __iconData231 = {
+var __iconData232 = {
   name: "undo-2",
   size: 24,
   node: [
@@ -18870,11 +18886,11 @@ var __iconData231 = {
     ["path", { d: "M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5a5.5 5.5 0 0 1-5.5 5.5H11", key: "f3b9sd" }]
   ]
 };
-__iconData231.node;
-var Undo2 = createLucideIcon(__iconData231);
+__iconData232.node;
+var Undo2 = createLucideIcon(__iconData232);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/ungroup.mjs
-var __iconData232 = {
+var __iconData233 = {
   name: "ungroup",
   size: 24,
   node: [
@@ -18882,11 +18898,11 @@ var __iconData232 = {
     ["rect", { x: "3", y: "3", width: "10", height: "7", rx: "2", key: "1ljebb" }]
   ]
 };
-__iconData232.node;
-var Ungroup = createLucideIcon(__iconData232);
+__iconData233.node;
+var Ungroup = createLucideIcon(__iconData233);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/upload.mjs
-var __iconData233 = {
+var __iconData234 = {
   name: "upload",
   size: 24,
   node: [
@@ -18895,11 +18911,11 @@ var __iconData233 = {
     ["path", { d: "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4", key: "ih7n3h" }]
   ]
 };
-__iconData233.node;
-var Upload = createLucideIcon(__iconData233);
+__iconData234.node;
+var Upload = createLucideIcon(__iconData234);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/user-round.mjs
-var __iconData234 = {
+var __iconData235 = {
   name: "user-round",
   size: 24,
   node: [
@@ -18908,11 +18924,11 @@ var __iconData234 = {
   ],
   aliases: ["user-2"]
 };
-__iconData234.node;
-var UserRound = createLucideIcon(__iconData234);
+__iconData235.node;
+var UserRound = createLucideIcon(__iconData235);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/user.mjs
-var __iconData235 = {
+var __iconData236 = {
   name: "user",
   size: 24,
   node: [
@@ -18920,11 +18936,11 @@ var __iconData235 = {
     ["circle", { cx: "12", cy: "7", r: "4", key: "17ys0d" }]
   ]
 };
-__iconData235.node;
-var User = createLucideIcon(__iconData235);
+__iconData236.node;
+var User = createLucideIcon(__iconData236);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/users.mjs
-var __iconData236 = {
+var __iconData237 = {
   name: "users",
   size: 24,
   node: [
@@ -18934,11 +18950,11 @@ var __iconData236 = {
     ["circle", { cx: "9", cy: "7", r: "4", key: "nufk8" }]
   ]
 };
-__iconData236.node;
-var Users = createLucideIcon(__iconData236);
+__iconData237.node;
+var Users = createLucideIcon(__iconData237);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/video.mjs
-var __iconData237 = {
+var __iconData238 = {
   name: "video",
   size: 24,
   node: [
@@ -18952,11 +18968,11 @@ var __iconData237 = {
     ["rect", { x: "2", y: "6", width: "14", height: "12", rx: "2", key: "158x01" }]
   ]
 };
-__iconData237.node;
-var Video = createLucideIcon(__iconData237);
+__iconData238.node;
+var Video = createLucideIcon(__iconData238);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/volume-2.mjs
-var __iconData238 = {
+var __iconData239 = {
   name: "volume-2",
   size: 24,
   node: [
@@ -18971,11 +18987,11 @@ var __iconData238 = {
     ["path", { d: "M19.364 18.364a9 9 0 0 0 0-12.728", key: "ijwkga" }]
   ]
 };
-__iconData238.node;
-var Volume2 = createLucideIcon(__iconData238);
+__iconData239.node;
+var Volume2 = createLucideIcon(__iconData239);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/volume-x.mjs
-var __iconData239 = {
+var __iconData240 = {
   name: "volume-x",
   size: 24,
   node: [
@@ -18990,11 +19006,11 @@ var __iconData239 = {
     ["path", { d: "m16.5 9.5 5 5", key: "1akey5" }]
   ]
 };
-__iconData239.node;
-var VolumeX = createLucideIcon(__iconData239);
+__iconData240.node;
+var VolumeX = createLucideIcon(__iconData240);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/wand-sparkles.mjs
-var __iconData240 = {
+var __iconData241 = {
   name: "wand-sparkles",
   size: 24,
   node: [
@@ -19015,11 +19031,11 @@ var __iconData240 = {
   ],
   aliases: ["wand-2"]
 };
-__iconData240.node;
-var WandSparkles = createLucideIcon(__iconData240);
+__iconData241.node;
+var WandSparkles = createLucideIcon(__iconData241);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/waves-horizontal.mjs
-var __iconData241 = {
+var __iconData242 = {
   name: "waves-horizontal",
   size: 24,
   node: [
@@ -19029,11 +19045,11 @@ var __iconData241 = {
   ],
   aliases: ["waves"]
 };
-__iconData241.node;
-var WavesHorizontal = createLucideIcon(__iconData241);
+__iconData242.node;
+var WavesHorizontal = createLucideIcon(__iconData242);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/wind.mjs
-var __iconData242 = {
+var __iconData243 = {
   name: "wind",
   size: 24,
   node: [
@@ -19042,11 +19058,11 @@ var __iconData242 = {
     ["path", { d: "M9.8 4.4A2 2 0 1 1 11 8H2", key: "75valh" }]
   ]
 };
-__iconData242.node;
-var Wind = createLucideIcon(__iconData242);
+__iconData243.node;
+var Wind = createLucideIcon(__iconData243);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/workflow.mjs
-var __iconData243 = {
+var __iconData244 = {
   name: "workflow",
   size: 24,
   node: [
@@ -19055,11 +19071,11 @@ var __iconData243 = {
     ["rect", { width: "8", height: "8", x: "13", y: "13", rx: "2", key: "1cgmvn" }]
   ]
 };
-__iconData243.node;
-var Workflow = createLucideIcon(__iconData243);
+__iconData244.node;
+var Workflow = createLucideIcon(__iconData244);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/wrench.mjs
-var __iconData244 = {
+var __iconData245 = {
   name: "wrench",
   size: 24,
   node: [
@@ -19072,11 +19088,11 @@ var __iconData244 = {
     ]
   ]
 };
-__iconData244.node;
-var Wrench = createLucideIcon(__iconData244);
+__iconData245.node;
+var Wrench = createLucideIcon(__iconData245);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/x.mjs
-var __iconData245 = {
+var __iconData246 = {
   name: "x",
   size: 24,
   node: [
@@ -19084,11 +19100,11 @@ var __iconData245 = {
     ["path", { d: "m6 6 12 12", key: "d8bk6v" }]
   ]
 };
-__iconData245.node;
-var X = createLucideIcon(__iconData245);
+__iconData246.node;
+var X = createLucideIcon(__iconData246);
 
 // ../../../../../genvr/node_modules/.pnpm/lucide-react@1.48.0_react@19.3.0/node_modules/lucide-react/dist/esm/icons/zap.mjs
-var __iconData246 = {
+var __iconData247 = {
   name: "zap",
   size: 24,
   node: [
@@ -19101,8 +19117,8 @@ var __iconData246 = {
     ]
   ]
 };
-__iconData246.node;
-var Zap = createLucideIcon(__iconData246);
+__iconData247.node;
+var Zap = createLucideIcon(__iconData247);
 
 // ../world/dist/terrain-fields.js
 var stride = (channel) => channel.encoding === "u8" ? 1 : 4;
@@ -21177,8 +21193,8 @@ function isFieldCommand(command) {
 }
 var TerrainFieldStateError = class extends Error {
   code;
-  constructor(code2, message2) {
-    super(message2);
+  constructor(code2, message3) {
+    super(message3);
     this.code = code2;
   }
 };
@@ -22700,8 +22716,8 @@ var ACTIVE_SURFACE_BLOCKED = /* @__PURE__ */ new Set([
 ]);
 var CommandError = class extends Error {
   code;
-  constructor(code2, message2) {
-    super(message2);
+  constructor(code2, message3) {
+    super(message3);
     this.code = code2;
   }
 };
@@ -24866,7 +24882,7 @@ var DESCRIPTIONS = {
   share_studio: "Inspect sharing capability, open the separate Share dialog, or create a host-authorized world/Avatar Live link. Creating requires explicit user authorization and an attached platform sharing service; local SDK cannot publish private data. Password enforcement belongs to the host server.",
   avatar_studio: "Avatar tab: inspect the character (recipe, view, bones, height, whether the face can move); set merges recipe parts (name, body, shape {height, weight, scale, anime, muscle, fat, fatPattern, definition, muscles {group: -1..1}, fatRegions {region: -1..1}, face {feature: -1..1}}, colors {skin, hair, top, bottom, shoes}, hair); view sets the view mode (skeleton, muscles, fat\u2026) and shading; expression holds a facial expression; play a move by id; save the character to My characters; export the recipe JSON; reset_shape back to the normal shape; undo / redo step through the character edits. Works on the live Studio only.",
   present_avatar: "Use kind display to open/configure Avatar Live layouts (large, desktop, browser, compact, banner, circle, watch), background and framing. For saved world backgrounds, use worldId from inspect_studio.availableWorlds and optional worldSpot {position,target,player} XYZ coordinates; set worldId/worldSpot to null for the current live world view. Optionally show a gesture, facial expression, visual effect, notification or rich card when useful. Transient, never saves the world. target is self or a host agent ID. Use only available Core animation IDs. Never invent live app or stock data. No action permissions are granted by a card.",
-  motion_lab: "Motion lab (only in a motion lab project): { operation: { kind } }. Kinds: commands (list with help), inspect, course_get, course_set, obstacle_add {obstacle: {kind step|ramp|gap|low_wall|window, z, sizes in metres}}, obstacle_set {id, set}, obstacle_remove {id}, course_from_seed {seed, obstacles?, hardness?, street?}, traffic_set {street?, cars?}, settings_set {settings}, run {settings?, version?} (fixed step + seed, returns score and events), runs_list, scores {run?}, frame {run?, t}, view_set {overlays?, speed?}, versions, save_version {run?, note?}, save_best {version} (only asks: the owner confirms it in the Lab), rollback {version}, version_delete {version, confirm: true} (only versions an agent made, never the best). Read inspect before changing the course.",
+  motion_lab: "Motion lab (only in a motion lab project): { operation: { kind } }. Kinds: commands (list with help), inspect, course_get, course_set, obstacle_add {obstacle: {kind step|ramp|gap|low_wall|window, z, sizes in metres}}, obstacle_set {id, set}, obstacle_remove {id}, course_from_seed {seed, obstacles?, hardness?, street?}, traffic_set {street?, cars?}, settings_set {settings}, run {settings?, version?} (fixed step + seed, returns score and events), runs_list, scores {run?}, frame {run?, t}, view_set {overlays?, speed?}, versions, save_version {run?, note?}, save_best {version} (only asks: the owner confirms it in the Lab), rollback {version}, version_delete {version, confirm: true} (only versions an agent made, never the best). Sharing with the GenVR community (publishing): motions_mine (share state, rights), motion_similar {version}, share_prepare {version, share: {name, description?, tags?, preview_s?}} (prepares only), share {version, confirm: true} (owner only: you are refused, the owner confirms in the Lab), unshare {version, confirm: true}. Never prepare a share the owner did not ask for. Read inspect before changing the course.",
   get_resource_controls: "Read supported controls, scope, source defaults and documentation for a Core model or ocean resource. Models use instance-scoped set_resource_params; oceans use world-scoped set_sea. Empty model controls means no generated settings; creator package controls are not described.",
   set_resource_params: "Change supported generated controls on one placed Core item. Use keys and ranges from get_resource_controls; null removes an instance override and restores its resource default. Saved as a normal undoable change. Does not change world defaults or arbitrary script parameters.",
   get_world_summary: "Describe the place now: size, style, sky, items with ids and positions, roads, walls, water, rivers, and the sea. Items come 100 at a time; more_items_from names the from_item of the next page.",
@@ -25983,7 +25999,7 @@ function checkItemRules(item2, rules, env, others, nameOf2) {
   const name2 = nameOf2(instance2);
   const [cx, cz] = feet[0];
   const results = [];
-  const result = (rule, label12, message2, fix = null) => results.push({ rule, label: label12, ok: message2 === null, message: message2, fix: message2 === null ? null : fix });
+  const result = (rule, label13, message3, fix = null) => results.push({ rule, label: label13, ok: message3 === null, message: message3, fix: message3 === null ? null : fix });
   if (rules.maxTilt !== void 0 && rules.maxTilt < 180) {
     const up2 = rotate([0, 1, 0], instance2.transform.rotation);
     const lean = toDegrees(Math.acos(Math.max(-1, Math.min(1, up2[1]))));
@@ -26017,8 +26033,8 @@ function checkItemRules(item2, rules, env, others, nameOf2) {
   })();
   if (rules.stands && resting) {
     const words = { ground: "the ground", built: "floors or other items", water: "water" };
-    const message2 = rules.stands.includes(resting) ? null : resting === "water" ? `${name2} stands in water; it belongs on ${list(rules.stands.map((s2) => words[s2]))}.` : resting === "built" ? `${name2} stands on a built thing; it belongs on ${list(rules.stands.map((s2) => words[s2]))}.` : `${name2} stands on the ground; it belongs on ${list(rules.stands.map((s2) => words[s2]))}.`;
-    result("stands", `Stands on ${list(rules.stands.map((s2) => words[s2]))}`, message2);
+    const message3 = rules.stands.includes(resting) ? null : resting === "water" ? `${name2} stands in water; it belongs on ${list(rules.stands.map((s2) => words[s2]))}.` : resting === "built" ? `${name2} stands on a built thing; it belongs on ${list(rules.stands.map((s2) => words[s2]))}.` : `${name2} stands on the ground; it belongs on ${list(rules.stands.map((s2) => words[s2]))}.`;
+    result("stands", `Stands on ${list(rules.stands.map((s2) => words[s2]))}`, message3);
   }
   if (rules.soils && resting === "ground" && env.soilAt) {
     const soil = env.soilAt(cx, cz);
@@ -29751,10 +29767,10 @@ function ShareDialog({ projectId, layout: layout2, display, initialSurface, shar
       setBusy(false);
     }
   };
-  const copy = async (text5, label12) => {
+  const copy = async (text5, label13) => {
     try {
       await navigator.clipboard.writeText(text5);
-      setCopied(label12);
+      setCopied(label13);
     } catch {
       setError("Select and copy the text below.");
     }
@@ -29775,25 +29791,25 @@ function ShareDialog({ projectId, layout: layout2, display, initialSurface, shar
       /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { "aria-label": "Close sharing", onClick: close, className: "rounded-lg p-2 hover:bg-ink/10", children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(X, { className: "size-4" }) })
     ] }),
     /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "space-y-5 overflow-auto p-5", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { role: "group", "aria-label": "What to share", className: "inline-flex gap-1 rounded-xl border border-ink/15 p-1", children: [["avatar-live", "Avatar Live", Monitor], ["world", "World", Globe]].map(([id2, label12, Icon2]) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", { "aria-pressed": surface3 === id2, className: pill(surface3 === id2), onClick: () => {
+      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { role: "group", "aria-label": "What to share", className: "inline-flex gap-1 rounded-xl border border-ink/15 p-1", children: [["avatar-live", "Avatar Live", Monitor], ["world", "World", Globe]].map(([id2, label13, Icon2]) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", { "aria-pressed": surface3 === id2, className: pill(surface3 === id2), onClick: () => {
         setSurface(id2);
         reset();
       }, children: [
         /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Icon2, { className: "size-4" }),
-        label12
+        label13
       ] }, id2)) }),
       /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("fieldset", { children: [
         /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("legend", { className: "mb-2 flex items-center gap-2 text-xs font-bold", children: [
           /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ShieldCheck, { className: "size-4" }),
           "Who can open it"
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "grid grid-cols-1 gap-2 sm:grid-cols-3", children: ACCESS.map(({ id: id2, label: label12, hint, Icon: Icon2 }) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", { "aria-pressed": access === id2, className: tile(access === id2), onClick: () => {
+        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "grid grid-cols-1 gap-2 sm:grid-cols-3", children: ACCESS.map(({ id: id2, label: label13, hint, Icon: Icon2 }) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", { "aria-pressed": access === id2, className: tile(access === id2), onClick: () => {
           setAccess(id2);
           reset();
         }, children: [
           /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { className: "flex items-center gap-2 font-bold", children: [
             /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Icon2, { className: "size-4" }),
-            label12
+            label13
           ] }),
           /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "text-ink/60", children: hint })
         ] }, id2)) }),
@@ -29821,13 +29837,13 @@ function ShareDialog({ projectId, layout: layout2, display, initialSurface, shar
           /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Users, { className: "size-4" }),
           surface3 === "avatar-live" ? "Visitors can" : "People can"
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "inline-flex gap-1 rounded-xl border border-ink/15 p-1", children: [[false, surface3 === "avatar-live" ? "Watch only" : "Look around", Eye], [true, surface3 === "avatar-live" ? "Talk to the agent" : "Join and play", MessageCircle]].map(([value, label12, Icon2]) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", { "aria-pressed": talk === value, className: pill(talk === value), onClick: () => {
+        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "inline-flex gap-1 rounded-xl border border-ink/15 p-1", children: [[false, surface3 === "avatar-live" ? "Watch only" : "Look around", Eye], [true, surface3 === "avatar-live" ? "Talk to the agent" : "Join and play", MessageCircle]].map(([value, label13, Icon2]) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", { "aria-pressed": talk === value, className: pill(talk === value), onClick: () => {
           setTalk(value);
           reset();
         }, children: [
           /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Icon2, { className: "size-4" }),
-          label12
-        ] }, label12)) }),
+          label13
+        ] }, label13)) }),
         surface3 === "avatar-live" ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { className: "mt-2 text-[11px] text-ink/55", children: "Talking follows Settings \u2192 What it may do. Visitors never see your files or approvals." }) : null
       ] }),
       /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [
@@ -29849,12 +29865,12 @@ function ShareDialog({ projectId, layout: layout2, display, initialSurface, shar
             /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Code, { className: "size-4" }),
             "Add to your website"
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { role: "group", "aria-label": "Website look", className: "inline-flex gap-1 rounded-xl border border-ink/15 p-1", children: LOOKS.map(({ id: id2, label: label12, Icon: Icon2 }) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", { "aria-pressed": look === id2, className: pill(look === id2), onClick: () => {
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { role: "group", "aria-label": "Website look", className: "inline-flex gap-1 rounded-xl border border-ink/15 p-1", children: LOOKS.map(({ id: id2, label: label13, Icon: Icon2 }) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", { "aria-pressed": look === id2, className: pill(look === id2), onClick: () => {
             setLook(id2);
             setCopied("");
           }, children: [
             /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Icon2, { className: "size-4" }),
-            label12
+            label13
           ] }, id2)) })
         ] }),
         /* @__PURE__ */ (0, import_jsx_runtime.jsx)("textarea", { "aria-label": "Website code", readOnly: true, className: `${field} h-24 text-[11px]`, value: code2.iframe }),
@@ -43237,9 +43253,9 @@ function butterflies(shared2, t8) {
     workgroupBarrier();
   }
 }
-function arrayTexture(cascades, label12) {
+function arrayTexture(cascades, label13) {
   const tex = new StorageArrayTexture(N2, N2, cascades);
-  tex.name = label12;
+  tex.name = label13;
   tex.format = RGBAFormat;
   tex.type = HalfFloatType;
   tex.wrapS = RepeatWrapping;
@@ -46716,7 +46732,7 @@ var BuildTools = class {
       },
       surfaces: () => [options.ground, options.structures, options.items.group],
       onChange: () => this.#emit(),
-      fail: (message2) => this.#fail(message2),
+      fail: (message3) => this.#fail(message3),
       beginGroup: options.beginGroup,
       endGroup: options.endGroup,
       ...options.isResting ? { isResting: options.isResting } : {}
@@ -47291,8 +47307,8 @@ var BuildTools = class {
       this.#emit();
     }
   }
-  #fail(message2) {
-    this.#message = message2;
+  #fail(message3) {
+    this.#message = message3;
     this.#emit();
     return false;
   }
@@ -48840,19 +48856,19 @@ var DamageNumbers = class {
   /** Shows `-damage` with its bottom at `at` (above the victim's head). */
   show(at3, damage) {
     const text5 = `-${Math.round(damage)}`;
-    let label12 = this.#textures.get(text5);
-    if (!label12) {
-      label12 = labelTexture(text5);
-      this.#textures.set(text5, label12);
+    let label13 = this.#textures.get(text5);
+    if (!label13) {
+      label13 = labelTexture(text5);
+      this.#textures.set(text5, label13);
     }
     const sprite = this.#spare.pop() ?? new Sprite(new SpriteMaterial({ depthTest: false, depthWrite: false, transparent: true }));
     sprite.name = "damage-number";
     sprite.renderOrder = 20;
     if (!sprite.material.map)
       sprite.material.needsUpdate = true;
-    sprite.material.map = label12.texture;
+    sprite.material.map = label13.texture;
     sprite.material.opacity = 1;
-    sprite.scale.set(DAMAGE_NUMBER.height * label12.aspect, DAMAGE_NUMBER.height, 1);
+    sprite.scale.set(DAMAGE_NUMBER.height * label13.aspect, DAMAGE_NUMBER.height, 1);
     sprite.position.set(at3.x, at3.y + DAMAGE_NUMBER.height / 2, at3.z);
     this.group.add(sprite);
     this.#shown.push({ sprite, age: 0, baseY: sprite.position.y });
@@ -70770,12 +70786,12 @@ function simulateLabRun(course, input12 = {}, seed = course.seed) {
   const dt = LAB_STEP;
   const events = [];
   const seen = /* @__PURE__ */ new Set();
-  const event2 = (t9, kind, label12, obstacle, once = true) => {
+  const event2 = (t9, kind, label13, obstacle, once = true) => {
     const key2 = `${kind}:${obstacle ?? ""}`;
     if (once && seen.has(key2))
       return;
     seen.add(key2);
-    events.push({ t: round7(t9), kind, label: label12, ...obstacle ? { obstacle } : {} });
+    events.push({ t: round7(t9), kind, label: label13, ...obstacle ? { obstacle } : {} });
   };
   const ordered = [...course.obstacles].filter((o2) => !o2.hidden && Math.abs(o2.x) <= halfWidth(o2)).sort((a2, b2) => a2.z - b2.z);
   const natStride = move2.stride * Math.sqrt(s2.speed / move2.speed);
@@ -75175,10 +75191,10 @@ var SECTIONS = [
 ];
 var tile2 = (on) => `flex min-h-14 flex-col items-start justify-center gap-1 rounded-xl border-2 px-3 py-2 text-left text-xs ${on ? "border-ink bg-ink/5 font-bold" : "border-ink/15 hover:bg-ink/5"}`;
 var pill2 = (on) => `min-h-9 rounded-lg px-3 text-xs font-bold ${on ? "bg-ink text-on-brand" : "hover:bg-ink/5"}`;
-function Switch2({ label: label12, hint, checked: checked2, onChange }) {
+function Switch2({ label: label13, hint, checked: checked2, onChange }) {
   return /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("label", { className: "flex min-h-12 items-center justify-between gap-3 rounded-lg border border-ink/15 px-3 py-2 text-xs", children: [
     /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("span", { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { className: "block font-bold", children: label12 }),
+      /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { className: "block font-bold", children: label13 }),
       hint ? /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { className: "block text-ink/60", children: hint }) : null
     ] }),
     /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("input", { type: "checkbox", className: "size-5", checked: checked2, onChange: (e2) => onChange(e2.target.checked) })
@@ -75294,7 +75310,7 @@ function AvatarLive({ controller, recipe, onStage, projectId, characters, voice,
     };
     if (!display.open) return;
     setReady(false);
-    void import("./character-HBARRT2V.js").then(async ({ createCharacterStage }) => {
+    void import("./character-PGJB2G6Q.js").then(async ({ createCharacterStage }) => {
       if (cancelled || !container.current) return;
       made = await createCharacterStage({ container: container.current, recipe: current5.current.recipe, viewCube: false, forceWebGL: embedded });
       if (cancelled) {
@@ -75420,9 +75436,9 @@ function AvatarLive({ controller, recipe, onStage, projectId, characters, voice,
       /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("button", { "aria-label": "Close settings", onClick: () => setSettingsOpen(false), className: "rounded-lg p-2 hover:bg-ink/10", children: /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(X, { className: "size-4" }) })
     ] }),
     /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "flex min-h-0 flex-1 flex-col md:flex-row", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("nav", { "aria-label": "Settings sections", className: "flex shrink-0 gap-1 overflow-auto border-b border-ink/10 p-2 md:w-52 md:flex-col md:border-b-0 md:border-r", children: SECTIONS.map(({ id: id2, label: label12, Icon: Icon2 }) => /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("button", { "aria-pressed": section === id2, onClick: () => setSection(id2), className: `flex min-h-10 shrink-0 items-center gap-2 rounded-lg px-3 text-left text-xs font-bold ${section === id2 ? "bg-ink text-on-brand" : "hover:bg-ink/5"}`, children: [
+      /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("nav", { "aria-label": "Settings sections", className: "flex shrink-0 gap-1 overflow-auto border-b border-ink/10 p-2 md:w-52 md:flex-col md:border-b-0 md:border-r", children: SECTIONS.map(({ id: id2, label: label13, Icon: Icon2 }) => /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("button", { "aria-pressed": section === id2, onClick: () => setSection(id2), className: `flex min-h-10 shrink-0 items-center gap-2 rounded-lg px-3 text-left text-xs font-bold ${section === id2 ? "bg-ink text-on-brand" : "hover:bg-ink/5"}`, children: [
         /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(Icon2, { className: "size-4 shrink-0" }),
-        label12
+        label13
       ] }, id2)) }),
       /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "min-w-0 flex-1 space-y-4 overflow-auto p-5", children: [
         section === "agent" ? /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "space-y-3", children: [
@@ -75460,7 +75476,7 @@ function AvatarLive({ controller, recipe, onStage, projectId, characters, voice,
             "Now: ",
             /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("b", { children: backgroundLabel })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { className: "grid grid-cols-3 gap-2", children: [["world", "My worlds"], ["color", "Color"], ["transparent", "Transparent"]].map(([id2, label12]) => /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("button", { "aria-pressed": display.background === id2, disabled: id2 === "world" && !worldStorage && !worldViewport, className: `${tile2(display.background === id2)} disabled:opacity-40`, onClick: () => change({ background: id2 }), children: label12 }, id2)) }),
+          /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { className: "grid grid-cols-3 gap-2", children: [["world", "My worlds"], ["color", "Color"], ["transparent", "Transparent"]].map(([id2, label13]) => /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("button", { "aria-pressed": display.background === id2, disabled: id2 === "world" && !worldStorage && !worldViewport, className: `${tile2(display.background === id2)} disabled:opacity-40`, onClick: () => change({ background: id2 }), children: label13 }, id2)) }),
           display.background === "world" ? /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "space-y-2", children: [
             /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("p", { className: "text-xs text-ink/70", children: [
               "Pick one of your worlds, then ",
@@ -75549,7 +75565,7 @@ function AvatarLive({ controller, recipe, onStage, projectId, characters, voice,
       /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(Monitor, { className: "size-4" }),
       /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("strong", { className: "text-sm", children: "Avatar Live" }),
       agent ? /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { className: "rounded-full border border-ink/15 px-3 py-1 text-xs font-bold", children: agent.name }) : null,
-      /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { role: "group", "aria-label": "Who it talks to", className: "flex gap-1 rounded-xl border border-ink/15 p-1", children: [["me", "For me"], ["customers", "For my customers"]].map(([id2, label12]) => /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("button", { "aria-pressed": prefs.mode === id2, className: pill2(prefs.mode === id2), onClick: () => setPrefs({ mode: id2 }), children: label12 }, id2)) }),
+      /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { role: "group", "aria-label": "Who it talks to", className: "flex gap-1 rounded-xl border border-ink/15 p-1", children: [["me", "For me"], ["customers", "For my customers"]].map(([id2, label13]) => /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("button", { "aria-pressed": prefs.mode === id2, className: pill2(prefs.mode === id2), onClick: () => setPrefs({ mode: id2 }), children: label13 }, id2)) }),
       /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { className: "flex-1" }),
       /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("button", { onClick: () => setFullscreen(!full), "aria-pressed": full, "aria-label": full ? "Exit full screen" : "Full screen", title: full ? "Exit full screen" : "Full screen", className: "inline-flex min-h-10 items-center rounded-lg border border-ink/15 px-3", children: full ? /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(Minimize2, { className: "size-4" }) : /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(Maximize2, { className: "size-4" }) }),
       /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("button", { onClick: () => setSettingsOpen(true), "aria-haspopup": "dialog", className: "inline-flex min-h-10 items-center gap-2 rounded-lg border border-ink/15 px-3 text-xs font-bold", children: [
@@ -76158,7 +76174,7 @@ function BodySection({ editor }) {
 }
 function BodyCard({
   on,
-  label: label12,
+  label: label13,
   note,
   onPick,
   children
@@ -76173,7 +76189,7 @@ function BodyCard({
       className: `relative flex flex-col items-center gap-0.5 rounded-2xl bg-paper px-2 pt-2 pb-1.5 text-xs font-bold text-ink transition active:scale-95 ${on ? "ring-2 ring-ink" : "hover:bg-ink/5"}`,
       children: [
         children,
-        /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("span", { className: "truncate", children: label12 }),
+        /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("span", { className: "truncate", children: label13 }),
         /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("span", { className: "text-[10px] font-semibold text-ink/50", children: note }),
         on ? /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("span", { className: "absolute top-1.5 right-1.5 flex size-5 items-center justify-center rounded-full bg-ink text-on-brand", children: /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(Check, { className: "size-3", strokeWidth: 3, "aria-hidden": true }) }) : null
       ]
@@ -76189,7 +76205,7 @@ function ShapeSection({ editor }) {
   const { recipe } = editor;
   const normal = JSON.stringify(recipe.shape) === JSON.stringify(NORMAL_CHARACTER_SHAPE);
   return /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("div", { className: "flex flex-col gap-2.5", children: [
-    SHAPES.map(({ key: key2, label: label12 }) => {
+    SHAPES.map(({ key: key2, label: label13 }) => {
       const limits = CHARACTER_SHAPE_LIMITS[key2];
       const value = recipe.shape[key2];
       return /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(
@@ -76197,7 +76213,7 @@ function ShapeSection({ editor }) {
         {
           className: "grid grid-cols-[4.75rem_minmax(0,1fr)_2.75rem] items-center gap-2 text-xs font-bold text-ink/75",
           children: [
-            label12,
+            label13,
             /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
               "input",
               {
@@ -76206,7 +76222,7 @@ function ShapeSection({ editor }) {
                 max: limits.max,
                 step: 0.01,
                 value,
-                "aria-label": label12,
+                "aria-label": label13,
                 onChange: (event2) => {
                   const next3 = Number(event2.target.value);
                   editor.change((current5) => ({ ...current5, shape: { ...current5.shape, [key2]: next3 } }));
@@ -76318,7 +76334,7 @@ var NORMAL_BUILD = {
   fatRegions: {}
 };
 function BuildSlider({
-  label: label12,
+  label: label13,
   value,
   min: min10 = -1,
   max: max22 = 1,
@@ -76336,7 +76352,7 @@ function BuildSlider({
       children: [
         /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("span", { className: "flex min-w-0 items-center gap-1.5", children: [
           color2 ? /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("span", { className: "size-2.5 shrink-0 rounded-full", style: { background: color2 }, "aria-hidden": true }) : null,
-          /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("span", { className: "truncate", children: label12 })
+          /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("span", { className: "truncate", children: label13 })
         ] }),
         /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
           "input",
@@ -76346,7 +76362,7 @@ function BuildSlider({
             max: max22,
             step: 0.05,
             value,
-            "aria-label": label12,
+            "aria-label": label13,
             onChange: (event2) => onChange(Number(event2.target.value)),
             onPointerDown: onShow,
             onFocus: onShow,
@@ -76362,7 +76378,7 @@ function BuildSlider({
   );
 }
 function NumberField({
-  label: label12,
+  label: label13,
   unit: unit2,
   value,
   onCommit
@@ -76373,14 +76389,14 @@ function NumberField({
     setDraft(null);
   };
   return /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("label", { className: "flex items-center gap-1.5 rounded-lg px-2 py-1 ring-1 ring-ink/15", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("span", { className: "text-ink/60", children: label12 }),
+    /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("span", { className: "text-ink/60", children: label13 }),
     /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
       "input",
       {
         type: "number",
         inputMode: "numeric",
         value: draft ?? value ?? "",
-        "aria-label": `${label12} in ${unit2}`,
+        "aria-label": `${label13} in ${unit2}`,
         onChange: (event2) => setDraft(event2.target.value),
         onBlur: commit,
         onKeyDown: (event2) => {
@@ -76683,7 +76699,7 @@ function HairChoices({ editor }) {
 function FaceFromPhoto({ editor }) {
   const input12 = (0, import_react15.useRef)(null);
   const [busy, setBusy] = (0, import_react15.useState)(false);
-  const [message2, setMessage] = (0, import_react15.useState)(null);
+  const [message3, setMessage] = (0, import_react15.useState)(null);
   const [previous, setPrevious] = (0, import_react15.useState)(null);
   const read2 = async (file) => {
     setBusy(true);
@@ -76752,7 +76768,7 @@ function FaceFromPhoto({ editor }) {
         }
       ) : null
     ] }),
-    message2 ? /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("p", { role: "status", className: "text-xs font-semibold text-ink/80", children: message2 }) : null
+    message3 ? /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("p", { role: "status", className: "text-xs font-semibold text-ink/80", children: message3 }) : null
   ] });
 }
 function FaceSection({ editor }) {
@@ -77088,7 +77104,7 @@ function MovesSection({
 }
 function RecipeSection({ editor }) {
   const file = (0, import_react15.useRef)(null);
-  const [message2, setMessage] = (0, import_react15.useState)(null);
+  const [message3, setMessage] = (0, import_react15.useState)(null);
   const { recipe } = editor;
   const download2 = () => {
     const blob = new Blob([editor.exportJson()], { type: "application/json" });
@@ -77147,7 +77163,7 @@ function RecipeSection({ editor }) {
         }
       }
     ),
-    message2 ? /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("p", { role: "status", className: "text-xs font-semibold text-ink/60", children: message2 }) : null,
+    message3 ? /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("p", { role: "status", className: "text-xs font-semibold text-ink/60", children: message3 }) : null,
     editor.saved.length > 0 ? /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("ul", { "aria-label": "Saved characters", className: "mt-1 flex flex-col gap-1", children: editor.saved.map((entry) => /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("li", { className: "flex items-center gap-1", children: [
       /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(
         "button",
@@ -77183,7 +77199,7 @@ function RecipeSection({ editor }) {
 }
 function ActionButton({
   Icon: Icon2,
-  label: label12,
+  label: label13,
   onClick,
   primary: primary3 = false
 }) {
@@ -77195,7 +77211,7 @@ function ActionButton({
       className: `flex items-center justify-center gap-1.5 rounded-xl py-2 text-xs font-bold ${primary3 ? "bg-brand text-on-brand" : "bg-paper text-ink hover:bg-ink/5"}`,
       children: [
         /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(Icon2, { className: "size-4", "aria-hidden": true }),
-        label12
+        label13
       ]
     }
   );
@@ -77907,16 +77923,16 @@ function VoicePanel({
                   { id: "library", label: "Voice library", Icon: Earth },
                   { id: "clone", label: "Clone my voice", Icon: UserRound },
                   { id: "models", label: "Models", Icon: Cpu }
-                ].map(({ id: id2, label: label12, Icon: Icon2 }) => /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)(
+                ].map(({ id: id2, label: label13, Icon: Icon2 }) => /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)(
                   "button",
                   {
                     "aria-pressed": tab === id2,
-                    title: label12,
+                    title: label13,
                     onClick: () => setTab(id2),
                     className: `flex items-center gap-2 rounded-lg px-3 py-2.5 text-left text-xs ${tab === id2 ? "bg-ink/10 font-bold" : "text-ink/60 hover:bg-ink/5"}`,
                     children: [
                       /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(Icon2, { className: "size-4 shrink-0" }),
-                      /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("span", { className: "max-sm:hidden", children: label12 })
+                      /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("span", { className: "max-sm:hidden", children: label13 })
                     ]
                   },
                   id2
@@ -82469,7 +82485,7 @@ var AvatarPresentation = class {
     this.#media.add(url);
     return url;
   }
-  async importMotion(target2, label12, data, slot) {
+  async importMotion(target2, label13, data, slot) {
     if (this.#disposed || this.options.enabled === false) throw new Error("Avatar presentation is disabled.");
     const replacing = slot && this.#state.motions.some((row2) => row2.target === target2 && row2.id === `motion:${slot}`);
     if (!replacing && this.#state.motions.length >= 32) throw new Error("At most 32 imported motions per viewport.");
@@ -82478,7 +82494,7 @@ var AvatarPresentation = class {
     if (!rt?.importAvatarMotion) throw new Error("Motion import is unavailable in this viewport.");
     const id2 = slot ? `motion:${slot}` : `motion:${++this.#serial}`;
     if (!await rt.importAvatarMotion(target2 === "self" ? target2 : `host-agent:${target2}`, id2, data)) throw new Error("Avatar target is unavailable.");
-    if (!this.#disposed) this.#publish({ motions: [...this.#state.motions.filter((row2) => row2.target !== target2 || row2.id !== id2), { target: target2, id: id2, label: label12.slice(0, 150) }], lastAction: "motion imported" });
+    if (!this.#disposed) this.#publish({ motions: [...this.#state.motions.filter((row2) => row2.target !== target2 || row2.id !== id2), { target: target2, id: id2, label: label13.slice(0, 150) }], lastAction: "motion imported" });
   }
   dismiss = (id2) => {
     this.#cancel(id2);
@@ -82662,17 +82678,17 @@ function PresentationControls({ controller, section, agents, search = "", includ
   const target2 = sharedTarget ?? ownTarget;
   const execute = (event2) => setError(controller.execute(event2) ?? "");
   const matches2 = (value) => `${value} ${plainName(value)}`.toLowerCase().includes(search.toLowerCase());
-  const tile5 = (key2, label12, Icon2, onClick, active = false) => /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)(
+  const tile5 = (key2, label13, Icon2, onClick, active = false) => /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)(
     "button",
     {
       type: "button",
       onClick,
       "aria-pressed": active,
-      title: label12,
+      title: label13,
       className: `flex min-w-0 flex-col items-center gap-1 rounded-xl px-1 py-2 text-[11px] font-bold ${active ? "bg-ink text-on-brand" : "bg-paper text-ink hover:bg-ink/10"}`,
       children: [
         /* @__PURE__ */ (0, import_jsx_runtime17.jsx)(Icon2, { className: "size-5", strokeWidth: 1.8, "aria-hidden": true }),
-        /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("span", { className: "w-full truncate text-center", children: label12 })
+        /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("span", { className: "w-full truncate text-center", children: label13 })
       ]
     },
     key2
@@ -82772,7 +82788,7 @@ function PresentationControls({ controller, section, agents, search = "", includ
 
 // studio/app.tsx
 var import_client = __toESM(require_client(), 1);
-var import_react100 = __toESM(require_react(), 1);
+var import_react101 = __toESM(require_react(), 1);
 
 // ../../apps/web/lib/motion-lab.ts
 var PERSON = { kind: "person" };
@@ -82786,6 +82802,7 @@ var LabController = class {
   #listeners = /* @__PURE__ */ new Set();
   #version = 0;
   #onChange;
+  #publisher = null;
   constructor(data, onChange = () => {
   }) {
     this.#data = LabProjectData.parse(data);
@@ -82950,7 +82967,8 @@ var LabController = class {
   deleteVersion(id2, by = PERSON) {
     const version = this.#versionById(id2);
     if (by.kind === "agent" && (version.best || version.by !== "agent")) throw new Error(version.best ? "Only the owner can delete the best version." : "Only the owner can delete a version a person made.");
-    this.#set({ versions: this.#data.versions.filter((v2) => v2.id !== id2), best_pending: this.#data.best_pending?.version === id2 ? null : this.#data.best_pending });
+    if (this.shareOf(id2)?.state === "shared") throw new Error(`${id2} is shared with the community: stop sharing it first.`);
+    this.#set({ versions: this.#data.versions.filter((v2) => v2.id !== id2), shares: this.#data.shares.filter((s2) => s2.version !== id2), best_pending: this.#data.best_pending?.version === id2 ? null : this.#data.best_pending });
     this.#view = { ...this.#view, ghost: this.#ghost() };
     this.#emit(false);
   }
@@ -82966,6 +82984,123 @@ var LabController = class {
     const best = this.best();
     if (!best) return null;
     return simulateLabRun(this.#data.course, best.settings, this.#data.course.seed);
+  }
+  // ---- sharing with the GenVR community (board M14)
+  setPublisher(publisher) {
+    this.#publisher = publisher;
+  }
+  get publishing() {
+    return this.#publisher ? "platform" : "local-preview";
+  }
+  versionById(id2) {
+    return this.#versionById(id2);
+  }
+  shareOf(id2) {
+    return this.#data.shares.find((s2) => s2.version === id2);
+  }
+  /** Made in this lab, from a GenVR library move on a GenVR character (never Mixamo), no source video, passes the course. */
+  rights(id2) {
+    const v2 = this.#versionById(id2), reasons = [];
+    const run3 = this.#data.runs.find((r3) => r3.id === v2.run);
+    const madeHere = Boolean(run3) || v2.run.startsWith("run-");
+    const native = Object.hasOwn(LAB_GROUND_MOVES, v2.settings.motion) && !v2.settings.character.startsWith("user.");
+    const passes = v2.score.finished && !v2.score.fell && !v2.score.car_hit;
+    if (!madeHere) reasons.push("It was not made in this lab.");
+    if (!native) reasons.push(`"${v2.settings.motion}" on "${v2.settings.character}" is not a GenVR library move on a GenVR character (moves made from Mixamo are never shared).`);
+    if (!passes) reasons.push(v2.score.fell ? "It falls on the course." : v2.score.car_hit ? "A car hits it on the course." : "It does not finish the course.");
+    return { made_here: madeHere, not_mixamo: native, video_rights: true, passes_course: passes, reasons };
+  }
+  shareStatus(id2) {
+    const share = this.shareOf(id2);
+    if (share?.state === "shared") return "shared";
+    if (!this.rights(id2).reasons.length) return share?.state === "pending" ? "pending" : "private";
+    return "blocked";
+  }
+  /** My motions: every version, newest first, with its share state. */
+  mine() {
+    return [...this.#data.versions].reverse().map((v2) => {
+      const share = this.shareOf(v2.id), rights = this.rights(v2.id);
+      return { version: v2.id, motion: v2.motion, n: v2.n, score: v2.score.total, best: v2.best, by: v2.by, status: this.shareStatus(v2.id), share: share ?? null, blocked: rights.reasons };
+    });
+  }
+  /**
+   * Motions we already have that are like this one: the GenVR library move it is made from (alike by pace, stride, lean
+   * and step height — not pose by pose yet), and my other shared versions of the same move. The library move is also run
+   * on this course so the two can be compared.
+   */
+  similar(id2) {
+    const v2 = this.#versionById(id2), natural = labGroundMove(v2.settings.motion);
+    const alike = (a2, b2) => {
+      const off = Math.abs(a2.speed - b2.speed) / b2.speed * 0.45 + Math.abs(a2.stride - b2.stride) / b2.stride * 0.35 + Math.abs(a2.lean_deg - b2.lean_deg) / 40 * 0.1 + Math.abs(a2.step_height - b2.step_height) / 0.6 * 0.1;
+      return Math.max(0, Math.min(100, Math.round(100 - off * 100)));
+    };
+    const defaults = LabRunSettings.parse({});
+    const library = LabRunSettings.parse({ ...defaults, motion: v2.settings.motion, speed: Math.min(8, Math.max(0.5, natural.speed)), stride: natural.stride });
+    const course = this.#data.course;
+    const libScore = scoreLabRun(course, simulateLabRun(course, library, course.seed));
+    const out = Object.hasOwn(LAB_GROUND_MOVES, v2.settings.motion) ? [{
+      name: v2.settings.motion,
+      source: "library",
+      alike: alike(v2.settings, library),
+      note: `On this course: yours ${v2.score.foot_slide_cm} cm foot slide, score ${v2.score.total}; library ${libScore.foot_slide_cm} cm, score ${libScore.total}.`
+    }] : [];
+    for (const other of this.#data.versions) {
+      if (other.id === v2.id || other.motion !== v2.motion || this.shareOf(other.id)?.state !== "shared") continue;
+      out.push({ name: this.shareOf(other.id).name, source: "mine", alike: alike(v2.settings, other.settings), note: `Your shared ${other.id}, score ${other.score.total}.` });
+    }
+    return out.sort((a2, b2) => b2.alike - a2.alike);
+  }
+  /** Use the library move instead of this version (the person's "Use library one"): its natural pace and stride. */
+  useLibraryMove(id2) {
+    const v2 = this.#versionById(id2), natural = labGroundMove(v2.settings.motion);
+    return this.setSettings({ motion: v2.settings.motion, speed: Math.min(8, Math.max(0.5, natural.speed)), stride: natural.stride });
+  }
+  /** Prepare a share. Nothing is published: it waits for the owner (`share`). Blocked versions cannot be prepared. */
+  prepareShare(id2, draft, by = PERSON) {
+    const v2 = this.#versionById(id2), input12 = MotionShareDraft.parse(draft), rights = this.rights(id2);
+    if (rights.reasons.length) throw new Error(`This motion cannot be shared: ${rights.reasons.join(" ")}`);
+    const old = this.shareOf(id2);
+    if (old?.state === "shared") throw new Error(`${id2} is already shared. Stop sharing first to change it.`);
+    const share = MotionShare.parse({
+      version: v2.id,
+      state: "pending",
+      name: input12.name,
+      description: input12.description ?? old?.description ?? "",
+      tags: input12.tags ?? old?.tags ?? [],
+      character: v2.settings.character === LAB_CHARACTER ? "Standard robot" : v2.settings.character,
+      score: v2.score.total,
+      preview_s: input12.preview_s ?? old?.preview_s ?? 4,
+      licence: MOTION_SHARE_LICENCE.id,
+      prepared_by: by.kind === "agent" ? by.name : "you",
+      prepared_at: (/* @__PURE__ */ new Date()).toISOString()
+    });
+    this.#set({ shares: [...this.#data.shares.filter((s2) => s2.version !== id2), share] });
+    return share;
+  }
+  /** Publish a prepared share. Owner only. Without a host adapter it is a local preview (nothing leaves the device). */
+  async share(id2, by = PERSON) {
+    const pending = this.shareOf(id2);
+    if (by.kind === "agent") throw new Error(pending?.state === "pending" ? `Only the owner shares a motion. "${pending.name}" is prepared and waits for their OK in the Lab (My motions).` : "Only the owner shares a motion. Prepare it with share_prepare; the owner confirms it in the Lab.");
+    if (!pending || pending.state !== "pending") throw new Error(pending?.state === "shared" ? `${id2} is already shared.` : `Prepare ${id2} first (name, description, tags).`);
+    const rights = this.rights(id2);
+    if (rights.reasons.length) throw new Error(`This motion cannot be shared: ${rights.reasons.join(" ")}`);
+    const version = this.#versionById(id2);
+    const published = this.#publisher ? await this.#publisher.publish(pending, version) : {};
+    const share = MotionShare.parse({ ...pending, state: "shared", shared_at: (/* @__PURE__ */ new Date()).toISOString(), where: this.#publisher ? "platform" : "local-preview", ...published.url ? { url: published.url } : {} });
+    this.#set({ shares: this.#data.shares.map((s2) => s2.version === id2 ? share : s2) });
+    return share;
+  }
+  /** Stop sharing (a shared motion is taken down), or drop a prepared share. */
+  async unshare(id2) {
+    const share = this.shareOf(id2);
+    if (!share || share.state === "stopped") throw new Error(`${id2} is not shared.`);
+    if (share.state === "shared" && share.where === "platform") {
+      if (!this.#publisher) throw new Error("Connect GenVR hosting to take this motion down there.");
+      await this.#publisher.unpublish(share);
+    }
+    const next3 = MotionShare.parse({ ...share, state: "stopped", stopped_at: (/* @__PURE__ */ new Date()).toISOString() });
+    this.#set({ shares: this.#data.shares.map((s2) => s2.version === id2 ? next3 : s2) });
+    return next3;
   }
   // ---- view
   select(id2) {
@@ -83043,7 +83178,12 @@ var HELP = {
   save_version: "Keep a run as a new version of its motion: { run?, note? }.",
   save_best: "Ask to make a version the best: the owner confirms it in the Lab.",
   rollback: "Use a version's settings again: { version }.",
-  version_delete: "Delete a version an agent made: { version, confirm: true }. The best version and versions a person made are the owner's."
+  version_delete: "Delete a version an agent made: { version, confirm: true }. The best version and versions a person made are the owner's.",
+  motions_mine: "My motions: every version with its share state (private, pending, shared, blocked), the share and why it is blocked.",
+  motion_similar: "Motions we already have like this one: { version }. The GenVR library move (also run on this course to compare) and my shared versions.",
+  share_prepare: "Prepare a share with the GenVR community: { version, share: { name, description?, tags?, preview_s? } }. Nothing is published; it waits for the owner.",
+  share: "Publish a prepared share: { version, confirm: true }. Owner only: an agent is refused and the share keeps waiting for the owner in the Lab.",
+  unshare: "Stop sharing a motion, or drop a prepared share: { version, confirm: true }."
 };
 async function runMotionLab(lab, input12, by) {
   if (!lab) throw new Error("Open a motion lab project first (My projects \u203A New motion lab).");
@@ -83117,6 +83257,20 @@ async function runMotionLab(lab, input12, by) {
     case "version_delete":
       lab.deleteVersion(op.version, by);
       return { deleted: op.version };
+    case "motions_mine":
+      return { publishing: lab.publishing, licence: MOTION_SHARE_LICENCE, motions: lab.mine() };
+    case "motion_similar":
+      return { version: op.version, similar: lab.similar(op.version) };
+    case "share_prepare": {
+      const share = lab.prepareShare(op.version, op.share, by);
+      return { share, rights: lab.rights(op.version), licence: MOTION_SHARE_LICENCE, note: "Prepared, not published. The owner confirms each share in the Lab (My motions)." };
+    }
+    case "share": {
+      const share = await lab.share(op.version, by);
+      return { share, note: share.where === "local-preview" ? "Local preview: marked shared on this device only. Nothing was published (no GenVR hosting connected)." : "Shared with the GenVR community." };
+    }
+    case "unshare":
+      return { share: await lab.unshare(op.version) };
   }
 }
 var motionLabBridge = /* @__PURE__ */ (() => {
@@ -83238,7 +83392,7 @@ function PlaySettingsPicker({
     /* @__PURE__ */ (0, import_jsx_runtime18.jsxs)("fieldset", { disabled, className: "flex flex-col gap-2", children: [
       /* @__PURE__ */ (0, import_jsx_runtime18.jsx)("legend", { className: `mb-2 font-bold text-ink/60 ${compact ? "text-xs" : "text-sm"}`, children: "Made for" }),
       /* @__PURE__ */ (0, import_jsx_runtime18.jsx)("div", { className: "flex flex-wrap gap-2", children: PLAY_DEVICES.map((device) => {
-        const { label: label12, Icon: Icon2, soon } = DEVICES[device];
+        const { label: label13, Icon: Icon2, soon } = DEVICES[device];
         const on = value.devices.includes(device);
         return /* @__PURE__ */ (0, import_jsx_runtime18.jsxs)(
           "button",
@@ -83249,7 +83403,7 @@ function PlaySettingsPicker({
             className: chip(on, compact),
             children: [
               /* @__PURE__ */ (0, import_jsx_runtime18.jsx)(Icon2, { className: "size-4", "aria-hidden": true }),
-              label12,
+              label13,
               soon ? /* @__PURE__ */ (0, import_jsx_runtime18.jsx)("span", { className: "text-xs opacity-60", children: "later" }) : null
             ]
           },
@@ -83268,8 +83422,8 @@ function Page({ title, children }) {
     children
   ] });
 }
-function ErrorNote({ message: message2 }) {
-  return message2 ? /* @__PURE__ */ (0, import_jsx_runtime19.jsx)("p", { role: "alert", className: "rounded-xl bg-coral/10 px-4 py-3 text-sm font-semibold text-coral", children: message2 }) : null;
+function ErrorNote({ message: message3 }) {
+  return message3 ? /* @__PURE__ */ (0, import_jsx_runtime19.jsx)("p", { role: "alert", className: "rounded-xl bg-coral/10 px-4 py-3 text-sm font-semibold text-coral", children: message3 }) : null;
 }
 function Badge({ children, tone: tone2 = "neutral" }) {
   const tones = { neutral: "bg-ink/5 text-ink/70", good: "bg-mint/15 text-mint", warn: "bg-sun/25 text-ink/70" };
@@ -84406,7 +84560,7 @@ function GroundRules({
     if (draft !== null && draft !== line) onChange({ snowLine: draft });
     setDraft(null);
   };
-  const toggle = (label12, on, run3) => /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)(
+  const toggle = (label13, on, run3) => /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)(
     "button",
     {
       type: "button",
@@ -84415,7 +84569,7 @@ function GroundRules({
       onClick: run3,
       className: "flex items-center justify-between gap-2 rounded-xl bg-paper px-3 py-2 text-xs font-bold text-ink hover:bg-ink/10",
       children: [
-        label12,
+        label13,
         /* @__PURE__ */ (0, import_jsx_runtime21.jsx)("span", { className: `relative h-5 w-9 rounded-full ${on ? "bg-ink" : "bg-ink/20"}`, "aria-hidden": true, children: /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(
           "span",
           {
@@ -84588,7 +84742,7 @@ function WaterRules({
           value: sea.swell?.direction ?? "auto",
           onChange: (event2) => onSwell(event2.target.value === "auto" ? null : Number(event2.target.value)),
           className: "rounded-lg bg-paper px-2 py-1 text-xs font-bold text-ink",
-          children: SWELL_DIRECTIONS.map(([label12, value]) => /* @__PURE__ */ (0, import_jsx_runtime21.jsx)("option", { value, children: label12 }, label12))
+          children: SWELL_DIRECTIONS.map(([label13, value]) => /* @__PURE__ */ (0, import_jsx_runtime21.jsx)("option", { value, children: label13 }, label13))
         }
       )
     ] }) : null,
@@ -84763,7 +84917,7 @@ function correctionsFor(placeId) {
 // ../../apps/web/lib/script-engine.ts
 var loading2 = null;
 function load() {
-  loading2 ??= import("./dist-5KBUQPCL.js").catch((error) => {
+  loading2 ??= import("./dist-CJOWVYCA.js").catch((error) => {
     loading2 = null;
     throw error;
   });
@@ -85200,7 +85354,7 @@ async function applyMapBuild(target2, commands, options) {
     mark = -1;
     return ours;
   };
-  const stop = (message2) => new Error(takeBack() ? message2 : MAP_BUILD_CHANGED);
+  const stop = (message3) => new Error(takeBack() ? message3 : MAP_BUILD_CHANGED);
   let size = MAP_BUILD_PIECE.first;
   for (let i3 = 0; i3 < commands.length; ) {
     if (progress?.signal.aborted) throw stop(MAP_BUILD_CANCELLED);
@@ -85337,7 +85491,7 @@ function RealPlacePanel({
     const timer = window.setInterval(() => setWaited((s2) => s2 + 1), 1e3);
     return () => window.clearInterval(timer);
   }, [busy]);
-  const [message2, setMessage] = (0, import_react25.useState)(null);
+  const [message3, setMessage] = (0, import_react25.useState)(null);
   const [stage, setStage] = (0, import_react25.useState)(null);
   const buildAbort = (0, import_react25.useRef)(null);
   const [townMatch, setTownMatch] = (0, import_react25.useState)(null);
@@ -85629,7 +85783,7 @@ function RealPlacePanel({
       /* @__PURE__ */ (0, import_jsx_runtime24.jsx)("div", { role: "group", "aria-label": "Size in the game", className: "flex gap-1 rounded-xl bg-paper p-1 text-xs", children: [
         [false, "Real size"],
         [true, "Bigger for play"]
-      ].map(([value, label12]) => /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(
+      ].map(([value, label13]) => /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(
         "button",
         {
           type: "button",
@@ -85639,12 +85793,12 @@ function RealPlacePanel({
             setPreview(null);
           },
           className: `rounded-lg px-2 py-1 font-bold ${gameSize === value ? "bg-ink text-on-brand" : "text-ink"}`,
-          children: label12
+          children: label13
         },
-        label12
+        label13
       )) })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime24.jsx)("div", { role: "group", "aria-label": "What to build", className: "flex flex-wrap gap-1 text-xs", children: LAYERS.map(([id2, label12]) => /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(
+    /* @__PURE__ */ (0, import_jsx_runtime24.jsx)("div", { role: "group", "aria-label": "What to build", className: "flex flex-wrap gap-1 text-xs", children: LAYERS.map(([id2, label13]) => /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(
       "button",
       {
         type: "button",
@@ -85652,7 +85806,7 @@ function RealPlacePanel({
         disabled: id2 === "paths" && !layers.roads,
         onClick: () => setLayers((current5) => ({ ...current5, [id2]: !current5[id2] })),
         className: `rounded-lg px-2 py-1 font-bold disabled:opacity-40 ${layers[id2] ? "bg-ink text-on-brand" : "bg-paper text-ink"}`,
-        children: label12
+        children: label13
       },
       id2
     )) }),
@@ -85812,7 +85966,7 @@ function RealPlacePanel({
         )
       ] })
     ] }),
-    message2 && /* @__PURE__ */ (0, import_jsx_runtime24.jsx)("p", { className: "text-sm text-ink", children: message2 }),
+    message3 && /* @__PURE__ */ (0, import_jsx_runtime24.jsx)("p", { className: "text-sm text-ink", children: message3 }),
     built && onUndoBuild && busy === null && /* @__PURE__ */ (0, import_jsx_runtime24.jsxs)(
       "button",
       {
@@ -86784,11 +86938,11 @@ function GroundPicker({
             )
           ] }),
           /* @__PURE__ */ (0, import_jsx_runtime26.jsxs)("div", { className: "flex flex-col gap-3 overflow-y-auto [scrollbar-width:none]", children: [
-            GROUND_GROUPS.map(({ kind, label: label12 }) => {
+            GROUND_GROUPS.map(({ kind, label: label13 }) => {
               const list2 = matches2.filter((material3) => material3.kind === kind);
               if (!list2.length) return null;
               return /* @__PURE__ */ (0, import_jsx_runtime26.jsxs)("section", { className: "flex flex-col gap-1.5", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime26.jsx)("h3", { className: "text-xs font-bold text-ink/60", children: label12 }),
+                /* @__PURE__ */ (0, import_jsx_runtime26.jsx)("h3", { className: "text-xs font-bold text-ink/60", children: label13 }),
                 /* @__PURE__ */ (0, import_jsx_runtime26.jsx)("div", { className: "grid grid-cols-4 gap-1.5", children: list2.map((material3) => {
                   const chosen3 = material3.name === current5?.name;
                   return /* @__PURE__ */ (0, import_jsx_runtime26.jsxs)(
@@ -86934,9 +87088,9 @@ function RiverSettings({
     if (value !== void 0 && value !== river[key2]) onChange({ [key2]: value });
     setDraft((current5) => ({ ...current5, [key2]: void 0 }));
   };
-  const slider = (key2, label12, value, min10, max22, step3) => /* @__PURE__ */ (0, import_jsx_runtime26.jsxs)("label", { className: "flex flex-col gap-1 text-xs font-bold text-ink/70", children: [
+  const slider = (key2, label13, value, min10, max22, step3) => /* @__PURE__ */ (0, import_jsx_runtime26.jsxs)("label", { className: "flex flex-col gap-1 text-xs font-bold text-ink/70", children: [
     /* @__PURE__ */ (0, import_jsx_runtime26.jsxs)("span", { className: "flex justify-between gap-3", children: [
-      label12,
+      label13,
       /* @__PURE__ */ (0, import_jsx_runtime26.jsx)("span", { className: "text-ink", children: value })
     ] }),
     /* @__PURE__ */ (0, import_jsx_runtime26.jsx)(
@@ -87228,19 +87382,19 @@ function CharacterTabs({ editor }) {
       ] }),
       /* @__PURE__ */ (0, import_jsx_runtime29.jsx)("button", { type: "button", "aria-label": "More: export, import, my characters", title: "Export, import, my characters", onClick: () => setTab("saved"), className: "inline-flex size-7 items-center justify-center rounded-md hover:bg-ink/10", children: /* @__PURE__ */ (0, import_jsx_runtime29.jsx)(Bookmark, { className: "size-4" }) })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime29.jsx)("div", { role: "tablist", "aria-label": "Avatar tools", className: "flex gap-0.5 border-b border-ink/10 bg-surface p-1", children: TABS.map(({ id: id2, label: label12, icon: Icon2 }) => /* @__PURE__ */ (0, import_jsx_runtime29.jsxs)(
+    /* @__PURE__ */ (0, import_jsx_runtime29.jsx)("div", { role: "tablist", "aria-label": "Avatar tools", className: "flex gap-0.5 border-b border-ink/10 bg-surface p-1", children: TABS.map(({ id: id2, label: label13, icon: Icon2 }) => /* @__PURE__ */ (0, import_jsx_runtime29.jsxs)(
       "button",
       {
         type: "button",
         role: "tab",
         "aria-selected": tab === id2,
-        "aria-label": label12,
-        title: label12,
+        "aria-label": label13,
+        title: label13,
         onClick: () => setTab(id2),
         className: `flex h-8 items-center justify-center gap-1.5 rounded-md px-2 text-xs font-bold ${tab === id2 ? "flex-1 bg-ink text-paper" : "min-w-8 text-ink/60 hover:bg-ink/5 hover:text-ink"}`,
         children: [
           /* @__PURE__ */ (0, import_jsx_runtime29.jsx)(Icon2, { className: "size-4" }),
-          tab === id2 ? label12 : null
+          tab === id2 ? label13 : null
         ]
       },
       id2
@@ -87250,7 +87404,7 @@ function CharacterTabs({ editor }) {
 }
 
 // ../../apps/web/components/studio/studio-chrome.tsx
-var import_react95 = __toESM(require_react(), 1);
+var import_react96 = __toESM(require_react(), 1);
 
 // ../../apps/web/lib/theme.ts
 var import_react31 = __toESM(require_react(), 1);
@@ -87338,7 +87492,7 @@ var bytes2 = (value) => value >= 1048576 ? `${(value / 1048576).toFixed(2)} MiB`
 function ResourceDiagnostics({ runtime }) {
   const [snapshot, setSnapshot] = (0, import_react32.useState)(null);
   const [view, setView] = (0, import_react32.useState)("resources");
-  const [query, setQuery] = (0, import_react32.useState)(""), [message2, setMessage] = (0, import_react32.useState)("");
+  const [query, setQuery] = (0, import_react32.useState)(""), [message3, setMessage] = (0, import_react32.useState)("");
   const scan = (instanceId) => {
     try {
       if (!runtime.current) {
@@ -87442,7 +87596,7 @@ function ResourceDiagnostics({ runtime }) {
       )
     ] }),
     /* @__PURE__ */ (0, import_jsx_runtime31.jsxs)("div", { className: "min-h-0 flex-1 overflow-auto px-3 py-2 text-xs", children: [
-      message2 ? /* @__PURE__ */ (0, import_jsx_runtime31.jsx)("p", { role: "status", children: message2 }) : null,
+      message3 ? /* @__PURE__ */ (0, import_jsx_runtime31.jsx)("p", { role: "status", children: message3 }) : null,
       snapshot ? /* @__PURE__ */ (0, import_jsx_runtime31.jsxs)(import_jsx_runtime31.Fragment, { children: [
         /* @__PURE__ */ (0, import_jsx_runtime31.jsxs)("p", { className: "mb-2 text-ink/60", children: [
           snapshot.backend,
@@ -87728,10 +87882,10 @@ function ConsolePanel({
       ["Draw calls", stats.drawCalls],
       ["Triangles", stats.triangles.toLocaleString()],
       ["Objects", stats.objects.toLocaleString()]
-    ].map(([label12, value]) => /* @__PURE__ */ (0, import_jsx_runtime32.jsxs)("div", { className: "rounded-lg bg-paper px-3 py-2", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime32.jsx)("dt", { className: "text-xs font-bold text-ink/50", children: label12 }),
+    ].map(([label13, value]) => /* @__PURE__ */ (0, import_jsx_runtime32.jsxs)("div", { className: "rounded-lg bg-paper px-3 py-2", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime32.jsx)("dt", { className: "text-xs font-bold text-ink/50", children: label13 }),
       /* @__PURE__ */ (0, import_jsx_runtime32.jsx)("dd", { className: "font-mono text-lg font-bold", children: value })
-    ] }, label12)) })
+    ] }, label13)) })
   ] });
 }
 
@@ -87795,14 +87949,14 @@ function DeviceBar({
   return /* @__PURE__ */ (0, import_jsx_runtime33.jsxs)("div", { className: "flex items-center gap-1", children: [
     /* @__PURE__ */ (0, import_jsx_runtime33.jsx)("div", { className: "flex rounded-lg bg-paper p-0.5", role: "group", "aria-label": "Preview as", children: KINDS.map((entry) => {
       const unsuited = Boolean(entry.device && devices && !devices.includes(entry.device));
-      const label12 = entry.kind === "desktop" ? entry.label : `Preview on a ${entry.label}${unsuited ? " (this place is not made for it)" : ""}`;
+      const label13 = entry.kind === "desktop" ? entry.label : `Preview on a ${entry.label}${unsuited ? " (this place is not made for it)" : ""}`;
       return /* @__PURE__ */ (0, import_jsx_runtime33.jsx)(
         "button",
         {
           type: "button",
           "aria-pressed": kind === entry.kind,
-          "aria-label": label12,
-          title: label12,
+          "aria-label": label13,
+          title: label13,
           onClick: () => onPreview({ ...preview, model: defaultModel(entry.kind) }),
           className: `flex size-8 items-center justify-center rounded-md ${kind === entry.kind ? "bg-surface text-ink shadow" : "text-ink/50 hover:text-ink"} ${unsuited && kind !== entry.kind ? "opacity-35" : ""}`,
           children: /* @__PURE__ */ (0, import_jsx_runtime33.jsx)(entry.Icon, { className: "size-4", "aria-hidden": true })
@@ -87867,6 +88021,8 @@ function DeviceBar({
 var import_react34 = __toESM(require_react(), 1);
 var DOCK_ORDER = [
   "tab",
+  // The world's parts sit in the Build left dock between Tools and Explorer (WORLD-W10).
+  "world",
   "outline",
   "properties",
   "assistant",
@@ -87880,6 +88036,7 @@ function defaultLayout(mode) {
     mode,
     docks: {
       tab: "left",
+      world: "left",
       outline: "left",
       properties: "right",
       assistant: "right",
@@ -87904,12 +88061,20 @@ function defaultLayout(mode) {
 }
 var DEFAULT_LAYOUT = defaultLayout("build");
 function allowedPanels(mode) {
-  return DOCK_ORDER.filter((id2) => mode === "filming" ? id2 !== "assistant" : id2 !== "timeline");
+  return DOCK_ORDER.filter((id2) => mode === "filming" ? id2 !== "assistant" && id2 !== "world" : id2 !== "timeline");
 }
 function dockPanels(layout2, side2) {
   return layout2.order.filter(
     (id2) => allowedPanels(layout2.mode).includes(id2) && !layout2.hidden.includes(id2) && layout2.docks[id2] === side2
   );
+}
+function panelShown(layout2, id2, visible2 = () => true) {
+  const side2 = layout2.docks[id2];
+  if (!allowedPanels(layout2.mode).includes(id2) || layout2.hidden.includes(id2) || !visible2(id2)) return false;
+  if (side2 === "floating") return true;
+  if (!layout2[`${side2}Open`]) return false;
+  const panels = dockPanels(layout2, side2).filter(visible2);
+  return (panels.includes(layout2.active[side2]) ? layout2.active[side2] : panels[0]) === id2;
 }
 var finite = (value, fallback, min10, max22) => typeof value === "number" && Number.isFinite(value) ? Math.max(min10, Math.min(max22, value)) : fallback;
 function constrainFloating(rect, width, height) {
@@ -87929,7 +88094,9 @@ function normalizeLayout(value, mode) {
     if (["left", "right", "bottom", "floating"].includes(String(docks[id2])))
       base.docks[id2] = docks[id2];
   const validPanels = (value2) => Array.isArray(value2) ? value2.filter((id2) => DOCK_ORDER.includes(id2)) : [];
-  base.order = [.../* @__PURE__ */ new Set([...validPanels(saved.order), ...DOCK_ORDER])];
+  const savedOrder = validPanels(saved.order);
+  if (savedOrder.length && !savedOrder.includes("world")) savedOrder.splice(savedOrder.indexOf("tab") + 1, 0, "world");
+  base.order = [.../* @__PURE__ */ new Set([...savedOrder, ...DOCK_ORDER])];
   if (Array.isArray(saved.hidden)) base.hidden = [...new Set(validPanels(saved.hidden))];
   for (const side2 of ["left", "right", "bottom"])
     if (DOCK_ORDER.includes(active[side2])) base.active[side2] = active[side2];
@@ -88080,7 +88247,7 @@ function Splitter({
 var import_react35 = __toESM(require_react(), 1);
 var import_jsx_runtime35 = __toESM(require_jsx_runtime(), 1);
 function ToolbarMenu({
-  label: label12,
+  label: label13,
   children,
   compact = false,
   icon: Icon2,
@@ -88109,12 +88276,12 @@ function ToolbarMenu({
     /* @__PURE__ */ (0, import_jsx_runtime35.jsx)(
       "summary",
       {
-        "aria-label": label12,
-        title: label12,
+        "aria-label": label13,
+        title: label13,
         className: "flex cursor-pointer list-none items-center gap-1 rounded-lg px-2 py-1.5 text-xs font-bold hover:bg-ink/10 [&::-webkit-details-marker]:hidden",
         children: compact ? /* @__PURE__ */ (0, import_jsx_runtime35.jsx)(Ellipsis, { "aria-hidden": true, className: "size-4" }) : /* @__PURE__ */ (0, import_jsx_runtime35.jsxs)(import_jsx_runtime35.Fragment, { children: [
           Icon2 ? /* @__PURE__ */ (0, import_jsx_runtime35.jsx)(Icon2, { "aria-hidden": true, className: "size-4" }) : null,
-          label12,
+          label13,
           /* @__PURE__ */ (0, import_jsx_runtime35.jsx)(ChevronDown, { "aria-hidden": true, className: "size-3" })
         ] })
       }
@@ -88143,7 +88310,8 @@ function DockWorkspace({
   layout: layout2,
   onLayout,
   title,
-  content
+  content,
+  visible: visible2 = () => true
 }) {
   const [drag, setDrag] = (0, import_react36.useState)(null);
   const [transient, setTransient] = (0, import_react36.useState)({});
@@ -88266,7 +88434,7 @@ function DockWorkspace({
   const body = (id2) => /* @__PURE__ */ (0, import_jsx_runtime36.jsx)("div", { className: "flex min-h-0 flex-1 flex-col overflow-auto", children: content(id2) });
   return /* @__PURE__ */ (0, import_jsx_runtime36.jsxs)(import_jsx_runtime36.Fragment, { children: [
     EDGES.map((side2) => {
-      const panels = dockPanels(layout2, side2);
+      const panels = dockPanels(layout2, side2).filter(visible2);
       if (!panels.length || !layout2[`${side2}Open`]) return null;
       const active = panels.includes(layout2.active[side2]) ? layout2.active[side2] : panels[0];
       return /* @__PURE__ */ (0, import_jsx_runtime36.jsxs)("div", { className: "contents", children: [
@@ -88338,7 +88506,7 @@ function DockWorkspace({
         )
       ] }, side2);
     }),
-    dockPanels(layout2, "floating").map((id2) => {
+    dockPanels(layout2, "floating").filter(visible2).map((id2) => {
       const rect = transient[id2] ?? layout2.floating[id2] ?? START_RECT;
       return /* @__PURE__ */ (0, import_jsx_runtime36.jsxs)(
         "section",
@@ -88425,8 +88593,8 @@ var import_react39 = __toESM(require_react(), 1);
 // ../../apps/web/lib/free-assets.ts
 var FreeAssetError = class extends Error {
   /** The API's error code (`sign_in` when Sketchfab needs the creator's own sign-in first). */
-  constructor(message2, code2) {
-    super(message2);
+  constructor(message3, code2) {
+    super(message3);
     this.code = code2;
   }
   code;
@@ -89500,7 +89668,7 @@ function LibraryPanel({
           (host.presentationTargets?.() ?? []).map((agent) => /* @__PURE__ */ (0, import_jsx_runtime38.jsx)("option", { value: agent.id, children: agent.name }, agent.id))
         ] })
       ] }) : null,
-      /* @__PURE__ */ (0, import_jsx_runtime38.jsx)("div", { role: "tablist", "aria-label": "Moves", className: "grid grid-cols-3 gap-1 rounded-xl bg-paper p-1", children: [["library", "Library"], ["mine", "My motions"], ["faces", "Faces"]].filter(([id2]) => id2 === "library" || host.presentationControls).map(([id2, label12]) => /* @__PURE__ */ (0, import_jsx_runtime38.jsx)(
+      /* @__PURE__ */ (0, import_jsx_runtime38.jsx)("div", { role: "tablist", "aria-label": "Moves", className: "grid grid-cols-3 gap-1 rounded-xl bg-paper p-1", children: [["library", "Library"], ["mine", "My motions"], ["faces", "Faces"]].filter(([id2]) => id2 === "library" || host.presentationControls).map(([id2, label13]) => /* @__PURE__ */ (0, import_jsx_runtime38.jsx)(
         "button",
         {
           type: "button",
@@ -89508,7 +89676,7 @@ function LibraryPanel({
           "aria-selected": moveTab === id2,
           onClick: () => setMoveTab(id2),
           className: `rounded-lg py-1.5 text-xs font-bold ${moveTab === id2 ? "bg-surface shadow" : "text-ink/60 hover:text-ink"}`,
-          children: label12
+          children: label13
         },
         id2
       )) })
@@ -89560,7 +89728,7 @@ function CaptureButton({
   placeId
 }) {
   const [open2, setOpen] = (0, import_react40.useState)(false);
-  const [message2, setMessage] = (0, import_react40.useState)(null);
+  const [message3, setMessage] = (0, import_react40.useState)(null);
   const [busy, setBusy] = (0, import_react40.useState)(false);
   const box = (0, import_react40.useRef)(null);
   (0, import_react40.useEffect)(() => {
@@ -89608,18 +89776,18 @@ function CaptureButton({
       [
         ["thumbnail", "Use as thumbnail"],
         ["screenshot", "Add as screenshot"]
-      ].map(([kind, label12]) => /* @__PURE__ */ (0, import_jsx_runtime39.jsx)(
+      ].map(([kind, label13]) => /* @__PURE__ */ (0, import_jsx_runtime39.jsx)(
         "button",
         {
           type: "button",
           disabled: busy,
           onClick: () => void take(kind),
           className: "rounded-lg bg-paper px-3 py-2 text-left text-sm font-bold text-ink hover:bg-ink/10 disabled:opacity-50",
-          children: busy ? "Saving\u2026" : label12
+          children: busy ? "Saving\u2026" : label13
         },
         kind
       )),
-      message2 ? /* @__PURE__ */ (0, import_jsx_runtime39.jsx)("p", { className: "text-xs font-bold text-ink/70", children: message2 }) : null
+      message3 ? /* @__PURE__ */ (0, import_jsx_runtime39.jsx)("p", { className: "text-xs font-bold text-ink/70", children: message3 }) : null
     ] }) : null
   ] });
 }
@@ -91225,7 +91393,7 @@ var degrees2 = (radians2) => {
   return d2 < 0 ? d2 + 360 : d2;
 };
 function NumberField2({
-  label: label12,
+  label: label13,
   value,
   step: step3,
   unit: unit2,
@@ -91239,12 +91407,12 @@ function NumberField2({
     if (Number.isFinite(parsed) && parsed !== value) onCommit(parsed);
   };
   return /* @__PURE__ */ (0, import_jsx_runtime47.jsxs)("label", { className: "flex items-center gap-1 text-xs", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime47.jsx)("span", { className: "w-12 shrink-0 font-bold text-ink/60", children: label12 }),
+    /* @__PURE__ */ (0, import_jsx_runtime47.jsx)("span", { className: "w-12 shrink-0 font-bold text-ink/60", children: label13 }),
     /* @__PURE__ */ (0, import_jsx_runtime47.jsx)(
       "button",
       {
         type: "button",
-        "aria-label": `${label12} minus ${step3}`,
+        "aria-label": `${label13} minus ${step3}`,
         onClick: () => onCommit(tidy(value - step3)),
         className: "rounded-md p-1 text-ink/50 hover:bg-ink/10 hover:text-ink",
         children: /* @__PURE__ */ (0, import_jsx_runtime47.jsx)(ChevronLeft, { className: "size-3.5", "aria-hidden": true })
@@ -91262,7 +91430,7 @@ function NumberField2({
           if (event2.key === "Enter") commit();
           if (event2.key === "Escape") setDraft(null);
         },
-        "aria-label": label12,
+        "aria-label": label13,
         className: "h-7 w-full min-w-0 rounded-md bg-paper px-2 text-right font-mono text-xs font-bold outline-none focus:ring-2 focus:ring-ink/30"
       }
     ),
@@ -91270,7 +91438,7 @@ function NumberField2({
       "button",
       {
         type: "button",
-        "aria-label": `${label12} plus ${step3}`,
+        "aria-label": `${label13} plus ${step3}`,
         onClick: () => onCommit(tidy(value + step3)),
         className: "rounded-md p-1 text-ink/50 hover:bg-ink/10 hover:text-ink",
         children: /* @__PURE__ */ (0, import_jsx_runtime47.jsx)(ChevronRight, { className: "size-3.5", "aria-hidden": true })
@@ -91691,7 +91859,7 @@ function WaterProperties({
     rt()?.applyCommand(command);
     onChange();
   };
-  const slider = (key2, label12, value, shown, min10, max22, step3, commit) => {
+  const slider = (key2, label13, value, shown, min10, max22, step3, commit) => {
     const now = draft[key2] ?? value;
     const done = () => {
       if (draft[key2] !== void 0 && draft[key2] !== value) commit(draft[key2]);
@@ -91703,7 +91871,7 @@ function WaterProperties({
     };
     return /* @__PURE__ */ (0, import_jsx_runtime47.jsxs)("label", { className: "flex flex-col gap-1 text-xs font-bold text-ink/70", children: [
       /* @__PURE__ */ (0, import_jsx_runtime47.jsxs)("span", { className: "flex justify-between gap-3", children: [
-        label12,
+        label13,
         /* @__PURE__ */ (0, import_jsx_runtime47.jsx)("span", { className: "text-ink", children: draft[key2] !== void 0 ? `${now}` : shown })
       ] }),
       /* @__PURE__ */ (0, import_jsx_runtime47.jsx)(
@@ -92453,6 +92621,7 @@ function pickGround(runtime, done, cancel) {
   };
   const onKey = (event2) => {
     if (event2.key === "Escape") {
+      event2.stopPropagation();
       stop();
       cancel();
     }
@@ -92520,7 +92689,7 @@ var LIGHT_PRESETS = {
   back: { name: "Back light", color: "#ffffff", intensity: 16, angle: 30, softness: 0.4, position: [0, 3.2, -3], target: [0, 1.6, 0] }
 };
 var LIGHT_COLORS = ["#ffffff", "#fff4e0", "#ffd7a0", "#ffb36b", "#dfe8ff", "#a8c8ff", "#7fa8ff", "#ff8fa3", "#b8ffb0"];
-function LightingPart({ runtime, busy, actors, message: message2 }) {
+function LightingPart({ runtime, busy, actors, message: message3 }) {
   const [, redraw] = (0, import_react51.useState)(0);
   const [error, setError] = (0, import_react51.useState)("");
   const [placing, setPlacing] = (0, import_react51.useState)(false);
@@ -92531,7 +92700,7 @@ function LightingPart({ runtime, busy, actors, message: message2 }) {
   const save3 = (next3) => {
     const ok = rt.applyCommand({ type: "set_lighting", params: { lights: next3 } });
     setError(ok ? "" : "The lights could not change.");
-    if (!ok) message2("The lights could not change.");
+    if (!ok) message3("The lights could not change.");
     redraw((n2) => n2 + 1);
   };
   const update = (patch) => {
@@ -92987,11 +93156,11 @@ function WorldSummary({ runtime }) {
     ] }, key2)) })
   ] });
 }
-function WorldSidePanel({ runtime, busy = false, actors = [], message: message2 = () => {
+function WorldSidePanel({ runtime, busy = false, actors = [], message: message3 = () => {
 }, onStyle, fallback, placeId }) {
   useWorldVersion(runtime);
   const part2 = useWorldPart();
-  return /* @__PURE__ */ (0, import_jsx_runtime51.jsx)("div", { className: "flex flex-col gap-3 px-3 pb-3 text-ink", children: part2 === "lighting" ? /* @__PURE__ */ (0, import_jsx_runtime51.jsx)(LightingPart, { runtime, busy, actors, message: message2 }) : part2 === "sky" ? /* @__PURE__ */ (0, import_jsx_runtime51.jsx)(SkyPart, { runtime }) : part2 === "weather" ? /* @__PURE__ */ (0, import_jsx_runtime51.jsx)(WeatherPart, { runtime }) : part2 === "water" ? /* @__PURE__ */ (0, import_jsx_runtime51.jsx)(WaterPart, { runtime }) : part2 === "place" ? /* @__PURE__ */ (0, import_jsx_runtime51.jsx)(PlacePart, { runtime, onStyle, placeId }) : fallback ?? /* @__PURE__ */ (0, import_jsx_runtime51.jsx)(WorldSummary, { runtime }) });
+  return /* @__PURE__ */ (0, import_jsx_runtime51.jsx)("div", { className: "flex flex-col gap-3 px-3 pb-3 text-ink", children: part2 === "lighting" ? /* @__PURE__ */ (0, import_jsx_runtime51.jsx)(LightingPart, { runtime, busy, actors, message: message3 }) : part2 === "sky" ? /* @__PURE__ */ (0, import_jsx_runtime51.jsx)(SkyPart, { runtime }) : part2 === "weather" ? /* @__PURE__ */ (0, import_jsx_runtime51.jsx)(WeatherPart, { runtime }) : part2 === "water" ? /* @__PURE__ */ (0, import_jsx_runtime51.jsx)(WaterPart, { runtime }) : part2 === "place" ? /* @__PURE__ */ (0, import_jsx_runtime51.jsx)(PlacePart, { runtime, onStyle, placeId }) : fallback ?? /* @__PURE__ */ (0, import_jsx_runtime51.jsx)(WorldSummary, { runtime }) });
 }
 
 // ../../apps/web/components/studio/snap-bar.tsx
@@ -93020,7 +93189,7 @@ function SnapBar({
           value: grid2,
           onChange: (event2) => onChange({ snapGrid: Number(event2.target.value) }),
           className: select10,
-          children: GRIDS.map(([value, label12]) => /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("option", { value, children: label12 }, value))
+          children: GRIDS.map(([value, label13]) => /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("option", { value, children: label13 }, value))
         }
       )
     ] }),
@@ -93086,9 +93255,9 @@ function LightingPanel({ filming }) {
 }
 function LightEditor({ light, filming, save: save3, remove: remove2 }) {
   const [d2, set] = (0, import_react52.useState)(light), change = (patch) => set((old) => ({ ...old, ...patch }));
-  const num = (label12, value, update, min10, max22) => /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)("label", { className: "flex items-center justify-between gap-2 text-xs", children: [
-    label12,
-    /* @__PURE__ */ (0, import_jsx_runtime54.jsx)("input", { "aria-label": `${label12} \xB7 ${light.id}`, className: "w-20 rounded border border-ink/15 bg-paper p-1", type: "number", min: min10, max: max22, step: 0.1, value, onChange: (e2) => update(Number(e2.target.value)) })
+  const num = (label13, value, update, min10, max22) => /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)("label", { className: "flex items-center justify-between gap-2 text-xs", children: [
+    label13,
+    /* @__PURE__ */ (0, import_jsx_runtime54.jsx)("input", { "aria-label": `${label13} \xB7 ${light.id}`, className: "w-20 rounded border border-ink/15 bg-paper p-1", type: "number", min: min10, max: max22, step: 0.1, value, onChange: (e2) => update(Number(e2.target.value)) })
   ] });
   return /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)("fieldset", { disabled: filming.busy || filming.studio.rendering, className: "space-y-2 border-t border-ink/15 pt-2", children: [
     /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)("div", { className: "flex items-center justify-between", children: [
@@ -94139,8 +94308,8 @@ function presetAnimator(id2, edge, clipDuration, newId6) {
 var EditError = class extends Error {
   name = "EditError";
 };
-function refuse(message2) {
-  throw new EditError(message2);
+function refuse(message3) {
+  throw new EditError(message3);
 }
 function transact(project, edit) {
   const draft = structuredClone(project);
@@ -96478,10 +96647,10 @@ var FilmSession = class {
   list(options = {}) {
     return COMMANDS.filter((c2) => options.host || !c2.hostOnly).map((c2) => {
       const reason = c2.args.safeParse({}).success ? this.reason(c2.id) : null;
-      const label12 = typeof c2.label === "string" ? c2.label : c2.id;
+      const label13 = typeof c2.label === "string" ? c2.label : c2.id;
       return {
         id: c2.id,
-        label: label12,
+        label: label13,
         group: c2.group,
         ...c2.shortcut ? { shortcut: c2.shortcut } : {},
         args: external_exports.toJSONSchema(c2.args, { io: "input" }),
@@ -96524,13 +96693,13 @@ var FilmSession = class {
   }
   run(id2, rawArgs = {}) {
     try {
-      const { state, result, label: label12 } = this.apply(this.state, id2, rawArgs);
+      const { state, result, label: label13 } = this.apply(this.state, id2, rawArgs);
       if (id2 === "edit.undo" || id2 === "edit.redo" || id2 === "history.goto") {
         this.changed(this);
-        return { ok: true, result: label12 };
+        return { ok: true, result: label13 };
       }
       if (state.project !== this.state.project)
-        this.history.record({ label: label12, before: this.state.project, after: state.project, by: this.author, at: Date.now() });
+        this.history.record({ label: label13, before: this.state.project, after: state.project, by: this.author, at: Date.now() });
       this.state = state;
       this.changed(this);
       return { ok: true, result };
@@ -96618,22 +96787,22 @@ var FilmSession = class {
     const why = spec.enabled?.(state, args);
     if (why)
       throw new EditError(why);
-    const label12 = typeof spec.label === "string" ? spec.label : spec.label(args);
+    const label13 = typeof spec.label === "string" ? spec.label : spec.label(args);
     if (id2 === "select.set")
-      return { state: { ...state, selection: args.clips.filter((c2) => state.project.tracks.some((t8) => t8.clips.some((x3) => x3.id === c2))) }, label: label12 };
+      return { state: { ...state, selection: args.clips.filter((c2) => state.project.tracks.some((t8) => t8.clips.some((x3) => x3.id === c2))) }, label: label13 };
     if (id2 === "playhead.set")
-      return { state: { ...state, playhead: secondsOnFrame(args.at, state.project.rate) }, label: label12 };
+      return { state: { ...state, playhead: secondsOnFrame(args.at, state.project.rate) }, label: label13 };
     if (id2 === "playhead.step")
-      return { state: { ...state, playhead: Math.max(0, state.playhead + args.frames * frame(state.project.rate)) }, label: label12 };
+      return { state: { ...state, playhead: Math.max(0, state.playhead + args.frames * frame(state.project.rate)) }, label: label13 };
     const context3 = { id: this.newId, state };
     if (!spec.journal)
-      return { state, result: spec.run(state.project, args, context3), label: label12 };
+      return { state, result: spec.run(state.project, args, context3), label: label13 };
     let result;
     const project = transact(state.project, (draft) => {
       result = spec.run(draft, args, context3);
     });
     const alive = (c2) => project.tracks.some((t8) => t8.clips.some((x3) => x3.id === c2));
-    return { state: { ...state, project, selection: state.selection.filter(alive) }, result, label: label12 };
+    return { state: { ...state, project, selection: state.selection.filter(alive) }, result, label: label13 };
   }
 };
 
@@ -97374,7 +97543,7 @@ var languageOf = (code2) => SUBTITLE_LANGUAGES.find((l2) => l2.code === code2);
 var DOWNLOAD_NOTE = "Speech: about 80 MB once. Translation: about 110 MB per language (Turkish, Portuguese, Persian, Urdu: one shared model of about 500 MB).";
 var worker2 = null;
 var next2 = 1;
-var call4 = (message2, report, signal, transfer = []) => new Promise((resolve, reject) => {
+var call4 = (message3, report, signal, transfer = []) => new Promise((resolve, reject) => {
   worker2 ??= new Worker(new URL("./workers/subtitle-worker.js", import.meta.url), { type: "module", name: "genvr-subtitles" });
   const id2 = next2++, w2 = worker2;
   const files = /* @__PURE__ */ new Map();
@@ -97406,7 +97575,7 @@ var call4 = (message2, report, signal, transfer = []) => new Promise((resolve, r
   };
   w2.addEventListener("message", listen);
   signal.addEventListener("abort", abort);
-  w2.postMessage({ ...message2, id: id2 }, transfer);
+  w2.postMessage({ ...message3, id: id2 }, transfer);
 });
 async function decode16k(blob) {
   const buffer2 = await new OfflineAudioContext(1, 1, 16e3).decodeAudioData(await blob.arrayBuffer());
@@ -97670,7 +97839,7 @@ function SubtitleLook({ filming }) {
   const set = (change) => studio.run("subtitles.style", change);
   return /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)("fieldset", { disabled: off, "data-film-id": "film.subtitles.look", className: "space-y-1.5 rounded-md bg-ink/5 p-2 text-xs text-ink/60", children: [
     /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("legend", { className: "sr-only", children: "Subtitle look" }),
-    /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("div", { className: "grid grid-cols-3 gap-1", role: "radiogroup", "aria-label": "Subtitle background", children: [["none", "No background"], ["line", "Box"], ["band", "Band"]].map(([id2, label12]) => /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(
+    /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("div", { className: "grid grid-cols-3 gap-1", role: "radiogroup", "aria-label": "Subtitle background", children: [["none", "No background"], ["line", "Box"], ["band", "Band"]].map(([id2, label13]) => /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(
       "button",
       {
         type: "button",
@@ -97679,7 +97848,7 @@ function SubtitleLook({ filming }) {
         "data-film-id": `film.subtitles.box.${id2}`,
         onClick: () => set({ box: id2 }),
         className: `rounded-md px-1.5 py-1 font-semibold ${style.box === id2 ? "bg-ink text-paper" : "ring-1 ring-ink/15 hover:text-ink"}`,
-        children: label12
+        children: label13
       },
       id2
     )) }),
@@ -97740,7 +97909,7 @@ var WORKSPACES = [
 ];
 function WorkspaceSwitch({ filming }) {
   const studio = filming.studio;
-  return /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("div", { role: "tablist", "aria-label": "Filming workspace", "data-film-id": "film.workspace", className: "flex rounded-lg bg-ink/5 p-0.5", children: WORKSPACES.map(({ id: id2, label: label12, icon: Icon2, hint }) => /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)(
+  return /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("div", { role: "tablist", "aria-label": "Filming workspace", "data-film-id": "film.workspace", className: "flex rounded-lg bg-ink/5 p-0.5", children: WORKSPACES.map(({ id: id2, label: label13, icon: Icon2, hint }) => /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)(
     "button",
     {
       role: "tab",
@@ -97752,7 +97921,7 @@ function WorkspaceSwitch({ filming }) {
       className: `inline-flex items-center gap-1 rounded-md px-2 py-1 text-[11px] font-bold ${studio.workspace === id2 ? "bg-surface text-ink shadow-sm" : "text-ink/55 hover:text-ink"}`,
       children: [
         /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(Icon2, { className: "size-3.5" }),
-        label12
+        label13
       ]
     },
     id2
@@ -98683,7 +98852,7 @@ function CastInspector({ filming }) {
       menu ? /* @__PURE__ */ (0, import_jsx_runtime60.jsx)(ContextMenu, { at: menu.at, title: menu.title, items: menu.items, close: () => setMenu(null) }) : null,
       /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("button", { type: "button", className: icon2, "aria-label": "Close character", title: "Close (Esc)", onClick: () => castSelection.set(null), children: /* @__PURE__ */ (0, import_jsx_runtime60.jsx)(X, { className: "size-4" }) })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("div", { role: "tablist", className: "flex gap-0.5 border-b border-ink/10 p-1.5", children: [["details", "Details", UserRound], ["story", "Story & script", BookOpen]].map(([id2, label12, Icon2]) => /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)(
+    /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("div", { role: "tablist", className: "flex gap-0.5 border-b border-ink/10 p-1.5", children: [["details", "Details", UserRound], ["story", "Story & script", BookOpen]].map(([id2, label13, Icon2]) => /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)(
       "button",
       {
         type: "button",
@@ -98693,7 +98862,7 @@ function CastInspector({ filming }) {
         className: `flex flex-1 items-center justify-center gap-1.5 rounded-md py-1.5 text-xs font-bold ${tab === id2 ? "bg-ink text-paper" : "text-ink/60 hover:bg-ink/5"}`,
         children: [
           /* @__PURE__ */ (0, import_jsx_runtime60.jsx)(Icon2, { className: "size-3.5" }),
-          label12
+          label13
         ]
       },
       id2
@@ -98970,7 +99139,7 @@ var import_react64 = __toESM(require_react(), 1);
 // ../../apps/web/components/studio/film/drag-number.tsx
 var import_react62 = __toESM(require_react(), 1);
 var import_jsx_runtime61 = __toESM(require_jsx_runtime(), 1);
-function DragNumber({ label: label12, value, commit, min: min10 = -Infinity, max: max22 = Infinity, step: step3 = 0.1, unit: unit2, disabled, title, width = "w-24" }) {
+function DragNumber({ label: label13, value, commit, min: min10 = -Infinity, max: max22 = Infinity, step: step3 = 0.1, unit: unit2, disabled, title, width = "w-24" }) {
   const [draft, setDraft] = (0, import_react62.useState)(null), [typing, setTyping] = (0, import_react62.useState)(false);
   const drag = (0, import_react62.useRef)(null);
   const clamp22 = (v2) => Math.min(max22, Math.max(min10, Math.round(v2 / step3) * step3));
@@ -98979,11 +99148,11 @@ function DragNumber({ label: label12, value, commit, min: min10 = -Infinity, max
     if (!typing) setDraft(null);
   }, [value, typing]);
   if (typing) return /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("label", { className: `inline-flex h-8 items-center gap-1.5 rounded-md border border-ink/30 bg-paper px-2 ${width}`, children: [
-    /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("b", { className: "text-[9px] font-semibold uppercase tracking-wide text-ink/50", children: label12 }),
+    /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("b", { className: "text-[9px] font-semibold uppercase tracking-wide text-ink/50", children: label13 }),
     /* @__PURE__ */ (0, import_jsx_runtime61.jsx)(
       "input",
       {
-        "aria-label": label12,
+        "aria-label": label13,
         autoFocus: true,
         type: "number",
         min: Number.isFinite(min10) ? min10 : void 0,
@@ -99010,12 +99179,12 @@ function DragNumber({ label: label12, value, commit, min: min10 = -Infinity, max
     {
       type: "button",
       role: "spinbutton",
-      "aria-label": label12,
+      "aria-label": label13,
       "aria-valuenow": value,
       "aria-valuemin": Number.isFinite(min10) ? min10 : void 0,
       "aria-valuemax": Number.isFinite(max22) ? max22 : void 0,
       disabled,
-      title: title ?? `${label12}: drag to change (Shift = big steps), click to type`,
+      title: title ?? `${label13}: drag to change (Shift = big steps), click to type`,
       className: `inline-flex h-8 cursor-ew-resize touch-none select-none items-center gap-1.5 rounded-md border border-ink/10 bg-paper px-2 text-left disabled:opacity-35 ${width}`,
       onPointerDown: (e2) => {
         if (disabled) return;
@@ -99052,7 +99221,7 @@ function DragNumber({ label: label12, value, commit, min: min10 = -Infinity, max
         if (e2.key === "Enter") setTyping(true);
       },
       children: [
-        /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("b", { className: "text-[9px] font-semibold uppercase tracking-wide text-ink/50", children: label12 }),
+        /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("b", { className: "text-[9px] font-semibold uppercase tracking-wide text-ink/50", children: label13 }),
         /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("span", { className: "ml-auto font-mono text-xs", children: [
           shown.toFixed(digits),
           unit2 ? /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("span", { className: "text-ink/50", children: [
@@ -99238,7 +99407,7 @@ function DirectorWindow({ filming, close }) {
   const start2 = () => {
     if (run(filming, "director.start", { idea: idea.trim(), kind, episodes: kind === "film" ? 1 : episodes, minutes, autonomy })) setIdea("");
   };
-  const seg4 = (label12, value, options, change) => /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("div", { role: "radiogroup", "aria-label": label12, className: "inline-flex rounded-md border border-ink/10 p-0.5", children: options.map(([v2, t8, tip]) => /* @__PURE__ */ (0, import_jsx_runtime62.jsx)(
+  const seg4 = (label13, value, options, change) => /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("div", { role: "radiogroup", "aria-label": label13, className: "inline-flex rounded-md border border-ink/10 p-0.5", children: options.map(([v2, t8, tip]) => /* @__PURE__ */ (0, import_jsx_runtime62.jsx)(
     "button",
     {
       type: "button",
@@ -99252,7 +99421,7 @@ function DirectorWindow({ filming, close }) {
     },
     v2
   )) });
-  const STATUS = { waiting_for_agent: "Waiting for an agent", running: "Running", paused: "Paused", stopped: "Stopped", done: "Done" };
+  const STATUS2 = { waiting_for_agent: "Waiting for an agent", running: "Running", paused: "Paused", stopped: "Stopped", done: "Done" };
   return (0, import_react_dom4.createPortal)(/* @__PURE__ */ (0, import_jsx_runtime62.jsx)(
     "dialog",
     {
@@ -99305,7 +99474,7 @@ function DirectorWindow({ filming, close }) {
                 current5.idea.slice(0, 80),
                 current5.idea.length > 80 ? "\u2026" : ""
               ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("span", { className: `rounded px-1.5 py-0.5 text-[10px] font-bold ${current5.status === "running" ? "bg-green-500/15 text-green-600" : current5.status === "paused" || current5.status === "waiting_for_agent" ? "bg-amber-400/20 text-amber-600" : "bg-ink/10 text-ink/60"}`, children: STATUS[current5.status] })
+              /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("span", { className: `rounded px-1.5 py-0.5 text-[10px] font-bold ${current5.status === "running" ? "bg-green-500/15 text-green-600" : current5.status === "paused" || current5.status === "waiting_for_agent" ? "bg-amber-400/20 text-amber-600" : "bg-ink/10 text-ink/60"}`, children: STATUS2[current5.status] })
             ] }),
             /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)("div", { className: "flex items-center gap-2 rounded-md border border-ink/10 p-2", children: [
               /* @__PURE__ */ (0, import_jsx_runtime62.jsx)(Bot, { className: "size-3.5" }),
@@ -99449,7 +99618,7 @@ function ScenesList({ filming }) {
     }
   };
   return /* @__PURE__ */ (0, import_jsx_runtime63.jsxs)("div", { children: [
-    /* @__PURE__ */ (0, import_jsx_runtime63.jsx)("div", { className: "p-2", children: /* @__PURE__ */ (0, import_jsx_runtime63.jsx)("div", { role: "radiogroup", "aria-label": "Scenes view", className: "flex gap-0.5 rounded-md border border-ink/10 p-0.5", children: [[false, "Timeline", Clapperboard], [true, "Workflow", Workflow]].map(([value, label12, Icon2]) => /* @__PURE__ */ (0, import_jsx_runtime63.jsxs)(
+    /* @__PURE__ */ (0, import_jsx_runtime63.jsx)("div", { className: "p-2", children: /* @__PURE__ */ (0, import_jsx_runtime63.jsx)("div", { role: "radiogroup", "aria-label": "Scenes view", className: "flex gap-0.5 rounded-md border border-ink/10 p-0.5", children: [[false, "Timeline", Clapperboard], [true, "Workflow", Workflow]].map(([value, label13, Icon2]) => /* @__PURE__ */ (0, import_jsx_runtime63.jsxs)(
       "button",
       {
         type: "button",
@@ -99459,10 +99628,10 @@ function ScenesList({ filming }) {
         className: `flex flex-1 items-center justify-center gap-1.5 rounded py-1 text-xs font-bold ${workflow2 === value ? "bg-ink text-paper" : "hover:bg-ink/10"}`,
         children: [
           /* @__PURE__ */ (0, import_jsx_runtime63.jsx)(Icon2, { className: "size-3.5" }),
-          label12
+          label13
         ]
       },
-      label12
+      label13
     )) }) }),
     filmSettings(project).kind === "series" ? /* @__PURE__ */ (0, import_jsx_runtime63.jsx)(EpisodesList, { filming }) : null,
     /* @__PURE__ */ (0, import_jsx_runtime63.jsxs)("section", { "aria-label": "Scenes", className: "px-2 pb-2", children: [
@@ -99640,9 +99809,9 @@ function SceneInspector({ filming }) {
         } }, scene.id + "in")
       ] })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime63.jsx)("div", { role: "tablist", className: "flex gap-0.5 border-b border-ink/10 p-1.5", children: [["who", `Who \xB7 ${scene.who.length}`, Users], ["lines", `Lines \xB7 ${lines.length}`, ArrowRight], ["sound", scene.sound.mode === "own" ? "Sound \xB7 own" : "Sound", Volume2]].map(([id2, label12, Icon2]) => /* @__PURE__ */ (0, import_jsx_runtime63.jsxs)("button", { type: "button", role: "tab", "aria-selected": tab === id2, onClick: () => setTab(id2), className: `flex flex-1 items-center justify-center gap-1.5 rounded-md py-1.5 text-xs font-bold ${tab === id2 ? "bg-ink text-paper" : "text-ink/60 hover:bg-ink/5"}`, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime63.jsx)("div", { role: "tablist", className: "flex gap-0.5 border-b border-ink/10 p-1.5", children: [["who", `Who \xB7 ${scene.who.length}`, Users], ["lines", `Lines \xB7 ${lines.length}`, ArrowRight], ["sound", scene.sound.mode === "own" ? "Sound \xB7 own" : "Sound", Volume2]].map(([id2, label13, Icon2]) => /* @__PURE__ */ (0, import_jsx_runtime63.jsxs)("button", { type: "button", role: "tab", "aria-selected": tab === id2, onClick: () => setTab(id2), className: `flex flex-1 items-center justify-center gap-1.5 rounded-md py-1.5 text-xs font-bold ${tab === id2 ? "bg-ink text-paper" : "text-ink/60 hover:bg-ink/5"}`, children: [
       /* @__PURE__ */ (0, import_jsx_runtime63.jsx)(Icon2, { className: "size-3.5" }),
-      label12
+      label13
     ] }, id2)) }),
     tab === "who" ? /* @__PURE__ */ (0, import_jsx_runtime63.jsxs)("div", { className: "divide-y divide-ink/10", children: [
       /* @__PURE__ */ (0, import_jsx_runtime63.jsxs)("section", { className: "space-y-1.5 px-3 py-3", children: [
@@ -99779,12 +99948,12 @@ function SceneInspector({ filming }) {
     tab === "sound" ? /* @__PURE__ */ (0, import_jsx_runtime63.jsxs)("section", { className: "space-y-3 px-3 py-3 text-xs", children: [
       /* @__PURE__ */ (0, import_jsx_runtime63.jsx)("div", { role: "radiogroup", "aria-label": "Scene sound", className: "inline-flex rounded-md border border-ink/10 p-0.5", children: [["world", "Same as the world"], ["own", "This scene's own"]].map(([v2, t8]) => /* @__PURE__ */ (0, import_jsx_runtime63.jsx)("button", { type: "button", role: "radio", "aria-checked": scene.sound.mode === v2, disabled: off, onClick: () => set({ sound: { mode: v2 } }), className: `rounded px-2.5 py-1 font-semibold ${scene.sound.mode === v2 ? "bg-ink text-paper" : "hover:bg-ink/10"}`, children: t8 }, v2)) }),
       scene.sound.mode === "own" ? /* @__PURE__ */ (0, import_jsx_runtime63.jsxs)(import_jsx_runtime63.Fragment, { children: [
-        [["ambience", "Nature and weather"], ["steps", "Footsteps and effects"]].map(([key2, label12]) => /* @__PURE__ */ (0, import_jsx_runtime63.jsxs)("label", { className: "block", children: [
+        [["ambience", "Nature and weather"], ["steps", "Footsteps and effects"]].map(([key2, label13]) => /* @__PURE__ */ (0, import_jsx_runtime63.jsxs)("label", { className: "block", children: [
           /* @__PURE__ */ (0, import_jsx_runtime63.jsxs)("span", { className: "flex justify-between", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime63.jsx)("span", { children: label12 }),
+            /* @__PURE__ */ (0, import_jsx_runtime63.jsx)("span", { children: label13 }),
             /* @__PURE__ */ (0, import_jsx_runtime63.jsx)("span", { className: "font-mono", children: scene.sound[key2] })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime63.jsx)("input", { "aria-label": label12, type: "range", min: 0, max: 100, value: scene.sound[key2], disabled: off, onChange: (e2) => set({ sound: { [key2]: Number(e2.target.value) } }), className: "w-full" })
+          /* @__PURE__ */ (0, import_jsx_runtime63.jsx)("input", { "aria-label": label13, type: "range", min: 0, max: 100, value: scene.sound[key2], disabled: off, onChange: (e2) => set({ sound: { [key2]: Number(e2.target.value) } }), className: "w-full" })
         ] }, key2)),
         /* @__PURE__ */ (0, import_jsx_runtime63.jsx)("p", { className: "text-ink/55", children: "Used while takes of this scene record. Rain, wind and birds follow the world's weather; this sets how loud they are." })
       ] }) : /* @__PURE__ */ (0, import_jsx_runtime63.jsx)("p", { className: "text-ink/55", children: "Takes of this scene use the world's own sound." })
@@ -100011,19 +100180,19 @@ function FilmingPanel({ filming }) {
     setTab(shooting ? "camera" : "shots");
   }, [shooting]);
   return /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)("div", { className: "text-ink", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime65.jsx)("div", { role: "tablist", "aria-label": "Filming tools", className: "sticky top-0 z-10 flex gap-0.5 border-b border-ink/10 bg-surface p-1", children: TABS2.map(({ id: id2, label: label12, icon: Icon2 }) => /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)(
+    /* @__PURE__ */ (0, import_jsx_runtime65.jsx)("div", { role: "tablist", "aria-label": "Filming tools", className: "sticky top-0 z-10 flex gap-0.5 border-b border-ink/10 bg-surface p-1", children: TABS2.map(({ id: id2, label: label13, icon: Icon2 }) => /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)(
       "button",
       {
         type: "button",
         role: "tab",
         "aria-selected": tab === id2,
-        "aria-label": label12,
-        title: label12,
+        "aria-label": label13,
+        title: label13,
         onClick: () => setTab(id2),
         className: `flex h-8 items-center justify-center gap-1.5 rounded-md px-2 text-xs font-bold ${tab === id2 ? "flex-1 bg-ink text-paper" : "min-w-8 text-ink/60 hover:bg-ink/5 hover:text-ink"}`,
         children: [
           /* @__PURE__ */ (0, import_jsx_runtime65.jsx)(Icon2, { className: "size-4" }),
-          tab === id2 ? label12 : null
+          tab === id2 ? label13 : null
         ]
       },
       id2
@@ -100046,13 +100215,13 @@ function CameraPanel({ filming }) {
   (0, import_react66.useEffect)(() => {
     if (filming.camera) setDraft(filming.camera);
   }, [filming.camera]);
-  const number2 = (label12, value, change, min10, max22) => /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)("label", { className: "flex min-w-0 flex-col gap-1 text-xs font-bold text-ink/70", children: [
-    label12,
+  const number2 = (label13, value, change, min10, max22) => /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)("label", { className: "flex min-w-0 flex-col gap-1 text-xs font-bold text-ink/70", children: [
+    label13,
     /* @__PURE__ */ (0, import_jsx_runtime65.jsx)(
       "input",
       {
         type: "number",
-        "aria-label": label12,
+        "aria-label": label13,
         value,
         min: min10,
         max: max22,
@@ -100065,8 +100234,8 @@ function CameraPanel({ filming }) {
   ] });
   const axis = (field6) => /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)("fieldset", { className: "space-y-1", children: [
     /* @__PURE__ */ (0, import_jsx_runtime65.jsx)("legend", { className: "text-xs font-bold", children: field6 === "position" ? "Camera position (world metres)" : "Look at (world metres)" }),
-    /* @__PURE__ */ (0, import_jsx_runtime65.jsx)("div", { className: "grid grid-cols-3 gap-2", children: ["X", "Y", "Z"].map((label12, index) => /* @__PURE__ */ (0, import_jsx_runtime65.jsx)("div", { children: number2(
-      `${field6} ${label12}`,
+    /* @__PURE__ */ (0, import_jsx_runtime65.jsx)("div", { className: "grid grid-cols-3 gap-2", children: ["X", "Y", "Z"].map((label13, index) => /* @__PURE__ */ (0, import_jsx_runtime65.jsx)("div", { children: number2(
+      `${field6} ${label13}`,
       draft[field6][index],
       (value) => {
         const point2 = [...draft[field6]];
@@ -100075,7 +100244,7 @@ function CameraPanel({ filming }) {
       },
       -6e4,
       6e4
-    ) }, label12)) })
+    ) }, label13)) })
   ] });
   const defaults = FILM_PRESETS[draft.preset];
   return /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)("div", { className: "text-ink", children: [
@@ -101075,7 +101244,7 @@ function StoryPanel({
   const [selected2, setSelected] = (0, import_react69.useState)(0);
   const [time9, setTime] = (0, import_react69.useState)(null);
   const [playing, setPlaying] = (0, import_react69.useState)(false);
-  const [message2, setMessage] = (0, import_react69.useState)("");
+  const [message3, setMessage] = (0, import_react69.useState)("");
   const drag = (0, import_react69.useRef)(null);
   const svg = (0, import_react69.useRef)(null);
   (0, import_react69.useEffect)(() => {
@@ -101525,7 +101694,7 @@ function StoryPanel({
         ]
       }
     ) : /* @__PURE__ */ (0, import_jsx_runtime68.jsx)("p", { className: "text-xs text-ink/60", children: "Add at least two stops to make the page." })),
-    message2 && /* @__PURE__ */ (0, import_jsx_runtime68.jsx)("p", { className: "text-xs text-ink/60", role: "status", children: message2 })
+    message3 && /* @__PURE__ */ (0, import_jsx_runtime68.jsx)("p", { className: "text-xs text-ink/60", role: "status", children: message3 })
   ] });
 }
 
@@ -102590,7 +102759,7 @@ var icon8 = "inline-flex size-6 items-center justify-center rounded hover:bg-ink
 var button13 = "inline-flex items-center justify-center gap-1 rounded-md border border-ink/10 bg-paper px-2 py-1 text-[11px] font-semibold hover:bg-ink/10 disabled:opacity-35";
 var keysOf = (clip, path) => clip.keys?.[path] ?? [];
 var keyFilmTimes = (clip, path) => keysOf(clip, path).map((k2) => ({ key: k2, at: toSeconds(filmTime(clip, k2.at)) }));
-function AnimatedSlider({ filming, clip, path, label: label12, disabled, id: id2 }) {
+function AnimatedSlider({ filming, clip, path, label: label13, disabled, id: id2 }) {
   const studio = filming.studio, info = property2(clip, path);
   const [draft, setDraft] = (0, import_react70.useState)(null);
   if (!info || info.kind !== "number") return null;
@@ -102612,12 +102781,12 @@ function AnimatedSlider({ filming, clip, path, label: label12, disabled, id: id2
           disabled,
           "aria-pressed": animated2,
           title: animated2 ? "Stop animating (keeps the value at the playhead)" : "Animate: add a key at the playhead",
-          "aria-label": `Animate ${label12 ?? info.label}`,
+          "aria-label": `Animate ${label13 ?? info.label}`,
           onClick: () => studio.run(animated2 ? "property.clear" : "key.add", { clip: clip.id, property: path }),
           children: /* @__PURE__ */ (0, import_jsx_runtime69.jsx)(Timer2, { className: "size-3.5" })
         }
       ),
-      /* @__PURE__ */ (0, import_jsx_runtime69.jsx)("span", { className: "flex-1 truncate", children: label12 ?? info.label }),
+      /* @__PURE__ */ (0, import_jsx_runtime69.jsx)("span", { className: "flex-1 truncate", children: label13 ?? info.label }),
       animated2 ? /* @__PURE__ */ (0, import_jsx_runtime69.jsxs)(import_jsx_runtime69.Fragment, { children: [
         /* @__PURE__ */ (0, import_jsx_runtime69.jsx)("button", { className: icon8, disabled: disabled || prev === void 0, title: "Previous key", "aria-label": "Previous key", onClick: () => prev !== void 0 && studio.setPlayhead(prev), children: /* @__PURE__ */ (0, import_jsx_runtime69.jsx)(ChevronLeft, { className: "size-3" }) }),
         /* @__PURE__ */ (0, import_jsx_runtime69.jsx)(
@@ -102639,7 +102808,7 @@ function AnimatedSlider({ filming, clip, path, label: label12, disabled, id: id2
       "input",
       {
         type: "range",
-        "aria-label": label12 ?? info.label,
+        "aria-label": label13 ?? info.label,
         min: info.min,
         max: info.max,
         step: info.step,
@@ -103124,7 +103293,7 @@ var import_jsx_runtime71 = __toESM(require_jsx_runtime(), 1);
 var button14 = "inline-flex items-center justify-center gap-1.5 rounded-md border border-ink/10 bg-paper px-2 py-1 text-xs font-semibold hover:bg-ink/10 disabled:opacity-35";
 var select11 = "w-full rounded-md border border-ink/10 bg-paper px-2 py-1.5 text-xs";
 var legend = "flex items-center gap-1 px-1 text-xs font-semibold";
-function CommitSlider({ label: label12, value, min: min10, max: max22, step: step3, disabled, commit, id: id2 }) {
+function CommitSlider({ label: label13, value, min: min10, max: max22, step: step3, disabled, commit, id: id2 }) {
   const [draft, setDraft] = (0, import_react72.useState)(null);
   const done = () => {
     if (draft !== null && draft !== value) commit(draft);
@@ -103133,14 +103302,14 @@ function CommitSlider({ label: label12, value, min: min10, max: max22, step: ste
   const shown = draft ?? value;
   return /* @__PURE__ */ (0, import_jsx_runtime71.jsxs)("label", { className: "block text-xs text-ink/60", "data-film-id": id2, children: [
     /* @__PURE__ */ (0, import_jsx_runtime71.jsxs)("span", { className: "flex justify-between", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime71.jsx)("span", { children: label12 }),
+      /* @__PURE__ */ (0, import_jsx_runtime71.jsx)("span", { children: label13 }),
       /* @__PURE__ */ (0, import_jsx_runtime71.jsx)("span", { className: "font-mono", children: Number(shown.toFixed(3)) })
     ] }),
     /* @__PURE__ */ (0, import_jsx_runtime71.jsx)(
       "input",
       {
         type: "range",
-        "aria-label": label12,
+        "aria-label": label13,
         min: min10,
         max: max22,
         step: step3,
@@ -103179,12 +103348,12 @@ function LayerControls({ filming, clip, locked }) {
   const studio = filming.studio, off = studio.rendering || filming.busy || locked;
   const [adding, setAdding] = (0, import_react72.useState)("");
   if (clip.type === "effect") {
-    const label12 = isEffect(clip.effect) ? EFFECTS2[clip.effect].label : clip.effect;
+    const label13 = isEffect(clip.effect) ? EFFECTS2[clip.effect].label : clip.effect;
     return /* @__PURE__ */ (0, import_jsx_runtime71.jsxs)("fieldset", { disabled: off, "data-film-id": "film.clip.adjustment", className: "space-y-2 rounded-lg border border-ink/10 p-3", children: [
       /* @__PURE__ */ (0, import_jsx_runtime71.jsxs)("legend", { className: legend, children: [
         /* @__PURE__ */ (0, import_jsx_runtime71.jsx)(Layers, { className: "size-3.5" }),
         "Adjustment layer \xB7 ",
-        label12
+        label13
       ] }),
       /* @__PURE__ */ (0, import_jsx_runtime71.jsx)("p", { className: "text-[10px] text-ink/45", children: "Changes everything on the tracks below it while it lasts." }),
       /* @__PURE__ */ (0, import_jsx_runtime71.jsx)(
@@ -103680,8 +103849,8 @@ var SECTIONS2 = [
   { key: "titles", label: "Titles & credits", icon: Type, soon: true }
 ];
 var Help6 = ({ text: text5 }) => /* @__PURE__ */ (0, import_jsx_runtime75.jsx)("span", { title: text5, "aria-label": text5, className: "inline-flex text-ink/50", children: /* @__PURE__ */ (0, import_jsx_runtime75.jsx)(Info, { className: "size-3.5" }) });
-function Segment({ label: label12, value, options, onChange, disabled }) {
-  return /* @__PURE__ */ (0, import_jsx_runtime75.jsx)("div", { role: "radiogroup", "aria-label": label12, className: "inline-flex gap-0.5 rounded-md border border-ink/10 bg-paper p-0.5", children: options.map(([v2, text5]) => /* @__PURE__ */ (0, import_jsx_runtime75.jsx)(
+function Segment({ label: label13, value, options, onChange, disabled }) {
+  return /* @__PURE__ */ (0, import_jsx_runtime75.jsx)("div", { role: "radiogroup", "aria-label": label13, className: "inline-flex gap-0.5 rounded-md border border-ink/10 bg-paper p-0.5", children: options.map(([v2, text5]) => /* @__PURE__ */ (0, import_jsx_runtime75.jsx)(
     "button",
     {
       type: "button",
@@ -103695,10 +103864,10 @@ function Segment({ label: label12, value, options, onChange, disabled }) {
     v2
   )) });
 }
-function Switch3({ label: label12, help, checked: checked2, onChange, disabled, id: id2 }) {
+function Switch3({ label: label13, help, checked: checked2, onChange, disabled, id: id2 }) {
   return /* @__PURE__ */ (0, import_jsx_runtime75.jsxs)("label", { className: "flex items-center justify-between gap-3 py-1.5 text-xs", "data-film-id": id2, children: [
     /* @__PURE__ */ (0, import_jsx_runtime75.jsxs)("span", { className: "flex items-center gap-1.5", children: [
-      label12,
+      label13,
       help ? /* @__PURE__ */ (0, import_jsx_runtime75.jsx)(Help6, { text: help }) : null
     ] }),
     /* @__PURE__ */ (0, import_jsx_runtime75.jsx)("input", { type: "checkbox", role: "switch", checked: checked2, disabled, onChange: (e2) => onChange(e2.target.checked), className: "size-4" })
@@ -103978,7 +104147,7 @@ function FilmSettings2({ filming, close }) {
           ] }),
           /* @__PURE__ */ (0, import_jsx_runtime75.jsxs)("div", { className: "flex min-h-0 flex-1", children: [
             /* @__PURE__ */ (0, import_jsx_runtime75.jsxs)("nav", { "aria-label": "Film settings sections", className: "w-56 shrink-0 space-y-0.5 overflow-y-auto border-r border-ink/10 p-2", children: [
-              shown.map(({ key: key2, label: label12, icon: Icon2, soon }) => /* @__PURE__ */ (0, import_jsx_runtime75.jsxs)(
+              shown.map(({ key: key2, label: label13, icon: Icon2, soon }) => /* @__PURE__ */ (0, import_jsx_runtime75.jsxs)(
                 "button",
                 {
                   type: "button",
@@ -103989,7 +104158,7 @@ function FilmSettings2({ filming, close }) {
                     /* @__PURE__ */ (0, import_jsx_runtime75.jsx)(Icon2, { className: "mt-0.5 size-3.5 shrink-0" }),
                     /* @__PURE__ */ (0, import_jsx_runtime75.jsxs)("span", { className: "min-w-0", children: [
                       /* @__PURE__ */ (0, import_jsx_runtime75.jsxs)("b", { className: "block", children: [
-                        label12,
+                        label13,
                         soon ? /* @__PURE__ */ (0, import_jsx_runtime75.jsx)("span", { className: "ml-1 rounded bg-ink/10 px-1 text-[9px] font-semibold uppercase text-ink/60", children: "soon" }) : null
                       ] }),
                       /* @__PURE__ */ (0, import_jsx_runtime75.jsx)("span", { className: "block truncate text-ink/55", children: summary(key2, s2, filming.output.size) })
@@ -104384,8 +104553,8 @@ function SuggestBlock({ filming, kind, clip, children }) {
   const [mode, setMode] = (0, import_react79.useState)("hand"), [prompt, setPrompt] = (0, import_react79.useState)("");
   const pending = (studio.project.suggestions ?? []).filter((s2) => s2.clip === clip && s2.kind === kind && s2.status === "pending");
   const open2 = (studio.project.requests ?? []).filter((r3) => r3.clip === clip && r3.kind === kind && r3.status === "open");
-  const keep = (id2, steps, label12) => {
-    const result = studio.batch([...steps, { id: "suggestion.mark", args: { suggestion: id2, status: "kept" } }], { label: `Keep suggestion: ${label12}` });
+  const keep = (id2, steps, label13) => {
+    const result = studio.batch([...steps, { id: "suggestion.mark", args: { suggestion: id2, status: "kept" } }], { label: `Keep suggestion: ${label13}` });
     if (!result.ok) studio.setMessage(`The suggestion could not be applied: ${result.failed.reason}`);
   };
   const run3 = (id2, args) => {
@@ -105289,9 +105458,9 @@ function LinePanel({ filming, cueId, shotMedia, onClose }) {
   const fullList = isSelf ? filming.actions.filter((a2) => !a2.id.startsWith("face:")) : isFx ? [...SCENE_FX_ACTIONS] : ["dance", "bob", "spin", "sway", "run"].map((id2) => ({ id: id2, label: id2 === "run" ? "run (walk its spots faster)" : id2 }));
   const tiles = [
     { id: "none", label: isFx ? "No effect" : "Idle \xB7 no movement", Icon: isFx ? X : PersonStanding },
-    ...isSelf ? COMMON.flatMap(([word, label12, Icon2]) => {
+    ...isSelf ? COMMON.flatMap(([word, label13, Icon2]) => {
       const found = fullList.find((a2) => keyword(word).test(a2.id) || a2.label.toLowerCase() === word);
-      return found ? [{ id: found.id, label: label12, Icon: Icon2 }] : [];
+      return found ? [{ id: found.id, label: label13, Icon: Icon2 }] : [];
     }) : fullList.map((a2) => ({ id: a2.id, label: a2.label, Icon: (isFx ? FX_ICONS[a2.id] : OBJECT_ICONS[a2.id]) ?? Sparkles }))
   ];
   const faces = isSelf ? filming.actions.filter((a2) => a2.id.startsWith("face:")) : [];
@@ -105492,14 +105661,14 @@ function LinePanel({ filming, cueId, shotMedia, onClose }) {
       }
     ) : null,
     /* @__PURE__ */ (0, import_jsx_runtime82.jsxs)(Fold, { title: isFx ? "Effect" : "Action", icon: isFx ? Sparkles : PersonStanding, value: actionLabel, children: [
-      /* @__PURE__ */ (0, import_jsx_runtime82.jsx)("div", { role: "radiogroup", "aria-label": "Action", className: "grid grid-cols-4 gap-1", children: tiles.map(({ id: id2, label: label12, Icon: Icon2 }) => /* @__PURE__ */ (0, import_jsx_runtime82.jsx)(
+      /* @__PURE__ */ (0, import_jsx_runtime82.jsx)("div", { role: "radiogroup", "aria-label": "Action", className: "grid grid-cols-4 gap-1", children: tiles.map(({ id: id2, label: label13, Icon: Icon2 }) => /* @__PURE__ */ (0, import_jsx_runtime82.jsx)(
         "button",
         {
           type: "button",
           role: "radio",
           "aria-checked": cue2.action === id2,
-          "aria-label": label12,
-          title: label12,
+          "aria-label": label13,
+          title: label13,
           disabled: off,
           className: `flex h-10 items-center justify-center rounded-md border ${cue2.action === id2 ? "border-ink bg-ink text-paper" : "border-ink/10 bg-paper hover:bg-ink/10"} disabled:opacity-35`,
           onClick: () => update({ action: id2 }),
@@ -105696,7 +105865,7 @@ function LinkPanel({ filming, linkId, onClose }) {
       if (studio.run("link.remove", { link: link2.id }).ok) onClose?.();
     } }
   ];
-  const shotSelect = (label12, value, change) => /* @__PURE__ */ (0, import_jsx_runtime83.jsxs)("select", { "aria-label": label12, className: input10, value, disabled: off, onChange: (e2) => change(e2.target.value), children: [
+  const shotSelect = (label13, value, change) => /* @__PURE__ */ (0, import_jsx_runtime83.jsxs)("select", { "aria-label": label13, className: input10, value, disabled: off, onChange: (e2) => change(e2.target.value), children: [
     shot2(value) ? null : /* @__PURE__ */ (0, import_jsx_runtime83.jsx)("option", { value, children: "missing shot" }),
     shots.map((m2) => /* @__PURE__ */ (0, import_jsx_runtime83.jsxs)("option", { value: m2.id, children: [
       m2.name,
@@ -105725,13 +105894,13 @@ function LinkPanel({ filming, linkId, onClose }) {
       onClose ? /* @__PURE__ */ (0, import_jsx_runtime83.jsx)("button", { type: "button", className: icon14, "aria-label": "Close", title: "Close (Esc)", onClick: onClose, children: /* @__PURE__ */ (0, import_jsx_runtime83.jsx)(X, { className: "size-4" }) }) : null
     ] }),
     menu ? /* @__PURE__ */ (0, import_jsx_runtime83.jsx)(ContextMenu, { at: menu, items, close: () => setMenu(null), title }) : null,
-    /* @__PURE__ */ (0, import_jsx_runtime83.jsx)(Fold2, { title: "Type", icon: kind[2], value: kind[1], children: /* @__PURE__ */ (0, import_jsx_runtime83.jsx)("div", { role: "radiogroup", "aria-label": "Link type", className: "grid grid-cols-5 gap-1", children: KINDS4.map(([id2, label12, Icon2, tip]) => /* @__PURE__ */ (0, import_jsx_runtime83.jsx)(
+    /* @__PURE__ */ (0, import_jsx_runtime83.jsx)(Fold2, { title: "Type", icon: kind[2], value: kind[1], children: /* @__PURE__ */ (0, import_jsx_runtime83.jsx)("div", { role: "radiogroup", "aria-label": "Link type", className: "grid grid-cols-5 gap-1", children: KINDS4.map(([id2, label13, Icon2, tip]) => /* @__PURE__ */ (0, import_jsx_runtime83.jsx)(
       "button",
       {
         type: "button",
         role: "radio",
         "aria-checked": link2.kind === id2,
-        "aria-label": label12,
+        "aria-label": label13,
         title: tip,
         disabled: off,
         className: `flex h-10 items-center justify-center rounded-md border ${link2.kind === id2 ? "border-ink bg-ink text-paper" : "border-ink/10 bg-paper hover:bg-ink/10"} disabled:opacity-35`,
@@ -105790,7 +105959,7 @@ function LinkPanel({ filming, linkId, onClose }) {
         commit: (returnAt) => set({ returnAt })
       }
     ) }) : null,
-    /* @__PURE__ */ (0, import_jsx_runtime83.jsx)(Fold2, { title: "Look of the jump", icon: Sparkles, value: LOOKS4.find(([l2]) => l2 === link2.look)?.[1], children: /* @__PURE__ */ (0, import_jsx_runtime83.jsx)("div", { role: "radiogroup", "aria-label": "Look of the jump", className: "flex gap-0.5 rounded-md border border-ink/10 p-0.5", children: LOOKS4.map(([id2, label12]) => /* @__PURE__ */ (0, import_jsx_runtime83.jsx)(
+    /* @__PURE__ */ (0, import_jsx_runtime83.jsx)(Fold2, { title: "Look of the jump", icon: Sparkles, value: LOOKS4.find(([l2]) => l2 === link2.look)?.[1], children: /* @__PURE__ */ (0, import_jsx_runtime83.jsx)("div", { role: "radiogroup", "aria-label": "Look of the jump", className: "flex gap-0.5 rounded-md border border-ink/10 p-0.5", children: LOOKS4.map(([id2, label13]) => /* @__PURE__ */ (0, import_jsx_runtime83.jsx)(
       "button",
       {
         type: "button",
@@ -105801,7 +105970,7 @@ function LinkPanel({ filming, linkId, onClose }) {
         onClick: () => {
           if (link2.look !== id2) set({ look: id2 });
         },
-        children: label12
+        children: label13
       },
       id2
     )) }) })
@@ -105995,7 +106164,7 @@ function SoundClipPanel({ filming, clipId: clipId2, onClose }) {
       /* @__PURE__ */ (0, import_jsx_runtime84.jsx)(DragNumber, { label: "In", value: fadeIn, min: 0, max: Math.min(10, length12), step: 0.1, unit: "s", width: "w-full", disabled: off, commit: (v2) => studio.run("clip.fade", { clip: clip.id, in: v2 }) }),
       /* @__PURE__ */ (0, import_jsx_runtime84.jsx)(DragNumber, { label: "Out", value: fadeOut, min: 0, max: Math.min(10, length12), step: 0.1, unit: "s", width: "w-full", disabled: off, commit: (v2) => studio.run("clip.fade", { clip: clip.id, out: v2 }) })
     ] }) }),
-    /* @__PURE__ */ (0, import_jsx_runtime84.jsx)(Fold3, { title: "Sound type", icon: WavesHorizontal, value: SOUND_TYPES.find(([id2]) => id2 === type)?.[1], help: "What the sound is, for ducking and loudness. Ambience is world sound (ocean, wind), separate from character voices.", children: /* @__PURE__ */ (0, import_jsx_runtime84.jsx)("div", { role: "radiogroup", "aria-label": "Sound type", className: "flex gap-0.5 rounded-md border border-ink/10 p-0.5", children: SOUND_TYPES.map(([id2, label12]) => /* @__PURE__ */ (0, import_jsx_runtime84.jsx)(
+    /* @__PURE__ */ (0, import_jsx_runtime84.jsx)(Fold3, { title: "Sound type", icon: WavesHorizontal, value: SOUND_TYPES.find(([id2]) => id2 === type)?.[1], help: "What the sound is, for ducking and loudness. Ambience is world sound (ocean, wind), separate from character voices.", children: /* @__PURE__ */ (0, import_jsx_runtime84.jsx)("div", { role: "radiogroup", "aria-label": "Sound type", className: "flex gap-0.5 rounded-md border border-ink/10 p-0.5", children: SOUND_TYPES.map(([id2, label13]) => /* @__PURE__ */ (0, import_jsx_runtime84.jsx)(
       "button",
       {
         type: "button",
@@ -106006,7 +106175,7 @@ function SoundClipPanel({ filming, clipId: clipId2, onClose }) {
         onClick: () => {
           if (type !== id2) studio.run("clip.soundType", { clip: clip.id, type: id2 });
         },
-        children: label12
+        children: label13
       },
       id2
     )) }) }),
@@ -106262,10 +106431,10 @@ function clipBox(clip, media, selected2, inRange = false) {
   return { background: fill, boxShadow: selected2 ? `inset 0 0 0 2px #ebebeb, inset 0 0 0 3px #000` : `inset 1px 0 0 #000, inset 0 1px 0 ${lighten(fill, 0.15)}` };
 }
 function Ruler2({ project, zoom, width, range: range2, onScrub, onDrag }) {
-  const fps = project.rate.num / project.rate.den, { label: label12, tick: tick2 } = rulerSteps(zoom, fps), end2 = width / zoom;
+  const fps = project.rate.num / project.rate.den, { label: label13, tick: tick2 } = rulerSteps(zoom, fps), end2 = width / zoom;
   const ticks = [];
   for (let i3 = 0, t8 = 0; t8 <= end2 && i3 < 4e3; i3++, t8 = i3 * tick2) ticks.push(t8);
-  const isLabel = (t8) => Math.abs(t8 / label12 - Math.round(t8 / label12)) < 1e-6;
+  const isLabel = (t8) => Math.abs(t8 / label13 - Math.round(t8 / label13)) < 1e-6;
   return /* @__PURE__ */ (0, import_jsx_runtime87.jsxs)(
     "div",
     {
@@ -106380,7 +106549,7 @@ function TrackHeader({ filming, track: track3, height, onResize, onToggleSize })
     }
   );
 }
-function ClipFace({ clip, track: track3, media, blob, zoom, height, label: label12, seconds: seconds2, show: show2, fps }) {
+function ClipFace({ clip, track: track3, media, blob, zoom, height, label: label13, seconds: seconds2, show: show2, fps }) {
   const width = seconds2 * zoom, band = 16;
   const effects = clip.type === "media" ? clip.effects?.length ?? 0 : 0;
   const changed = "keys" in clip && !!clip.keys && Object.keys(clip.keys).length > 0 || "transform" in clip && !!clip.transform;
@@ -106394,7 +106563,7 @@ function ClipFace({ clip, track: track3, media, blob, zoom, height, label: label
     clip.type === "media" && media && track3.kind === "picture" && show2.pictures && height > 28 && width > 20 ? /* @__PURE__ */ (0, import_jsx_runtime87.jsx)("div", { className: "absolute inset-x-0", style: { top: band, height: height - band - 1 - (zone ? 0 : 0) }, children: /* @__PURE__ */ (0, import_jsx_runtime87.jsx)(ClipStrip, { clip, media, blob, zoom, height: height - band - 1, head: !show2.strip }) }) : null,
     clip.type === "media" && media && zone ? /* @__PURE__ */ (0, import_jsx_runtime87.jsx)("div", { className: "pointer-events-none absolute inset-x-px bottom-px overflow-hidden", style: { height: zone }, children: /* @__PURE__ */ (0, import_jsx_runtime87.jsx)(ClipWave, { clip, media, blob, zoom, height: zone }) }) : null,
     volumeY !== null ? /* @__PURE__ */ (0, import_jsx_runtime87.jsx)("span", { "aria-hidden": true, className: "pointer-events-none absolute inset-x-0 h-px bg-white shadow-[0_1px_0_#000]", style: { top: volumeY } }) : null,
-    width > 24 ? /* @__PURE__ */ (0, import_jsx_runtime87.jsx)("span", { className: "pointer-events-none absolute left-1.5 right-6 top-0 flex h-4 items-center truncate text-[11.5px] leading-none", style: { color: "#d9d9d9" }, children: label12 }) : null,
+    width > 24 ? /* @__PURE__ */ (0, import_jsx_runtime87.jsx)("span", { className: "pointer-events-none absolute left-1.5 right-6 top-0 flex h-4 items-center truncate text-[11.5px] leading-none", style: { color: "#d9d9d9" }, children: label13 }) : null,
     (effects || changed) && width > 40 ? /* @__PURE__ */ (0, import_jsx_runtime87.jsx)(
       "span",
       {
@@ -106509,14 +106678,14 @@ function attempt3(filming, action) {
 }
 function Command({ filming, id: id2, args, children, title, name: name2, disabled }) {
   const studio = filming.studio, reason = studio.film.reason(id2, args ?? {});
-  const label12 = title ?? studio.film.labelOf(id2, args ?? {});
+  const label13 = title ?? studio.film.labelOf(id2, args ?? {});
   return /* @__PURE__ */ (0, import_jsx_runtime88.jsx)(
     "button",
     {
       className: button26,
       disabled: disabled || !!reason || studio.rendering || filming.busy,
-      title: reason ?? label12,
-      "aria-label": name2 ?? label12,
+      title: reason ?? label13,
+      "aria-label": name2 ?? label13,
       "data-command": id2,
       onClick: () => studio.run(id2, args ?? {}),
       children
@@ -107058,11 +107227,11 @@ Flashing can hurt people with photosensitive epilepsy. Export anyway?`)) void pl
       ] })
     ] }),
     /* @__PURE__ */ (0, import_jsx_runtime88.jsxs)("div", { className: "flex min-h-0 flex-1", style: { background: TL.panel, color: TL.text }, children: [
-      /* @__PURE__ */ (0, import_jsx_runtime88.jsx)("div", { className: "flex min-h-0 w-9 shrink-0 flex-col items-center gap-1 py-2", role: "toolbar", "aria-label": "Editing tools", style: { background: TL.panel, borderRight: `4px solid ${TL.divider}` }, children: TOOLS2.map(({ id: id2, key: key2, label: label12, hint, icon: Icon2 }) => /* @__PURE__ */ (0, import_jsx_runtime88.jsx)(
+      /* @__PURE__ */ (0, import_jsx_runtime88.jsx)("div", { className: "flex min-h-0 w-9 shrink-0 flex-col items-center gap-1 py-2", role: "toolbar", "aria-label": "Editing tools", style: { background: TL.panel, borderRight: `4px solid ${TL.divider}` }, children: TOOLS2.map(({ id: id2, key: key2, label: label13, hint, icon: Icon2 }) => /* @__PURE__ */ (0, import_jsx_runtime88.jsx)(
         "button",
         {
-          title: `${label12} (${key2.toUpperCase()}): ${hint}`,
-          "aria-label": label12,
+          title: `${label13} (${key2.toUpperCase()}): ${hint}`,
+          "aria-label": label13,
           "aria-pressed": tool2 === id2,
           "data-film-id": `film.tool.${id2}`,
           onClick: () => setTool(id2),
@@ -107315,7 +107484,7 @@ function InspectorBody({ filming, mode, focus = "trim" }) {
     }
   }, [clip]);
   const disabled = running || filming.busy;
-  const number2 = (label12, value, update, max22 = 180) => /* @__PURE__ */ (0, import_jsx_runtime88.jsx)(DragNumber, { label: label12, value, commit: update, min: 0, max: max22, step: 0.01, unit: "s", width: "w-full" });
+  const number2 = (label13, value, update, max22 = 180) => /* @__PURE__ */ (0, import_jsx_runtime88.jsx)(DragNumber, { label: label13, value, commit: update, min: 0, max: max22, step: 0.01, unit: "s", width: "w-full" });
   const applyTrim = () => {
     if (clip?.type !== "media") return;
     const byStart = sourceIn - toSeconds(clip.in), byEnd = sourceOut - sourceIn - (toSeconds(clip.duration) - byStart);
@@ -107393,7 +107562,7 @@ function InspectorBody({ filming, mode, focus = "trim" }) {
       ] }) : /* @__PURE__ */ (0, import_jsx_runtime88.jsx)("p", { className: "text-xs text-ink/45", children: "Select a timeline clip to edit it. Drag clips to move, drag an edge to trim (with Ripple on, everything after follows on every track; Shift: the opposite). Keys: Ctrl+K split, Delete, Shift+Delete (the opposite of Ripple), Ctrl+Z undo, M marker, Space play, Left/Right frame." })
     ] }) : null,
     mode === "scene" ? /* @__PURE__ */ (0, import_jsx_runtime88.jsxs)(import_jsx_runtime88.Fragment, { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime88.jsx)("div", { role: "tablist", "aria-label": "Scene inspector tools", className: "sticky top-0 z-10 grid grid-cols-3 border-b border-ink/15 bg-paper", children: inspectorTabs.map(({ id: id2, label: label12, icon: Icon2 }, index) => /* @__PURE__ */ (0, import_jsx_runtime88.jsxs)(
+      /* @__PURE__ */ (0, import_jsx_runtime88.jsx)("div", { role: "tablist", "aria-label": "Scene inspector tools", className: "sticky top-0 z-10 grid grid-cols-3 border-b border-ink/15 bg-paper", children: inspectorTabs.map(({ id: id2, label: label13, icon: Icon2 }, index) => /* @__PURE__ */ (0, import_jsx_runtime88.jsxs)(
         "button",
         {
           id: `${inspectorId}-${id2}`,
@@ -107412,7 +107581,7 @@ function InspectorBody({ filming, mode, focus = "trim" }) {
           className: `flex min-w-0 flex-col items-center gap-1 border-b-2 px-1 py-2.5 text-xs font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand ${inspectorTab === id2 ? "border-brand text-ink" : "border-transparent text-ink/50 hover:bg-ink/5 hover:text-ink"}`,
           children: [
             /* @__PURE__ */ (0, import_jsx_runtime88.jsx)(Icon2, { className: "size-4" }),
-            label12
+            label13
           ]
         },
         id2
@@ -107737,7 +107906,7 @@ function CharacterStageView({
     };
     void (async () => {
       try {
-        const { createCharacterStage } = await import("./character-HBARRT2V.js");
+        const { createCharacterStage } = await import("./character-PGJB2G6Q.js");
         if (cancelled || !container.current) return;
         made = await createCharacterStage({
           container: container.current,
@@ -107819,13 +107988,13 @@ function CharacterStageView({
               ["Show skeleton", () => editor.setView("skeleton-mesh")],
               ["Normal view", () => editor.setView("normal")],
               ["Reset camera", () => stage.current?.resetView()]
-            ].map(([label12, run3], index) => /* @__PURE__ */ (0, import_jsx_runtime89.jsxs)("div", { children: [
+            ].map(([label13, run3], index) => /* @__PURE__ */ (0, import_jsx_runtime89.jsxs)("div", { children: [
               index === 3 || index === 7 ? /* @__PURE__ */ (0, import_jsx_runtime89.jsx)("div", { className: "my-1 h-px bg-ink/10" }) : null,
               /* @__PURE__ */ (0, import_jsx_runtime89.jsx)("button", { type: "button", role: "menuitem", autoFocus: index === 0, onClick: () => {
                 run3();
                 setMenu(null);
-              }, className: "flex w-full rounded-lg px-2 py-1.5 text-left hover:bg-ink/10", children: label12 })
-            ] }, label12))
+              }, className: "flex w-full rounded-lg px-2 py-1.5 text-left hover:bg-ink/10", children: label13 })
+            ] }, label13))
           }
         ) : null,
         /* @__PURE__ */ (0, import_jsx_runtime89.jsx)("div", { ref: container, "data-character-stage": true, className: "absolute inset-0" }),
@@ -107889,7 +108058,7 @@ function CharacterStageView({
                     ]
                   }
                 ),
-                viewMenu ? /* @__PURE__ */ (0, import_jsx_runtime89.jsx)("div", { role: "menu", "aria-label": "View mode", className: "absolute bottom-12 left-0 w-60 rounded-2xl bg-surface p-1.5 text-xs font-semibold text-ink shadow-xl ring-1 ring-ink/10", children: MODES.map(({ id: id2, label: label12, Icon: Icon2, group: group2 }, index) => /* @__PURE__ */ (0, import_jsx_runtime89.jsxs)("div", { children: [
+                viewMenu ? /* @__PURE__ */ (0, import_jsx_runtime89.jsx)("div", { role: "menu", "aria-label": "View mode", className: "absolute bottom-12 left-0 w-60 rounded-2xl bg-surface p-1.5 text-xs font-semibold text-ink shadow-xl ring-1 ring-ink/10", children: MODES.map(({ id: id2, label: label13, Icon: Icon2, group: group2 }, index) => /* @__PURE__ */ (0, import_jsx_runtime89.jsxs)("div", { children: [
                   index > 0 && MODES[index - 1].group !== group2 ? /* @__PURE__ */ (0, import_jsx_runtime89.jsx)("div", { className: "my-1 h-px bg-ink/10" }) : null,
                   /* @__PURE__ */ (0, import_jsx_runtime89.jsxs)(
                     "button",
@@ -107904,7 +108073,7 @@ function CharacterStageView({
                       className: `flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left ${view === id2 ? "bg-ink text-on-brand" : "hover:bg-ink/10"}`,
                       children: [
                         /* @__PURE__ */ (0, import_jsx_runtime89.jsx)(Icon2, { className: "size-4", "aria-hidden": true }),
-                        label12
+                        label13
                       ]
                     }
                   )
@@ -108017,7 +108186,7 @@ function CharacterStageView({
 }
 function Toggle2({
   Icon: Icon2,
-  label: label12,
+  label: label13,
   on,
   onChange
 }) {
@@ -108031,7 +108200,7 @@ function Toggle2({
       className: "flex w-full items-center gap-2 rounded-lg py-1 text-left",
       children: [
         /* @__PURE__ */ (0, import_jsx_runtime89.jsx)(Icon2, { className: "size-4 text-ink/60", "aria-hidden": true }),
-        /* @__PURE__ */ (0, import_jsx_runtime89.jsx)("span", { className: "flex-1", children: label12 }),
+        /* @__PURE__ */ (0, import_jsx_runtime89.jsx)("span", { className: "flex-1", children: label13 }),
         /* @__PURE__ */ (0, import_jsx_runtime89.jsx)("span", { className: `relative h-5 w-9 rounded-full transition ${on ? "bg-ink" : "bg-ink/20"}`, children: /* @__PURE__ */ (0, import_jsx_runtime89.jsx)(
           "span",
           {
@@ -108204,7 +108373,7 @@ function useCharacterEditor() {
 var import_jsx_runtime90 = __toESM(require_jsx_runtime(), 1);
 
 // ../../apps/web/components/studio/lab/lab-panels.tsx
-var import_react94 = __toESM(require_react(), 1);
+var import_react95 = __toESM(require_react(), 1);
 
 // ../../apps/web/components/studio/lab/lab-stage.tsx
 var import_react93 = __toESM(require_react(), 1);
@@ -108224,7 +108393,7 @@ function LabStage({ lab }) {
     let made = null;
     void (async () => {
       try {
-        const { createCharacterStage } = await import("./character-HBARRT2V.js");
+        const { createCharacterStage } = await import("./character-PGJB2G6Q.js");
         if (cancelled || !container.current) return;
         made = await createCharacterStage({ container: container.current, recipe: { ...DEFAULT_CHARACTER_RECIPE, body: "robot" }, viewCube: true });
         if (cancelled) {
@@ -108346,9 +108515,9 @@ var LabWorld = class {
     }
     if (measures) {
       for (const o2 of course.obstacles) if (!o2.hidden) {
-        const label12 = text4(measure(o2), o2.id === selected2 ? "#0b0d12" : "#f2f3f5", o2.id === selected2 ? "#f5b942" : "#0b0d12e6");
-        label12.position.set(o2.x + 2.2, labelHeight(o2) + 0.35, o2.z + 0.2);
-        this.#course.add(label12);
+        const label13 = text4(measure(o2), o2.id === selected2 ? "#0b0d12" : "#f2f3f5", o2.id === selected2 ? "#f5b942" : "#0b0d12e6");
+        label13.position.set(o2.x + 2.2, labelHeight(o2) + 0.35, o2.z + 0.2);
+        this.#course.add(label13);
       }
     }
     if (measures) for (const z2 of [0, 5, 10, 15, 20, 25, 30]) {
@@ -108475,8 +108644,8 @@ function grid(end2, step3, color2) {
 var labels = /* @__PURE__ */ new Map();
 function text4(value, color2 = "#f2f3f5", background = "#0b0d12e6") {
   const key2 = `${value}|${color2}|${background}`;
-  let label12 = labels.get(key2);
-  if (!label12) {
+  let label13 = labels.get(key2);
+  if (!label13) {
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
     const font = '600 28px "IBM Plex Mono", ui-monospace, monospace';
@@ -108490,11 +108659,11 @@ function text4(value, color2 = "#f2f3f5", background = "#0b0d12e6") {
     ctx.fillStyle = color2;
     ctx.textBaseline = "middle";
     ctx.fillText(value, 12, 23);
-    label12 = { material: new SpriteMaterial({ map: new CanvasTexture(canvas), depthTest: false, transparent: true }), width };
-    labels.set(key2, label12);
+    label13 = { material: new SpriteMaterial({ map: new CanvasTexture(canvas), depthTest: false, transparent: true }), width };
+    labels.set(key2, label13);
   }
-  const sprite = new Sprite(label12.material);
-  sprite.scale.set(label12.width / 140, 44 / 140, 1);
+  const sprite = new Sprite(label13.material);
+  sprite.scale.set(label13.width / 140, 44 / 140, 1);
   sprite.renderOrder = 10;
   return sprite;
 }
@@ -108528,14 +108697,239 @@ function labelHeight(o2) {
   }
 }
 
-// ../../apps/web/components/studio/lab/lab-panels.tsx
+// ../../apps/web/components/studio/lab/lab-share.tsx
+var import_react94 = __toESM(require_react(), 1);
 var import_jsx_runtime92 = __toESM(require_jsx_runtime(), 1);
 var label11 = "text-[11px] font-black tracking-wide text-ink/50 uppercase";
+var STATUS = {
+  private: { short: "Private", text: "Private \xB7 only on this device", className: "bg-ink/10 text-ink/70", icon: Lock },
+  pending: { short: "Waiting for your OK", text: "Waiting for your OK to share", className: "bg-amber-500/15 text-amber-700", icon: Clock },
+  shared: { short: "Shared", text: "Shared with the community", className: "bg-emerald-500/15 text-emerald-700", icon: Globe },
+  blocked: { short: "Cannot be shared", text: "Cannot be shared (rights)", className: "bg-coral/15 text-coral", icon: Ban }
+};
+var message = (e2) => e2 instanceof Error ? e2.message.split("\n")[0] : String(e2);
+function StatusChip({ status, local: local2 }) {
+  const s2 = STATUS[status], Icon2 = s2.icon;
+  return /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("span", { className: `inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[10px] font-bold ${s2.className}`, title: s2.text, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(Icon2, { className: "size-3" }),
+    status === "shared" && local2 ? "Shared \xB7 local preview" : s2.short
+  ] });
+}
+function MyMotions({ lab, open: open2 }) {
+  const [error, setError] = (0, import_react94.useState)(null);
+  const mine = lab.mine();
+  const asks = mine.filter((m2) => m2.status === "pending" && m2.share && m2.share.prepared_by !== "you");
+  return /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("section", { "aria-label": "My motions", className: "flex flex-col gap-1.5", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("span", { className: `${label11} mt-2`, children: [
+      "My motions \xB7 ",
+      mine.length
+    ] }),
+    asks.map((m2) => /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("div", { role: "status", className: "flex items-center gap-2 rounded-lg bg-amber-500/15 px-2 py-1.5 text-xs", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("span", { className: "flex-1", children: [
+        m2.share.prepared_by,
+        " prepared ",
+        /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("b", { children: m2.share.name }),
+        " to share. It waits for your OK."
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("button", { type: "button", className: "rounded bg-ink px-2 py-1 font-bold text-on-brand", onClick: () => open2(m2.version), children: "Review" })
+    ] }, m2.version)),
+    mine.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("p", { className: "text-xs text-ink/50", children: "No motions yet: run, then Save as version. New versions stay on this device until you share them." }) : null,
+    /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("ul", { className: "flex flex-col gap-0.5", children: mine.map((m2) => /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("li", { className: "flex min-h-9 items-center gap-2 rounded-lg px-2 py-1 text-xs hover:bg-ink/5", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("div", { className: "min-w-0 flex-1", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("div", { className: "truncate font-semibold", children: [
+          m2.share && m2.share.state !== "stopped" ? m2.share.name : `${m2.motion} v${m2.n}`,
+          m2.best ? " \xB7 best" : ""
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(StatusChip, { status: m2.status, local: m2.share?.where === "local-preview" })
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("b", { className: "font-mono tabular-nums", children: m2.score }),
+      m2.status === "shared" ? /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("button", { type: "button", className: "rounded px-1.5 py-1 font-bold hover:bg-ink/10", onClick: () => {
+        if (window.confirm(`Stop sharing "${m2.share.name}"?`)) lab.unshare(m2.version).then(() => setError(null), (e2) => setError(message(e2)));
+      }, children: "Stop sharing" }) : /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("button", { type: "button", className: "flex items-center gap-1 rounded px-1.5 py-1 font-bold hover:bg-ink/10", title: m2.status === "blocked" ? m2.blocked.join(" ") : "Share with the GenVR community", onClick: () => open2(m2.version), children: [
+        /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(Share2, { className: "size-3.5" }),
+        m2.status === "pending" ? "Review" : "Share\u2026"
+      ] })
+    ] }, m2.version)) }),
+    error ? /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("p", { role: "alert", className: "rounded-lg bg-coral/15 px-2 py-1.5 text-xs font-semibold text-coral", children: error }) : null
+  ] });
+}
+function ShareMotionDialog({ lab, version, close }) {
+  const v2 = lab.versionById(version);
+  const share = lab.shareOf(version);
+  const live = share && share.state !== "stopped" ? share : void 0;
+  const rights = lab.rights(version);
+  const similar = (0, import_react94.useMemo)(() => lab.similar(version), [lab, version]);
+  const [step3, setStep] = (0, import_react94.useState)(similar.length && !live ? 1 : 2);
+  const [name2, setName2] = (0, import_react94.useState)(live?.name ?? (v2.note || `${v2.motion} \xB7 ${v2.settings.speed} m/s`));
+  const [description, setDescription] = (0, import_react94.useState)(live?.description ?? "");
+  const [tags, setTags] = (0, import_react94.useState)((live?.tags ?? [v2.motion.toLowerCase().replace(/[^a-z0-9]+/g, "-"), "robot"]).join(", "));
+  const [preview, setPreview] = (0, import_react94.useState)(live?.preview_s ?? 4);
+  const [error, setError] = (0, import_react94.useState)(null);
+  const [busy, setBusy] = (0, import_react94.useState)(false);
+  (0, import_react94.useEffect)(() => {
+    const key2 = (e2) => {
+      if (e2.key === "Escape") close();
+    };
+    window.addEventListener("keydown", key2);
+    return () => window.removeEventListener("keydown", key2);
+  }, [close]);
+  const tagList = tags.split(/[,\s]+/).map((t8) => t8.trim().toLowerCase()).filter(Boolean);
+  const blocked = rights.reasons.length > 0;
+  const local2 = lab.publishing === "local-preview";
+  const shareNow = async () => {
+    setBusy(true);
+    try {
+      const draft = { name: name2, description, tags: tagList, preview_s: preview };
+      const same = live?.state === "pending" && live.name === name2 && live.description === description && live.tags.join(",") === tagList.join(",") && live.preview_s === preview;
+      if (!same) lab.prepareShare(version, draft, PERSON);
+      await lab.share(version, PERSON);
+      close();
+    } catch (e2) {
+      setError(message(e2));
+    } finally {
+      setBusy(false);
+    }
+  };
+  const checks = [
+    [rights.made_here, `Made in this lab${v2.by === "agent" ? " (by your agent)" : " by you"}`],
+    [rights.not_mixamo, "Made from a GenVR library move, not from a Mixamo move"],
+    [rights.video_rights, "No source video (or you own its rights)"],
+    [rights.passes_course, `Passes the course: score ${v2.score.total}${v2.score.fell ? ", falls" : ", no fall"}`]
+  ];
+  const field6 = "w-full rounded-lg border border-ink/15 bg-paper px-2 py-1.5 text-sm outline-none focus:border-ink";
+  return /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("div", { className: "fixed inset-0 z-50 grid place-items-center bg-black/50 p-4", onMouseDown: (e2) => {
+    if (e2.target === e2.currentTarget) close();
+  }, children: /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("div", { role: "dialog", "aria-modal": "true", "aria-label": "Share a motion", className: "flex max-h-[90vh] w-[min(34rem,100%)] flex-col gap-3 overflow-y-auto rounded-xl border border-ink/15 bg-surface p-4 text-ink shadow-xl", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("div", { className: "flex items-start gap-2", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("div", { className: "flex-1", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("div", { className: label11, children: step3 === 1 ? "Step 1 \xB7 saved" : "Step 2 \xB7 share with the GenVR community?" }),
+        /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("b", { className: "text-sm", children: [
+          v2.motion,
+          " v",
+          v2.n,
+          " \xB7 ",
+          v2.id
+        ] })
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("button", { type: "button", "aria-label": "Close", className: "rounded p-1 hover:bg-ink/10", onClick: close, children: /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(X, { className: "size-4" }) })
+    ] }),
+    step3 === 1 ? /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)(import_jsx_runtime92.Fragment, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("p", { className: "rounded-lg bg-ink/5 p-2 text-xs", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(Lock, { className: "mr-1 inline size-3.5" }),
+        /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("b", { children: "Saved privately in My motions." }),
+        " Only on this device. Nothing leaves it until you share."
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("div", { className: label11, children: "Similar motions we already have" }),
+      /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("ul", { className: "flex flex-col gap-1", children: similar.map((s2) => /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("li", { className: "rounded-lg border border-ink/10 p-2 text-xs", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("div", { className: "flex items-center gap-2", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("b", { className: "flex-1", children: [
+            s2.name,
+            " \xB7 ",
+            s2.source === "library" ? "library" : "yours, shared"
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("span", { className: "font-mono font-bold", children: [
+            s2.alike,
+            "% alike"
+          ] })
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("p", { className: "text-ink/60", children: s2.note })
+      ] }, `${s2.source}-${s2.name}`)) }),
+      /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("p", { className: "text-[11px] text-ink/50", children: "Alike by pace, stride, lean and step height (not pose by pose yet)." }),
+      /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("div", { className: "flex flex-wrap justify-end gap-2", children: [
+        similar[0]?.source === "library" ? /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("button", { type: "button", className: "rounded-lg border border-ink/15 px-3 py-1.5 text-xs font-bold hover:bg-ink/5", onClick: () => {
+          try {
+            lab.useLibraryMove(version);
+            close();
+          } catch (e2) {
+            setError(message(e2));
+          }
+        }, children: "Use library one" }) : null,
+        /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("button", { type: "button", className: "rounded-lg bg-ink px-3 py-1.5 text-xs font-bold text-on-brand", onClick: () => setStep(2), children: "Keep yours" })
+      ] })
+    ] }) : /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)(import_jsx_runtime92.Fragment, { children: [
+      live?.state === "pending" && live.prepared_by !== "you" ? /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("p", { role: "status", className: "rounded-lg bg-amber-500/15 px-2 py-1.5 text-xs", children: [
+        "Prepared by your agent ",
+        /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("b", { children: live.prepared_by }),
+        " \xB7 waits for your OK"
+      ] }) : null,
+      live?.state === "shared" ? /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("p", { role: "status", className: "rounded-lg bg-emerald-500/15 px-2 py-1.5 text-xs", children: [
+        "Shared",
+        live.where === "local-preview" ? " as a local preview (nothing was published)" : "",
+        ". Stop sharing it in My motions."
+      ] }) : null,
+      /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("label", { className: "flex flex-col gap-1 text-xs", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("span", { className: label11, children: "Name" }),
+        /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("input", { className: field6, maxLength: 80, value: name2, onChange: (e2) => setName2(e2.target.value) })
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("label", { className: "flex flex-col gap-1 text-xs", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("span", { className: label11, children: "Description" }),
+        /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("textarea", { className: `${field6} min-h-16`, maxLength: 400, value: description, onChange: (e2) => setDescription(e2.target.value), placeholder: "What it does, what it was tuned for" })
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("label", { className: "flex flex-col gap-1 text-xs", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("span", { className: label11, children: "Tags (comma between)" }),
+        /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("input", { className: field6, value: tags, onChange: (e2) => setTags(e2.target.value) }),
+        /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("span", { className: "flex flex-wrap gap-1", children: tagList.slice(0, 8).map((t8) => /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("span", { className: "rounded-full bg-ink/10 px-2 py-0.5 text-[11px]", children: t8 }, t8)) })
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("div", { className: "grid grid-cols-3 gap-2 text-xs", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("div", { className: "rounded-lg border border-ink/10 p-2", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("div", { className: label11, children: "Made on" }),
+          /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("b", { children: v2.settings.character === "robot" ? "Standard robot" : v2.settings.character })
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("div", { className: "rounded-lg border border-ink/10 p-2", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("div", { className: label11, children: "Score" }),
+          /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("b", { className: "font-mono", children: v2.score.total })
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("label", { className: "rounded-lg border border-ink/10 p-2", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("div", { className: label11, children: "Preview" }),
+          /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("select", { className: "bg-transparent font-bold outline-none", value: preview, onChange: (e2) => setPreview(Number(e2.target.value)), children: [2, 3, 4, 6, 8, 10].map((s2) => /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("option", { value: s2, children: [
+            s2,
+            " s"
+          ] }, s2)) })
+        ] })
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("p", { className: "text-[11px] text-ink/50", children: [
+        "The preview clip is the first ",
+        preview,
+        " s of this version's run (",
+        v2.run,
+        "), replayed from its course and settings."
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("div", { className: label11, children: "Checks before sharing" }),
+      /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("ul", { className: "flex flex-col gap-1 text-xs", children: checks.map(([ok, text5]) => /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("li", { className: `flex items-center gap-2 ${ok ? "" : "font-semibold text-coral"}`, children: [
+        ok ? /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(Check, { className: "size-3.5 text-emerald-600" }) : /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(Ban, { className: "size-3.5" }),
+        text5
+      ] }, text5)) }),
+      /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("div", { className: "rounded-lg border border-ink/10 bg-paper p-2 text-xs", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("div", { className: label11, children: "Licence" }),
+        /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("b", { children: MOTION_SHARE_LICENCE.name }),
+        /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("p", { className: "text-ink/70", children: MOTION_SHARE_LICENCE.text })
+      ] }),
+      local2 && !blocked ? /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("p", { className: "rounded-lg border border-ink/15 bg-paper p-2 text-xs text-ink/70", children: "Local preview. Publishing to the GenVR community needs GenVR hosting; without it the motion is only marked shared on this device and nothing leaves it." }) : null,
+      error ? /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("p", { role: "alert", className: "rounded-lg bg-coral/15 px-2 py-1.5 text-xs font-semibold text-coral", children: error }) : null,
+      /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("div", { className: "flex flex-wrap justify-end gap-2", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("button", { type: "button", className: "rounded-lg border border-ink/15 px-3 py-1.5 text-xs font-bold hover:bg-ink/5", onClick: () => {
+          if (live?.state === "pending") void lab.unshare(version).catch(() => {
+          });
+          close();
+        }, children: "Keep private" }),
+        /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("button", { type: "button", disabled: blocked || busy || !name2.trim() || live?.state === "shared", className: "flex items-center gap-1.5 rounded-lg bg-ink px-3 py-1.5 text-xs font-bold text-on-brand disabled:opacity-40", onClick: () => void shareNow(), children: [
+          /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(Share2, { className: "size-3.5" }),
+          "Share with the community"
+        ] })
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("p", { className: "text-[11px] text-ink/50", children: "You can stop sharing any time (My motions \u203A Stop sharing)." })
+    ] })
+  ] }) });
+}
+
+// ../../apps/web/components/studio/lab/lab-panels.tsx
+var import_jsx_runtime93 = __toESM(require_jsx_runtime(), 1);
+var label12 = "text-[11px] font-black tracking-wide text-ink/50 uppercase";
 var row = "flex h-9 items-center gap-2 rounded-lg px-2 text-left text-xs";
 var KIND_NAMES2 = { step: "Step", ramp: "Ramp", gap: "Gap", low_wall: "Low wall", window: "Window" };
 var LATER_NAMES = { beam: "Beam", door: "Door", uneven: "Uneven ground", moving_platform: "Moving platform" };
 function useLab(lab) {
-  (0, import_react94.useSyncExternalStore)(lab.subscribe, lab.getVersion, lab.getVersion);
+  (0, import_react95.useSyncExternalStore)(lab.subscribe, lab.getVersion, lab.getVersion);
   return lab;
 }
 function tryRun(fn, setError) {
@@ -108547,11 +108941,11 @@ function tryRun(fn, setError) {
   }
 }
 function NumberField3({ name: name2, value, unit: unit2, step: step3 = 0.05, min: min10, max: max22, onChange }) {
-  const [draft, setDraft] = (0, import_react94.useState)(String(value));
-  (0, import_react94.useEffect)(() => setDraft(String(value)), [value]);
-  return /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("label", { className: "flex h-8 min-w-0 items-center gap-1.5 rounded-lg border border-ink/10 bg-paper px-2 text-xs", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("span", { className: "shrink-0 text-[10px] font-black uppercase text-ink/50", children: name2 }),
-    /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(
+  const [draft, setDraft] = (0, import_react95.useState)(String(value));
+  (0, import_react95.useEffect)(() => setDraft(String(value)), [value]);
+  return /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("label", { className: "flex h-8 min-w-0 items-center gap-1.5 rounded-lg border border-ink/10 bg-paper px-2 text-xs", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("span", { className: "shrink-0 text-[10px] font-black uppercase text-ink/50", children: name2 }),
+    /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(
       "input",
       {
         type: "number",
@@ -108574,73 +108968,73 @@ function NumberField3({ name: name2, value, unit: unit2, step: step3 = 0.05, min
         }
       }
     ),
-    unit2 ? /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("span", { className: "shrink-0 text-[10px] text-ink/50", children: unit2 }) : null
+    unit2 ? /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("span", { className: "shrink-0 text-[10px] text-ink/50", children: unit2 }) : null
   ] });
 }
 function Problem({ text: text5 }) {
-  return text5 ? /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("p", { role: "alert", className: "rounded-lg bg-coral/15 px-2 py-1.5 text-xs font-semibold text-coral", children: text5 }) : null;
+  return text5 ? /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("p", { role: "alert", className: "rounded-lg bg-coral/15 px-2 py-1.5 text-xs font-semibold text-coral", children: text5 }) : null;
 }
 function LabLeft({ lab }) {
   useLab(lab);
-  const [error, setError] = (0, import_react94.useState)(null);
-  const [menu, setMenu] = (0, import_react94.useState)(null);
+  const [error, setError] = (0, import_react95.useState)(null);
+  const [menu, setMenu] = (0, import_react95.useState)(null);
   const { course } = lab.data;
   const value = (o2) => measure(o2).replace(/^(step|ramp|gap|low wall|window) /, "");
-  return /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("div", { className: "flex h-full min-h-0 flex-col gap-2 overflow-auto p-3", onClick: () => setMenu(null), children: [
-    /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("div", { className: "flex items-center gap-1", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("span", { className: `${label11} flex-1`, children: [
+  return /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("div", { className: "flex h-full min-h-0 flex-col gap-2 overflow-auto p-3", onClick: () => setMenu(null), children: [
+    /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("div", { className: "flex items-center gap-1", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("span", { className: `${label12} flex-1`, children: [
         "Course \xB7 seed ",
         course.seed
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("button", { type: "button", className: "rounded p-1.5 hover:bg-ink/10", title: "New course from the seed (right panel)", "aria-label": "New course from a seed", onClick: () => lab.select(null), children: /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(Dices, { className: "size-4" }) })
+      /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("button", { type: "button", className: "rounded p-1.5 hover:bg-ink/10", title: "New course from the seed (right panel)", "aria-label": "New course from a seed", onClick: () => lab.select(null), children: /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(Dices, { className: "size-4" }) })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("ul", { className: "flex flex-col gap-0.5", "aria-label": "Obstacles", children: course.obstacles.map((o2) => /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("li", { children: /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("div", { className: `${row} ${lab.view.selected === o2.id ? "bg-ink/10 ring-1 ring-ink" : "hover:bg-ink/5"}`, onContextMenu: (e2) => {
+    /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("ul", { className: "flex flex-col gap-0.5", "aria-label": "Obstacles", children: course.obstacles.map((o2) => /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("li", { children: /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("div", { className: `${row} ${lab.view.selected === o2.id ? "bg-ink/10 ring-1 ring-ink" : "hover:bg-ink/5"}`, onContextMenu: (e2) => {
       e2.preventDefault();
       setMenu({ id: o2.id, x: e2.clientX, y: e2.clientY });
     }, children: [
-      /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("button", { type: "button", className: "flex min-w-0 flex-1 items-center gap-2 text-left", onClick: () => lab.select(o2.id), "aria-pressed": lab.view.selected === o2.id, children: [
-        /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("b", { className: "truncate", children: KIND_NAMES2[o2.kind] }),
-        /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("span", { className: "ml-auto truncate font-mono text-[11px] text-ink/50", children: value(o2) })
+      /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("button", { type: "button", className: "flex min-w-0 flex-1 items-center gap-2 text-left", onClick: () => lab.select(o2.id), "aria-pressed": lab.view.selected === o2.id, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("b", { className: "truncate", children: KIND_NAMES2[o2.kind] }),
+        /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("span", { className: "ml-auto truncate font-mono text-[11px] text-ink/50", children: value(o2) })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("button", { type: "button", className: "rounded p-1 hover:bg-ink/10", title: o2.hidden ? "Show" : "Hide", "aria-label": `${o2.hidden ? "Show" : "Hide"} ${o2.id}`, onClick: () => tryRun(() => lab.setObstacle(o2.id, { hidden: !o2.hidden }), setError), children: o2.hidden ? /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(EyeOff, { className: "size-3.5" }) : /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(Eye, { className: "size-3.5" }) })
+      /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("button", { type: "button", className: "rounded p-1 hover:bg-ink/10", title: o2.hidden ? "Show" : "Hide", "aria-label": `${o2.hidden ? "Show" : "Hide"} ${o2.id}`, onClick: () => tryRun(() => lab.setObstacle(o2.id, { hidden: !o2.hidden }), setError), children: o2.hidden ? /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(EyeOff, { className: "size-3.5" }) : /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(Eye, { className: "size-3.5" }) })
     ] }) }, o2.id)) }),
-    /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("span", { className: label11, children: "Street" }),
-    /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("div", { className: "flex flex-col gap-0.5 text-xs", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("button", { type: "button", className: `${row} hover:bg-ink/5`, onClick: () => lab.select(null), children: [
-        /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(TrafficCone, { className: "size-3.5" }),
-        /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("b", { className: "flex-1", children: course.street ? `Street \xB7 ${course.street.lanes} lanes` : "No street" }),
-        /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("span", { className: "font-mono text-[11px] text-ink/50", children: course.street ? `light ${course.street.light.cycle_s} s` : "" })
+    /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("span", { className: label12, children: "Street" }),
+    /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("div", { className: "flex flex-col gap-0.5 text-xs", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("button", { type: "button", className: `${row} hover:bg-ink/5`, onClick: () => lab.select(null), children: [
+        /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(TrafficCone, { className: "size-3.5" }),
+        /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("b", { className: "flex-1", children: course.street ? `Street \xB7 ${course.street.lanes} lanes` : "No street" }),
+        /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("span", { className: "font-mono text-[11px] text-ink/50", children: course.street ? `light ${course.street.light.cycle_s} s` : "" })
       ] }),
-      course.cars.map((car) => /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("button", { type: "button", className: `${row} hover:bg-ink/5`, onClick: () => lab.select(null), children: [
-        /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(Car, { className: "size-3.5" }),
-        /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("b", { className: "flex-1", children: car.id }),
-        /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("span", { className: "font-mono text-[11px] text-ink/50", children: [
+      course.cars.map((car) => /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("button", { type: "button", className: `${row} hover:bg-ink/5`, onClick: () => lab.select(null), children: [
+        /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(Car, { className: "size-3.5" }),
+        /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("b", { className: "flex-1", children: car.id }),
+        /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("span", { className: "font-mono text-[11px] text-ink/50", children: [
           car.speed,
           " m/s",
           car.runs_red ? " \xB7 runs red" : ""
         ] })
       ] }, car.id))
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("span", { className: label11, children: "Add an obstacle" }),
-    /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("div", { className: "grid grid-cols-3 gap-1", children: [
-      LAB_OBSTACLE_KINDS.map((kind) => /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("button", { type: "button", className: "flex h-12 flex-col items-center justify-center gap-0.5 rounded-xl bg-paper text-[11px] font-bold hover:bg-ink/10", onClick: () => tryRun(() => lab.addObstacle(kind), setError), title: `Add a ${KIND_NAMES2[kind].toLowerCase()}`, children: [
-        /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(Plus, { className: "size-3.5" }),
+    /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("span", { className: label12, children: "Add an obstacle" }),
+    /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("div", { className: "grid grid-cols-3 gap-1", children: [
+      LAB_OBSTACLE_KINDS.map((kind) => /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("button", { type: "button", className: "flex h-12 flex-col items-center justify-center gap-0.5 rounded-xl bg-paper text-[11px] font-bold hover:bg-ink/10", onClick: () => tryRun(() => lab.addObstacle(kind), setError), title: `Add a ${KIND_NAMES2[kind].toLowerCase()}`, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(Plus, { className: "size-3.5" }),
         KIND_NAMES2[kind]
       ] }, kind)),
-      LAB_LATER_KINDS.map((kind) => /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("button", { type: "button", disabled: true, className: "flex h-12 flex-col items-center justify-center gap-0.5 rounded-xl bg-paper text-[11px] font-bold opacity-40", title: `${LATER_NAMES[kind]} \u2014 later`, children: [
-        /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(Plus, { className: "size-3.5" }),
+      LAB_LATER_KINDS.map((kind) => /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("button", { type: "button", disabled: true, className: "flex h-12 flex-col items-center justify-center gap-0.5 rounded-xl bg-paper text-[11px] font-bold opacity-40", title: `${LATER_NAMES[kind]} \u2014 later`, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(Plus, { className: "size-3.5" }),
         LATER_NAMES[kind].split(" ")[0]
       ] }, kind))
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(Problem, { text: error }),
-    menu ? /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("div", { role: "menu", className: "fixed z-50 min-w-48 rounded-xl border border-ink/10 bg-surface p-1 text-xs shadow-xl", style: { left: menu.x, top: menu.y }, children: [
-      /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("button", { role: "menuitem", type: "button", className: "flex w-full items-center gap-2 rounded px-2 py-1.5 hover:bg-ink/10", onClick: () => lab.select(menu.id), children: "Settings" }),
-      /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("button", { role: "menuitem", type: "button", className: "flex w-full items-center gap-2 rounded px-2 py-1.5 hover:bg-ink/10", onClick: () => tryRun(() => lab.duplicateObstacle(menu.id), setError), children: [
-        /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(Copy, { className: "size-3.5" }),
+    /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(Problem, { text: error }),
+    menu ? /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("div", { role: "menu", className: "fixed z-50 min-w-48 rounded-xl border border-ink/10 bg-surface p-1 text-xs shadow-xl", style: { left: menu.x, top: menu.y }, children: [
+      /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("button", { role: "menuitem", type: "button", className: "flex w-full items-center gap-2 rounded px-2 py-1.5 hover:bg-ink/10", onClick: () => lab.select(menu.id), children: "Settings" }),
+      /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("button", { role: "menuitem", type: "button", className: "flex w-full items-center gap-2 rounded px-2 py-1.5 hover:bg-ink/10", onClick: () => tryRun(() => lab.duplicateObstacle(menu.id), setError), children: [
+        /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(Copy, { className: "size-3.5" }),
         "Duplicate"
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("button", { role: "menuitem", type: "button", className: "flex w-full items-center gap-2 rounded px-2 py-1.5 text-coral hover:bg-ink/10", onClick: () => tryRun(() => lab.removeObstacle(menu.id), setError), children: [
-        /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(Trash, { className: "size-3.5" }),
+      /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("button", { role: "menuitem", type: "button", className: "flex w-full items-center gap-2 rounded px-2 py-1.5 text-coral hover:bg-ink/10", onClick: () => tryRun(() => lab.removeObstacle(menu.id), setError), children: [
+        /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(Trash, { className: "size-3.5" }),
         "Remove"
       ] })
     ] }) : null
@@ -108656,83 +109050,88 @@ var SIZE_FIELDS = {
 function LabRight({ lab }) {
   useLab(lab);
   const selected2 = lab.data.course.obstacles.find((o2) => o2.id === lab.view.selected);
-  return /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("div", { className: "flex h-full min-h-0 flex-col gap-3 overflow-auto p-3", children: selected2 ? /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(ObstacleProperties, { lab, o: selected2 }) : /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)(import_jsx_runtime92.Fragment, { children: [
-    /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(RunPanel, { lab }),
-    /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(CoursePanel, { lab })
-  ] }) });
+  const [sharing, setSharing] = (0, import_react95.useState)(null);
+  return /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("div", { className: "flex h-full min-h-0 flex-col gap-3 overflow-auto p-3", children: [
+    selected2 ? /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(ObstacleProperties, { lab, o: selected2 }) : /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)(import_jsx_runtime93.Fragment, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(RunPanel, { lab, share: setSharing }),
+      /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(MyMotions, { lab, open: setSharing }),
+      /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(CoursePanel, { lab })
+    ] }),
+    sharing && lab.data.versions.some((v2) => v2.id === sharing) ? /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(ShareMotionDialog, { lab, version: sharing, close: () => setSharing(null) }, sharing) : null
+  ] });
 }
 function ObstacleProperties({ lab, o: o2 }) {
-  const [error, setError] = (0, import_react94.useState)(null);
+  const [error, setError] = (0, import_react95.useState)(null);
   const set = (patch) => tryRun(() => lab.setObstacle(o2.id, patch), setError);
   const record2 = o2;
-  return /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("section", { "aria-label": `${KIND_NAMES2[o2.kind]} settings`, className: "flex flex-col gap-2", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("div", { className: "flex items-center gap-2", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("div", { className: "flex-1", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("div", { className: label11, children: "Obstacle" }),
-        /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("b", { className: "text-sm", children: [
+  return /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("section", { "aria-label": `${KIND_NAMES2[o2.kind]} settings`, className: "flex flex-col gap-2", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("div", { className: "flex items-center gap-2", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("div", { className: "flex-1", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("div", { className: label12, children: "Obstacle" }),
+        /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("b", { className: "text-sm", children: [
           KIND_NAMES2[o2.kind],
           " \xB7 ",
           o2.id
         ] })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("button", { type: "button", className: "rounded p-1.5 hover:bg-ink/10", title: "Duplicate", "aria-label": "Duplicate", onClick: () => tryRun(() => lab.duplicateObstacle(o2.id), setError), children: /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(Copy, { className: "size-4" }) }),
-      /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("button", { type: "button", className: "rounded p-1.5 text-coral hover:bg-ink/10", title: "Remove", "aria-label": "Remove", onClick: () => tryRun(() => lab.removeObstacle(o2.id), setError), children: /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(Trash, { className: "size-4" }) }),
-      /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("button", { type: "button", className: "rounded p-1.5 hover:bg-ink/10", title: "Close (Esc)", "aria-label": "Close", onClick: () => lab.select(null), children: /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(X, { className: "size-4" }) })
+      /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("button", { type: "button", className: "rounded p-1.5 hover:bg-ink/10", title: "Duplicate", "aria-label": "Duplicate", onClick: () => tryRun(() => lab.duplicateObstacle(o2.id), setError), children: /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(Copy, { className: "size-4" }) }),
+      /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("button", { type: "button", className: "rounded p-1.5 text-coral hover:bg-ink/10", title: "Remove", "aria-label": "Remove", onClick: () => tryRun(() => lab.removeObstacle(o2.id), setError), children: /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(Trash, { className: "size-4" }) }),
+      /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("button", { type: "button", className: "rounded p-1.5 hover:bg-ink/10", title: "Close (Esc)", "aria-label": "Close", onClick: () => lab.select(null), children: /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(X, { className: "size-4" }) })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("p", { className: "font-mono text-xs text-ink/60", children: measure(o2) }),
-    /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("div", { className: "grid grid-cols-2 gap-1.5", children: [
-      SIZE_FIELDS[o2.kind].map(([key2, name2, step3]) => /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(NumberField3, { name: name2, unit: "m", step: step3 ?? 0.05, value: record2[key2], onChange: (v2) => set({ [key2]: v2 }) }, key2)),
-      /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(NumberField3, { name: "Z", unit: "m", step: 0.1, value: o2.z, onChange: (v2) => set({ z: v2 }) }),
-      /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(NumberField3, { name: "X", unit: "m", step: 0.1, value: o2.x, onChange: (v2) => set({ x: v2 }) })
+    /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("p", { className: "font-mono text-xs text-ink/60", children: measure(o2) }),
+    /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("div", { className: "grid grid-cols-2 gap-1.5", children: [
+      SIZE_FIELDS[o2.kind].map(([key2, name2, step3]) => /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(NumberField3, { name: name2, unit: "m", step: step3 ?? 0.05, value: record2[key2], onChange: (v2) => set({ [key2]: v2 }) }, key2)),
+      /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(NumberField3, { name: "Z", unit: "m", step: 0.1, value: o2.z, onChange: (v2) => set({ z: v2 }) }),
+      /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(NumberField3, { name: "X", unit: "m", step: 0.1, value: o2.x, onChange: (v2) => set({ x: v2 }) })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(Problem, { text: error })
+    /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(Problem, { text: error })
   ] });
 }
 function CoursePanel({ lab }) {
-  const [error, setError] = (0, import_react94.useState)(null);
-  const [seed, setSeed] = (0, import_react94.useState)(lab.data.course.seed), [count3, setCount] = (0, import_react94.useState)(5), [hard, setHard] = (0, import_react94.useState)(2);
+  const [error, setError] = (0, import_react95.useState)(null);
+  const [seed, setSeed] = (0, import_react95.useState)(lab.data.course.seed), [count3, setCount] = (0, import_react95.useState)(5), [hard, setHard] = (0, import_react95.useState)(2);
   const { course } = lab.data;
   const st = course.street, car = course.cars[0];
-  return /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("section", { "aria-label": "Course and traffic", className: "flex flex-col gap-2 border-t border-ink/10 pt-3", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("span", { className: label11, children: "Course from a seed" }),
-    /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("div", { className: "grid grid-cols-3 gap-1.5", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(NumberField3, { name: "Seed", step: 1, min: 0, value: seed, onChange: (v2) => setSeed(Math.max(0, Math.round(v2))) }),
-      /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(NumberField3, { name: "Obst.", step: 1, min: 1, max: 12, value: count3, onChange: (v2) => setCount(Math.round(v2)) }),
-      /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(NumberField3, { name: "Hard", step: 1, min: 1, max: 5, value: hard, onChange: (v2) => setHard(Math.round(v2)) })
+  return /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("section", { "aria-label": "Course and traffic", className: "flex flex-col gap-2 border-t border-ink/10 pt-3", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("span", { className: label12, children: "Course from a seed" }),
+    /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("div", { className: "grid grid-cols-3 gap-1.5", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(NumberField3, { name: "Seed", step: 1, min: 0, value: seed, onChange: (v2) => setSeed(Math.max(0, Math.round(v2))) }),
+      /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(NumberField3, { name: "Obst.", step: 1, min: 1, max: 12, value: count3, onChange: (v2) => setCount(Math.round(v2)) }),
+      /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(NumberField3, { name: "Hard", step: 1, min: 1, max: 5, value: hard, onChange: (v2) => setHard(Math.round(v2)) })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("div", { className: "flex gap-1.5", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("button", { type: "button", className: "flex h-8 flex-1 items-center justify-center gap-1.5 rounded-lg border border-ink/15 text-xs font-bold hover:bg-ink/5", onClick: () => tryRun(() => lab.fromSeed(seed, count3, hard, Boolean(st)), setError), children: [
-        /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(Dices, { className: "size-3.5" }),
+    /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("div", { className: "flex gap-1.5", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("button", { type: "button", className: "flex h-8 flex-1 items-center justify-center gap-1.5 rounded-lg border border-ink/15 text-xs font-bold hover:bg-ink/5", onClick: () => tryRun(() => lab.fromSeed(seed, count3, hard, Boolean(st)), setError), children: [
+        /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(Dices, { className: "size-3.5" }),
         "New course"
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("button", { type: "button", className: "flex h-8 items-center justify-center gap-1.5 rounded-lg border border-ink/15 px-2 text-xs font-bold hover:bg-ink/5", title: "A random seed", onClick: () => setSeed(Math.floor(Math.random() * 1e5)), children: "Random seed" })
+      /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("button", { type: "button", className: "flex h-8 items-center justify-center gap-1.5 rounded-lg border border-ink/15 px-2 text-xs font-bold hover:bg-ink/5", title: "A random seed", onClick: () => setSeed(Math.floor(Math.random() * 1e5)), children: "Random seed" })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("span", { className: "text-[11px] text-ink/50", children: "Same seed = same course, for people, MCP and the lab manager." }),
-    /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("span", { className: label11, children: "Traffic" }),
-    /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("label", { className: "flex items-center gap-2 text-xs", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("input", { type: "checkbox", checked: Boolean(st), onChange: (e2) => tryRun(() => lab.setTraffic(e2.target.checked ? { z: Math.ceil(course.finish_z - 10) } : null, e2.target.checked ? course.cars : []), setError) }),
+    /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("span", { className: "text-[11px] text-ink/50", children: "Same seed = same course, for people, MCP and the lab manager." }),
+    /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("span", { className: label12, children: "Traffic" }),
+    /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("label", { className: "flex items-center gap-2 text-xs", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("input", { type: "checkbox", checked: Boolean(st), onChange: (e2) => tryRun(() => lab.setTraffic(e2.target.checked ? { z: Math.ceil(course.finish_z - 10) } : null, e2.target.checked ? course.cars : []), setError) }),
       "Street with a crossing"
     ] }),
-    st ? /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("div", { className: "grid grid-cols-2 gap-1.5", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(NumberField3, { name: "Lanes", step: 1, min: 1, max: 4, value: st.lanes, onChange: (v2) => tryRun(() => lab.setTraffic({ ...st, lanes: Math.round(v2) }, course.cars.map((c2) => ({ ...c2, lane: Math.min(c2.lane, Math.round(v2) - 1) }))), setError) }),
-      /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(NumberField3, { name: "Z", unit: "m", step: 0.5, value: st.z, onChange: (v2) => tryRun(() => lab.setTraffic({ ...st, z: v2 }), setError) }),
-      /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(NumberField3, { name: "Light", unit: "s", step: 1, value: st.light.cycle_s, onChange: (v2) => tryRun(() => lab.setTraffic({ ...st, light: { ...st.light, cycle_s: v2 } }), setError) }),
-      /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(NumberField3, { name: "Red", unit: "s", step: 1, value: st.light.red_s, onChange: (v2) => tryRun(() => lab.setTraffic({ ...st, light: { ...st.light, red_s: v2 } }), setError) })
+    st ? /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("div", { className: "grid grid-cols-2 gap-1.5", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(NumberField3, { name: "Lanes", step: 1, min: 1, max: 4, value: st.lanes, onChange: (v2) => tryRun(() => lab.setTraffic({ ...st, lanes: Math.round(v2) }, course.cars.map((c2) => ({ ...c2, lane: Math.min(c2.lane, Math.round(v2) - 1) }))), setError) }),
+      /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(NumberField3, { name: "Z", unit: "m", step: 0.5, value: st.z, onChange: (v2) => tryRun(() => lab.setTraffic({ ...st, z: v2 }), setError) }),
+      /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(NumberField3, { name: "Light", unit: "s", step: 1, value: st.light.cycle_s, onChange: (v2) => tryRun(() => lab.setTraffic({ ...st, light: { ...st.light, cycle_s: v2 } }), setError) }),
+      /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(NumberField3, { name: "Red", unit: "s", step: 1, value: st.light.red_s, onChange: (v2) => tryRun(() => lab.setTraffic({ ...st, light: { ...st.light, red_s: v2 } }), setError) })
     ] }) : null,
-    st && car ? /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("div", { className: "grid grid-cols-2 gap-1.5", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(NumberField3, { name: "Car speed", unit: "m/s", step: 0.5, value: car.speed, onChange: (v2) => tryRun(() => lab.setTraffic(void 0, course.cars.map((c2, i3) => i3 ? c2 : { ...c2, speed: v2 })), setError) }),
-      /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(NumberField3, { name: "At crossing", unit: "s", step: 0.5, value: car.offset_s, onChange: (v2) => tryRun(() => lab.setTraffic(void 0, course.cars.map((c2, i3) => i3 ? c2 : { ...c2, offset_s: v2 })), setError) }),
-      /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("label", { className: "col-span-2 flex items-center gap-2 text-xs", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("input", { type: "checkbox", checked: car.runs_red, onChange: (e2) => tryRun(() => lab.setTraffic(void 0, course.cars.map((c2, i3) => i3 ? c2 : { ...c2, runs_red: e2.target.checked })), setError) }),
+    st && car ? /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("div", { className: "grid grid-cols-2 gap-1.5", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(NumberField3, { name: "Car speed", unit: "m/s", step: 0.5, value: car.speed, onChange: (v2) => tryRun(() => lab.setTraffic(void 0, course.cars.map((c2, i3) => i3 ? c2 : { ...c2, speed: v2 })), setError) }),
+      /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(NumberField3, { name: "At crossing", unit: "s", step: 0.5, value: car.offset_s, onChange: (v2) => tryRun(() => lab.setTraffic(void 0, course.cars.map((c2, i3) => i3 ? c2 : { ...c2, offset_s: v2 })), setError) }),
+      /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("label", { className: "col-span-2 flex items-center gap-2 text-xs", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("input", { type: "checkbox", checked: car.runs_red, onChange: (e2) => tryRun(() => lab.setTraffic(void 0, course.cars.map((c2, i3) => i3 ? c2 : { ...c2, runs_red: e2.target.checked })), setError) }),
         "Edge case: the car runs the red light"
       ] })
     ] }) : null,
-    st && !car ? /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("button", { type: "button", className: "flex h-8 items-center justify-center gap-1.5 rounded-lg border border-ink/15 text-xs font-bold hover:bg-ink/5", onClick: () => tryRun(() => lab.setTraffic(void 0, [{ id: "car-1", lane: 0 }]), setError), children: [
-      /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(Car, { className: "size-3.5" }),
+    st && !car ? /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("button", { type: "button", className: "flex h-8 items-center justify-center gap-1.5 rounded-lg border border-ink/15 text-xs font-bold hover:bg-ink/5", onClick: () => tryRun(() => lab.setTraffic(void 0, [{ id: "car-1", lane: 0 }]), setError), children: [
+      /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(Car, { className: "size-3.5" }),
       "Add a box car"
     ] }) : null,
-    /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(NumberField3, { name: "Finish", unit: "m", step: 1, value: course.finish_z, onChange: (v2) => tryRun(() => lab.setCourse({ ...course, finish_z: v2 }), setError) }),
-    /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(Problem, { text: error })
+    /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(NumberField3, { name: "Finish", unit: "m", step: 1, value: course.finish_z, onChange: (v2) => tryRun(() => lab.setCourse({ ...course, finish_z: v2 }), setError) }),
+    /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(Problem, { text: error })
   ] });
 }
 var SCORE_ROWS = [
@@ -108756,135 +109155,135 @@ function dot12(key2, v2) {
   if (key2 === "smoothness") return Number(v2) < 0.5 ? "bg-amber-500" : "bg-emerald-500";
   return "bg-ink/30";
 }
-function RunPanel({ lab }) {
-  const [error, setError] = (0, import_react94.useState)(null);
+function RunPanel({ lab, share }) {
+  const [error, setError] = (0, import_react95.useState)(null);
   const s2 = lab.data.settings;
   const set = (patch) => tryRun(() => lab.setSettings(patch), setError);
   const shown = lab.view.run ? lab.data.runs.find((r3) => r3.id === lab.view.run.id) : void 0;
   const best = lab.best();
   const pending = lab.data.best_pending;
   const versions = lab.data.versions.filter((v2) => v2.motion === s2.motion);
-  return /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("section", { "aria-label": "Run", className: "flex flex-col gap-2", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("div", { className: label11, children: "Motion" }),
-    /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("div", { className: "grid grid-cols-2 gap-1.5", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("label", { className: "flex h-8 items-center gap-1.5 rounded-lg border border-ink/10 bg-paper px-2 text-xs", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("span", { className: "text-[10px] font-black uppercase text-ink/50", children: "Who" }),
-        /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("span", { className: "truncate font-semibold", children: "Standard robot" })
+  return /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("section", { "aria-label": "Run", className: "flex flex-col gap-2", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("div", { className: label12, children: "Motion" }),
+    /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("div", { className: "grid grid-cols-2 gap-1.5", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("label", { className: "flex h-8 items-center gap-1.5 rounded-lg border border-ink/10 bg-paper px-2 text-xs", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("span", { className: "text-[10px] font-black uppercase text-ink/50", children: "Who" }),
+        /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("span", { className: "truncate font-semibold", children: "Standard robot" })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("label", { className: "flex h-8 items-center gap-1.5 rounded-lg border border-ink/10 bg-paper px-2 text-xs", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("span", { className: "text-[10px] font-black uppercase text-ink/50", children: "Move" }),
-        /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("select", { className: "min-w-0 flex-1 bg-transparent font-semibold outline-none", value: s2.motion, onChange: (e2) => set({ motion: e2.target.value }), children: LAB_MOVES.map((m2) => /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("option", { children: m2 }, m2)) })
+      /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("label", { className: "flex h-8 items-center gap-1.5 rounded-lg border border-ink/10 bg-paper px-2 text-xs", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("span", { className: "text-[10px] font-black uppercase text-ink/50", children: "Move" }),
+        /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("select", { className: "min-w-0 flex-1 bg-transparent font-semibold outline-none", value: s2.motion, onChange: (e2) => set({ motion: e2.target.value }), children: LAB_MOVES.map((m2) => /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("option", { children: m2 }, m2)) })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(NumberField3, { name: "Speed", unit: "m/s", step: 0.1, value: s2.speed, onChange: (v2) => set({ speed: v2 }) }),
-      /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(NumberField3, { name: "Stride", unit: "m", step: 0.02, value: s2.stride, onChange: (v2) => set({ stride: v2 }) }),
-      /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(NumberField3, { name: "Step h", unit: "m", step: 0.02, value: s2.step_height, onChange: (v2) => set({ step_height: v2 }) }),
-      /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(NumberField3, { name: "Jump t", unit: "ms", step: 10, value: s2.jump_timing_ms, onChange: (v2) => set({ jump_timing_ms: Math.round(v2) }) }),
-      /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(NumberField3, { name: "Blend", unit: "s", step: 0.05, value: s2.blend_s, onChange: (v2) => set({ blend_s: v2 }) }),
-      /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(NumberField3, { name: "Lean", unit: "\xB0", step: 1, value: s2.lean_deg, onChange: (v2) => set({ lean_deg: v2 }) })
+      /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(NumberField3, { name: "Speed", unit: "m/s", step: 0.1, value: s2.speed, onChange: (v2) => set({ speed: v2 }) }),
+      /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(NumberField3, { name: "Stride", unit: "m", step: 0.02, value: s2.stride, onChange: (v2) => set({ stride: v2 }) }),
+      /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(NumberField3, { name: "Step h", unit: "m", step: 0.02, value: s2.step_height, onChange: (v2) => set({ step_height: v2 }) }),
+      /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(NumberField3, { name: "Jump t", unit: "ms", step: 10, value: s2.jump_timing_ms, onChange: (v2) => set({ jump_timing_ms: Math.round(v2) }) }),
+      /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(NumberField3, { name: "Blend", unit: "s", step: 0.05, value: s2.blend_s, onChange: (v2) => set({ blend_s: v2 }) }),
+      /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(NumberField3, { name: "Lean", unit: "\xB0", step: 1, value: s2.lean_deg, onChange: (v2) => set({ lean_deg: v2 }) })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("label", { className: "flex items-center gap-2 text-xs", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("input", { type: "checkbox", checked: s2.wait_for_green, onChange: (e2) => set({ wait_for_green: e2.target.checked }) }),
+    /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("label", { className: "flex items-center gap-2 text-xs", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("input", { type: "checkbox", checked: s2.wait_for_green, onChange: (e2) => set({ wait_for_green: e2.target.checked }) }),
       "Waits for green at the crossing"
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("button", { type: "button", className: "flex h-9 items-center justify-center gap-2 rounded-lg bg-ink text-sm font-bold text-on-brand", onClick: () => tryRun(() => lab.run({}, PERSON), setError), children: [
-      /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(Play, { className: "size-4" }),
+    /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("button", { type: "button", className: "flex h-9 items-center justify-center gap-2 rounded-lg bg-ink text-sm font-bold text-on-brand", onClick: () => tryRun(() => lab.run({}, PERSON), setError), children: [
+      /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(Play, { className: "size-4" }),
       "Run",
-      /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("kbd", { className: "font-mono text-[10px] opacity-70", children: "R" })
+      /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("kbd", { className: "font-mono text-[10px] opacity-70", children: "R" })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(Problem, { text: error }),
-    /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("div", { className: "mt-1 grid grid-cols-[1fr_64px_64px_10px] gap-1.5", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("span", { className: label11, children: "Score" }),
-      /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("span", { className: label11, children: shown?.id ?? "\u2014" }),
-      /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("span", { className: `${label11} !text-cyan-600`, children: best ? `best ${best.id.replace(/^.*-v/, "v")}` : "best \u2014" }),
-      /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("span", {})
+    /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(Problem, { text: error }),
+    /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("div", { className: "mt-1 grid grid-cols-[1fr_64px_64px_10px] gap-1.5", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("span", { className: label12, children: "Score" }),
+      /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("span", { className: label12, children: shown?.id ?? "\u2014" }),
+      /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("span", { className: `${label12} !text-cyan-600`, children: best ? `best ${best.id.replace(/^.*-v/, "v")}` : "best \u2014" }),
+      /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("span", {})
     ] }),
-    SCORE_ROWS.map(([key2, name2, hint]) => /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("div", { title: hint, className: "grid h-7 grid-cols-[1fr_64px_64px_10px] items-center gap-1.5 border-b border-ink/5 text-xs", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("span", { children: name2 }),
-      /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("b", { className: "font-mono tabular-nums", children: shown ? show(key2, shown.score[key2]) : "\u2014" }),
-      /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("span", { className: "font-mono tabular-nums text-cyan-600", children: best ? show(key2, best.score[key2]) : "\u2014" }),
-      /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("span", { className: `size-2 rounded-full ${shown ? dot12(key2, shown.score[key2]) : "bg-ink/20"}` })
+    SCORE_ROWS.map(([key2, name2, hint]) => /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("div", { title: hint, className: "grid h-7 grid-cols-[1fr_64px_64px_10px] items-center gap-1.5 border-b border-ink/5 text-xs", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("span", { children: name2 }),
+      /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("b", { className: "font-mono tabular-nums", children: shown ? show(key2, shown.score[key2]) : "\u2014" }),
+      /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("span", { className: "font-mono tabular-nums text-cyan-600", children: best ? show(key2, best.score[key2]) : "\u2014" }),
+      /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("span", { className: `size-2 rounded-full ${shown ? dot12(key2, shown.score[key2]) : "bg-ink/20"}` })
     ] }, key2)),
-    /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("div", { className: "flex items-center gap-2", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("b", { className: "font-mono text-2xl tabular-nums", children: shown?.score.total ?? "\u2014" }),
-      /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("span", { className: "text-[11px] leading-tight text-ink/50", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("div", { className: "flex items-center gap-2", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("b", { className: "font-mono text-2xl tabular-nums", children: shown?.score.total ?? "\u2014" }),
+      /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("span", { className: "text-[11px] leading-tight text-ink/50", children: [
         "total / 100",
-        best ? /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)(import_jsx_runtime92.Fragment, { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("br", {}),
+        best ? /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)(import_jsx_runtime93.Fragment, { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("br", {}),
           "best is ",
           best.score.total
         ] }) : null
       ] }),
-      shown && !shown.score.finished ? /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("span", { className: "ml-auto rounded-full bg-coral/15 px-2 py-0.5 text-[11px] font-bold text-coral", children: shown.events.at(-1)?.label }) : null
+      shown && !shown.score.finished ? /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("span", { className: "ml-auto rounded-full bg-coral/15 px-2 py-0.5 text-[11px] font-bold text-coral", children: shown.events.at(-1)?.label }) : null
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("div", { className: "mt-2 flex items-center gap-2", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("span", { className: `${label11} flex-1`, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("div", { className: "mt-2 flex items-center gap-2", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("span", { className: `${label12} flex-1`, children: [
         "Versions \xB7 ",
         s2.motion
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("button", { type: "button", disabled: !shown, className: "flex h-7 items-center gap-1 rounded-lg border border-ink/15 px-2 text-xs font-bold hover:bg-ink/5 disabled:opacity-40", onClick: () => tryRun(() => lab.saveVersion(shown?.id, "", PERSON), setError), children: [
-        /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(Star, { className: "size-3.5" }),
+      /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("button", { type: "button", disabled: !shown, className: "flex h-7 items-center gap-1 rounded-lg border border-ink/15 px-2 text-xs font-bold hover:bg-ink/5 disabled:opacity-40", onClick: () => tryRun(() => share(lab.saveVersion(shown?.id, "", PERSON).id), setError), children: [
+        /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(Star, { className: "size-3.5" }),
         "Save as version"
       ] })
     ] }),
-    pending ? /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("div", { role: "status", className: "flex items-center gap-2 rounded-lg bg-amber-500/15 px-2 py-1.5 text-xs", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("span", { className: "flex-1", children: [
+    pending ? /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("div", { role: "status", className: "flex items-center gap-2 rounded-lg bg-amber-500/15 px-2 py-1.5 text-xs", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("span", { className: "flex-1", children: [
         pending.by,
         " asks to make ",
-        /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("b", { children: pending.version }),
+        /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("b", { children: pending.version }),
         " the best."
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("button", { type: "button", className: "flex items-center gap-1 rounded bg-ink px-2 py-1 font-bold text-on-brand", onClick: () => lab.confirmPendingBest(), children: [
-        /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(Check, { className: "size-3.5" }),
+      /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("button", { type: "button", className: "flex items-center gap-1 rounded bg-ink px-2 py-1 font-bold text-on-brand", onClick: () => lab.confirmPendingBest(), children: [
+        /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(Check, { className: "size-3.5" }),
         "Make best"
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("button", { type: "button", className: "rounded px-2 py-1 font-bold hover:bg-ink/10", onClick: () => lab.rejectPendingBest(), children: "No" })
+      /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("button", { type: "button", className: "rounded px-2 py-1 font-bold hover:bg-ink/10", onClick: () => lab.rejectPendingBest(), children: "No" })
     ] }) : null,
-    /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("ul", { className: "flex flex-col gap-0.5", "aria-label": "Versions", children: [
-      versions.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("li", { className: "text-xs text-ink/50", children: "No versions yet: run, then Save as version." }) : null,
-      [...versions].reverse().map((v2) => /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("li", { className: `flex h-9 items-center gap-2 rounded-lg px-2 text-xs ${v2.best ? "bg-emerald-500/10" : "hover:bg-ink/5"}`, children: [
-        /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("span", { className: "rounded bg-ink/10 px-1.5 py-0.5 font-bold", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("ul", { className: "flex flex-col gap-0.5", "aria-label": "Versions", children: [
+      versions.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("li", { className: "text-xs text-ink/50", children: "No versions yet: run, then Save as version." }) : null,
+      [...versions].reverse().map((v2) => /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("li", { className: `flex h-9 items-center gap-2 rounded-lg px-2 text-xs ${v2.best ? "bg-emerald-500/10" : "hover:bg-ink/5"}`, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("span", { className: "rounded bg-ink/10 px-1.5 py-0.5 font-bold", children: [
           "v",
           v2.n
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("button", { type: "button", className: "min-w-0 flex-1 truncate text-left font-semibold", title: "Show this version's run", onClick: () => tryRun(() => lab.showRun(v2.run), setError), children: [
+        /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("button", { type: "button", className: "min-w-0 flex-1 truncate text-left font-semibold", title: "Show this version's run", onClick: () => tryRun(() => lab.showRun(v2.run), setError), children: [
           v2.note || `${v2.settings.speed} m/s \xB7 stride ${v2.settings.stride}`,
           v2.best ? " \xB7 best" : "",
           v2.by === "agent" ? " \xB7 agent" : ""
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("b", { className: "font-mono tabular-nums", children: v2.score.total }),
-        /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("button", { type: "button", className: "rounded p-1 hover:bg-ink/10", title: "Make best", "aria-label": `Make ${v2.id} the best`, onClick: () => tryRun(() => lab.saveBest(v2.id, PERSON), setError), children: /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(Star, { className: `size-3.5 ${v2.best ? "fill-current text-amber-500" : ""}` }) }),
-        /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("button", { type: "button", className: "rounded p-1 hover:bg-ink/10", title: "Roll back: use these settings", "aria-label": `Roll back to ${v2.id}`, onClick: () => tryRun(() => lab.rollback(v2.id), setError), children: /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(RotateCcw, { className: "size-3.5" }) }),
-        /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("button", { type: "button", className: "rounded p-1 text-coral hover:bg-ink/10", title: "Delete", "aria-label": `Delete ${v2.id}`, onClick: () => {
+        /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("b", { className: "font-mono tabular-nums", children: v2.score.total }),
+        /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("button", { type: "button", className: "rounded p-1 hover:bg-ink/10", title: "Make best", "aria-label": `Make ${v2.id} the best`, onClick: () => tryRun(() => lab.saveBest(v2.id, PERSON), setError), children: /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(Star, { className: `size-3.5 ${v2.best ? "fill-current text-amber-500" : ""}` }) }),
+        /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("button", { type: "button", className: "rounded p-1 hover:bg-ink/10", title: "Roll back: use these settings", "aria-label": `Roll back to ${v2.id}`, onClick: () => tryRun(() => lab.rollback(v2.id), setError), children: /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(RotateCcw, { className: "size-3.5" }) }),
+        /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("button", { type: "button", className: "rounded p-1 text-coral hover:bg-ink/10", title: "Delete", "aria-label": `Delete ${v2.id}`, onClick: () => {
           if (window.confirm(`Delete ${v2.id}?`)) tryRun(() => lab.deleteVersion(v2.id, PERSON), setError);
-        }, children: /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(Trash, { className: "size-3.5" }) })
+        }, children: /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(Trash, { className: "size-3.5" }) })
       ] }, v2.id))
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("span", { className: `${label11} mt-2`, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("span", { className: `${label12} mt-2`, children: [
       "Last runs \xB7 ",
       lab.data.runs.length,
       " of 20"
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("ul", { className: "flex flex-col gap-0.5", "aria-label": "Last runs", children: [...lab.data.runs].reverse().slice(0, 8).map((r3) => /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("li", { children: /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("button", { type: "button", className: `${row} w-full ${lab.view.run?.id === r3.id ? "bg-ink/10" : "hover:bg-ink/5"}`, onClick: () => tryRun(() => lab.showRun(r3.id), setError), children: [
-      /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("span", { className: "w-12 font-mono text-[11px] text-ink/50", children: r3.id }),
-      /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("span", { className: "flex-1 truncate", children: r3.events.at(-1)?.label }),
-      /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("b", { className: "font-mono", children: r3.score.total }),
-      /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("span", { className: `size-2 rounded-full ${r3.score.finished ? "bg-emerald-500" : "bg-coral"}` })
+    /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("ul", { className: "flex flex-col gap-0.5", "aria-label": "Last runs", children: [...lab.data.runs].reverse().slice(0, 8).map((r3) => /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("li", { children: /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("button", { type: "button", className: `${row} w-full ${lab.view.run?.id === r3.id ? "bg-ink/10" : "hover:bg-ink/5"}`, onClick: () => tryRun(() => lab.showRun(r3.id), setError), children: [
+      /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("span", { className: "w-12 font-mono text-[11px] text-ink/50", children: r3.id }),
+      /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("span", { className: "flex-1 truncate", children: r3.events.at(-1)?.label }),
+      /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("b", { className: "font-mono", children: r3.score.total }),
+      /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("span", { className: `size-2 rounded-full ${r3.score.finished ? "bg-emerald-500" : "bg-coral"}` })
     ] }) }, r3.id)) })
   ] });
 }
 var OVERLAY_BUTTONS = [
-  ["skeleton", "Skeleton", "k", /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(Bone2, { className: "size-4" }, "b")],
-  ["feet", "Feet (green planted, red sliding)", "f", /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(Footprints, { className: "size-4" }, "f")],
-  ["balance", "Balance point", "b", /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(Scale, { className: "size-4" }, "s")],
-  ["speed", "Speed arrow", "v", /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(ArrowRight, { className: "size-4" }, "a")],
-  ["ghost", "Ghost of the best version", "g", /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(Ghost, { className: "size-4" }, "g")],
-  ["measures", "Measures", "m", /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(Ruler, { className: "size-4" }, "r")]
+  ["skeleton", "Skeleton", "k", /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(Bone2, { className: "size-4" }, "b")],
+  ["feet", "Feet (green planted, red sliding)", "f", /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(Footprints, { className: "size-4" }, "f")],
+  ["balance", "Balance point", "b", /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(Scale, { className: "size-4" }, "s")],
+  ["speed", "Speed arrow", "v", /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(ArrowRight, { className: "size-4" }, "a")],
+  ["ghost", "Ghost of the best version", "g", /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(Ghost, { className: "size-4" }, "g")],
+  ["measures", "Measures", "m", /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(Ruler, { className: "size-4" }, "r")]
 ];
 var SPEEDS = [[0.25, "\xBC\xD7"], [0.5, "\xBD\xD7"], [1, "1\xD7"], [2, "2\xD7"]];
 function LabRunBar({ lab }) {
   useLab(lab);
-  const [error, setError] = (0, import_react94.useState)(null);
-  (0, import_react94.useEffect)(() => {
+  const [error, setError] = (0, import_react95.useState)(null);
+  (0, import_react95.useEffect)(() => {
     const onKey = (event2) => {
       const target2 = event2.target;
       if (target2?.closest('input, textarea, select, [contenteditable="true"]') || event2.ctrlKey || event2.metaKey || event2.altKey) return;
@@ -108912,15 +109311,15 @@ function LabRunBar({ lab }) {
     return () => window.removeEventListener("keydown", onKey);
   }, [lab]);
   const on = lab.view.overlays;
-  return /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("div", { role: "toolbar", "aria-label": "Run bar", className: "pointer-events-auto absolute inset-x-0 top-0 z-20 flex flex-wrap items-center justify-center gap-1 border-b border-ink/10 bg-surface/95 px-2 py-1 text-xs", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("button", { type: "button", className: "flex h-7 items-center gap-1.5 rounded-lg bg-ink px-2.5 font-bold text-on-brand", onClick: () => tryRun(() => lab.run({}, PERSON), setError), title: "Run the motion through the course once (R)", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(Play, { className: "size-3.5" }),
+  return /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("div", { role: "toolbar", "aria-label": "Run bar", className: "pointer-events-auto absolute inset-x-0 top-0 z-20 flex flex-wrap items-center justify-center gap-1 border-b border-ink/10 bg-surface/95 px-2 py-1 text-xs", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("button", { type: "button", className: "flex h-7 items-center gap-1.5 rounded-lg bg-ink px-2.5 font-bold text-on-brand", onClick: () => tryRun(() => lab.run({}, PERSON), setError), title: "Run the motion through the course once (R)", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(Play, { className: "size-3.5" }),
       "Run",
-      /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("kbd", { className: "font-mono text-[10px] opacity-70", children: "R" })
+      /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("kbd", { className: "font-mono text-[10px] opacity-70", children: "R" })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("button", { type: "button", className: "rounded-lg p-1.5 hover:bg-ink/10 disabled:opacity-40", disabled: !lab.view.run, title: lab.view.playing ? "Pause (Space)" : "Play (Space)", "aria-label": lab.view.playing ? "Pause" : "Play", onClick: () => lab.setPlaying(!lab.view.playing), children: lab.view.playing ? /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(Square, { className: "size-3.5" }) : /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(Play, { className: "size-3.5" }) }),
-    /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("span", { className: "mx-1 h-5 w-px bg-ink/15" }),
-    OVERLAY_BUTTONS.map(([id2, name2, key2, icon16]) => /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(
+    /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("button", { type: "button", className: "rounded-lg p-1.5 hover:bg-ink/10 disabled:opacity-40", disabled: !lab.view.run, title: lab.view.playing ? "Pause (Space)" : "Play (Space)", "aria-label": lab.view.playing ? "Pause" : "Play", onClick: () => lab.setPlaying(!lab.view.playing), children: lab.view.playing ? /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(Square, { className: "size-3.5" }) : /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(Play, { className: "size-3.5" }) }),
+    /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("span", { className: "mx-1 h-5 w-px bg-ink/15" }),
+    OVERLAY_BUTTONS.map(([id2, name2, key2, icon16]) => /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(
       "button",
       {
         type: "button",
@@ -108933,18 +109332,18 @@ function LabRunBar({ lab }) {
       },
       id2
     )),
-    /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("span", { className: "mx-1 h-5 w-px bg-ink/15" }),
-    /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("button", { type: "button", className: "rounded-lg p-1.5 hover:bg-ink/10", title: "Previous frame (,)", "aria-label": "Previous frame", onClick: () => lab.step(-1), children: /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(StepBack, { className: "size-3.5" }) }),
-    /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("div", { role: "group", "aria-label": "Play speed", className: "flex rounded-lg border border-ink/10 p-0.5", children: SPEEDS.map(([v2, name2]) => /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("button", { type: "button", "aria-pressed": lab.view.speed === v2, onClick: () => lab.setSpeed(v2), className: `rounded-md px-2 py-0.5 font-bold ${lab.view.speed === v2 ? "bg-ink text-on-brand" : "text-ink/70 hover:bg-ink/10"}`, children: name2 }, v2)) }),
-    /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("button", { type: "button", className: "rounded-lg p-1.5 hover:bg-ink/10", title: "Next frame (.)", "aria-label": "Next frame", onClick: () => lab.step(1), children: /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(StepForward, { className: "size-3.5" }) }),
-    /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("span", { className: "ml-1 rounded-lg border border-ink/10 px-2 py-1 font-mono tabular-nums", title: "Same seed, same run", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("span", { className: "mx-1 h-5 w-px bg-ink/15" }),
+    /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("button", { type: "button", className: "rounded-lg p-1.5 hover:bg-ink/10", title: "Previous frame (,)", "aria-label": "Previous frame", onClick: () => lab.step(-1), children: /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(StepBack, { className: "size-3.5" }) }),
+    /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("div", { role: "group", "aria-label": "Play speed", className: "flex rounded-lg border border-ink/10 p-0.5", children: SPEEDS.map(([v2, name2]) => /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("button", { type: "button", "aria-pressed": lab.view.speed === v2, onClick: () => lab.setSpeed(v2), className: `rounded-md px-2 py-0.5 font-bold ${lab.view.speed === v2 ? "bg-ink text-on-brand" : "text-ink/70 hover:bg-ink/10"}`, children: name2 }, v2)) }),
+    /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("button", { type: "button", className: "rounded-lg p-1.5 hover:bg-ink/10", title: "Next frame (.)", "aria-label": "Next frame", onClick: () => lab.step(1), children: /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(StepForward, { className: "size-3.5" }) }),
+    /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("span", { className: "ml-1 rounded-lg border border-ink/10 px-2 py-1 font-mono tabular-nums", title: "Same seed, same run", children: [
       "seed ",
       lab.data.course.seed,
       " \xB7 ",
       lab.view.t.toFixed(2),
       " s"
     ] }),
-    error ? /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("span", { role: "alert", className: "ml-2 font-semibold text-coral", children: error }) : null
+    error ? /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("span", { role: "alert", className: "ml-2 font-semibold text-coral", children: error }) : null
   ] });
 }
 var EVENT_TAGS = { step: "step", ramp: "ramp", gap_jump: "jump", land: "land", vault: "wall", window: "window", wait: "wait", crossing: "cross", car_hit: "car!", fall: "fall!", slide: "slide", blocked: "blocked", finish: "finish" };
@@ -108975,41 +109374,41 @@ function LabRunStrip({ lab }) {
   const best = lab.view.ghost;
   const speedPath = frames2.length ? frames2.filter((_2, i3) => i3 % 6 === 0).map((f2) => `${f2.t / end2 * 1e3},${40 - Math.min(38, f2.speed * 9)}`).join(" ") : "";
   const lanes = [
-    ["Course", run3?.events.filter((e2) => e2.kind !== "car_near" && e2.kind !== "start").map((e2, i3) => /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("span", { title: `${e2.t.toFixed(1)} s \xB7 ${e2.label}`, className: `absolute top-1 whitespace-nowrap text-[10px] font-semibold ${e2.kind === "fall" || e2.kind === "car_hit" || e2.kind === "blocked" ? "text-coral" : "text-ink/70"}`, style: { left: pct(e2.t) }, children: [
-      /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("span", { className: "mr-0.5 inline-block h-2.5 w-0.5 bg-ink/40 align-[-1px]" }),
+    ["Course", run3?.events.filter((e2) => e2.kind !== "car_near" && e2.kind !== "start").map((e2, i3) => /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("span", { title: `${e2.t.toFixed(1)} s \xB7 ${e2.label}`, className: `absolute top-1 whitespace-nowrap text-[10px] font-semibold ${e2.kind === "fall" || e2.kind === "car_hit" || e2.kind === "blocked" ? "text-coral" : "text-ink/70"}`, style: { left: pct(e2.t) }, children: [
+      /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("span", { className: "mr-0.5 inline-block h-2.5 w-0.5 bg-ink/40 align-[-1px]" }),
       EVENT_TAGS[e2.kind] ?? e2.kind
     ] }, i3))],
-    ["Left foot", spans(0).map((s2, i3) => /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("span", { className: `absolute top-1.5 h-3 rounded ${s2.slide ? "bg-coral" : "bg-emerald-500"}`, style: { left: pct(s2.a), width: pct(Math.max(0.01, s2.b - s2.a)) } }, i3))],
-    ["Right foot", spans(1).map((s2, i3) => /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("span", { className: `absolute top-1.5 h-3 rounded ${s2.slide ? "bg-coral" : "bg-emerald-500"}`, style: { left: pct(s2.a), width: pct(Math.max(0.01, s2.b - s2.a)) } }, i3))],
-    ["Speed", /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("svg", { viewBox: "0 0 1000 40", preserveAspectRatio: "none", className: "absolute inset-0 h-full w-full", "aria-hidden": true, children: /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("polyline", { points: speedPath, fill: "none", stroke: "currentColor", strokeWidth: 2, className: "text-indigo-400" }) }, "s")],
-    ["Ghost (best)", best ? /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("span", { className: "absolute top-2 h-2 rounded bg-cyan-600/60", style: { left: 0, width: pct(Math.min(end2, best.frames.at(-1)?.t ?? 0)) } }) : /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("span", { className: "absolute left-1 top-1 text-[10px] text-ink/50", children: "No best version yet" })]
+    ["Left foot", spans(0).map((s2, i3) => /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("span", { className: `absolute top-1.5 h-3 rounded ${s2.slide ? "bg-coral" : "bg-emerald-500"}`, style: { left: pct(s2.a), width: pct(Math.max(0.01, s2.b - s2.a)) } }, i3))],
+    ["Right foot", spans(1).map((s2, i3) => /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("span", { className: `absolute top-1.5 h-3 rounded ${s2.slide ? "bg-coral" : "bg-emerald-500"}`, style: { left: pct(s2.a), width: pct(Math.max(0.01, s2.b - s2.a)) } }, i3))],
+    ["Speed", /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("svg", { viewBox: "0 0 1000 40", preserveAspectRatio: "none", className: "absolute inset-0 h-full w-full", "aria-hidden": true, children: /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("polyline", { points: speedPath, fill: "none", stroke: "currentColor", strokeWidth: 2, className: "text-indigo-400" }) }, "s")],
+    ["Ghost (best)", best ? /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("span", { className: "absolute top-2 h-2 rounded bg-cyan-600/60", style: { left: 0, width: pct(Math.min(end2, best.frames.at(-1)?.t ?? 0)) } }) : /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("span", { className: "absolute left-1 top-1 text-[10px] text-ink/50", children: "No best version yet" })]
   ];
-  return /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("section", { "aria-label": "Run timeline", className: "flex h-full min-h-0 flex-col text-xs", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("div", { className: "flex items-center gap-2 border-b border-ink/10 px-2 py-1", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("b", { children: run3 ? `Run ${run3.id} \xB7 ${run3.settings.motion}` : "No run yet \u2014 press Run (R)" }),
-      run3 ? /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("span", { className: "text-ink/50", children: [
+  return /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("section", { "aria-label": "Run timeline", className: "flex h-full min-h-0 flex-col text-xs", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("div", { className: "flex items-center gap-2 border-b border-ink/10 px-2 py-1", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("b", { children: run3 ? `Run ${run3.id} \xB7 ${run3.settings.motion}` : "No run yet \u2014 press Run (R)" }),
+      run3 ? /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("span", { className: "text-ink/50", children: [
         "0:00 \u2192 ",
         end2.toFixed(1),
         " s \xB7 fixed step 1/60 s \xB7 seed ",
         run3.seed
       ] }) : null,
-      /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("span", { className: "flex-1" }),
-      /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("span", { className: "inline-flex items-center gap-1 text-ink/60", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("span", { className: "size-2 rounded-full bg-emerald-500" }),
+      /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("span", { className: "flex-1" }),
+      /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("span", { className: "inline-flex items-center gap-1 text-ink/60", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("span", { className: "size-2 rounded-full bg-emerald-500" }),
         "planted"
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("span", { className: "inline-flex items-center gap-1 text-ink/60", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("span", { className: "size-2 rounded-full bg-coral" }),
+      /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("span", { className: "inline-flex items-center gap-1 text-ink/60", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("span", { className: "size-2 rounded-full bg-coral" }),
         "sliding"
       ] }),
-      run3 ? /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("button", { type: "button", className: "flex h-6 items-center gap-1 rounded-lg border border-ink/15 px-2 font-bold hover:bg-ink/5", onClick: () => lab.saveVersion(run3.id, "", PERSON), children: [
-        /* @__PURE__ */ (0, import_jsx_runtime92.jsx)(Star, { className: "size-3.5" }),
+      run3 ? /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("button", { type: "button", className: "flex h-6 items-center gap-1 rounded-lg border border-ink/15 px-2 font-bold hover:bg-ink/5", onClick: () => lab.saveVersion(run3.id, "", PERSON), children: [
+        /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(Star, { className: "size-3.5" }),
         "Save as version"
       ] }) : null
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)("div", { className: "flex min-h-0 flex-1 overflow-auto", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("div", { className: "w-24 shrink-0 border-r border-ink/10", children: lanes.map(([name2]) => /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("div", { className: "flex h-7 items-center border-b border-ink/5 px-2 font-semibold text-ink/70", children: name2 }, name2)) }),
-      /* @__PURE__ */ (0, import_jsx_runtime92.jsxs)(
+    /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("div", { className: "flex min-h-0 flex-1 overflow-auto", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("div", { className: "w-24 shrink-0 border-r border-ink/10", children: lanes.map(([name2]) => /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("div", { className: "flex h-7 items-center border-b border-ink/5 px-2 font-semibold text-ink/70", children: name2 }, name2)) }),
+      /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)(
         "div",
         {
           className: "relative min-w-0 flex-1 cursor-pointer",
@@ -109029,8 +109428,8 @@ function LabRunStrip({ lab }) {
             if (e2.key === "ArrowRight") lab.step(6);
           },
           children: [
-            lanes.map(([name2, content]) => /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("div", { className: "relative h-7 overflow-hidden border-b border-ink/5", children: content }, name2)),
-            /* @__PURE__ */ (0, import_jsx_runtime92.jsx)("span", { className: "pointer-events-none absolute inset-y-0 w-0.5 bg-coral", style: { left: pct(lab.view.t) } })
+            lanes.map(([name2, content]) => /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("div", { className: "relative h-7 overflow-hidden border-b border-ink/5", children: content }, name2)),
+            /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("span", { className: "pointer-events-none absolute inset-y-0 w-0.5 bg-coral", style: { left: pct(lab.view.t) } })
           ]
         }
       )
@@ -109039,11 +109438,10 @@ function LabRunStrip({ lab }) {
 }
 
 // ../../apps/web/components/studio/studio-chrome.tsx
-var import_jsx_runtime93 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime94 = __toESM(require_jsx_runtime(), 1);
 var TABS3 = [
   { id: "build", label: "Build" },
   { id: "items", label: "Items" },
-  { id: "world", label: "World" },
   { id: "avatar", label: "Avatar" },
   { id: "filming", label: "Filming" },
   // MOTION-LAB: only in a motion lab project.
@@ -109058,7 +109456,8 @@ var DOCK_GROUPS = [
 ];
 var TOOL_KEYS = new Map(DOCK_GROUPS.flatMap((group2) => group2.tools.map((one2) => [one2.key.toLowerCase(), one2.tool])));
 var PANEL_TITLES = {
-  tab: (tab) => ({ build: "Build tools", items: "Library", world: "World", avatar: "Avatar", filming: "Filming", lab: "Course" })[tab],
+  tab: (tab) => ({ build: "Tools", items: "Library", avatar: "Avatar", filming: "Filming", lab: "Course" })[tab],
+  world: () => "World",
   outline: () => "Explorer",
   properties: (tab) => tab === "filming" ? "Scene inspector" : tab === "avatar" ? "Moves" : "Properties",
   assistant: () => "Assistant",
@@ -109066,35 +109465,35 @@ var PANEL_TITLES = {
   timeline: () => "Timeline"
 };
 function SidebarButton({
-  label: label12,
+  label: label13,
   Icon: Icon2,
   active = false,
   shortcut,
   onClick
 }) {
-  return /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)(
+  return /* @__PURE__ */ (0, import_jsx_runtime94.jsxs)(
     "button",
     {
       type: "button",
       "aria-pressed": active,
       "aria-keyshortcuts": shortcut,
-      title: shortcut ? `${label12} (${shortcut})` : label12,
+      title: shortcut ? `${label13} (${shortcut})` : label13,
       onClick,
       className: `relative flex flex-col items-center gap-1 rounded-xl py-2.5 text-[11px] font-bold ${active ? "bg-ink text-on-brand" : "bg-paper text-ink hover:bg-ink/10"}`,
       children: [
-        shortcut ? /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("span", { "aria-hidden": true, className: "absolute top-1 right-1.5 font-mono text-[9px] font-medium opacity-50", children: shortcut }) : null,
-        /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(Icon2, { className: "size-5", strokeWidth: 2, "aria-hidden": true }),
-        label12
+        shortcut ? /* @__PURE__ */ (0, import_jsx_runtime94.jsx)("span", { "aria-hidden": true, className: "absolute top-1 right-1.5 font-mono text-[9px] font-medium opacity-50", children: shortcut }) : null,
+        /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(Icon2, { className: "size-5", strokeWidth: 2, "aria-hidden": true }),
+        label13
       ]
     }
   );
 }
 function PanelTitle({ children }) {
-  return /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("h2", { className: "px-3 pt-2.5 pb-1.5 text-xs font-black tracking-wide text-ink/50 uppercase", children });
+  return /* @__PURE__ */ (0, import_jsx_runtime94.jsx)("h2", { className: "px-3 pt-2.5 pb-1.5 text-xs font-black tracking-wide text-ink/50 uppercase", children });
 }
 function DockedTimeline({ filming }) {
-  (0, import_react95.useEffect)(() => () => filming.studio.setPreviewing(false), [filming.studio.identity]);
-  return /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(VideoEditor, { filming });
+  (0, import_react96.useEffect)(() => () => filming.studio.setPreviewing(false), [filming.studio.identity]);
+  return /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(VideoEditor, { filming });
 }
 function StudioChrome({
   onCharacter,
@@ -109124,22 +109523,59 @@ function StudioChrome({
   const host = useStudioHost();
   const filmWorkspace = tab === "filming";
   const character = useCharacterEditor();
-  (0, import_react95.useEffect)(() => avatarStudioBridge.register(character), [character]);
-  (0, import_react95.useEffect)(() => motionLabBridge.register(lab ?? null), [lab]);
-  (0, import_react95.useEffect)(() => {
+  (0, import_react96.useEffect)(() => avatarStudioBridge.register(character), [character]);
+  (0, import_react96.useEffect)(() => motionLabBridge.register(lab ?? null), [lab]);
+  (0, import_react96.useEffect)(() => {
     if (status.tool !== "select" && status.tool !== null) setStructureFocus(null);
   }, [status.tool]);
-  (0, import_react95.useEffect)(() => setStructureFocus(null), [tab]);
-  const lastTab = (0, import_react95.useRef)(tab);
-  const toolNow = (0, import_react95.useRef)(status.tool);
+  (0, import_react96.useEffect)(() => setStructureFocus(null), [tab]);
+  const lastTab = (0, import_react96.useRef)(tab);
+  const toolNow = (0, import_react96.useRef)(status.tool);
   toolNow.current = status.tool;
-  (0, import_react95.useEffect)(() => {
+  (0, import_react96.useEffect)(() => {
     if (lastTab.current === tab) return;
     lastTab.current = tab;
-    if (toolNow.current && (toolNow.current !== "select" || tab === "world" || tab === "avatar" || tab === "filming")) runtime.current?.setTool(tab === "build" || tab === "items" ? "select" : null);
+    if (toolNow.current && (toolNow.current !== "select" || tab === "avatar" || tab === "filming")) runtime.current?.setTool(tab === "build" || tab === "items" ? "select" : null);
   }, [tab, runtime]);
-  (0, import_react95.useEffect)(() => {
-    if (testing || tab !== "build" && tab !== "items" && tab !== "world" && tab !== "avatar") return;
+  const visiblePanel = (id2) => id2 !== "world" || tab === "build";
+  const worldOpen = !testing && tab === "build" && layout2.mode === "build" && panelShown(layout2, "world", visiblePanel);
+  const worldWas = (0, import_react96.useRef)(worldOpen);
+  (0, import_react96.useEffect)(() => {
+    if (worldWas.current === worldOpen) return;
+    worldWas.current = worldOpen;
+    if (worldOpen) {
+      if (toolNow.current) runtime.current?.setTool(null);
+      return;
+    }
+    setWorldPart(null);
+    if (tab === "build" && !testing && !toolNow.current) runtime.current?.setTool("select");
+  }, [worldOpen, tab, testing, runtime]);
+  const toolWas = (0, import_react96.useRef)(status.tool);
+  (0, import_react96.useEffect)(() => {
+    const changed = toolWas.current !== status.tool;
+    toolWas.current = status.tool;
+    if (!changed || !status.tool || !worldOpen) return;
+    const side2 = layout2.docks.world;
+    if (side2 !== "floating" && layout2.docks.tab === side2) onLayout({ active: { ...layout2.active, [side2]: "tab" } });
+  }, [status.tool, worldOpen, layout2, onLayout]);
+  (0, import_react96.useEffect)(() => {
+    if (!worldOpen) return;
+    const onKey = (event2) => {
+      if (event2.key !== "Escape" || event2.defaultPrevented) return;
+      const target2 = event2.target instanceof Element ? event2.target : null;
+      if (target2?.closest('input, textarea, select, [contenteditable="true"], [role="dialog"], [role="alertdialog"]')) return;
+      const side2 = layout2.docks.world;
+      if (side2 === "floating" || layout2.docks.tab !== side2) {
+        setWorldPart(null);
+        return;
+      }
+      onLayout({ active: { ...layout2.active, [side2]: "tab" } });
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [worldOpen, layout2, onLayout]);
+  (0, import_react96.useEffect)(() => {
+    if (testing || tab !== "build" && tab !== "items" && tab !== "avatar") return;
     const onKey = (event2) => {
       const target2 = event2.target;
       if (target2?.closest('input, textarea, select, [contenteditable="true"]')) return;
@@ -109168,42 +109604,42 @@ function StudioChrome({
     return () => window.removeEventListener("keydown", onKey);
   }, [tab, testing, runtime, character]);
   const workflowOpen = useWorkflowOpen();
-  (0, import_react95.useEffect)(() => {
+  (0, import_react96.useEffect)(() => {
     onCharacter?.(character);
   }, [character]);
-  (0, import_react95.useEffect)(() => host.characterBody?.((body) => character.change((recipe) => ({ ...recipe, body }))), [host.characterBody]);
-  (0, import_react95.useEffect)(() => {
+  (0, import_react96.useEffect)(() => host.characterBody?.((body) => character.change((recipe) => ({ ...recipe, body }))), [host.characterBody]);
+  (0, import_react96.useEffect)(() => {
     host.characterRecipe?.(character.recipe);
   }, [character.recipe, host.characterRecipe]);
-  (0, import_react95.useEffect)(() => {
+  (0, import_react96.useEffect)(() => {
     host.characterLook?.(recipeLook(character.recipe));
   }, [character.recipe, host.characterLook]);
   const characterWorkspace = tab === "avatar" && !testing;
   const labWorkspace = tab === "lab" && Boolean(lab) && !testing;
-  (0, import_react95.useEffect)(() => {
+  (0, import_react96.useEffect)(() => {
     if (!characterWorkspace && !labWorkspace) return;
     runtime.current?.setPaused(true);
     return () => runtime.current?.setPaused(false);
   }, [characterWorkspace, labWorkspace, runtime]);
-  (0, import_react95.useEffect)(() => {
+  (0, import_react96.useEffect)(() => {
     filming.studio.setOpen(filmWorkspace);
   }, [filmWorkspace]);
-  (0, import_react95.useEffect)(() => {
+  (0, import_react96.useEffect)(() => {
     runtime.current?.setSnap({ grid: layout2.snapGrid, angle: layout2.snapAngle * Math.PI / 180 });
   }, [runtime, layout2.snapGrid, layout2.snapAngle]);
   const panelContent = (id2) => {
-    if (id2 === "output") return /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(ConsolePanel, { runtime, logs, onClear: onClearLogs });
-    if (id2 === "timeline") return /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(DockedTimeline, { filming });
-    if (filmWorkspace && id2 === "properties") return /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(VideoSceneInspector, { filming });
-    if (tab === "avatar" && id2 === "properties") return /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(CharacterMoves, { editor: character });
+    if (id2 === "output") return /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(ConsolePanel, { runtime, logs, onClear: onClearLogs });
+    if (id2 === "timeline") return /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(DockedTimeline, { filming });
+    if (filmWorkspace && id2 === "properties") return /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(VideoSceneInspector, { filming });
+    if (tab === "avatar" && id2 === "properties") return /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(CharacterMoves, { editor: character });
     if (tab === "lab" && lab) {
-      if (id2 === "properties") return /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(LabRight, { lab });
-      if (id2 === "tab") return /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(LabLeft, { lab });
+      if (id2 === "properties") return /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(LabRight, { lab });
+      if (id2 === "tab") return /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(LabLeft, { lab });
     }
     if (id2 === "tab" && tab === "filming" && filming.studio.workspace === "story")
-      return /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(StoryPanel, { runtime, status, placeId, filming });
+      return /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(StoryPanel, { runtime, status, placeId, filming });
     if (id2 === "tab" && tab === "filming")
-      return /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(
+      return /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(
         FilmingPanel,
         {
           filming: {
@@ -109219,12 +109655,14 @@ function StudioChrome({
         }
       );
     if (id2 === "outline")
-      return /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("div", { className: "px-1.5 pb-2", children: /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(ExplorerPanel, { runtime, status }) });
-    if (id2 === "assistant") return /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(AssistantPanel, { runtime, placeId });
+      return /* @__PURE__ */ (0, import_jsx_runtime94.jsx)("div", { className: "px-1.5 pb-2", children: /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(ExplorerPanel, { runtime, status }) });
+    if (id2 === "assistant") return /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(AssistantPanel, { runtime, placeId });
     if (id2 === "properties" && tab === "build" && status.tool && OPTION_TOOLS.has(status.tool))
-      return /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(ToolOptionsPanel, { runtime, status, placeId });
-    if (id2 === "properties" && tab === "world")
-      return /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(
+      return /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(ToolOptionsPanel, { runtime, status, placeId });
+    if (id2 === "world")
+      return /* @__PURE__ */ (0, import_jsx_runtime94.jsx)("div", { className: "px-2 pb-2", children: /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(WorldPartsList, { runtime }) });
+    if (id2 === "properties" && worldOpen)
+      return /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(
         WorldSidePanel,
         {
           runtime,
@@ -109233,11 +109671,11 @@ function StudioChrome({
           actors: filming.sceneActors(),
           message: filming.studio.setMessage,
           onStyle: () => onStyle?.(runtime.current?.world.style.base ?? "blocky"),
-          fallback: status.selected || status.water ? /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(PropertiesPanel, { placeId: isOwner && host.platform ? placeId : void 0, runtime, status, grid: layout2.snapGrid, angle: layout2.snapAngle }) : void 0
+          fallback: status.selected || status.water ? /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(PropertiesPanel, { placeId: isOwner && host.platform ? placeId : void 0, runtime, status, grid: layout2.snapGrid, angle: layout2.snapAngle }) : void 0
         }
       );
     if (id2 === "properties" && tab === "items")
-      return /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(
+      return /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(
         ItemsSidePanel,
         {
           runtime,
@@ -109250,7 +109688,7 @@ function StudioChrome({
         }
       );
     if (id2 === "properties")
-      return /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("div", { className: "px-3 pb-3", children: /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(
+      return /* @__PURE__ */ (0, import_jsx_runtime94.jsx)("div", { className: "px-3 pb-3", children: /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(
         PropertiesPanel,
         {
           placeId: isOwner && host.platform ? placeId : void 0,
@@ -109261,21 +109699,19 @@ function StudioChrome({
         }
       ) });
     if (tab === "items")
-      return /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("div", { className: "flex min-h-0 flex-1 flex-col px-2 pb-2", children: /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(LibraryPanel, { runtime, status, style }) });
-    if (tab === "world")
-      return /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("div", { className: "px-2 pb-2", children: /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(WorldPartsList, { runtime }) });
-    if (tab === "avatar") return /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(CharacterTabs, { editor: character });
+      return /* @__PURE__ */ (0, import_jsx_runtime94.jsx)("div", { className: "flex min-h-0 flex-1 flex-col px-2 pb-2", children: /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(LibraryPanel, { runtime, status, style }) });
+    if (tab === "avatar") return /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(CharacterTabs, { editor: character });
     const available = toolsFor(rt()).filter((entry) => !NOT_IN_DOCK.has(entry.tool));
-    return /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("div", { className: "flex flex-col gap-1 px-2 pb-2", children: [
+    return /* @__PURE__ */ (0, import_jsx_runtime94.jsxs)("div", { className: "flex flex-col gap-1 px-2 pb-2", children: [
       DOCK_GROUPS.map((group2) => {
         const entries = group2.tools.flatMap((one2) => {
           const entry = available.find((tool2) => tool2.tool === one2.tool);
           return entry ? [{ ...entry, key: one2.key }] : [];
         });
         if (!entries.length) return null;
-        return /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("section", { "aria-label": group2.label, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("h3", { className: "mt-1 mb-1 px-1 text-[10px] font-black tracking-wide text-ink/45 uppercase", children: group2.label }),
-          /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("div", { className: "grid grid-cols-3 gap-1.5", children: entries.map((entry) => /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(
+        return /* @__PURE__ */ (0, import_jsx_runtime94.jsxs)("section", { "aria-label": group2.label, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime94.jsx)("h3", { className: "mt-1 mb-1 px-1 text-[10px] font-black tracking-wide text-ink/45 uppercase", children: group2.label }),
+          /* @__PURE__ */ (0, import_jsx_runtime94.jsx)("div", { className: "grid grid-cols-3 gap-1.5", children: entries.map((entry) => /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(
             SidebarButton,
             {
               label: entry.label,
@@ -109288,17 +109724,17 @@ function StudioChrome({
           )) })
         ] }, group2.label);
       }),
-      /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("p", { className: "mt-2 px-1 text-[11px] text-ink/50", children: "Keys pick a tool \xB7 Esc stops drawing \xB7 each tool's options are on the right." })
+      /* @__PURE__ */ (0, import_jsx_runtime94.jsx)("p", { className: "mt-2 px-1 text-[11px] text-ink/50", children: "Keys pick a tool \xB7 Esc stops drawing \xB7 each tool's options are on the right. Sky, lights, weather, water and the start point are in World." })
     ] });
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)(import_jsx_runtime93.Fragment, { children: [
-    /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)(
+  return /* @__PURE__ */ (0, import_jsx_runtime94.jsxs)(import_jsx_runtime94.Fragment, { children: [
+    /* @__PURE__ */ (0, import_jsx_runtime94.jsxs)(
       "header",
       {
         style: { gridArea: "top" },
         className: `flex h-14 min-w-0 items-center gap-2 border-b border-ink/10 bg-surface pr-3 ${testing ? "pl-[8.5rem]" : "pl-3"}`,
         children: [
-          testing ? null : /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(
+          testing ? null : /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(
             "a",
             {
               href: `/places/${placeId}`,
@@ -109309,20 +109745,20 @@ function StudioChrome({
               title: "Leave the studio",
               "aria-label": "Leave the studio",
               className: "flex size-9 shrink-0 items-center justify-center rounded-lg hover:bg-ink/5",
-              children: /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(GenvrMark, { className: "size-6" })
+              children: /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(GenvrMark, { className: "size-6" })
             }
           ),
-          /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("div", { className: "min-w-0 max-w-48 flex-1", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("p", { className: "truncate text-sm font-black", children: title }),
-            saveText ? /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("p", { className: "truncate text-[10px] font-semibold text-ink/50", children: saveText }) : null
+          /* @__PURE__ */ (0, import_jsx_runtime94.jsxs)("div", { className: "min-w-0 max-w-48 flex-1", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime94.jsx)("p", { className: "truncate text-sm font-black", children: title }),
+            saveText ? /* @__PURE__ */ (0, import_jsx_runtime94.jsx)("p", { className: "truncate text-[10px] font-semibold text-ink/50", children: saveText }) : null
           ] }),
-          testing ? null : /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(
+          testing ? null : /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(
             "nav",
             {
               role: "tablist",
               "aria-label": "Workspace mode",
               className: "flex shrink-0 gap-1 rounded-xl bg-paper p-1",
-              children: TABS3.filter((entry) => entry.id !== "lab" || lab).map((entry) => /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(
+              children: TABS3.filter((entry) => entry.id !== "lab" || lab).map((entry) => /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(
                 "button",
                 {
                   type: "button",
@@ -109343,10 +109779,10 @@ function StudioChrome({
               ))
             }
           ),
-          /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("div", { className: "ml-auto flex shrink-0 items-center gap-1", children: [
-            !testing && !filmWorkspace ? /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)(import_jsx_runtime93.Fragment, { children: [
-              /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(ToolbarMenu, { label: "Snap", children: /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(SnapBar, { grid: layout2.snapGrid, angle: layout2.snapAngle, onChange: onLayout }) }),
-              /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime94.jsxs)("div", { className: "ml-auto flex shrink-0 items-center gap-1", children: [
+            !testing && !filmWorkspace ? /* @__PURE__ */ (0, import_jsx_runtime94.jsxs)(import_jsx_runtime94.Fragment, { children: [
+              /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(ToolbarMenu, { label: "Snap", children: /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(SnapBar, { grid: layout2.snapGrid, angle: layout2.snapAngle, onChange: onLayout }) }),
+              /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(
                 "button",
                 {
                   type: "button",
@@ -109354,10 +109790,10 @@ function StudioChrome({
                   "aria-label": "Undo (Ctrl+Z)",
                   title: "Undo (Ctrl+Z)",
                   className: "rounded-lg p-2 hover:bg-ink/5",
-                  children: /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(Undo2, { className: "size-4", "aria-hidden": true })
+                  children: /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(Undo2, { className: "size-4", "aria-hidden": true })
                 }
               ),
-              /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(
                 "button",
                 {
                   type: "button",
@@ -109365,14 +109801,14 @@ function StudioChrome({
                   "aria-label": "Redo (Ctrl+Y)",
                   title: "Redo (Ctrl+Y)",
                   className: "rounded-lg p-2 hover:bg-ink/5",
-                  children: /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(Redo2, { className: "size-4", "aria-hidden": true })
+                  children: /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(Redo2, { className: "size-4", "aria-hidden": true })
                 }
               )
             ] }) : null,
-            /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(ToolbarMenu, { label: "Preview", children: /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("div", { className: "[&>div]:flex-wrap", children: /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(DeviceBar, { preview, onPreview, devices }) }) }),
-            testing ? null : /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)(ToolbarMenu, { label: "Panels", closeOnAction: true, children: [
-              /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("p", { className: "text-xs text-ink/50", children: "Drag a panel grip to an edge or into the view to float it." }),
-              allowedPanels(layout2.mode).map((id2) => /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)(
+            /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(ToolbarMenu, { label: "Preview", children: /* @__PURE__ */ (0, import_jsx_runtime94.jsx)("div", { className: "[&>div]:flex-wrap", children: /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(DeviceBar, { preview, onPreview, devices }) }) }),
+            testing ? null : /* @__PURE__ */ (0, import_jsx_runtime94.jsxs)(ToolbarMenu, { label: "Panels", closeOnAction: true, children: [
+              /* @__PURE__ */ (0, import_jsx_runtime94.jsx)("p", { className: "text-xs text-ink/50", children: "Drag a panel grip to an edge or into the view to float it." }),
+              allowedPanels(layout2.mode).filter(visiblePanel).map((id2) => /* @__PURE__ */ (0, import_jsx_runtime94.jsxs)(
                 "button",
                 {
                   type: "button",
@@ -109385,7 +109821,7 @@ function StudioChrome({
                 },
                 id2
               )),
-              ["left", "right", "bottom"].map((side2) => /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)(
+              ["left", "right", "bottom"].map((side2) => /* @__PURE__ */ (0, import_jsx_runtime94.jsxs)(
                 "button",
                 {
                   type: "button",
@@ -109401,7 +109837,7 @@ function StudioChrome({
                 },
                 side2
               )),
-              /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)(
+              /* @__PURE__ */ (0, import_jsx_runtime94.jsxs)(
                 "button",
                 {
                   type: "button",
@@ -109420,14 +109856,14 @@ function StudioChrome({
                 }
               )
             ] }),
-            isOwner && host.platform && !testing ? /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(ToolbarMenu, { label: "More", children: /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(CaptureButton, { runtime, placeId }) }) : null,
-            /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)(ToolbarMenu, { label: "Settings", children: [
-              host.platform ? /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("fieldset", { "aria-label": "MCP connection", className: "space-y-2 rounded-lg border border-ink/10 p-2", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("legend", { className: "px-1 text-xs font-bold", children: "MCP connection" }),
-                /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("p", { role: "status", className: "text-xs text-ink/60", children: filming.connected ? "Connected to this Studio session" : "Disconnected" }),
-                /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("p", { className: "text-xs text-ink/50", children: "One connection for your assistant in this open Studio. Camera, photos and video run in the Filming tab." }),
-                /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("div", { className: "flex gap-2", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(
+            isOwner && host.platform && !testing ? /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(ToolbarMenu, { label: "More", children: /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(CaptureButton, { runtime, placeId }) }) : null,
+            /* @__PURE__ */ (0, import_jsx_runtime94.jsxs)(ToolbarMenu, { label: "Settings", children: [
+              host.platform ? /* @__PURE__ */ (0, import_jsx_runtime94.jsxs)("fieldset", { "aria-label": "MCP connection", className: "space-y-2 rounded-lg border border-ink/10 p-2", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime94.jsx)("legend", { className: "px-1 text-xs font-bold", children: "MCP connection" }),
+                /* @__PURE__ */ (0, import_jsx_runtime94.jsx)("p", { role: "status", className: "text-xs text-ink/60", children: filming.connected ? "Connected to this Studio session" : "Disconnected" }),
+                /* @__PURE__ */ (0, import_jsx_runtime94.jsx)("p", { className: "text-xs text-ink/50", children: "One connection for your assistant in this open Studio. Camera, photos and video run in the Filming tab." }),
+                /* @__PURE__ */ (0, import_jsx_runtime94.jsxs)("div", { className: "flex gap-2", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(
                     "button",
                     {
                       type: "button",
@@ -109437,7 +109873,7 @@ function StudioChrome({
                       children: "Connect MCP"
                     }
                   ),
-                  /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(
+                  /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(
                     "button",
                     {
                       type: "button",
@@ -109449,10 +109885,10 @@ function StudioChrome({
                   )
                 ] })
               ] }) : null,
-              isOwner && !testing ? /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(import_jsx_runtime93.Fragment, { children: host.settings ? /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("button", { type: "button", onClick: host.settings, className: "flex items-center gap-2 rounded-lg p-2 hover:bg-ink/10", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(Settings2, { "aria-hidden": true, className: "size-4" }),
+              isOwner && !testing ? /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(import_jsx_runtime94.Fragment, { children: host.settings ? /* @__PURE__ */ (0, import_jsx_runtime94.jsxs)("button", { type: "button", onClick: host.settings, className: "flex items-center gap-2 rounded-lg p-2 hover:bg-ink/10", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(Settings2, { "aria-hidden": true, className: "size-4" }),
                 "Place settings"
-              ] }) : /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)(
+              ] }) : /* @__PURE__ */ (0, import_jsx_runtime94.jsxs)(
                 "a",
                 {
                   href: `/places/${placeId}/settings`,
@@ -109460,12 +109896,12 @@ function StudioChrome({
                   rel: "noreferrer",
                   className: "flex items-center gap-2 rounded-lg p-2 hover:bg-ink/10",
                   children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(Settings2, { "aria-hidden": true, className: "size-4" }),
+                    /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(Settings2, { "aria-hidden": true, className: "size-4" }),
                     "Place settings"
                   ]
                 }
               ) }) : null,
-              testing ? null : /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)(
+              testing ? null : /* @__PURE__ */ (0, import_jsx_runtime94.jsxs)(
                 "button",
                 {
                   type: "button",
@@ -109473,20 +109909,20 @@ function StudioChrome({
                   onClick: () => onLayout({ worldSounds: !layout2.worldSounds }),
                   className: "flex items-center gap-2 rounded-lg p-2 text-left hover:bg-ink/10",
                   children: [
-                    layout2.worldSounds ? /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(Volume2, { "aria-hidden": true, className: "size-4" }) : /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(VolumeX, { "aria-hidden": true, className: "size-4" }),
+                    layout2.worldSounds ? /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(Volume2, { "aria-hidden": true, className: "size-4" }) : /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(VolumeX, { "aria-hidden": true, className: "size-4" }),
                     "World sounds ",
                     layout2.worldSounds ? "on" : "off"
                   ]
                 }
               ),
-              /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("div", { className: "flex items-center justify-between text-xs", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime94.jsxs)("div", { className: "flex items-center justify-between text-xs", children: [
                 "Theme",
-                /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(ThemeToggle, { className: "size-8 rounded-lg" })
+                /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(ThemeToggle, { className: "size-8 rounded-lg" })
               ] })
             ] }),
             isOwner && host.platform && !testing ? (
               // Publishing stays the owner's own step: it opens the place to visitors (and its scroll stories).
-              /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)(
+              /* @__PURE__ */ (0, import_jsx_runtime94.jsxs)(
                 "a",
                 {
                   href: `/places/${placeId}/publish`,
@@ -109494,21 +109930,21 @@ function StudioChrome({
                   rel: "noreferrer",
                   className: "ml-1 inline-flex items-center gap-1.5 rounded-lg border border-ink/20 px-3 py-1.5 text-xs font-bold hover:bg-ink/10",
                   children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(Globe, { className: "size-4", "aria-hidden": true }),
+                    /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(Globe, { className: "size-4", "aria-hidden": true }),
                     "Publish"
                   ]
                 }
               )
             ) : null,
-            host.share ? /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("button", { type: "button", onClick: host.share, className: "ml-1 inline-flex items-center gap-1.5 rounded-lg border border-ink/20 px-3 py-1.5 text-xs font-bold", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(Share2, { className: "size-4" }),
+            host.share ? /* @__PURE__ */ (0, import_jsx_runtime94.jsxs)("button", { type: "button", onClick: host.share, className: "ml-1 inline-flex items-center gap-1.5 rounded-lg border border-ink/20 px-3 py-1.5 text-xs font-bold", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(Share2, { className: "size-4" }),
               "Share"
             ] }) : null,
-            host.avatarLive ? /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("button", { type: "button", onClick: host.avatarLive, className: "ml-1 inline-flex items-center gap-1.5 rounded-lg border border-ink/20 px-3 py-1.5 text-xs font-bold", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(Users, { className: "size-4" }),
+            host.avatarLive ? /* @__PURE__ */ (0, import_jsx_runtime94.jsxs)("button", { type: "button", onClick: host.avatarLive, className: "ml-1 inline-flex items-center gap-1.5 rounded-lg border border-ink/20 px-3 py-1.5 text-xs font-bold", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(Users, { className: "size-4" }),
               "Avatar Live"
             ] }) : null,
-            /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)(
+            /* @__PURE__ */ (0, import_jsx_runtime94.jsxs)(
               "button",
               {
                 type: "button",
@@ -109535,7 +109971,7 @@ function StudioChrome({
                 },
                 className: "ml-1 inline-flex items-center gap-1.5 rounded-lg bg-brand px-3 py-1.5 text-xs font-bold text-on-brand",
                 children: [
-                  testing ? /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(Square, { className: "size-4", "aria-hidden": true }) : /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(Play, { className: "size-4", "aria-hidden": true }),
+                  testing ? /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(Square, { className: "size-4", "aria-hidden": true }) : /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(Play, { className: "size-4", "aria-hidden": true }),
                   filmWorkspace ? filming.studio.filmPlaying ? "Pause film" : "Play film" : labWorkspace ? "Run lab" : tab === "avatar" && host.avatarLive ? "Preview avatar" : testing ? "Stop test" : "Test world"
                 ]
               }
@@ -109544,7 +109980,7 @@ function StudioChrome({
         ]
       }
     ),
-    filmWorkspace ? /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(
+    filmWorkspace ? /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(
       "div",
       {
         id: "genvr-film-stage",
@@ -109553,43 +109989,44 @@ function StudioChrome({
         className: `relative min-h-0 min-w-0 ${filming.studio.previewing ? "z-20 bg-black" : "pointer-events-none opacity-0"}`
       }
     ) : null,
-    filmWorkspace && !testing ? /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("div", { style: { gridArea: "viewport" }, className: "pointer-events-none relative z-30 min-h-0 min-w-0", children: /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(RecordingFrame, { filming }) }) : null,
-    filmWorkspace && !testing && workflowOpen ? /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("div", { style: { gridColumn: "3 / 4", gridRow: "3 / -1" }, className: "relative z-[45] min-h-0 min-w-0", children: /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(WorkflowView, { filming }) }) : null,
-    filmWorkspace && !testing ? /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("div", { style: { gridArea: "scenebar" }, className: "relative z-40 min-w-0 border-b border-ink/15 bg-surface", children: /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("div", { className: "flex flex-wrap items-center justify-center", children: [
-      host.userAvatarControls ? null : /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)(ToolbarMenu, { label: "Characters", icon: Users, children: [
-        /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("p", { className: "text-xs font-semibold", children: "Choose the live character" }),
-        /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(BodySection, { editor: character })
+    filmWorkspace && !testing ? /* @__PURE__ */ (0, import_jsx_runtime94.jsx)("div", { style: { gridArea: "viewport" }, className: "pointer-events-none relative z-30 min-h-0 min-w-0", children: /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(RecordingFrame, { filming }) }) : null,
+    filmWorkspace && !testing && workflowOpen ? /* @__PURE__ */ (0, import_jsx_runtime94.jsx)("div", { style: { gridColumn: "3 / 4", gridRow: "3 / -1" }, className: "relative z-[45] min-h-0 min-w-0", children: /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(WorkflowView, { filming }) }) : null,
+    filmWorkspace && !testing ? /* @__PURE__ */ (0, import_jsx_runtime94.jsx)("div", { style: { gridArea: "scenebar" }, className: "relative z-40 min-w-0 border-b border-ink/15 bg-surface", children: /* @__PURE__ */ (0, import_jsx_runtime94.jsxs)("div", { className: "flex flex-wrap items-center justify-center", children: [
+      host.userAvatarControls ? null : /* @__PURE__ */ (0, import_jsx_runtime94.jsxs)(ToolbarMenu, { label: "Characters", icon: Users, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime94.jsx)("p", { className: "text-xs font-semibold", children: "Choose the live character" }),
+        /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(BodySection, { editor: character })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(RecordingBar, { filming })
+      /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(RecordingBar, { filming })
     ] }) }) : null,
-    labWorkspace && lab ? /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("div", { style: { gridArea: "viewport" }, className: "relative z-20 flex min-h-0 min-w-0 flex-col bg-surface", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)("div", { className: "relative min-h-0 flex-1", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(LabStage, { lab }),
-        /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(LabRunBar, { lab })
+    labWorkspace && lab ? /* @__PURE__ */ (0, import_jsx_runtime94.jsxs)("div", { style: { gridArea: "viewport" }, className: "relative z-20 flex min-h-0 min-w-0 flex-col bg-surface", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime94.jsxs)("div", { className: "relative min-h-0 flex-1", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(LabStage, { lab }),
+        /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(LabRunBar, { lab })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("div", { className: "h-48 shrink-0 border-t border-ink/10", children: /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(LabRunStrip, { lab }) })
+      /* @__PURE__ */ (0, import_jsx_runtime94.jsx)("div", { className: "h-48 shrink-0 border-t border-ink/10", children: /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(LabRunStrip, { lab }) })
     ] }) : null,
-    characterWorkspace ? /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("div", { style: { gridArea: "viewport" }, className: "relative z-20 min-h-0 min-w-0", children: /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(CharacterStageView, { editor: character }) }) : null,
-    testing && tab === "filming" ? /* @__PURE__ */ (0, import_jsx_runtime93.jsxs)(
+    characterWorkspace ? /* @__PURE__ */ (0, import_jsx_runtime94.jsx)("div", { style: { gridArea: "viewport" }, className: "relative z-20 min-h-0 min-w-0", children: /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(CharacterStageView, { editor: character }) }) : null,
+    testing && tab === "filming" ? /* @__PURE__ */ (0, import_jsx_runtime94.jsxs)(
       "aside",
       {
         "aria-label": "Filming",
         className: "absolute top-20 right-3 z-30 max-h-[calc(100dvh-6rem)] w-80 overflow-y-auto rounded-xl bg-surface shadow-xl",
         children: [
-          /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(PanelTitle, { children: "Filming" }),
-          /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("div", { className: "border-b border-ink/10", children: /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(RecordingBar, { filming }) }),
-          /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(FilmingPanel, { filming })
+          /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(PanelTitle, { children: "Filming" }),
+          /* @__PURE__ */ (0, import_jsx_runtime94.jsx)("div", { className: "border-b border-ink/10", children: /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(RecordingBar, { filming }) }),
+          /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(FilmingPanel, { filming })
         ]
       }
     ) : null,
-    testing && filming.studio.open ? /* @__PURE__ */ (0, import_jsx_runtime93.jsx)("div", { className: "absolute right-0 bottom-0 left-0 z-30 h-80 bg-surface shadow-xl", children: /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(DockedTimeline, { filming }) }) : null,
-    testing ? null : /* @__PURE__ */ (0, import_jsx_runtime93.jsx)(
+    testing && filming.studio.open ? /* @__PURE__ */ (0, import_jsx_runtime94.jsx)("div", { className: "absolute right-0 bottom-0 left-0 z-30 h-80 bg-surface shadow-xl", children: /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(DockedTimeline, { filming }) }) : null,
+    testing ? null : /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(
       DockWorkspace,
       {
         layout: layout2,
         onLayout,
         title: (id2) => PANEL_TITLES[id2](tab),
-        content: panelContent
+        content: panelContent,
+        visible: visiblePanel
       },
       layout2.mode
     )
@@ -109597,8 +110034,8 @@ function StudioChrome({
 }
 
 // ../../apps/web/components/studio/film/phone-filming.tsx
-var import_react96 = __toESM(require_react(), 1);
-var import_jsx_runtime94 = __toESM(require_jsx_runtime(), 1);
+var import_react97 = __toESM(require_react(), 1);
+var import_jsx_runtime95 = __toESM(require_jsx_runtime(), 1);
 var PANES = [
   { id: "timeline", label: "Timeline", Icon: Film },
   { id: "camera", label: "Camera", Icon: Camera },
@@ -109606,20 +110043,20 @@ var PANES = [
 ];
 function PhoneFilming({ filming, onClose }) {
   const studio = filming.studio;
-  const [pane, setPane] = (0, import_react96.useState)("timeline");
-  (0, import_react96.useEffect)(() => {
+  const [pane, setPane] = (0, import_react97.useState)("timeline");
+  (0, import_react97.useEffect)(() => {
     studio.setOpen(true);
     return () => {
       studio.setPreviewing(false);
       studio.setOpen(false);
     };
   }, []);
-  return /* @__PURE__ */ (0, import_jsx_runtime94.jsxs)("div", { role: "dialog", "aria-label": "Filming", "data-film-id": "film.phone", className: "absolute inset-0 z-40 flex flex-col text-ink", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime94.jsxs)("div", { className: "flex shrink-0 items-center gap-2 bg-surface/95 px-3 py-2 shadow", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(Clapperboard, { className: "size-4 text-brand" }),
-      /* @__PURE__ */ (0, import_jsx_runtime94.jsx)("strong", { className: "text-sm", children: "Filming" }),
-      /* @__PURE__ */ (0, import_jsx_runtime94.jsx)("span", { className: "truncate text-[11px] text-ink/50", children: studio.message }),
-      /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime95.jsxs)("div", { role: "dialog", "aria-label": "Filming", "data-film-id": "film.phone", className: "absolute inset-0 z-40 flex flex-col text-ink", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime95.jsxs)("div", { className: "flex shrink-0 items-center gap-2 bg-surface/95 px-3 py-2 shadow", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime95.jsx)(Clapperboard, { className: "size-4 text-brand" }),
+      /* @__PURE__ */ (0, import_jsx_runtime95.jsx)("strong", { className: "text-sm", children: "Filming" }),
+      /* @__PURE__ */ (0, import_jsx_runtime95.jsx)("span", { className: "truncate text-[11px] text-ink/50", children: studio.message }),
+      /* @__PURE__ */ (0, import_jsx_runtime95.jsx)(
         "button",
         {
           className: "ml-auto inline-flex size-8 items-center justify-center rounded-lg hover:bg-ink/10",
@@ -109627,11 +110064,11 @@ function PhoneFilming({ filming, onClose }) {
           "data-film-id": "film.phone.close",
           disabled: studio.rendering || filming.busy,
           onClick: onClose,
-          children: /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(X, { className: "size-5" })
+          children: /* @__PURE__ */ (0, import_jsx_runtime95.jsx)(X, { className: "size-5" })
         }
       )
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(
+    /* @__PURE__ */ (0, import_jsx_runtime95.jsx)(
       "div",
       {
         id: "genvr-film-stage",
@@ -109639,8 +110076,8 @@ function PhoneFilming({ filming, onClose }) {
         className: `relative min-h-0 flex-1 ${studio.previewing ? "bg-black" : "pointer-events-none opacity-0"}`
       }
     ),
-    /* @__PURE__ */ (0, import_jsx_runtime94.jsxs)("div", { className: "flex h-[48dvh] shrink-0 flex-col bg-surface landscape:h-[60dvh]", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime94.jsx)("div", { role: "tablist", "aria-label": "Filming panel", className: "flex shrink-0 border-b border-ink/10", children: PANES.map(({ id: id2, label: label12, Icon: Icon2 }) => /* @__PURE__ */ (0, import_jsx_runtime94.jsxs)(
+    /* @__PURE__ */ (0, import_jsx_runtime95.jsxs)("div", { className: "flex h-[48dvh] shrink-0 flex-col bg-surface landscape:h-[60dvh]", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime95.jsx)("div", { role: "tablist", "aria-label": "Filming panel", className: "flex shrink-0 border-b border-ink/10", children: PANES.map(({ id: id2, label: label13, Icon: Icon2 }) => /* @__PURE__ */ (0, import_jsx_runtime95.jsxs)(
         "button",
         {
           role: "tab",
@@ -109649,24 +110086,24 @@ function PhoneFilming({ filming, onClose }) {
           className: `flex flex-1 items-center justify-center gap-1 py-2 text-xs font-bold ${pane === id2 ? "border-b-2 border-brand text-ink" : "text-ink/50"}`,
           onClick: () => setPane(id2),
           children: [
-            /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(Icon2, { className: "size-4" }),
-            id2 === "camera" && studio.workspace !== "shoot" ? "Shots" : label12
+            /* @__PURE__ */ (0, import_jsx_runtime95.jsx)(Icon2, { className: "size-4" }),
+            id2 === "camera" && studio.workspace !== "shoot" ? "Shots" : label13
           ]
         },
         id2
       )) }),
-      /* @__PURE__ */ (0, import_jsx_runtime94.jsxs)("div", { className: "min-h-0 flex-1 overflow-auto", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime94.jsx)("div", { className: pane === "timeline" ? "h-full" : "hidden", children: /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(VideoEditor, { filming }) }),
-        pane === "camera" ? /* @__PURE__ */ (0, import_jsx_runtime94.jsx)("div", { className: "py-2", children: /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(FilmingPanel, { filming }) }) : null,
-        pane === "clip" ? /* @__PURE__ */ (0, import_jsx_runtime94.jsx)("div", { className: "py-2", children: /* @__PURE__ */ (0, import_jsx_runtime94.jsx)(VideoSceneInspector, { filming }) }) : null
+      /* @__PURE__ */ (0, import_jsx_runtime95.jsxs)("div", { className: "min-h-0 flex-1 overflow-auto", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime95.jsx)("div", { className: pane === "timeline" ? "h-full" : "hidden", children: /* @__PURE__ */ (0, import_jsx_runtime95.jsx)(VideoEditor, { filming }) }),
+        pane === "camera" ? /* @__PURE__ */ (0, import_jsx_runtime95.jsx)("div", { className: "py-2", children: /* @__PURE__ */ (0, import_jsx_runtime95.jsx)(FilmingPanel, { filming }) }) : null,
+        pane === "clip" ? /* @__PURE__ */ (0, import_jsx_runtime95.jsx)("div", { className: "py-2", children: /* @__PURE__ */ (0, import_jsx_runtime95.jsx)(VideoSceneInspector, { filming }) }) : null
       ] })
     ] })
   ] });
 }
 
 // ../../apps/web/components/studio/device-emulator.tsx
-var import_react97 = __toESM(require_react(), 1);
-var import_jsx_runtime95 = __toESM(require_jsx_runtime(), 1);
+var import_react98 = __toESM(require_react(), 1);
+var import_jsx_runtime96 = __toESM(require_jsx_runtime(), 1);
 function DeviceEmulator({
   placeId,
   model,
@@ -109675,9 +110112,9 @@ function DeviceEmulator({
   reloadKey,
   source
 }) {
-  const area = (0, import_react97.useRef)(null);
-  const [space, setSpace] = (0, import_react97.useState)({ width: 0, height: 0 });
-  (0, import_react97.useEffect)(() => {
+  const area = (0, import_react98.useRef)(null);
+  const [space, setSpace] = (0, import_react98.useState)({ width: 0, height: 0 });
+  (0, import_react98.useEffect)(() => {
     const element2 = area.current;
     if (!element2) return;
     const observer = new ResizeObserver(
@@ -109694,14 +110131,14 @@ function DeviceEmulator({
   const fit2 = Math.min(1, (space.width - 48) / outerWidth, (space.height - 72) / outerHeight);
   const scale = zoom === "fit" ? Math.max(0.1, fit2) : zoom;
   const src = source ?? `/places/${encodeURIComponent(placeId)}/play?preview=${model.kind}`;
-  return /* @__PURE__ */ (0, import_jsx_runtime95.jsxs)(
+  return /* @__PURE__ */ (0, import_jsx_runtime96.jsxs)(
     "div",
     {
       ref: area,
       style: { gridArea: "viewport" },
       className: "relative flex min-h-0 min-w-0 items-center justify-center overflow-auto bg-paper",
       children: [
-        /* @__PURE__ */ (0, import_jsx_runtime95.jsxs)("p", { className: "absolute top-2 left-1/2 z-10 -translate-x-1/2 rounded-full bg-surface px-3 py-1 text-xs font-bold whitespace-nowrap text-ink/70 shadow", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime96.jsxs)("p", { className: "absolute top-2 left-1/2 z-10 -translate-x-1/2 rounded-full bg-surface px-3 py-1 text-xs font-bold whitespace-nowrap text-ink/70 shadow", children: [
           model.name,
           " \xB7 ",
           width,
@@ -109713,7 +110150,7 @@ function DeviceEmulator({
         ] }),
         space.width > 0 ? (
           // The frame takes its scaled size in the layout; the device inside is drawn at full size.
-          /* @__PURE__ */ (0, import_jsx_runtime95.jsx)("div", { className: "m-auto shrink-0", style: { width: outerWidth * scale, height: outerHeight * scale }, children: /* @__PURE__ */ (0, import_jsx_runtime95.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime96.jsx)("div", { className: "m-auto shrink-0", style: { width: outerWidth * scale, height: outerHeight * scale }, children: /* @__PURE__ */ (0, import_jsx_runtime96.jsx)(
             "div",
             {
               className: "origin-top-left bg-ink shadow-2xl",
@@ -109724,7 +110161,7 @@ function DeviceEmulator({
                 borderRadius: model.radius + model.bezel,
                 transform: `scale(${scale})`
               },
-              children: /* @__PURE__ */ (0, import_jsx_runtime95.jsx)(
+              children: /* @__PURE__ */ (0, import_jsx_runtime96.jsx)(
                 "iframe",
                 {
                   title: `${model.name} preview`,
@@ -109746,7 +110183,7 @@ function DeviceEmulator({
 }
 
 // ../../apps/web/lib/use-studio-filming.ts
-var import_react99 = __toESM(require_react(), 1);
+var import_react100 = __toESM(require_react(), 1);
 
 // ../../apps/web/lib/filming.ts
 async function connectFilming(place3, rig, canvas, subscribe, report, disconnected, available = () => true, activity = () => {
@@ -109871,7 +110308,7 @@ async function connectFilming(place3, rig, canvas, subscribe, report, disconnect
 }
 
 // ../../apps/web/lib/video-studio/use-video-studio.ts
-var import_react98 = __toESM(require_react(), 1);
+var import_react99 = __toESM(require_react(), 1);
 
 // ../../apps/web/lib/video-studio/storage.ts
 async function open() {
@@ -109904,21 +110341,21 @@ async function backupOnce(key2, value) {
 
 // ../../apps/web/lib/video-studio/use-video-studio.ts
 function useVideoStudio(place3, key2, filmExample) {
-  const [, setVersion] = (0, import_react98.useState)(0);
-  const film = (0, import_react98.useRef)(null);
+  const [, setVersion] = (0, import_react99.useState)(0);
+  const film = (0, import_react99.useRef)(null);
   if (!film.current) film.current = new FilmSession(emptyFilm(), () => crypto.randomUUID(), () => setVersion((n2) => n2 + 1));
-  const transport = (0, import_react98.useRef)(null);
-  const [filmPlaying, setFilmPlaying] = (0, import_react98.useState)(false);
-  const [assets, setAssets] = (0, import_react98.useState)([]);
-  const [open2, setOpen] = (0, import_react98.useState)(false), [mode, setMode] = (0, import_react98.useState)("production");
-  const [rendering, updateRendering] = (0, import_react98.useState)(false), [previewing, setPreviewing] = (0, import_react98.useState)(false);
-  const renderBusy = (0, import_react98.useRef)(false);
+  const transport = (0, import_react99.useRef)(null);
+  const [filmPlaying, setFilmPlaying] = (0, import_react99.useState)(false);
+  const [assets, setAssets] = (0, import_react99.useState)([]);
+  const [open2, setOpen] = (0, import_react99.useState)(false), [mode, setMode] = (0, import_react99.useState)("production");
+  const [rendering, updateRendering] = (0, import_react99.useState)(false), [previewing, setPreviewing] = (0, import_react99.useState)(false);
+  const renderBusy = (0, import_react99.useRef)(false);
   const setRendering = (value) => {
     renderBusy.current = value;
     updateRendering(value);
   };
-  const [message2, setMessage] = (0, import_react98.useState)("Projects stay in this browser.");
-  const [workspace, updateWorkspace] = (0, import_react98.useState)(() => {
+  const [message3, setMessage] = (0, import_react99.useState)("Projects stay in this browser.");
+  const [workspace, updateWorkspace] = (0, import_react99.useState)(() => {
     try {
       if (new URLSearchParams(window.location.search).get("tab") === "story") return "story";
       const saved = localStorage.getItem("genvr-film-workspace");
@@ -109934,12 +110371,12 @@ function useVideoStudio(place3, key2, filmExample) {
     } catch {
     }
   };
-  const [source, setSource] = (0, import_react98.useState)(null);
-  const [guides, setGuides] = (0, import_react98.useState)({ safe: false, thirds: false });
-  const [ungraded, setUngraded] = (0, import_react98.useState)(false);
-  const [levels3, setLevels] = (0, import_react98.useState)({});
-  const [previous, setPrevious] = (0, import_react98.useState)(false);
-  (0, import_react98.useEffect)(() => {
+  const [source, setSource] = (0, import_react99.useState)(null);
+  const [guides, setGuides] = (0, import_react99.useState)({ safe: false, thirds: false });
+  const [ungraded, setUngraded] = (0, import_react99.useState)(false);
+  const [levels3, setLevels] = (0, import_react99.useState)({});
+  const [previous, setPrevious] = (0, import_react99.useState)(false);
+  (0, import_react99.useEffect)(() => {
     if (!key2) return;
     let live = true;
     void storage6(`${key2}:before-open`).then((kept) => {
@@ -109950,17 +110387,17 @@ function useVideoStudio(place3, key2, filmExample) {
       live = false;
     };
   }, [key2, filmExample]);
-  const [ready2, setReady] = (0, import_react98.useState)(false);
-  const [loadedKey, setLoadedKey] = (0, import_react98.useState)(null);
-  const [saveable, setSaveable] = (0, import_react98.useState)(false);
-  const activeKey = (0, import_react98.useRef)(key2);
+  const [ready2, setReady] = (0, import_react99.useState)(false);
+  const [loadedKey, setLoadedKey] = (0, import_react99.useState)(null);
+  const [saveable, setSaveable] = (0, import_react99.useState)(false);
+  const activeKey = (0, import_react99.useRef)(key2);
   activeKey.current = key2;
-  const currentAssets = (0, import_react98.useRef)(assets);
+  const currentAssets = (0, import_react99.useRef)(assets);
   currentAssets.current = assets;
-  const saving = (0, import_react98.useRef)(Promise.resolve());
-  const pendingAudio = (0, import_react98.useRef)(/* @__PURE__ */ new Set());
+  const saving = (0, import_react99.useRef)(Promise.resolve());
+  const pendingAudio = (0, import_react99.useRef)(/* @__PURE__ */ new Set());
   const project = film.current.project;
-  (0, import_react98.useEffect)(() => {
+  (0, import_react99.useEffect)(() => {
     let cancelled = false;
     setReady(false);
     setLoadedKey(null);
@@ -110010,7 +110447,7 @@ function useVideoStudio(place3, key2, filmExample) {
       cancelled = true;
     };
   }, [key2]);
-  (0, import_react98.useEffect)(() => {
+  (0, import_react99.useEffect)(() => {
     if (!ready2 || !key2 || !saveable || loadedKey !== key2) return;
     const value = { project, assets };
     saving.current = saving.current.catch(() => {
@@ -110022,7 +110459,7 @@ function useVideoStudio(place3, key2, filmExample) {
       }
     });
   }, [key2, loadedKey, ready2, saveable, project, assets]);
-  (0, import_react98.useEffect)(() => {
+  (0, import_react99.useEffect)(() => {
     const used = new Set([
       project,
       ...film.current.history.past.flatMap((s2) => [s2.before, s2.after]),
@@ -110225,7 +110662,7 @@ function useVideoStudio(place3, key2, filmExample) {
     openFile,
     restorePrevious,
     previous,
-    message: message2,
+    message: message3,
     setMessage,
     ready: ready2,
     flush,
@@ -110249,12 +110686,12 @@ var filmRoom = {
   get self() {
     return sender2?.self ?? null;
   },
-  sendTake(message2) {
-    sender2?.take(message2);
+  sendTake(message3) {
+    sender2?.take(message3);
     return sender2 !== null;
   },
-  sendVoice(message2) {
-    sender2?.voice(message2);
+  sendVoice(message3) {
+    sender2?.voice(message3);
   },
   receivedTake(event2) {
     for (const listen of takeListeners) listen(event2);
@@ -110389,17 +110826,17 @@ var WALK_RUN = /(^|[.:/])run$/;
 var WALK_CLIP = /(crouch-walk|sneak)$/;
 var EMPTY_TAKE = `The take came out empty, so nothing was saved. Try again; if it repeats, turn off "Record the world's sound".`;
 function useStudioFilming(place3, runtime, container, log3, editing, storageKey, platformEnabled2 = true, voiceService, filmExample) {
-  const rig = (0, import_react99.useRef)(new FilmRig());
+  const rig = (0, import_react100.useRef)(new FilmRig());
   const studio = useVideoStudio(place3, storageKey, filmExample);
-  const latestStudio = (0, import_react99.useRef)(studio);
+  const latestStudio = (0, import_react100.useRef)(studio);
   latestStudio.current = studio;
-  const voice = (0, import_react99.useRef)(voiceService);
+  const voice = (0, import_react100.useRef)(voiceService);
   voice.current = voiceService;
-  const sceneSpeech = (0, import_react99.useRef)(null);
+  const sceneSpeech = (0, import_react100.useRef)(null);
   if (!sceneSpeech.current) sceneSpeech.current = new SceneSpeech((actor, shape2) => {
     runtime.current?.setSpeechMouth(actor, shape2);
   });
-  const directing = (0, import_react99.useRef)(null);
+  const directing = (0, import_react100.useRef)(null);
   const prepareCast = async (cues2) => {
     await sceneSpeech.current.prepare(cues2, latestStudio.current.snapshot().assets);
     const ids2 = [...new Set(cues2.filter((cue2) => cue2.actor === "self" && cue2.action.startsWith("motion:")).map((cue2) => cue2.action))];
@@ -110409,28 +110846,28 @@ function useStudioFilming(place3, runtime, container, log3, editing, storageKey,
     const first = [...cues2].sort((a2, b2) => a2.start - b2.start).find((c2) => c2.actor === "self" && c2.at);
     if (first?.at) runtime.current?.teleportPlayer({ x: first.at.x, z: first.at.z });
   };
-  const frames2 = (0, import_react99.useRef)(/* @__PURE__ */ new Set());
-  const originalFov = (0, import_react99.useRef)(/* @__PURE__ */ new WeakMap());
-  const cleanup = (0, import_react99.useRef)(null);
-  const storyPreview = (0, import_react99.useRef)(null);
-  const manualFinish = (0, import_react99.useRef)(null), manualBegan = (0, import_react99.useRef)(0);
-  const [manualRecording, setManualRecording] = (0, import_react99.useState)(false);
-  const [shotRecording, setShotRecording] = (0, import_react99.useState)(null);
-  const localBusy = (0, import_react99.useRef)(false), remoteBusy = (0, import_react99.useRef)(false), connecting = (0, import_react99.useRef)(false);
-  const epoch = (0, import_react99.useRef)(0), abort = (0, import_react99.useRef)(new AbortController());
-  const logger = (0, import_react99.useRef)(log3);
+  const frames2 = (0, import_react100.useRef)(/* @__PURE__ */ new Set());
+  const originalFov = (0, import_react100.useRef)(/* @__PURE__ */ new WeakMap());
+  const cleanup = (0, import_react100.useRef)(null);
+  const storyPreview = (0, import_react100.useRef)(null);
+  const manualFinish = (0, import_react100.useRef)(null), manualBegan = (0, import_react100.useRef)(0);
+  const [manualRecording, setManualRecording] = (0, import_react100.useState)(false);
+  const [shotRecording, setShotRecording] = (0, import_react100.useState)(null);
+  const localBusy = (0, import_react100.useRef)(false), remoteBusy = (0, import_react100.useRef)(false), connecting = (0, import_react100.useRef)(false);
+  const epoch = (0, import_react100.useRef)(0), abort = (0, import_react100.useRef)(new AbortController());
+  const logger = (0, import_react100.useRef)(log3);
   logger.current = log3;
-  const isEditing = (0, import_react99.useRef)(editing);
+  const isEditing = (0, import_react100.useRef)(editing);
   isEditing.current = editing;
-  const [camera, setCamera] = (0, import_react99.useState)(null);
-  const [output2, setOutput] = (0, import_react99.useState)({ seconds: 5, size: "1920x1080", worldSound: true, liveActors: false });
-  const outputRef = (0, import_react99.useRef)(output2);
+  const [camera, setCamera] = (0, import_react100.useState)(null);
+  const [output2, setOutput] = (0, import_react100.useState)({ seconds: 5, size: "1920x1080", worldSound: true, liveActors: false });
+  const outputRef = (0, import_react100.useRef)(output2);
   outputRef.current = output2;
   const saved = filmSettings(studio.project);
-  (0, import_react99.useEffect)(() => {
+  (0, import_react100.useEffect)(() => {
     setOutput((old) => old.worldSound === saved.worldSound && old.liveActors === saved.roomVoices ? old : { ...old, worldSound: saved.worldSound, liveActors: saved.roomVoices });
   }, [saved.worldSound, saved.roomVoices]);
-  (0, import_react99.useEffect)(() => {
+  (0, import_react100.useEffect)(() => {
     setOutput((old) => old.seconds === saved.shotSeconds ? old : { ...old, seconds: saved.shotSeconds });
   }, [saved.shotSeconds]);
   const liveTake = () => {
@@ -110493,8 +110930,8 @@ function useStudioFilming(place3, runtime, container, log3, editing, storageKey,
     if (!result.ok) report(`The shot was added, but not to the scene: ${result.reason}`);
   };
   const worldSound = () => output2.worldSound ? runtime.current?.worldSoundStream() ?? null : null;
-  const [connected, setConnected] = (0, import_react99.useState)(false), [busy, setBusy] = (0, import_react99.useState)(false);
-  const [message2, setMessage] = (0, import_react99.useState)("Choose a camera preset, then take a photo or record.");
+  const [connected, setConnected] = (0, import_react100.useState)(false), [busy, setBusy] = (0, import_react100.useState)(false);
+  const [message3, setMessage] = (0, import_react100.useState)("Choose a camera preset, then take a photo or record.");
   const report = (text5) => {
     setMessage(text5);
     logger.current(`Filming: ${text5}`);
@@ -110533,7 +110970,7 @@ function useStudioFilming(place3, runtime, container, log3, editing, storageKey,
     setBusy(false);
     setCamera(null);
   };
-  (0, import_react99.useEffect)(() => {
+  (0, import_react100.useEffect)(() => {
     epoch.current++;
     abort.current = new AbortController();
     setConnected(false);
@@ -110768,9 +111205,9 @@ function useStudioFilming(place3, runtime, container, log3, editing, storageKey,
     } catch {
     }
   };
-  const connectRef = (0, import_react99.useRef)(connect);
+  const connectRef = (0, import_react100.useRef)(connect);
   connectRef.current = connect;
-  (0, import_react99.useEffect)(() => {
+  (0, import_react100.useEffect)(() => {
     if (!platformEnabled2) return;
     let wanted2 = false;
     try {
@@ -111315,7 +111752,7 @@ function useStudioFilming(place3, runtime, container, log3, editing, storageKey,
     setOutput,
     busy,
     connected,
-    message: message2,
+    message: message3,
     onFilmFrame,
     onRendered,
     releaseRuntime,
@@ -111666,11 +112103,11 @@ async function flushStudioClose(film, saveWorld) {
 }
 
 // studio/app.tsx
-var import_jsx_runtime96 = __toESM(require_jsx_runtime(), 1);
-var message = (error) => error instanceof Error ? error.message : "Operation failed.";
+var import_jsx_runtime97 = __toESM(require_jsx_runtime(), 1);
+var message2 = (error) => error instanceof Error ? error.message : "Operation failed.";
 var button27 = "inline-flex size-10 shrink-0 items-center justify-center rounded-lg hover:bg-ink/10 disabled:opacity-40";
-function IconButton({ label: label12, children, ...props }) {
-  return /* @__PURE__ */ (0, import_jsx_runtime96.jsx)("button", { type: "button", ...props, className: button27, "aria-label": label12, title: label12, children });
+function IconButton({ label: label13, children, ...props }) {
+  return /* @__PURE__ */ (0, import_jsx_runtime97.jsx)("button", { type: "button", ...props, className: button27, "aria-label": label13, title: label13, children });
 }
 var download = (project) => {
   const url = URL.createObjectURL(new Blob([JSON.stringify(project)], { type: "application/json" }));
@@ -111681,20 +112118,20 @@ var download = (project) => {
   setTimeout(() => URL.revokeObjectURL(url), 6e4);
 };
 function Editor({ initial, storage: storage7, options, leave, beforeClose }) {
-  const container = (0, import_react100.useRef)(null), runtime = (0, import_react100.useRef)(null);
-  const characterFingerprint = (0, import_react100.useRef)("");
-  const speechPlayback = (0, import_react100.useRef)(null);
-  const registerSpeech = (0, import_react100.useRef)((value) => {
+  const container = (0, import_react101.useRef)(null), runtime = (0, import_react101.useRef)(null);
+  const characterFingerprint = (0, import_react101.useRef)("");
+  const speechPlayback = (0, import_react101.useRef)(null);
+  const registerSpeech = (0, import_react101.useRef)((value) => {
     speechPlayback.current = value;
   }).current;
-  const sharedCharacter = (0, import_react100.useRef)(null);
-  const liveStage = (0, import_react100.useRef)(null);
-  const [livePlayerHost, setLivePlayerHost] = (0, import_react100.useState)(null);
-  const worldPreview = (0, import_react100.useRef)(null);
-  const sharePreviewPending = (0, import_react100.useRef)(false);
-  const [sharePreparing, setSharePreparing] = (0, import_react100.useState)(false);
-  const [sharePreviewError, setSharePreviewError] = (0, import_react100.useState)("");
-  const [sharePreview, setSharePreview] = (0, import_react100.useState)({});
+  const sharedCharacter = (0, import_react101.useRef)(null);
+  const liveStage = (0, import_react101.useRef)(null);
+  const [livePlayerHost, setLivePlayerHost] = (0, import_react101.useState)(null);
+  const worldPreview = (0, import_react101.useRef)(null);
+  const sharePreviewPending = (0, import_react101.useRef)(false);
+  const [sharePreparing, setSharePreparing] = (0, import_react101.useState)(false);
+  const [sharePreviewError, setSharePreviewError] = (0, import_react101.useState)("");
+  const [sharePreview, setSharePreview] = (0, import_react101.useState)({});
   const openShare = async () => {
     setShareOpen(true);
     setSharePreparing(true);
@@ -111759,18 +112196,18 @@ function Editor({ initial, storage: storage7, options, leave, beforeClose }) {
     setSharePreparing(false);
     if (stage && !Object.keys(previews).length) setSharePreviewError("Could not capture previews. Refresh to try again.");
   };
-  const [shareOpen, setShareOpen] = (0, import_react100.useState)(false);
-  const [liveRecipe, setLiveRecipe] = (0, import_react100.useState)(() => {
+  const [shareOpen, setShareOpen] = (0, import_react101.useState)(false);
+  const [liveRecipe, setLiveRecipe] = (0, import_react101.useState)(() => {
     try {
       return readCharacterRecipe(JSON.parse(localStorage.getItem("genvr-character-draft-v1") ?? "null"));
     } catch {
       return DEFAULT_CHARACTER_RECIPE;
     }
   });
-  const liveRecipeKey = (0, import_react100.useRef)("");
+  const liveRecipeKey = (0, import_react101.useRef)("");
   const embedLayout = new URLSearchParams(window.location.search).get("avatar-live");
-  const presentationStage = (0, import_react100.useRef)(null);
-  const [presentation] = (0, import_react100.useState)(() => new AvatarPresentation(() => {
+  const presentationStage = (0, import_react101.useRef)(null);
+  const [presentation] = (0, import_react101.useState)(() => new AvatarPresentation(() => {
     const world = runtime.current;
     if (!world || presentation.snapshot().display.open && !liveStage.current) return null;
     return {
@@ -111779,8 +112216,8 @@ function Editor({ initial, storage: storage7, options, leave, beforeClose }) {
       importAvatarMotion: (target2, id2, data) => target2 === "self" && (liveStage.current ?? presentationStage.current) ? (liveStage.current ?? presentationStage.current).importAvatarMotion(id2, data) : world.importAvatarMotion(target2, id2, data)
     };
   }, options.presentation));
-  const presentationState = (0, import_react100.useSyncExternalStore)(presentation.subscribe, presentation.snapshot);
-  (0, import_react100.useEffect)(() => {
+  const presentationState = (0, import_react101.useSyncExternalStore)(presentation.subscribe, presentation.snapshot);
+  (0, import_react101.useEffect)(() => {
     if (embedLayout) {
       const query = new URLSearchParams(window.location.search);
       const values = Object.fromEntries(["background", "color", "framing", "media", "worldId"].flatMap((key2) => query.has(key2) ? [[key2, query.get(key2)]] : []));
@@ -111793,11 +112230,11 @@ function Editor({ initial, storage: storage7, options, leave, beforeClose }) {
       })() : {} });
     }
   }, []);
-  const [presentationAgents, setPresentationAgents] = (0, import_react100.useState)([]);
-  const [library] = (0, import_react100.useState)(() => !options.userLibrary ? null : options.userLibrary.storage ?? browserUserAvatarStorage(options.userLibrary.scope));
-  const [userAvatars] = (0, import_react100.useState)(() => library ? new UserAvatarSession(library) : null);
-  const selfLibraryBody = (0, import_react100.useRef)(void 0);
-  const localLooks = (0, import_react100.useRef)(/* @__PURE__ */ new Map()), agentRows = (0, import_react100.useRef)([]);
+  const [presentationAgents, setPresentationAgents] = (0, import_react101.useState)([]);
+  const [library] = (0, import_react101.useState)(() => !options.userLibrary ? null : options.userLibrary.storage ?? browserUserAvatarStorage(options.userLibrary.scope));
+  const [userAvatars] = (0, import_react101.useState)(() => library ? new UserAvatarSession(library) : null);
+  const selfLibraryBody = (0, import_react101.useRef)(void 0);
+  const localLooks = (0, import_react101.useRef)(/* @__PURE__ */ new Map()), agentRows = (0, import_react101.useRef)([]);
   const restoreLibrary = async (target2) => {
     const body = project.current.avatarBodies?.[target2];
     if (body) {
@@ -111836,20 +112273,20 @@ function Editor({ initial, storage: storage7, options, leave, beforeClose }) {
     const error2 = presentation.execute({ kind: "animation", target: target2, animation: "motion:user-library", duration: Math.min(6e4, Math.max(1e3, (asset.metadata.duration ?? 10) * 1e3)) });
     if (error2) throw new Error(error2);
   };
-  (0, import_react100.useEffect)(() => {
+  (0, import_react101.useEffect)(() => {
     const unsubscribe = options.presentation?.subscribe?.(initial.id, presentation.execute);
     return () => {
       unsubscribe?.();
       presentation.dispose();
     };
   }, [presentation]);
-  const project = (0, import_react100.useRef)(initial), queue = (0, import_react100.useRef)(new StudioSaveQueue()), timer = (0, import_react100.useRef)(null);
-  const dirty = (0, import_react100.useRef)(false), mounted2 = (0, import_react100.useRef)(true);
-  const [agentCount, setAgentCount] = (0, import_react100.useState)(null);
-  const [ready2, setReady] = (0, import_react100.useState)(false), [error, setError] = (0, import_react100.useState)(null), [saved, setSaved] = (0, import_react100.useState)("Loading");
-  const [metadata, setMetadata] = (0, import_react100.useState)(initial), [settings2, setSettings] = (0, import_react100.useState)(false), [testing, setTesting] = (0, import_react100.useState)(false);
-  const [tab, setTab] = (0, import_react100.useState)(initial.lab ? "lab" : "build"), [preview, setPreview] = (0, import_react100.useState)(DEFAULT_PREVIEW);
-  (0, import_react100.useEffect)(() => {
+  const project = (0, import_react101.useRef)(initial), queue = (0, import_react101.useRef)(new StudioSaveQueue()), timer = (0, import_react101.useRef)(null);
+  const dirty = (0, import_react101.useRef)(false), mounted2 = (0, import_react101.useRef)(true);
+  const [agentCount, setAgentCount] = (0, import_react101.useState)(null);
+  const [ready2, setReady] = (0, import_react101.useState)(false), [error, setError] = (0, import_react101.useState)(null), [saved, setSaved] = (0, import_react101.useState)("Loading");
+  const [metadata, setMetadata] = (0, import_react101.useState)(initial), [settings2, setSettings] = (0, import_react101.useState)(false), [testing, setTesting] = (0, import_react101.useState)(false);
+  const [tab, setTab] = (0, import_react101.useState)(initial.lab ? "lab" : "build"), [preview, setPreview] = (0, import_react101.useState)(DEFAULT_PREVIEW);
+  (0, import_react101.useEffect)(() => {
     const world = runtime.current;
     if (!world || !presentationState.display.open) return;
     const background = presentationState.display.background === "world" && !presentationState.display.worldId;
@@ -111860,9 +112297,9 @@ function Editor({ initial, storage: storage7, options, leave, beforeClose }) {
       world.setPaused(tab === "avatar" && !testing);
     };
   }, [presentationState.display.open, presentationState.display.background, presentationState.display.worldId, ready2]);
-  const [logs, setLogs] = (0, import_react100.useState)([]), desktop = useIsDesktop();
+  const [logs, setLogs] = (0, import_react101.useState)([]), desktop = useIsDesktop();
   const [layout2, setLayout] = useStudioLayout(tab === "filming" ? "filming" : "build");
-  const [status, setStatus] = (0, import_react100.useState)({
+  const [status, setStatus] = (0, import_react101.useState)({
     tool: null,
     points: 0,
     canFinish: false,
@@ -111885,7 +112322,7 @@ function Editor({ initial, storage: storage7, options, leave, beforeClose }) {
     return body.result;
   };
   const filming = useStudioFilming(initial.id, runtime, container, log3, () => !testing, `sdk-studio:${initial.id}`, false, avatarVoice, options.filmExample === false ? false : options.filmExample ?? "/film-examples/island-languages.genvrfilm");
-  const latestFilm = (0, import_react100.useRef)(filming);
+  const latestFilm = (0, import_react101.useRef)(filming);
   latestFilm.current = filming;
   const snapshot = () => readStudioProject({ ...project.current, ...runtime.current?.snapshot() ?? {} });
   const save3 = async () => {
@@ -111905,7 +112342,7 @@ function Editor({ initial, storage: storage7, options, leave, beforeClose }) {
     } catch (error2) {
       if (mounted2.current) {
         setSaved("Not saved");
-        setError(message(error2));
+        setError(message2(error2));
       }
       return false;
     }
@@ -111919,11 +112356,15 @@ function Editor({ initial, storage: storage7, options, leave, beforeClose }) {
       void save3();
     }, 400);
   };
-  const [lab] = (0, import_react100.useState)(() => initial.lab ? new LabController(initial.lab, (data) => {
-    project.current = { ...project.current, lab: data };
-    changed();
-  }) : void 0);
-  (0, import_react100.useEffect)(() => {
+  const [lab] = (0, import_react101.useState)(() => {
+    const made = initial.lab ? new LabController(initial.lab, (data) => {
+      project.current = { ...project.current, lab: data };
+      changed();
+    }) : void 0;
+    made?.setPublisher(options.motionSharing ?? null);
+    return made;
+  });
+  (0, import_react101.useEffect)(() => {
     mounted2.current = true;
     const abort = new AbortController();
     let current5 = null;
@@ -111978,12 +112419,12 @@ function Editor({ initial, storage: storage7, options, leave, beforeClose }) {
           setLiveRecipe((current6) => ({ ...current6, body: look.body, colors: { ...current6.colors, skin: look.skin, hair: look.hair, top: look.shirt, bottom: look.pants, shoes: look.shoes } }));
         }
       }).catch((error2) => {
-        if (!abort.signal.aborted) setError(message(error2));
+        if (!abort.signal.aborted) setError(message2(error2));
       });
       setReady(true);
       setSaved("Saved locally");
     }).catch((error2) => {
-      if (!abort.signal.aborted) setError(message(error2));
+      if (!abort.signal.aborted) setError(message2(error2));
     });
     const beforeUnload = (event2) => {
       if (dirty.current) {
@@ -112004,7 +112445,7 @@ function Editor({ initial, storage: storage7, options, leave, beforeClose }) {
       if (!options.userLibrary || !options.userLibrary.storage) library?.close();
     };
   }, []);
-  (0, import_react100.useEffect)(() => {
+  (0, import_react101.useEffect)(() => {
     if (!ready2 || !options.agents || !runtime.current) return;
     let stopped = false, running = false, previous = "";
     const refresh = async () => {
@@ -112035,17 +112476,17 @@ function Editor({ initial, storage: storage7, options, leave, beforeClose }) {
       clearInterval(timer2);
     };
   }, [ready2]);
-  (0, import_react100.useEffect)(() => {
+  (0, import_react101.useEffect)(() => {
     runtime.current?.setSimulating(testing);
     runtime.current?.setControlsEnabled(!settings2);
   }, [testing, settings2, ready2]);
-  (0, import_react100.useEffect)(() => {
+  (0, import_react101.useEffect)(() => {
     runtime.current?.setAudioVolumes({ effects: layout2.worldSounds ? 1 : 0, ambience: layout2.worldSounds ? 1 : 0 });
   }, [layout2.worldSounds, ready2]);
-  (0, import_react100.useEffect)(() => {
+  (0, import_react101.useEffect)(() => {
     runtime.current?.setPaused(!!preview.model);
   }, [preview.model, ready2]);
-  (0, import_react100.useEffect)(() => {
+  (0, import_react101.useEffect)(() => {
     const key2 = (event2) => {
       if ((event2.ctrlKey || event2.metaKey) && event2.key.toLowerCase() === "s") {
         event2.preventDefault();
@@ -112079,10 +112520,10 @@ function Editor({ initial, storage: storage7, options, leave, beforeClose }) {
     }
     return { action: input12.action, target: input12.target, id: input12.id, private: true };
   };
-  const [voicePlayerHost, setVoicePlayerHost] = (0, import_react100.useState)(null);
-  const [voiceOpen, setVoiceOpen] = (0, import_react100.useState)(false);
-  const [liveConnected, setLiveConnected] = (0, import_react100.useState)(false);
-  const liveExecutor = (0, import_react100.useRef)(async () => {
+  const [voicePlayerHost, setVoicePlayerHost] = (0, import_react101.useState)(null);
+  const [voiceOpen, setVoiceOpen] = (0, import_react101.useState)(false);
+  const [liveConnected, setLiveConnected] = (0, import_react101.useState)(false);
+  const liveExecutor = (0, import_react101.useRef)(async () => {
     throw new Error("Studio is loading.");
   });
   liveExecutor.current = async (tool2, raw, signal) => {
@@ -112153,7 +112594,7 @@ function Editor({ initial, storage: storage7, options, leave, beforeClose }) {
     }
     throw new Error("Unsupported live Studio tool.");
   };
-  (0, import_react100.useEffect)(() => {
+  (0, import_react101.useEffect)(() => {
     if (!ready2 || !options.liveBridge) return;
     return connectLiveStudio(options.liveBridge, initial, { avatar: true, privateLibrary: Boolean(library), filming: true, voice: true, avatarLive: true, sharing: Boolean(options.sharing), motionLab: Boolean(lab) }, (tool2, args, signal) => liveExecutor.current(tool2, args, signal), setLiveConnected);
   }, [ready2, initial.id, options.liveBridge]);
@@ -112180,14 +112621,14 @@ function Editor({ initial, storage: storage7, options, leave, beforeClose }) {
     setMetadata(next3);
     changed();
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime96.jsx)(StudioHostProvider, { value: {
+  return /* @__PURE__ */ (0, import_jsx_runtime97.jsx)(StudioHostProvider, { value: {
     platform: false,
     userAvatarControls: library ? (section, search, _onSelfBody, target2) => {
-      return /* @__PURE__ */ (0, import_jsx_runtime96.jsx)(UserAvatarPanel, { storage: library, section, search, agents: presentationAgents, assign: assignUserAvatar, play: playUserMotion, target: target2 });
+      return /* @__PURE__ */ (0, import_jsx_runtime97.jsx)(UserAvatarPanel, { storage: library, section, search, agents: presentationAgents, assign: assignUserAvatar, play: playUserMotion, target: target2 });
     } : void 0,
-    presentationControls: options.presentation?.enabled === false ? void 0 : (section, search, target2) => /* @__PURE__ */ (0, import_jsx_runtime96.jsx)(PresentationControls, { controller: presentation, section, search, agents: presentationAgents, target: target2 }),
+    presentationControls: options.presentation?.enabled === false ? void 0 : (section, search, target2) => /* @__PURE__ */ (0, import_jsx_runtime97.jsx)(PresentationControls, { controller: presentation, section, search, agents: presentationAgents, target: target2 }),
     presentationTargets: () => presentationAgents,
-    presentationOverlay: () => options.presentation?.enabled === false ? null : /* @__PURE__ */ (0, import_jsx_runtime96.jsx)(PresentationViewport, { controller: presentation }),
+    presentationOverlay: () => options.presentation?.enabled === false ? null : /* @__PURE__ */ (0, import_jsx_runtime97.jsx)(PresentationViewport, { controller: presentation }),
     shareStudio,
     share: openShare,
     avatarLive: () => {
@@ -112227,48 +112668,48 @@ function Editor({ initial, storage: storage7, options, leave, beforeClose }) {
       void goHome();
     },
     settings: () => setSettings(true)
-  }, children: /* @__PURE__ */ (0, import_jsx_runtime96.jsxs)("div", { className: "flex h-dvh flex-col overflow-hidden bg-paper text-ink", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime96.jsxs)("div", { style: embedLayout || desktop ? { display: "none" } : void 0, className: "flex h-12 shrink-0 items-center gap-1 border-b border-ink/10 bg-surface px-2", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime96.jsx)(IconButton, { label: "My projects", disabled: !ready2 && !error || filming.busy || filming.studio.rendering, onClick: () => void goHome(), children: /* @__PURE__ */ (0, import_jsx_runtime96.jsx)(House, { className: "size-4" }) }),
-      /* @__PURE__ */ (0, import_jsx_runtime96.jsx)("span", { className: "truncate text-xs font-bold", children: "Local Studio" }),
-      options.liveBridge ? /* @__PURE__ */ (0, import_jsx_runtime96.jsx)("span", { role: "status", "aria-label": "Live MCP connection", className: "rounded-full border border-ink/10 px-2 py-1 text-[10px]", children: liveConnected ? "MCP connected" : "MCP connecting" }) : null,
-      agentCount !== null ? /* @__PURE__ */ (0, import_jsx_runtime96.jsxs)("span", { className: "text-xs", role: "status", children: [
+  }, children: /* @__PURE__ */ (0, import_jsx_runtime97.jsxs)("div", { className: "flex h-dvh flex-col overflow-hidden bg-paper text-ink", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime97.jsxs)("div", { style: embedLayout || desktop ? { display: "none" } : void 0, className: "flex h-12 shrink-0 items-center gap-1 border-b border-ink/10 bg-surface px-2", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime97.jsx)(IconButton, { label: "My projects", disabled: !ready2 && !error || filming.busy || filming.studio.rendering, onClick: () => void goHome(), children: /* @__PURE__ */ (0, import_jsx_runtime97.jsx)(House, { className: "size-4" }) }),
+      /* @__PURE__ */ (0, import_jsx_runtime97.jsx)("span", { className: "truncate text-xs font-bold", children: "Local Studio" }),
+      options.liveBridge ? /* @__PURE__ */ (0, import_jsx_runtime97.jsx)("span", { role: "status", "aria-label": "Live MCP connection", className: "rounded-full border border-ink/10 px-2 py-1 text-[10px]", children: liveConnected ? "MCP connected" : "MCP connecting" }) : null,
+      agentCount !== null ? /* @__PURE__ */ (0, import_jsx_runtime97.jsxs)("span", { className: "text-xs", role: "status", children: [
         agentCount,
         " agents"
       ] }) : null,
-      /* @__PURE__ */ (0, import_jsx_runtime96.jsx)("span", { className: "min-w-0 flex-1 truncate text-xs text-ink/60", role: "status", children: saved }),
-      /* @__PURE__ */ (0, import_jsx_runtime96.jsx)(IconButton, { label: "Save project", disabled: !ready2, onClick: () => void save3(), children: /* @__PURE__ */ (0, import_jsx_runtime96.jsx)(Save, { className: "size-4" }) }),
-      /* @__PURE__ */ (0, import_jsx_runtime96.jsx)(IconButton, { label: "Export project", disabled: !ready2, onClick: () => {
+      /* @__PURE__ */ (0, import_jsx_runtime97.jsx)("span", { className: "min-w-0 flex-1 truncate text-xs text-ink/60", role: "status", children: saved }),
+      /* @__PURE__ */ (0, import_jsx_runtime97.jsx)(IconButton, { label: "Save project", disabled: !ready2, onClick: () => void save3(), children: /* @__PURE__ */ (0, import_jsx_runtime97.jsx)(Save, { className: "size-4" }) }),
+      /* @__PURE__ */ (0, import_jsx_runtime97.jsx)(IconButton, { label: "Export project", disabled: !ready2, onClick: () => {
         try {
           download(snapshot());
         } catch (error2) {
-          setError(message(error2));
+          setError(message2(error2));
         }
-      }, children: /* @__PURE__ */ (0, import_jsx_runtime96.jsx)(Download, { className: "size-4" }) }),
-      options.liveBridge ? /* @__PURE__ */ (0, import_jsx_runtime96.jsx)(IconButton, { label: "Avatar voice", disabled: !ready2, onClick: () => setVoiceOpen((value) => !value), children: /* @__PURE__ */ (0, import_jsx_runtime96.jsx)(Mic, { className: "size-4" }) }) : null,
-      /* @__PURE__ */ (0, import_jsx_runtime96.jsx)(IconButton, { label: "Place settings", disabled: !ready2, onClick: () => setSettings(true), children: /* @__PURE__ */ (0, import_jsx_runtime96.jsx)(Settings2, { className: "size-4" }) }),
-      !desktop ? /* @__PURE__ */ (0, import_jsx_runtime96.jsxs)(import_jsx_runtime96.Fragment, { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime96.jsx)(IconButton, { label: "Avatar Live", onClick: () => presentation.execute({ kind: "display", open: true }), children: /* @__PURE__ */ (0, import_jsx_runtime96.jsx)(Monitor, { className: "size-4" }) }),
-        /* @__PURE__ */ (0, import_jsx_runtime96.jsx)(IconButton, { label: "Share", onClick: openShare, children: /* @__PURE__ */ (0, import_jsx_runtime96.jsx)(Share2, { className: "size-4" }) })
+      }, children: /* @__PURE__ */ (0, import_jsx_runtime97.jsx)(Download, { className: "size-4" }) }),
+      options.liveBridge ? /* @__PURE__ */ (0, import_jsx_runtime97.jsx)(IconButton, { label: "Avatar voice", disabled: !ready2, onClick: () => setVoiceOpen((value) => !value), children: /* @__PURE__ */ (0, import_jsx_runtime97.jsx)(Mic, { className: "size-4" }) }) : null,
+      /* @__PURE__ */ (0, import_jsx_runtime97.jsx)(IconButton, { label: "Place settings", disabled: !ready2, onClick: () => setSettings(true), children: /* @__PURE__ */ (0, import_jsx_runtime97.jsx)(Settings2, { className: "size-4" }) }),
+      !desktop ? /* @__PURE__ */ (0, import_jsx_runtime97.jsxs)(import_jsx_runtime97.Fragment, { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime97.jsx)(IconButton, { label: "Avatar Live", onClick: () => presentation.execute({ kind: "display", open: true }), children: /* @__PURE__ */ (0, import_jsx_runtime97.jsx)(Monitor, { className: "size-4" }) }),
+        /* @__PURE__ */ (0, import_jsx_runtime97.jsx)(IconButton, { label: "Share", onClick: openShare, children: /* @__PURE__ */ (0, import_jsx_runtime97.jsx)(Share2, { className: "size-4" }) })
       ] }) : null,
-      !desktop ? /* @__PURE__ */ (0, import_jsx_runtime96.jsx)(IconButton, { label: "Filming", disabled: !ready2, onClick: () => {
+      !desktop ? /* @__PURE__ */ (0, import_jsx_runtime97.jsx)(IconButton, { label: "Filming", disabled: !ready2, onClick: () => {
         runtime.current?.setTool(null);
         setTab("filming");
-      }, children: /* @__PURE__ */ (0, import_jsx_runtime96.jsx)(Clapperboard, { className: "size-4" }) }) : null
+      }, children: /* @__PURE__ */ (0, import_jsx_runtime97.jsx)(Clapperboard, { className: "size-4" }) }) : null
     ] }),
-    error ? /* @__PURE__ */ (0, import_jsx_runtime96.jsxs)("div", { role: "alert", className: "flex items-center gap-2 bg-coral px-3 py-2 text-sm text-white", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime96.jsx)("span", { className: "flex-1", children: error }),
-      /* @__PURE__ */ (0, import_jsx_runtime96.jsx)("button", { "aria-label": "Dismiss error", onClick: () => setError(null), children: /* @__PURE__ */ (0, import_jsx_runtime96.jsx)(X, { className: "size-4" }) })
+    error ? /* @__PURE__ */ (0, import_jsx_runtime97.jsxs)("div", { role: "alert", className: "flex items-center gap-2 bg-coral px-3 py-2 text-sm text-white", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime97.jsx)("span", { className: "flex-1", children: error }),
+      /* @__PURE__ */ (0, import_jsx_runtime97.jsx)("button", { "aria-label": "Dismiss error", onClick: () => setError(null), children: /* @__PURE__ */ (0, import_jsx_runtime97.jsx)(X, { className: "size-4" }) })
     ] }) : null,
-    voiceOpen && options.liveBridge ? /* @__PURE__ */ (0, import_jsx_runtime96.jsx)(VoicePanel, { connection: options.liveBridge, projectId: initial.id, agents: presentationAgents, playerHost: setVoicePlayerHost, close: () => setVoiceOpen(false) }) : null,
-    shareOpen ? /* @__PURE__ */ (0, import_jsx_runtime96.jsx)(ShareDialog, { projectId: initial.id, layout: presentationState.display.layout, display: presentationState.display, preview: sharePreview, initialSurface: presentationState.display.open ? "avatar-live" : "world", preparing: sharePreparing, previewError: sharePreviewError, requestPreview: () => {
+    voiceOpen && options.liveBridge ? /* @__PURE__ */ (0, import_jsx_runtime97.jsx)(VoicePanel, { connection: options.liveBridge, projectId: initial.id, agents: presentationAgents, playerHost: setVoicePlayerHost, close: () => setVoiceOpen(false) }) : null,
+    shareOpen ? /* @__PURE__ */ (0, import_jsx_runtime97.jsx)(ShareDialog, { projectId: initial.id, layout: presentationState.display.layout, display: presentationState.display, preview: sharePreview, initialSurface: presentationState.display.open ? "avatar-live" : "world", preparing: sharePreparing, previewError: sharePreviewError, requestPreview: () => {
       if (liveStage.current) void openShare();
       else {
         sharePreviewPending.current = true;
         presentation.execute({ kind: "display", open: true });
       }
     }, sharing: options.sharing, close: () => setShareOpen(false) }) : null,
-    presentationState.display.open ? /* @__PURE__ */ (0, import_jsx_runtime96.jsx)(AvatarLive, { controller: presentation, recipe: liveRecipe, onStage: (stage) => {
+    presentationState.display.open ? /* @__PURE__ */ (0, import_jsx_runtime97.jsx)(AvatarLive, { controller: presentation, recipe: liveRecipe, onStage: (stage) => {
       liveStage.current = stage;
       if (stage && sharePreviewPending.current) {
         sharePreviewPending.current = false;
@@ -112280,24 +112721,24 @@ function Editor({ initial, storage: storage7, options, leave, beforeClose }) {
         worldPreview.current = null;
         callback(canvas);
       }
-    }, worldStorage: storage7, currentProject: () => project.current, characters: /* @__PURE__ */ (0, import_jsx_runtime96.jsx)(LiveCharacters, { editor: sharedCharacter.current }), voice: /* @__PURE__ */ (0, import_jsx_runtime96.jsxs)(import_jsx_runtime96.Fragment, { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime96.jsx)(QuickVoice, { filming }),
-      /* @__PURE__ */ (0, import_jsx_runtime96.jsx)("button", { className: "mt-3 rounded border border-ink/20 p-2 text-xs", onClick: () => setVoiceOpen(true), children: "Open voice generator" })
+    }, worldStorage: storage7, currentProject: () => project.current, characters: /* @__PURE__ */ (0, import_jsx_runtime97.jsx)(LiveCharacters, { editor: sharedCharacter.current }), voice: /* @__PURE__ */ (0, import_jsx_runtime97.jsxs)(import_jsx_runtime97.Fragment, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime97.jsx)(QuickVoice, { filming }),
+      /* @__PURE__ */ (0, import_jsx_runtime97.jsx)("button", { className: "mt-3 rounded border border-ink/20 p-2 text-xs", onClick: () => setVoiceOpen(true), children: "Open voice generator" })
     ] }) }) : null,
-    /* @__PURE__ */ (0, import_jsx_runtime96.jsxs)("main", { inert: presentationState.display.open || void 0, style: embedLayout ? { display: "none" } : desktop ? studioGrid(layout2, testing, tab === "filming") : void 0, className: "relative min-h-0 flex-1", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime96.jsxs)("div", { className: "relative min-h-0 min-w-0 overflow-hidden", style: desktop ? { gridArea: "viewport", visibility: preview.model ? "hidden" : void 0 } : { height: "100%" }, children: [
-        /* @__PURE__ */ (0, import_jsx_runtime96.jsx)("div", { ref: container, className: "h-full w-full" }),
-        ready2 && (tab !== "avatar" || testing) && options.presentation?.enabled !== false ? /* @__PURE__ */ (0, import_jsx_runtime96.jsx)(PresentationViewport, { controller: presentation, agents: presentationAgents }) : null,
-        !ready2 ? /* @__PURE__ */ (0, import_jsx_runtime96.jsx)("p", { className: "absolute inset-x-0 top-1/2 text-center text-sm", children: error ? "Could not open the world" : "Loading world" }) : null
+    /* @__PURE__ */ (0, import_jsx_runtime97.jsxs)("main", { inert: presentationState.display.open || void 0, style: embedLayout ? { display: "none" } : desktop ? studioGrid(layout2, testing, tab === "filming") : void 0, className: "relative min-h-0 flex-1", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime97.jsxs)("div", { className: "relative min-h-0 min-w-0 overflow-hidden", style: desktop ? { gridArea: "viewport", visibility: preview.model ? "hidden" : void 0 } : { height: "100%" }, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime97.jsx)("div", { ref: container, className: "h-full w-full" }),
+        ready2 && (tab !== "avatar" || testing) && options.presentation?.enabled !== false ? /* @__PURE__ */ (0, import_jsx_runtime97.jsx)(PresentationViewport, { controller: presentation, agents: presentationAgents }) : null,
+        !ready2 ? /* @__PURE__ */ (0, import_jsx_runtime97.jsx)("p", { className: "absolute inset-x-0 top-1/2 text-center text-sm", children: error ? "Could not open the world" : "Loading world" }) : null
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime96.jsx)("div", { style: { ...desktop ? { gridArea: "viewport" } : {}, ...presentationState.display.open ? { position: "fixed", left: 0, right: 0, bottom: 0, zIndex: 140 } : {} }, className: desktop ? "pointer-events-none relative z-30 min-h-0 min-w-0" : "pointer-events-none absolute inset-0 z-30", children: /* @__PURE__ */ (0, import_jsx_runtime96.jsx)(AvatarSpeechPlayer, { portal: voicePlayerHost ?? livePlayerHost, register: registerSpeech, mouth: (target2, shape2) => {
+      /* @__PURE__ */ (0, import_jsx_runtime97.jsx)("div", { style: { ...desktop ? { gridArea: "viewport" } : {}, ...presentationState.display.open ? { position: "fixed", left: 0, right: 0, bottom: 0, zIndex: 140 } : {} }, className: desktop ? "pointer-events-none relative z-30 min-h-0 min-w-0" : "pointer-events-none absolute inset-0 z-30", children: /* @__PURE__ */ (0, import_jsx_runtime97.jsx)(AvatarSpeechPlayer, { portal: voicePlayerHost ?? livePlayerHost, register: registerSpeech, mouth: (target2, shape2) => {
         runtime.current?.setSpeechMouth(target2, shape2);
         if (target2 === "self") {
           presentationStage.current?.setMouth(shape2);
           liveStage.current?.setMouth(shape2);
         }
       }, recording: (stream) => runtime.current?.setVoiceRecordingStream(stream) }) }),
-      ready2 && desktop ? /* @__PURE__ */ (0, import_jsx_runtime96.jsx)(
+      ready2 && desktop ? /* @__PURE__ */ (0, import_jsx_runtime97.jsx)(
         StudioChrome,
         {
           onCharacter: (editor) => {
@@ -112337,7 +112778,7 @@ function Editor({ initial, storage: storage7, options, leave, beforeClose }) {
           lab
         }
       ) : null,
-      preview.model && desktop ? /* @__PURE__ */ (0, import_jsx_runtime96.jsx)(
+      preview.model && desktop ? /* @__PURE__ */ (0, import_jsx_runtime97.jsx)(
         DeviceEmulator,
         {
           placeId: initial.id,
@@ -112348,81 +112789,81 @@ function Editor({ initial, storage: storage7, options, leave, beforeClose }) {
           source: `?studioPreview=${initial.id}&touch=${preview.model.kind === "phone" || preview.model.kind === "tablet" ? "1" : "0"}`
         }
       ) : null,
-      ready2 && !testing && tab !== "lab" && (desktop || tab !== "filming") ? desktop ? /* @__PURE__ */ (0, import_jsx_runtime96.jsx)("div", { style: { gridArea: "viewport" }, className: "pointer-events-none relative z-30 min-h-0 min-w-0", children: /* @__PURE__ */ (0, import_jsx_runtime96.jsx)(BuildPanel, { runtime, status, studio: true, contextMenu: tab === "build" || tab === "items", placeId: initial.id, onTest: () => test(true) }) }) : /* @__PURE__ */ (0, import_jsx_runtime96.jsx)(BuildPanel, { runtime, status, studio: false, placeId: initial.id, onTest: () => test(true) }) : null,
-      !desktop && testing ? /* @__PURE__ */ (0, import_jsx_runtime96.jsx)("button", { className: "absolute right-3 top-3 rounded-lg bg-surface px-3 py-2 font-bold", onClick: () => setTesting(false), children: "Stop test" }) : null,
-      ready2 && !status.tool && (testing || tab !== "filming" && tab !== "avatar" && tab !== "lab") && !preview.model ? /* @__PURE__ */ (0, import_jsx_runtime96.jsx)(PlayControls, { runtime, raised: !desktop && !testing, forceTouch: !desktop, dash: testing && initial.play.view === "side" && initial.play.moves.includes("dash") }) : null,
-      !desktop && !testing && tab === "filming" && ready2 ? /* @__PURE__ */ (0, import_jsx_runtime96.jsx)(PhoneFilming, { filming, onClose: () => setTab("build") }) : null
+      ready2 && !testing && tab !== "lab" && (desktop || tab !== "filming") ? desktop ? /* @__PURE__ */ (0, import_jsx_runtime97.jsx)("div", { style: { gridArea: "viewport" }, className: "pointer-events-none relative z-30 min-h-0 min-w-0", children: /* @__PURE__ */ (0, import_jsx_runtime97.jsx)(BuildPanel, { runtime, status, studio: true, contextMenu: tab === "build" || tab === "items", placeId: initial.id, onTest: () => test(true) }) }) : /* @__PURE__ */ (0, import_jsx_runtime97.jsx)(BuildPanel, { runtime, status, studio: false, placeId: initial.id, onTest: () => test(true) }) : null,
+      !desktop && testing ? /* @__PURE__ */ (0, import_jsx_runtime97.jsx)("button", { className: "absolute right-3 top-3 rounded-lg bg-surface px-3 py-2 font-bold", onClick: () => setTesting(false), children: "Stop test" }) : null,
+      ready2 && !status.tool && (testing || tab !== "filming" && tab !== "avatar" && tab !== "lab") && !preview.model ? /* @__PURE__ */ (0, import_jsx_runtime97.jsx)(PlayControls, { runtime, raised: !desktop && !testing, forceTouch: !desktop, dash: testing && initial.play.view === "side" && initial.play.moves.includes("dash") }) : null,
+      !desktop && !testing && tab === "filming" && ready2 ? /* @__PURE__ */ (0, import_jsx_runtime97.jsx)(PhoneFilming, { filming, onClose: () => setTab("build") }) : null
     ] }),
     desktop && !embedLayout ? (
       // ITEMS-I10: on the computer the top strip becomes a thin status bar at the bottom, like Dpro.
-      /* @__PURE__ */ (0, import_jsx_runtime96.jsxs)("footer", { "aria-label": "Status bar", className: "flex h-6 shrink-0 items-center gap-0.5 border-t border-ink/10 bg-surface px-1.5 text-[11px] text-ink/60", children: [
-        options.liveBridge ? /* @__PURE__ */ (0, import_jsx_runtime96.jsxs)("span", { role: "status", "aria-label": "Live MCP connection", className: "inline-flex h-5 items-center gap-1.5 px-1.5", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime96.jsx)("span", { "aria-hidden": true, className: `size-1.5 rounded-full ${liveConnected ? "bg-emerald-500" : "bg-amber-500"}` }),
+      /* @__PURE__ */ (0, import_jsx_runtime97.jsxs)("footer", { "aria-label": "Status bar", className: "flex h-6 shrink-0 items-center gap-0.5 border-t border-ink/10 bg-surface px-1.5 text-[11px] text-ink/60", children: [
+        options.liveBridge ? /* @__PURE__ */ (0, import_jsx_runtime97.jsxs)("span", { role: "status", "aria-label": "Live MCP connection", className: "inline-flex h-5 items-center gap-1.5 px-1.5", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime97.jsx)("span", { "aria-hidden": true, className: `size-1.5 rounded-full ${liveConnected ? "bg-emerald-500" : "bg-amber-500"}` }),
           liveConnected ? "MCP connected" : "MCP connecting"
         ] }) : null,
-        /* @__PURE__ */ (0, import_jsx_runtime96.jsx)("span", { className: "inline-flex h-5 items-center px-1.5", children: "Local Studio" }),
-        agentCount !== null ? /* @__PURE__ */ (0, import_jsx_runtime96.jsxs)("span", { role: "status", className: "inline-flex h-5 items-center px-1.5", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime97.jsx)("span", { className: "inline-flex h-5 items-center px-1.5", children: "Local Studio" }),
+        agentCount !== null ? /* @__PURE__ */ (0, import_jsx_runtime97.jsxs)("span", { role: "status", className: "inline-flex h-5 items-center px-1.5", children: [
           agentCount,
           " agents"
         ] }) : null,
-        /* @__PURE__ */ (0, import_jsx_runtime96.jsx)("span", { role: "status", className: "inline-flex h-5 min-w-0 items-center truncate px-1.5", children: saved }),
-        /* @__PURE__ */ (0, import_jsx_runtime96.jsxs)("button", { type: "button", "aria-pressed": layout2.bottomOpen, onClick: () => setLayout({ ...layout2, bottomOpen: !layout2.bottomOpen }), title: layout2.bottomOpen ? "Fold the bottom panel" : "Open the Debug panel", className: "inline-flex h-5 items-center gap-1 rounded px-1.5 hover:bg-ink/10 hover:text-ink", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime96.jsx)(ChevronUp, { className: `size-3 transition-transform ${layout2.bottomOpen ? "rotate-180" : ""}`, "aria-hidden": true }),
+        /* @__PURE__ */ (0, import_jsx_runtime97.jsx)("span", { role: "status", className: "inline-flex h-5 min-w-0 items-center truncate px-1.5", children: saved }),
+        /* @__PURE__ */ (0, import_jsx_runtime97.jsxs)("button", { type: "button", "aria-pressed": layout2.bottomOpen, onClick: () => setLayout({ ...layout2, bottomOpen: !layout2.bottomOpen }), title: layout2.bottomOpen ? "Fold the bottom panel" : "Open the Debug panel", className: "inline-flex h-5 items-center gap-1 rounded px-1.5 hover:bg-ink/10 hover:text-ink", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime97.jsx)(ChevronUp, { className: `size-3 transition-transform ${layout2.bottomOpen ? "rotate-180" : ""}`, "aria-hidden": true }),
           "Debug",
           logs.length ? ` \xB7 ${logs.length}` : " \xB7 no messages"
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime96.jsx)("span", { className: "flex-1" }),
-        /* @__PURE__ */ (0, import_jsx_runtime96.jsxs)("button", { type: "button", disabled: !ready2, onClick: () => void save3(), title: "Save project (Ctrl+S)", className: "inline-flex h-5 items-center gap-1 rounded px-1.5 hover:bg-ink/10 hover:text-ink disabled:opacity-40", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime96.jsx)(Save, { className: "size-3", "aria-hidden": true }),
+        /* @__PURE__ */ (0, import_jsx_runtime97.jsx)("span", { className: "flex-1" }),
+        /* @__PURE__ */ (0, import_jsx_runtime97.jsxs)("button", { type: "button", disabled: !ready2, onClick: () => void save3(), title: "Save project (Ctrl+S)", className: "inline-flex h-5 items-center gap-1 rounded px-1.5 hover:bg-ink/10 hover:text-ink disabled:opacity-40", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime97.jsx)(Save, { className: "size-3", "aria-hidden": true }),
           "Save"
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime96.jsxs)("button", { type: "button", disabled: !ready2, onClick: () => {
+        /* @__PURE__ */ (0, import_jsx_runtime97.jsxs)("button", { type: "button", disabled: !ready2, onClick: () => {
           try {
             download(snapshot());
           } catch (error2) {
-            setError(message(error2));
+            setError(message2(error2));
           }
         }, title: "Export project", className: "inline-flex h-5 items-center gap-1 rounded px-1.5 hover:bg-ink/10 hover:text-ink disabled:opacity-40", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime96.jsx)(Download, { className: "size-3", "aria-hidden": true }),
+          /* @__PURE__ */ (0, import_jsx_runtime97.jsx)(Download, { className: "size-3", "aria-hidden": true }),
           "Export"
         ] }),
-        options.liveBridge ? /* @__PURE__ */ (0, import_jsx_runtime96.jsxs)("button", { type: "button", disabled: !ready2, "aria-pressed": voiceOpen, onClick: () => setVoiceOpen((value) => !value), title: "Avatar voice", className: "inline-flex h-5 items-center gap-1 rounded px-1.5 hover:bg-ink/10 hover:text-ink disabled:opacity-40", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime96.jsx)(Mic, { className: "size-3", "aria-hidden": true }),
+        options.liveBridge ? /* @__PURE__ */ (0, import_jsx_runtime97.jsxs)("button", { type: "button", disabled: !ready2, "aria-pressed": voiceOpen, onClick: () => setVoiceOpen((value) => !value), title: "Avatar voice", className: "inline-flex h-5 items-center gap-1 rounded px-1.5 hover:bg-ink/10 hover:text-ink disabled:opacity-40", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime97.jsx)(Mic, { className: "size-3", "aria-hidden": true }),
           "Voice"
         ] }) : null,
-        /* @__PURE__ */ (0, import_jsx_runtime96.jsxs)("button", { type: "button", disabled: !ready2, onClick: () => setSettings(true), title: "Place settings", className: "inline-flex h-5 items-center gap-1 rounded px-1.5 hover:bg-ink/10 hover:text-ink disabled:opacity-40", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime96.jsx)(Settings2, { className: "size-3", "aria-hidden": true }),
+        /* @__PURE__ */ (0, import_jsx_runtime97.jsxs)("button", { type: "button", disabled: !ready2, onClick: () => setSettings(true), title: "Place settings", className: "inline-flex h-5 items-center gap-1 rounded px-1.5 hover:bg-ink/10 hover:text-ink disabled:opacity-40", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime97.jsx)(Settings2, { className: "size-3", "aria-hidden": true }),
           "Place settings"
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime96.jsxs)("button", { type: "button", disabled: !ready2 && !error || filming.busy || filming.studio.rendering, onClick: () => void goHome(), title: "My projects", className: "inline-flex h-5 items-center gap-1 rounded px-1.5 hover:bg-ink/10 hover:text-ink disabled:opacity-40", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime96.jsx)(House, { className: "size-3", "aria-hidden": true }),
+        /* @__PURE__ */ (0, import_jsx_runtime97.jsxs)("button", { type: "button", disabled: !ready2 && !error || filming.busy || filming.studio.rendering, onClick: () => void goHome(), title: "My projects", className: "inline-flex h-5 items-center gap-1 rounded px-1.5 hover:bg-ink/10 hover:text-ink disabled:opacity-40", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime97.jsx)(House, { className: "size-3", "aria-hidden": true }),
           "My projects"
         ] })
       ] })
     ) : null,
-    settings2 ? /* @__PURE__ */ (0, import_jsx_runtime96.jsx)("div", { className: "fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4", onClick: () => setSettings(false), children: /* @__PURE__ */ (0, import_jsx_runtime96.jsxs)("section", { role: "dialog", "aria-modal": "true", "aria-label": "Place settings", className: "max-h-[90dvh] w-full max-w-xl overflow-auto rounded-lg bg-surface p-5 shadow-xl", onClick: (event2) => event2.stopPropagation(), children: [
-      /* @__PURE__ */ (0, import_jsx_runtime96.jsxs)("div", { className: "mb-5 flex items-center justify-between", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime96.jsx)("h2", { className: "text-lg font-bold", children: "Place settings" }),
-        /* @__PURE__ */ (0, import_jsx_runtime96.jsx)(IconButton, { label: "Close settings", onClick: () => setSettings(false), children: /* @__PURE__ */ (0, import_jsx_runtime96.jsx)(X, { className: "size-5" }) })
+    settings2 ? /* @__PURE__ */ (0, import_jsx_runtime97.jsx)("div", { className: "fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4", onClick: () => setSettings(false), children: /* @__PURE__ */ (0, import_jsx_runtime97.jsxs)("section", { role: "dialog", "aria-modal": "true", "aria-label": "Place settings", className: "max-h-[90dvh] w-full max-w-xl overflow-auto rounded-lg bg-surface p-5 shadow-xl", onClick: (event2) => event2.stopPropagation(), children: [
+      /* @__PURE__ */ (0, import_jsx_runtime97.jsxs)("div", { className: "mb-5 flex items-center justify-between", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime97.jsx)("h2", { className: "text-lg font-bold", children: "Place settings" }),
+        /* @__PURE__ */ (0, import_jsx_runtime97.jsx)(IconButton, { label: "Close settings", onClick: () => setSettings(false), children: /* @__PURE__ */ (0, import_jsx_runtime97.jsx)(X, { className: "size-5" }) })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime96.jsxs)("label", { className: "mb-5 block text-sm font-bold", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime97.jsxs)("label", { className: "mb-5 block text-sm font-bold", children: [
         "Name",
-        /* @__PURE__ */ (0, import_jsx_runtime96.jsx)("input", { className: "mt-2 w-full rounded border border-ink/20 bg-paper p-2", value: metadata.title, maxLength: 120, onChange: (event2) => updateMetadata({ ...project.current, title: event2.target.value }) })
+        /* @__PURE__ */ (0, import_jsx_runtime97.jsx)("input", { className: "mt-2 w-full rounded border border-ink/20 bg-paper p-2", value: metadata.title, maxLength: 120, onChange: (event2) => updateMetadata({ ...project.current, title: event2.target.value }) })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime96.jsx)(PlaySettingsPicker, { value: metadata.play, onChange: (play) => updateMetadata({ ...project.current, play }) }),
-      /* @__PURE__ */ (0, import_jsx_runtime96.jsx)("p", { className: "mt-5 text-sm text-ink/60", children: "Access: private local project" }),
-      /* @__PURE__ */ (0, import_jsx_runtime96.jsx)("p", { className: "mt-2 text-xs text-ink/60", children: metadata.play.view !== initial.play.view || JSON.stringify(metadata.play.moves) !== JSON.stringify(initial.play.moves) ? "Saved play settings apply when this project is reopened." : "" })
+      /* @__PURE__ */ (0, import_jsx_runtime97.jsx)(PlaySettingsPicker, { value: metadata.play, onChange: (play) => updateMetadata({ ...project.current, play }) }),
+      /* @__PURE__ */ (0, import_jsx_runtime97.jsx)("p", { className: "mt-5 text-sm text-ink/60", children: "Access: private local project" }),
+      /* @__PURE__ */ (0, import_jsx_runtime97.jsx)("p", { className: "mt-2 text-xs text-ink/60", children: metadata.play.view !== initial.play.view || JSON.stringify(metadata.play.moves) !== JSON.stringify(initial.play.moves) ? "Saved play settings apply when this project is reopened." : "" })
     ] }) }) : null
   ] }) });
 }
 function App({ options, beforeClose }) {
-  const [storage7] = (0, import_react100.useState)(() => options.storage ?? browserStudioStorage());
-  const [project, setProject] = (0, import_react100.useState)(null), [recent, setRecent] = (0, import_react100.useState)([]);
-  const [error, setError] = (0, import_react100.useState)(null), picker = (0, import_react100.useRef)(null);
+  const [storage7] = (0, import_react101.useState)(() => options.storage ?? browserStudioStorage());
+  const [project, setProject] = (0, import_react101.useState)(null), [recent, setRecent] = (0, import_react101.useState)([]);
+  const [error, setError] = (0, import_react101.useState)(null), picker = (0, import_react101.useRef)(null);
   const refresh = () => {
-    void storage7.list().then(setRecent).catch((error2) => setError(message(error2)));
+    void storage7.list().then(setRecent).catch((error2) => setError(message2(error2)));
   };
-  (0, import_react100.useEffect)(() => {
+  (0, import_react101.useEffect)(() => {
     refresh();
     const id2 = new URLSearchParams(window.location.search).get("project") ?? options.initialProjectId;
     if (id2) void open2(id2);
@@ -112432,7 +112873,7 @@ function App({ options, beforeClose }) {
       setProject(await storage7.read(id2));
       setError(null);
     } catch (error2) {
-      setError(message(error2));
+      setError(message2(error2));
     }
   };
   const create = async ({ style, worldKind, play }) => {
@@ -112441,34 +112882,34 @@ function App({ options, beforeClose }) {
     setProject(next3);
   };
   const previewId = new URLSearchParams(location.search).get("studioPreview");
-  if (previewId) return /* @__PURE__ */ (0, import_jsx_runtime96.jsx)(PlayerPreview, { id: previewId, storage: storage7, options });
+  if (previewId) return /* @__PURE__ */ (0, import_jsx_runtime97.jsx)(PlayerPreview, { id: previewId, storage: storage7, options });
   if (!project) beforeClose.current = async () => true;
-  return project ? /* @__PURE__ */ (0, import_jsx_runtime96.jsx)(Editor, { initial: project, storage: storage7, options, beforeClose, leave: () => {
+  return project ? /* @__PURE__ */ (0, import_jsx_runtime97.jsx)(Editor, { initial: project, storage: storage7, options, beforeClose, leave: () => {
     setProject(null);
     refresh();
-  } }, project.id) : /* @__PURE__ */ (0, import_jsx_runtime96.jsxs)("div", { className: "min-h-dvh bg-paper text-ink", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime96.jsxs)("header", { className: "flex min-h-14 flex-wrap items-center gap-3 border-b border-ink/10 bg-surface px-4 py-2", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime96.jsx)("strong", { children: "Genvr Studio" }),
-      recent.length ? /* @__PURE__ */ (0, import_jsx_runtime96.jsxs)("select", { "aria-label": "Open project", className: "min-w-0 max-w-full rounded border border-ink/20 bg-paper p-2 text-sm", value: "", onChange: (event2) => void open2(event2.target.value), children: [
-        /* @__PURE__ */ (0, import_jsx_runtime96.jsx)("option", { value: "", disabled: true, children: "My projects" }),
-        recent.map((p2) => /* @__PURE__ */ (0, import_jsx_runtime96.jsx)("option", { value: p2.id, children: p2.title }, p2.id))
+  } }, project.id) : /* @__PURE__ */ (0, import_jsx_runtime97.jsxs)("div", { className: "min-h-dvh bg-paper text-ink", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime97.jsxs)("header", { className: "flex min-h-14 flex-wrap items-center gap-3 border-b border-ink/10 bg-surface px-4 py-2", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime97.jsx)("strong", { children: "Genvr Studio" }),
+      recent.length ? /* @__PURE__ */ (0, import_jsx_runtime97.jsxs)("select", { "aria-label": "Open project", className: "min-w-0 max-w-full rounded border border-ink/20 bg-paper p-2 text-sm", value: "", onChange: (event2) => void open2(event2.target.value), children: [
+        /* @__PURE__ */ (0, import_jsx_runtime97.jsx)("option", { value: "", disabled: true, children: "My projects" }),
+        recent.map((p2) => /* @__PURE__ */ (0, import_jsx_runtime97.jsx)("option", { value: p2.id, children: p2.title }, p2.id))
       ] }) : null,
-      /* @__PURE__ */ (0, import_jsx_runtime96.jsx)(IconButton, { label: "Import project", onClick: () => picker.current?.click(), children: /* @__PURE__ */ (0, import_jsx_runtime96.jsx)(FolderOpen, { className: "size-4" }) }),
-      /* @__PURE__ */ (0, import_jsx_runtime96.jsxs)("button", { type: "button", className: "inline-flex items-center gap-1.5 rounded-lg border border-ink/20 px-3 py-1.5 text-xs font-bold", title: "A test world for making and training motion", onClick: async () => {
+      /* @__PURE__ */ (0, import_jsx_runtime97.jsx)(IconButton, { label: "Import project", onClick: () => picker.current?.click(), children: /* @__PURE__ */ (0, import_jsx_runtime97.jsx)(FolderOpen, { className: "size-4" }) }),
+      /* @__PURE__ */ (0, import_jsx_runtime97.jsxs)("button", { type: "button", className: "inline-flex items-center gap-1.5 rounded-lg border border-ink/20 px-3 py-1.5 text-xs font-bold", title: "A test world for making and training motion", onClick: async () => {
         try {
           const next3 = createLabProject(newLabData());
           await storage7.write(next3);
           setProject(next3);
           setError(null);
         } catch (error2) {
-          setError(message(error2));
+          setError(message2(error2));
         }
       }, children: [
-        /* @__PURE__ */ (0, import_jsx_runtime96.jsx)(FlaskConical, { className: "size-4", "aria-hidden": true }),
+        /* @__PURE__ */ (0, import_jsx_runtime97.jsx)(FlaskConical, { className: "size-4", "aria-hidden": true }),
         "New motion lab"
       ] })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime96.jsx)("input", { ref: picker, type: "file", accept: ".genvr-studio,.genvr-world,application/json", className: "hidden", "aria-label": "Project file", onChange: async (event2) => {
+    /* @__PURE__ */ (0, import_jsx_runtime97.jsx)("input", { ref: picker, type: "file", accept: ".genvr-studio,.genvr-world,application/json", className: "hidden", "aria-label": "Project file", onChange: async (event2) => {
       const file = event2.target.files?.[0];
       event2.target.value = "";
       if (!file) return;
@@ -112479,18 +112920,18 @@ function App({ options, beforeClose }) {
         setProject(next3);
         setError(null);
       } catch (error2) {
-        setError(message(error2));
+        setError(message2(error2));
       }
     } }),
-    error ? /* @__PURE__ */ (0, import_jsx_runtime96.jsx)("p", { role: "alert", className: "mx-auto max-w-4xl p-4 text-coral", children: error }) : null,
-    /* @__PURE__ */ (0, import_jsx_runtime96.jsx)(CreateFlow, { onCreate: create, onImport: () => picker.current?.click() })
+    error ? /* @__PURE__ */ (0, import_jsx_runtime97.jsx)("p", { role: "alert", className: "mx-auto max-w-4xl p-4 text-coral", children: error }) : null,
+    /* @__PURE__ */ (0, import_jsx_runtime97.jsx)(CreateFlow, { onCreate: create, onImport: () => picker.current?.click() })
   ] });
 }
 function PlayerPreview({ id: id2, storage: storage7, options }) {
-  const container = (0, import_react100.useRef)(null), [error, setError] = (0, import_react100.useState)(null);
-  const player = (0, import_react100.useRef)(null), [project, setProject] = (0, import_react100.useState)(null);
+  const container = (0, import_react101.useRef)(null), [error, setError] = (0, import_react101.useState)(null);
+  const player = (0, import_react101.useRef)(null), [project, setProject] = (0, import_react101.useState)(null);
   const touch = new URLSearchParams(location.search).get("touch") === "1";
-  (0, import_react100.useEffect)(() => {
+  (0, import_react101.useEffect)(() => {
     const abort = new AbortController();
     let runtime;
     void storage7.read(id2).then((project2) => {
@@ -112518,7 +112959,7 @@ function PlayerPreview({ id: id2, storage: storage7, options }) {
         player.current = view;
       }
     }).catch((error2) => {
-      if (!abort.signal.aborted) setError(message(error2));
+      if (!abort.signal.aborted) setError(message2(error2));
     });
     return () => {
       abort.abort();
@@ -112526,10 +112967,10 @@ function PlayerPreview({ id: id2, storage: storage7, options }) {
       player.current = null;
     };
   }, [id2]);
-  return /* @__PURE__ */ (0, import_jsx_runtime96.jsxs)("div", { className: "relative h-dvh w-full", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime96.jsx)("div", { ref: container, className: "h-full w-full" }),
-    error ? /* @__PURE__ */ (0, import_jsx_runtime96.jsx)("p", { role: "alert", children: error }) : null,
-    project ? /* @__PURE__ */ (0, import_jsx_runtime96.jsx)(PlayControls, { runtime: player, raised: false, forceTouch: touch, dash: project.play.view === "side" && project.play.moves.includes("dash") }) : null
+  return /* @__PURE__ */ (0, import_jsx_runtime97.jsxs)("div", { className: "relative h-dvh w-full", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime97.jsx)("div", { ref: container, className: "h-full w-full" }),
+    error ? /* @__PURE__ */ (0, import_jsx_runtime97.jsx)("p", { role: "alert", children: error }) : null,
+    project ? /* @__PURE__ */ (0, import_jsx_runtime97.jsx)(PlayControls, { runtime: player, raised: false, forceTouch: touch, dash: project.play.view === "side" && project.play.moves.includes("dash") }) : null
   ] });
 }
 var mounted = false;
@@ -112540,7 +112981,7 @@ function mountStudio(container, options = {}) {
   const restoreMotions = options.motionLibrary ? registerAvatarMotionLibrary(options.motionLibrary) : void 0;
   const restore = setPlatformEnabled(false), root = (0, import_client.createRoot)(container);
   const beforeClose = { current: async () => true };
-  root.render(/* @__PURE__ */ (0, import_jsx_runtime96.jsx)(App, { options, beforeClose }));
+  root.render(/* @__PURE__ */ (0, import_jsx_runtime97.jsx)(App, { options, beforeClose }));
   return { async dispose() {
     if (!await beforeClose.current()) return false;
     root.unmount();
@@ -112553,7 +112994,7 @@ function mountStudio(container, options = {}) {
 function mountAvatarPresentation(container, runtime, options = {}) {
   const controller = new AvatarPresentation(() => runtime, options);
   const root = (0, import_client.createRoot)(container);
-  root.render(/* @__PURE__ */ (0, import_jsx_runtime96.jsx)(PresentationViewport, { controller }));
+  root.render(/* @__PURE__ */ (0, import_jsx_runtime97.jsx)(PresentationViewport, { controller }));
   const unsubscribe = options.subscribe?.("", controller.execute);
   return { execute: controller.execute, controller, dispose() {
     unsubscribe?.();
@@ -112563,9 +113004,9 @@ function mountAvatarPresentation(container, runtime, options = {}) {
 }
 function LiveCharacters({ editor }) {
   const host = useStudioHost();
-  if (!editor) return /* @__PURE__ */ (0, import_jsx_runtime96.jsx)("p", { className: "text-xs", children: "Character controls are loading." });
-  return /* @__PURE__ */ (0, import_jsx_runtime96.jsxs)(import_jsx_runtime96.Fragment, { children: [
-    /* @__PURE__ */ (0, import_jsx_runtime96.jsx)(BodySection, { editor }),
+  if (!editor) return /* @__PURE__ */ (0, import_jsx_runtime97.jsx)("p", { className: "text-xs", children: "Character controls are loading." });
+  return /* @__PURE__ */ (0, import_jsx_runtime97.jsxs)(import_jsx_runtime97.Fragment, { children: [
+    /* @__PURE__ */ (0, import_jsx_runtime97.jsx)(BodySection, { editor }),
     host.userAvatarControls?.("characters", "", (body) => editor.change((recipe) => ({ ...recipe, body })))
   ] });
 }
@@ -112574,11 +113015,11 @@ function mountAvatarLive(container, options = {}) {
   const controller = new AvatarPresentation(() => stage ? { presentAnimation: (target2, id2) => target2 === "self" && (stage?.presentAnimation(id2) ?? false), presentExpression: (target2, expression2) => target2 === "self" && (stage?.presentExpression(expression2) ?? false), importAvatarMotion: async (target2, id2, data) => target2 === "self" && Boolean(await stage?.importAvatarMotion(id2, data)) } : null, options);
   controller.execute({ kind: "display", ...options.display, open: true });
   const root = (0, import_client.createRoot)(container);
-  const draw = () => root.render(/* @__PURE__ */ (0, import_jsx_runtime96.jsxs)(import_jsx_runtime96.Fragment, { children: [
-    /* @__PURE__ */ (0, import_jsx_runtime96.jsx)(AvatarLive, { controller, recipe, onStage: (value) => {
+  const draw = () => root.render(/* @__PURE__ */ (0, import_jsx_runtime97.jsxs)(import_jsx_runtime97.Fragment, { children: [
+    /* @__PURE__ */ (0, import_jsx_runtime97.jsx)(AvatarLive, { controller, recipe, onStage: (value) => {
       stage = value;
     }, projectId: options.projectId ?? "avatar", embedded: true, agent, host: host ? { ...host, settingsRequest } : void 0 }),
-    /* @__PURE__ */ (0, import_jsx_runtime96.jsx)(AvatarSpeechPlayer, { register: (value) => {
+    /* @__PURE__ */ (0, import_jsx_runtime97.jsx)(AvatarSpeechPlayer, { register: (value) => {
       speech = value;
     }, mouth: (_target, shape2) => stage?.setMouth(shape2), recording: () => {
     } })
@@ -112713,6 +113154,7 @@ lucide-react/dist/esm/icons/arrow-up-right.mjs:
 lucide-react/dist/esm/icons/arrow-up.mjs:
 lucide-react/dist/esm/icons/at-sign.mjs:
 lucide-react/dist/esm/icons/audio-waveform.mjs:
+lucide-react/dist/esm/icons/ban.mjs:
 lucide-react/dist/esm/icons/banknote.mjs:
 lucide-react/dist/esm/icons/bell.mjs:
 lucide-react/dist/esm/icons/blocks.mjs:
@@ -112966,4 +113408,4 @@ three/examples/jsm/libs/fflate.module.js:
   version 0.8.2
   *)
 */
-//# sourceMappingURL=chunk-AR4CFI3H.js.map
+//# sourceMappingURL=chunk-OF7KHSVT.js.map
