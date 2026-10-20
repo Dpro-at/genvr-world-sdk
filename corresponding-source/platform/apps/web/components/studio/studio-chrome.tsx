@@ -16,7 +16,7 @@ import { toolsFor } from '../build-panel';
 import { ThemeToggle } from '../theme-toggle';
 import { ConsolePanel, type LogEntry } from './console-panel';
 import { DeviceBar, type PreviewState } from './device-bar';
-import { allowedPanels, defaultLayout, movePanel, type DockPanel, type StudioLayout } from './layout';
+import { allowedPanels, defaultLayout, movePanel, panelShown, type DockPanel, type StudioLayout } from './layout';
 import { DockWorkspace } from './dock-workspace';
 import { ToolbarMenu } from './toolbar-menu';
 import { LibraryPanel } from './library-panel';
@@ -26,7 +26,7 @@ import { ExplorerPanel } from './explorer-panel';
 import { PropertiesPanel } from './properties-panel';
 import { OPTION_TOOLS, ToolOptionsPanel } from './tool-options-panel';
 import { ItemsSidePanel } from './items-side-panel';
-import { WorldPartsList, WorldSidePanel } from './world-panel';
+import { setWorldPart, WorldPartsList, WorldSidePanel } from './world-panel';
 import { setStructureFocus } from '../../lib/structure-focus';
 import { SnapBar } from './snap-bar';
 import { GenvrMark } from '../genvr-mark';
@@ -48,11 +48,11 @@ import { LabLeft, LabRight, LabRunBar, LabRunStrip } from './lab/lab-panels';
 import { LabStage } from './lab/lab-stage';
 import { motionLabBridge, type LabController } from '../../lib/motion-lab';
 
-export type StudioTab = 'build' | 'items' | 'world' | 'avatar' | 'filming' | 'lab';
+/** World is not a tab of its own any more: it is a panel in the Build left dock, Tools · World · Explorer (WORLD-W10). */
+export type StudioTab = 'build' | 'items' | 'avatar' | 'filming' | 'lab';
 const TABS: Array<{ id: StudioTab; label: string }> = [
   { id: 'build', label: 'Build' },
   { id: 'items', label: 'Items' },
-  { id: 'world', label: 'World' },
   { id: 'avatar', label: 'Avatar' },
   { id: 'filming', label: 'Filming' },
   // MOTION-LAB: only in a motion lab project.
@@ -89,7 +89,8 @@ const TOOL_KEYS = new Map(DOCK_GROUPS.flatMap((group) => group.tools.map((one) =
 /** Panel titles; the tab panel is named after the open tab. */
 const PANEL_TITLES: Record<DockPanel, (tab: StudioTab) => string> = {
   tab: (tab) =>
-    ({ build: 'Build tools', items: 'Library', world: 'World', avatar: 'Avatar', filming: 'Filming', lab: 'Course' })[tab],
+    ({ build: 'Tools', items: 'Library', avatar: 'Avatar', filming: 'Filming', lab: 'Course' })[tab],
+  world: () => 'World',
   outline: () => 'Explorer',
   properties: (tab) => (tab === 'filming' ? 'Scene inspector' : tab === 'avatar' ? 'Moves' : 'Properties'),
   assistant: () => 'Assistant',
@@ -195,7 +196,7 @@ export function StudioChrome({
   onTesting: (testing: boolean) => void;
   logs: LogEntry[];
   onClearLogs: () => void;
-  /** The place's style changed (World tab). */
+  /** The place's style changed (Build → World → Style and place). */
   onStyle: (style: 'blocky' | 'realistic' | 'anime' | 'voxel') => void;
 }) {
   const rt = () => runtime.current;
@@ -217,12 +218,46 @@ export function StudioChrome({
   useEffect(() => {
     if (lastTab.current === tab) return;
     lastTab.current = tab;
-    // World has no tools in the view (WORLD-W9): Select does not follow into it either.
-    if (toolNow.current && (toolNow.current !== 'select' || tab === 'world' || tab === 'avatar' || tab === 'filming')) runtime.current?.setTool(tab === 'build' || tab === 'items' ? 'select' : null);
+    if (toolNow.current && (toolNow.current !== 'select' || tab === 'avatar' || tab === 'filming')) runtime.current?.setTool(tab === 'build' || tab === 'items' ? 'select' : null);
   }, [tab, runtime]);
+  // The World panel only belongs to Build (WORLD-W10): Items, Avatar and Lab keep their left dock as it was.
+  const visiblePanel = (id: DockPanel) => id !== 'world' || tab === 'build';
+  const worldOpen = !testing && tab === 'build' && layout.mode === 'build' && panelShown(layout, 'world', visiblePanel);
+  // World has no tools in the view (WORLD-W9): opening it puts the tool away, leaving it gives Select back.
+  const worldWas = useRef(worldOpen);
+  useEffect(() => {
+    if (worldWas.current === worldOpen) return;
+    worldWas.current = worldOpen;
+    if (worldOpen) { if (toolNow.current) runtime.current?.setTool(null); return; }
+    setWorldPart(null);
+    if (tab === 'build' && !testing && !toolNow.current) runtime.current?.setTool('select');
+  }, [worldOpen, tab, testing, runtime]);
+  // Picking a tool while World is open (a key, the assistant) shows the Tools panel again.
+  const toolWas = useRef(status.tool);
+  useEffect(() => {
+    const changed = toolWas.current !== status.tool;
+    toolWas.current = status.tool;
+    if (!changed || !status.tool || !worldOpen) return;
+    const side = layout.docks.world;
+    if (side !== 'floating' && layout.docks.tab === side) onLayout({ active: { ...layout.active, [side]: 'tab' } });
+  }, [status.tool, worldOpen, layout, onLayout]);
+  // Esc in World goes back to Tools (WORLD-W10); placing a light or the start point keeps its own Esc.
+  useEffect(() => {
+    if (!worldOpen) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape' || event.defaultPrevented) return;
+      const target = event.target instanceof Element ? event.target : null;
+      if (target?.closest('input, textarea, select, [contenteditable="true"], [role="dialog"], [role="alertdialog"]')) return;
+      const side = layout.docks.world;
+      if (side === 'floating' || layout.docks.tab !== side) { setWorldPart(null); return; }
+      onLayout({ active: { ...layout.active, [side]: 'tab' } });
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [worldOpen, layout, onLayout]);
   // Build keys (BUILD-B1): a letter picks a tool; Ctrl/Cmd+Z undoes, Ctrl+Y or Shift+Ctrl/Cmd+Z redoes.
   useEffect(() => {
-    if (testing || (tab !== 'build' && tab !== 'items' && tab !== 'world' && tab !== 'avatar')) return;
+    if (testing || (tab !== 'build' && tab !== 'items' && tab !== 'avatar')) return;
     const onKey = (event: KeyboardEvent) => {
       const target = event.target as HTMLElement | null;
       if (target?.closest('input, textarea, select, [contenteditable="true"]')) return;
@@ -297,7 +332,15 @@ export function StudioChrome({
     if (id === 'assistant') return <AssistantPanel runtime={runtime} placeId={placeId} />;
     if (id === 'properties' && tab === 'build' && status.tool && OPTION_TOOLS.has(status.tool))
       return <ToolOptionsPanel runtime={runtime} status={status} placeId={placeId} />;
-    if (id === 'properties' && tab === 'world')
+    if (id === 'world')
+      return (
+        <div className="px-2 pb-2">
+          <WorldPartsList runtime={runtime} />
+        </div>
+      );
+    // The right dock on Build: the tool's options, else the picked world part while World is open, else the
+    // selection's Properties or the place summary — never empty (WORLD-W7, W10).
+    if (id === 'properties' && worldOpen)
       return (
         <WorldSidePanel
           runtime={runtime}
@@ -341,12 +384,6 @@ export function StudioChrome({
           <LibraryPanel runtime={runtime} status={status} style={style} />
         </div>
       );
-    if (tab === 'world')
-      return (
-        <div className="px-2 pb-2">
-          <WorldPartsList runtime={runtime} />
-        </div>
-      );
     if (tab === 'avatar') return <CharacterTabs editor={character} />;
     const available = toolsFor(rt()).filter((entry) => !NOT_IN_DOCK.has(entry.tool));
     return (
@@ -375,7 +412,7 @@ export function StudioChrome({
             </section>
           );
         })}
-        <p className="mt-2 px-1 text-[11px] text-ink/50">Keys pick a tool · Esc stops drawing · each tool's options are on the right.</p>
+        <p className="mt-2 px-1 text-[11px] text-ink/50">Keys pick a tool · Esc stops drawing · each tool's options are on the right. Sky, lights, weather, water and the start point are in World.</p>
       </div>
     );
   };
@@ -459,7 +496,7 @@ export function StudioChrome({
               <p className="text-xs text-ink/50">
                 Drag a panel grip to an edge or into the view to float it.
               </p>
-              {allowedPanels(layout.mode).map((id) => (
+              {allowedPanels(layout.mode).filter(visiblePanel).map((id) => (
                 <button
                   type="button"
                   key={id}
@@ -652,6 +689,7 @@ export function StudioChrome({
           onLayout={onLayout}
           title={(id) => PANEL_TITLES[id](tab)}
           content={panelContent}
+          visible={visiblePanel}
         />
       )}
     </>

@@ -5,6 +5,7 @@ import {
   dockPanels,
   movePanel,
   normalizeLayout,
+  panelShown,
   readWorkspaces,
   studioGrid,
 } from './layout';
@@ -45,7 +46,7 @@ describe('Studio workspaces', () => {
     expect(layout.left).toBe(280);
     expect(layout.right).toBe(220);
     expect(layout.bottom).toBe(180);
-    expect(layout.order).toEqual(['tab', 'outline', 'properties', 'assistant', 'output', 'timeline']);
+    expect(layout.order).toEqual(['tab', 'world', 'outline', 'properties', 'assistant', 'output', 'timeline']);
     expect(layout.hidden).toEqual(['output']);
     expect(layout.docks.tab).toBe('left');
     expect(layout.floating.tab?.width).toBe(360);
@@ -54,7 +55,7 @@ describe('Studio workspaces', () => {
   it('moves, restores and reorders a panel once, without mutating the previous layout', () => {
     const previous = { ...defaultLayout('build'), hidden: ['assistant'] as const };
     const next = movePanel({ ...previous, hidden: [...previous.hidden] }, 'assistant', 'left', 'outline');
-    expect(dockPanels(next, 'left')).toEqual(['tab', 'assistant', 'outline']);
+    expect(dockPanels(next, 'left')).toEqual(['tab', 'world', 'assistant', 'outline']);
     expect(next.active.left).toBe('assistant');
     expect(next.hidden).toEqual([]);
     expect(previous.hidden).toEqual(['assistant']);
@@ -68,12 +69,25 @@ describe('Studio workspaces', () => {
     expect(dockPanels(layout, 'bottom')).toEqual(['output']);
     layout = movePanel(layout, 'output', 'floating');
     expect(studioGrid(layout, false).gridTemplateRows).toContain('0px 0px');
-    layout = { ...layout, hidden: ['tab', 'outline'] };
+    layout = { ...layout, hidden: ['tab', 'world', 'outline'] };
     expect(studioGrid(layout, false).gridTemplateColumns).toMatch(/^0px 0px/);
     expect(dockPanels(defaultLayout('filming'), 'right')).toEqual(['properties']);
     expect(studioGrid(defaultLayout('filming'), true).gridTemplateColumns).toBe(
       '0px 0px minmax(0, 1fr) 0px 0px',
     );
+  });
+  it('puts World between Tools and Explorer in Build only, also in layouts saved before it (WORLD-W10)', () => {
+    expect(dockPanels(defaultLayout('build'), 'left')).toEqual(['tab', 'world', 'outline']);
+    expect(dockPanels(defaultLayout('filming'), 'left')).toEqual(['tab']);
+    const old = normalizeLayout({ order: ['tab', 'outline', 'properties', 'assistant', 'output', 'timeline'], active: { left: 'outline' } }, 'build');
+    expect(dockPanels(old, 'left')).toEqual(['tab', 'world', 'outline']);
+    expect(old.active.left).toBe('outline');
+    const world = { ...defaultLayout('build'), active: { ...defaultLayout('build').active, left: 'world' as const } };
+    expect(panelShown(world, 'world')).toBe(true);
+    expect(panelShown(world, 'world', (id) => id !== 'world')).toBe(false);
+    expect(panelShown({ ...world, leftOpen: false }, 'world')).toBe(false);
+    expect(panelShown(defaultLayout('build'), 'world')).toBe(false);
+    expect(panelShown(movePanel(defaultLayout('build'), 'world', 'floating'), 'world')).toBe(true);
   });
   it('keeps the entire floating panel below the toolbar and inside resized viewports', () => {
     const rect = constrainFloating({ x: 1800, y: -20, width: 1700, height: 2000 }, 1100, 900);

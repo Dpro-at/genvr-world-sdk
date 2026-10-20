@@ -75,7 +75,8 @@ function pickGround(runtime: GenvrRuntime, done: (spot: { x: number; z: number }
     stop();
     done(spot);
   };
-  const onKey = (event: KeyboardEvent) => { if (event.key === 'Escape') { stop(); cancel(); } };
+  // This Esc only stops placing; it does not also leave the World panel (WORLD-W10).
+  const onKey = (event: KeyboardEvent) => { if (event.key === 'Escape') { event.stopPropagation(); stop(); cancel(); } };
   const stop = () => { window.removeEventListener('click', onClick, true); window.removeEventListener('keydown', onKey, true); };
   window.addEventListener('click', onClick, true);
   window.addEventListener('keydown', onKey, true);
@@ -85,7 +86,7 @@ function pickGround(runtime: GenvrRuntime, done: (spot: { x: number; z: number }
 const hour = (h: number) => `${String(Math.floor(h)).padStart(2, '0')}:${String(Math.round((h % 1) * 60) % 60).padStart(2, '0')}`;
 const compass = (deg: number) => ['North', 'North-east', 'East', 'South-east', 'South', 'South-west', 'West', 'North-west'][Math.round((((deg % 360) + 360) % 360) / 45) % 8]!;
 
-/** The world's parts in one list with their value (WORLD-W1, left dock). */
+/** The world's parts in one list with their value (WORLD-W1; the World panel of the Build left dock, W10). */
 export function WorldPartsList({ runtime }: { runtime: RefObject<GenvrRuntime | null> }) {
   useWorldVersion(runtime);
   const part = useWorldPart();
@@ -455,7 +456,7 @@ export function WorldSummary({ runtime }: { runtime: RefObject<GenvrRuntime | nu
   );
 }
 
-/** The right dock on World (WORLD-W1–W6): the picked part, else the World summary — never empty (W7). */
+/** The right dock while World is open in Build (WORLD-W1–W6, W10): the picked part, else the World summary — never empty (W7). */
 export function WorldSidePanel({ runtime, busy = false, actors = [], message = () => {}, onStyle, fallback, placeId }: {
   runtime: RefObject<GenvrRuntime | null>; placeId?: string | undefined; busy?: boolean; actors?: Array<{ id: string; label: string }>; message?: (text: string) => void; onStyle?: () => void;
   /** Shown instead of the summary when something is selected (the selection's Properties). */

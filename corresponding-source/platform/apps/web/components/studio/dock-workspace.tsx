@@ -23,11 +23,14 @@ export function DockWorkspace({
   onLayout,
   title,
   content,
+  visible = () => true,
 }: {
   layout: StudioLayout;
   onLayout: (change: Partial<StudioLayout>) => void;
   title: (id: DockPanel) => string;
   content: (id: DockPanel) => ReactNode;
+  /** Panels that belong to one tab only (World is a Build panel, WORLD-W10); the others stay where they are. */
+  visible?: (id: DockPanel) => boolean;
 }) {
   const [drag, setDrag] = useState<{ id: DockPanel; x: number; y: number } | null>(null);
   const [transient, setTransient] = useState<Partial<Record<DockPanel, FloatingRect>>>({});
@@ -161,7 +164,7 @@ export function DockWorkspace({
   return (
     <>
       {EDGES.map((side) => {
-        const panels = dockPanels(layout, side);
+        const panels = dockPanels(layout, side).filter(visible);
         if (!panels.length || !layout[`${side}Open`]) return null;
         const active = panels.includes(layout.active[side]) ? layout.active[side] : panels[0]!;
         return (
@@ -220,7 +223,7 @@ export function DockWorkspace({
           </div>
         );
       })}
-      {dockPanels(layout, 'floating').map((id) => {
+      {dockPanels(layout, 'floating').filter(visible).map((id) => {
         const rect = transient[id] ?? layout.floating[id] ?? START_RECT;
         return (
           <section

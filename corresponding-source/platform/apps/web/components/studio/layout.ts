@@ -3,7 +3,7 @@
 import { useEffect, useState, type CSSProperties } from 'react';
 
 export type WorkspaceMode = 'build' | 'filming';
-export type DockPanel = 'tab' | 'outline' | 'properties' | 'assistant' | 'output' | 'timeline';
+export type DockPanel = 'tab' | 'world' | 'outline' | 'properties' | 'assistant' | 'output' | 'timeline';
 export type DockEdge = 'left' | 'right' | 'bottom';
 export type DockSide = DockEdge | 'floating';
 export interface FloatingRect {
@@ -31,6 +31,8 @@ export interface StudioLayout {
 }
 export const DOCK_ORDER: readonly DockPanel[] = [
   'tab',
+  // The world's parts sit in the Build left dock between Tools and Explorer (WORLD-W10).
+  'world',
   'outline',
   'properties',
   'assistant',
@@ -44,6 +46,7 @@ export function defaultLayout(mode: WorkspaceMode): StudioLayout {
     mode,
     docks: {
       tab: 'left',
+      world: 'left',
       outline: 'left',
       properties: 'right',
       assistant: 'right',
@@ -68,13 +71,22 @@ export function defaultLayout(mode: WorkspaceMode): StudioLayout {
 }
 export const DEFAULT_LAYOUT = defaultLayout('build');
 export function allowedPanels(mode: WorkspaceMode): readonly DockPanel[] {
-  return DOCK_ORDER.filter((id) => (mode === 'filming' ? id !== 'assistant' : id !== 'timeline'));
+  return DOCK_ORDER.filter((id) => (mode === 'filming' ? id !== 'assistant' && id !== 'world' : id !== 'timeline'));
 }
 export function dockPanels(layout: StudioLayout, side: DockSide): DockPanel[] {
   return layout.order.filter(
     (id) =>
       allowedPanels(layout.mode).includes(id) && !layout.hidden.includes(id) && layout.docks[id] === side,
   );
+}
+/** Whether a panel is on screen now: floating, or the open tab of an open dock (`visible` hides panels of other tabs). */
+export function panelShown(layout: StudioLayout, id: DockPanel, visible: (id: DockPanel) => boolean = () => true): boolean {
+  const side = layout.docks[id];
+  if (!allowedPanels(layout.mode).includes(id) || layout.hidden.includes(id) || !visible(id)) return false;
+  if (side === 'floating') return true;
+  if (!layout[`${side}Open`]) return false;
+  const panels = dockPanels(layout, side).filter(visible);
+  return (panels.includes(layout.active[side]) ? layout.active[side] : panels[0]) === id;
 }
 const finite = (value: unknown, fallback: number, min: number, max: number) =>
   typeof value === 'number' && Number.isFinite(value) ? Math.max(min, Math.min(max, value)) : fallback;
@@ -101,7 +113,10 @@ export function normalizeLayout(value: unknown, mode: WorkspaceMode): StudioLayo
       base.docks[id] = docks[id] as DockSide;
   const validPanels = (value: unknown) =>
     Array.isArray(value) ? value.filter((id): id is DockPanel => DOCK_ORDER.includes(id)) : [];
-  base.order = [...new Set([...validPanels(saved.order), ...DOCK_ORDER])];
+  const savedOrder = validPanels(saved.order);
+  // Layouts saved before WORLD-W10 have no World panel: it goes right after Tools, not at the end.
+  if (savedOrder.length && !savedOrder.includes('world')) savedOrder.splice(savedOrder.indexOf('tab') + 1, 0, 'world');
+  base.order = [...new Set([...savedOrder, ...DOCK_ORDER])];
   if (Array.isArray(saved.hidden)) base.hidden = [...new Set(validPanels(saved.hidden))];
   for (const side of ['left', 'right', 'bottom'] as const)
     if (DOCK_ORDER.includes(active[side] as DockPanel)) base.active[side] = active[side] as DockPanel;
