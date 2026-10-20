@@ -40,7 +40,7 @@ Arguments are `{ "event": { ... } }`. All durations are milliseconds, from 200 t
 {"event":{"kind":"expression","target":"self","expression":"thinking","duration":3000}}
 ```
 
-Expressions: `neutral`, `smile`, `angry`, `sad`, `surprised`, `thinking`. Use restrained transitions. Missing model face morphs cannot be invented: mesh bodies need compatible morphs; generated humans use drawn face controls; the standard robot uses independent screen eyes, brows and mouth; other block bodies have a simpler mouth response.
+Expressions: `neutral`, `smile`, `angry`, `sad`, `surprised`, `thinking`. Use restrained transitions. Missing model face morphs cannot be invented: mesh bodies need compatible morphs; generated humans use drawn face controls; the standard robot uses independent screen eyes (round, with pupils and lids that blink and follow the viewer), brows and mouth; other block bodies have a simpler mouth response.
 
 ```json
 {"event":{"kind":"animation","target":"self","animation":"genvr.core.animation.wave","duration":4000}}

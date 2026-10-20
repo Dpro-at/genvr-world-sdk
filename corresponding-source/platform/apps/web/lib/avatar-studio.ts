@@ -25,6 +25,8 @@ function merge(base: Record<string, unknown>, patch: Record<string, unknown>): R
 const describe = (editor: CharacterEditor) => ({
   recipe: editor.recipe, view: editor.view, shading: editor.shading, clip: editor.clip,
   info: editor.info ? { height: editor.info.height, bones: editor.info.bones, expression: editor.info.expression, expressionSupported: editor.info.expressionSupported } : null,
+  // What the Standard robot's feet and screen face can do (board A11).
+  ...(editor.recipe.body === 'robot' ? { body: { toes: 5, toeJoint: 'ToeBase 0–45° (bends up when the heel lifts)', eyes: 'round, blink, follow the viewer' } } : {}),
   saved: editor.saved.map((s) => ({ id: s.id, name: s.recipe.name, savedAt: s.savedAt })),
 });
 

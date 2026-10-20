@@ -12,7 +12,8 @@ description: >-
 # Motion lab
 
 A motion lab is its own Studio project ("My projects › New motion lab"). It never changes a real world. The lab
-character is the Standard robot (body `robot`). Everything a person can do in the Lab area, an agent can do with
+character is the Standard robot (body `robot`): the same 52-bone human skeleton as the human bodies, with five toes
+on one ToeBase joint per foot that bend up 0–45° by themselves when the heel lifts (a clip that keys ToeBase wins). Everything a person can do in the Lab area, an agent can do with
 `motion_lab`, with the same owner gates.
 
 ## Start

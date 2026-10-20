@@ -25,8 +25,16 @@ for (const side of ['Left', 'Right'] as const) {
     { joint: `${side}Leg`, center: [.12 * s, .44, 0], size: [.10, .09, .10], color: 'pants' },
     { joint: `${side}Leg`, center: [.12 * s, .27, 0], size: [.135, .25, .14], color: 'skin', area: 'lowerLegs' },
     { joint: `${side}Foot`, center: [.12 * s, .09, 0], size: [.085, .06, .085], color: 'pants' },
-    { joint: `${side}Foot`, center: [.12 * s, .045, .045], size: [.17, .09, .27], color: 'shoes', area: 'feet' },
+    // Heel and mid plate end at the ToeBase joint (12 cm in front of the ankle); a dark core shows when the toes bend.
+    { joint: `${side}Foot`, center: [.12 * s, .045, .014], size: [.17, .09, .208], color: 'shoes', area: 'feet' },
+    { joint: `${side}Foot`, center: [.12 * s, .024, .12], size: [.16, .044, .012], color: 'pants' },
   );
+  // Five toes on ToeBase: the big toe on the inner side, the others narrower and shorter, 5 mm apart.
+  let x = .035;
+  for (const [width, length] of [[.044, .075], [.031, .068], [.028, .062], [.025, .056], [.022, .05]] as const) {
+    parts.push({ joint: `${side}ToeBase`, center: [(x + width / 2) * s, .025, .122 + length / 2], size: [width, .05, length], color: 'shoes', area: 'feet' });
+    x += width + .005;
+  }
   for (const joint of starter.joints.filter(joint => joint.name.startsWith(`${side}Hand`) && /[123]$/.test(joint.name))) {
     parts.push({ joint: joint.name, center: [joint.at[0] + .008 * s, joint.at[1], joint.at[2]], size: [.018, .022, .016], color: 'skin' });
   }

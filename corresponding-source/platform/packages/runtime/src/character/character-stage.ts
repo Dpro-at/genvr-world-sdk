@@ -654,7 +654,8 @@ export async function createCharacterStage({
         const side = Math.sign(base!.bones[base!.mesh.skeleton.bones.indexOf(bone)]!.rest.x) || 1;
         bone.quaternion.premultiply(forward(side));
       }
-    if (!paused) { avatar.updateSprings(delta); avatar.updateExpression(delta); }
+    // Screen eyes look at whoever watches the stage.
+    if (!paused) { avatar.updateSprings(delta); avatar.setGazeTarget(camera.position); avatar.updateExpression(delta); }
     const material = base?.material;
     const face = (Array.isArray(material) ? material[0] : material)?.userData.face as FaceUniforms | undefined;
     if (face) face.eyeClosure.value = eyeClosure;

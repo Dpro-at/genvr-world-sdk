@@ -1,6 +1,7 @@
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { LEGACY_BONE_PREFIX } from './avatar-rig-compatibility.js';
 import { createRobotFace } from './robot-face.js';
+import { createToeRoll } from './toe-roll.js';
 import { applyAvatarExpression, EXPRESSION_KEYS, type AvatarExpression } from './avatar-expression.js';
 import {
   AnimationClip,
@@ -428,6 +429,8 @@ export interface GenvrAvatar {
   setMouth(shape: MouthShape): void;
   readonly expressionSupported: boolean;
   setExpression(expression: AvatarExpression): void;
+  /** A world point the eyes follow (the camera, a speaker); null looks straight ahead. Screen-face bodies only. */
+  setGazeTarget(point: Vector3 | null): void;
   updateExpression(delta: number): void;
   /** The mouth shape shown now (`X` at rest, and for bodies that cannot show one). */
   readonly mouth: MouthShape;
@@ -850,6 +853,10 @@ export function createGenvrAvatar(
       mouthMesh.setShape(mouthShape);
       head.add(mouthMesh.mesh);
     }
+    // Bodies with toe shells (the robot) keep their toes flat on the ground when the heel lifts.
+    toeRoll = !model && current.parts.some(part => part.joint.endsWith('ToeBase'))
+      ? createToeRoll(['LeftToeBase', 'RightToeBase'].map(name => skeleton.getBoneByName(nodeName(current, name))).filter((bone): bone is Bone => Boolean(bone)))
+      : null;
     made.position.y = -CHEST_HEIGHT;
     springs =
       model && current.springs
@@ -860,6 +867,9 @@ export function createGenvrAvatar(
     return made;
   };
   let springs: SpringBones | null = null;
+  let toeRoll: ReturnType<typeof createToeRoll> | null = null;
+  let gazeTarget: Vector3 | null = null;
+  const gazeLocal = new Vector3();
   let robotFace: ReturnType<typeof createRobotFace> | null = null;
   let mouthMesh: MouthMesh | null = null;
   let mouthMorphTable: MouthMorphs | null = null;
@@ -1064,7 +1074,15 @@ export function createGenvrAvatar(
     },
     get expressionSupported() { return Boolean(robotFace || mouthMesh || mesh.userData.humanMaterial || EXPRESSION_KEYS.some(key => mesh.morphTargetDictionary?.[key] !== undefined)); },
     setExpression(value) { expression = value; mouthMesh?.setExpression(value); robotFace?.setExpression(value); },
+    setGazeTarget(point) { gazeTarget = point ? (gazeTarget ?? new Vector3()).copy(point) : null; },
     updateExpression(delta) {
+      if (robotFace) {
+        // The target in the screen's own space: sideways and up offsets over the distance in front.
+        if (gazeTarget) {
+          const local = robotFace.root.worldToLocal(gazeLocal.copy(gazeTarget)), ahead = Math.max(.3, local.z);
+          robotFace.setGaze(local.x / ahead * 2.5, local.y / ahead * 2.5);
+        } else robotFace.setGaze(0, 0);
+      }
       robotFace?.update(delta);
       if (mouthShape === 'X') mouthMesh?.setExpression(expression);
       for (const key of EXPRESSION_KEYS) { const i = mesh.morphTargetDictionary?.[key]; if (i !== undefined && mesh.morphTargetInfluences) mesh.morphTargetInfluences[i] = 0; }
@@ -1084,6 +1102,7 @@ export function createGenvrAvatar(
       return robotFace || mouthMesh || mouthMorphTable || mesh.userData.humanMaterial ? mouthShape : 'X';
     },
     updateSprings(delta) {
+      toeRoll?.update();
       springs?.update(delta);
     },
     setCubes(on) {
