@@ -3,6 +3,7 @@ import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { GLTFExporter } from 'three/examples/jsm/exporters/GLTFExporter.js';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
+import { unifyMorphs } from '@genvr/runtime';
 import { avatarDigest, USER_AVATAR_BYTES, UserAvatarMetadata, type UserAvatarAsset } from '../src/user-avatar-library';
 
 const standard = (name: string) => name.replace(/^.*:/, '').replace(/^mixamorig\d*/i, '');
@@ -128,14 +129,27 @@ export function canonicalCharacter(root: Group): { root: Group; joints: NonNulla
     bones[i]!.position.fromArray(joint.at);
     if (parent !== undefined) { bones[i]!.position.sub(new Vector3(...joints[parent]!.at)); bones[parent]!.add(bones[i]!); }
   });
-  const materials: Material[] = [], geometries: BufferGeometry[] = [], groups: Array<{ start: number; count: number; material: number }> = [];
+  const materials: Material[] = [], geometries: BufferGeometry[] = [], groups: Array<{ start: number; count: number; material: number }> = [], shapes: string[][] = [];
+  const shifted = new Vector3();
   let start = 0;
   for (const mesh of meshes) {
     const geometry = mesh.geometry.clone(), positions = geometry.getAttribute('position');
+    // Face shapes (FACE-IMPORT): each offset goes through the same bind pose and scale as its vertex.
+    const names = Object.entries(mesh.morphTargetDictionary ?? {}).sort((a, b) => a[1] - b[1]).map(([name]) => name);
+    const offsets = names.length ? (geometry.morphAttributes.position ?? []).slice(0, names.length) as BufferAttribute[] : [];
+    const relative = geometry.morphTargetsRelative;
+    const moved = offsets.map(attribute => new BufferAttribute(new Float32Array(attribute.count * 3), 3));
     for (let i = 0; i < positions.count; i++) {
-      point.fromBufferAttribute(positions, i); mesh.applyBoneTransform(i, point).applyMatrix4(mesh.matrixWorld).sub(origin).multiplyScalar(scale);
+      point.fromBufferAttribute(positions, i);
+      offsets.forEach((attribute, k) => {
+        shifted.fromBufferAttribute(attribute, i); if (relative) shifted.add(point);
+        mesh.applyBoneTransform(i, shifted).applyMatrix4(mesh.matrixWorld).sub(origin).multiplyScalar(scale);
+        moved[k]!.setXYZ(i, shifted.x, shifted.y, shifted.z);
+      });
+      mesh.applyBoneTransform(i, point).applyMatrix4(mesh.matrixWorld).sub(origin).multiplyScalar(scale);
       if (!point.toArray().every(Number.isFinite)) throw new Error('Character contains invalid positions.');
       positions.setXYZ(i, point.x, point.y, point.z);
+      for (const attribute of moved) attribute.setXYZ(i, attribute.getX(i) - point.x, attribute.getY(i) - point.y, attribute.getZ(i) - point.z);
     }
     const indices = geometry.getAttribute('skinIndex'), weights = geometry.getAttribute('skinWeight');
     const remapped = new Uint16Array(indices.count * 4), normalized = new Float32Array(indices.count * 4);
@@ -147,8 +161,9 @@ export function canonicalCharacter(root: Group): { root: Group; joints: NonNulla
     geometry.setAttribute('skinIndex', new BufferAttribute(remapped, 4)); geometry.setAttribute('skinWeight', new BufferAttribute(normalized, 4));
     if (!geometry.getAttribute('uv')) geometry.setAttribute('uv', new BufferAttribute(new Float32Array(positions.count * 2), 2));
     for (const name of Object.keys(geometry.attributes)) if (!['position', 'normal', 'uv', 'skinIndex', 'skinWeight'].includes(name)) geometry.deleteAttribute(name);
-    // morphs are dropped; reset their flag too, or a part with morphs will not merge with one without
-    geometry.morphAttributes = {}; geometry.morphTargetsRelative = false; geometry.computeVertexNormals();
+    // Face shapes stay as offsets in the new space; all parts get the same list below so they merge.
+    geometry.morphAttributes = moved.length ? { position: moved } : {}; geometry.morphTargetsRelative = true; geometry.computeVertexNormals();
+    if (moved.some(attribute => !Array.from(attribute.array as Float32Array).every(Number.isFinite))) throw new Error('Character contains invalid face shapes.');
     if (!geometry.index) geometry.setIndex(Array.from({ length: positions.count }, (_, i) => i));
     const own = Array.isArray(mesh.material) ? mesh.material : [mesh.material], materialOffset = materials.length;
     for (const original of own) {
@@ -157,13 +172,19 @@ export function canonicalCharacter(root: Group): { root: Group; joints: NonNulla
       materials.push(material);
     }
     for (const group of geometry.groups.length ? geometry.groups : [{ start: 0, count: geometry.index!.count, materialIndex: 0 }]) groups.push({ start: start + group.start, count: group.count, material: materialOffset + (group.materialIndex ?? 0) });
-    start += geometry.index!.count; geometry.clearGroups(); geometries.push(geometry);
+    start += geometry.index!.count; geometry.clearGroups(); geometries.push(geometry); shapes.push(names.slice(0, moved.length));
   }
+  const shapeNames = unifyMorphs(geometries.map((part, i) => ({ geometry: part, names: shapes[i]! })));
   const geometry = mergeGeometries(geometries, false);
+  // Merging makes new shape attributes without their names, and without the offsets flag.
+  geometry?.morphAttributes.position?.forEach((attribute, i) => { attribute.name = shapeNames[i] ?? attribute.name; });
+  if (geometry) geometry.morphTargetsRelative = true;
   if (!geometry) throw new Error('Character mesh parts could not be combined.');
   for (const part of geometries) part.dispose();
   for (const group of groups) geometry.addGroup(group.start, group.count, group.material);
-  const character = new SkinnedMesh(geometry, materials); character.name = 'ImportedCharacter'; character.add(bones[0]!); character.updateMatrixWorld(true); character.bind(new Skeleton(bones), new Matrix4());
+  const character = new SkinnedMesh(geometry, materials); character.name = 'ImportedCharacter';
+  // Shape names by index, so the export keeps them (targetNames) and the face can find them by name.
+  character.updateMorphTargets(); character.add(bones[0]!); character.updateMatrixWorld(true); character.bind(new Skeleton(bones), new Matrix4());
   const out = new Group(); out.add(character); return { root: out, joints, height, ...(restPose ? { restPose } : {}) };
 }
 

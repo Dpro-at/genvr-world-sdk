@@ -573,9 +573,30 @@ export function bindModelGeometry(
   return geometry;
 }
 
-/** Retains every material primitive in a locally imported character. */
+/**
+ * Gives every part the same blend shapes in the same order (zero offsets where a part has none, e.g. hair beside a face
+ * with 52 shapes), so the parts merge into one mesh; returns the shape names by index. Shape normals are dropped.
+ */
+export function unifyMorphs(parts: ReadonlyArray<{ geometry: BufferGeometry; names: readonly string[] }>): string[] {
+  const names = [...new Set(parts.flatMap((part) => part.names))];
+  for (const { geometry, names: own } of parts) {
+    const count = geometry.getAttribute('position').count, positions = geometry.morphAttributes.position ?? [];
+    geometry.morphAttributes = names.length ? { position: names.map((name) => {
+      const found = positions[own.indexOf(name)];
+      const attribute = found ?? new BufferAttribute(new Float32Array(count * 3), 3);
+      attribute.name = name;
+      return attribute;
+    }) } : {};
+    geometry.morphTargetsRelative = true;
+  }
+  return names;
+}
+/** A mesh's blend shape names by index. */
+const morphNames = (mesh: SkinnedMesh) => Object.entries(mesh.morphTargetDictionary ?? {}).sort((a, b) => a[1] - b[1]).map(([name]) => name);
+
+/** Retains every material primitive in a locally imported character, with its face's blend shapes (FACE-IMPORT). */
 export function mergeLocalBodyPrimitives(body: AvatarBody, scene: Group): BodyModel {
-          const parts: BufferGeometry[] = [], materials: Material[] = [];
+          const parts: BufferGeometry[] = [], materials: Material[] = [], shapes: string[][] = [];
           const groups: Array<{ start: number; count: number; material: number }> = [];
           let start = 0;
           scene.traverse(object => {
@@ -588,13 +609,18 @@ export function mergeLocalBodyPrimitives(body: AvatarBody, scene: Group): BodyMo
             for (const group of geometry.groups.length ? geometry.groups : [{ start: 0, count: geometry.index?.count ?? geometry.getAttribute('position').count, materialIndex: 0 }])
               groups.push({ start: start + group.start, count: group.count, material: materials.length + (group.materialIndex ?? 0) });
             start += geometry.index?.count ?? geometry.getAttribute('position').count;
-            materials.push(...own); geometry.clearGroups(); parts.push(geometry);
+            materials.push(...own); geometry.clearGroups(); parts.push(geometry); shapes.push(morphNames(part));
           });
+          const names = unifyMorphs(parts.map((geometry, i) => ({ geometry, names: shapes[i]! })));
           const geometry = mergeGeometries(parts, false);
           for (const part of parts) part.dispose();
           if (!geometry) throw new Error('Imported character primitives could not be combined.');
           for (const group of groups) geometry.addGroup(group.start, group.count, group.material);
-          return { geometry, material: materials, mouth: null };
+          // The merged shapes are still offsets (merging drops the flag).
+          geometry.morphTargetsRelative = true;
+          if (!names.length) return { geometry, material: materials, mouth: null };
+          const morphs = Object.fromEntries(names.map((name, i) => [name, i]));
+          return { geometry, material: materials, morphs, mouth: mouthMorphs(morphs) };
 
 }
 

@@ -79,3 +79,19 @@ it('combines a part with face morphs and a part without (hair added to a body)',
   expect(output.geometry.getAttribute('position').count).toBe(8);
   expect(output.geometry.groups).toHaveLength(2);
 });
+
+it('keeps the face shapes (blend shapes) through the import, also when another part has none (FACE-IMPORT)', () => {
+  const root = humanoid(0), face = root.children.find(child => (child as SkinnedMesh).isSkinnedMesh) as SkinnedMesh;
+  // The head vertex opens its jaw 10 cm down; a hair part on the same skeleton has no shapes.
+  const jaw = new BufferAttribute(new Float32Array(12), 3); jaw.setXYZ(2, 0, -.1, 0); jaw.name = 'jawOpen';
+  face.geometry.morphAttributes.position = [jaw]; face.geometry.morphTargetsRelative = true; face.updateMorphTargets();
+  const hairGeometry = face.geometry.clone(); hairGeometry.morphAttributes = {};
+  const hair = new SkinnedMesh(hairGeometry, new MeshStandardMaterial()); root.add(hair); root.updateMatrixWorld(true); hair.bind(face.skeleton);
+  const output = canonicalCharacter(root).root.children[0] as SkinnedMesh;
+  expect(output.morphTargetDictionary).toEqual({ jawOpen: 0 });
+  const shape = output.geometry.morphAttributes.position![0]!;
+  expect(shape.count).toBe(8);
+  expect(shape.getY(2)).toBeCloseTo(-.1, 4);
+  expect(shape.getY(6)).toBe(0);
+  expect(output.geometry.morphTargetsRelative).toBe(true);
+});

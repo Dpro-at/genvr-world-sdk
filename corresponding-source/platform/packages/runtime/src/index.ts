@@ -82,6 +82,7 @@ export {
   registerLocalAvatarBody,
   preloadAvatarLook,
   STANDARD_BONES,
+  unifyMorphs,
   type AvatarLook,
   type GenvrAvatar,
   type StandardBone,
