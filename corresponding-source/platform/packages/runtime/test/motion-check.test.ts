@@ -96,4 +96,13 @@ describe('board M16 · headless run on the Standard robot', () => {
     expect(checkAllMoves(undefined, ['realistic'])).toEqual(first);
     for (const cell of first) expect(MotionCheckCell.parse(cell)).toEqual(cell);
   }, 60000);
+  it('fix the base: no move puts a sole under the floor (swims are in water)', () => {
+    for (const move of sampleMoves()) {
+      if (move.move.startsWith('Swim')) continue;
+      const lowest = Math.min(...move.frames.flatMap(f => f.feet.flatMap(foot => [foot.heel[1], foot.toe[1]])));
+      expect(lowest, move.move).toBeGreaterThan(-0.01);
+    }
+    // Crouch walk travels at its Lab speed.
+    expect(sampleMoves(undefined, ['CrouchWalk'])[0]!.velocity).toEqual([0, 0.9]);
+  }, 60000);
 });

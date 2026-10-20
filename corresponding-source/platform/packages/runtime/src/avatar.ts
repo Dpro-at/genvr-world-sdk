@@ -5,6 +5,7 @@ import { createToeRoll } from './toe-roll.js';
 import { applyAvatarExpression, EXPRESSION_KEYS, type AvatarExpression } from './avatar-expression.js';
 import {
   AnimationClip,
+  AnimationMixer,
   Bone,
   BoxGeometry,
   BufferAttribute,
@@ -12,6 +13,7 @@ import {
   Color,
   Euler,
   Group,
+  LoopOnce,
   Matrix3,
   Matrix4,
   MeshStandardMaterial,
@@ -1287,10 +1289,42 @@ const clipCache = new WeakMap<AvatarBody, AnimationClip[]>();
 function avatarClips(body: AvatarBody): AnimationClip[] {
   let clips = clipCache.get(body);
   if (!clips) {
-    clips = CORE_ANIMATIONS.map((animation) => clipFromAnimation(animation, body));
+    clips = CORE_ANIMATIONS.map((animation) => groundClip(clipFromAnimation(animation, body), body));
     clipCache.set(body, clips);
   }
   return clips;
+}
+
+const SOLE_JOINTS = ['LeftFoot', 'RightFoot', 'LeftToeBase', 'RightToeBase'];
+/**
+ * Board M16 (fix the base): on this body no key may put a sole under the floor. Each key is measured on the body's own
+ * skeleton and the hips rise just enough; keys never go lower, so jumps keep their flight. Swim clips are in water.
+ */
+export function groundClip(clip: AnimationClip, body: AvatarBody): AnimationClip {
+  const soles = SOLE_JOINTS.flatMap((name) => body.joints.filter((joint) => joint.name === name));
+  if (!soles.length || SWIM_CLIPS.has(clip.name)) return clip;
+  const rootJoint = body.joints[0]!, hipsName = `${nodeName(body, rootJoint.name)}.position`;
+  const { root } = buildSkeleton(body);
+  const bones = soles.map((joint) => root.getObjectByName(nodeName(body, joint.name))!);
+  const position = clip.tracks.find((track) => track.name === hipsName);
+  // The keys plus a 1/60 s grid, so the blend between two keys cannot dip under the floor either.
+  const keys = Array.from(clip.tracks[0]?.times ?? []);
+  const times = [...new Set([...keys, ...Array.from({ length: Math.floor(clip.duration * 60) + 1 }, (_, i) => Math.min(clip.duration, i / 60))].map((t) => Math.round(t * 1e4) / 1e4))].sort((a, b) => a - b);
+  if (!keys.length) return clip;
+  const mixer = new AnimationMixer(root), action = mixer.clipAction(clip);
+  action.setLoop(LoopOnce, 1); action.clampWhenFinished = true; action.play();
+  const at = new Vector3(), values: number[] = [];
+  const lifts = times.map((time) => {
+    mixer.setTime(Math.min(time, clip.duration)); root.updateMatrixWorld(true);
+    values.push(...root.position.toArray());
+    return Math.max(0, ...bones.map((bone, i) => soles[i]!.at[1] - bone.getWorldPosition(at).y));
+  });
+  mixer.stopAllAction(); mixer.uncacheRoot(root);
+  if (Math.max(...lifts) < 0.005) return clip;
+  lifts.forEach((lift, i) => { values[i * 3 + 1] = values[i * 3 + 1]! + lift; });
+  const tracks = clip.tracks.filter((track) => track !== position);
+  tracks.push(new VectorKeyframeTrack(hipsName, times, values));
+  return new AnimationClip(clip.name, clip.duration, tracks);
 }
 
 /** Every Core animation as clips of a body type (Classic when not given). */

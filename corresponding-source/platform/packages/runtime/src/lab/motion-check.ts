@@ -17,7 +17,9 @@ export interface CheckFrame {
 }
 export interface CheckMove { move: string; body: string; style: MotionStyleId; loop: boolean; frames: readonly CheckFrame[];
   /** Radius of the torso around the hips → neck line (m); from the body's rest pose. */
-  torsoRadius: number; }
+  torsoRadius: number;
+  /** A seat or a wall carries the weight (Sit, Climb): balance is not scored. */
+  supported?: boolean; }
 
 /** A sole point touches the floor below this height (m) when it is not moving up or down fast. */
 export const PLANT_HEIGHT = 0.03, PLANT_VERTICAL_SPEED = 0.2;
@@ -121,18 +123,26 @@ function loopSeam(frames: readonly CheckFrame[]): Series {
   return out;
 }
 
-/** Speed match: while moving, how far the planted feet's speed under the body differs from the body's speed (%). */
+/**
+ * Speed match: over the frames where the body moves, the median speed of the planted feet under the body against the
+ * median body speed (%). One value for the move, written on every moving frame.
+ */
 function speedMatch(frames: readonly CheckFrame[]): Series {
-  return frames.map((f, i) => {
+  const moving: number[] = [], feet: number[] = [], body: number[] = [];
+  frames.forEach((f, i) => {
     const speed = bodySpeed(frames, i);
-    if (speed <= MOVING_SPEED || i === 0) return 0;
+    if (speed <= MOVING_SPEED || i === 0) return;
+    moving.push(i); body.push(speed);
     const prev = frames[i - 1]!, dt = (f.t - prev.t) || 1;
-    const relative = ([0, 1] as const).filter(foot => planted(frames, foot, 'heel', i) || planted(frames, foot, 'toe', i)).map(foot => {
-      const p = planted(frames, foot, 'toe', i) ? 'toe' : 'heel';
-      return flat(sub(f.feet[foot][p], f.hips), sub(prev.feet[foot][p], prev.hips)) / dt;
-    });
-    return relative.length ? Math.abs(Math.max(...relative) - speed) / speed * 100 : 0;
+    for (const foot of [0, 1] as const) for (const p of ['heel', 'toe'] as const)
+      if (planted(frames, foot, p, i) && planted(frames, foot, p, i - 1)) feet.push(flat(sub(f.feet[foot][p], f.hips), sub(prev.feet[foot][p], prev.hips)) / dt);
   });
+  const out = frames.map(() => 0);
+  if (!feet.length) return out;
+  const median = (values: number[]) => [...values].sort((a, b) => a - b)[Math.floor(values.length / 2)]!;
+  const mismatch = Math.abs(median(feet) - median(body)) / median(body) * 100;
+  for (const i of moving) out[i] = mismatch;
+  return out;
 }
 
 /** Ranges of frames where a series goes over the limit, worst value per range. */
@@ -160,7 +170,7 @@ export function checkMove(input: CheckMove, limits: MotionCheckLimits): MotionCh
     ...ranges('ground', ground(frames), limits.ground_cm),
     ...ranges('joint_limits', jointLimits(frames), limits.joint_extra_deg),
     ...ranges('body_clash', bodyClash(frames, input.torsoRadius), limits.body_clash_cm),
-    ...(limits.balance_s === null ? [] : ranges('balance', balance(frames), limits.balance_s)),
+    ...(limits.balance_s === null || input.supported ? [] : ranges('balance', balance(frames), limits.balance_s)),
     ...(input.loop ? ranges('loop_seam', loopSeam(frames), limits.loop_seam_deg) : []),
     ...ranges('speed_match', speedMatch(frames), limits.speed_match_pct),
   ];
