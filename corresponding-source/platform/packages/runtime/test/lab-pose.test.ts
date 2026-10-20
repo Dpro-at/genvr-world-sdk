@@ -32,6 +32,15 @@ describe('motion lab pose (board M11)', () => {
     expect(labPoseProblems(labStandPose())).toEqual([]);
   });
 
+  it('turns each finger joint (the stage shows the fingers by their own names)', () => {
+    const bent = labClipPose({ ...labStandPose(), 'R.index.base': 80, 'R.index.mid': 90 }).bones;
+    const flat = labClipPose({ ...labStandPose(), 'R.hand.fist': 0 }).bones;
+    const turn = (v: number[] | undefined) => Math.hypot(...(v ?? [0, 0, 0]));
+    expect(turn(bent.RightHandIndex1)).toBeGreaterThan(60);
+    expect(turn(bent.RightHandIndex2)).toBeGreaterThan(60);
+    expect(turn(flat.RightHandIndex1)).toBeLessThan(10);
+  });
+
   it('lowers the hands when the arms come down, and his left hand is on his left', () => {
     const hands = labLimbPositions(labStandPose());
     expect(hands.left_hand[0]).toBeGreaterThan(0.1);

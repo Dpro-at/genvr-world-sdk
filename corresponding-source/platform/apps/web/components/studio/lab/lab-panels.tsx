@@ -9,6 +9,7 @@ import { LAB_FOLLOW_AVATAR, LAB_LATER_KINDS, LAB_OBSTACLE_KINDS, type LabObstacl
 import { LAB_MOVES, PERSON, type LabController, type LabSpeed } from '../../../lib/motion-lab';
 import { measure } from './lab-stage';
 import { MyMotions, ShareMotionDialog } from './lab-share';
+import { LabKeyTrack, LabModeSwitch, LabPoseBar, LabPoseLeft, LabPoseRight } from './lab-pose';
 
 /**
  * The Lab area's panels (boards M1, M2, M3): course list and add tiles on the left; the chosen obstacle's sizes, the
@@ -43,7 +44,13 @@ function Problem({ text }: { text: string | null }) {
 }
 
 // ---------------------------------------------------------------- left: course (M1, M2)
-export function LabLeft({ lab }: { lab: LabController }) {
+// Board M11: each Lab panel shows the Pose mode's own panel while Pose is on.
+export function LabLeft({ lab }: { lab: LabController }) { useLab(lab); return lab.view.mode === 'pose' ? <LabPoseLeft lab={lab} /> : <LabCourseLeft lab={lab} />; }
+export function LabRight({ lab }: { lab: LabController }) { useLab(lab); return lab.view.mode === 'pose' ? <LabPoseRight lab={lab} /> : <LabRunRight lab={lab} />; }
+export function LabRunBar({ lab }: { lab: LabController }) { useLab(lab); return lab.view.mode === 'pose' ? <LabPoseBar lab={lab} /> : <LabCourseBar lab={lab} />; }
+export function LabRunStrip({ lab }: { lab: LabController }) { useLab(lab); return lab.view.mode === 'pose' ? <LabKeyTrack lab={lab} /> : <LabRunTimeline lab={lab} />; }
+
+function LabCourseLeft({ lab }: { lab: LabController }) {
   useLab(lab);
   const [error, setError] = useState<string | null>(null);
   const [menu, setMenu] = useState<{ id: string; x: number; y: number } | null>(null);
@@ -51,6 +58,7 @@ export function LabLeft({ lab }: { lab: LabController }) {
   const value = (o: LabObstacle) => measure(o).replace(/^(step|ramp|gap|low wall|window) /, '');
   return (
     <div className="flex h-full min-h-0 flex-col gap-2 overflow-auto p-3" onClick={() => setMenu(null)}>
+      <LabModeSwitch lab={lab} />
       <div className="flex items-center gap-1"><span className={`${label} flex-1`}>Course · seed {course.seed}</span>
         <button type="button" className="rounded p-1.5 hover:bg-ink/10" title="New course from the seed (right panel)" aria-label="New course from a seed" onClick={() => lab.select(null)}><Dices className="size-4" /></button></div>
       <ul className="flex flex-col gap-0.5" aria-label="Obstacles">
@@ -100,7 +108,7 @@ const SIZE_FIELDS: Record<LabObstacleKind, Array<[key: string, name: string, ste
   window: [['sill', 'Sill'], ['opening_width', 'Opening width'], ['opening_height', 'Opening height'], ['wall_height', 'Wall height', 0.1], ['wall_width', 'Wall width', 0.1], ['thickness', 'Thickness']],
 };
 
-export function LabRight({ lab }: { lab: LabController }) {
+function LabRunRight({ lab }: { lab: LabController }) {
   useLab(lab);
   const selected = lab.data.course.obstacles.find((o) => o.id === lab.view.selected);
   // Board M14: the share dialog opens after Save as version, from My motions, or to review an agent's prepared share.
@@ -285,7 +293,7 @@ const OVERLAY_BUTTONS: Array<[LabOverlay, string, string, ReactNode]> = [
 ];
 const SPEEDS: Array<[LabSpeed, string]> = [[0.25, '¼×'], [0.5, '½×'], [1, '1×'], [2, '2×']];
 
-export function LabRunBar({ lab }: { lab: LabController }) {
+function LabCourseBar({ lab }: { lab: LabController }) {
   useLab(lab);
   const [error, setError] = useState<string | null>(null);
   useEffect(() => {
@@ -329,7 +337,7 @@ export function LabRunBar({ lab }: { lab: LabController }) {
 // ---------------------------------------------------------------- run timeline under the view (M1, M3)
 const EVENT_TAGS: Record<string, string> = { step: 'step', ramp: 'ramp', gap_jump: 'jump', land: 'land', vault: 'wall', window: 'window', wait: 'wait', crossing: 'cross', car_hit: 'car!', fall: 'fall!', slide: 'slide', blocked: 'blocked', finish: 'finish' };
 
-export function LabRunStrip({ lab }: { lab: LabController }) {
+function LabRunTimeline({ lab }: { lab: LabController }) {
   useLab(lab);
   const shown = lab.view.run;
   const run = shown ? lab.data.runs.find((r) => r.id === shown.id) : undefined;

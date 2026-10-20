@@ -108,6 +108,18 @@ export interface CharacterStage {
   setPaused(paused: boolean): void;
   /** Shows the playing clip at this time (seconds, looped): a host that drives the clock (the motion lab) pauses the stage and calls this every frame. */
   setClipTime(seconds: number): void;
+  /**
+   * Holds the character in one pose (the motion lab's Pose mode, board M11): turns per joint as Euler XYZ degrees from
+   * rest, as the clips store them (the rig bones, and fingers by their own names), and a hips offset in metres. Null
+   * goes back to the playing clip.
+   */
+  setHeldPose(pose: { bones: Readonly<Record<string, readonly number[]>>; root: readonly number[] } | null): void;
+  /** Where joints of the drawn character are (world metres), by joint name (`RightHand`). */
+  jointPositions(names: readonly string[]): Record<string, [number, number, number]>;
+  /** World points to pixels in the stage's container (null: behind the camera). */
+  project(points: ReadonlyArray<readonly number[]>): Array<[number, number] | null>;
+  /** A pixel in the container to the world point on the plane that faces the camera through `through`. */
+  unproject(x: number, y: number, through: readonly number[]): [number, number, number];
   /** Manual eyelid inspection: null restores automatic blinking. */
   setEyeClosure(amount: number | null): void;
   capturePreview(options?: {width:number;height:number;framing:'full'|'bust'|'face';anchor?:number}): Promise<string>;
@@ -122,6 +134,9 @@ export interface CharacterStage {
    * from +z toward +x, `elevation` degrees above the ground, `distance` metres.
    */
   setOrbit(azimuth: number, elevation: number, distance: number): void;
+  /** Turn the camera round what it looks at (degrees, + to the right) or move it closer (factor < 1) / further (> 1). */
+  turnView(degrees: number): void;
+  zoomView(factor: number): void;
   onChange(listener: (info: CharacterStageInfo) => void): () => void;
   /**
    * The muscle paint tool (generated bodies): the character is replaced by the default boy, static, to paint
@@ -132,6 +147,7 @@ export interface CharacterStage {
   dispose(): void;
 }
 
+const FINGER_JOINT = /^(Left|Right)Hand(Thumb|Index|Middle|Ring|Pinky)\d$/;
 const CORE_ANIMATED =
   /^(Hips|Spine|Spine1|Spine2|Neck|Head|(Left|Right)(UpLeg|Leg|Foot|ToeBase|Shoulder|Arm|ForeArm|Hand))$/;
 
@@ -641,6 +657,38 @@ export async function createCharacterStage({
     if (jointDots) jointDots.instanceMatrix.needsUpdate = true;
   };
 
+  // The motion lab's held pose (board M11): set after the mixer each frame; the bones it moved go back when it ends.
+  let held: { bones: Readonly<Record<string, readonly number[]>>; root: readonly number[] } | null = null;
+  const touched = new Map<Bone, { q: Quaternion; p: Vector3 }>();
+  const heldQ = new Quaternion(), heldPart = new Quaternion(), heldE = new Euler();
+  const jointBones = () => {
+    const prefix = base?.body.bonePrefix ?? '';
+    return new Map(avatar.skeleton.bones.map((bone) => [prefix && bone.name.startsWith(prefix) ? bone.name.slice(prefix.length) : bone.name, bone]));
+  };
+  const applyHeld = () => {
+    if (!held || !base) return;
+    const body = base.body, bones = jointBones();
+    const remember = (bone: Bone) => { if (!touched.has(bone)) touched.set(bone, { q: bone.quaternion.clone(), p: bone.position.clone() }); };
+    const turn = (v: readonly number[] | undefined) => heldPart.setFromEuler(heldE.set(((v?.[0] ?? 0) * Math.PI) / 180, ((v?.[1] ?? 0) * Math.PI) / 180, ((v?.[2] ?? 0) * Math.PI) / 180, 'XYZ'));
+    for (const [joint, sources] of Object.entries(body.animation)) {
+      const bone = bones.get(joint);
+      if (!bone) continue;
+      remember(bone);
+      heldQ.identity();
+      for (const source of sources) heldQ.multiply(turn(held.bones[source]));
+      bone.quaternion.copy(heldQ);
+    }
+    for (const joint of body.joints) {
+      const bone = bones.get(joint.name);
+      if (!bone || !FINGER_JOINT.test(joint.name) || !held.bones[joint.name]) continue;
+      remember(bone);
+      bone.quaternion.copy(turn(held.bones[joint.name]));
+    }
+    const root = body.joints[0], rootBone = root ? bones.get(root.name) : undefined;
+    if (root && rootBone) { remember(rootBone); rootBone.position.set(root.at[0] + (held.root[0] ?? 0), root.at[1] + (held.root[1] ?? 0), root.at[2] + (held.root[2] ?? 0)); }
+  };
+  const tmp = new Vector3();
+
   let painting: MusclePaintMode | null = null;
   renderer.setAnimationLoop(() => {
     clock.update();
@@ -648,7 +696,8 @@ export async function createCharacterStage({
     const firstPerson = mode === 'first-person';
     for (const [bone, q] of saved) bone.quaternion.copy(q);
     saved.clear();
-    if (!paused) mixer.update(delta);
+    if (!paused && !held) mixer.update(delta);
+    applyHeld();
     avatar.root.updateMatrixWorld(true);
     if (firstPerson && handsUp)
       for (const bone of upperArms()) {
@@ -770,6 +819,35 @@ export async function createCharacterStage({
     setPaused(next) {
       paused = next;
     },
+    setHeldPose(pose) {
+      held = pose;
+      if (pose) return;
+      const live = new Set(avatar.skeleton.bones);
+      for (const [bone, rest] of touched) if (live.has(bone)) { bone.quaternion.copy(rest.q); bone.position.copy(rest.p); }
+      touched.clear();
+      mixer.update(0);
+    },
+    jointPositions(names) {
+      const bones = jointBones(), out: Record<string, [number, number, number]> = {};
+      for (const name of names) { const bone = bones.get(name); if (bone) { bone.getWorldPosition(tmp); out[name] = [tmp.x, tmp.y, tmp.z]; } }
+      return out;
+    },
+    project(points) {
+      const width = container.clientWidth, heightPx = container.clientHeight;
+      return points.map((p) => {
+        tmp.set(p[0] ?? 0, p[1] ?? 0, p[2] ?? 0).project(camera);
+        return tmp.z > 1 || tmp.z < -1 ? null : [((tmp.x + 1) / 2) * width, ((1 - tmp.y) / 2) * heightPx];
+      });
+    },
+    unproject(x, y, through) {
+      const width = Math.max(1, container.clientWidth), heightPx = Math.max(1, container.clientHeight);
+      const dir = new Vector3((x / width) * 2 - 1, -(y / heightPx) * 2 + 1, 0.5).unproject(camera).sub(camera.position).normalize();
+      const normal = camera.getWorldDirection(new Vector3());
+      const point = new Vector3(through[0] ?? 0, through[1] ?? 0, through[2] ?? 0);
+      const t = point.sub(camera.position).dot(normal) / (dir.dot(normal) || 1e-6);
+      const hit = camera.position.clone().addScaledVector(dir, t);
+      return [hit.x, hit.y, hit.z];
+    },
     setClipTime(seconds) {
       if (!action || !Number.isFinite(seconds)) return;
       action.time = ((seconds % action.getClip().duration) + action.getClip().duration) % action.getClip().duration;
@@ -806,6 +884,18 @@ export async function createCharacterStage({
         controls.target.y + Math.sin(e) * d,
         controls.target.z + Math.cos(a) * Math.cos(e) * d,
       );
+      controls.update();
+    },
+    turnView(degrees) {
+      const offset = camera.position.clone().sub(controls.target);
+      offset.applyAxisAngle(new Vector3(0, 1, 0), (-degrees * Math.PI) / 180);
+      camera.position.copy(controls.target).add(offset);
+      controls.update();
+    },
+    zoomView(factor) {
+      const offset = camera.position.clone().sub(controls.target);
+      const distance = Math.max(controls.minDistance, Math.min(controls.maxDistance, offset.length() * factor));
+      camera.position.copy(controls.target).add(offset.setLength(distance));
       controls.update();
     },
     async startPaint(paint) {

@@ -25,9 +25,10 @@ import {
 } from 'three';
 import { DEFAULT_CHARACTER_RECIPE, type LabCourse, type LabObstacle } from '@genvr/contracts';
 import { CORE_ANIMATIONS } from '@genvr/core-library';
-import { carBoxes, courseBoxes, laneCentreZ, LAB_CAR_SIZE, walkerGreen, type LabFrame } from '@genvr/runtime';
+import { carBoxes, courseBoxes, labClipPose, labMadeMotionPace, labPoseAt, laneCentreZ, LAB_CAR_SIZE, walkerGreen, type LabFrame } from '@genvr/runtime';
 import type { CharacterStage } from '@genvr/runtime/character';
 import { labClipTime, type LabController } from '../../../lib/motion-lab';
+import { LabPoseOverlay } from './lab-pose';
 
 /**
  * The lab's 3D view (boards M1, M3): the Standard robot stands at the centre of the character stage and plays the move
@@ -38,6 +39,8 @@ const CLIPS = new Map(CORE_ANIMATIONS.map((a) => [a.manifest.name, a.clip]));
 const OBSTACLE = 0xc5c9d1, SELECTED = 0xf5b942;
 /** Behind the character, a little to its right and above (azimuth from +z, elevation, distance). */
 const LAB_ORBIT = [215, 24, 11] as const;
+/** In front of the character and to his right, close enough to pick joints. */
+const POSE_ORBIT = [-35, 12, 5.5] as const;
 
 export function LabStage({ lab }: { lab: LabController }) {
   useSyncExternalStore(lab.subscribe, lab.getVersion, lab.getVersion);
@@ -82,7 +85,9 @@ export function LabStage({ lab }: { lab: LabController }) {
 
   const { course } = lab.data;
   const view = lab.view;
-  const frame = lab.frameAt(view.t);
+  // Board M11: in Pose the character stands at the start holding the open made motion's pose on the pose frame.
+  const posing = view.mode === 'pose' && Boolean(lab.openMotion);
+  const frame = posing ? null : lab.frameAt(view.t);
   const ghost = view.ghost?.frames[Math.min(view.ghost.frames.length - 1, Math.round(view.t * 60))] ?? null;
   // During a run the move's clip follows the run itself (feet keep pace with the floor at any speed, slow motion,
   // pause and seeking); at the end of the run the robot stands in Idle instead of walking on the spot.
@@ -90,6 +95,11 @@ export function LabStage({ lab }: { lab: LabController }) {
   const finished = Boolean(frames?.length) && !view.playing && view.t >= lab.duration() - 1e-6;
   const driven = Boolean(frames?.length) && !finished;
   const clip = finished ? 'Idle' : frame?.clip ?? 'Idle';
+  // A run of a made motion shows its keys: the clip time from the run (paced by the motion's own feet) on its frames.
+  const madeInRun = !posing && driven && frame ? lab.madeMotion(frame.clip) : undefined;
+  const runMove = madeInRun ? { [madeInRun.name]: { ...labMadeMotionPace(madeInRun), clip: madeInRun.name } } : {};
+  const heldPose = posing ? lab.poseAt(view.pose.frame)
+    : madeInRun && frames ? labPoseAt(madeInRun, (labClipTime(frames, view.t * 60, lab.legScale, runMove) * 60) % madeInRun.frames) : null;
 
   useEffect(() => { if (ready) world.current?.setCourse(course, view.selected, view.overlays.includes('measures')); }, [ready, course, view.selected, view.overlays]);
 
@@ -106,18 +116,26 @@ export function LabStage({ lab }: { lab: LabController }) {
     return () => { live = false; };
   }, [ready, who, lab]);
   useEffect(() => { const id = CLIPS.get(clip) ?? CLIPS.get('Idle'); if (ready && id) stage.current?.play(id); }, [ready, clip, shown]);
+  // Pose (board M11) looks at the character from close, in front and to his right; the run view goes back behind him.
+  useEffect(() => {
+    if (!ready || !stage.current) return;
+    if (posing) { stage.current.frameAvatar('full'); stage.current.setOrbit(...POSE_ORBIT); } else { stage.current.resetView(); stage.current.setOrbit(...LAB_ORBIT); }
+  }, [ready, posing, shown]);
   // Again after a character swap: the new body starts in the stage's own view mode.
   useEffect(() => { if (ready) stage.current?.setViewMode(view.overlays.includes('skeleton') ? 'skeleton-mesh' : 'normal'); }, [ready, view.overlays, shown]);
   useEffect(() => {
     if (!ready || !stage.current) return;
-    stage.current.setPaused(driven);
-    if (driven && frames) stage.current.setClipTime(labClipTime(frames, view.t * 60, lab.legScale));
+    stage.current.setPaused(driven || posing);
+    if (driven && frames && !madeInRun) stage.current.setClipTime(labClipTime(frames, view.t * 60, lab.legScale));
+    if (heldPose) { const { bones, root } = labClipPose(heldPose); stage.current.setHeldPose({ bones, root: root.map((m) => m * lab.legScale) }); }
+    else stage.current.setHeldPose(null);
   });
   useEffect(() => { if (ready) world.current?.show(course, frame, ghost, view.t, view.overlays); });
 
   return (
     <div className="relative h-full min-h-0 w-full overflow-hidden" style={{ background: '#30343c' }}>
       <div ref={container} className="absolute inset-0" aria-label={`Motion lab view: ${lab.character.name} on the course`} role="img" />
+      {posing && ready && stage.current ? <LabPoseOverlay lab={lab} stage={stage.current} /> : null}
       {failed ? <p role="alert" className="absolute inset-x-0 top-1/2 text-center text-sm text-white">The lab view could not start (WebGL is needed).</p> : null}
     </div>
   );
