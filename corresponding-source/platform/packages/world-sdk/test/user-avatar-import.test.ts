@@ -70,3 +70,12 @@ it('leaves T-pose and near-T arms exactly where they are', () => {
     expect(hand[0]).toBeCloseTo(.15 + .6 * Math.cos(r), 6); expect(hand[1]).toBeCloseTo(1.45 - .6 * Math.sin(r), 6);
   }
 });
+
+it('combines a part with face morphs and a part without (hair added to a body)', () => {
+  const root = humanoid(0), body = root.children.find(child => (child as SkinnedMesh).isSkinnedMesh) as SkinnedMesh;
+  const hair = new SkinnedMesh(body.geometry.clone(), new MeshStandardMaterial()); root.add(hair); hair.bind(body.skeleton);
+  body.geometry.morphAttributes.position = [body.geometry.getAttribute('position').clone()]; body.geometry.morphTargetsRelative = true;
+  const output = canonicalCharacter(root).root.children[0] as SkinnedMesh;
+  expect(output.geometry.getAttribute('position').count).toBe(8);
+  expect(output.geometry.groups).toHaveLength(2);
+});

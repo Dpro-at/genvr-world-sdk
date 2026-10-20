@@ -147,7 +147,8 @@ export function canonicalCharacter(root: Group): { root: Group; joints: NonNulla
     geometry.setAttribute('skinIndex', new BufferAttribute(remapped, 4)); geometry.setAttribute('skinWeight', new BufferAttribute(normalized, 4));
     if (!geometry.getAttribute('uv')) geometry.setAttribute('uv', new BufferAttribute(new Float32Array(positions.count * 2), 2));
     for (const name of Object.keys(geometry.attributes)) if (!['position', 'normal', 'uv', 'skinIndex', 'skinWeight'].includes(name)) geometry.deleteAttribute(name);
-    geometry.morphAttributes = {}; geometry.computeVertexNormals();
+    // morphs are dropped; reset their flag too, or a part with morphs will not merge with one without
+    geometry.morphAttributes = {}; geometry.morphTargetsRelative = false; geometry.computeVertexNormals();
     if (!geometry.index) geometry.setIndex(Array.from({ length: positions.count }, (_, i) => i));
     const own = Array.isArray(mesh.material) ? mesh.material : [mesh.material], materialOffset = materials.length;
     for (const original of own) {
