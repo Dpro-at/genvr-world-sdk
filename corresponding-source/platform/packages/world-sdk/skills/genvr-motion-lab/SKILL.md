@@ -4,7 +4,8 @@ description: >-
   Guide for the Genvr Studio motion lab through the live Studio MCP tool `motion_lab` (or the Lab area by hand):
   building a measured test course (step, ramp, gap, low wall, window, a street with a timed light and box cars),
   running the lab robot through it with repeatable fixed-step runs, reading the scores (foot slide, penetration,
-  fall, car hit, time, smoothness), and keeping motion versions. Use whenever an agent tests, tunes or compares
+  fall, car hit, time, smoothness), keeping motion versions and sharing a version with the GenVR community (owner
+  confirms). Use whenever an agent tests, tunes, compares or prepares to share
   motion in a motion lab project.
 ---
 
@@ -64,6 +65,29 @@ character is the Standard robot (body `robot`). Everything a person can do in th
   The best version is the ghost the next runs are compared with.
 - `rollback { version }` uses a version's settings again.
 - `version_delete { version, confirm: true }`: an agent may delete only versions an agent made, never the best one.
+
+## Sharing a motion with the GenVR community (publishing)
+
+Every version is private on this device first. Sharing publishes it, so the owner decides every share.
+
+- `motions_mine` lists every version with its state: `private`, `pending` (prepared, waits for the owner), `shared`,
+  `blocked` (with the reasons), plus `publishing`: `platform` (GenVR hosting connected) or `local-preview`.
+- `motion_similar { version }` shows motions we already have that are like it: the GenVR library move it is made from
+  (also run on the same course, so foot slide and score can be compared) and the owner's shared versions of that move.
+  Alike = pace, stride, lean and step height; it is not a pose-by-pose compare yet. Tell the owner when the library
+  move is as good or better: keeping theirs or using the library one is their choice.
+- `share_prepare { version, share: { name, description?, tags?, preview_s? } }` prepares a share only when the owner
+  asked for it. Tags: lower-case words with dashes, up to 8. Nothing is published; the owner sees it in the Lab and
+  presses "Share with the community".
+- `share { version, confirm: true }` is the owner's: an agent is refused and the prepared share keeps waiting.
+- `unshare { version, confirm: true }` stops sharing (or drops a prepared share). A shared version cannot be deleted
+  before it is unshared.
+- Never shareable: a motion not made from a GenVR library move on a GenVR character (for example made from Mixamo),
+  a motion from a video the owner has no rights to, and a version that falls, is hit by a car or does not finish.
+- Licence shown on every shared motion: **GenVR community licence** — free to use in GenVR worlds and films, also
+  commercially; credit the creator; do not sell or re-share the motion file on its own.
+- Without GenVR hosting a share is a local preview: say so plainly ("marked shared on this device, nothing was
+  published").
 
 ## Good habits
 

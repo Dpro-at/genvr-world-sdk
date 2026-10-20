@@ -8,6 +8,7 @@ import {
 import { LAB_LATER_KINDS, LAB_OBSTACLE_KINDS, type LabObstacle, type LabObstacleKind, type LabOverlay, type LabRun } from '@genvr/contracts';
 import { LAB_MOVES, PERSON, type LabController, type LabSpeed } from '../../../lib/motion-lab';
 import { measure } from './lab-stage';
+import { MyMotions, ShareMotionDialog } from './lab-share';
 
 /**
  * The Lab area's panels (boards M1, M2, M3): course list and add tiles on the left; the chosen obstacle's sizes, the
@@ -102,7 +103,10 @@ const SIZE_FIELDS: Record<LabObstacleKind, Array<[key: string, name: string, ste
 export function LabRight({ lab }: { lab: LabController }) {
   useLab(lab);
   const selected = lab.data.course.obstacles.find((o) => o.id === lab.view.selected);
-  return <div className="flex h-full min-h-0 flex-col gap-3 overflow-auto p-3">{selected ? <ObstacleProperties lab={lab} o={selected} /> : <><RunPanel lab={lab} /><CoursePanel lab={lab} /></>}</div>;
+  // Board M14: the share dialog opens after Save as version, from My motions, or to review an agent's prepared share.
+  const [sharing, setSharing] = useState<string | null>(null);
+  return <div className="flex h-full min-h-0 flex-col gap-3 overflow-auto p-3">{selected ? <ObstacleProperties lab={lab} o={selected} /> : <><RunPanel lab={lab} share={setSharing} /><MyMotions lab={lab} open={setSharing} /><CoursePanel lab={lab} /></>}
+    {sharing && lab.data.versions.some((v) => v.id === sharing) ? <ShareMotionDialog key={sharing} lab={lab} version={sharing} close={() => setSharing(null)} /> : null}</div>;
 }
 
 function ObstacleProperties({ lab, o }: { lab: LabController; o: LabObstacle }) {
@@ -186,7 +190,7 @@ function dot(key: string, v: unknown): string {
   return 'bg-ink/30';
 }
 
-function RunPanel({ lab }: { lab: LabController }) {
+function RunPanel({ lab, share }: { lab: LabController; share: (version: string) => void }) {
   const [error, setError] = useState<string | null>(null);
   const s = lab.data.settings;
   const set = (patch: Record<string, unknown>) => tryRun(() => lab.setSettings(patch), setError);
@@ -221,7 +225,7 @@ function RunPanel({ lab }: { lab: LabController }) {
       <div className="flex items-center gap-2"><b className="font-mono text-2xl tabular-nums">{shown?.score.total ?? '—'}</b><span className="text-[11px] leading-tight text-ink/50">total / 100{best ? <><br />best is {best.score.total}</> : null}</span>
         {shown && !shown.score.finished ? <span className="ml-auto rounded-full bg-coral/15 px-2 py-0.5 text-[11px] font-bold text-coral">{shown.events.at(-1)?.label}</span> : null}</div>
       <div className="mt-2 flex items-center gap-2"><span className={`${label} flex-1`}>Versions · {s.motion}</span>
-        <button type="button" disabled={!shown} className="flex h-7 items-center gap-1 rounded-lg border border-ink/15 px-2 text-xs font-bold hover:bg-ink/5 disabled:opacity-40" onClick={() => tryRun(() => lab.saveVersion(shown?.id, '', PERSON), setError)}><Star className="size-3.5" />Save as version</button></div>
+        <button type="button" disabled={!shown} className="flex h-7 items-center gap-1 rounded-lg border border-ink/15 px-2 text-xs font-bold hover:bg-ink/5 disabled:opacity-40" onClick={() => tryRun(() => share(lab.saveVersion(shown?.id, '', PERSON).id), setError)}><Star className="size-3.5" />Save as version</button></div>
       {pending ? (
         <div role="status" className="flex items-center gap-2 rounded-lg bg-amber-500/15 px-2 py-1.5 text-xs">
           <span className="flex-1">{pending.by} asks to make <b>{pending.version}</b> the best.</span>

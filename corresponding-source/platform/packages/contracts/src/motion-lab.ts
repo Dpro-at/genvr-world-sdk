@@ -154,6 +154,49 @@ export const MotionVersion = z.object({
 }).strict();
 export type MotionVersion = z.infer<typeof MotionVersion>;
 
+/**
+ * Sharing a motion with the GenVR community (board M14). A version is first only on this device; sharing publishes it,
+ * so an agent can only prepare a share (`pending`) and the owner confirms each one; the owner (or an agent, with
+ * `confirm`) can stop sharing at any time. Never shareable: motions not made from a GenVR library move (for example
+ * from Mixamo, Q-MIXAMO) or from a video the owner has no rights to.
+ */
+export const MOTION_SHARE_LICENCE = {
+  id: 'genvr-community-1',
+  name: 'GenVR community licence',
+  /** Q-LAB-3, chosen by the owner on 2026-10-20. */
+  text: 'Free to use in GenVR worlds and films, also commercially. Credit the creator. Do not sell or re-share the motion file on its own.',
+} as const;
+export const MotionShareTag = z.string().regex(/^[a-z0-9][a-z0-9-]{0,23}$/, 'Tags: lower-case letters, digits and dashes, up to 24.');
+export const MotionShare = z.object({
+  version: labId,
+  /** `pending`: prepared, waits for the owner's OK. `shared`: the owner confirmed. `stopped`: the owner stopped sharing. */
+  state: z.enum(['pending', 'shared', 'stopped']),
+  name: z.string().trim().min(1).max(80),
+  description: z.string().max(400).default(''),
+  tags: z.array(MotionShareTag).max(8).default([]),
+  character: z.string().min(1).max(60),
+  score: z.number().min(0).max(100),
+  /** Seconds of the version's run shown as the preview clip. */
+  preview_s: metres(2, 10).default(4),
+  licence: z.literal(MOTION_SHARE_LICENCE.id).default(MOTION_SHARE_LICENCE.id),
+  prepared_by: z.string().min(1).max(80),
+  prepared_at: z.string().max(40),
+  shared_at: z.string().max(40).optional(),
+  stopped_at: z.string().max(40).optional(),
+  /** Where the share went: `local-preview` when no GenVR hosting is connected (nothing left the device). */
+  where: z.enum(['local-preview', 'platform']).optional(),
+  url: z.string().url().max(300).optional(),
+}).strict();
+export type MotionShare = z.infer<typeof MotionShare>;
+/** What a share shows; the rest (character, score, licence) comes from the version. */
+export const MotionShareDraft = z.object({
+  name: z.string().trim().min(1).max(80),
+  description: z.string().max(400).optional(),
+  tags: z.array(MotionShareTag).max(8).optional(),
+  preview_s: metres(2, 10).optional(),
+}).strict();
+export type MotionShareDraft = z.infer<typeof MotionShareDraft>;
+
 /** The lab part of a lab project. An agent's "make best" waits in `best_pending` until the owner confirms. */
 export const LabProjectData = z.object({
   format: z.literal(LAB_FORMAT).default(LAB_FORMAT),
@@ -162,6 +205,8 @@ export const LabProjectData = z.object({
   runs: z.array(LabRun).max(LAB_KEEP_RUNS).default([]),
   versions: z.array(MotionVersion).max(500).default([]),
   best_pending: z.object({ version: labId, by: z.string().max(80) }).strict().nullable().default(null),
+  /** Board M14: shares of versions with the GenVR community (one per version). */
+  shares: z.array(MotionShare).max(500).default([]),
 }).strict();
 export type LabProjectData = z.infer<typeof LabProjectData>;
 
@@ -199,6 +244,17 @@ export const MotionLabOperation = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('save_best'), version: labId }).strict(),
   z.object({ kind: z.literal('rollback'), version: labId }).strict(),
   z.object({ kind: z.literal('version_delete'), version: labId, confirm: z.literal(true) }).strict(),
+  // ---- sharing (board M14)
+  /** My motions: every version with its share state and the rights checks. */
+  z.object({ kind: z.literal('motions_mine') }).strict(),
+  /** Motions we already have that are like this version (GenVR library moves and my shared versions). */
+  z.object({ kind: z.literal('motion_similar'), version: labId }).strict(),
+  /** Prepare a share (name, description, tags, preview). It waits for the owner's OK; nothing is published. */
+  z.object({ kind: z.literal('share_prepare'), version: labId, share: MotionShareDraft }).strict(),
+  /** Publish a prepared share. Owner only: an agent's call is refused and the share keeps waiting for the owner. */
+  z.object({ kind: z.literal('share'), version: labId, confirm: z.literal(true) }).strict(),
+  /** Stop sharing (or drop a prepared share). */
+  z.object({ kind: z.literal('unshare'), version: labId, confirm: z.literal(true) }).strict(),
 ]);
 export type MotionLabOperation = z.infer<typeof MotionLabOperation>;
 export const MOTION_LAB_KINDS = MotionLabOperation.options.map((o) => o.shape.kind.value);

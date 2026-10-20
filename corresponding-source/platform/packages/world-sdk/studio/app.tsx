@@ -22,7 +22,7 @@ import { PresentationViewport } from './presentation/viewport';
 import { createRoot } from 'react-dom/client';
 import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
 import { Monitor, Share2, Clapperboard, Download, FolderOpen, FlaskConical, House, Save, Settings2, Mic, X, ChevronUp } from 'lucide-react';
-import { LabController, newLabData, runMotionLab } from '../../../apps/web/lib/motion-lab';
+import { LabController, newLabData, runMotionLab, type MotionSharePublisher } from '../../../apps/web/lib/motion-lab';
 import { createRuntime, DEFAULT_BRUSH, DEFAULT_RIVER, type GenvrRuntime, type ToolStatus } from '@genvr/runtime';
 import { runTool, TOOL_ARGS, EXPRESSIONS, type AssistantHost, type ChatModel } from '@genvr/assistant';
 import { CreateFlow, type CreationOptions } from '../../../apps/web/components/create-flow';
@@ -43,7 +43,7 @@ import { syncStudioAgents, type StudioAgent } from '../src/studio-agents';
 import type { StoreEntry } from '../../../apps/web/lib/store-items';
 import { StudioSaveQueue, flushStudioClose } from '../src/studio-save';
 
-export interface StudioOptions { sharing?: StudioSharing; filmExample?: string | false; liveBridge?: LiveStudioOptions; motionLibrary?: AvatarMotionLibrary; userLibrary?: false | { scope: string; storage?: UserAvatarStorage }; presentation?: AvatarPresentationOptions; storage?: StudioStorage; model?: ChatModel; forceWebGL?: boolean; initialProjectId?: string; agents?: (projectId: string) => Promise<StudioAgent[]>; catalog?: { list(): Promise<StoreEntry[]>; asset(id: string): Promise<StudioProject['assets'][number]> }; }
+export interface StudioOptions { sharing?: StudioSharing; /** Board M14: publishes shared lab motions to the GenVR community; without it a share is a local preview. */ motionSharing?: MotionSharePublisher; filmExample?: string | false; liveBridge?: LiveStudioOptions; motionLibrary?: AvatarMotionLibrary; userLibrary?: false | { scope: string; storage?: UserAvatarStorage }; presentation?: AvatarPresentationOptions; storage?: StudioStorage; model?: ChatModel; forceWebGL?: boolean; initialProjectId?: string; agents?: (projectId: string) => Promise<StudioAgent[]>; catalog?: { list(): Promise<StoreEntry[]>; asset(id: string): Promise<StudioProject['assets'][number]> }; }
 const message = (error: unknown) => error instanceof Error ? error.message : 'Operation failed.';
 const button = 'inline-flex size-10 shrink-0 items-center justify-center rounded-lg hover:bg-ink/10 disabled:opacity-40';
 function IconButton({ label, children, ...props }: { label: string; children: ReactNode } & React.ButtonHTMLAttributes<HTMLButtonElement>) {
@@ -175,7 +175,7 @@ function Editor({ initial, storage, options, leave, beforeClose }: { initial: St
     timer.current = setTimeout(() => { void save(); }, 400);
   };
   // MOTION-LAB: a lab project's course, runs and versions; every change is saved with the project.
-  const [lab] = useState(() => initial.lab ? new LabController(initial.lab, data => { project.current = { ...project.current, lab: data }; changed(); }) : undefined);
+  const [lab] = useState(() => { const made = initial.lab ? new LabController(initial.lab, data => { project.current = { ...project.current, lab: data }; changed(); }) : undefined; made?.setPublisher(options.motionSharing ?? null); return made; });
   useEffect(() => {
     mounted.current = true;
     const abort = new AbortController(); let current: GenvrRuntime | null = null;

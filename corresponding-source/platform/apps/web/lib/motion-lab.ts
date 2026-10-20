@@ -1,4 +1,5 @@
 import {
+  LAB_CHARACTER,
   LAB_KEEP_RUNS,
   LAB_LATER_KINDS,
   LAB_OBSTACLE_KINDS,
@@ -10,13 +11,16 @@ import {
   LabRunSettings,
   LabStreet,
   MOTION_LAB_KINDS,
+  MOTION_SHARE_LICENCE,
   MotionLabOperation,
+  MotionShare,
+  MotionShareDraft,
   type LabObstacleKind,
   type LabOverlay,
   type LabRun,
   type MotionVersion,
 } from '@genvr/contracts';
-import { courseFromSeed, defaultLabCourse, scoreLabRun, simulateLabRun, LAB_GROUND_MOVES, type LabFrame, type LabRunResult } from '@genvr/runtime';
+import { courseFromSeed, defaultLabCourse, labGroundMove, scoreLabRun, simulateLabRun, LAB_GROUND_MOVES, type LabFrame, type LabRunResult } from '@genvr/runtime';
 
 /**
  * The motion lab's state and actions (MOTION-LAB L1 + L2). The Lab area and the `motion_lab` agent tool both go
@@ -41,6 +45,19 @@ export interface LabView {
 
 export const LAB_MOVES = Object.keys(LAB_GROUND_MOVES);
 
+/**
+ * Publishing shared motions needs a host adapter (GenVR hosting). Without one a share is a local preview: it is marked
+ * shared on this device and nothing leaves it, and every message says so.
+ */
+export interface MotionSharePublisher {
+  publish(share: MotionShare, version: MotionVersion): Promise<{ url?: string }>;
+  unpublish(share: MotionShare): Promise<void>;
+}
+/** The rights checks a version must pass before it can be shared (board M14). */
+export interface MotionShareRights { made_here: boolean; not_mixamo: boolean; video_rights: boolean; passes_course: boolean; reasons: string[] }
+export type MotionShareStatus = 'private' | 'pending' | 'shared' | 'blocked';
+export interface SimilarMotion { name: string; source: 'library' | 'mine'; alike: number; note: string }
+
 export function newLabData(): LabProjectData {
   return LabProjectData.parse({ course: defaultLabCourse() });
 }
@@ -51,6 +68,7 @@ export class LabController {
   #listeners = new Set<() => void>();
   #version = 0;
   #onChange: (data: LabProjectData) => void;
+  #publisher: MotionSharePublisher | null = null;
 
   constructor(data: LabProjectData, onChange: (data: LabProjectData) => void = () => {}) {
     this.#data = LabProjectData.parse(data);
@@ -189,7 +207,8 @@ export class LabController {
   deleteVersion(id: string, by: LabActor = PERSON) {
     const version = this.#versionById(id);
     if (by.kind === 'agent' && (version.best || version.by !== 'agent')) throw new Error(version.best ? 'Only the owner can delete the best version.' : 'Only the owner can delete a version a person made.');
-    this.#set({ versions: this.#data.versions.filter((v) => v.id !== id), best_pending: this.#data.best_pending?.version === id ? null : this.#data.best_pending });
+    if (this.shareOf(id)?.state === 'shared') throw new Error(`${id} is shared with the community: stop sharing it first.`);
+    this.#set({ versions: this.#data.versions.filter((v) => v.id !== id), shares: this.#data.shares.filter((s) => s.version !== id), best_pending: this.#data.best_pending?.version === id ? null : this.#data.best_pending });
     this.#view = { ...this.#view, ghost: this.#ghost() };
     this.#emit(false);
   }
@@ -201,6 +220,108 @@ export class LabController {
     // The best version's settings on the course as it is now, so the ghost runs beside the new run on the same course
     // (it keeps working when the best run has left the last 20: a run is replayed from settings + course + seed).
     return simulateLabRun(this.#data.course, best.settings, this.#data.course.seed);
+  }
+
+  // ---- sharing with the GenVR community (board M14)
+  setPublisher(publisher: MotionSharePublisher | null) { this.#publisher = publisher; }
+  get publishing(): 'platform' | 'local-preview' { return this.#publisher ? 'platform' : 'local-preview'; }
+  versionById(id: string) { return this.#versionById(id); }
+  shareOf(id: string): MotionShare | undefined { return this.#data.shares.find((s) => s.version === id); }
+  /** Made in this lab, from a GenVR library move on a GenVR character (never Mixamo), no source video, passes the course. */
+  rights(id: string): MotionShareRights {
+    const v = this.#versionById(id), reasons: string[] = [];
+    const run = this.#data.runs.find((r) => r.id === v.run);
+    const madeHere = Boolean(run) || v.run.startsWith('run-');
+    const native = Object.hasOwn(LAB_GROUND_MOVES, v.settings.motion) && !v.settings.character.startsWith('user.');
+    const passes = v.score.finished && !v.score.fell && !v.score.car_hit;
+    if (!madeHere) reasons.push('It was not made in this lab.');
+    if (!native) reasons.push(`"${v.settings.motion}" on "${v.settings.character}" is not a GenVR library move on a GenVR character (moves made from Mixamo are never shared).`);
+    if (!passes) reasons.push(v.score.fell ? 'It falls on the course.' : v.score.car_hit ? 'A car hits it on the course.' : 'It does not finish the course.');
+    // The lab has no video-to-motion yet (board M8), so no version has a source video.
+    return { made_here: madeHere, not_mixamo: native, video_rights: true, passes_course: passes, reasons };
+  }
+  shareStatus(id: string): MotionShareStatus {
+    const share = this.shareOf(id);
+    if (share?.state === 'shared') return 'shared';
+    if (!this.rights(id).reasons.length) return share?.state === 'pending' ? 'pending' : 'private';
+    return 'blocked';
+  }
+  /** My motions: every version, newest first, with its share state. */
+  mine() {
+    return [...this.#data.versions].reverse().map((v) => {
+      const share = this.shareOf(v.id), rights = this.rights(v.id);
+      return { version: v.id, motion: v.motion, n: v.n, score: v.score.total, best: v.best, by: v.by, status: this.shareStatus(v.id), share: share ?? null, blocked: rights.reasons };
+    });
+  }
+  /**
+   * Motions we already have that are like this one: the GenVR library move it is made from (alike by pace, stride, lean
+   * and step height — not pose by pose yet), and my other shared versions of the same move. The library move is also run
+   * on this course so the two can be compared.
+   */
+  similar(id: string): SimilarMotion[] {
+    const v = this.#versionById(id), natural = labGroundMove(v.settings.motion);
+    const alike = (a: LabRunSettings, b: Pick<LabRunSettings, 'speed' | 'stride' | 'lean_deg' | 'step_height'>) => {
+      const off = Math.abs(a.speed - b.speed) / b.speed * 0.45 + Math.abs(a.stride - b.stride) / b.stride * 0.35
+        + Math.abs(a.lean_deg - b.lean_deg) / 40 * 0.1 + Math.abs(a.step_height - b.step_height) / 0.6 * 0.1;
+      return Math.max(0, Math.min(100, Math.round(100 - off * 100)));
+    };
+    const defaults = LabRunSettings.parse({});
+    const library = LabRunSettings.parse({ ...defaults, motion: v.settings.motion, speed: Math.min(8, Math.max(0.5, natural.speed)), stride: natural.stride });
+    const course = this.#data.course;
+    const libScore = scoreLabRun(course, simulateLabRun(course, library, course.seed));
+    const out: SimilarMotion[] = Object.hasOwn(LAB_GROUND_MOVES, v.settings.motion) ? [{
+      name: v.settings.motion, source: 'library', alike: alike(v.settings, library),
+      note: `On this course: yours ${v.score.foot_slide_cm} cm foot slide, score ${v.score.total}; library ${libScore.foot_slide_cm} cm, score ${libScore.total}.`,
+    }] : [];
+    for (const other of this.#data.versions) {
+      if (other.id === v.id || other.motion !== v.motion || this.shareOf(other.id)?.state !== 'shared') continue;
+      out.push({ name: this.shareOf(other.id)!.name, source: 'mine', alike: alike(v.settings, other.settings), note: `Your shared ${other.id}, score ${other.score.total}.` });
+    }
+    return out.sort((a, b) => b.alike - a.alike);
+  }
+  /** Use the library move instead of this version (the person's "Use library one"): its natural pace and stride. */
+  useLibraryMove(id: string) {
+    const v = this.#versionById(id), natural = labGroundMove(v.settings.motion);
+    return this.setSettings({ motion: v.settings.motion, speed: Math.min(8, Math.max(0.5, natural.speed)), stride: natural.stride });
+  }
+  /** Prepare a share. Nothing is published: it waits for the owner (`share`). Blocked versions cannot be prepared. */
+  prepareShare(id: string, draft: MotionShareDraft, by: LabActor = PERSON): MotionShare {
+    const v = this.#versionById(id), input = MotionShareDraft.parse(draft), rights = this.rights(id);
+    if (rights.reasons.length) throw new Error(`This motion cannot be shared: ${rights.reasons.join(' ')}`);
+    const old = this.shareOf(id);
+    if (old?.state === 'shared') throw new Error(`${id} is already shared. Stop sharing first to change it.`);
+    const share = MotionShare.parse({
+      version: v.id, state: 'pending', name: input.name, description: input.description ?? old?.description ?? '', tags: input.tags ?? old?.tags ?? [],
+      character: v.settings.character === LAB_CHARACTER ? 'Standard robot' : v.settings.character, score: v.score.total, preview_s: input.preview_s ?? old?.preview_s ?? 4,
+      licence: MOTION_SHARE_LICENCE.id, prepared_by: by.kind === 'agent' ? by.name : 'you', prepared_at: new Date().toISOString(),
+    });
+    this.#set({ shares: [...this.#data.shares.filter((s) => s.version !== id), share] });
+    return share;
+  }
+  /** Publish a prepared share. Owner only. Without a host adapter it is a local preview (nothing leaves the device). */
+  async share(id: string, by: LabActor = PERSON): Promise<MotionShare> {
+    const pending = this.shareOf(id);
+    if (by.kind === 'agent') throw new Error(pending?.state === 'pending' ? `Only the owner shares a motion. "${pending.name}" is prepared and waits for their OK in the Lab (My motions).` : 'Only the owner shares a motion. Prepare it with share_prepare; the owner confirms it in the Lab.');
+    if (!pending || pending.state !== 'pending') throw new Error(pending?.state === 'shared' ? `${id} is already shared.` : `Prepare ${id} first (name, description, tags).`);
+    const rights = this.rights(id);
+    if (rights.reasons.length) throw new Error(`This motion cannot be shared: ${rights.reasons.join(' ')}`);
+    const version = this.#versionById(id);
+    const published = this.#publisher ? await this.#publisher.publish(pending, version) : {};
+    const share = MotionShare.parse({ ...pending, state: 'shared', shared_at: new Date().toISOString(), where: this.#publisher ? 'platform' : 'local-preview', ...(published.url ? { url: published.url } : {}) });
+    this.#set({ shares: this.#data.shares.map((s) => (s.version === id ? share : s)) });
+    return share;
+  }
+  /** Stop sharing (a shared motion is taken down), or drop a prepared share. */
+  async unshare(id: string): Promise<MotionShare> {
+    const share = this.shareOf(id);
+    if (!share || share.state === 'stopped') throw new Error(`${id} is not shared.`);
+    if (share.state === 'shared' && share.where === 'platform') {
+      if (!this.#publisher) throw new Error('Connect GenVR hosting to take this motion down there.');
+      await this.#publisher.unpublish(share);
+    }
+    const next = MotionShare.parse({ ...share, state: 'stopped', stopped_at: new Date().toISOString() });
+    this.#set({ shares: this.#data.shares.map((s) => (s.version === id ? next : s)) });
+    return next;
   }
 
   // ---- view
@@ -261,6 +382,11 @@ const HELP: Record<string, string> = {
   save_best: 'Ask to make a version the best: the owner confirms it in the Lab.',
   rollback: 'Use a version\'s settings again: { version }.',
   version_delete: 'Delete a version an agent made: { version, confirm: true }. The best version and versions a person made are the owner\'s.',
+  motions_mine: 'My motions: every version with its share state (private, pending, shared, blocked), the share and why it is blocked.',
+  motion_similar: 'Motions we already have like this one: { version }. The GenVR library move (also run on this course to compare) and my shared versions.',
+  share_prepare: 'Prepare a share with the GenVR community: { version, share: { name, description?, tags?, preview_s? } }. Nothing is published; it waits for the owner.',
+  share: 'Publish a prepared share: { version, confirm: true }. Owner only: an agent is refused and the share keeps waiting for the owner in the Lab.',
+  unshare: 'Stop sharing a motion, or drop a prepared share: { version, confirm: true }.',
 };
 
 export async function runMotionLab(lab: LabController | null, input: unknown, by: LabActor): Promise<unknown> {
@@ -299,6 +425,17 @@ export async function runMotionLab(lab: LabController | null, input: unknown, by
     }
     case 'rollback': return lab.rollback(op.version);
     case 'version_delete': lab.deleteVersion(op.version, by); return { deleted: op.version };
+    case 'motions_mine': return { publishing: lab.publishing, licence: MOTION_SHARE_LICENCE, motions: lab.mine() };
+    case 'motion_similar': return { version: op.version, similar: lab.similar(op.version) };
+    case 'share_prepare': {
+      const share = lab.prepareShare(op.version, op.share, by);
+      return { share, rights: lab.rights(op.version), licence: MOTION_SHARE_LICENCE, note: 'Prepared, not published. The owner confirms each share in the Lab (My motions).' };
+    }
+    case 'share': {
+      const share = await lab.share(op.version, by);
+      return { share, note: share.where === 'local-preview' ? 'Local preview: marked shared on this device only. Nothing was published (no GenVR hosting connected).' : 'Shared with the GenVR community.' };
+    }
+    case 'unshare': return { share: await lab.unshare(op.version) };
   }
 }
 

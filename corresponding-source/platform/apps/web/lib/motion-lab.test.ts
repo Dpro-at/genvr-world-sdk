@@ -108,3 +108,68 @@ describe('motion lab in the in-app Assistant', () => {
     expect((await runTool('motion_lab', { operation: { kind: 'inspect' } }, host)).result).toMatch(/motion lab project/);
   });
 });
+
+describe('sharing a motion (board M14)', () => {
+  const ready = async () => {
+    const lab = new LabController(newLabData());
+    lab.run({}, PERSON);
+    const v = lab.saveVersion(undefined, '', PERSON);
+    return { lab, v };
+  };
+  it('keeps a new version private, lets an agent prepare a share and only the owner publish it', async () => {
+    const { lab, v } = await ready();
+    expect(lab.data.runs.at(-1)!.score.finished).toBe(true);
+    expect(lab.shareStatus(v.id)).toBe('private');
+    const prepared = (await runMotionLab(lab, { kind: 'share_prepare', version: v.id, share: { name: 'Calm walk', tags: ['walk', 'street'] } }, agent)) as { share: { state: string; prepared_by: string; licence: string } };
+    expect(prepared.share).toMatchObject({ state: 'pending', prepared_by: 'Luna', licence: 'genvr-community-1' });
+    expect(lab.shareStatus(v.id)).toBe('pending');
+    await expect(runMotionLab(lab, { kind: 'share', version: v.id, confirm: true }, agent)).rejects.toThrow(/Only the owner shares/);
+    expect(lab.shareStatus(v.id)).toBe('pending');
+    // `confirm: true` is required by the schema.
+    await expect(runMotionLab(lab, { kind: 'share', version: v.id }, PERSON)).rejects.toThrow();
+    const shared = (await runMotionLab(lab, { kind: 'share', version: v.id, confirm: true }, PERSON)) as { share: { state: string; where: string }; note: string };
+    expect(shared.share).toMatchObject({ state: 'shared', where: 'local-preview' });
+    expect(shared.note).toMatch(/Local preview/);
+    expect(() => lab.deleteVersion(v.id, PERSON)).toThrow(/stop sharing/);
+    expect(await runMotionLab(lab, { kind: 'unshare', version: v.id, confirm: true }, agent)).toMatchObject({ share: { state: 'stopped' } });
+    expect(lab.shareStatus(v.id)).toBe('private');
+  });
+  it('publishes through the host adapter when one is connected', async () => {
+    const { lab, v } = await ready();
+    const calls: string[] = [];
+    lab.setPublisher({ publish: async (share) => { calls.push(`publish ${share.name}`); return { url: 'https://genvr.example/motions/1' }; }, unpublish: async (share) => { calls.push(`unpublish ${share.version}`); } });
+    lab.prepareShare(v.id, { name: 'Walk' }, PERSON);
+    expect(await lab.share(v.id, PERSON)).toMatchObject({ state: 'shared', where: 'platform', url: 'https://genvr.example/motions/1' });
+    await lab.unshare(v.id);
+    expect(calls).toEqual(['publish Walk', `unpublish ${v.id}`]);
+  });
+  it('never shares a motion that is not a GenVR library move or does not pass the course', async () => {
+    const { lab } = await ready();
+    lab.setObstacle('gap-1', { width: 3 });
+    lab.run({}, PERSON);
+    const fell = lab.saveVersion(undefined, '', PERSON);
+    expect(lab.data.runs.at(-1)!.score.finished).toBe(false);
+    expect(lab.shareStatus(fell.id)).toBe('blocked');
+    expect(() => lab.prepareShare(fell.id, { name: 'x' }, PERSON)).toThrow(/cannot be shared/);
+    const data = { ...lab.data, versions: lab.data.versions.map((x) => ({ ...x, settings: { ...x.settings, motion: 'Mixamo Walk' }, score: { ...x.score, finished: true, fell: false } })) };
+    const other = new LabController(data);
+    expect(other.rights(fell.id)).toMatchObject({ not_mixamo: false });
+    expect(other.shareStatus(fell.id)).toBe('blocked');
+  });
+  it('shows the library move it is like, run on the same course, and my shared versions', async () => {
+    const { lab, v } = await ready();
+    const similar = await runMotionLab(lab, { kind: 'motion_similar', version: v.id }, agent) as { similar: Array<{ name: string; source: string; alike: number; note: string }> };
+    expect(similar.similar[0]).toMatchObject({ name: 'Walk', source: 'library' });
+    expect(similar.similar[0]!.alike).toBeGreaterThan(50);
+    expect(similar.similar[0]!.note).toMatch(/library .* cm/);
+    lab.prepareShare(v.id, { name: 'Calm walk' }, PERSON);
+    await lab.share(v.id, PERSON);
+    lab.run({ speed: 1.7 }, PERSON);
+    const v2 = lab.saveVersion(undefined, '', PERSON);
+    expect(lab.similar(v2.id).map((s) => s.source)).toEqual(expect.arrayContaining(['library', 'mine']));
+    const mine = await runMotionLab(lab, { kind: 'motions_mine' }, agent) as { publishing: string; licence: { name: string }; motions: Array<{ version: string; status: string }> };
+    expect(mine.publishing).toBe('local-preview');
+    expect(mine.licence.name).toBe('GenVR community licence');
+    expect(mine.motions.map((m) => [m.version, m.status])).toEqual([[v2.id, 'private'], [v.id, 'shared']]);
+  });
+});
