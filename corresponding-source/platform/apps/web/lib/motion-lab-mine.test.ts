@@ -46,3 +46,38 @@ describe('board M20 P1 · My motions (private) in the Lab', () => {
     await expect(runMotionLab(lab, { kind: 'check_move', move: 'mine:000000000000' }, agent)).rejects.toThrow('No private motion');
   });
 });
+
+describe('board M20 P2 · Compare our move with a private reference', () => {
+  it('compare checks both, shows them together, keeps the pair by keys only; the same for a person and an agent', async () => {
+    const saved: LabProjectData[] = [];
+    const lab = new LabController(newLabData(), (d) => saved.push(d));
+    lab.setCharacterSource(source()); await lab.refreshCharacters();
+    const key = mineKey(ID);
+    const result = await runMotionLab(lab, { kind: 'compare', ours: 'Walk', ref: key, place: 'over' }, agent) as { style: string; ours: { move: string; score: number }; ref: { move: string; score: number }; rows: Array<{ check: string }>; private_reference: boolean };
+    expect(result).toMatchObject({ style: 'realistic', ours: { move: 'Walk' }, ref: { move: key }, private_reference: true });
+    expect(result.rows.map((r) => r.check)).toEqual(['foot_slide', 'ground', 'joint_limits', 'body_clash', 'balance', 'loop_seam', 'speed_match']);
+    // The person sees it: Check mode, our move in the card, the reference over it.
+    expect(lab.view).toMatchObject({ mode: 'check', check: { move: 'Walk', compare: { ours: 'Walk', ref: key, place: 'over' } } });
+    expect(lab.comparison?.ref.score).toBe(result.ref.score);
+    lab.setComparePlace('beside');
+    expect(lab.view.check.compare?.place).toBe('beside');
+    // Kept by keys only.
+    expect(LabProjectData.parse(saved.at(-1)).references).toEqual([expect.objectContaining({ ours: 'Walk', ref: key })]);
+    const text = JSON.stringify(saved.at(-1));
+    expect(text).not.toContain('Swing Walk'); expect(text).not.toContain(ID);
+    // Comparing the same pair again does not add a second row; opening another move ends the comparison.
+    await lab.compare('Walk', key);
+    expect(lab.data.references).toHaveLength(1);
+    lab.setCheckView({ move: 'Run' });
+    expect(lab.view.check.compare).toBeNull();
+  }, 120000);
+  it('ours must be one of our moves and the reference a known private motion', async () => {
+    const lab = new LabController(newLabData());
+    lab.setCharacterSource(source()); await lab.refreshCharacters();
+    const key = mineKey(ID);
+    await expect(runMotionLab(lab, { kind: 'compare', ours: key, ref: key }, agent)).rejects.toThrow('move of ours');
+    await expect(runMotionLab(lab, { kind: 'compare', ours: 'Walk', ref: 'mine:000000000000' }, agent)).rejects.toThrow('No private motion');
+    await expect(runMotionLab(lab, { kind: 'compare', ours: 'Moonwalk', ref: key }, agent)).rejects.toThrow('No move');
+    await expect(runMotionLab(lab, { kind: 'compare', ours: 'Walk', ref: 'Swing Walk' } as never, agent)).rejects.toThrow();
+  }, 60000);
+});

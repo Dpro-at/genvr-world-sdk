@@ -124,13 +124,16 @@ export function LabStage({ lab }: { lab: LabController }) {
   const [imported, setImported] = useState<ReadonlySet<string>>(new Set());
   // A new body rebuilds the stage's clips: import again.
   useEffect(() => setImported(new Set()), [shown]);
-  const wanted = checking ? view.check.move : frame?.clip;
+  const compare = checking ? view.check.compare ?? null : null;
+  const wanted = [checking ? view.check.move : frame?.clip, compare?.ref].find((key) => key?.startsWith('mine:') && !imported.has(key));
   useEffect(() => {
-    if (!ready || !wanted?.startsWith('mine:') || imported.has(wanted) || !stage.current) return;
+    if (!ready || !wanted || !stage.current) return;
     let live = true;
     void lab.mineData(wanted).then((data) => stage.current?.importAvatarMotion(wanted, data)).then(() => { if (live) setImported((s) => new Set([...s, wanted])); }).catch(() => undefined);
     return () => { live = false; };
-  }, [ready, wanted, imported, lab, shown]);
+  }, [ready, wanted, lab, shown]);
+  // Board M20 · Compare: the reference plays on a see-through body beside ours or over it, on the same clock.
+  useEffect(() => { if (ready) stage.current?.setCompanion(compare && imported.has(compare.ref) ? { clip: compare.ref, place: compare.place } : null); }, [ready, compare?.ref, compare?.place, imported, shown]);
   useEffect(() => { const id = checking ? (view.check.move ?? 'Idle') : clip.startsWith('mine:') ? clip : CLIPS.get(clip) ?? CLIPS.get('Idle'); if (ready && id && (!id.startsWith('mine:') || imported.has(id))) stage.current?.play(id); }, [ready, clip, shown, checking, view.check.move, imported]);
   // Pose (board M11) looks at the character from close, in front and to his right; the run view goes back behind him.
   useEffect(() => {

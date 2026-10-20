@@ -74,8 +74,18 @@ export interface LabView {
   /** Board M18 phase 5: the last Run all stations report (not saved; runs are not kept). */
   report: StationReportRow[] | null;
   /** Board M16 · Check: the style shown, the move open in the card and the frame it stands on (null = playing). */
-  check: { style: MotionStyleId; move: string | null; frame: number | null };
+  check: { style: MotionStyleId; move: string | null; frame: number | null; compare?: LabCompareView | null };
   pose: LabPoseView;
+}
+/** Board M20 · Compare: our move (open in the card, on the character) and a private reference on a see-through body. */
+export interface LabCompareView { ours: string; ref: string; place: 'beside' | 'over' }
+/** Both check cells and, per check, the worst value on each side (null: within the style's limit). */
+export interface LabCompare { style: MotionStyleId; ours: MotionCheckCell; ref: MotionCheckCell; rows: Array<{ check: string; ours: number | null; ref: number | null; unit: string; limit: number | null }> }
+const COMPARE_CHECKS: Array<[string, string]> = [['foot_slide', 'cm'], ['ground', 'cm'], ['joint_limits', '°'], ['body_clash', 'cm'], ['balance', 's'], ['loop_seam', '°'], ['speed_match', '%']];
+const worstOf = (cell: MotionCheckCell, check: string) => cell.issues.filter((i) => i.check === check).reduce<{ value: number; limit: number } | null>((w, i) => (!w || i.value > w.value ? { value: i.value, limit: i.limit } : w), null);
+export function compareRows(style: MotionStyleId, ours: MotionCheckCell, ref: MotionCheckCell): LabCompare {
+  return { style, ours, ref, rows: COMPARE_CHECKS.map(([check, unit]) => { const a = worstOf(ours, check), b = worstOf(ref, check);
+    return { check, ours: a?.value ?? null, ref: b?.value ?? null, unit, limit: a?.limit ?? b?.limit ?? null }; }) };
 }
 /** What the Pose mode shows: the open made motion, the frame, the chosen joints and the mouse tool. */
 export interface LabPoseView {
@@ -175,6 +185,8 @@ export class LabController {
   #characters: LabCharacter[] = [ROBOT];
   #mine: LabMine[] = [];
   #mineChecks = new Map<string, LabMineCheck>();
+  /** Board M20: our side of each comparison (style:move), also when no full check report is kept. */
+  #compared = new Map<string, MotionCheckCell>();
   #avatar: string | null = null;
 
   constructor(data: LabProjectData, onChange: (data: LabProjectData) => void = () => {}) {
@@ -536,7 +548,35 @@ export class LabController {
     return this.setStyle(pending.style, { params: pending.params, limits: pending.limits }, PERSON);
   }
   rejectPendingStyle() { this.#set({ style_pending: null }); }
-  setCheckView(change: Partial<LabView['check']>) { this.#setView({ check: { ...this.#view.check, ...change } }); }
+  setCheckView(change: Partial<LabView['check']>) {
+    const next = { ...this.#view.check, ...change };
+    // Another move in the card ends the comparison.
+    if (next.compare && next.move !== next.compare.ours) next.compare = null;
+    this.#setView({ check: next });
+  }
+  /**
+   * Board M20 · Compare our move with a private reference: both are checked now in the style, the card opens on our
+   * move and the reference plays on a see-through body beside or over it. The pair is kept by keys only.
+   */
+  async compare(ours: string, ref: string, style: MotionStyleId = this.#view.check.style, place: LabCompareView['place'] = 'beside'): Promise<LabCompare> {
+    if (ours.startsWith('mine:')) throw new Error('Compare one of our moves with a private motion: "ours" is a move of ours (check_report lists them).');
+    if (!this.mineByKey(ref)) throw new Error(`No private motion "${ref}". Ask mine_list for the motions.`);
+    const oursCell = this.checkMove(ours, style);
+    this.#compared.set(`${style}:${oursCell.move}`, oursCell);
+    const refCell = (await this.tryMine(ref, style)).cells[style]!;
+    const references = [...this.#data.references.filter((r) => !(r.ours === oursCell.move && r.ref === ref)), { ours: oursCell.move, ref, at: new Date().toISOString() }].slice(-100);
+    this.#set({ references });
+    this.#setView({ mode: 'check', check: { ...this.#view.check, style, move: oursCell.move, frame: null, compare: { ours: oursCell.move, ref, place } } });
+    return compareRows(style, oursCell, refCell);
+  }
+  /** The comparison shown now (both cells as they were last checked), or null. */
+  get comparison(): LabCompare | null {
+    const { compare, style } = this.#view.check;
+    if (!compare) return null;
+    const ours = this.#compared.get(`${style}:${compare.ours}`) ?? this.checkReport(style, 999).find((c) => c.move === compare.ours), ref = this.mineCheck(compare.ref)?.cells[style];
+    return ours && ref ? compareRows(style, ours, ref) : null;
+  }
+  setComparePlace(place: LabCompareView['place']) { const c = this.#view.check.compare; if (c) this.setCheckView({ compare: { ...c, place } }); }
   confirmPendingBest() { const pending = this.#data.best_pending; if (pending) this.saveBest(pending.version, PERSON); }
   rejectPendingBest() { this.#set({ best_pending: null }); }
   /** Use a version's settings again; a made motion's version also brings its keys back (board M11). */
@@ -948,6 +988,7 @@ const HELP: Record<string, string> = {
   prop_remove: 'Remove an object: { id, confirm: true }.',
   conveyor_set: 'Belt speed (0.1–1 m/s), one object every 1–5 s, mixed objects: { id, speed_mps?, every_s?, mix? }.',
   mine_list: 'Board M20: My motions, private on this device (for example Mixamo): { query?, pack?, limit? } → key (mine:…), name, pack, seconds. They stay on the device; never shared, published or adopted. Use the key in check_move, settings_set { motion } and run.',
+  compare: 'Board M20: compare one of our moves with a private reference: { ours (our move), ref (mine:… from mine_list), style?, place? beside|over } → both check cells and, per check, the worst value of each (null = within the limit). The person sees ours on the character and the reference on a see-through body. The pair is kept by keys only; the reference is never shared, published or adopted.',
   check_all: 'Board M16 motion check: every move on the Lab body (the Standard robot) in { styles? } (default realistic, game, anime): foot slide, ground, joint limits, body clash, balance, loop seam, speed match against each style\'s limits; 0–100 per move. The report is kept in the project; returns the worst 10 per style.',
   check_report: 'The kept check report, worst first: { style?, limit? }. Each cell: move, body, style, score, issues (check, frames from–to, value, limit, unit).',
   check_move: 'One move\'s card, checked again now: { move, style? } (after fixing a move).',
@@ -1006,6 +1047,7 @@ export async function runMotionLab(lab: LabController | null, input: unknown, by
     case 'stations_run_all': return { report: lab.runAllStations(op.repeats, op.settings ?? {}) };
     case 'check_all': { const styles = op.styles ?? [...MOTION_STYLES]; lab.checkAll(styles); return { body: lab.checkBody, moves: new Set(lab.checkReport(undefined, 9999).map((c) => c.move)).size, worst: Object.fromEntries(styles.map((st) => [st, lab.checkReport(st, 10).map((c) => ({ move: c.move, score: c.score, worst: c.issues[0] ?? null }))])) }; }
     case 'check_report': { if (!lab.data.check) throw new Error('No check yet. Use check_all first.'); return { at: lab.data.check.at, body: lab.data.check.body, cells: lab.checkReport(op.style, op.limit) }; }
+    case 'compare': { const result = await lab.compare(op.ours, op.ref, op.style, op.place); return { ...result, private_reference: true, shown: op.place }; }
     case 'check_move': { if (op.move.startsWith('mine:')) { const tried = await lab.tryMine(op.move, op.style); return { ...tried.cells[op.style], pace: tried.pace, private: true }; } return lab.checkMove(op.move, op.style); }
     case 'mine_list': { const list = lab.privateMotions(op.query, op.pack); return { total: list.length, private: true, motions: list.slice(0, op.limit).map((m) => ({ key: mineKey(m.id), name: m.name, pack: m.pack, seconds: m.seconds })) }; }
     case 'style_params': return { styles: lab.styleParams(op.style), pending: lab.data.style_pending };

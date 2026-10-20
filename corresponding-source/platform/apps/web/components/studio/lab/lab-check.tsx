@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useSyncExternalStore } from 'react';
-import { Check, Play, RotateCcw, X } from 'lucide-react';
+import { Check, Ghost, Play, RotateCcw, SplitSquareHorizontal, X } from 'lucide-react';
 import { MOTION_STYLES, type MotionCheckCell, type MotionCheckLimits, type MotionStyleId } from '@genvr/contracts';
 import { PERSON, mineKey, type LabController } from '../../../lib/motion-lab';
 import { LabModeSwitch } from './lab-pose';
@@ -78,7 +78,8 @@ export function LabCheckRight({ lab }: { lab: LabController }) {
   const [error, setError] = useState<string | null>(null);
   const { style, move, frame } = lab.view.check;
   const privateMotion = move?.startsWith('mine:') ? lab.mineByKey(move) : undefined;
-  const cell = move?.startsWith('mine:') ? lab.mineCheck(move)?.cells[style] : move ? lab.checkReport(style, 999).find((c) => c.move === move) : undefined;
+  const compared = lab.comparison;
+  const cell = move?.startsWith('mine:') ? lab.mineCheck(move)?.cells[style] : move ? (compared?.ours.move === move ? compared.ours : lab.checkReport(style, 999).find((c) => c.move === move)) : undefined;
   const limits = lab.data.styles[style].limits, pending = lab.data.style_pending;
   return (
     <div className="flex h-full min-h-0 flex-col gap-3 overflow-auto p-3">
@@ -112,7 +113,7 @@ export function LabCheckRight({ lab }: { lab: LabController }) {
             <button type="button" className="flex h-8 items-center justify-center gap-1.5 rounded-lg border border-ink/15 text-xs font-bold hover:bg-ink/5" onClick={() => (move?.startsWith('mine:') ? void lab.tryMine(move, style).catch((e: unknown) => setError(String(e))) : tryRun(() => lab.checkMove(cell.move, style), setError))}>
               <RotateCcw className="size-3.5" />Check again</button>
           </div>
-          <p className="text-[11px] text-ink/50">Compare (board M4) comes later.</p>
+          <LabCompareCard lab={lab} move={move!} style={style} onError={setError} />
         </section>
       ) : move?.startsWith('mine:') ? <button type="button" className="h-8 rounded-lg border border-ink/15 text-xs font-bold hover:bg-ink/5" onClick={() => void lab.tryMine(move, style).catch((e: unknown) => setError(String(e)))}>Check it in {STYLE_NAMES[style]}</button>
         : <p className="text-xs text-ink/50">{lab.data.check ? 'Pick a move to open its card.' : 'Check all moves first.'}</p>}
@@ -134,4 +135,51 @@ export function LabCheckRight({ lab }: { lab: LabController }) {
       {error ? <p role="alert" className="rounded-lg bg-coral/15 px-2 py-1.5 text-xs font-semibold text-coral">{error}</p> : null}
     </div>
   );
+}
+
+/**
+ * Board M20 · Compare: our move on the character and a private reference (My motions) on a see-through body beside it
+ * or over it, on the same clock, with both check scores. Same as `motion_lab compare`.
+ */
+function LabCompareCard({ lab, move, style, onError }: { lab: LabController; move: string; style: MotionStyleId; onError: (e: string | null) => void }) {
+  const [busy, setBusy] = useState(false);
+  const shown = lab.comparison, compare = lab.view.check.compare;
+  const go = (ours: string, ref: string) => { setBusy(true); onError(null); void lab.compare(ours, ref, style, compare?.place ?? 'beside').catch((e: unknown) => onError(e instanceof Error ? e.message : String(e))).finally(() => setBusy(false)); };
+  const isPrivate = move.startsWith('mine:');
+  const privates = lab.privateMotions(), ours = lab.checkReport(style, 999).map((c) => c.move).sort();
+  if (!shown || !compare) {
+    if (isPrivate ? !ours.length : !privates.length) return <p className="text-[11px] text-ink/50">{isPrivate ? 'Check all moves first to compare with one of ours.' : 'Import motions in Avatar › My motions to compare with a reference.'}</p>;
+    return (
+      <label className="flex h-8 items-center gap-2 rounded-lg border border-ink/15 px-2 text-xs">
+        <SplitSquareHorizontal className="size-3.5 shrink-0" /><span className="shrink-0 font-bold">{busy ? 'Comparing…' : 'Compare with'}</span>
+        <select aria-label={isPrivate ? 'Compare with one of our moves' : 'Compare with a private motion'} disabled={busy} value="" className="min-w-0 flex-1 bg-transparent outline-none"
+          onChange={(e) => { if (e.target.value) go(isPrivate ? e.target.value : move, isPrivate ? move : e.target.value); }}>
+          <option value="">{isPrivate ? 'one of our moves…' : 'a private motion…'}</option>
+          {isPrivate ? ours.map((m) => <option key={m} value={m}>{m}</option>)
+            : privates.map((m) => <option key={m.id} value={mineKey(m.id)}>{m.name} · {m.pack}</option>)}
+        </select>
+      </label>);
+  }
+  const ref = lab.mineByKey(compare.ref);
+  const cellTone = (v: number | null) => (v === null ? 'text-ink/40' : 'text-coral');
+  return (
+    <section aria-label="Compare" className="flex flex-col gap-1.5 rounded-lg border border-ink/10 p-2">
+      <div className="flex items-center gap-2"><span className={`${label} flex-1`}>Compare · {STYLE_NAMES[style]}</span>
+        <button type="button" className="rounded p-1 hover:bg-ink/10" aria-label="Stop comparing" onClick={() => lab.setCheckView({ compare: null })}><X className="size-3.5" /></button></div>
+      <div className="grid grid-cols-[1fr_64px_64px] items-end gap-1 text-xs">
+        <span className="text-ink/50">Check</span>
+        <span className="truncate text-right"><b className="block font-mono text-lg tabular-nums">{shown.ours.score}</b>ours · {compare.ours}</span>
+        <span className="truncate text-right text-cyan-600 dark:text-cyan-300"><b className="block font-mono text-lg tabular-nums">{shown.ref.score}</b>ref</span>
+        {shown.rows.map((r) => <div key={r.check} className="contents">
+          <span className="truncate border-t border-ink/5 py-0.5">{CHECK_NAMES[r.check] ?? r.check}</span>
+          <span className={`border-t border-ink/5 py-0.5 text-right font-mono tabular-nums ${cellTone(r.ours)}`}>{r.ours === null ? 'ok' : `${r.ours} ${r.unit}`}</span>
+          <span className={`border-t border-ink/5 py-0.5 text-right font-mono tabular-nums ${cellTone(r.ref)}`}>{r.ref === null ? 'ok' : `${r.ref} ${r.unit}`}</span></div>)}
+      </div>
+      <p className="truncate text-[11px] text-ink/50">Reference: {ref ? `${ref.name} · ${ref.pack}` : compare.ref} · private, on this device</p>
+      <div role="radiogroup" aria-label="Where the reference stands" className="grid grid-cols-2 gap-1.5">
+        {([['beside', 'Side by side', SplitSquareHorizontal], ['over', 'Ghost over ours', Ghost]] as const).map(([id, name, Icon]) => (
+          <button key={id} type="button" role="radio" aria-checked={compare.place === id} onClick={() => lab.setComparePlace(id)}
+            className={`flex h-8 items-center justify-center gap-1.5 rounded-lg border text-xs font-bold ${compare.place === id ? 'border-ink bg-ink text-on-brand' : 'border-ink/15 hover:bg-ink/5'}`}><Icon className="size-3.5" />{name}</button>))}
+      </div>
+    </section>);
 }

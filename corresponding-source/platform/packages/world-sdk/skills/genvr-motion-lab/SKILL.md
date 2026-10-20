@@ -124,6 +124,7 @@ Every version is private on this device first. Sharing publishes it, so the owne
 Motions the owner imported in Avatar › My motions (for example Mixamo) are private references on this device. `mine_list { query?, pack? }` lists them by key (`mine:` + 12 letters), name and pack. `check_move { move: key, style? }` plays one on the Lab body and checks it like our moves (also its pace from its feet); `settings_set { motion: key }` + `run` runs the course with it. The project keeps only the key, never the file, its name or its pack.
 
 - Use them to compare and learn: run and check ours and the reference the same way, then improve our move in Pose and keys.
+- `compare { ours, ref, style?, place? }` checks one of our moves and a private reference now and returns both cells and, per check, the worst value of each (null = within the limit). The person sees ours on the character and the reference on a see-through body `beside` it or `over` it, on the same clock. The pair is kept in the project by keys only. Read the rows: where the reference is clean and ours is not, that is what to improve in ours.
 - Never share, publish or adopt a private motion (Q-MIXAMO); only our own versions can join the basics, and the owner confirms (later phases of M20).
 
 ## Training stations (board M18)

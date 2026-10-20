@@ -109,6 +109,11 @@ export interface CharacterStage {
   /** Shows the playing clip at this time (seconds, looped): a host that drives the clock (the motion lab) pauses the stage and calls this every frame. */
   setClipTime(seconds: number): void;
   /**
+   * Board M20: a second, see-through body of the same character playing another clip on the same clock (the motion
+   * lab's Compare): `beside` stands it next to the character, `over` puts it on the character. Null removes it.
+   */
+  setCompanion(companion: { clip: string; place: 'beside' | 'over' } | null): void;
+  /**
    * Holds the character in one pose (the motion lab's Pose mode, board M11): turns per joint as Euler XYZ degrees from
    * rest, as the clips store them (the rig bones, and fingers by their own names), and a hips offset in metres. Null
    * goes back to the playing clip.
@@ -343,6 +348,55 @@ export async function createCharacterStage({
   scene.add(avatar.root);
   const mixer = new AnimationMixer(avatar.root);
   let action: AnimationAction | null = null;
+  type Companion = { avatar: GenvrAvatar; mixer: AnimationMixer; action: AnimationAction | null; clip: string; place: 'beside' | 'over'; materials: Array<[Mesh, Material | Material[], Material[]]>; seeThrough: () => void };
+  let companion: Companion | null = null;
+  const COMPANION_GAP = 0.9;
+  const dropCompanion = () => {
+    if (!companion) return;
+    companion.mixer.stopAllAction(); companion.mixer.uncacheRoot(companion.avatar.root);
+    for (const [mesh, original, made] of companion.materials) { mesh.material = original; for (const one of made) one.dispose(); }
+    scene.remove(companion.avatar.root); companion.avatar.dispose(); companion = null;
+  };
+  /** Plays the companion's clip from the main clip's time, so both start together. */
+  const startCompanion = () => {
+    if (!companion) return;
+    const clip = clips.find((entry) => entry.name === companion!.clip);
+    companion.mixer.stopAllAction(); companion.mixer.uncacheRoot(companion.avatar.root); companion.action = null;
+    if (!clip) return;
+    companion.avatar.pose.rotation.x = clipTilt(clip.name);
+    companion.action = companion.mixer.clipAction(clip);
+    companion.action.setLoop(LoopRepeat, Infinity); companion.action.play();
+    companion.action.time = (action?.time ?? 0) % Math.max(clip.duration, 1e-3);
+    companion.mixer.update(0);
+  };
+  const makeCompanion = (clip: string, place: 'beside' | 'over') => {
+    dropCompanion();
+    const materials: Companion['materials'] = [];
+    const madeSee = new WeakSet<Material>();
+    // See-through and cyan, also for meshes a body brings when its model finishes loading.
+    const seeThrough = (root: Object3D) => root.traverse((object) => {
+      const mesh = object as Mesh;
+      if (!mesh.isMesh || (Array.isArray(mesh.material) ? mesh.material : [mesh.material]).every((one) => madeSee.has(one))) return;
+      mesh.castShadow = false;
+      const original = mesh.material, list = (Array.isArray(original) ? original : [original]).map((one) => {
+        // Flat cyan without the body's own texture, so it reads as the reference and not as a second character.
+        const see = one.clone() as Material & { color?: Color; map?: unknown };
+        see.transparent = true; see.opacity = 0.4; see.depthWrite = false;
+        see.color?.set(0x67e8f9);
+        if (see.map) see.map = null;
+        madeSee.add(see);
+        return see;
+      });
+      mesh.material = Array.isArray(original) ? list : list[0]!;
+      materials.push([mesh, original, list]);
+    });
+    const made = createGenvrAvatar(lookOf(recipe), { onBodyReady: () => { seeThrough(made.root); if (companion?.avatar === made) startCompanion(); } });
+    seeThrough(made.root);
+    made.root.position.x = place === 'beside' ? COMPANION_GAP : 0;
+    scene.add(made.root);
+    companion = { avatar: made, mixer: new AnimationMixer(made.root), action: null, clip, place, materials, seeThrough: () => seeThrough(made.root) };
+    startCompanion();
+  };
 
   /** Takes a freshly made mesh (another body, or new colours) as the start of every reshape. */
   const capture = () => {
@@ -472,6 +526,7 @@ export async function createCharacterStage({
     action.setLoop(LoopRepeat, Infinity);
     action.play();
     action.time = time % Math.max(clip.duration, 1e-3);
+    startCompanion();
   };
 
   /** Puts the right geometry and material on the mesh for the view mode and shading. */
@@ -696,7 +751,9 @@ export async function createCharacterStage({
     const firstPerson = mode === 'first-person';
     for (const [bone, q] of saved) bone.quaternion.copy(q);
     saved.clear();
-    if (!paused && !held) mixer.update(delta);
+    if (!paused && !held) { mixer.update(delta); companion?.mixer.update(delta); }
+    // A body may swap its meshes or materials after it loads: keep the companion see-through.
+    companion?.seeThrough();
     applyHeld();
     avatar.root.updateMatrixWorld(true);
     if (firstPerson && handsUp)
@@ -765,6 +822,7 @@ export async function createCharacterStage({
       }
       avatar.setLook({ ...lookOf(next), scale: { height: 1, width: 1, head: 1 } });
       refresh();
+      if (companion) makeCompanion(companion.clip, companion.place);
       if (bodyChanged) resetView();
     },
     setAnatomyFocus(muscle, fat) {
@@ -852,6 +910,14 @@ export async function createCharacterStage({
       if (!action || !Number.isFinite(seconds)) return;
       action.time = ((seconds % action.getClip().duration) + action.getClip().duration) % action.getClip().duration;
       mixer.update(0);
+      const other = companion?.action;
+      if (other) { const length = other.getClip().duration; other.time = ((seconds % length) + length) % length; companion!.mixer.update(0); }
+    },
+    setCompanion(next) {
+      if (!next) { dropCompanion(); return; }
+      if (companion && companion.clip === next.clip && companion.place === next.place) return;
+      if (companion && companion.clip === next.clip) { companion.place = next.place; companion.avatar.root.position.x = next.place === 'beside' ? COMPANION_GAP : 0; return; }
+      makeCompanion(next.clip, next.place);
     },
     async capturePreview(options){
       if(!previewInit)previewInit=(async()=>{const capture=new WebGPURenderer({antialias:true,alpha:true,forceWebGL:true});await capture.init();if(disposed){capture.dispose();throw new Error('Character stage closed.');}capture.shadowMap.enabled=true;previewRenderer=capture;return capture;})();
@@ -932,6 +998,7 @@ export async function createCharacterStage({
         base.quadWire?.dispose();
       }
       motionRequest++;
+      dropCompanion();
       avatar.dispose();
       for (const one of [clay, ghost, wire, normals, dotMaterial] as Material[]) one.dispose();
       boneLines.geometry.dispose();

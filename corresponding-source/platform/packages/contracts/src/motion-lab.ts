@@ -269,6 +269,11 @@ export const MotionShareDraft = z.object({
 export type MotionShareDraft = z.infer<typeof MotionShareDraft>;
 
 /** The lab part of a lab project. An agent's "make best" waits in `best_pending` until the owner confirms. */
+/** A private motion's key in the Lab (board M20): "mine:" + 12 hex letters of its hash. */
+export const LabMineKey = z.string().regex(/^mine:[0-9a-f]{12}$/);
+export const LabReference = z.object({ ours: z.string().min(1).max(60), ref: LabMineKey, at: z.string().max(40) }).strict();
+export type LabReference = z.infer<typeof LabReference>;
+
 export const LabProjectData = z.object({
   format: z.literal(LAB_FORMAT).default(LAB_FORMAT),
   course: LabCourse.default(() => LabCourse.parse({})),
@@ -288,6 +293,8 @@ export const LabProjectData = z.object({
   styles: z.object({ realistic: MotionStyle, game: MotionStyle, anime: MotionStyle }).strict().default(() => structuredClone(DEFAULT_MOTION_STYLES)),
   /** An agent's change to a style waits here until the owner confirms it (a style is for everyone). */
   style_pending: z.object({ style: MotionStyleId, params: MotionStyleParams.partial().optional(), limits: MotionCheckLimits.partial().optional(), by: z.string().max(80) }).strict().nullable().default(null),
+  /** Board M20: pairs compared (our move ↔ a private reference, by its key only: never a name or file), newest last. */
+  references: z.array(LabReference).max(100).default([]),
 }).strict().superRefine((data, ctx) => {
   const names = new Set<string>();
   for (const [i, m] of data.motions.entries()) {
@@ -420,6 +427,7 @@ export const MotionLabOperation = z.discriminatedUnion('kind', [
   /** The kept report, worst first: { style?, limit? }. */
   z.object({ kind: z.literal('check_report'), style: MotionStyleId.optional(), limit: z.number().int().min(1).max(200).default(20) }).strict(),
   /** One move's card: score and issues by frame in a style (checked again now). */
+  z.object({ kind: z.literal('compare'), ours: z.string().min(1).max(60), ref: LabMineKey, style: MotionStyleId.default('realistic'), place: z.enum(['beside', 'over']).default('beside') }).strict(),
   z.object({ kind: z.literal('check_move'), move: z.string().min(1).max(60), style: MotionStyleId.default('realistic') }).strict(),
   /** A style's numbers and limits. */
   z.object({ kind: z.literal('style_params'), style: MotionStyleId.optional() }).strict(),
