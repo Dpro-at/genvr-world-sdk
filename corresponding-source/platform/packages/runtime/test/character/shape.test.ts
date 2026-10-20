@@ -129,6 +129,15 @@ describe('character shaping (CHAR-01)', () => {
     expect(span(big.positions, 1).size).toBeCloseTo(before * 1.5, 3);
   });
 
+  it('a realistic (proportional) body keeps its proportions: head and neck change with the height (long necks, 2026-10-20)', () => {
+    const { input } = inputOf('starter');
+    const before = span(input.positions, 1).size;
+    const short = shapeSkin({ ...input, proportional: true }, { height: 0.85, weight: 1, scale: 1 });
+    // Every vertex height scales with the body, so the whole body is 85 % tall, head and neck included.
+    expect(span(short.positions, 1).size).toBeCloseTo(before * 0.85, 3);
+    const stylised = shapeSkin(input, { height: 0.85, weight: 1, scale: 1 });
+    expect(span(stylised.positions, 1).size).toBeGreaterThan(before * 0.86);
+  });
   it('weight widens the torso without lengthening the legs', () => {
     const { input } = inputOf('classic');
     const names = findBody('classic').joints.map((joint) => joint.name);

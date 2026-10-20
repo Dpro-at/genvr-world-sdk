@@ -27,5 +27,5 @@ The Island starter uses matching Realistic resources and an original wooden rowb
 | avatar-appearance/emotes | 11 | 11 shared | 11 shared | 11 shared | 11 shared | Moves are the same in every style (the skeleton does not change). |
 | avatar-appearance/clothing | 8 | 8 own | 8 shared | 8 MISSING | 8 MISSING | Made per body fit; cube avatars in Voxel places wear the blocky fit (decision 104). |
 | avatar-appearance/accessories | 9 | 9 own | 9 shared | 9 MISSING | 9 MISSING | Made per body fit; cube avatars in Voxel places wear the blocky fit (decision 104). |
-| avatar-appearance/bodies | 8 | 8 shared | 8 shared | 8 shared | 8 shared | One body in every style; cube avatars change only the material (decision 104). |
+| avatar-appearance/bodies | 10 | 10 shared | 10 shared | 10 shared | 10 shared | One body in every style; cube avatars change only the material (decision 104). |
 <!-- STYLE-COVERAGE:END -->

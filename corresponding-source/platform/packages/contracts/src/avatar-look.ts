@@ -37,7 +37,7 @@ export const MAX_WORN_ITEMS = 8;
  * (P2-35), a mesh body with swinging hair and coat; `human` is our own generated body (CHAR-02): made by our code
  * from settings (style, gender), anime boy first. The realistic body joins later.
  */
-export const AvatarBodyType = z.enum(['classic', 'simple', 'starter', 'flat', 'anime-boy', 'warrior', 'human', 'robot']);
+export const AvatarBodyType = z.enum(['classic', 'simple', 'starter', 'flat', 'anime-boy', 'warrior', 'human', 'robot', 'rpm-male', 'rpm-female']);
 export type AvatarBodyType = z.infer<typeof AvatarBodyType>;
 
 /** A creator's uploaded body item, by its store id (uploaded bodies, 2026-10-03). */

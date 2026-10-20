@@ -41,11 +41,10 @@ export function boneRoles(body: Pick<AvatarBody, 'joints' | 'animation'>): BoneR
 }
 
 /** How much a bone of a role lengthens (along its parent link) and thickens (across its own direction). */
-export function boneFactors(role: BoneRole, shape: CharacterShape): { length: number; thickness: number } {
+export function boneFactors(role: BoneRole, shape: CharacterShape, proportional = false): { length: number; thickness: number } {
   const h = shape.height;
   const w = shape.weight;
-  const length = role === 'head' ? 1 : role === 'neck' ? 1 + (h - 1) * 0.5 : h;
-  const thickness =
+  const weight =
     role === 'spine' || role === 'arm' || role === 'leg'
       ? w
       : role === 'neck'
@@ -53,7 +52,10 @@ export function boneFactors(role: BoneRole, shape: CharacterShape): { length: nu
         : role === 'hand'
           ? 1 + (w - 1) * 0.3
           : 1;
-  return { length, thickness };
+  // A realistic body is a smaller or larger person: everything scales with the height, then weight widens.
+  if (proportional) return { length: h, thickness: h * weight };
+  // A stylised body keeps its head size and half its neck change.
+  return { length: role === 'head' ? 1 : role === 'neck' ? 1 + (h - 1) * 0.5 : h, thickness: weight };
 }
 
 export interface ShapeBone {
@@ -72,6 +74,8 @@ export interface ShapeInput {
   skinIndex: ArrayLike<number>;
   skinWeight: ArrayLike<number>;
   bones: readonly ShapeBone[];
+  /** The body keeps its proportions (see `AvatarBody.proportional`). */
+  proportional?: boolean;
 }
 
 export interface ShapeOutput {
@@ -90,7 +94,7 @@ const NORMAL: CharacterShape = NORMAL_CHARACTER_SHAPE;
 export function shapeSkin(input: ShapeInput, shape: CharacterShape = NORMAL): ShapeOutput {
   const { bones } = input;
   const count = bones.length;
-  const factors = bones.map((bone) => boneFactors(bone.role, shape));
+  const factors = bones.map((bone) => boneFactors(bone.role, shape, input.proportional));
   const at: Vector3[] = [];
   const turn: Quaternion[] = [];
   const size: Vector3[] = [];

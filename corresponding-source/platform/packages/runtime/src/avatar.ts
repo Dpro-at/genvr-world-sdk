@@ -650,15 +650,17 @@ export function loadBodyModel(body: AvatarBody): Promise<BodyModel | null> {
     load = createGltfLoader()
       .loadAsync(body.model)
       .then((gltf) => {
-        let skinned: SkinnedMesh | undefined;
+        let skinned: SkinnedMesh | undefined, primitives = 0;
         gltf.scene.updateMatrixWorld(true);
         gltf.scene.traverse((object) => {
-          if (!skinned && (object as SkinnedMesh).isSkinnedMesh) skinned = object as SkinnedMesh;
+          if (!(object as SkinnedMesh).isSkinnedMesh) return;
+          primitives += 1;
+          skinned ??= object as SkinnedMesh;
         });
         if (!skinned) return null;
         // GLTF splits a multi-material character into separate skinned primitives.
-        // Local imports must retain every primitive, including clothes, eyes and hair.
-        if (body.id.startsWith('user.')) {
+        // Local imports and base characters made from them retain every primitive, including clothes, eyes and hair.
+        if (body.id.startsWith('user.') || primitives > 1) {
           const model = mergeLocalBodyPrimitives(body, gltf.scene);
           bodyModels.set(body.id, model); return model;
         }

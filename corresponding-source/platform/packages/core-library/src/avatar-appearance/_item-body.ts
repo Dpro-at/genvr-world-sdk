@@ -47,6 +47,8 @@ export function bodyFromItem(
     // Body cards show the picture; the flat sketch numbers only matter for block bodies.
     sketchArm: { start: 0.2, axisY: 1.3, hangX: 0.2, topY: 1.3 },
     model: files.model,
+    // Characters people import are real proportions (made by character services or scans).
+    proportional: true,
     ...(files.picture ? { picture: files.picture } : {}),
   };
 }

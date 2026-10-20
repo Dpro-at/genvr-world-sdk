@@ -21,6 +21,8 @@ import flat from './bodies/flat.js';
 import simple from './bodies/simple.js';
 import starter from './bodies/starter.js';
 import robot from './bodies/robot.js';
+import rpmMale from './bodies/rpm-male.js';
+import rpmFemale from './bodies/rpm-female.js';
 
 /**
  * The dressed avatar (tasks P2-20, P2-22): a body type's blocks with repainted areas, plus the worn
@@ -29,7 +31,7 @@ import robot from './bodies/robot.js';
  */
 
 /** Body types in library order (all of them, hidden ones too, so old worlds still open). */
-export const AVATAR_BODIES: readonly CoreBody[] = [classic, simple, starter, flat, animeBoy, warrior, human, robot];
+export const AVATAR_BODIES: readonly CoreBody[] = [classic, simple, starter, flat, animeBoy, warrior, human, robot, rpmMale, rpmFemale];
 
 /**
  * Bodies players pick for themselves (the Look tab). The flat 2D body is a place body: it is

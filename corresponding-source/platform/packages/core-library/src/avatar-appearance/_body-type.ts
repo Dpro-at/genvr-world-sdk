@@ -122,6 +122,11 @@ export interface AvatarBody {
   generated?: 'human';
   /** A picture for body cards (mesh bodies have no block sketch). */
   picture?: string;
+  /**
+   * A realistic body (a person made from a scan or a character service): Shape's height keeps its proportions, so the
+   * head and neck shrink and grow with the body instead of keeping their size (owner, 2026-10-20: long necks).
+   */
+  proportional?: boolean;
   /** Hair, coat panels, and tassels that swing with the body's motion (P2-35 warrior). */
   springs?: { chains: readonly SpringChain[]; colliders: readonly SpringCollider[] };
 }

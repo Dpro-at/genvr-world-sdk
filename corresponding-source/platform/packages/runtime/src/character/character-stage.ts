@@ -490,6 +490,7 @@ export async function createCharacterStage({
         skinIndex: base.source.getAttribute('skinIndex').array,
         skinWeight: base.source.getAttribute('skinWeight').array,
         bones: base.bones,
+        proportional: Boolean(base.body.proportional),
       },
       recipe.shape,
     );
