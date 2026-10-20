@@ -37,3 +37,4 @@ export * from './lighting.js';
 export * from './studio-sharing.js';
 
 export * from './motion-lab.js';
+export * from './motion-style.js';
