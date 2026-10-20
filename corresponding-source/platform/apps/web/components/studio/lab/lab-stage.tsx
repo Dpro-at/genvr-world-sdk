@@ -27,7 +27,7 @@ import { DEFAULT_CHARACTER_RECIPE, type LabCourse, type LabObstacle } from '@gen
 import { CORE_ANIMATIONS } from '@genvr/core-library';
 import { carBoxes, courseBoxes, laneCentreZ, LAB_CAR_SIZE, walkerGreen, type LabFrame } from '@genvr/runtime';
 import type { CharacterStage } from '@genvr/runtime/character';
-import type { LabController } from '../../../lib/motion-lab';
+import { labClipTime, type LabController } from '../../../lib/motion-lab';
 
 /**
  * The lab's 3D view (boards M1, M3): the Standard robot stands at the centre of the character stage and plays the move
@@ -81,11 +81,21 @@ export function LabStage({ lab }: { lab: LabController }) {
   const view = lab.view;
   const frame = lab.frameAt(view.t);
   const ghost = view.ghost?.frames[Math.min(view.ghost.frames.length - 1, Math.round(view.t * 60))] ?? null;
-  const clip = frame?.clip ?? 'Idle';
+  // During a run the move's clip follows the run itself (feet keep pace with the floor at any speed, slow motion,
+  // pause and seeking); at the end of the run the robot stands in Idle instead of walking on the spot.
+  const frames = view.run?.result.frames;
+  const finished = Boolean(frames?.length) && !view.playing && view.t >= lab.duration() - 1e-6;
+  const driven = Boolean(frames?.length) && !finished;
+  const clip = finished ? 'Idle' : frame?.clip ?? 'Idle';
 
   useEffect(() => { if (ready) world.current?.setCourse(course, view.selected, view.overlays.includes('measures')); }, [ready, course, view.selected, view.overlays]);
   useEffect(() => { if (ready) stage.current?.setViewMode(view.overlays.includes('skeleton') ? 'skeleton-mesh' : 'normal'); }, [ready, view.overlays]);
   useEffect(() => { const id = CLIPS.get(clip) ?? CLIPS.get('Idle'); if (ready && id) stage.current?.play(id); }, [ready, clip]);
+  useEffect(() => {
+    if (!ready || !stage.current) return;
+    stage.current.setPaused(driven);
+    if (driven && frames) stage.current.setClipTime(labClipTime(frames, view.t * 60));
+  });
   useEffect(() => { if (ready) world.current?.show(course, frame, ghost, view.t, view.overlays); });
 
   return (

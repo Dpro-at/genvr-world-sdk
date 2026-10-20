@@ -106,6 +106,8 @@ export interface CharacterStage {
   presentExpression(expression: AvatarExpression): boolean;
   importAvatarMotion(id: string, data: ArrayBuffer): Promise<boolean>;
   setPaused(paused: boolean): void;
+  /** Shows the playing clip at this time (seconds, looped): a host that drives the clock (the motion lab) pauses the stage and calls this every frame. */
+  setClipTime(seconds: number): void;
   /** Manual eyelid inspection: null restores automatic blinking. */
   setEyeClosure(amount: number | null): void;
   capturePreview(options?: {width:number;height:number;framing:'full'|'bust'|'face';anchor?:number}): Promise<string>;
@@ -767,6 +769,11 @@ export async function createCharacterStage({
     },
     setPaused(next) {
       paused = next;
+    },
+    setClipTime(seconds) {
+      if (!action || !Number.isFinite(seconds)) return;
+      action.time = ((seconds % action.getClip().duration) + action.getClip().duration) % action.getClip().duration;
+      mixer.update(0);
     },
     async capturePreview(options){
       if(!previewInit)previewInit=(async()=>{const capture=new WebGPURenderer({antialias:true,alpha:true,forceWebGL:true});await capture.init();if(disposed){capture.dispose();throw new Error('Character stage closed.');}capture.shadowMap.enabled=true;previewRenderer=capture;return capture;})();

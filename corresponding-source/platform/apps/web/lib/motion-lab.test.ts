@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { simulateLabRun } from '@genvr/runtime';
+import { simulateLabRun, type LabFrame } from '@genvr/runtime';
 import { runTool, type AssistantHost } from '@genvr/assistant';
-import { LabController, motionLabBridge, newLabData, runMotionLab, PERSON } from './motion-lab';
+import { LabController, labClipTime, motionLabBridge, newLabData, runMotionLab, PERSON } from './motion-lab';
 
 const simulateOn = (lab: LabController) => simulateLabRun(lab.data.course, lab.best()!.settings, lab.data.course.seed).frames.at(-1);
 
@@ -171,5 +171,23 @@ describe('sharing a motion (board M14)', () => {
     expect(mine.publishing).toBe('local-preview');
     expect(mine.licence.name).toBe('GenVR community licence');
     expect(mine.motions.map((m) => [m.version, m.status])).toEqual([[v2.id, 'private'], [v.id, 'shared']]);
+  });
+});
+
+describe('the lab view keeps the move in step with the run', () => {
+  const frame = (t: number, z: number, clip: string) => ({ t, x: 0, y: 0, z, tilt: 0, feet: [{ x: -0.1, y: 0, z, planted: true }, { x: 0.1, y: 0, z, planted: false }], com: [0, z], speed: 0, clip }) as unknown as LabFrame;
+  it('advances a ground move by distance over its natural speed, so faster runs step faster', () => {
+    // Walk's natural speed is 1.4 m/s: walking 2.8 m in 1 s is two seconds of the clip, 0.7 m is half a second.
+    const fast = Array.from({ length: 61 }, (_, i) => frame(i / 60, (i / 60) * 2.8, 'Walk'));
+    const slow = Array.from({ length: 61 }, (_, i) => frame(i / 60, (i / 60) * 0.7, 'Walk'));
+    expect(labClipTime(fast, 60)).toBeCloseTo(2, 5);
+    expect(labClipTime(slow, 60)).toBeCloseTo(0.5, 5);
+    // Seeking back gives the same pose as playing there.
+    expect(labClipTime(fast, 30)).toBeCloseTo(1, 5);
+  });
+  it('counts other moves from the moment they began', () => {
+    const frames = [...Array.from({ length: 30 }, (_, i) => frame(i / 60, i * 0.02, 'Walk')), ...Array.from({ length: 30 }, (_, i) => frame((30 + i) / 60, 0.6 + i * 0.03, 'Jump Forward'))];
+    expect(labClipTime(frames, 29 + 30)).toBeCloseTo(29 / 60, 5);
+    expect(labClipTime(frames, 30)).toBe(0);
   });
 });

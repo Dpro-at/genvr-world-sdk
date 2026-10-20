@@ -46,6 +46,24 @@ export interface LabView {
 export const LAB_MOVES = Object.keys(LAB_GROUND_MOVES);
 
 /**
+ * Where the move's clip stands at run frame `index` (seconds into the clip). Ground moves advance with the distance
+ * walked over their natural speed, so the feet keep pace with the floor at any speed and in slow motion; other moves
+ * (jump, climb, landing) count the time since they began. Driven from the run, the pose also follows seeking.
+ */
+export function labClipTime(frames: readonly LabFrame[], index: number): number {
+  const i = Math.max(0, Math.min(frames.length - 1, Math.floor(index)));
+  const clip = frames[i]?.clip;
+  if (!clip) return 0;
+  let start = i;
+  while (start > 0 && frames[start - 1]!.clip === clip) start--;
+  const natural = Object.values(LAB_GROUND_MOVES).find((move) => move.clip === clip)?.speed;
+  if (!natural) return frames[i]!.t - frames[start]!.t;
+  let walked = 0;
+  for (let k = start + 1; k <= i; k++) walked += Math.hypot(frames[k]!.x - frames[k - 1]!.x, frames[k]!.z - frames[k - 1]!.z);
+  return walked / natural;
+}
+
+/**
  * Publishing shared motions needs a host adapter (GenVR hosting). Without one a share is a local preview: it is marked
  * shared on this device and nothing leaves it, and every message says so.
  */
