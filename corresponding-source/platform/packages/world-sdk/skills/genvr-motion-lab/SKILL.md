@@ -101,6 +101,23 @@ Every version is private on this device first. Sharing publishes it, so the owne
 - Without GenVR hosting a share is a local preview: say so plainly ("marked shared on this device, nothing was
   published").
 
+## Training stations (board M18)
+
+The lab has stations to train every kind of move, standing in the course like obstacles (same ids, `x` across, `z` along, `turn` in degrees, sizes in metres). `stations_base { confirm: true }` puts the base lab's 11 in the 42 × 26 m yard; `station_add` adds one. Pick a station by what the move needs:
+
+| Station | Use it for | Runs now |
+|---|---|---|
+| `jump_pit` (runway 20 m, board 1–3 m before 8 × 3 m sand) | Run, Long Jump, landings | yes: distance from the board edge, foul (toe over the board, cm), take-off speed, steps, landing forward/back |
+| `grasp_table` (2 × 0.9 m, 0.6–1.1 m high, 12 objects 0.1–8 kg) | Reach, grab, lift, carry, place | yes: objects, grabbed, held without a drop, drops, reach at the grab (cm), place error (cm) |
+| `conveyor`, `tool_bench`, `pool`, `climb_wall`, `ladder`, `weapon_rack`, `target_post`, `high_bar`, `hurdles` | timing on moving objects, tools, water, climbing, training weapons, bar and hurdles | placed and drawn; runs come in later phases |
+
+- Run on a station: `run { station }` (or the Lab's Run on picker). The answer has `station_score` next to the common scores. Jump pit: speed is the run-up, `jump_timing_ms` moves the take-off foot (later can foul), `lean_deg` sets the flight angle (20° + half the lean) and a negative lean sits back on landing.
+- A station run's total is half the common score (foot slide, penetration, smoothness, fall; no time goal on a station) and half the station's quality: a clean jump's distance against 8 m (a foul is 0), or the objects held without a drop out of all of them less the place error (cm, at most 30).
+- "Fit to character" (on by default) sets table, belt and bench heights by the character's hip height, so short and tall bodies train at the same reach. Objects beyond the arm's reach are missed, which is a result, not an error.
+- Objects: `prop_add / prop_set / prop_remove { confirm: true }` (shape, size, mass, grip power|pinch|hook|handle, spot `at`, mark `target`). A grip holds at most power 15, handle 12, hook 10, pinch 1.5 kg (fully closed).
+- Removing a station or an object needs `confirm: true`. Weapons are foam or wood training props only: no brands, no damage, nothing breaks.
+- Start with the moves we have, compare only within one character, and keep the best per station.
+
 ## Making a motion by pose and key frames (board M11)
 
 The Lab's **Pose and keys** mode (left: body map + hand map; right: the sliders; over the view: Turn joint 1, Move

@@ -12,7 +12,12 @@ import {
   LabProjectData,
   LabRunSettings,
   LabStreet,
+  LabProp,
+  LabStation,
+  LAB_STATION_KINDS,
   MOTION_LAB_KINDS,
+  baseLabStations,
+  graspTableProps,
   MOTION_SHARE_LICENCE,
   MotionLabOperation,
   MotionShare,
@@ -24,11 +29,12 @@ import {
   type LabPoseEase,
   type LabPoseRow,
   type LabRun,
+  type LabStationKind,
   type MotionVersion,
 } from '@genvr/contracts';
 import {
   courseFromSeed, defaultLabCourse, labGroundMove, labHoldPins, labKeyRows, labLimbMove, labLimbPositions, labMadeMotionPace, labMirror, labPoseAt,
-  labPoseLimit, labPoseProblems, labPoseRow as labRowOf, labRowKeys, labAsk, labStandPose, labTPose, scoreLabRun, simulateLabRun, LAB_GROUND_MOVES, LAB_POSE_KEYS,
+  labPoseLimit, labPoseProblems, labPoseRow as labRowOf, labRowKeys, labAsk, labStandPose, labTPose, runStation, scoreLabRun, simulateLabRun, LAB_GROUND_MOVES, LAB_POSE_KEYS, LAB_RUNNABLE_STATIONS, STATION_REFERENCE_HIP,
   type LabFrame, type LabGroundMove, type LabPose, type LabPoseSide, type LabRunResult,
 } from '@genvr/runtime';
 import { madeEntry, type MadeMotionStore } from './made-moves';
@@ -54,6 +60,8 @@ export interface LabView {
   ghost: LabRunResult | null;
   /** Board M11: Run shows runs on the course; Pose edits a made motion by pose and key frames. */
   mode: 'run' | 'pose';
+  /** Board M18: Run goes on the course (null) or on this station. */
+  station: string | null;
   pose: LabPoseView;
 }
 /** What the Pose mode shows: the open made motion, the frame, the chosen joints and the mouse tool. */
@@ -132,7 +140,7 @@ export function newLabData(): LabProjectData {
 export class LabController {
   #data: LabProjectData;
   #view: LabView = { overlays: ['skeleton', 'feet', 'balance', 'speed', 'ghost', 'measures'], speed: 1, playing: false, t: 0, selected: null, run: null, ghost: null,
-    mode: 'run', pose: { motion: null, frame: 0, playing: false, group: 'Elbow', side: 'R', tool: 'turn', onion: false } };
+    mode: 'run', station: null, pose: { motion: null, frame: 0, playing: false, group: 'Elbow', side: 'R', tool: 'turn', onion: false } };
   /** The made motion each run of this session used, as it was (Save as version keeps it with the version). */
   #runMotion = new Map<string, LabMadeMotion>();
   /** Board M19: My motions, where every saved version of a made motion goes. */
@@ -209,6 +217,71 @@ export class LabController {
     this.setCourse({ ...course, obstacles: course.obstacles.filter((o) => o.id !== id) });
     if (this.#view.selected === id) this.select(null);
   }
+  // ---- training stations (board M18)
+  addStation(kind: LabStationKind, fields: Record<string, unknown> = {}) {
+    if (!LAB_STATION_KINDS.includes(kind)) throw new Error(`"${kind}" is not a station (stations: ${LAB_STATION_KINDS.join(', ')}).`);
+    const course = this.#data.course;
+    const id = typeof fields.id === 'string' ? fields.id : freeId(course, kind.replace('_', '-'));
+    const station = LabStation.parse({ z: 0, x: 0, ...fields, kind, id });
+    // The grasp table comes with its 12 objects.
+    const props = kind === 'grasp_table' && !course.props.some((p) => p.on === id) ? graspTableProps(id) : [];
+    this.setCourse({ ...course, stations: [...course.stations, station], props: [...course.props, ...props] });
+    this.select(station.id);
+    return station;
+  }
+  setStation(id: string, patch: Record<string, unknown>) {
+    const course = this.#data.course, at = course.stations.findIndex((s) => s.id === id);
+    if (at < 0) throw new Error(`No station "${id}". Ask course_get for the ids.`);
+    const next = LabStation.parse({ ...course.stations[at], ...patch, id, kind: course.stations[at]!.kind });
+    this.setCourse({ ...course, stations: course.stations.map((s, i) => (i === at ? next : s)) });
+    return next;
+  }
+  removeStation(id: string) {
+    const course = this.#data.course;
+    if (!course.stations.some((s) => s.id === id)) throw new Error(`No station "${id}".`);
+    this.setCourse({ ...course, stations: course.stations.filter((s) => s.id !== id), props: course.props.filter((p) => p.on !== id) });
+    if (this.#view.selected === id) this.select(null);
+    if (this.#view.station === id) this.#setView({ station: null });
+  }
+  /** The base lab's stations in the 42 × 26 m yard (they replace the stations and their objects). */
+  baseStations() {
+    const stations = baseLabStations();
+    this.setCourse({ ...this.#data.course, stations, props: stations.filter((s) => s.kind === 'grasp_table').flatMap((s) => graspTableProps(s.id)) });
+    this.select(null);
+    return this.#data.course.stations;
+  }
+  addProp(fields: Record<string, unknown>) {
+    const course = this.#data.course;
+    const prop = LabProp.parse({ ...fields, id: typeof fields.id === 'string' ? fields.id : freeId(course, 'prop') });
+    this.setCourse({ ...course, props: [...course.props, prop] });
+    return prop;
+  }
+  setProp(id: string, patch: Record<string, unknown>) {
+    const course = this.#data.course, at = course.props.findIndex((p) => p.id === id);
+    if (at < 0) throw new Error(`No object "${id}".`);
+    const next = LabProp.parse({ ...course.props[at], ...patch, id });
+    this.setCourse({ ...course, props: course.props.map((p, i) => (i === at ? next : p)) });
+    return next;
+  }
+  removeProp(id: string) {
+    const course = this.#data.course;
+    if (!course.props.some((p) => p.id === id)) throw new Error(`No object "${id}".`);
+    this.setCourse({ ...course, props: course.props.filter((p) => p.id !== id) });
+  }
+  setConveyor(id: string, patch: { speed_mps?: number | undefined; every_s?: number | undefined; mix?: boolean | undefined }) {
+    const station = this.#data.course.stations.find((s) => s.id === id);
+    if (station?.kind !== 'conveyor') throw new Error(`"${id}" is not a conveyor.`);
+    return this.setStation(id, Object.fromEntries(Object.entries(patch).filter(([, v]) => v !== undefined)));
+  }
+  /** Where Run goes: the course (null) or a station with a phase-1 engine. */
+  runOn(id: string | null) {
+    if (id !== null) {
+      const station = this.#data.course.stations.find((s) => s.id === id);
+      if (!station) throw new Error(`No station "${id}".`);
+      if (!LAB_RUNNABLE_STATIONS.includes(station.kind)) throw new Error(`Runs on the ${station.kind.replace('_', ' ')} come in a later phase.`);
+    }
+    this.#setView({ station: id });
+  }
   fromSeed(seed: number, count = 5, hardness = 2, street = true) { const course = this.setCourse(courseFromSeed(seed, count, hardness, street)); this.select(null); return course; }
   setTraffic(street?: unknown, cars?: unknown[]) {
     const course = this.#data.course;
@@ -258,7 +331,8 @@ export class LabController {
   }
 
   // ---- runs (boards M1, M3)
-  run(patch: Partial<LabRunSettings> = {}, by: LabActor = PERSON, fromVersion?: string): LabRun {
+  run(patch: Partial<LabRunSettings> = {}, by: LabActor = PERSON, fromVersion?: string, station: string | null = this.#view.station): LabRun {
+    if (station) return this.#runStation(station, patch, by, fromVersion);
     let base = this.#data.settings;
     if (fromVersion) base = this.#versionById(fromVersion).settings;
     if (patch.character !== undefined && patch.character !== this.character.id) this.setWho(patch.character);
@@ -282,6 +356,21 @@ export class LabController {
     if (made) this.#runMotion.set(run.id, made);
     this.#data = LabProjectData.parse({ ...this.#data, settings, runs: [...this.#data.runs, run].slice(-LAB_KEEP_RUNS) });
     this.#view = { ...this.#view, run: { id: run.id, result }, t: 0, playing: true, mode: 'run' };
+    this.#emit(true);
+    return run;
+  }
+  #runStation(id: string, patch: Partial<LabRunSettings>, by: LabActor, fromVersion?: string): LabRun {
+    let base = this.#data.settings;
+    if (fromVersion) base = this.#versionById(fromVersion).settings;
+    if (patch.character !== undefined && patch.character !== this.character.id) this.setWho(patch.character);
+    const settings = LabRunSettings.parse({ ...base, ...patch, character: this.character.id });
+    const course = this.#data.course, hip = STATION_REFERENCE_HIP * this.legScale;
+    const { result, score } = runStation(course, id, settings, course.seed, hip);
+    const run: LabRun = { id: freeRunId(this.#data.runs), at: new Date().toISOString(), seed: course.seed, settings, course, score,
+      events: result.events.slice(0, 400), ...(fromVersion ? { version: fromVersion } : {}), by: by.kind, station: id,
+      station_score: { ...result.stationScore, values: { ...result.stationScore.values, hip_m: Math.round(hip * 1000) / 1000 } } };
+    this.#data = LabProjectData.parse({ ...this.#data, settings, runs: [...this.#data.runs, run].slice(-LAB_KEEP_RUNS) });
+    this.#view = { ...this.#view, run: { id: run.id, result }, t: 0, playing: true, mode: 'run', station: id };
     this.#emit(true);
     return run;
   }
@@ -679,10 +768,13 @@ export class LabController {
   }
 }
 
-function replay(run: LabRun): LabRunResult { return simulateLabRun(run.course, run.settings, run.seed, run.move ? { [run.settings.motion]: { ...run.move, clip: run.settings.motion } } : {}); }
+function replay(run: LabRun): LabRunResult {
+  if (run.station) { const hip = run.station_score?.values.hip_m; return runStation(run.course, run.station, run.settings, run.seed, typeof hip === 'number' ? hip : STATION_REFERENCE_HIP).result; }
+  return simulateLabRun(run.course, run.settings, run.seed, run.move ? { [run.settings.motion]: { ...run.move, clip: run.settings.motion } } : {});
+}
 
 function freeId(course: LabCourse, base: string): string {
-  const used = new Set([...course.obstacles.map((o) => o.id), ...course.cars.map((c) => c.id)]);
+  const used = new Set([...course.obstacles.map((o) => o.id), ...course.cars.map((c) => c.id), ...course.stations.map((s) => s.id), ...course.props.map((p) => p.id)]);
   for (let n = 1; ; n++) if (!used.has(`${base}-${n}`)) return `${base}-${n}`;
 }
 function freeRunId(runs: readonly LabRun[]): string {
@@ -710,7 +802,7 @@ const HELP: Record<string, string> = {
   characters: 'Characters the Lab can use (id, name, source lab|mine, leg in metres), who runs now, and whether the Lab follows the Avatar tab.',
   who_set: 'Pick who runs: { who: a character id from characters, or "avatar" to follow the Avatar tab }. Hidden bodies are not offered.',
   settings_set: 'Run settings: motion (Walk, Run, Sneak, Crouch Walk), speed, stride, step_height, jump_timing_ms, blend_s, lean_deg, wait_for_green.',
-  run: 'Run the course once (fixed step, seed). Optional settings or a version to start from. Returns the run id and scores.',
+  run: 'Run the course once (fixed step, seed). Optional settings or a version to start from; { station } runs on a training station instead (jump_pit, grasp_table now). Returns the run id and scores (station scores too).',
   runs_list: 'The last 20 runs with their scores.',
   scores: 'Scores of a run (default: the last).',
   frame: 'One frame of a run at time t: body, feet (planted), balance point, speed, move.',
@@ -725,6 +817,14 @@ const HELP: Record<string, string> = {
   share_prepare: 'Prepare a share with the GenVR community: { version, share: { name, description?, tags?, preview_s? } }. Nothing is published; it waits for the owner.',
   share: 'Publish a prepared share: { version, confirm: true }. Owner only: an agent is refused and the share keeps waiting for the owner in the Lab.',
   unshare: 'Stop sharing a motion, or drop a prepared share: { version, confirm: true }.',
+  station_add: 'Add a training station (board M18): { station: { kind: jump_pit|high_bar|hurdles|pool|climb_wall|ladder|grasp_table|conveyor|tool_bench|weapon_rack|target_post, x, z, turn?, …sizes in metres } }. The grasp table comes with its 12 objects.',
+  station_set: 'Change a station\'s place or sizes: { id, set: { x, z, turn, height, runway_length, … } }.',
+  station_remove: 'Remove a station and the objects on it: { id, confirm: true }.',
+  stations_base: 'Put the base lab\'s 11 stations in the 42 × 26 m yard (replaces the stations and their objects): { confirm: true }.',
+  prop_add: 'Add an object on a station: { prop: { on, name, shape box|cylinder|sphere|tool, size_m [x,y,z], mass_kg, grip power|pinch|hook|handle, at [x,z], target? [x,z] } }.',
+  prop_set: 'Change an object: { id, set: { mass_kg, at, target, … } }.',
+  prop_remove: 'Remove an object: { id, confirm: true }.',
+  conveyor_set: 'Belt speed (0.1–1 m/s), one object every 1–5 s, mixed objects: { id, speed_mps?, every_s?, mix? }.',
   pose_list: 'Motions made here by pose and key frames (board M11): id, name, frames (60 per second), loop, keys, pins; and the one open in Pose.',
   pose_new: 'A new made motion: { name, frames? (default 120 = 2 s), loop? (default true), from: stand|t_pose }. Frame 0 gets a key of the whole pose; it opens in Pose.',
   pose_open: 'Open a made motion in Pose: { motion: id or name, frames?, loop? }.',
@@ -750,7 +850,8 @@ export async function runMotionLab(lab: LabController | null, input: unknown, by
     case 'commands': return MOTION_LAB_KINDS.map((kind) => ({ kind, help: HELP[kind] }));
     case 'inspect': {
       const d = lab.data, last = d.runs.at(-1), best = lab.best();
-      return { character: { id: lab.character.id, name: lab.character.name, follows_avatar: d.who === LAB_FOLLOW_AVATAR }, course: { seed: d.course.seed, finish_z: d.course.finish_z, obstacles: d.course.obstacles.map((o) => `${o.id} ${o.kind} at ${o.z} m`), street: d.course.street, cars: d.course.cars.length },
+      return { character: { id: lab.character.id, name: lab.character.name, follows_avatar: d.who === LAB_FOLLOW_AVATAR }, course: { seed: d.course.seed, finish_z: d.course.finish_z, obstacles: d.course.obstacles.map((o) => `${o.id} ${o.kind} at ${o.z} m`), street: d.course.street, cars: d.course.cars.length,
+          stations: d.course.stations.map((s) => `${s.id} ${s.kind} at x ${s.x} z ${s.z}${LAB_RUNNABLE_STATIONS.includes(s.kind) ? '' : ' (placed; runs later)'}`), objects: d.course.props.length, run_on: lab.view.station ?? 'course' },
         settings: d.settings, moves: LAB_MOVES, last_run: last ? summary(last) : null, best: best ? { id: best.id, score: best.score.total } : null, best_pending: d.best_pending,
         runs: d.runs.length, versions: d.versions.length, view: { overlays: lab.view.overlays, speed: lab.view.speed, mode: lab.view.mode },
         made_motions: d.motions.map((m) => m.name), open_motion: lab.openMotion?.name ?? null };
@@ -764,6 +865,14 @@ export async function runMotionLab(lab: LabController | null, input: unknown, by
     case 'obstacle_set': return lab.setObstacle(op.id, op.set);
     case 'obstacle_remove': lab.removeObstacle(op.id); return { removed: op.id };
     case 'course_from_seed': return lab.fromSeed(op.seed, op.obstacles, op.hardness, op.street);
+    case 'station_add': { const st = (op.station ?? {}) as Record<string, unknown>; return lab.addStation(String(st.kind) as LabStationKind, st); }
+    case 'station_set': return lab.setStation(op.id, op.set);
+    case 'station_remove': lab.removeStation(op.id); return { removed: op.id };
+    case 'stations_base': return { stations: lab.baseStations().map((s) => `${s.id} ${s.kind} at x ${s.x} z ${s.z}`) };
+    case 'prop_add': return lab.addProp((op.prop ?? {}) as Record<string, unknown>);
+    case 'prop_set': return lab.setProp(op.id, op.set);
+    case 'prop_remove': lab.removeProp(op.id); return { removed: op.id };
+    case 'conveyor_set': return lab.setConveyor(op.id, { speed_mps: op.speed_mps, every_s: op.every_s, mix: op.mix });
     case 'traffic_set': return lab.setTraffic(op.street, op.cars);
     case 'settings_set': {
       const { character, ...rest } = op.settings;
@@ -772,9 +881,9 @@ export async function runMotionLab(lab: LabController | null, input: unknown, by
     }
     case 'characters': await lab.refreshCharacters(); return { who: lab.data.who, follows_avatar: lab.data.who === LAB_FOLLOW_AVATAR, now: lab.character, avatar: lab.avatarCharacter, missing: lab.missingCharacter, characters: lab.characters };
     case 'who_set': return lab.setWho(op.who);
-    case 'run': return summary(lab.run(op.settings ?? {}, by, op.version));
+    case 'run': { const run = lab.run(op.settings ?? {}, by, op.version, op.station ?? null); return { ...summary(run), ...(run.station ? { station: run.station, station_score: run.station_score } : {}) }; }
     case 'runs_list': return lab.data.runs.map((r) => ({ id: r.id, motion: r.settings.motion, character: r.settings.character, total: r.score.total, at: r.at, by: r.by }));
-    case 'scores': { const run = lab.runById(op.run); return { run: run.id, score: run.score, best: lab.best()?.score ?? null }; }
+    case 'scores': { const run = lab.runById(op.run); return { run: run.id, score: run.score, ...(run.station ? { station: run.station, station_score: run.station_score } : {}), best: lab.best()?.score ?? null }; }
     case 'frame': { const f = lab.frameAt(op.t, op.run); if (!f) throw new Error('No run yet. Use run first.'); return f; }
     case 'view_set': { if (op.overlays) lab.setOverlays(op.overlays); if (op.speed) lab.setSpeed(op.speed as LabSpeed); return { overlays: lab.view.overlays, speed: lab.view.speed }; }
     case 'versions': return { versions: lab.data.versions, best_pending: lab.data.best_pending };

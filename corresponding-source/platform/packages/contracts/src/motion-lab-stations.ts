@@ -8,7 +8,7 @@ import { z } from 'zod';
  */
 const stationId = z.string().regex(/^[a-z0-9][a-z0-9-]{0,39}$/, 'Use a short id: lower-case letters, digits and dashes.');
 const metres = (min: number, max: number) => z.number().min(min).max(max);
-const place = { id: stationId, z: metres(0, 80), x: metres(-21, 21).default(0), turn: z.number().min(0).max(359).default(0), hidden: z.boolean().default(false) };
+const place = { id: stationId, z: metres(0, 80), x: metres(-60, 60).default(0), turn: z.number().min(0).max(359).default(0), hidden: z.boolean().default(false) };
 
 export const LabJumpPit = z.object({ ...place, kind: z.literal('jump_pit'), runway_length: metres(10, 30).default(20), runway_width: metres(0.8, 2).default(1.2),
   /** The take-off board (0.2 m deep) ends this far before the sand. */
@@ -74,13 +74,13 @@ export function graspTableProps(on: string): LabProp[] {
     { name: 'Box', shape: 'box', size_m: [0.3, 0.3, 0.3], mass_kg: 3, grip: 'power', material: 'card' },
     { name: 'Crate', shape: 'box', size_m: [0.4, 0.4, 0.4], mass_kg: 8, grip: 'handle', material: 'wood' },
   ];
-  // Two rows across the table; each object's target mark is its mirror spot across the table's middle.
+  // Two rows across the table; each object's mark is its own spot: a Place run picks it up and puts it back on it.
   return kinds.flatMap((kind, k) => [0, 1].map(copy => { const x = -0.85 + k * 0.34, z = copy ? 0.22 : -0.22;
-    return LabProp.parse({ ...kind, id: `${on}-${kind.name.toLowerCase()}-${copy + 1}`, on, at: [x, z], target: [-x, z] }); }));
+    return LabProp.parse({ ...kind, id: `${on}-${kind.name.toLowerCase()}-${copy + 1}`, on, at: [x, z], target: [x, z] }); }));
 }
 
-/** The base lab yard (board M18): 42 × 26 m with a 1 m grid. */
-export const LAB_BASE_YARD = { width: 42, depth: 26 } as const;
+/** The base lab yard (board M18): 42 × 26 m with a 1 m grid, beside the course (its middle at x 25 m, clear of the run line). */
+export const LAB_BASE_YARD = { width: 42, depth: 26, x: 25 } as const;
 /**
  * Footprint on the floor: `width` across the station (local x, centred on its spot) and `length` along it (local z,
  * from its spot forward). `turn` turns local z toward +x (seen from above).
@@ -122,7 +122,7 @@ export function baseLabStations(): LabStation[] {
     { kind: 'conveyor', id: 'conveyor', x: 15, z: 10 },
     { kind: 'weapon_rack', id: 'weapon-rack', x: 15, z: 3 },
     { kind: 'target_post', id: 'target-post', x: 15, z: 6 },
-  ].map(row => LabStation.parse(row));
+  ].map(row => LabStation.parse({ ...row, x: row.x + LAB_BASE_YARD.x }));
 }
 
 /** Ids must be unique across stations, obstacles and cars; at most LAB_MAX_STATIONS stations. Returns the problems. */

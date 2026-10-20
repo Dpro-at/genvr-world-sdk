@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { LAB_STATION_KINDS, LabStation, baseLabStations, graspTableProps } from '@genvr/contracts';
+import { LAB_STATION_KINDS, LabCourse, LabStation, baseLabStations, graspTableProps } from '@genvr/contracts';
 import type { LabFrame } from '../src/lab/sim.js';
-import { fittedHeight, measureLongJump, runGraspTable, stationParts, stationToWorld, worldToStation, type GraspHand, type Vec3 } from '../src/lab/stations.js';
+import { fittedHeight, measureLongJump, runGraspTable, runStation, stationParts, stationToWorld, worldToStation, type GraspHand, type Vec3 } from '../src/lab/stations.js';
 
 const pit = LabStation.parse({ kind: 'jump_pit', id: 'pit', z: 0 }) as Extract<LabStation, { kind: 'jump_pit' }>;
 const table = LabStation.parse({ kind: 'grasp_table', id: 'table', z: 0 }) as Extract<LabStation, { kind: 'grasp_table' }>;
@@ -72,5 +72,50 @@ describe('board M18 · stations in the engine', () => {
     expect(fittedHeight(table, 0.42)).toBe(0.375);
     expect(fittedHeight({ ...table, fit_to_character: false }, 0.42)).toBe(0.75);
     expect(stationParts(table, 0.42).find(p => p.part === 'top')!.center[1]).toBeCloseTo(0.355, 6);
+  });
+});
+
+describe('board M18 · runs on a station', () => {
+  const course = LabCourse.parse({ stations: [pit, table], props: graspTableProps('table') });
+  it('a jump pit run takes off at the board, flies and lands in the sand; a late take-off fouls', () => {
+    const { result, score } = runStation(course, 'pit', { speed: 8, stride: 1.6 });
+    const v = result.stationScore.values;
+    expect(v.foul_cm).toBe(0);
+    expect(v.distance_m as number).toBeGreaterThan(4);
+    expect(v.distance_m as number).toBeLessThan(8);
+    expect(result.events.map(e => e.kind)).toEqual(['start', 'take_off', 'land', 'finish']);
+    expect(score.total).toBeGreaterThan(50);
+    const late = runStation(course, 'pit', { speed: 8, stride: 1.6, jump_timing_ms: 60 });
+    expect(late.result.stationScore.values.foul_cm as number).toBeGreaterThan(0);
+    expect(late.result.events.some(e => e.kind === 'foul')).toBe(true);
+    expect(late.score.total).toBeLessThan(score.total);
+    // Same course, settings and seed: the same run.
+    expect(runStation(course, 'pit', { speed: 8, stride: 1.6 }).result.frames).toEqual(result.frames);
+  });
+  it('a slow run-up comes down before the sand: no distance, but take-off speed and steps are measured', () => {
+    const v = runStation(course, 'pit', { speed: 1.6 }).result.stationScore.values;
+    expect(v).toMatchObject({ distance_m: null, landing: 'short', take_off_speed: 1.6 });
+    expect(v.steps as number).toBeGreaterThan(5);
+  });
+  it('a grasp table run grabs the reachable objects, carries them to their marks and drops nothing', () => {
+    const { result, score } = runStation(course, 'table');
+    const v = result.stationScore.values;
+    expect(v.objects).toBe(12);
+    expect(v.drops).toBe(0);
+    expect(v.grabbed as number).toBeGreaterThanOrEqual(6);
+    expect(v.place_error_cm as number).toBeLessThan(3);
+    expect(result.objects).toHaveLength(12);
+    expect(result.objects[0]!.at).toHaveLength(result.frames.length);
+    expect(score.total).toBeGreaterThan(40);
+    // Side-steps keep the planted feet still.
+    expect(score.foot_slide_cm).toBeLessThan(2);
+    // A smaller body (half the hip height) reaches less far.
+    const small = runStation(course, 'table', {}, course.seed, 0.42).result.stationScore.values;
+    expect(small.grabbed as number).toBeLessThanOrEqual(v.grabbed as number);
+  });
+  it('stations without a phase-1 engine say so', () => {
+    const pool = LabCourse.parse({ stations: [LabStation.parse({ kind: 'pool', id: 'pool', z: 0 })] });
+    expect(() => runStation(pool, 'pool')).toThrow('later phase');
+    expect(() => runStation(pool, 'nope')).toThrow('No station');
   });
 });

@@ -5,9 +5,10 @@ import {
   ArrowRight, Bone, Car, Check, Copy, Dices, Eye, EyeOff, Footprints, Ghost, Play, Plus, RotateCcw, Ruler, Scale, Square, Star,
   StepBack, StepForward, TrafficCone, Trash2, X,
 } from 'lucide-react';
-import { LAB_FOLLOW_AVATAR, LAB_LATER_KINDS, LAB_OBSTACLE_KINDS, type LabObstacle, type LabObstacleKind, type LabOverlay, type LabRun } from '@genvr/contracts';
+import { LAB_FOLLOW_AVATAR, LAB_LATER_KINDS, LAB_OBSTACLE_KINDS, LAB_STATION_KINDS, type LabObstacle, type LabObstacleKind, type LabOverlay, type LabRun, type LabStation, type LabStationKind } from '@genvr/contracts';
+import { LAB_RUNNABLE_STATIONS } from '@genvr/runtime';
 import { LAB_MOVES, PERSON, type LabController, type LabSpeed } from '../../../lib/motion-lab';
-import { measure } from './lab-stage';
+import { measure, stationName } from './lab-stage';
 import { MyMotions, ShareMotionDialog } from './lab-share';
 import { LabKeyTrack, LabModeSwitch, LabPoseBar, LabPoseLeft, LabPoseRight } from './lab-pose';
 
@@ -20,6 +21,9 @@ const label = 'text-[11px] font-black tracking-wide text-ink/50 uppercase';
 const row = 'flex h-9 items-center gap-2 rounded-lg px-2 text-left text-xs';
 const KIND_NAMES: Record<LabObstacleKind, string> = { step: 'Step', ramp: 'Ramp', gap: 'Gap', low_wall: 'Low wall', window: 'Window' };
 const LATER_NAMES: Record<(typeof LAB_LATER_KINDS)[number], string> = { beam: 'Beam', door: 'Door', uneven: 'Uneven ground', moving_platform: 'Moving platform' };
+/** Board M18: the Station tiles, in the board's order. */
+const STATION_NAMES: Record<LabStationKind, string> = { jump_pit: 'Jump pit', high_bar: 'High bar', hurdles: 'Hurdles', pool: 'Pool', climb_wall: 'Climb wall', ladder: 'Ladder',
+  grasp_table: 'Grasp table', conveyor: 'Conveyor', tool_bench: 'Tool bench', weapon_rack: 'Weapons rack', target_post: 'Target post' };
 
 function useLab(lab: LabController) { useSyncExternalStore(lab.subscribe, lab.getVersion, lab.getVersion); return lab; }
 function tryRun(fn: () => unknown, setError: (e: string | null) => void) { try { fn(); setError(null); } catch (e) { setError(e instanceof Error ? e.message.split('\n')[0]! : String(e)); } }
@@ -54,6 +58,7 @@ function LabCourseLeft({ lab }: { lab: LabController }) {
   useLab(lab);
   const [error, setError] = useState<string | null>(null);
   const [menu, setMenu] = useState<{ id: string; x: number; y: number } | null>(null);
+  const [base, setBase] = useState(false);
   const { course } = lab.data;
   const value = (o: LabObstacle) => measure(o).replace(/^(step|ramp|gap|low wall|window) /, '');
   return (
@@ -74,6 +79,22 @@ function LabCourseLeft({ lab }: { lab: LabController }) {
           </li>
         ))}
       </ul>
+      {course.stations.length ? <>
+        <span className={label}>Stations</span>
+        <ul className="flex flex-col gap-0.5" aria-label="Stations">
+          {course.stations.map((st) => (
+            <li key={st.id}>
+              <div className={`${row} ${lab.view.selected === st.id ? 'bg-ink/10 ring-1 ring-ink' : 'hover:bg-ink/5'}`}>
+                <button type="button" className="flex min-w-0 flex-1 items-center gap-2 text-left" onClick={() => lab.select(st.id)} aria-pressed={lab.view.selected === st.id}>
+                  <b className="truncate">{STATION_NAMES[st.kind]}</b><span className="ml-auto truncate text-[11px] text-ink/50">{LAB_RUNNABLE_STATIONS.includes(st.kind) ? 'station' : 'placed · runs later'}</span>
+                </button>
+                <button type="button" className="rounded p-1 hover:bg-ink/10" title={st.hidden ? 'Show' : 'Hide'} aria-label={`${st.hidden ? 'Show' : 'Hide'} ${st.id}`} onClick={() => tryRun(() => lab.setStation(st.id, { hidden: !st.hidden }), setError)}>
+                  {st.hidden ? <EyeOff className="size-3.5" /> : <Eye className="size-3.5" />}</button>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </> : null}
       <span className={label}>Street</span>
       <div className="flex flex-col gap-0.5 text-xs">
         <button type="button" className={`${row} hover:bg-ink/5`} onClick={() => lab.select(null)}><TrafficCone className="size-3.5" /><b className="flex-1">{course.street ? `Street · ${course.street.lanes} lanes` : 'No street'}</b><span className="font-mono text-[11px] text-ink/50">{course.street ? `light ${course.street.light.cycle_s} s` : ''}</span></button>
@@ -86,6 +107,17 @@ function LabCourseLeft({ lab }: { lab: LabController }) {
             <Plus className="size-3.5" />{KIND_NAMES[kind]}</button>
         ))}
         {LAB_LATER_KINDS.map((kind) => <button key={kind} type="button" disabled className="flex h-12 flex-col items-center justify-center gap-0.5 rounded-xl bg-paper text-[11px] font-bold opacity-40" title={`${LATER_NAMES[kind]} — later`}><Plus className="size-3.5" />{LATER_NAMES[kind].split(' ')[0]}</button>)}
+      </div>
+      <div className="flex items-center gap-1"><span className={`${label} flex-1`}>Add a station</span>
+        <button type="button" className={`rounded-full px-2 py-0.5 text-[11px] font-bold ${base ? 'bg-amber-500 text-white' : 'bg-ink/5 hover:bg-ink/10'}`}
+          title="Put the base lab's 11 stations in the 42 × 26 m yard (replaces the stations)"
+          onClick={() => { if (base || !course.stations.length) { tryRun(() => lab.baseStations(), setError); setBase(false); } else setBase(true); }}>{base ? 'Replace stations?' : 'Base lab'}</button></div>
+      <div className="grid grid-cols-3 gap-1" aria-label="Add a station">
+        {LAB_STATION_KINDS.map((kind) => (
+          <button key={kind} type="button" className="flex h-12 flex-col items-center justify-center gap-0.5 rounded-xl bg-paper text-[11px] font-bold hover:bg-ink/10" onClick={() => tryRun(() => lab.addStation(kind, nextSpot(course.stations.length)), setError)}
+            title={`Add a ${STATION_NAMES[kind].toLowerCase()}${LAB_RUNNABLE_STATIONS.includes(kind) ? '' : ' (runs on it come in a later phase)'}`}>
+            <Plus className="size-3.5" />{STATION_NAMES[kind]}</button>
+        ))}
       </div>
       <Problem text={error} />
       {menu ? (
@@ -108,12 +140,60 @@ const SIZE_FIELDS: Record<LabObstacleKind, Array<[key: string, name: string, ste
   window: [['sill', 'Sill'], ['opening_width', 'Opening width'], ['opening_height', 'Opening height'], ['wall_height', 'Wall height', 0.1], ['wall_width', 'Wall width', 0.1], ['thickness', 'Thickness']],
 };
 
+/** New stations go to the side of the course, one behind the other (x 8 m), so they do not stand on the run. */
+function nextSpot(n: number): Record<string, number> { return { x: 8 + (n % 2) * 6, z: Math.floor(n / 2) * 10 }; }
+
+const STATION_FIELDS: Record<LabStationKind, Array<[key: string, name: string, unit: string, step: number]>> = {
+  jump_pit: [['runway_length', 'Runway', 'm', 1], ['runway_width', 'Runway w', 'm', 0.1], ['board_gap', 'Board gap', 'm', 0.1], ['sand_length', 'Sand', 'm', 0.5], ['sand_width', 'Sand w', 'm', 0.1], ['sand_depth', 'Sand d', 'm', 0.05]],
+  high_bar: [['width', 'Width', 'm', 0.1], ['height', 'Height', 'm', 0.05]],
+  hurdles: [['lane_length', 'Lane', 'm', 1], ['count', 'Count', '', 1], ['height', 'Height', 'm', 0.02], ['spacing', 'Spacing', 'm', 0.1]],
+  pool: [['length', 'Length', 'm', 0.5], ['width', 'Width', 'm', 0.5]],
+  climb_wall: [['width', 'Width', 'm', 0.5], ['height', 'Height', 'm', 0.5], ['hold_spacing', 'Holds', 'm', 0.05]],
+  ladder: [['height', 'Height', 'm', 0.1], ['rung_spacing', 'Rungs', 'm', 0.01]],
+  grasp_table: [['width', 'Width', 'm', 0.1], ['depth', 'Depth', 'm', 0.05], ['height', 'Height', 'm', 0.05]],
+  conveyor: [['length', 'Length', 'm', 0.5], ['width', 'Width', 'm', 0.05], ['height', 'Height', 'm', 0.05], ['speed_mps', 'Speed', 'm/s', 0.05], ['every_s', 'Every', 's', 0.5]],
+  tool_bench: [['width', 'Width', 'm', 0.1], ['depth', 'Depth', 'm', 0.05], ['height', 'Height', 'm', 0.05]],
+  weapon_rack: [['width', 'Width', 'm', 0.1]],
+  target_post: [['height', 'Height', 'm', 0.05], ['pads', 'Pads', '', 1]],
+};
+
+function StationProperties({ lab, st }: { lab: LabController; st: LabStation }) {
+  const [error, setError] = useState<string | null>(null);
+  const set = (patch: Record<string, unknown>) => tryRun(() => lab.setStation(st.id, patch), setError);
+  const record = st as unknown as Record<string, number | boolean>;
+  const props = lab.data.course.props.filter((p) => p.on === st.id), runnable = LAB_RUNNABLE_STATIONS.includes(st.kind);
+  return (
+    <section aria-label={`${STATION_NAMES[st.kind]} settings`} className="flex flex-col gap-2">
+      <div className="flex items-center gap-2"><div className="flex-1"><div className={label}>Station</div><b className="text-sm">{STATION_NAMES[st.kind]} · {st.id}</b></div>
+        <button type="button" className="rounded p-1.5 text-coral hover:bg-ink/10" title="Remove" aria-label="Remove" onClick={() => { if (window.confirm(`Remove ${st.id} and the objects on it?`)) tryRun(() => lab.removeStation(st.id), setError); }}><Trash2 className="size-4" /></button>
+        <button type="button" className="rounded p-1.5 hover:bg-ink/10" title="Close (Esc)" aria-label="Close" onClick={() => lab.select(null)}><X className="size-4" /></button></div>
+      <p className="font-mono text-xs text-ink/60">{stationName(st)}</p>
+      <div className="grid grid-cols-2 gap-1.5">
+        {STATION_FIELDS[st.kind].map(([key, name, unit, step]) => <NumberField key={key} name={name} unit={unit} step={step} value={record[key] as number} onChange={(v) => set({ [key]: v })} />)}
+        <NumberField name="X" unit="m" step={0.5} value={st.x} onChange={(v) => set({ x: v })} />
+        <NumberField name="Z" unit="m" step={0.5} value={st.z} onChange={(v) => set({ z: v })} />
+        <NumberField name="Turn" unit="°" step={15} value={st.turn} onChange={(v) => set({ turn: ((Math.round(v) % 360) + 360) % 360 })} />
+      </div>
+      {'fit_to_character' in st ? <label className="flex items-center gap-2 text-xs"><input type="checkbox" checked={Boolean(record.fit_to_character)} onChange={(e) => set({ fit_to_character: e.target.checked })} />Fit to character (heights follow the hip height)</label> : null}
+      {props.length ? <><span className={label}>Objects · {props.length}</span>
+        <ul className="flex max-h-40 flex-col gap-0.5 overflow-auto text-xs" aria-label="Objects on the station">
+          {props.map((p) => <li key={p.id} className="flex h-7 items-center gap-2 rounded px-1 hover:bg-ink/5"><span className="flex-1 truncate">{p.name}</span><span className="font-mono text-[11px] text-ink/50">{p.mass_kg} kg · {p.grip}</span>
+            <button type="button" className="rounded p-0.5 text-coral hover:bg-ink/10" aria-label={`Remove ${p.id}`} onClick={() => tryRun(() => lab.removeProp(p.id), setError)}><X className="size-3" /></button></li>)}
+        </ul></> : null}
+      {runnable ? <button type="button" className="flex h-9 items-center justify-center gap-2 rounded-lg bg-ink text-sm font-bold text-on-brand" onClick={() => tryRun(() => { lab.runOn(st.id); lab.select(null); lab.run({}, PERSON); }, setError)}><Play className="size-4" />Run here</button>
+        : <p className="text-[11px] text-ink/50">Placed and drawn. Runs on the {STATION_NAMES[st.kind].toLowerCase()} come in a later phase of board M18.</p>}
+      <Problem text={error} />
+    </section>
+  );
+}
+
 function LabRunRight({ lab }: { lab: LabController }) {
   useLab(lab);
   const selected = lab.data.course.obstacles.find((o) => o.id === lab.view.selected);
+  const station = lab.data.course.stations.find((s) => s.id === lab.view.selected);
   // Board M14: the share dialog opens after Save as version, from My motions, or to review an agent's prepared share.
   const [sharing, setSharing] = useState<string | null>(null);
-  return <div className="flex h-full min-h-0 flex-col gap-3 overflow-auto p-3">{selected ? <ObstacleProperties lab={lab} o={selected} /> : <><RunPanel lab={lab} share={setSharing} /><MyMotions lab={lab} open={setSharing} /><CoursePanel lab={lab} /></>}
+  return <div className="flex h-full min-h-0 flex-col gap-3 overflow-auto p-3">{station ? <StationProperties lab={lab} st={station} /> : selected ? <ObstacleProperties lab={lab} o={selected} /> : <><RunPanel lab={lab} share={setSharing} /><MyMotions lab={lab} open={setSharing} /><CoursePanel lab={lab} /></>}
     {sharing && lab.data.versions.some((v) => v.id === sharing) ? <ShareMotionDialog key={sharing} lab={lab} version={sharing} close={() => setSharing(null)} /> : null}</div>;
 }
 
@@ -236,8 +316,20 @@ function RunPanel({ lab, share }: { lab: LabController; share: (version: string)
         : lab.data.who !== LAB_FOLLOW_AVATAR ? <p className="text-[11px] text-ink/50">Picked in the Lab · <button type="button" className="underline" onClick={() => tryRun(() => lab.setWho(LAB_FOLLOW_AVATAR), setError)}>Follow the Avatar tab</button></p>
         : <p className="text-[11px] text-ink/50">Follows the Avatar tab.</p>}
       <label className="flex items-center gap-2 text-xs"><input type="checkbox" checked={s.wait_for_green} onChange={(e) => set({ wait_for_green: e.target.checked })} />Waits for green at the crossing</label>
+      {lab.data.course.stations.some((st) => LAB_RUNNABLE_STATIONS.includes(st.kind)) ? (
+        <label className="flex h-8 items-center gap-1.5 rounded-lg border border-ink/10 bg-paper px-2 text-xs"><span className="text-[10px] font-black uppercase text-ink/50">Run on</span>
+          <select aria-label="Run on" className="min-w-0 flex-1 bg-transparent font-semibold outline-none" value={lab.view.station ?? ''} onChange={(e) => tryRun(() => lab.runOn(e.target.value || null), setError)}>
+            <option value="">The course</option>
+            {lab.data.course.stations.filter((st) => LAB_RUNNABLE_STATIONS.includes(st.kind)).map((st) => <option key={st.id} value={st.id}>{STATION_NAMES[st.kind]} · {st.id}</option>)}
+          </select></label>) : null}
       <button type="button" className="flex h-9 items-center justify-center gap-2 rounded-lg bg-ink text-sm font-bold text-on-brand" onClick={() => tryRun(() => lab.run({}, PERSON), setError)}><Play className="size-4" />Run<kbd className="font-mono text-[10px] opacity-70">R</kbd></button>
       <Problem text={error} />
+      {shown?.station_score ? (
+        <div aria-label="Station scores" className="rounded-lg bg-ink/5 p-2">
+          <div className={label}>{STATION_NAMES[shown.station_score.kind]} · {shown.station}</div>
+          {Object.entries(shown.station_score.values).filter(([key]) => key !== 'hip_m').map(([key, value]) => (
+            <div key={key} className="flex h-6 items-center text-xs"><span className="flex-1">{key.replace(/_/g, ' ')}</span><b className="font-mono tabular-nums">{value === null ? '—' : String(value)}</b></div>))}
+        </div>) : null}
       <div className="mt-1 grid grid-cols-[1fr_64px_64px_10px] gap-1.5"><span className={label}>Score</span><span className={label}>{shown?.id ?? '—'}</span><span className={`${label} !text-cyan-600`}>{best ? `best ${best.id.replace(/^.*-v/, 'v')}` : 'best —'}</span><span /></div>
       {SCORE_ROWS.map(([key, name, hint]) => (
         <div key={key} title={hint} className="grid h-7 grid-cols-[1fr_64px_64px_10px] items-center gap-1.5 border-b border-ink/5 text-xs">

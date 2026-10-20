@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { LAB_MAX_STATIONS, LAB_STATION_KINDS, LabProp, LabStation, stationProblems } from './motion-lab-stations.js';
 
 /**
  * Motion lab (MOTION-LAB L1 + L2): an empty grey test world with a measured course, a street with box cars, repeatable
@@ -74,12 +75,16 @@ export const LabCourse = z.object({
   cars: z.array(LabCar).max(8).default([]),
   /** Where the run ends (metres along the course). */
   finish_z: metres(2, 120).default(30),
+  /** Board M18: training stations in the lab (jump pit, grasp table, pool …) and the objects on them. */
+  stations: z.array(LabStation).max(LAB_MAX_STATIONS).default([]),
+  props: z.array(LabProp).max(80).default([]),
 }).strict().superRefine((course, ctx) => {
   const ids = new Set<string>();
   for (const [i, o] of [...course.obstacles, ...course.cars].entries()) {
     if (ids.has(o.id)) ctx.addIssue({ code: 'custom', message: `Two parts share the id "${o.id}".`, path: ['obstacles', i, 'id'] });
     ids.add(o.id);
   }
+  for (const message of stationProblems(course.stations, [...ids], course.props)) ctx.addIssue({ code: 'custom', message, path: ['stations'] });
   if (course.street) for (const [i, car] of course.cars.entries())
     if (car.lane >= course.street.lanes) ctx.addIssue({ code: 'custom', message: `Car "${car.id}" is on lane ${car.lane}, the street has ${course.street.lanes}.`, path: ['cars', i, 'lane'] });
   if (course.street && course.street.light.red_s >= course.street.light.cycle_s)
@@ -125,8 +130,10 @@ export const LabScore = z.object({
 }).strict();
 export type LabScore = z.infer<typeof LabScore>;
 
-export const LabEventKind = z.enum(['start', 'step', 'ramp', 'gap_jump', 'land', 'vault', 'window', 'wait', 'crossing', 'car_near', 'car_hit', 'fall', 'slide', 'blocked', 'finish']);
-export const LabEvent = z.object({ t: z.number().min(0), kind: LabEventKind, label: z.string().max(120), obstacle: labId.optional() }).strict();
+export const LabEventKind = z.enum(['start', 'step', 'ramp', 'gap_jump', 'land', 'vault', 'window', 'wait', 'crossing', 'car_near', 'car_hit', 'fall', 'slide', 'blocked', 'finish',
+  // Board M18 · stations.
+  'take_off', 'foul', 'grab', 'drop', 'place', 'swing_hit', 'water_in', 'float', 'stroke', 'ladder', 'bar_touch']);
+export const LabEvent = z.object({ t: z.number().min(0), kind: LabEventKind, label: z.string().max(120), obstacle: labId.optional(), station: labId.optional() }).strict();
 export type LabEvent = z.infer<typeof LabEvent>;
 
 /**
@@ -191,8 +198,15 @@ export const LabRun = z.object({
   by: z.enum(['person', 'agent']).default('person'),
   /** A run of a motion made in the Lab (board M11): its natural pace measured from its keys, so a replay is exact. */
   move: z.object({ speed: z.number().min(0).max(20), stride: z.number().min(0).max(4) }).strict().optional(),
+  /** Board M18: a run on a station and what it measured there (distance, foul, grabs …), shown above the common scores. */
+  station: labId.optional(),
+  station_score: z.lazy(() => LabStationScore).optional(),
 }).strict();
 export type LabRun = z.infer<typeof LabRun>;
+/** What a run on a station measured: named values in the station's own units. */
+export const LabStationScore = z.object({ kind: z.enum(LAB_STATION_KINDS as [LabStation['kind'], ...LabStation['kind'][]]),
+  values: z.record(z.string().max(40), z.union([z.number(), z.string().max(40), z.null()])) }).strict();
+export type LabStationScore = z.infer<typeof LabStationScore>;
 
 export const MotionVersion = z.object({
   id: labId,
@@ -366,7 +380,7 @@ export const MotionLabOperation = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('characters') }).strict(),
   /** Pick who runs: a character id from `characters`, or `avatar` to follow the Avatar tab. */
   z.object({ kind: z.literal('who_set'), who: characterId }).strict(),
-  z.object({ kind: z.literal('run'), settings: LabRunSettingsPatch.optional(), version: labId.optional() }).strict(),
+  z.object({ kind: z.literal('run'), settings: LabRunSettingsPatch.optional(), version: labId.optional(), station: labId.optional() }).strict(),
   z.object({ kind: z.literal('runs_list') }).strict(),
   z.object({ kind: z.literal('scores'), run: labId.optional() }).strict(),
   z.object({ kind: z.literal('frame'), run: labId.optional(), t: z.number().min(0).max(600) }).strict(),
@@ -377,6 +391,17 @@ export const MotionLabOperation = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('save_best'), version: labId }).strict(),
   z.object({ kind: z.literal('rollback'), version: labId }).strict(),
   z.object({ kind: z.literal('version_delete'), version: labId, confirm: z.literal(true) }).strict(),
+  // ---- training stations (board M18)
+  /** Add a station: { station: { kind, z, x?, turn?, …sizes } }; the grasp table brings its 12 objects. */
+  z.object({ kind: z.literal('station_add'), station: z.unknown() }).strict(),
+  z.object({ kind: z.literal('station_set'), id: labId, set: z.record(z.string().max(40), z.unknown()) }).strict(),
+  z.object({ kind: z.literal('station_remove'), id: labId, confirm: z.literal(true) }).strict(),
+  /** Put the base lab's stations in the yard (replaces the stations and their objects). */
+  z.object({ kind: z.literal('stations_base'), confirm: z.literal(true) }).strict(),
+  z.object({ kind: z.literal('prop_add'), prop: z.unknown() }).strict(),
+  z.object({ kind: z.literal('prop_set'), id: labId, set: z.record(z.string().max(40), z.unknown()) }).strict(),
+  z.object({ kind: z.literal('prop_remove'), id: labId, confirm: z.literal(true) }).strict(),
+  z.object({ kind: z.literal('conveyor_set'), id: labId, speed_mps: metres(0.1, 1).optional(), every_s: metres(1, 5).optional(), mix: z.boolean().optional() }).strict(),
   // ---- pose and key frames (board M11)
   /** Motions made in the Lab and the one open in Pose. */
   z.object({ kind: z.literal('pose_list') }).strict(),

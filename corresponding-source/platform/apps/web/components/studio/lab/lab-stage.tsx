@@ -23,9 +23,9 @@ import {
   Vector3,
   type Material,
 } from 'three';
-import { DEFAULT_CHARACTER_RECIPE, type LabCourse, type LabObstacle } from '@genvr/contracts';
+import { DEFAULT_CHARACTER_RECIPE, type LabCourse, type LabObstacle, type LabStation } from '@genvr/contracts';
 import { CORE_ANIMATIONS } from '@genvr/core-library';
-import { carBoxes, courseBoxes, labClipPose, labMadeMotionPace, labPoseAt, laneCentreZ, LAB_CAR_SIZE, walkerGreen, type LabFrame } from '@genvr/runtime';
+import { carBoxes, courseBoxes, fittedHeight, graspObjects, labClipPose, labMadeMotionPace, labPoseAt, laneCentreZ, stationParts, stationToWorld, LAB_CAR_SIZE, STATION_REFERENCE_HIP, walkerGreen, type LabFrame, type LabRunResult, type StationPart, type StationRunResult } from '@genvr/runtime';
 import type { CharacterStage } from '@genvr/runtime/character';
 import { labClipTime, type LabController } from '../../../lib/motion-lab';
 import { LabPoseOverlay } from './lab-pose';
@@ -37,6 +37,9 @@ import { LabPoseOverlay } from './lab-pose';
  */
 const CLIPS = new Map(CORE_ANIMATIONS.map((a) => [a.manifest.name, a.clip]));
 const OBSTACLE = 0xc5c9d1, SELECTED = 0xf5b942;
+/** Board M18: station parts by what they are made of. */
+const SURFACE: Record<NonNullable<StationPart['surface']>, number> = { sand: 0xd8c08a, water: 0x3b82f6, wet: 0x6b7280, mat: 0x2f5fb3, wood: 0xa97c50, metal: 0x9ca3af, belt: 0x27272a };
+const PROP = 0xf2f3f5;
 /** Behind the character, a little to its right and above (azimuth from +z, elevation, distance). */
 const LAB_ORBIT = [215, 24, 11] as const;
 /** In front of the character and to his right, close enough to pick joints. */
@@ -130,7 +133,7 @@ export function LabStage({ lab }: { lab: LabController }) {
     if (heldPose) { const { bones, root } = labClipPose(heldPose); stage.current.setHeldPose({ bones, root: root.map((m) => m * lab.legScale) }); }
     else stage.current.setHeldPose(null);
   });
-  useEffect(() => { if (ready) world.current?.show(course, frame, ghost, view.t, view.overlays); });
+  useEffect(() => { if (ready) world.current?.show(course, frame, ghost, view.t, view.overlays, view.run?.result ?? null, lab.legScale); });
 
   return (
     <div className="relative h-full min-h-0 w-full overflow-hidden" style={{ background: '#30343c' }}>
@@ -146,6 +149,8 @@ class LabWorld {
   readonly root = new Group();
   #course = new Group();
   #cars = new Group();
+  /** Board M18: objects on stations, moved along a station run's object tracks. */
+  #props = new Group();
   #marks = new Group();
   #light: Mesh[] = [];
   #red = new Mesh(new SphereGeometry(0.11, 12, 10), new MeshBasicMaterial({ color: 0xe5484d }));
@@ -157,7 +162,7 @@ class LabWorld {
   #key = '';
 
   constructor() {
-    this.root.add(this.#course, this.#cars, this.#marks);
+    this.root.add(this.#course, this.#cars, this.#marks, this.#props);
     const dot = (color: number) => { const m = new Mesh(new CylinderGeometry(0.07, 0.07, 0.01, 20), new MeshBasicMaterial({ color })); this.#marks.add(m); return m; };
     this.#feet = [dot(0x3dd68c), dot(0x3dd68c)];
     this.#balance = new Mesh(new BoxGeometry(0.12, 0.012, 0.12), new MeshBasicMaterial({ color: 0xf5b942 }));
@@ -186,13 +191,15 @@ class LabWorld {
     this.#key = key;
     // Meshes share a few cached shapes, materials and labels, and nothing is freed: WebGPU keeps drawing a freed
     // buffer for a while after a rebuild (seen as "used in submit while destroyed").
-    this.#course.clear(); this.#cars.clear();
+    this.#course.clear(); this.#cars.clear(); this.#props.clear();
     this.#light = [];
     const end = Math.max(course.finish_z + 6, 40);
     // Grey floor with a 1 m grid (5 m lines darker).
-    const floor = block(40, 0.004, end + 10, 0, -0.004, (end - 10) / 2, 0x4a4e57);
+    // Stations stand beside the course (the base yard is at x 4 … 46 m): the floor reaches them.
+    const right = Math.max(20, ...course.stations.map((st) => Math.ceil(st.x + 16)));
+    const floor = block(right + 23, 0.004, end + 10, (right - 23) / 2, -0.004, (end - 10) / 2, 0x4a4e57);
     floor.castShadow = false;
-    this.#course.add(floor, grid(end, 1, 0x5a5f6a), grid(end, 5, 0x767c88));
+    this.#course.add(floor, grid(end, 1, 0x5a5f6a, right), grid(end, 5, 0x767c88, right));
     for (const o of course.obstacles) if (o.kind === 'gap' && !o.hidden) this.#course.add(block(o.lane, 0.02, o.width, o.x, 0.003, o.z + o.width / 2, 0x15171c));
     // Obstacles.
     for (const b of courseBoxes(course)) {
@@ -209,6 +216,30 @@ class LabWorld {
       this.#course.add(label);
     }
     if (measures) for (const z of [0, 5, 10, 15, 20, 25, 30]) { const l = text(`${z} m`, '#9aa3b2'); l.position.set(-3, 0.05, z); l.scale.multiplyScalar(0.7); this.#course.add(l); }
+    // Training stations (board M18): their parts, turned with the station, and the objects on them.
+    for (const station of course.stations) if (!station.hidden) {
+      for (const part of stationParts(station)) {
+        const at = stationToWorld(station, part.center);
+        const color = station.id === selected ? SELECTED : part.surface ? SURFACE[part.surface] : OBSTACLE;
+        const mesh = block(part.size[0], part.size[1], part.size[2], at[0], at[1], at[2], color);
+        mesh.rotation.y = (station.turn * Math.PI) / 180;
+        if (part.surface === 'water') { mesh.material = waterMaterial(); mesh.position.y = Math.min(-0.03, at[1]); }
+        mesh.castShadow = part.surface !== 'water';
+        this.#course.add(mesh);
+      }
+      if (measures) { const l = text(stationName(station), station.id === selected ? '#0b0d12' : '#f2f3f5', station.id === selected ? '#f5b942' : '#0b0d12e6'); const at = stationToWorld(station, [0, 2.2, 0.5]); l.position.set(at[0], at[1], at[2]); this.#course.add(l); }
+    }
+    for (const prop of course.props) {
+      const station = course.stations.find((s) => s.id === prop.on);
+      if (!station || station.hidden) continue;
+      const mesh = prop.shape === 'sphere' ? new Mesh(unitSphere(), material(PROP)) : prop.shape === 'cylinder' ? new Mesh(unitCylinder(), material(PROP)) : new Mesh(unitBox ??= new BoxGeometry(1, 1, 1), material(prop.material === 'wood' ? 0xa97c50 : prop.material === 'card' ? 0xc8a46e : PROP));
+      mesh.scale.set(...prop.size_m);
+      mesh.rotation.y = (station.turn * Math.PI) / 180;
+      mesh.castShadow = true;
+      mesh.name = prop.id;
+      this.#props.add(mesh);
+    }
+    this.#restProps(course, STATION_REFERENCE_HIP);
     // Start and finish lines.
     this.#course.add(block(4, 0.01, 0.08, 0, 0.006, 0, 0xf2f3f5, 'basic'), block(4, 0.01, 0.08, 0, 0.006, course.finish_z, 0x3dd68c, 'basic'));
     // Street with its crossing and walkers' light.
@@ -235,12 +266,27 @@ class LabWorld {
     }
   }
 
-  show(course: LabCourse, frame: LabFrame | null, ghost: LabFrame | null, t: number, overlays: readonly string[]) {
+  /** Objects where they rest on their stations (tables and the bench fitted to the character's hip height). */
+  #restProps(course: LabCourse, hip: number) {
+    for (const station of course.stations) {
+      const rest = station.kind === 'grasp_table' ? graspObjects(station, course.props, hip).map((o) => [o.prop.id, o.at] as const)
+        : course.props.filter((p) => p.on === station.id).map((p) => [p.id, stationToWorld(station, [p.at[0], ('height' in station ? fittedHeight(station as LabStation & { height: number }, hip) : 0.5) + p.size_m[1] / 2, 0.3 + p.at[1]])] as const);
+      for (const [id, at] of rest) this.#props.getObjectByName(id)?.position.set(...at);
+    }
+  }
+
+  show(course: LabCourse, frame: LabFrame | null, ghost: LabFrame | null, t: number, overlays: readonly string[], result: LabRunResult | null = null, legScale = 1) {
     const f = frame ?? { x: 0, y: 0, z: -1, tilt: 0, feet: [{ x: -0.12, y: 0, z: -1, planted: true }, { x: 0.12, y: 0, z: -0.8, planted: true }], com: [0, -1], speed: 0, clip: 'Idle', t: 0 } as LabFrame;
     // The robot stays at the origin facing the stage's +z (the character stage's front, towards its camera); the
-    // course runs along +z too, so it lies ahead of the robot, and the world moves under it.
-    this.root.rotation.y = 0;
-    this.root.position.set(-f.x, -f.y, -f.z);
+    // course runs along +z too, so it lies ahead of the robot, and the world moves under it. On a station (board M18)
+    // the world also turns, so the character faces the way it runs or the table it works at.
+    const station = result && 'heading' in result ? result as StationRunResult : null, h = ((station?.heading ?? 0) * Math.PI) / 180;
+    this.root.rotation.y = -h;
+    this.root.position.set(-(f.x * Math.cos(h) - f.z * Math.sin(h)), -f.y, -(f.x * Math.sin(h) + f.z * Math.cos(h)));
+    if (station?.objects.length) {
+      const i = Math.max(0, Math.min(station.frames.length - 1, Math.round(t * 60)));
+      for (const track of station.objects) { const at = track.at[Math.min(i, track.at.length - 1)]; if (at) this.#props.getObjectByName(track.id)?.position.set(...at); }
+    } else this.#restProps(course, STATION_REFERENCE_HIP * legScale);
     const feetOn = overlays.includes('feet');
     f.feet.forEach((foot, i) => {
       const m = this.#feet[i]!;
@@ -312,13 +358,14 @@ function rampGeometry(min: [number, number, number], max: [number, number, numbe
   return g;
 }
 const grids = new Map<string, LineSegments>();
-function grid(end: number, step: number, color: number): LineSegments {
-  const key = `${end}:${step}`;
+/** The floor's grid: x −20 … 20 m, and on to `right` m when the course has stations beside it (board M18). */
+function grid(end: number, step: number, color: number, right = 20): LineSegments {
+  const key = `${end}:${step}:${right}`;
   let lines = grids.get(key);
   if (!lines) {
     const v: number[] = [];
-    for (let x = -20; x <= 20; x += step) v.push(x, 0.001, -5, x, 0.001, end);
-    for (let z = Math.ceil(-5 / step) * step; z <= end; z += step) v.push(-20, 0.001, z, 20, 0.001, z);
+    for (let x = -20; x <= right; x += step) v.push(x, 0.001, -5, x, 0.001, end);
+    for (let z = Math.ceil(-5 / step) * step; z <= end; z += step) v.push(-20, 0.001, z, right, 0.001, z);
     const g = new BufferGeometry();
     g.setAttribute('position', new Float32BufferAttribute(v, 3));
     lines = new LineSegments(g, new LineBasicMaterial({ color, transparent: true, opacity: step > 1 ? 0.9 : 0.55 }));
@@ -349,6 +396,29 @@ function text(value: string, color = '#f2f3f5', background = '#0b0d12e6'): Sprit
   return sprite;
 }
 
+let sphere: SphereGeometry | null = null, cylinder: CylinderGeometry | null = null, water: Material | null = null;
+const unitSphere = () => (sphere ??= new SphereGeometry(0.5, 18, 12));
+const unitCylinder = () => (cylinder ??= new CylinderGeometry(0.5, 0.5, 1, 18));
+const waterMaterial = () => (water ??= new MeshStandardMaterial({ color: SURFACE.water, transparent: true, opacity: 0.55, roughness: 0.2, depthWrite: false }));
+const STATION_NAMES: Record<LabStation['kind'], string> = { jump_pit: 'Jump pit', high_bar: 'High bar', hurdles: 'Hurdles', pool: 'Pool', climb_wall: 'Climbing wall', ladder: 'Ladder',
+  grasp_table: 'Grasp table', conveyor: 'Conveyor', tool_bench: 'Tool bench', weapon_rack: 'Weapons rack', target_post: 'Target post' };
+/** A station's name and main sizes, as its label and in the course list. */
+export function stationName(s: LabStation): string {
+  const m = (v: number) => `${v} m`;
+  switch (s.kind) {
+    case 'jump_pit': return `${STATION_NAMES[s.kind]} · runway ${m(s.runway_length)} · board ${m(s.board_gap)}`;
+    case 'high_bar': return `${STATION_NAMES[s.kind]} · ${m(s.height)}`;
+    case 'hurdles': return `${STATION_NAMES[s.kind]} · ${s.count} × ${m(s.height)}`;
+    case 'pool': return `${STATION_NAMES[s.kind]} · ${s.length} × ${m(s.width)}`;
+    case 'climb_wall': return `${STATION_NAMES[s.kind]} · ${m(s.height)}`;
+    case 'ladder': return `${STATION_NAMES[s.kind]} · ${m(s.height)}`;
+    case 'grasp_table': return `${STATION_NAMES[s.kind]} · ${m(s.height)}`;
+    case 'conveyor': return `${STATION_NAMES[s.kind]} · ${s.speed_mps} m/s`;
+    case 'tool_bench': return `${STATION_NAMES[s.kind]} · ${s.tools.length} tools`;
+    case 'weapon_rack': return `${STATION_NAMES[s.kind]} · ${s.weapons.length} props`;
+    case 'target_post': return `${STATION_NAMES[s.kind]} · ${s.pads} pads`;
+  }
+}
 export function measure(o: LabObstacle): string {
   const cm = (m: number) => `${Math.round(m * 100)} cm`;
   switch (o.kind) {

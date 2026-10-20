@@ -42,7 +42,9 @@ describe('board M18 · training stations', () => {
     expect(stationProblems(stations)).toEqual([]);
     const boxes = stations.map(station => { const c = stationCorners(station); return { id: station.id, x0: Math.min(...c.map(p => p[0])), x1: Math.max(...c.map(p => p[0])), z0: Math.min(...c.map(p => p[1])), z1: Math.max(...c.map(p => p[1])) }; });
     for (const b of boxes) {
-      expect(b.x0, b.id).toBeGreaterThanOrEqual(-LAB_BASE_YARD.width / 2); expect(b.x1, b.id).toBeLessThanOrEqual(LAB_BASE_YARD.width / 2);
+      expect(b.x0, b.id).toBeGreaterThanOrEqual(LAB_BASE_YARD.x - LAB_BASE_YARD.width / 2); expect(b.x1, b.id).toBeLessThanOrEqual(LAB_BASE_YARD.x + LAB_BASE_YARD.width / 2);
+      // Clear of the course's run line (x −3 … 3 m).
+      expect(b.x0, b.id).toBeGreaterThan(3);
       expect(b.z0, b.id).toBeGreaterThanOrEqual(0); expect(b.z1, b.id).toBeLessThanOrEqual(LAB_BASE_YARD.depth);
     }
     for (const a of boxes) for (const b of boxes) if (a !== b) expect(a.x1 <= b.x0 || b.x1 <= a.x0 || a.z1 <= b.z0 || b.z1 <= a.z0, `${a.id} / ${b.id}`).toBe(true);
