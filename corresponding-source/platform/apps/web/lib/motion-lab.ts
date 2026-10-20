@@ -19,6 +19,7 @@ import {
   baseLabStations,
   graspTableProps,
   toolBenchProps,
+  weaponRackProps,
   MOTION_SHARE_LICENCE,
   MotionLabOperation,
   MotionShare,
@@ -225,7 +226,7 @@ export class LabController {
     const id = typeof fields.id === 'string' ? fields.id : freeId(course, kind.replace('_', '-'));
     const station = LabStation.parse({ z: 0, x: 0, ...fields, kind, id });
     // The grasp table comes with its 12 objects, the tool bench with its tools and the pieces they work on.
-    const props = course.props.some((p) => p.on === id) ? [] : station.kind === 'grasp_table' ? graspTableProps(id) : station.kind === 'tool_bench' ? toolBenchProps(id, station.tools) : [];
+    const props = course.props.some((p) => p.on === id) ? [] : station.kind === 'grasp_table' ? graspTableProps(id) : station.kind === 'tool_bench' ? toolBenchProps(id, station.tools) : station.kind === 'weapon_rack' ? weaponRackProps(id, station.weapons) : [];
     this.setCourse({ ...course, stations: [...course.stations, station], props: [...course.props, ...props] });
     this.select(station.id);
     return station;
@@ -247,7 +248,7 @@ export class LabController {
   /** The base lab's stations in the 42 × 26 m yard (they replace the stations and their objects). */
   baseStations() {
     const stations = baseLabStations();
-    this.setCourse({ ...this.#data.course, stations, props: stations.flatMap((s) => (s.kind === 'grasp_table' ? graspTableProps(s.id) : s.kind === 'tool_bench' ? toolBenchProps(s.id, s.tools) : [])) });
+    this.setCourse({ ...this.#data.course, stations, props: stations.flatMap((s) => (s.kind === 'grasp_table' ? graspTableProps(s.id) : s.kind === 'tool_bench' ? toolBenchProps(s.id, s.tools) : s.kind === 'weapon_rack' ? weaponRackProps(s.id, s.weapons) : [])) });
     this.select(null);
     return this.#data.course.stations;
   }
@@ -803,7 +804,7 @@ const HELP: Record<string, string> = {
   characters: 'Characters the Lab can use (id, name, source lab|mine, leg in metres), who runs now, and whether the Lab follows the Avatar tab.',
   who_set: 'Pick who runs: { who: a character id from characters, or "avatar" to follow the Avatar tab }. Hidden bodies are not offered.',
   settings_set: 'Run settings: motion (Walk, Run, Sneak, Crouch Walk), speed, stride, step_height, jump_timing_ms, blend_s, lean_deg, wait_for_green.',
-  run: 'Run the course once (fixed step, seed). Optional settings or a version to start from; { station } runs on a training station instead (jump_pit, grasp_table, conveyor, tool_bench, pool, climb_wall, ladder now). Returns the run id and scores (station scores too).',
+  run: 'Run the course once (fixed step, seed). Optional settings or a version to start from; { station } runs on a training station instead (jump_pit, grasp_table, conveyor, tool_bench, pool, climb_wall, ladder, weapon_rack, target_post now). Returns the run id and scores (station scores too).',
   runs_list: 'The last 20 runs with their scores.',
   scores: 'Scores of a run (default: the last).',
   frame: 'One frame of a run at time t: body, feet (planted), balance point, speed, move.',
@@ -818,7 +819,7 @@ const HELP: Record<string, string> = {
   share_prepare: 'Prepare a share with the GenVR community: { version, share: { name, description?, tags?, preview_s? } }. Nothing is published; it waits for the owner.',
   share: 'Publish a prepared share: { version, confirm: true }. Owner only: an agent is refused and the share keeps waiting for the owner in the Lab.',
   unshare: 'Stop sharing a motion, or drop a prepared share: { version, confirm: true }.',
-  station_add: 'Add a training station (board M18): { station: { kind: jump_pit|high_bar|hurdles|pool|climb_wall|ladder|grasp_table|conveyor|tool_bench|weapon_rack|target_post, x, z, turn?, …sizes in metres } }. The grasp table comes with its 12 objects, the tool bench with its tools and pieces.',
+  station_add: 'Add a training station (board M18): { station: { kind: jump_pit|high_bar|hurdles|pool|climb_wall|ladder|grasp_table|conveyor|tool_bench|weapon_rack|target_post, x, z, turn?, …sizes in metres } }. The grasp table comes with its 12 objects, the tool bench with its tools and pieces, the weapons rack with its foam and wood training props.',
   station_set: 'Change a station\'s place or sizes: { id, set: { x, z, turn, height, runway_length, … } }.',
   station_remove: 'Remove a station and the objects on it: { id, confirm: true }.',
   stations_base: 'Put the base lab\'s 11 stations in the 42 × 26 m yard (replaces the stations and their objects): { confirm: true }.',

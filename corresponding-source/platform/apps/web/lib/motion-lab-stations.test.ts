@@ -44,12 +44,16 @@ describe('board M18 · stations in the Lab and through motion_lab', () => {
     expect(lab.data.course.props.filter((p) => p.on === 'bench').map((p) => p.name)).toEqual(['Hammer', 'Nail board', 'Screwdriver', 'Screw plate', 'Hand saw', 'Plank in clamp', 'Wrench', 'Bolt']);
     const bench = await runMotionLab(lab, { kind: 'run', station: 'bench' }, agent) as { station_score: { values: Record<string, unknown> } };
     expect(bench.station_score.values).toMatchObject({ wrench_pulls: 8, other_hand_holds: 'yes' });
-    // Phase 3: the pool runs too; the weapons rack comes in a later phase.
+    // Phase 3: the pool runs too. Phase 4: the weapons rack (with its props) runs; the high bar comes in a later phase.
     await runMotionLab(lab, { kind: 'station_add', station: { kind: 'pool', id: 'pool', x: 20, z: 4 } }, agent);
     const swim = await runMotionLab(lab, { kind: 'run', station: 'pool' }, agent) as { station_score: { values: Record<string, unknown> } };
     expect(swim.station_score.values).toMatchObject({ sank: 'no', reached_deep_end: 'yes' });
     await runMotionLab(lab, { kind: 'station_add', station: { kind: 'weapon_rack', id: 'rack', x: 30, z: 4 } }, agent);
-    await expect(runMotionLab(lab, { kind: 'run', station: 'rack' }, agent)).rejects.toThrow('later phase');
+    expect(lab.data.course.props.filter((p) => p.on === 'rack').map((p) => p.material)).toEqual(['foam', 'wood', 'foam', 'wood', 'foam', 'foam']);
+    const blows = await runMotionLab(lab, { kind: 'run', station: 'rack' }, agent) as { station_score: { values: Record<string, unknown> } };
+    expect(blows.station_score.values).toMatchObject({ weapons: 6, strikes: 13, target: 'practice target' });
+    await runMotionLab(lab, { kind: 'station_add', station: { kind: 'high_bar', id: 'bar', x: 36, z: 4 } }, agent);
+    await expect(runMotionLab(lab, { kind: 'run', station: 'bar' }, agent)).rejects.toThrow('later phase');
   });
   it('removing needs confirm, like version_delete; the base lab puts all 11 stations in the yard', async () => {
     const lab = new LabController(newLabData());
@@ -62,10 +66,10 @@ describe('board M18 · stations in the Lab and through motion_lab', () => {
     const base = await runMotionLab(lab, { kind: 'stations_base', confirm: true }, agent) as { stations: string[] };
     expect(base.stations).toHaveLength(11);
     const inspect = await runMotionLab(lab, { kind: 'inspect' }, agent) as { course: { stations: string[]; objects: number } };
-    expect(inspect.course.stations.find((s) => s.startsWith('weapon-rack'))).toContain('runs later');
+    expect(inspect.course.stations.find((s) => s.startsWith('high-bar'))).toContain('runs later');
     expect(inspect.course.stations.find((s) => s.startsWith('pool'))).not.toContain('runs later');
-    // 12 grasp objects + the tool bench's 4 tools and 4 pieces.
-    expect(inspect.course.objects).toBe(20);
+    // 12 grasp objects + the tool bench's 4 tools and 4 pieces + the rack's 6 training props.
+    expect(inspect.course.objects).toBe(26);
     // Ids stay unique across obstacles, stations and objects.
     await expect(runMotionLab(lab, { kind: 'station_add', station: { kind: 'ladder', id: 'pool', z: 1 } }, agent)).rejects.toThrow('share the id');
   });

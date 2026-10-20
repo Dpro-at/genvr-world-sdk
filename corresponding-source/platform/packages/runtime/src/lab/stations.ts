@@ -315,7 +315,7 @@ export function simulateGraspTable(station: GraspTable, props: readonly LabProp[
 }
 
 /** Stations whose runs are built (phase 1); the others are placed and drawn, their runs come in later phases. */
-export const LAB_RUNNABLE_STATIONS: ReadonlyArray<LabStation['kind']> = ['jump_pit', 'grasp_table', 'conveyor', 'tool_bench', 'pool', 'climb_wall', 'ladder'];
+export const LAB_RUNNABLE_STATIONS: ReadonlyArray<LabStation['kind']> = ['jump_pit', 'grasp_table', 'conveyor', 'tool_bench', 'pool', 'climb_wall', 'ladder', 'weapon_rack', 'target_post'];
 
 /** How well the station's task went (0–100): a clean jump's distance against 8 m; objects held without a drop, less the place error. */
 export function stationQuality(score: LabStationScore): number {
@@ -325,6 +325,7 @@ export function stationQuality(score: LabStationScore): number {
   if (score.kind === 'conveyor') return Math.max(0, Math.round(n('picked_pct') - Math.min(20, n('timing_ms') / 10) - 5 * n('dropped')));
   if (score.kind === 'tool_bench') return Math.max(0, Math.min(100, Math.round(n('quality'))));
   if (score.kind === 'pool') return v.sank === 'yes' ? 0 : Math.round(0.5 * n('head_above_pct') + (v.reached_deep_end === 'yes' ? 30 : 0) + (n('ladder_exit_s') > 0 && n('ladder_exit_s') <= 8 ? 20 : 0));
+  if (score.kind === 'weapon_rack' || score.kind === 'target_post') return v.body_cross === 'yes' ? 0 : Math.max(0, Math.round(n('hit_pct') - Math.min(20, n('mean_off_cm') / 2) - (v.balance === 'lost' ? 30 : 0)));
   if (score.kind === 'climb_wall' || score.kind === 'ladder') return Math.max(0, Math.min(100, Math.round((v.reached_top === 'yes' ? 60 : 0) + 0.3 * n('three_point_pct') - 10 * n('slips') + (v.climb_down_clean === 'yes' ? 10 : 0))));
   return 0;
 }
@@ -339,6 +340,7 @@ export function runStation(course: LabCourse, id: string, input: Partial<LabRunS
     : station.kind === 'tool_bench' ? simulateToolBench(station, course.props, input, seed, hipHeight)
     : station.kind === 'pool' ? simulatePool(station, input, seed, hipHeight)
     : station.kind === 'climb_wall' || station.kind === 'ladder' ? simulateClimb(station, input, seed, hipHeight)
+    : station.kind === 'weapon_rack' || station.kind === 'target_post' ? simulateStrikes(station, course, input, seed, hipHeight)
     : simulateGraspTable(station as GraspTable, course.props, input, seed, hipHeight);
   const measured = scoreLabRun(LabCourse.parse({ finish_z: 120 }), result), w = LAB_SCORE_WEIGHTS;
   // In the pool the feet stand on the pool's own floor, below the yard's: the yard floor is not a penetration there.
@@ -603,4 +605,131 @@ export function simulateClimb(station: Extract<LabStation, { kind: 'climb_wall' 
   return { frames: frames.map(fr => placeFrame(station, fr)), events, settings, seed, end: 'finish', station: station.id, heading: (station.turn + 180) % 360, objects: [], spawned: [],
     stationScore: { kind: station.kind, values: { holds_reached: holds, holds_total: rows, three_point_pct: moves ? Math.round(100 * threePoint / moves) : 0, slips: slips + slipsDown,
       time_to_top_s: top ? upS : null, reached_top: top ? 'yes' : 'no', climb_down_clean: slipsDown === 0 ? 'yes' : 'no' } } };
+}
+
+// ── Phase 4: training weapons rack and target post ──────────────────────────────────────────────────────────────
+
+type TargetPost = Extract<LabStation, { kind: 'target_post' }>;
+/** Half the size of a target pad (m): a blow lands on it when it is this near its middle. */
+export const PAD_HALF = 0.15;
+/** What each training prop does at the target: its blows (pad: 0 low … 1 high), and how precise it is (cm of spread). */
+const WEAPON_MOVES: Record<string, { blows: Array<[line: string, pad: number]>; spread: number; clip: string }> = {
+  knife: { blows: [['thrust', 0.5], ['thrust', 0.5], ['thrust', 0.6]], spread: -1, clip: 'Strike' },
+  sword: { blows: [['high line', 1], ['middle line', 0.5], ['low line', 0]], spread: 0, clip: 'Strike' },
+  hammer: { blows: [['overhead blow', 0.7], ['overhead blow', 0.7]], spread: 1, clip: 'Strike' },
+  staff: { blows: [['strike', 0.6], ['strike', 0.4], ['spin strike', 0.5]], spread: 2, clip: 'Strike' },
+  axe: { blows: [['chop', 0.7], ['chop', 0.5]], spread: 1, clip: 'Strike' },
+  shield: { blows: [], spread: 0, clip: 'Idle' },
+  hands: { blows: [['punch', 0.7], ['punch', 0.5], ['punch', 0.7], ['kick', 0], ['kick', 0.2]], spread: 0.5, clip: 'Strike' },
+};
+
+/**
+ * Strikes at a target post (engine v1). On the weapons rack each training prop in turn: taken from the rack, carried
+ * to the nearest target post (within 8 m; else a practice target 2 m in front of the rack), its blows (knife thrusts,
+ * the sword's three lines, hammer and axe blows, staff strikes and a spin, the shield's two blocks), back to guard and
+ * put back. On a target post: bare-hand punches and kicks. A blow lands off the aimed pad's middle by a seeded spread
+ * that grows with the run speed; within 15 cm it is a hit, counted once. Back to guard takes 0.25 s + 0.2 s per kg +
+ * 0.4 s / speed. A staff spun faster than 5 m/s passes through the body (fail); leaning more than 12° loses balance.
+ */
+export function simulateStrikes(station: Extract<LabStation, { kind: 'weapon_rack' | 'target_post' }>, course: LabCourse, input: Partial<LabRunSettings> = {}, seed = 0, hipHeight = STATION_REFERENCE_HIP): StationRunResult {
+  const settings = LabRunSettings.parse(input), next = labRandom(seed ^ 0xb10c), f = Math.max(0.3, settings.speed), size = hipHeight / STATION_REFERENCE_HIP;
+  const rack = station.kind === 'weapon_rack' ? station : null;
+  const dist = (a: LabStation, b: LabStation) => Math.hypot(a.x - b.x, a.z - b.z);
+  const post = station.kind === 'target_post' ? station
+    : (course.stations.filter((s): s is TargetPost => s.kind === 'target_post').sort((a, b) => dist(a, station) - dist(b, station))[0] ?? null);
+  const usePost = post && (!rack || dist(post, rack) <= 8) ? post : null;
+  // Pads in the course: the post's own, or a practice target 2 m in front of the rack.
+  const pads: Vec3[] = usePost ? Array.from({ length: usePost.pads }, (_, i) => stationToWorld(usePost, [0, usePost.height * (i + 1) / (usePost.pads + 1), 0.22]))
+    : [0.6, 1.0, 1.4].map(y => stationToWorld(station, [0, y, 2.8]));
+  const target = usePost ? stationToWorld(usePost, [0, 0, 0.22]) : stationToWorld(station, [0, 0, 2.8]);
+  const rackFront = rack ? stationToWorld(rack, [0, 0, 0.8]) : null;
+  const frames: LabFrame[] = [], events: LabEvent[] = [{ t: 0, kind: 'start', label: usePost ? `start · target post ${usePost.id}` : 'start · practice target (no target post near)', station: station.id }];
+  const props = rack ? course.props.filter(p => p.on === rack.id) : [];
+  const tracks = new Map(props.map(p => [p.id, [] as Vec3[]]));
+  const slot = (p: LabProp) => stationToWorld(rack!, [p.at[0], 0.75, 0.2]);
+  let t = 0, at: Vec3 = rackFront ?? stationToWorld(station, [0, 0, 0.9]), held: LabProp | null = null, heldAt: Vec3 | null = null;
+  // Facing the target from where the character stands.
+  const facing = (from: Vec3) => Math.atan2(target[0] - from[0], target[2] - from[2]);
+  // Where each foot stands now; standing frames keep them, walking and closing steps move them.
+  const standSpot = (k: number): LabFoot => { const h = facing(at), side = k ? -0.12 : 0.12; return foot(at[0] + side * Math.cos(h), 0, at[2] - side * Math.sin(h), true); };
+  let feetNow: [LabFoot, LabFoot] | null = null;
+  const frame = (clip: string, speed: number, feet?: [LabFoot, LabFoot]) => {
+    const h = facing(at);
+    feetNow = feet ?? feetNow ?? [standSpot(0), standSpot(1)];
+    frames.push({ t, x: at[0], y: 0, z: at[2], tilt: settings.lean_deg, com: [at[0] + Math.sin(h) * Math.sin(settings.lean_deg * Math.PI / 180) * 0.9, at[2] + Math.cos(h) * Math.sin(settings.lean_deg * Math.PI / 180) * 0.9], speed, clip,
+      feet: feetNow });
+    for (const p of props) tracks.get(p.id)!.push(p === held && heldAt ? heldAt : p === held ? [at[0] + Math.sin(h) * 0.35, 1.0 * size, at[2] + Math.cos(h) * 0.35] : slot(p));
+    t += STEP;
+  };
+  const stand = (seconds: number, clip: string) => { for (let i = 0, n = Math.max(1, Math.round(seconds / STEP)); i < n; i++) frame(clip, 0); };
+  // Walking: steps of up to 0.6 m; each step lifts one foot from where it is to its next spot while the other stays planted.
+  const walk = (to: Vec3) => {
+    const from = at, d = Math.hypot(to[0] - from[0], to[2] - from[2]), h = Math.atan2(to[0] - from[0], to[2] - from[2]);
+    if (d < 0.01) return;
+    feetNow ??= [standSpot(0), standSpot(1)];
+    const steps = Math.ceil(d / 0.6), perStep = Math.max(2, Math.round(d / steps / 1.4 / STEP));
+    for (let j = 0; j < steps; j++) {
+      const k = j % 2, side = k ? -0.12 : 0.12, along = Math.min(d, (j + 1) * (d / steps)) + (j === steps - 1 ? 0 : 0.15);
+      const start = feetNow![k]!, other = { ...feetNow![1 - k]!, planted: true }, target = foot(from[0] + Math.sin(h) * along + side * Math.cos(h), 0, from[2] + Math.cos(h) * along - side * Math.sin(h), true);
+      const body0 = j * (d / steps);
+      for (let i = 1; i <= perStep; i++) {
+        const q = i / perStep, done = i === perStep;
+        at = [from[0] + Math.sin(h) * (body0 + (d / steps) * q), 0, from[2] + Math.cos(h) * (body0 + (d / steps) * q)];
+        const swing = foot(start.x + (target.x - start.x) * q, done ? 0 : 0.08 * Math.sin(Math.PI * q), start.z + (target.z - start.z) * q, done);
+        frame('Walk', 1.4, k ? [other, swing] : [swing, other]);
+      }
+    }
+    // Two closing steps: each foot in turn lifts and goes to its standing spot while the other stays planted.
+    for (const k of [0, 1] as const) {
+      const from = feetNow![k], to = standSpot(k), other = feetNow![1 - k]!, moved = Math.hypot(to.x - from.x, to.z - from.z) > 0.005;
+      if (!moved) continue;
+      for (let i = 1; i <= 12; i++) { const q = i / 12, step = foot(from.x + (to.x - from.x) * q, i < 12 ? 0.06 : 0, from.z + (to.z - from.z) * q, i === 12);
+        frame('Walk', 0.4, k ? [{ ...other, planted: true }, step] : [step, { ...other, planted: true }]); }
+    }
+  };
+  const standAt = (reach: number): Vec3 => { const d = Math.hypot(at[0] - target[0], at[2] - target[2]) || 1; return [target[0] + (at[0] - target[0]) / d * reach, 0, target[2] + (at[2] - target[2]) / d * reach]; };
+  let strikes = 0, hits = 0, off = 0, recovery = 0, recoveries = 0, blocks = 0, angles: number[] = [], bodyCross = false;
+  const routine = (kind: string, mass: number, length: number) => {
+    const moves = WEAPON_MOVES[kind]!, spread = Math.max(0.5, 3 + 2.5 * f + moves.spread * 1.5);
+    for (const [line, pad] of moves.blows) {
+      strikes++;
+      const aim = pads[Math.round(pad * (pads.length - 1))]!, ex = gauss(next) * spread / 100, ey = gauss(next) * spread / 100, miss = Math.hypot(ex, ey);
+      const swing = Math.max(0.15, 0.45 / f * (1 + mass * 0.3)), n = Math.max(1, Math.round(swing / STEP)), h = facing(at), hand: Vec3 = [at[0] + Math.sin(h) * 0.35, 1.0 * size, at[2] + Math.cos(h) * 0.35];
+      for (let i = 1; i <= n; i++) { const k = i / n; heldAt = [hand[0] + (aim[0] + ex * Math.cos(h) - hand[0]) * k, hand[1] + (aim[1] + ey - hand[1]) * k, hand[2] + (aim[2] - ex * Math.sin(h) - hand[2]) * k]; frame(moves.clip, 0); }
+      // One blow, one count: a hit is the pad touched once, however long the prop stays on it.
+      if (miss <= PAD_HALF) { hits++; events.push({ t, kind: 'swing_hit', label: `${line}: hit, ${Math.round(miss * 100)} cm from the pad's middle`, station: station.id }); }
+      else events.push({ t, kind: 'miss', label: `${line}: missed the pad by ${Math.round((miss - PAD_HALF) * 100)} cm`, station: station.id });
+      off += miss * 100;
+      if (kind === 'staff' && line === 'spin strike' && f > 5) { bodyCross = true; events.push({ t, kind: 'body_cross', label: 'the staff passed through the body in the spin (fail)', station: station.id }); }
+      const back = 0.25 + 0.2 * mass + 0.4 / f;
+      recovery += back; recoveries++;
+      for (let i = 1, m = Math.max(1, Math.round(back / STEP)); i <= m; i++) { const k = i / m; heldAt = heldAt ? [heldAt[0] + (hand[0] - heldAt[0]) * k, heldAt[1] + (hand[1] - heldAt[1]) * k, heldAt[2] + (hand[2] - heldAt[2]) * k] : null; frame('Idle', 0); }
+      events.push({ t, kind: 'guard', label: `back to guard in ${round2(back)} s`, station: station.id });
+      heldAt = null;
+    }
+    if (kind === 'shield') for (let i = 0; i < 2; i++) {
+      const angle = Math.round(82 + gauss(next) * 6 + settings.lean_deg * 0.8);
+      blocks++; angles.push(angle); stand(0.5, 'Idle');
+      events.push({ t, kind: 'block', label: `block at ${angle}° ${angle >= 70 && angle <= 95 ? '(good)' : '(open)'}`, station: station.id });
+    }
+    void length;
+  };
+  if (rack) {
+    if (!props.length) events.push({ t, kind: 'miss', label: 'the rack holds no training props', station: station.id });
+    for (const prop of props) {
+      stand(0.3, 'Idle'); held = prop; stand(0.3, 'Idle');
+      walk(standAt(0.75 + prop.size_m[2] * 0.6)); stand(0.3, 'Idle');
+      routine(prop.id.slice(rack.id.length + 1), prop.mass_kg, prop.size_m[2]);
+      walk(rackFront!); stand(0.3, 'Idle'); held = null; stand(0.2, 'Idle');
+    }
+  } else { at = standAt(0.8); stand(0.4, 'Idle'); routine('hands', 0, 0.6); }
+  stand(0.3, 'Idle');
+  events.sort((a, b) => a.t - b.t);
+  events.push({ t, kind: 'finish', label: 'finish', station: station.id });
+  const balance = Math.abs(settings.lean_deg) > 12 ? 'lost' : 'ok';
+  const heading = frames.length ? facing([frames.at(-1)!.x, 0, frames.at(-1)!.z]) * 180 / Math.PI : 0;
+  return { frames, events, settings, seed, end: 'finish', station: station.id, heading: ((Math.round(heading) % 360) + 360) % 360, objects: props.map(p => ({ id: p.id, at: tracks.get(p.id)! })), spawned: [],
+    stationScore: { kind: station.kind, values: { ...(rack ? { weapons: props.length } : {}), strikes, hits, hit_pct: strikes ? Math.round(100 * hits / strikes) : 0, mean_off_cm: strikes ? Math.round(off / strikes) : null,
+      recovery_s: recoveries ? round2(recovery / recoveries) : null, ...(blocks ? { blocks, shield_angle_deg: Math.round(angles.reduce((a, b) => a + b, 0) / angles.length) } : {}),
+      body_cross: bodyCross ? 'yes' : 'no', balance, grip: 'handle end', target: usePost ? usePost.id : 'practice target' } } };
 }

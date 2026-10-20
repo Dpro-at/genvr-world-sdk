@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { LAB_STATION_KINDS, LabCourse, LabStation, baseLabStations, graspTableProps, toolBenchProps } from '@genvr/contracts';
+import { LAB_STATION_KINDS, LabCourse, LabStation, baseLabStations, graspTableProps, toolBenchProps, weaponRackProps } from '@genvr/contracts';
 import type { LabFrame } from '../src/lab/sim.js';
 import { fittedHeight, measureLongJump, poolDepth, runGraspTable, runStation, stationParts, stationQuality, stationToWorld, worldToStation, type GraspHand, type Vec3 } from '../src/lab/stations.js';
 
@@ -114,9 +114,9 @@ describe('board M18 · runs on a station', () => {
     expect(small.grabbed as number).toBeLessThanOrEqual(v.grabbed as number);
   });
   it('stations without a phase-1 engine say so', () => {
-    const rack = LabCourse.parse({ stations: [LabStation.parse({ kind: 'weapon_rack', id: 'rack', z: 0 })] });
-    expect(() => runStation(rack, 'rack')).toThrow('later phase');
-    expect(() => runStation(rack, 'nope')).toThrow('No station');
+    const bar = LabCourse.parse({ stations: [LabStation.parse({ kind: 'high_bar', id: 'bar', z: 0 })] });
+    expect(() => runStation(bar, 'bar')).toThrow('later phase');
+    expect(() => runStation(bar, 'nope')).toThrow('No station');
   });
 });
 
@@ -207,5 +207,42 @@ describe('board M18 · phase 3: pool, climbing wall and ladder', () => {
     const v = runStation(course, 'ladder').result.stationScore.values;
     expect(v).toMatchObject({ reached_top: 'yes', holds_total: 10 });
     expect(v.time_to_top_s as number).toBeGreaterThan(1);
+  });
+});
+
+describe('board M18 · phase 4: training weapons rack and target post', () => {
+  const rack = LabStation.parse({ kind: 'weapon_rack', id: 'rack', x: 0, z: 0 });
+  const post = LabStation.parse({ kind: 'target_post', id: 'post', x: 0, z: 3 });
+  const course = LabCourse.parse({ stations: [rack, post], props: weaponRackProps('rack') });
+  it('each training prop goes from the rack to the post and back; every blow is counted once', () => {
+    const { result } = runStation(course, 'rack', { speed: 1.6 });
+    const v = result.stationScore.values;
+    expect(v).toMatchObject({ weapons: 6, target: 'post', body_cross: 'no', balance: 'ok', grip: 'handle end', blocks: 2 });
+    // Knife 3 + sword 3 + hammer 2 + staff 3 + axe 2 = 13 blows; each is one hit or one miss event, never two.
+    expect(v.strikes).toBe(13);
+    expect(result.events.filter(e => e.kind === 'swing_hit')).toHaveLength(v.hits as number);
+    expect(result.events.filter(e => e.kind === 'swing_hit' || e.kind === 'miss')).toHaveLength(13);
+    expect(result.events.filter(e => e.kind === 'guard')).toHaveLength(13);
+    expect(v.shield_angle_deg as number).toBeGreaterThan(60);
+    for (const track of result.objects) expect(track.at.at(-1), track.id).toEqual(track.at[0]);
+    // The heavy staff takes longer back to guard than the foam knife.
+    const guards = result.events.filter(e => e.kind === 'guard').map(e => Number(e.label.match(/([\d.]+) s/)![1]));
+    expect(guards[8]!).toBeGreaterThan(guards[0]!);
+    expect(runStation(course, 'rack', { speed: 1.6 }).result.stationScore).toEqual(result.stationScore);
+    // Walking to the post and back, then standing: planted feet never slide.
+    expect(runStation(course, 'rack', { speed: 1.6 }).score.foot_slide_cm).toBeLessThan(3);
+  });
+  it('faster blows are less accurate; a staff spun too fast passes through the body (fail); a big lean loses balance', () => {
+    const calm = runStation(course, 'rack', { speed: 1 }).result.stationScore.values, rush = runStation(course, 'rack', { speed: 7 }).result;
+    expect(rush.stationScore.values.mean_off_cm as number).toBeGreaterThan(calm.mean_off_cm as number);
+    expect(rush.stationScore.values.body_cross).toBe('yes');
+    expect(stationQuality(rush.stationScore)).toBe(0);
+    expect(runStation(course, 'rack', { lean_deg: 18 }).result.stationScore.values.balance).toBe('lost');
+  });
+  it('bare hands on the target post: three punches and two kicks; no post near the rack: a practice target', () => {
+    const v = runStation(course, 'post').result.stationScore.values;
+    expect(v).toMatchObject({ strikes: 5, target: 'post' });
+    const alone = LabCourse.parse({ stations: [rack], props: weaponRackProps('rack') });
+    expect(runStation(alone, 'rack').result.stationScore.values.target).toBe('practice target');
   });
 });

@@ -95,6 +95,20 @@ export function toolBenchProps(on: string, tools: readonly (typeof LAB_TOOLS)[nu
   return tools.flatMap((tool, i) => sets[tool].map(({ key, ...prop }, k) => LabProp.parse({ ...prop, id: `${on}-${key}`, on, at: [-0.66 + i * 0.44 + (k ? 0.08 : -0.08), k ? -0.12 : 0.15] })));
 }
 
+/** The training weapons on the rack: generic foam or wood props only (Q-LAB-18a: no damage, nothing breaks). */
+export function weaponRackProps(on: string, weapons: readonly (typeof LAB_WEAPONS)[number][] = LAB_WEAPONS): LabProp[] {
+  const all: Record<(typeof LAB_WEAPONS)[number], Omit<LabProp, 'id' | 'on' | 'at'>> = {
+    knife: { name: 'Foam knife', shape: 'tool', size_m: [0.04, 0.03, 0.25], mass_kg: 0.1, grip: 'handle', material: 'foam' },
+    sword: { name: 'Wooden sword', shape: 'tool', size_m: [0.06, 0.03, 1], mass_kg: 0.8, grip: 'handle', material: 'wood' },
+    hammer: { name: 'Foam hammer', shape: 'tool', size_m: [0.12, 0.08, 0.6], mass_kg: 0.5, grip: 'handle', material: 'foam' },
+    staff: { name: 'Staff', shape: 'tool', size_m: [0.04, 0.04, 1.8], mass_kg: 1.2, grip: 'power', material: 'wood' },
+    shield: { name: 'Round shield', shape: 'cylinder', size_m: [0.6, 0.04, 0.6], mass_kg: 1.5, grip: 'handle', material: 'foam' },
+    axe: { name: 'Foam axe', shape: 'tool', size_m: [0.16, 0.04, 0.6], mass_kg: 0.4, grip: 'handle', material: 'foam' },
+  };
+  // In a row along the rack, standing in it.
+  return weapons.map((weapon, i) => LabProp.parse({ ...all[weapon], id: `${on}-${weapon}`, on, at: [-0.9 + (1.8 * i) / Math.max(1, weapons.length - 1), 0] }));
+}
+
 /** The base lab yard (board M18): 42 × 26 m with a 1 m grid, beside the course (its middle at x 25 m, clear of the run line). */
 export const LAB_BASE_YARD = { width: 42, depth: 26, x: 25 } as const;
 /**
