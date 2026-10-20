@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import type { UserAvatarMetadata, UserAvatarStorage } from '../src/user-avatar-library';
 import { userAvatarThumbnail } from './user-avatar-thumbnail';
 import { importUserAvatar } from './user-avatar-import';
+import { droppedFiles, IMPORT_FILE } from './dropped-files';
 
 export function UserAvatarPanel({ storage, section, search = '', agents, assign, play, target: sharedTarget }: {
   storage: UserAvatarStorage; section: 'characters' | 'motions'; search?: string;
@@ -19,6 +20,7 @@ export function UserAvatarPanel({ storage, section, search = '', agents, assign,
   const [status, setStatus] = useState(''), [error, setError] = useState(''), [busy, setBusy] = useState(false), [report, setReport] = useState<string[]>([]);
   const thumbnailWork = useRef(false), thumbnailAttempts = useRef(new Set<string>()), thumbnailQueue = useRef<UserAvatarMetadata[]>([]), cardGrid = useRef<HTMLDivElement>(null);
   const alive = useRef(true), serial = useRef(0);
+  const [dragItems, setDragItems] = useState(0), dragDepth = useRef(0);
   useEffect(() => { alive.current = true; const refresh = () => { void storage.list().then(rows => { if (alive.current) setRows(rows); }).catch(error => { if (alive.current) setError(String(error)); }); }; refresh(); const stop = storage.subscribe?.(refresh); return () => { alive.current = false; serial.current++; stop?.(); }; }, [storage]);
   useEffect(() => {
     const grid = cardGrid.current;
@@ -81,7 +83,18 @@ export function UserAvatarPanel({ storage, section, search = '', agents, assign,
   const libraryCount = new Set(rows.filter(row => row.kind === kind).map(row => `${row.originalFile}:${row.name}`)).size;
   const unique = visible.filter((row, index) => visible.findIndex(other => other.kind === row.kind && other.originalFile === row.originalFile && other.name === row.name) === index);
   const Icon = kind === 'character' ? PersonStanding : Play;
-  return <section aria-label={`User ${section} library`} className="space-y-3 border-t border-ink/10 pt-3 text-ink">
+  // Drop files or a folder anywhere on the panel (board A13): the same import as the buttons; other files are listed as skipped.
+  const dropFiles = (data: DataTransfer) => void run(async () => {
+    const files = await droppedFiles(data), skipped = files.filter(file => !IMPORT_FILE.test(file.name));
+    try { await ingest(files.filter(file => IMPORT_FILE.test(file.name))); }
+    finally { if (skipped.length && alive.current) setReport(lines => [...lines, ...skipped.map(file => `${file.name}: skipped (not an FBX, GLB or texture file).`)]); }
+  });
+  const dragging = dragItems > 0;
+  return <section aria-label={`User ${section} library`} className={`space-y-3 rounded-lg border-t border-ink/10 pt-3 text-ink ${dragging ? 'ring-2 ring-sky-400' : ''}`}
+    onDragEnter={event => { if (!busy && event.dataTransfer.types.includes('Files')) { event.preventDefault(); dragDepth.current++; setDragItems(event.dataTransfer.items.length || 1); } }}
+    onDragOver={event => { if (!busy && event.dataTransfer.types.includes('Files')) { event.preventDefault(); event.dataTransfer.dropEffect = 'copy'; } }}
+    onDragLeave={() => { dragDepth.current = Math.max(0, dragDepth.current - 1); if (!dragDepth.current) setDragItems(0); }}
+    onDrop={event => { event.preventDefault(); dragDepth.current = 0; setDragItems(0); if (!busy && event.dataTransfer.types.includes('Files')) dropFiles(event.dataTransfer); }}>
     <div className="flex items-center justify-between gap-2">
       <div><h3 className="flex items-center gap-1.5 text-xs font-bold"><Icon size={15} />My {section}<span className="text-ink/50">{libraryCount}</span></h3>
       <p className="mt-1 flex items-center gap-1 text-[10px] text-ink/50"><LockKeyhole size={11} />Private on this device</p></div>
@@ -109,7 +122,10 @@ export function UserAvatarPanel({ storage, section, search = '', agents, assign,
         </button>; })}
       </div>
       {!unique.length ? <p className="py-3 text-center text-xs text-ink/50">No matches. Try another name.</p> : null}
-    </> : <div className="rounded-lg border border-dashed border-ink/20 p-5 text-center"><Icon size={30} strokeWidth={1.2} className="mx-auto mb-2 text-ink/40" /><p className="text-xs font-bold">Your {section}, ready to use</p><p className="mt-1 text-[11px] leading-relaxed text-ink/50">Import your files, then choose one for your avatar or agent.</p></div>}
+    </> : null}
+    {dragging || !rows.some(row => row.kind === kind) ? <div className={`rounded-lg border border-dashed p-5 text-center ${dragging ? 'border-2 border-sky-400 bg-sky-400/10' : 'border-ink/20'}`}><Icon size={30} strokeWidth={1.2} className="mx-auto mb-2 text-ink/40" />
+      {dragging ? <><p className="text-xs font-bold">Drop to import</p><p className="mt-1 text-[11px] leading-relaxed text-ink/60">{dragItems} {dragItems === 1 ? 'item' : 'items'} · FBX, GLB, their textures or a folder</p></>
+        : <><p className="text-xs font-bold">Your {section}, ready to use</p><p className="mt-1 text-[11px] leading-relaxed text-ink/50">Drop FBX or GLB files or a folder here, or choose them with Import.</p></>}</div> : null}
     {status ? <p role="status" className="break-words text-[11px] leading-relaxed text-ink/60">{status}</p> : null}{error ? <p role="alert" className="text-xs text-red-600">{error}</p> : null}
     <details className="border-t border-ink/10 pt-2"><summary className="cursor-pointer text-[11px] text-ink/50">Library details{report.length ? ` (${report.length} import issues)` : ''}</summary>
       <p className="mt-2 text-[11px] leading-relaxed text-ink/50">Files stay in this browser profile. They are excluded from public packages and world exports.</p>
