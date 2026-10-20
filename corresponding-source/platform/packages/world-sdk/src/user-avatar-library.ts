@@ -25,7 +25,10 @@ export interface UserAvatarStorage {
   list(): Promise<UserAvatarMetadata[]>;
   get(id: string): Promise<UserAvatarAsset | null>;
   put(asset: UserAvatarAsset): Promise<void>;
+  /** Deletes the asset and its metadata and clears every assignment that points to it (board A14). */
   remove(id: string): Promise<void>;
+  /** Every project target assigned to this asset. */
+  usage(id: string): Promise<Array<{ projectId: string; target: string }>>;
   assignment(projectId: string, target: string): Promise<string | null>;
   assign(projectId: string, target: string, assetId: string | null): Promise<void>;
   subscribe?(listener: () => void): () => void;
@@ -63,9 +66,14 @@ export function browserUserAvatarStorage(scope: string, factory: IDBFactory = in
   const changeAsset = async (id: string, asset?: UserAvatarAsset) => {
     const db = await open();
     await new Promise<void>((resolve, reject) => {
-      const tx = db.transaction(['assets', 'metadata'], 'readwrite');
+      const tx = db.transaction(['assets', 'metadata', 'assignments'], 'readwrite');
       if (asset) { tx.objectStore('assets').put(asset); tx.objectStore('metadata').put(asset.metadata); }
-      else { tx.objectStore('assets').delete(id); tx.objectStore('metadata').delete(id); }
+      else {
+        tx.objectStore('assets').delete(id); tx.objectStore('metadata').delete(id);
+        // Targets that used the deleted asset fall back to the default body.
+        const assignments = tx.objectStore('assignments'), keys = assignments.getAllKeys(), values = assignments.getAll();
+        values.onsuccess = () => { values.result.forEach((value, i) => { if (value === id) assignments.delete(keys.result[i]!); }); };
+      }
       tx.oncomplete = () => resolve(); tx.onerror = tx.onabort = () => reject(tx.error ?? new Error('Library write failed.'));
     });
     publish(); channel?.postMessage('changed');
@@ -79,6 +87,14 @@ export function browserUserAvatarStorage(scope: string, factory: IDBFactory = in
       await changeAsset(metadata.id, { metadata, data: asset.data });
     },
     async remove(id) { await changeAsset(id); },
+    async usage(id) {
+      const db = await open();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction('assignments', 'readonly'), store = tx.objectStore('assignments'), keys = store.getAllKeys(), values = store.getAll();
+        tx.oncomplete = () => resolve(values.result.flatMap((value, i) => { if (value !== id) return []; const [projectId, target] = JSON.parse(String(keys.result[i])) as [string, string]; return [{ projectId, target }]; }));
+        tx.onerror = tx.onabort = () => reject(tx.error ?? new Error('User library storage failed.'));
+      });
+    },
     async assignment(project, target) { return await run<string | undefined>('assignments', 'readonly', store => store.get(key(project, target))) ?? null; },
     async assign(project, target, id) {
       if (id) { const asset = await run<UserAvatarAsset | undefined>('assets', 'readonly', store => store.get(id)); if (asset?.metadata.kind !== 'character') throw new Error('Choose a character from your library.'); }

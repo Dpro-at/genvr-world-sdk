@@ -1,17 +1,22 @@
-import { Check, FileUp, FolderOpen, LoaderCircle, LockKeyhole, PersonStanding, Play, Search, Upload, X } from 'lucide-react';
+import { Check, Ellipsis, FileUp, FolderOpen, LoaderCircle, LockKeyhole, PersonStanding, Play, Search, Trash2, Upload, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { FALLBACK_BODY_NAME, type DeleteAnswer, type DeleteRequest } from './user-avatar-delete';
 import type { UserAvatarMetadata, UserAvatarStorage } from '../src/user-avatar-library';
 import { userAvatarThumbnail } from './user-avatar-thumbnail';
 import { importUserAvatar } from './user-avatar-import';
 import { droppedFiles, IMPORT_FILE } from './dropped-files';
 
-export function UserAvatarPanel({ storage, section, search = '', agents, assign, play, target: sharedTarget }: {
+export function UserAvatarPanel({ storage, section, search = '', agents, assign, play, remove, deleted: lastDeleted, target: sharedTarget }: {
   storage: UserAvatarStorage; section: 'characters' | 'motions'; search?: string;
   /** One "Plays on" chosen by the caller (ITEMS-I4); the panel's own "Use for" otherwise. */
   target?: string | undefined;
   agents: Array<{ id: string; name: string }>;
   assign(target: string, id: string | null): Promise<void>;
   play(target: string, id: string): Promise<void>;
+  /** Board A14: asks the owner in the Studio's confirm; built-in bodies never reach this panel. */
+  remove?(id: string): Promise<{ result: 'deleted' | 'cancelled'; name: string }>;
+  /** The last delete, from this card menu or from an agent; shown as a short status. */
+  deleted?: { name: string; kind: UserAvatarMetadata['kind']; at: number } | undefined;
 }) {
   const [rows, setRows] = useState<UserAvatarMetadata[]>([]), [ownTarget, setTarget] = useState('self');
   const target = sharedTarget ?? ownTarget;
@@ -21,6 +26,9 @@ export function UserAvatarPanel({ storage, section, search = '', agents, assign,
   const thumbnailWork = useRef(false), thumbnailAttempts = useRef(new Set<string>()), thumbnailQueue = useRef<UserAvatarMetadata[]>([]), cardGrid = useRef<HTMLDivElement>(null);
   const alive = useRef(true), serial = useRef(0);
   const [dragItems, setDragItems] = useState(0), dragDepth = useRef(0);
+  const [menu, setMenu] = useState<string | null>(null), [deleted, setDeleted] = useState('');
+  useEffect(() => { if (lastDeleted && lastDeleted.kind === (section === 'characters' ? 'character' : 'motion')) { setDeleted(lastDeleted.name); setStatus(''); } }, [lastDeleted?.at]);
+  useEffect(() => { if (!menu) return; const close = (event: Event) => { if (!(event.target as Element | null)?.closest?.('[data-card-menu]')) setMenu(null); }; const key = (event: KeyboardEvent) => { if (event.key === 'Escape') setMenu(null); }; document.addEventListener('pointerdown', close); document.addEventListener('keydown', key); return () => { document.removeEventListener('pointerdown', close); document.removeEventListener('keydown', key); }; }, [menu]);
   useEffect(() => { alive.current = true; const refresh = () => { void storage.list().then(rows => { if (alive.current) setRows(rows); }).catch(error => { if (alive.current) setError(String(error)); }); }; refresh(); const stop = storage.subscribe?.(refresh); return () => { alive.current = false; serial.current++; stop?.(); }; }, [storage]);
   useEffect(() => {
     const grid = cardGrid.current;
@@ -115,17 +123,30 @@ export function UserAvatarPanel({ storage, section, search = '', agents, assign,
       <label className="flex items-center gap-2 rounded-lg border border-ink/10 px-2.5 py-2"><Search size={13} className="shrink-0 text-ink/50" /><input aria-label={`Search my ${section}`} placeholder={`Search ${section}`} value={filter} onChange={event => setFilter(event.target.value)} className="min-w-0 w-full bg-transparent text-xs outline-none" /></label>
       {sharedTarget === undefined ? <label className="block text-[11px] text-ink/60">Use for<select aria-label={`User ${section} target`} className="mt-1 w-full rounded-lg border border-ink/10 bg-paper p-2 text-xs text-ink" value={target} disabled={busy} onChange={event => setTarget(event.target.value)}><option value="self">My avatar</option>{agents.map(agent => <option key={agent.id} value={agent.id}>{agent.name}</option>)}</select></label> : null}
       <div ref={cardGrid} className="grid max-h-80 grid-cols-2 gap-2 overflow-y-auto pr-1" aria-label={`Private ${section}`}>
-        {unique.map(row => { const active = selected === row.id; const name = row.name.split('__')[0]!.replace(/_/g, ' '); return <button type="button" key={row.id} data-avatar-id={row.id} disabled={busy} aria-label={`${kind === 'character' ? 'Use' : 'Play'} ${row.name}`} aria-pressed={active} className={`group relative overflow-hidden rounded-lg border text-left transition-colors disabled:opacity-40 ${active ? 'border-ink bg-ink/10' : 'border-ink/10 hover:border-ink/40'}`} title={row.name} onClick={() => void run(async () => { if (kind === 'character') await assign(target, row.id); else await play(target, row.id); if (alive.current) { setSelected(row.id); setStatus(`${kind === 'character' ? 'Using' : 'Playing'} ${name}`); } })}>
+        {unique.map(row => { const active = selected === row.id; const name = row.name.split('__')[0]!.replace(/_/g, ' ');
+          const use = () => void run(async () => { if (kind === 'character') await assign(target, row.id); else await play(target, row.id); if (alive.current) { setSelected(row.id); setStatus(`${kind === 'character' ? 'Using' : 'Playing'} ${name}`); setDeleted(''); } });
+          const open = menu === row.id;
+          return <div key={row.id} data-card-menu={open ? '' : undefined} className="group relative">
+          <button type="button" data-avatar-id={row.id} disabled={busy} aria-label={`${kind === 'character' ? 'Use' : 'Play'} ${row.name}`} aria-pressed={active} className={`relative w-full overflow-hidden rounded-lg border text-left transition-colors disabled:opacity-40 ${active ? 'border-ink bg-ink/10' : 'border-ink/10 hover:border-ink/40'} ${open ? 'ring-2 ring-sky-400' : ''}`} title={row.name} onClick={use}>
           <div className="flex h-20 items-center justify-center bg-ink/5">{row.thumbnail ? <img src={row.thumbnail} alt={name} className="h-full w-full object-contain" /> : <Icon size={kind === 'character' ? 38 : 24} strokeWidth={1.25} className="text-ink/50" />}</div>
-          {active ? <span className="absolute right-1.5 top-1.5 rounded-full bg-ink p-1 text-paper"><Check size={10} /></span> : null}
+          {active ? <span className="absolute left-1.5 top-1.5 rounded-full bg-ink p-1 text-paper"><Check size={10} /></span> : null}
           <div className="px-2 py-2"><span className="block truncate text-[11px] font-bold">{kind === 'character' ? name : row.name}</span><span className="mt-0.5 block text-[10px] text-ink/50">{kind === 'character' ? 'Use character' : `${row.duration?.toFixed(1) ?? '—'} seconds`}</span></div>
-        </button>; })}
+          </button>
+          {remove ? <div data-card-menu className={`absolute right-1.5 top-1.5 ${open ? '' : 'opacity-0 focus-within:opacity-100 group-hover:opacity-100'}`}>
+            <button type="button" aria-label={`More for ${name}`} aria-haspopup="menu" aria-expanded={open} disabled={busy} onClick={() => setMenu(open ? null : row.id)} className={`flex size-6 items-center justify-center rounded-md border bg-paper text-ink ${open ? 'border-sky-400' : 'border-ink/20'}`}><Ellipsis size={13} /></button>
+          </div> : null}
+          {remove && open ? <div role="menu" aria-label={`${name} actions`} className="absolute inset-x-1.5 top-9 z-10 rounded-lg border border-ink/15 bg-paper p-1 text-xs shadow-lg">
+            <button type="button" role="menuitem" autoFocus className="block w-full rounded-md px-2 py-1.5 text-left hover:bg-ink/5" onClick={() => { setMenu(null); use(); }}>{kind === 'character' ? 'Use character' : 'Play motion'}</button>
+            <button type="button" role="menuitem" className="flex w-full items-center gap-1.5 rounded-md px-2 py-1.5 text-left text-red-600 hover:bg-red-500/10" onClick={() => { setMenu(null); setError(''); void remove(row.id).then(answer => { if (alive.current && answer.result === 'deleted' && selected === row.id) setSelected(null); }, error => { if (alive.current) setError(error instanceof Error ? error.message : String(error)); }); }}><Trash2 size={12} />Delete…</button>
+          </div> : null}
+        </div>; })}
       </div>
       {!unique.length ? <p className="py-3 text-center text-xs text-ink/50">No matches. Try another name.</p> : null}
     </> : null}
     {dragging || !rows.some(row => row.kind === kind) ? <div className={`rounded-lg border border-dashed p-5 text-center ${dragging ? 'border-2 border-sky-400 bg-sky-400/10' : 'border-ink/20'}`}><Icon size={30} strokeWidth={1.2} className="mx-auto mb-2 text-ink/40" />
       {dragging ? <><p className="text-xs font-bold">Drop to import</p><p className="mt-1 text-[11px] leading-relaxed text-ink/60">{dragItems} {dragItems === 1 ? 'item' : 'items'} · FBX, GLB, their textures or a folder</p></>
         : <><p className="text-xs font-bold">Your {section}, ready to use</p><p className="mt-1 text-[11px] leading-relaxed text-ink/50">Drop FBX or GLB files or a folder here, or choose them with Import.</p></>}</div> : null}
+    {deleted ? <p role="status" className="flex items-center gap-2 rounded-lg border border-ink/10 px-2.5 py-2 text-[11px]"><span className="min-w-0 truncate">Deleted {deleted}</span><span className="ml-auto shrink-0 text-ink/50">My {section} · {libraryCount}</span></p> : null}
     {status ? <p role="status" className="break-words text-[11px] leading-relaxed text-ink/60">{status}</p> : null}{error ? <p role="alert" className="text-xs text-red-600">{error}</p> : null}
     <details className="border-t border-ink/10 pt-2"><summary className="cursor-pointer text-[11px] text-ink/50">Library details{report.length ? ` (${report.length} import issues)` : ''}</summary>
       <p className="mt-2 text-[11px] leading-relaxed text-ink/50">Files stay in this browser profile. They are excluded from public packages and world exports.</p>
@@ -133,4 +154,22 @@ export function UserAvatarPanel({ storage, section, search = '', agents, assign,
       {report.length ? <ul className="mt-2 max-h-40 space-y-2 overflow-y-auto text-[11px] text-red-600">{report.map((row, i) => <li key={i}>{row}</li>)}</ul> : null}
     </details>
   </section>;
+}
+
+/** Board A14: the one confirm for a delete, from the card's menu or from an agent (MCP). Only these buttons answer it. */
+export function DeleteConfirm({ request, answer }: { request: DeleteRequest; answer(answer: DeleteAnswer): void }) {
+  const [alsoMotions, setAlsoMotions] = useState(false);
+  return <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 p-4" onKeyDown={event => { if (event.key === 'Escape') answer({ deleted: false, alsoMotions: false }); }}>
+    <section role="alertdialog" aria-modal="true" aria-labelledby="delete-user-avatar-title" className="w-full max-w-sm rounded-xl border border-red-500/40 bg-surface p-4 text-ink shadow-xl">
+      <h2 id="delete-user-avatar-title" className="text-sm font-bold">Delete {request.name}?</h2>
+      <p className="mt-1 text-xs text-ink/60">It is removed from this device. This cannot be undone.</p>
+      {request.by === 'agent' ? <p className="mt-2 text-[11px] text-ink/60">An agent asked to delete this. Nothing is deleted unless you press Delete.</p> : null}
+      {request.usedBy.length ? <p className="mt-2 rounded-lg bg-amber-400/15 p-2 text-[11px] text-amber-700 dark:text-amber-300">In use as <b>{request.usedBy.join(', ')}</b> in this project. After deleting, the project uses the {FALLBACK_BODY_NAME}.</p> : null}
+      {request.motionIds.length ? <label className="mt-2 flex items-center gap-2 text-[11px]"><input type="checkbox" checked={alsoMotions} onChange={event => setAlsoMotions(event.target.checked)} />Also delete its motions ({request.motionIds.length})</label> : null}
+      <div className="mt-3 flex justify-end gap-2">
+        <button type="button" autoFocus onClick={() => answer({ deleted: false, alsoMotions: false })} className="rounded-lg border border-ink/15 px-3 py-1.5 text-xs font-bold hover:bg-ink/5">Cancel</button>
+        <button type="button" onClick={() => answer({ deleted: true, alsoMotions })} className="rounded-lg bg-red-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-red-700">Delete</button>
+      </div>
+    </section>
+  </div>;
 }

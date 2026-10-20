@@ -13,7 +13,8 @@ import { CORE_ANIMATIONS } from '@genvr/core-library';
 import { registerAvatarMotionLibrary, avatarMotionEntries, motionCategories, type AvatarMotionLibrary } from '@genvr/runtime';
 import { browserUserAvatarStorage, type UserAvatarStorage } from '../src/user-avatar-library';
 import { UserAvatarSession } from './user-avatar-session';
-import { UserAvatarPanel } from './user-avatar-panel';
+import { DeleteConfirm, UserAvatarPanel } from './user-avatar-panel';
+import { DeleteConfirmGate, FALLBACK_BODY_NAME, deletable, deleteFromLibrary, deletePlan } from './user-avatar-delete';
 import { DEFAULT_AVATAR_LOOK, DEFAULT_CHARACTER_RECIPE, readCharacterRecipe, recipeLook, FilmCamera, FilmStudioOperation, type AvatarLook, type BodyId } from '@genvr/contracts';
 import type { CharacterStage } from '@genvr/runtime/character';
 import { PresentationControls } from './presentation/controls';
@@ -125,9 +126,29 @@ function Editor({ initial, storage, options, leave, beforeClose }: { initial: St
     if (builtin) avatarBodies[target] = builtin as NonNullable<StudioProject['avatarBodies']>[string]; else delete avatarBodies[target];
     project.current = { ...project.current, avatarBodies }; changed();
     if (look) localLooks.current.set(target, look); else localLooks.current.delete(target);
-    if (target === 'self') { setLiveRecipe(current=>({...current,body:look?.body??'classic'})); liveStage.current?.setRecipe({...liveRecipe,body:look?.body??'classic'}); runtime.current.setAvatarLook(look ?? DEFAULT_AVATAR_LOOK); selfLibraryBody.current?.(look?.body ?? 'classic'); }
+    if (target === 'self') { setLiveRecipe(current=>({...current,body:look?.body??DEFAULT_AVATAR_LOOK.body})); liveStage.current?.setRecipe({...liveRecipe,body:look?.body??DEFAULT_AVATAR_LOOK.body}); runtime.current.setAvatarLook(look ?? DEFAULT_AVATAR_LOOK); selfLibraryBody.current?.(look?.body ?? DEFAULT_AVATAR_LOOK.body); }
     else syncStudioAgents(runtime.current, agentRows.current, localLooks.current);
     if (target === 'self') void lab?.refreshCharacters();
+  };
+  // Board A14: one confirm for the owner's menu and for an agent; only the owner's Delete removes anything.
+  const [deleteGate] = useState(() => new DeleteConfirmGate());
+  const pendingDelete = useSyncExternalStore(deleteGate.subscribe, deleteGate.snapshot);
+  const [lastDeleted, setLastDeleted] = useState<{ name: string; kind: 'character' | 'motion'; at: number }>();
+  const deleteUserAvatar = async (id: string, by: 'owner' | 'agent') => {
+    if (!library) throw new Error('Private library is not connected.');
+    if (!deletable(id)) throw new Error('Built-in bodies cannot be deleted.');
+    const plan = deletePlan(await library.list(), id);
+    if (!plan) throw new Error('Character is missing from your local library.');
+    const used = new Set<string>();
+    for (const row of plan.ids) for (const use of await library.usage(row)) if (use.projectId === initial.id) used.add(use.target);
+    const usedBy = [...used].map(target => target === 'self' ? 'My avatar' : agentRows.current.find(row => row.id === target)?.name ?? target);
+    const answer = await deleteGate.ask({ ...plan, usedBy, by });
+    if (!answer.deleted) return { result: 'cancelled' as const, name: plan.name, id };
+    const targets = await deleteFromLibrary(library, initial.id, plan, answer.alsoMotions);
+    setLastDeleted({ name: plan.name, kind: plan.kind, at: Date.now() });
+    // Targets on stage switch to the fallback body at once.
+    for (const target of targets) { try { await assignUserAvatar(target, null); } catch { localLooks.current.delete(target); } }
+    return { result: 'deleted' as const, name: plan.name, id, removed: answer.alsoMotions ? plan.ids.length + plan.motionIds.length : plan.ids.length, ...(targets.length ? { replacedBy: FALLBACK_BODY_NAME, targets } : {}) };
   };
   const playUserMotion = async (target: string, id: string) => {
     const asset = await library?.get(id);
@@ -248,6 +269,10 @@ function Editor({ initial, storage, options, leave, beforeClose }: { initial: St
         const rows = [...(await library?.list() ?? []), ...[{ id: 'builtin:robot', name: 'Standard robot', kind: 'character' as const }, { id: 'builtin:human', name: 'Our human', kind: 'character' as const }]].filter(row => `${row.name} ${row.kind}`.toLowerCase().includes(input.query.toLowerCase()));
         return { private: true, bundled: false, total: rows.length, entries: rows.slice(input.offset, input.offset + input.limit).map(row => ({ id: row.id, kind: row.kind, name: row.name, ...('duration' in row ? { duration: row.duration } : {}), bundled: row.id.startsWith('builtin:') })) };
       }
+      if (input.action === 'delete') {
+        if (!input.id) throw new Error('Choose the ID of a character or motion from your library.');
+        return { action: 'delete', private: true, ...(await deleteUserAvatar(input.id, 'agent')) };
+      }
       if (input.action === 'assign') {
         if (input.id === undefined) throw new Error('Choose a character ID, or null to reset.');
         await assignUserAvatar(input.target, input.id);
@@ -317,7 +342,7 @@ function Editor({ initial, storage, options, leave, beforeClose }: { initial: St
   const test = (value: boolean) => { if (value) runtime.current?.setTool(null); setTesting(value); };
   const updateMetadata = (next: StudioProject) => { project.current = next; setMetadata(next); changed(); };
   return <StudioHostProvider value={{ platform: false,
-    userAvatarControls: library ? (section, search, _onSelfBody, target) => { return <UserAvatarPanel storage={library} section={section} search={search} agents={presentationAgents} assign={assignUserAvatar} play={playUserMotion} target={target} />; } : undefined,
+    userAvatarControls: library ? (section, search, _onSelfBody, target) => { return <UserAvatarPanel storage={library} section={section} search={search} agents={presentationAgents} assign={assignUserAvatar} play={playUserMotion} remove={id => deleteUserAvatar(id, 'owner')} deleted={lastDeleted} target={target} />; } : undefined,
     presentationControls: options.presentation?.enabled === false ? undefined : (section, search, target) => <PresentationControls controller={presentation} section={section} search={search} agents={presentationAgents} target={target} />,
     presentationTargets: () => presentationAgents,
     presentationOverlay: () => options.presentation?.enabled === false ? null : <PresentationViewport controller={presentation} />,
@@ -389,6 +414,7 @@ function Editor({ initial, storage, options, leave, beforeClose }: { initial: St
           <button type="button" disabled={(!ready && !error) || filming.busy || filming.studio.rendering} onClick={() => void goHome()} title="My projects" className="inline-flex h-5 items-center gap-1 rounded px-1.5 hover:bg-ink/10 hover:text-ink disabled:opacity-40"><House className="size-3" aria-hidden />My projects</button>
         </footer>
       ) : null}
+      {pendingDelete ? <DeleteConfirm key={pendingDelete.ids.join()} request={pendingDelete} answer={deleteGate.answer.bind(deleteGate)} /> : null}
       {settings ? <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={() => setSettings(false)}>
         <section role="dialog" aria-modal="true" aria-label="Place settings" className="max-h-[90dvh] w-full max-w-xl overflow-auto rounded-lg bg-surface p-5 shadow-xl" onClick={event => event.stopPropagation()}>
           <div className="mb-5 flex items-center justify-between"><h2 className="text-lg font-bold">Place settings</h2><IconButton label="Close settings" onClick={() => setSettings(false)}><X className="size-5" /></IconButton></div>

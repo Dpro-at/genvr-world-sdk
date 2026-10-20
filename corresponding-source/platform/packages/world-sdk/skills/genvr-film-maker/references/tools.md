@@ -11,7 +11,7 @@ Jobs live in the MCP client process that started them: keep one client open for 
 | `get_studio_capabilities` | what the live connection can do (filming, voice, avatarLive, privateLibrary, sharing) |
 | `list_studio_sessions` / `select_studio_session` | the open Studio window; gives `placeId` and session id |
 | `inspect_studio` | world style/kind, actor, animation, camera, `availableWorlds` |
-| `user_avatar_library` | `list` characters (built-in + private), `assign` to `self` or a host agent, `play` a private motion |
+| `user_avatar_library` | `list` characters (built-in + private), `assign` to `self` or a host agent, `play` a private motion, `delete` an imported one (waits for the owner's Delete; answers deleted or cancelled) |
 | `list_avatar_motions` | `query`, `category`, `offset`, `limit`; each entry has `id`, `source` (`native` or `private-host-library`) |
 | `present_avatar` | preview `animation` (duration ms ≥ 200), `expression`, `effect`, `notification`, `card`, `display` |
 | `avatar_voice` | `voices`, `models`, `assign`, `speak` (async job → `job`), `replay`, `playback`, `recordings` |

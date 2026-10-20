@@ -17,3 +17,15 @@ it('reports absent hosts, failed assignments and invalid pagination', async () =
   expect((await runTool('user_avatar_library', { action: 'list', limit: 101 }, host)).ok).toBe(false);
   expect(library).toHaveBeenCalledTimes(1);
 });
+it('delete waits for the host, which asks the owner, and passes on deleted or cancelled', async () => {
+  let answer: (value: unknown) => void = () => {};
+  const library = vi.fn(() => new Promise(resolve => { answer = resolve; }));
+  const host = { userAvatarLibrary: library } as unknown as AssistantHost;
+  let done = false;
+  const call = runTool('user_avatar_library', { action: 'delete', id: 'user.asset' }, host).then(result => { done = true; return result; });
+  await new Promise(resolve => setTimeout(resolve, 10));
+  expect(library).toHaveBeenCalledWith(expect.objectContaining({ action: 'delete', id: 'user.asset' }));
+  expect(done).toBe(false);
+  answer({ action: 'delete', result: 'cancelled', name: 'Hero' });
+  expect(JSON.parse((await call).result)).toMatchObject({ result: 'cancelled' });
+});
