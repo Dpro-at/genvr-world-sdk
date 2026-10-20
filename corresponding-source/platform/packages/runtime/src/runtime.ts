@@ -260,6 +260,8 @@ export interface RuntimeOptions {
   playView?: 'free' | 'side';
   /** Extra moves of a side-view place, chosen by its creator (decision 95). */
   sideMoves?: readonly SideMove[];
+  /** Board M19: the world's made motions (its package's `madeMoves`), on keys 1–8 and instead of base moves. */
+  madeMoves?: Parameters<GenvrRuntime['setMadeMoves']>[0];
   /** How blocks are drawn in places made of blocks, chosen by the owner (decision 110). */
   blockLook?: PlaceBlockLook;
   /**
@@ -685,6 +687,7 @@ export async function createRuntime({
   viewOnly = false,
   playView = 'free',
   sideMoves = [],
+  madeMoves: firstMadeMoves = [],
   blockLook,
   onPlayerBlocks,
   onHeldBlock,
@@ -1209,7 +1212,7 @@ export async function createRuntime({
   const animator = new AvatarAnimator(avatar.mesh, avatar.clips);
   animator.play('Idle');
   // Board M19: made motions on keys and instead of base moves; built again for every body the avatar takes.
-  let madeMoves: Parameters<GenvrRuntime['setMadeMoves']>[0] = [];
+  let madeMoves: Parameters<GenvrRuntime['setMadeMoves']>[0] = [...firstMadeMoves];
   const replacedBase = new Map<string, import('three/webgpu').AnimationClip>();
   function applyMadeMoves() {
     const body = avatar.mesh.userData.fittedBody as MadeBody | undefined;
@@ -1222,12 +1225,14 @@ export async function createRuntime({
       if (move.replaces && original) { replacedBase.set(move.replaces, original); animator.register(madeMotionClip(move.motion, body, move.replaces), false); }
     }
   }
+  applyMadeMoves();
   const avatarPose = avatar.pose;
   const [sx, sy, sz] = world.spawn.position;
   avatar.root.position.set(sx, Math.max(0, sy - 1), sz);
   scene.add(avatar.root);
   // Other players in the same realtime room.
   const remotePlayers = new RemotePlayers({ cubes: style.avatar === 'cubes' });
+  remotePlayers.setMadeMoves(firstMadeMoves);
   scene.add(remotePlayers.group);
   // A game's hits (P9-12): damage numbers over the one hit, and strikes heard where they happen.
   const damageNumbers = new DamageNumbers();

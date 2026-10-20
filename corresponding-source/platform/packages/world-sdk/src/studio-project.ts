@@ -117,7 +117,14 @@ export function importStudioProject(text: string): StudioProject {
   const parsed: unknown = JSON.parse(text);
   if (parsed && typeof parsed === 'object' && 'format' in parsed && parsed.format === 'genvr-studio') return readStudioProject(parsed);
   const legacy = replayWorldPackage(parsed);
-  return fromState(legacy.state, legacy.package.title, defaultPlaySettings(), legacy.package.assets);
+  const project = fromState(legacy.state, legacy.package.title, defaultPlaySettings(), legacy.package.assets);
+  // Board M19: a world's made motions come along into the project.
+  return legacy.package.madeMoves?.length ? readStudioProject({ ...project, madeMoves: legacy.package.madeMoves }) : project;
+}
+
+/** Board M19: the made motions of a Studio project a world package may carry (only shareable ones travel). */
+export function worldMadeMoves(project: Pick<StudioProject, 'madeMoves'>): NonNullable<StudioProject['madeMoves']> {
+  return (project.madeMoves ?? []).filter(m => m.rights.shareable);
 }
 
 export interface StudioStorage { list(): Promise<Array<{ id: string; title: string; /** A motion lab project (MOTION-LAB), and how much work it holds (runs + versions + made motions). */ lab?: boolean; labWork?: number }>>; read(id: string): Promise<StudioProject>; write(project: StudioProject): Promise<void>; }

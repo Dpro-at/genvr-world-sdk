@@ -3,6 +3,7 @@ import { Id, SizeTier } from './common.js';
 import { CommandPayload } from './commands.js';
 import { GenvrManifest, PackagePath } from './manifest.js';
 import { StyleSelection, WorldSeed } from './world.js';
+import { GameMadeMoves } from './motion-lab.js';
 
 export const WORLD_PACKAGE_BYTES = 8 * 1024 * 1024;
 export const WORLD_PACKAGE_COMMANDS = 500;
@@ -31,6 +32,12 @@ export const WorldPackage = z.object({
       data: z.string().max(WORLD_PACKAGE_BYTES).regex(/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/),
     }).strict()).min(1).max(32),
   }).strict()).max(32).default([]),
+  /**
+   * Board M19 (Q-M19d A): motions made in the Motion lab that this world plays — on a player's key 1–8 or instead of a
+   * base move — with their keys, so every player builds them on their own avatar. Only shareable ones travel with a
+   * world (made in the lab, not from Mixamo or a video, on a GenVR character); the owner confirms the publish.
+   */
+  madeMoves: GameMadeMoves.refine((moves) => moves.every((m) => m.rights.shareable), 'Only shareable made motions travel with a world.').optional(),
 }).strict();
 export type WorldPackage = z.infer<typeof WorldPackage>;
 

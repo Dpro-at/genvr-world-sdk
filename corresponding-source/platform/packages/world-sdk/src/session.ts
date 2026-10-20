@@ -129,6 +129,14 @@ export class WorldSession {
     this.#install(next);
     this.#undo.push(previous); if (this.#undo.length > 50) this.#undo.shift(); this.#redo = [];
   }
+  /** Board M19: the world's made motions (only shareable ones travel with a world); undo brings the old list back. */
+  get madeMoves(): NonNullable<WorldPackage['madeMoves']> { return structuredClone(this.#record.madeMoves ?? []); }
+  setMadeMoves(moves: NonNullable<WorldPackage['madeMoves']>): void {
+    const previous = this.export(), next = this.export();
+    if (moves.length) next.madeMoves = moves; else delete next.madeMoves;
+    this.#install(WorldPackage.parse(next));
+    this.#undo.push(previous); if (this.#undo.length > 50) this.#undo.shift(); this.#redo = [];
+  }
   undo(): void { const old = this.#undo.pop(); if (old) { this.#redo.push(this.export()); this.#install(old); } }
   redo(): void { const next = this.#redo.pop(); if (next) { this.#undo.push(this.export()); this.#install(next); } }
   addAsset(asset: WorldPackage['assets'][number]): void {
