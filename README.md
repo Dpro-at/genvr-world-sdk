@@ -1,17 +1,73 @@
-# 3D World SDK 0.3.0-preview.3
+# 3D World SDK 0.3.0-preview.16
 
 Account-link support in this version requires the matching Genvr host routes and database migration 0041.
 The host implementation is prepared for review; production account linking is not active until that rollout is verified.
-No npm publication or account activation is part of this release. Local authoring works independently.
+Account activation is not part of this release. Local authoring works independently.
 
 Standalone authoring with the same Genvr world contracts, command engine, Core Library and assistant tools.
-No Agent Player dependency or integration. JavaScript is bundled; declaration dependencies are ordinary npm
-packages, not private workspace packages. Download the standalone `.tgz` from the Dpro GitHub SDK prerelease,
-then `npm install /path/to/3d-world-sdk-0.3.0-preview.3.tgz` (Node 24+). Run `npx genvr-studio` to open
+No Dpro dependency; Dpro (https://agent.dpro.at) is one host that uses this package. JavaScript is bundled; declaration dependencies are ordinary npm
+packages, not private workspace packages. Install with `npm install 3d-world-sdk@preview` (Node 24+), or download the standalone `.tgz` from the GitHub SDK prerelease
+and run `npm install /path/to/3d-world-sdk-0.3.0-preview.16.tgz`. Run `npx genvr-studio` to open
 the included Studio at http://127.0.0.1:3029. Bundled Genvr source retains AGPL-3.0-only;
 the included asset credits describe their separate licenses. This preview uses the shared engine and
 authoring tools and existing website Studio components. `genvr-world-demo` remains the legacy simplified
 example on3028; `genvr-studio` is the creation/building/filming application.
+
+## Release notes
+
+Each release has its own notes in this repository:
+
+- [0.3.0-preview.16](RELEASE-0.3.0-preview.16.md)
+- [0.3.0-preview.15](RELEASE-0.3.0-preview.15.md)
+- [0.3.0-preview.14](RELEASE-0.3.0-preview.14.md)
+- [0.3.0-preview.13](RELEASE-0.3.0-preview.13.md)
+- [0.3.0-preview.12](RELEASE-0.3.0-preview.12.md)
+- [0.3.0-preview.11](RELEASE-0.3.0-preview.11.md)
+- [0.3.0-preview.10](RELEASE-0.3.0-preview.10.md)
+- [0.3.0-preview.9](RELEASE-0.3.0-preview.9.md)
+- [0.3.0-preview.8](RELEASE-0.3.0-preview.8.md)
+- [0.3.0-preview.5](RELEASE-0.3.0-preview.5.md)
+- [0.3.0-preview.4](RELEASE-0.3.0-preview.4.md)
+- [0.3.0-preview.2](RELEASE-0.3.0-preview.2.md)
+- [0.3.0-preview.1](RELEASE-0.3.0-preview.1.md)
+- [0.2.0](RELEASE-0.2.0.md)
+
+## What's new in 0.3.0-preview.16
+
+- **Motion lab workshop.** Make motions by pose and key frames, check every move in three motion styles, train on eleven stations, pick who runs and compare against private reference motions. See [Motion lab](#motion-lab).
+- **Truer moves on every body.** No move puts a foot under the floor, planted feet stay locked, turns lift the stepping foot and crouches keep the weight over the feet. Made motions play in the game (My motions, keys 1-8, base moves) and travel with a world package.
+- **Imported characters and motions.** An imported motion keeps its scale (rigs in centimetres), its limb twist and a level pelvis on any body, and comes down to the floor when it never touched it. Realistic bodies keep their proportions when Shape changes the height. Characters and motions can be deleted from the library.
+- **Our own motion files.** A `motionLibrary` entry may supply `motion()` returning a motion already in our own animation keys instead of `load()`; it plays through the same clip pipeline as the Core moves on every body. The local Studio server can serve an owner's private library from a folder outside the package (`GENVR_PRIVATE_MOTIONS`, local address only); it is never copied into the package.
+- **Bodies.** The Standard robot (five toes, round screen eyes) is the default and the only body offered; earlier bodies still open for old worlds.
+
+Earlier in 0.3.0: preview.15 moved the World tab into Build (Build · Items · Avatar · Filming; Build's left dock is Tools · World · Explorer) and added motion sharing; preview.14 redesigned the Studio tabs, added `avatar_studio` and the first motion lab; preview.13 simplified Avatar Live with one Settings window and a new Share dialog; preview.12 added account-linked world publication (below).
+
+No method scans or uploads private libraries, voices or model weights. Local storage keys, project and library IDs and voice assignments are unchanged; older projects and layouts open as before.
+
+## Motion lab
+
+The Lab tab opens a motion lab: its own Studio project that never changes a real world. Every change a person can make there is also available to agents, with the same owner rules.
+
+What a person can do:
+
+- **Course and runs.** Build a measured course (step, ramp, gap, low wall, window, a street with a timed light and box cars), run it with repeatable fixed-step runs and read the scores: foot slide, penetration, fall, car hit, time, smoothness and a total. Keep motion versions, roll back, and compare against a ghost of the best version.
+- **Who runs.** The Avatar tab's character, the Standard robot or a character from My characters. Imported characters are private; their versions are never shareable.
+- **Pose and keys.** Make a motion with a joint picker, sliders, mouse tools and a key track, then Test in course and Save as version. Saved motions appear in My motions and can be used in the game (keys 1-8 or instead of a base move).
+- **Motion check.** Every move is checked on the Lab body in three styles (Realistic, Game, Anime) for foot slide, ground, joint limits, body clash, balance, loop seam and speed match; each style's limits are numbers the owner sets.
+- **Training stations.** Eleven stations in the yard (jump pit, hurdles, high bar, grasp table, conveyor, tool bench, pool, climbing wall, ladder, weapons rack with foam and wood training props, target post), each with its own scores, plus Run all stations.
+- **Private references.** Motions a person imported in Avatar › My motions can be tried, checked, run and compared side by side or as a see-through ghost over one of our moves. A saved lab project keeps only a short key, never the file or its name.
+- **Sharing.** A version is private first. Before sharing, the lab shows similar library motions. Only motions made in the lab from a GenVR library move on a GenVR character, without a source video, that finish the course without a fall or a car hit can be shared, under the GenVR community licence (free in GenVR worlds and films, also commercially; credit the creator; do not sell or re-share the file on its own). Without a hosting adapter the result is stated as a local preview.
+
+What an agent can do through MCP: the live Studio MCP and the in-app Assistant expose `motion_lab` (one operation per call; `{operation:{kind:"commands"}}` lists them) and `get_motion_lab_guide`. Check `get_studio_capabilities` → `motionLab.executable` first. Operations cover the course (`obstacle_add`, `obstacle_set`, `obstacle_remove`, `course_from_seed`, `traffic_set`), runs (`settings_set`, `run`, `frame`, `scores`), versions (`save_version`, `save_best`, `rollback`, `version_delete`), who runs (`characters`, `who_set`), pose and keys (`pose_new`, `pose_get`, `pose_set`, `pose_mirror`, `pose_test`, `pose_save_version`, `made_to_moves`), checks (`check_all`, `check_report`, `check_move`, `style_params`, `style_set`), stations (`stations_base`, `station_add`, `stations_run_all`, `prop_add`), references (`mine_list`, `compare`) and sharing (`motions_mine`, `motion_similar`, `share_prepare`, `unshare`). Using a made motion in the game is `avatar_studio` `move_use`. The packaged guide is `skills/genvr-motion-lab/SKILL.md`.
+
+Owner gates:
+
+- `save_best` from an agent only asks; the owner confirms in the Lab.
+- Agents cannot delete the best version or a version a person made; deleting needs `confirm: true`.
+- `style_set` from an agent waits for the owner (`style_confirm` is the owner's).
+- An agent can `share_prepare` only when the owner asked; `share` itself is refused for agents. The owner can stop sharing at any time.
+- Removing a station or object and placing the base stations need `confirm: true`.
+- Private reference motions are never shared, published or adopted.
 
 ## Preview 3 updates
 
@@ -238,7 +294,7 @@ Hosts may explicitly map native clip names through `motionLibrary.replacements`,
 
 ### Standard robot and facial expressions
 
-The Avatar workspace includes a separate **Standard robot** body on the standard 52-joint rig, with rigid shells, articulated finger segments and a screen face. Human characters remain separate recipes. Save a character before changing bodies, then restore it from **My characters**. Use **Moves → Facial Expressions** for Neutral, Smile, Angry, Sad, Surprised and Thinking; expressions and body motion can run together.
+The Avatar workspace includes a separate **Standard robot** body on the standard 52-joint rig, with rigid shells, articulated finger segments and a screen face. It is the default and the only body offered for new characters; earlier bodies remain separate recipes and still open in older worlds. Bodies marked local (models kept only on the owner's device) are offered only when the host finds their model, and releases leave their files out. Save a character before changing bodies, then restore it from **My characters**. Use **Moves → Facial Expressions** for Neutral, Smile, Angry, Sad, Surprised and Thinking; expressions and body motion can run together.
 
 The standalone MCP server exposes `get_studio_capabilities` and `list_avatar_motions`. Configure `GENVR_MOTION_CATALOG` with a private catalog JSON path to discover additional host motion IDs, names and categories. The catalog tool reads metadata only and does not publish source files. A standalone file session has no connected viewport, character editor or account. Studio UI filming/editing and platform filming connections do not automatically become available through this server; inspect the reported capabilities before calling them.
 
@@ -247,7 +303,7 @@ The packaged MCP also exposes the established filming tools: `list_capture_sessi
 
 ### Private character library
 
-Enable `mountStudio(element, { userLibrary: { scope: "my-private-library" } })` to import personal FBX/GLB characters and assign them to the current avatar or host agents. Files stay in the browser profile, separately from world exports. Back up original files; browser storage is not a cloud account. The attached Studio assistant uses `user_avatar_library` to list, assign and play private assets. Standalone MCP without that host returns an unavailable result. Host motion providers remain available through `motionLibrary`; no third-party character or motion data is bundled. Imported rigs and facial morphs vary; compatibility is not guaranteed for arbitrary assets.
+Enable `mountStudio(element, { userLibrary: { scope: "my-private-library" } })` to import personal FBX/GLB characters and assign them to the current avatar or host agents. Files stay in the browser profile, separately from world exports. Back up original files; browser storage is not a cloud account. The attached Studio assistant uses `user_avatar_library` to list, assign and play private assets. Standalone MCP without that host returns an unavailable result. Host motion providers remain available through `motionLibrary`; no third-party character or motion data is bundled. Characters and motions can be deleted from the library, and files or folders can be dropped on **My characters** and **My motions**. Imported characters keep their face shapes, so expressions and the speaking mouth work. Imported rigs and facial morphs vary; compatibility is not guaranteed for arbitrary assets.
 
 
 ## Optional local avatar voice
@@ -325,7 +381,7 @@ Sound has a prominent Environment sound section for each audio clip classified a
 
 ### Shared world lighting and film export
 
-Build and Filming use the same live runtime/world. Entering Filming selects Shoot and the live world instead of silently displaying the teaching film. Lighting is available under World and Filming → Shoot. Add up to four spotlights, choose My avatar or a scene actor to follow, or World position for a fixed light. Position/aim are actor-relative offsets in metres when following. Colour, intensity, beam angle, soft edge and range are validated; settings persist in `world.environment.lighting`, participate in world undo/redo, and remain unchanged by sky settings. Lights illuminate live geometry and are baked into new recordings; existing videos require a new take for new lighting. These spotlights do not cast additional dynamic shadows.
+Build and Filming use the same live runtime/world. Entering Filming selects Shoot and the live world instead of silently displaying the teaching film. Lighting is available under Build → World and Filming → Shoot. Add up to four spotlights, choose My avatar or a scene actor to follow, or World position for a fixed light. Position/aim are actor-relative offsets in metres when following. Colour, intensity, beam angle, soft edge and range are validated; settings persist in `world.environment.lighting`, participate in world undo/redo, and remain unchanged by sky settings. Lights illuminate live geometry and are baked into new recordings; existing videos require a new take for new lighting. These spotlights do not cast additional dynamic shadows.
 
 MCP `studio_action` `{kind:"lighting"}` reads the same settings; supply `lights:[...]` to replace them (an empty array removes them). Each light has `id`, `name`, `enabled`, `actor` (`"self"`, scene actor ID, or null), `color` (`#rrggbb`), `intensity` (0–200), `angle` (5–85 degrees), `softness` (0–1), `distance` (1–200 metres), `position` and `target` (XYZ triples). Unknown actor targets hide their light until the actor is present. `inspect_studio` includes lighting.
 
@@ -353,7 +409,7 @@ Host apps (for example an agent app that shows the avatar inside its own chat) s
 
 `mountStudio(container,{sharing:{async create(request){return platform.createShare(request);}}})` enables the separate Share screen. The adapter receives project/surface/layout, private/public/invite access, explicit guests, optional password and joining permission, and returns `{id,url}`. The server must authorize the owner, enforce invitations and join rules, and hash/check passwords. The SDK does not implement public account access control or persist passwords in projects/URLs. Without this adapter the UI shows a local-only explanation and disables public link creation. `share_studio` supports inspect/open/create through MCP and the built-in assistant; creating links requires user authorization and the same host adapter.
 
-Toolbar playback is contextual: Test world in Build/Items/World, Preview avatar in Avatar, and Play film/Pause film in Filming.
+Toolbar playback is contextual: Test world in Build/Items, Preview avatar in Avatar, and Play film/Pause film in Filming.
 
 Share displays every Avatar Live result and its iframe code in one gallery. Multiple layouts can be selected and copied together; selection is not required to copy a single frame. Previews render the actual character at each layout's camera/aspect, without decorative browser/device frames. `Current world` in Studio uses the existing world renderer as a live backdrop, suppresses its duplicate self avatar/input, and restores the viewport on exit. It does not generate or replace the world. The standalone direct viewer requires a host world viewport for an equivalent background; use Studio for the built-in Current world option. Embedded Studio uses the WebGL fallback for reliable iframe startup.
 
