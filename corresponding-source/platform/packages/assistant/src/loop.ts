@@ -55,7 +55,7 @@ import {
 import type { ScriptRecording } from '@genvr/contracts';
 import type { ScriptLogLine } from '@genvr/script';
 import { getScripts, getScriptLogs, scriptApi, setScript, testScript, type ScriptEngine } from './scripts.js';
-import { BUILD_BLOCKS, isToolName, TOOL_ARGS, type ToolArgs, type ToolName } from './tools.js';
+import { BUILD_BLOCKS, isToolName, TOOL_ARGS, toolDefinitions, type ToolArgs, type ToolName } from './tools.js';
 import {
   describeGame,
   describeRideables,
@@ -85,6 +85,11 @@ export type ChatModel = (
   signal?: AbortSignal,
   /** Place in the model's waiting line (P4-05): requests ahead, 0 once the model works on it. */
   onQueue?: (ahead: number) => void,
+  /**
+   * The tools this place offers, in the Ollama / OpenAI function format (board W1): a host's own model
+   * needs them; the platform route adds its own and may ignore this.
+   */
+  tools?: ReturnType<typeof toolDefinitions>,
 ) => Promise<{ content: string; tool_calls: ToolCall[] }>;
 
 /** What the assistant can see and change: the editor's world (the studio runtime). */
@@ -1973,6 +1978,7 @@ export async function runAssistant({
       (delta) => onEvent({ type: 'text', delta }),
       signal,
       (ahead) => onEvent({ type: 'queue', ahead }),
+      toolDefinitions({ blockGround: host.blockGround?.() ?? false }),
     );
     conversation.push({
       role: 'assistant',

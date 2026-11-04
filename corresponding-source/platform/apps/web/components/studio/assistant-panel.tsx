@@ -4,12 +4,55 @@ import { runAvatarStudio } from '../../lib/avatar-studio';
 import { motionLabBridge, runMotionLab } from '../../lib/motion-lab';
 import { runAssistant, streamingChatModel, type AssistantHost, type ChatMessage , executeTool } from '@genvr/assistant';
 import type { GenvrRuntime } from '@genvr/runtime';
-import { ArrowUp, Check, ShieldCheck, Sparkles, Square, X } from 'lucide-react';
+import { ArrowUp, Check, FolderOpen, ShieldCheck, Sparkles, Square, X } from 'lucide-react';
 import { useEffect, useRef, useState, type RefObject } from 'react';
 import { api, API_URL } from '../../lib/api';
 import { correctionsFor } from '../../lib/corrections';
 import { studioScriptHost } from '../../lib/script-engine';
 import { useStudioHost } from '../../lib/studio-host';
+import type { StudioChatPanel } from '../../lib/studio-chat';
+
+const TAB_NAMES: Record<string, string> = { build: 'Build', items: 'Items', avatar: 'Avatar', filming: 'Filming', lab: 'Lab' };
+const KIND_NAMES: Record<string, string> = { valley: 'Valley', island: 'Island', plain: 'Plain', mountains: 'Mountains', empty: 'Empty land' };
+const LOOK_NAMES: Record<string, string> = { realistic: 'Realistic look', blocky: 'Blocky look', anime: 'Anime look', voxel: 'Voxel look' };
+
+/** Board W1: the open world, its folder and who answers, when a host's own chat answers here. */
+function ChatPlace({ chat }: { chat: StudioChatPanel }) {
+  const who = chat.answerer;
+  const type = [KIND_NAMES[chat.place.kind] ?? chat.place.kind, LOOK_NAMES[chat.place.look] ?? chat.place.look, TAB_NAMES[chat.place.tab] ?? chat.place.tab].join(' · ');
+  const face = who ? (
+    <span aria-hidden className="flex size-5 shrink-0 items-center justify-center rounded-full text-[10px] font-bold text-white" style={{ background: who.color ?? '#6b7280' }}>
+      {who.name.slice(0, 1).toUpperCase()}
+    </span>
+  ) : null;
+  return (
+    <div className="flex flex-col gap-1 border-b border-ink/10 pb-2" aria-label="Place">
+      <div className="flex min-w-0 items-center gap-2">
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-sm font-bold text-ink">{chat.place.name}</p>
+          <p className="truncate text-xs text-ink/60" title={type}>{type}</p>
+        </div>
+        {who ? (
+          chat.chooseAnswerer ? (
+            <button type="button" onClick={chat.chooseAnswerer} title="Who answers" className="flex max-w-40 items-center gap-1.5 rounded-full bg-paper px-2 py-1 text-xs font-bold text-ink ring-1 ring-ink/15 hover:bg-ink/10">
+              {face}<span className="truncate">{who.detail ? `${who.name} · ${who.detail}` : who.name}</span>
+            </button>
+          ) : (
+            <span title="Who answers" className="flex max-w-40 items-center gap-1.5 rounded-full bg-paper px-2 py-1 text-xs font-bold text-ink">
+              {face}<span className="truncate">{who.detail ? `${who.name} · ${who.detail}` : who.name}</span>
+            </span>
+          )
+        ) : null}
+      </div>
+      {chat.folder ? (
+        <p className="flex min-w-0 items-center gap-1.5 text-xs text-ink/60" title={chat.folder}>
+          <FolderOpen className="size-3.5 shrink-0" aria-hidden />
+          <span className="truncate font-mono">{chat.folder}</span>
+        </p>
+      ) : null}
+    </div>
+  );
+}
 
 interface ToolLine {
   name: string;
@@ -264,6 +307,7 @@ export function AssistantPanel({
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-2 px-2 pb-2">
+      {services.chat ? <ChatPlace chat={services.chat} /> : null}
       <div
         ref={list}
         className="flex min-h-24 flex-1 flex-col gap-2 overflow-y-auto [scrollbar-width:thin]"
@@ -361,7 +405,7 @@ export function AssistantPanel({
           }}
           rows={2}
           maxLength={500}
-          placeholder="Ask the assistant to build…"
+          placeholder={services.chat?.answerer ? `Ask ${services.chat.answerer.name} to act or build…` : 'Ask the assistant to build…'}
           aria-label="Message to the assistant"
           className="min-h-9 flex-1 resize-none bg-transparent px-1.5 py-1 text-sm font-semibold text-ink outline-none placeholder:text-ink/40"
         />

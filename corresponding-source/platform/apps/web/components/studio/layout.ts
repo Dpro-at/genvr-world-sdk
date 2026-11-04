@@ -28,6 +28,11 @@ export interface StudioLayout {
   rightOpen: boolean;
   bottomOpen: boolean;
   worldSounds: boolean;
+  /**
+   * Set by a host with its own chat (board W1), never saved: the chat may show on every tab,
+   * Filming too. Without it Filming keeps its own panels as before.
+   */
+  chatEverywhere?: boolean;
 }
 export const DOCK_ORDER: readonly DockPanel[] = [
   'tab',
@@ -70,19 +75,21 @@ export function defaultLayout(mode: WorkspaceMode): StudioLayout {
   };
 }
 export const DEFAULT_LAYOUT = defaultLayout('build');
-export function allowedPanels(mode: WorkspaceMode): readonly DockPanel[] {
-  return DOCK_ORDER.filter((id) => (mode === 'filming' ? id !== 'assistant' && id !== 'world' : id !== 'timeline'));
+export function allowedPanels(mode: WorkspaceMode, chatEverywhere = false): readonly DockPanel[] {
+  return DOCK_ORDER.filter((id) =>
+    mode === 'filming' ? (id !== 'assistant' || chatEverywhere) && id !== 'world' : id !== 'timeline',
+  );
 }
 export function dockPanels(layout: StudioLayout, side: DockSide): DockPanel[] {
   return layout.order.filter(
     (id) =>
-      allowedPanels(layout.mode).includes(id) && !layout.hidden.includes(id) && layout.docks[id] === side,
+      allowedPanels(layout.mode, layout.chatEverywhere).includes(id) && !layout.hidden.includes(id) && layout.docks[id] === side,
   );
 }
 /** Whether a panel is on screen now: floating, or the open tab of an open dock (`visible` hides panels of other tabs). */
 export function panelShown(layout: StudioLayout, id: DockPanel, visible: (id: DockPanel) => boolean = () => true): boolean {
   const side = layout.docks[id];
-  if (!allowedPanels(layout.mode).includes(id) || layout.hidden.includes(id) || !visible(id)) return false;
+  if (!allowedPanels(layout.mode, layout.chatEverywhere).includes(id) || layout.hidden.includes(id) || !visible(id)) return false;
   if (side === 'floating') return true;
   if (!layout[`${side}Open`]) return false;
   const panels = dockPanels(layout, side).filter(visible);

@@ -76,6 +76,16 @@ describe('Studio workspaces', () => {
       '0px 0px minmax(0, 1fr) 0px 0px',
     );
   });
+  it("shows a host's own chat on every tab, Filming too, only when the host asks (board W1)", () => {
+    const filming = defaultLayout('filming');
+    expect(dockPanels(filming, 'right')).toEqual(['properties']);
+    const withChat = { ...filming, chatEverywhere: true };
+    expect(dockPanels(withChat, 'right')).toEqual(['properties', 'assistant']);
+    expect(panelShown({ ...withChat, active: { ...withChat.active, right: 'assistant' } }, 'assistant')).toBe(true);
+    expect(dockPanels({ ...defaultLayout('build'), chatEverywhere: true }, 'right')).toEqual(dockPanels(defaultLayout('build'), 'right'));
+    // Never saved: a stored layout comes back without it.
+    expect(normalizeLayout(JSON.parse(JSON.stringify(withChat)), 'filming').chatEverywhere).toBeUndefined();
+  });
   it('puts World between Tools and Explorer in Build only, also in layouts saved before it (WORLD-W10)', () => {
     expect(dockPanels(defaultLayout('build'), 'left')).toEqual(['tab', 'world', 'outline']);
     expect(dockPanels(defaultLayout('filming'), 'left')).toEqual(['tab']);

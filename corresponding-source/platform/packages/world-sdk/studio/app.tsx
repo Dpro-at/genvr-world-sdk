@@ -41,6 +41,7 @@ import { DEFAULT_PREVIEW } from '../../../apps/web/components/studio/device-bar'
 import { DeviceEmulator } from '../../../apps/web/components/studio/device-emulator';
 import type { LogEntry } from '../../../apps/web/components/studio/console-panel';
 import { StudioHostProvider, useStudioHost } from '../../../apps/web/lib/studio-host';
+import { createChatStore, sameContext, type StudioChatOptions, type StudioChatStore, type StudioContext } from '../../../apps/web/lib/studio-chat';
 import { setPlatformEnabled } from '../../../apps/web/lib/api';
 import { useStudioFilming } from '../../../apps/web/lib/use-studio-filming';
 import { browserStudioStorage, createLabProject, myLabId, createStudioProject, importStudioProject, readStudioProject, STUDIO_PROJECT_BYTES, type StudioProject, type StudioStorage } from '../src/studio-project';
@@ -48,7 +49,14 @@ import { syncStudioAgents, type StudioAgent } from '../src/studio-agents';
 import type { StoreEntry } from '../../../apps/web/lib/store-items';
 import { StudioSaveQueue, flushStudioClose } from '../src/studio-save';
 
-export interface StudioOptions { sharing?: StudioSharing; /** Board M14: publishes shared lab motions to the GenVR community; without it a share is a local preview. */ motionSharing?: MotionSharePublisher; filmExample?: string | false; liveBridge?: LiveStudioOptions; motionLibrary?: AvatarMotionLibrary; userLibrary?: false | { scope: string; storage?: UserAvatarStorage }; presentation?: AvatarPresentationOptions; storage?: StudioStorage; model?: ChatModel; forceWebGL?: boolean; initialProjectId?: string; agents?: (projectId: string) => Promise<StudioAgent[]>; catalog?: { list(): Promise<StoreEntry[]>; asset(id: string): Promise<StudioProject['assets'][number]> }; }
+export interface StudioOptions { sharing?: StudioSharing; /** Board M14: publishes shared lab motions to the GenVR community; without it a share is a local preview. */ motionSharing?: MotionSharePublisher; filmExample?: string | false; liveBridge?: LiveStudioOptions; motionLibrary?: AvatarMotionLibrary; userLibrary?: false | { scope: string; storage?: UserAvatarStorage }; presentation?: AvatarPresentationOptions; storage?: StudioStorage; model?: ChatModel; forceWebGL?: boolean; initialProjectId?: string; agents?: (projectId: string) => Promise<StudioAgent[]>; catalog?: { list(): Promise<StoreEntry[]>; asset(id: string): Promise<StudioProject['assets'][number]> };
+  /** Board W1: told which world is open (on open, tab change, rename), so a host's own chat knows the place. */
+  onContext?: (context: StudioContext) => void;
+  /** Board W1: the host's own chat. The chat then shows on every tab and shows the place, its folder and who answers. */
+  chat?: StudioChatOptions; }
+/** Options as the mounted Studio holds them: the host's latest chat info lives in a store. */
+type MountedOptions = StudioOptions & { chatStore?: StudioChatStore };
+const noChat = () => () => {}, emptyChat = () => null;
 const message = (error: unknown) => error instanceof Error ? error.message : 'Operation failed.';
 const button = 'inline-flex size-10 shrink-0 items-center justify-center rounded-lg hover:bg-ink/10 disabled:opacity-40';
 function IconButton({ label, children, ...props }: { label: string; children: ReactNode } & React.ButtonHTMLAttributes<HTMLButtonElement>) {
@@ -61,7 +69,7 @@ const download = (project: StudioProject) => {
 };
 
 type BeforeClose = { current: () => Promise<boolean> };
-function Editor({ initial, storage, options, leave, openOther, beforeClose }: { initial: StudioProject; storage: StudioStorage; options: StudioOptions; leave: () => void; /** Open another project (the Lab tab of a world opens a lab project; null = a new one). */ openOther?: (id: string | null) => Promise<void>; beforeClose: BeforeClose }) {
+function Editor({ initial, storage, options, leave, openOther, beforeClose }: { initial: StudioProject; storage: StudioStorage; options: MountedOptions; leave: () => void; /** Open another project (the Lab tab of a world opens a lab project; null = a new one). */ openOther?: (id: string | null) => Promise<void>; beforeClose: BeforeClose }) {
   const container = useRef<HTMLDivElement>(null), runtime = useRef<GenvrRuntime | null>(null);
   const characterFingerprint = useRef('');
   const speechPlayback = useRef<AvatarSpeechPlayback|null>(null);
@@ -173,7 +181,18 @@ function Editor({ initial, storage, options, leave, openOther, beforeClose }: { 
   const [tab, setTab] = useState<StudioTab>(initial.lab ? 'lab' : 'build'), [preview, setPreview] = useState(DEFAULT_PREVIEW);
   useEffect(()=>{const world=runtime.current;if(!world||!presentationState.display.open)return;const background=presentationState.display.background==='world'&&!presentationState.display.worldId;world.setPresentationBackdrop(background);world.setPaused(!background);return()=>{world.setPresentationBackdrop(false);world.setPaused(tab==='avatar'&&!testing);};},[presentationState.display.open,presentationState.display.background,presentationState.display.worldId,ready]);
   const [logs, setLogs] = useState<LogEntry[]>([]), desktop = useIsDesktop();
-  const [layout, setLayout] = useStudioLayout(tab === 'filming' ? 'filming' : 'build');
+  const [savedLayout, setLayout] = useStudioLayout(tab === 'filming' ? 'filming' : 'build');
+  // Board W1: a host's own chat shows on every tab, Filming too; the website keeps its panels.
+  const layout = options.chat ? { ...savedLayout, chatEverywhere: true } : savedLayout;
+  const chatInfo = useSyncExternalStore(options.chatStore?.subscribe ?? noChat, options.chatStore?.get ?? emptyChat);
+  const lastContext = useRef<StudioContext | null>(null);
+  const place: StudioContext = { projectId: initial.id, name: metadata.title, tab,
+    look: (runtime.current?.world ?? initial.world).style.base, kind: (runtime.current?.world ?? initial.world).terrain.world?.kind ?? 'empty' };
+  useEffect(() => {
+    if (!options.onContext || sameContext(lastContext.current, place)) return;
+    lastContext.current = place;
+    try { options.onContext({ ...place }); } catch { /* A host error never stops the Studio. */ }
+  });
   const [status, setStatus] = useState<ToolStatus>({ tool: null, points: 0, canFinish: false, message: null, placeItemId: null,
     selected: null, moving: false, brush: { ...DEFAULT_BRUSH }, roadType: 'genvr.core.road.street', road: { oneway: false }, river: DEFAULT_RIVER, water: null });
   const log = (text: string) => setLogs(list => [...list.slice(-99), { id: Date.now(), at: Date.now(), level: 'info', text }]);
@@ -379,7 +398,8 @@ function Editor({ initial, storage, options, leave, openOther, beforeClose }: { 
     userAvatarLibrary, avatarVoice,
     characterBody: change => { selfLibraryBody.current = change; return () => { if (selfLibraryBody.current === change) selfLibraryBody.current = undefined; }; },
     presentationStage: stage => { presentationStage.current = stage; },
-    presentAvatar: presentation.execute, presentationInfo: () => presentation.describe() + "; Available targets: self, " + presentationAgents.map(row => `${row.id} (${row.name})`).join(", "), ...(options.catalog ? { catalog: options.catalog } : {}), ...(options.model ? { model: options.model } : {}), leave: () => { void goHome(); }, settings: () => setSettings(true) }}>
+    presentAvatar: presentation.execute, presentationInfo: () => presentation.describe() + "; Available targets: self, " + presentationAgents.map(row => `${row.id} (${row.name})`).join(", "), ...(options.catalog ? { catalog: options.catalog } : {}), ...(options.model ? { model: options.model } : {}),
+    ...(options.chat ? { chat: { ...chatInfo, place, ...(options.chat.chooseAnswerer ? { chooseAnswerer: options.chat.chooseAnswerer } : {}) } } : {}), leave: () => { void goHome(); }, settings: () => setSettings(true) }}>
     <div className="flex h-dvh flex-col overflow-hidden bg-paper text-ink">
       <div style={embedLayout || desktop ? { display: 'none' } : undefined} className="flex h-12 shrink-0 items-center gap-1 border-b border-ink/10 bg-surface px-2">
         <IconButton label="My projects" disabled={(!ready && !error) || filming.busy || filming.studio.rendering} onClick={() => void goHome()}><House className="size-4" /></IconButton>
@@ -454,7 +474,7 @@ function Editor({ initial, storage, options, leave, openOther, beforeClose }: { 
   </StudioHostProvider>;
 }
 
-function App({ options, beforeClose }: { options: StudioOptions; beforeClose: BeforeClose }) {
+function App({ options, beforeClose }: { options: MountedOptions; beforeClose: BeforeClose }) {
   const [storage] = useState(() => options.storage ?? browserStudioStorage());
   const [project, setProject] = useState<StudioProject | null>(null), [recent, setRecent] = useState<Array<{ id: string; title: string }>>([]);
   const [error, setError] = useState<string | null>(null), picker = useRef<HTMLInputElement>(null);
@@ -514,12 +534,16 @@ let mounted = false;
 export function mountStudio(container: HTMLElement, options: StudioOptions = {}) {
   if (mounted) throw new Error('Only one Studio can be mounted per SDK module. Dispose it before mounting another.');
   mounted = true;
-  options = { ...options, userLibrary: options.userLibrary ?? { scope: 'genvr-user-library' }, liveBridge: options.liveBridge ?? liveStudioOptions() };
+  const chatStore = options.chat ? createChatStore(options.chat) : undefined;
+  const mountedOptions: MountedOptions = { ...options, userLibrary: options.userLibrary ?? { scope: 'genvr-user-library' }, liveBridge: options.liveBridge ?? liveStudioOptions(), ...(chatStore ? { chatStore } : {}) };
   const restoreMotions = options.motionLibrary ? registerAvatarMotionLibrary(options.motionLibrary) : undefined;
   const restore = setPlatformEnabled(false), root = createRoot(container);
   const beforeClose: BeforeClose = { current: async () => true };
-  root.render(<App options={options} beforeClose={beforeClose} />);
-  return { async dispose() { if (!(await beforeClose.current())) return false; root.unmount(); restoreMotions?.(); restore(); mounted = false; return true; } };
+  root.render(<App options={mountedOptions} beforeClose={beforeClose} />);
+  return {
+    /** Board W1: what the host's chat shows now (its folder, who answers); needs the chat option. */
+    setChat(info: unknown) { if (!chatStore) throw new Error('Mount the Studio with the chat option first.'); chatStore.set(info); },
+    async dispose() { if (!(await beforeClose.current())) return false; root.unmount(); restoreMotions?.(); restore(); mounted = false; return true; } };
 }
 
 

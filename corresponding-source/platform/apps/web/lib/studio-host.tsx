@@ -29,6 +29,8 @@ export interface StudioHost {
   presentAvatar?: (event: AvatarPresentationEvent) => string | null;
   catalog?: { list(): Promise<StoreEntry[]> };
   model?: ChatModel;
+  /** A host's own chat (board W1): the open place, its folder and who answers. */
+  chat?: import('./studio-chat').StudioChatPanel;
   leave?: () => void;
   settings?: () => void;
 }

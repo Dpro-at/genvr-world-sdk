@@ -9,8 +9,17 @@ import type { StudioAgent } from './types/studio-agents.js';
 import type { StudioProject } from './types/studio-project.js';
 import type { GenvrManifest } from './types/vendor/contracts/index.js';
 export interface StudioCatalogItem { manifest: GenvrManifest; picture: string | null; caption: string | null; tags: string[]; }
-export interface StudioOptions { sharing?: import('./types/studio-sharing.js').StudioSharing; /** Publishes shared lab motions (board M14); without it a share is a local preview. */ motionSharing?: { publish(share: unknown, version: unknown): Promise<{ url?: string }>; unpublish(share: unknown): Promise<void> }; filmExample?: string | false; liveBridge?: { url: string; token: string }; motionLibrary?: AvatarMotionLibrary; userLibrary?: false | { scope: string; storage?: UserAvatarStorage }; presentation?: AvatarPresentationOptions; storage?: StudioStorage; model?: ChatModel; forceWebGL?: boolean; initialProjectId?: string; agents?: (projectId: string) => Promise<StudioAgent[]>; catalog?: { list(): Promise<StudioCatalogItem[]>; asset(id: string): Promise<StudioProject['assets'][number]> }; }
-export declare function mountStudio(container: HTMLElement, options?: StudioOptions): { dispose(): Promise<boolean> };
+export interface StudioOptions { sharing?: import('./types/studio-sharing.js').StudioSharing; /** Publishes shared lab motions (board M14); without it a share is a local preview. */ motionSharing?: { publish(share: unknown, version: unknown): Promise<{ url?: string }>; unpublish(share: unknown): Promise<void> }; filmExample?: string | false; liveBridge?: { url: string; token: string }; motionLibrary?: AvatarMotionLibrary; userLibrary?: false | { scope: string; storage?: UserAvatarStorage }; presentation?: AvatarPresentationOptions; storage?: StudioStorage; model?: ChatModel; forceWebGL?: boolean; initialProjectId?: string; agents?: (projectId: string) => Promise<StudioAgent[]>; catalog?: { list(): Promise<StudioCatalogItem[]>; asset(id: string): Promise<StudioProject['assets'][number]> };
+  /** Told which world is open (on open, tab change, rename), so a host's own chat knows the place. */
+  onContext?: (context: StudioContext) => void;
+  /** A host's own chat: the chat shows on every tab with the place, its folder and who answers. Pair it with `model`. */
+  chat?: StudioChatOptions; }
+/** The world open in the Studio. */
+export interface StudioContext { projectId: string; name: string; tab: 'build' | 'items' | 'avatar' | 'filming' | 'lab'; look: 'realistic' | 'blocky' | 'anime' | 'voxel'; kind: 'valley' | 'island' | 'plain' | 'mountains' | 'empty'; }
+/** What a host's chat shows about the place; `color` is #rrggbb. */
+export interface StudioChatInfo { folder?: string; answerer?: { name: string; detail?: string; color?: string }; }
+export interface StudioChatOptions extends StudioChatInfo { /** Opens the host's own picker for who answers. */ chooseAnswerer?: () => void; }
+export declare function mountStudio(container: HTMLElement, options?: StudioOptions): { /** Change what the chat shows (needs the chat option). */ setChat(info: StudioChatInfo): void; dispose(): Promise<boolean> };
 
 export declare function mountAvatarPresentation(container: HTMLElement, runtime: Pick<GenvrRuntime, 'presentAnimation' | 'presentExpression'>, options?: AvatarPresentationOptions): { execute: AvatarPresentation['execute']; controller: AvatarPresentation; dispose(): void };
 

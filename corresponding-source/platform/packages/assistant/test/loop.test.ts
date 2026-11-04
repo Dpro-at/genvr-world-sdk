@@ -86,6 +86,22 @@ function seeded(seed = 7) {
 }
 
 describe('runAssistant', () => {
+  it("hands the place's tools to the model, so a host's own model can call them (board W1)", async () => {
+    const { host } = fakeHost();
+    const offered: string[][] = [];
+    const model: ChatModel = async (_messages, onText, _signal, _onQueue, tools) => {
+      offered.push((tools ?? []).map((tool) => tool.function.name));
+      onText('Hi.');
+      return { content: 'Hi.', tool_calls: [] };
+    };
+    await runAssistant({ model, host, history: [], prompt: 'hello', onEvent: () => {}, random: () => 0.5 });
+    expect(offered).toHaveLength(1);
+    expect(offered[0]).toContain('place_item');
+    expect(offered[0]).toContain('present_avatar');
+    // Block places get block tools, others shape the ground; bulk MCP tools stay out of the chat.
+    expect(offered[0]).not.toContain('fill_blocks');
+    expect(offered[0]).not.toContain('place_items');
+  });
   it('asks the rest law to set what it places and scatters (P2-43)', () => {
     const { host, applied } = fakeHost();
     executeTool('place_item', { itemId: 'genvr.core.bench', x: 3, z: 3 }, host, seeded());

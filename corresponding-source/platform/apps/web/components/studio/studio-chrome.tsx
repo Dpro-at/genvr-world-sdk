@@ -501,7 +501,7 @@ export function StudioChrome({
               <p className="text-xs text-ink/50">
                 Drag a panel grip to an edge or into the view to float it.
               </p>
-              {allowedPanels(layout.mode).filter(visiblePanel).map((id) => (
+              {allowedPanels(layout.mode, layout.chatEverywhere).filter(visiblePanel).map((id) => (
                 <button
                   type="button"
                   key={id}
