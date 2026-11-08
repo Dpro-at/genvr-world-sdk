@@ -1,0 +1,1 @@
+declare const contract: {normalizeDisplay(input:unknown): {ok:true;document:{schemaVersion:1;root:string;elements:Record<string,{type:string;props:Record<string,unknown>;children:string[]}>};warnings:string[]}|{ok:false;error:string}}; export = contract;

@@ -1,3 +1,4 @@
+import * as displayContract from './display-runtime/contract.cjs';
 import { z } from 'zod';
 import { CORE_ANIMATIONS } from '@genvr/core-library';
 
@@ -14,9 +15,11 @@ export const PresentationNotification = z.object({
   biometricDevice: z.string().max(200).optional(), phoneNumber: z.string().max(100).optional(),
 }).strict();
 export const PresentationSpec = z.object({
+  schemaVersion: z.literal(1).optional(),
   root: z.string().min(1).max(100),
   elements: z.record(z.string().max(100), z.object({ type: z.string().max(80), props: z.record(z.string(), z.unknown()), children: z.array(z.string().max(100)).max(40) }).strict()),
 }).superRefine((spec, ctx) => {
+  const shared=displayContract.normalizeDisplay(spec);if(!shared.ok)ctx.addIssue({code:'custom',message:'Invalid display document: '+shared.error});
   if (Object.keys(spec.elements).length > 100 || JSON.stringify(spec).length > 32000) ctx.addIssue({ code: 'custom', message: 'Card exceeds display limits.' });
   if (!Object.hasOwn(spec.elements, spec.root)) ctx.addIssue({ code: 'custom', message: 'Missing card root.' });
   let visits = 0;

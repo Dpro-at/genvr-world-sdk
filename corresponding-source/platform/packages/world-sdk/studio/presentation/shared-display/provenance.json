@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "source": "Girru/packages/display-renderer/src",
+  "files": {
+    "catalogue.ts": "bc474820df9895fc485135bb309f462503196d6a38bb4c16acae36936553c0ce",
+    "charts.tsx": "99d883e5791f718d50820204269a06ccfaa9a9f449d7e72579d30cb191ad6d6e",
+    "contract.ts": "e1f6c756b88795f3d5a26a923ba11ead024d8ec961ea7e114a9e8a5572480be5",
+    "controls.tsx": "d3b615b83db6ab094a53a027f4cd2915be2c1f6fa35fccce10ddf8676a27bf55",
+    "finance.tsx": "a1a2bb7caea861f413874263958ccdd371242083ab1c260b363b64f514861eac",
+    "index.ts": "ec173c89b5ec892e87ad3b35c58cc464158ac73cdc406577a4ace6310f0c8e8e",
+    "renderer.tsx": "03d1a273aca8384744045470c8e7d7fb85de496a1fd1b6f174c39c1cec5c6271",
+    "styles.ts": "59e824bbbee100527652a9810051249a3cbd1e2c3f1e3498bf33013320a2d26f",
+    "text.tsx": "c2041de8f30522da277f77daf56847dead820971ab5dd7e9c0fcf7e140fb38e1",
+    "utils.ts": "6febd17f5d9b9a9002cebf00d0d53de09671bc180f155a07fe9c4deb29b0bd04"
+  }
+}
