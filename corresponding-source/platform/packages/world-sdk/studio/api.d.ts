@@ -13,7 +13,11 @@ export interface StudioOptions { sharing?: import('./types/studio-sharing.js').S
   /** Told which world is open (on open, tab change, rename), so a host's own chat knows the place. */
   onContext?: (context: StudioContext) => void;
   /** A host's own chat: the chat shows on every tab with the place, its folder and who answers. Pair it with `model`. */
-  chat?: StudioChatOptions; }
+  chat?: StudioChatOptions;
+  /** A host with its own place list: My projects (after saving) returns to the host instead of the Studio's own project page, and that page is not shown. */
+  onHome?: () => void;
+  /** Open the owner's motion lab at once (made the first time), like the Motion lab button. */
+  openLab?: boolean; }
 /** The world open in the Studio. */
 export interface StudioContext { projectId: string; name: string; tab: 'build' | 'items' | 'avatar' | 'filming' | 'lab'; look: 'realistic' | 'blocky' | 'anime' | 'voxel'; kind: 'valley' | 'island' | 'plain' | 'mountains' | 'empty'; }
 /** What a host's chat shows about the place; `color` is #rrggbb. */
