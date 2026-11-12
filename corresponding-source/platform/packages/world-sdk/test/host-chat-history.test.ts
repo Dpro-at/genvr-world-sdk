@@ -15,7 +15,7 @@ it('keeps only well-formed earlier lines, the latest 40, trimmed', () => {
 it('shows the earlier lines once and offers Open in Chat when the host gives it', () => {
   const panel = readFileSync(new URL('../../../apps/web/components/studio/assistant-panel.tsx', import.meta.url), 'utf8');
   const app = readFileSync(new URL('../studio/app.tsx', import.meta.url), 'utf8');
-  expect(panel).toMatch(/if \(current\.length\) return current;/);
+  expect(panel).toMatch(/if \(current\.length && \(!hostSends \|\| busy\)\) return current;/);
   expect(panel).toMatch(/chat\.openChat \?/);
   expect(app).toMatch(/options\.chat\.openChat \? \{ openChat: options\.chat\.openChat \}/);
 });
