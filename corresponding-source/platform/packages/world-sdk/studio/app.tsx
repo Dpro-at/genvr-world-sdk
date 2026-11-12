@@ -11,7 +11,7 @@ import { VoicePanel } from './voice-panel';
 import { AvatarCatalogQuery } from '../src/avatar-catalog-query';
 import { placePlay } from '../src/place-play';
 import { setLibraryDetails } from '../../../apps/web/lib/library-details';
-import { CORE_ANIMATIONS } from '@genvr/core-library';
+import { CORE_ANIMATIONS, LIBRARY } from '@genvr/core-library';
 import { registerAvatarMotionLibrary, avatarMotionEntries, motionCategories, type AvatarMotionLibrary } from '@genvr/runtime';
 import { browserUserAvatarStorage, type UserAvatarStorage } from '../src/user-avatar-library';
 import { browserMadeMotionStorage } from '../src/made-motion-library';
@@ -241,9 +241,13 @@ function Editor({ initial, storage, options, leave, openOther, beforeClose }: { 
   useEffect(() => { if (!ready || !runtime.current) return; madeMoves.setPlayer(runtime.current); return () => madeMoves.setPlayer(null); }, [ready]);
   // GV1c v2: opened from a host's market with an item: the Items tab shows it, ready to place.
   useEffect(() => {
-    if (!ready || !options.placeItem || !options.catalog) return;
+    if (!ready || !options.placeItem) return;
     let gone = false;
-    void options.catalog.list().then(items => { const entry = items.find(item => item.manifest.id === options.placeItem); if (gone || !entry) return; setTab('items'); setLibraryDetails(entry); }).catch(() => undefined);
+    const show = (entry: Parameters<typeof setLibraryDetails>[0]) => { if (gone || !entry) return; setTab('items'); setLibraryDetails(entry); };
+    // A built-in item first, else one from the host's market.
+    const builtIn = LIBRARY.find(item => item.manifest.id === options.placeItem);
+    if (builtIn) show(builtIn);
+    else if (options.catalog) void options.catalog.list().then(items => show(items.find(item => item.manifest.id === options.placeItem) ?? null)).catch(() => undefined);
     return () => { gone = true; };
   }, [ready]);
   // Board M17: the Lab runs the Avatar tab's character or one picked in the Lab, from the bodies and My characters.

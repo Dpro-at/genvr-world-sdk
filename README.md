@@ -38,6 +38,8 @@ Each release has its own notes in this repository:
 
 ## What's new in 0.3.0-preview.20
 
+- **The host's chat is the place's chat.** `chat.history` shows the host's earlier lines of this place's chat in the Studio chat (oldest first, the latest 40); `chat.openChat()` adds Open in Chat, which opens the same chat in the host.
+- **The market on its own.** `mountMarket(container, { catalog, onAdd, style })` shows the Studio's Items catalog without a world, with the selected item's details and Add to a place…; `mountStudio(..., { placeItem })` opens a place with that item ready in Items.
 - **The full editor in a narrow desktop window.** `mountStudio` takes `desktopLayout: true`: a desktop host gets the tabs, panels and Lab in any window with a mouse, also when it is narrower than 1024 px; side panels keep at most a third of the width each.
 
 ## What was new in 0.3.0-preview.19
