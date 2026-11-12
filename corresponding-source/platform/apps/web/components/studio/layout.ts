@@ -204,15 +204,16 @@ export function useStudioLayout(
       }),
   ];
 }
-export function useIsDesktop(): boolean {
+/** `minWidth` 0: any window with a fine pointer gets the desktop editor (a desktop host's narrow window). */
+export function useIsDesktop(minWidth = 1024): boolean {
   const [desktop, setDesktop] = useState(false);
   useEffect(() => {
-    const query = window.matchMedia('(min-width: 1024px) and (pointer: fine)');
+    const query = window.matchMedia(minWidth > 0 ? `(min-width: ${minWidth}px) and (pointer: fine)` : '(pointer: fine)');
     setDesktop(query.matches);
     const onChange = (event: MediaQueryListEvent) => setDesktop(event.matches);
     query.addEventListener('change', onChange);
     return () => query.removeEventListener('change', onChange);
-  }, []);
+  }, [minWidth]);
   return desktop;
 }
 /** `sceneBar`: Filming keeps its scene tools in a fixed row above the world view, so they never cover the picture. */

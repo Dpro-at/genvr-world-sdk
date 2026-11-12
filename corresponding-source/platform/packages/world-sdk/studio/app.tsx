@@ -58,7 +58,9 @@ export interface StudioOptions { sharing?: StudioSharing; /** Board M14: publish
   /** A host with its own place list: My projects (after saving) returns to the host instead of the Studio's own project page, and that page is not shown. */
   onHome?: () => void;
   /** Open the owner's motion lab at once (made the first time), like the Motion lab button. */
-  openLab?: boolean; }
+  openLab?: boolean;
+  /** A desktop host: the full editor (tabs, panels, Lab) in any window with a mouse, also when it is narrow. */
+  desktopLayout?: boolean; }
 /** Options as the mounted Studio holds them: the host's latest chat info lives in a store. */
 type MountedOptions = StudioOptions & { chatStore?: StudioChatStore };
 const noChat = () => () => {}, emptyChat = () => null;
@@ -185,7 +187,7 @@ function Editor({ initial, storage, options, leave, openOther, beforeClose }: { 
   const [metadata, setMetadata] = useState(initial), [settings, setSettings] = useState(false), [testing, setTesting] = useState(false);
   const [tab, setTab] = useState<StudioTab>(initial.lab ? 'lab' : 'build'), [preview, setPreview] = useState(DEFAULT_PREVIEW);
   useEffect(()=>{const world=runtime.current;if(!world||!presentationState.display.open)return;const background=presentationState.display.background==='world'&&!presentationState.display.worldId;world.setPresentationBackdrop(background);world.setPaused(!background);return()=>{world.setPresentationBackdrop(false);world.setPaused(tab==='avatar'&&!testing);};},[presentationState.display.open,presentationState.display.background,presentationState.display.worldId,ready]);
-  const [logs, setLogs] = useState<LogEntry[]>([]), desktop = useIsDesktop();
+  const [logs, setLogs] = useState<LogEntry[]>([]), desktop = useIsDesktop(options.desktopLayout ? 0 : undefined);
   const [savedLayout, setLayout] = useStudioLayout(tab === 'filming' ? 'filming' : 'build');
   // Board W1: a host's own chat shows on every tab, Filming too; the website keeps its panels.
   const layout = options.chat ? { ...savedLayout, chatEverywhere: true } : savedLayout;

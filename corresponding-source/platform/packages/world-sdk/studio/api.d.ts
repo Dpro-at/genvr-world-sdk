@@ -17,7 +17,9 @@ export interface StudioOptions { sharing?: import('./types/studio-sharing.js').S
   /** A host with its own place list: My projects (after saving) returns to the host instead of the Studio's own project page, and that page is not shown. */
   onHome?: () => void;
   /** Open the owner's motion lab at once (made the first time), like the Motion lab button. */
-  openLab?: boolean; }
+  openLab?: boolean;
+  /** A desktop host: the full editor (tabs, panels, Lab) in any window with a mouse, also when it is narrow. */
+  desktopLayout?: boolean; }
 /** The world open in the Studio. */
 export interface StudioContext { projectId: string; name: string; tab: 'build' | 'items' | 'avatar' | 'filming' | 'lab'; look: 'realistic' | 'blocky' | 'anime' | 'voxel'; kind: 'valley' | 'island' | 'plain' | 'mountains' | 'empty'; }
 /** What a host's chat shows about the place; `color` is #rrggbb. */

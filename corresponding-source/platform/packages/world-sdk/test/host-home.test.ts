@@ -11,3 +11,11 @@ it('hands My projects to a host with onHome and can open the motion lab at once'
   expect(api).toMatch(/onHome\?: \(\) => void;/);
   expect(api).toMatch(/openLab\?: boolean;/);
 });
+
+it('gives a desktop host the full editor in a narrow window', () => {
+  const app = readFileSync(new URL('../studio/app.tsx', import.meta.url), 'utf8');
+  const layout = readFileSync(new URL('../../../apps/web/components/studio/layout.ts', import.meta.url), 'utf8');
+  expect(app).toMatch(/desktop = useIsDesktop\(options\.desktopLayout \? 0 : undefined\);/);
+  expect(layout).toMatch(/export function useIsDesktop\(minWidth = 1024\)/);
+  expect(layout).toMatch(/minWidth > 0 \? `\(min-width: \$\{minWidth\}px\) and \(pointer: fine\)` : '\(pointer: fine\)'/);
+});
