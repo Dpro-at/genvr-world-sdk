@@ -34,6 +34,8 @@ export interface StudioChatInfo {
   answerer?: StudioChatAnswerer;
   /** The host's earlier messages of this place's chat, oldest first (its own chat keeps them). */
   history?: StudioChatLine[];
+  /** The names of the agents in this place, shown under who answers. */
+  team?: string[];
 }
 
 /** One earlier line of the host's chat. */
@@ -48,6 +50,8 @@ export interface StudioChatOptions extends StudioChatInfo {
   chooseAnswerer?: () => void;
   /** Opens this same chat in the host's own chat window ("Open in Chat"). */
   openChat?: () => void;
+  /** Shows the place's folder in the computer's file manager (the folder line becomes a button). */
+  openFolder?: () => void;
 }
 
 /** What the Studio chat panel receives through the Studio host. */
@@ -55,6 +59,7 @@ export interface StudioChatPanel extends StudioChatInfo {
   place: StudioContext;
   chooseAnswerer?: () => void;
   openChat?: () => void;
+  openFolder?: () => void;
 }
 
 const text = (value: unknown, max: number) =>
@@ -83,6 +88,10 @@ export function cleanChatInfo(value: unknown): StudioChatInfo {
       if ((row.role === 'user' || row.role === 'assistant') && said) lines.push({ role: row.role, text: said });
     }
     if (lines.length) out.history = lines;
+  }
+  if (Array.isArray(input.team)) {
+    const names = input.team.map((name) => text(name, 60)).filter((name): name is string => !!name).slice(0, 50);
+    if (names.length) out.team = names;
   }
   return out;
 }

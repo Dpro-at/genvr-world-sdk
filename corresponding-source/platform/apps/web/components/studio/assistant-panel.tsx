@@ -4,7 +4,7 @@ import { runAvatarStudio } from '../../lib/avatar-studio';
 import { motionLabBridge, runMotionLab } from '../../lib/motion-lab';
 import { runAssistant, streamingChatModel, type AssistantHost, type ChatMessage , executeTool } from '@genvr/assistant';
 import type { GenvrRuntime } from '@genvr/runtime';
-import { ArrowUp, Check, FolderOpen, ShieldCheck, Sparkles, Square, X } from 'lucide-react';
+import { ArrowUp, Check, FolderOpen, MessageSquare, ShieldCheck, Sparkles, Square, X } from 'lucide-react';
 import { useEffect, useRef, useState, type RefObject } from 'react';
 import { api, API_URL } from '../../lib/api';
 import { correctionsFor } from '../../lib/corrections';
@@ -44,17 +44,32 @@ function ChatPlace({ chat }: { chat: StudioChatPanel }) {
           )
         ) : null}
       </div>
-      {chat.openChat ? (
-        <button type="button" onClick={chat.openChat} title="Open this chat in the host's chat window" className="self-start text-xs font-bold text-ink/70 underline-offset-2 hover:underline">
-          Open in Chat
-        </button>
-      ) : null}
-      {chat.folder ? (
-        <p className="flex min-w-0 items-center gap-1.5 text-xs text-ink/60" title={chat.folder}>
-          <FolderOpen className="size-3.5 shrink-0" aria-hidden />
-          <span className="truncate font-mono">{chat.folder}</span>
-        </p>
-      ) : null}
+      {/* Icons, no text (Mohamed): the agents in this place as faces, Open in Chat, and the folder. */}
+      <div className="flex min-w-0 items-center gap-1.5">
+        {chat.team?.length ? (
+          <span className="flex min-w-0 items-center -space-x-1" title={`Agents in this place: ${chat.team.join(', ')}`} aria-label={`Agents in this place: ${chat.team.join(', ')}`}>
+            {chat.team.slice(0, 6).map((name) => (
+              <span key={name} aria-hidden className="flex size-5 shrink-0 items-center justify-center rounded-full bg-ink/70 text-[10px] font-bold text-paper ring-2 ring-surface">{name.slice(0, 1).toUpperCase()}</span>
+            ))}
+            {chat.team.length > 6 ? <span aria-hidden className="pl-2 text-[10px] font-bold text-ink/60">+{chat.team.length - 6}</span> : null}
+          </span>
+        ) : null}
+        <span className="flex-1" />
+        {chat.openChat ? (
+          <button type="button" onClick={chat.openChat} title="Open in Chat" aria-label="Open in Chat" className="rounded-lg p-1 text-ink/70 hover:bg-ink/10 hover:text-ink">
+            <MessageSquare className="size-4" aria-hidden />
+          </button>
+        ) : null}
+        {chat.folder ? (
+          chat.openFolder ? (
+            <button type="button" onClick={chat.openFolder} title={`Open the folder · ${chat.folder}`} aria-label="Open the folder" className="rounded-lg p-1 text-ink/70 hover:bg-ink/10 hover:text-ink">
+              <FolderOpen className="size-4" aria-hidden />
+            </button>
+          ) : (
+            <span title={chat.folder} aria-label={`Folder: ${chat.folder}`} className="rounded-lg p-1 text-ink/50"><FolderOpen className="size-4" aria-hidden /></span>
+          )
+        ) : null}
+      </div>
     </div>
   );
 }

@@ -192,6 +192,14 @@ function Editor({ initial, storage, options, leave, openOther, beforeClose }: { 
   useEffect(()=>{const world=runtime.current;if(!world||!presentationState.display.open)return;const background=presentationState.display.background==='world'&&!presentationState.display.worldId;world.setPresentationBackdrop(background);world.setPaused(!background);return()=>{world.setPresentationBackdrop(false);world.setPaused(tab==='avatar'&&!testing);};},[presentationState.display.open,presentationState.display.background,presentationState.display.worldId,ready]);
   const [logs, setLogs] = useState<LogEntry[]>([]), desktop = useIsDesktop(options.desktopLayout ? 0 : undefined);
   const [savedLayout, setLayout] = useStudioLayout(tab === 'filming' ? 'filming' : 'build');
+  // A host's own chat (Mohamed): the Assistant tab comes first in the right dock and is the open tab when a place opens.
+  useEffect(() => {
+    if (!options.chat) return;
+    const order: typeof savedLayout.order = savedLayout.order.filter(id => id !== 'assistant');
+    order.splice(Math.max(0, order.indexOf('properties')), 0, 'assistant');
+    setLayout({ ...savedLayout, order, active: { ...savedLayout.active, right: 'assistant' } });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initial.id]);
   // Board W1: a host's own chat shows on every tab, Filming too; the website keeps its panels.
   const layout = options.chat ? { ...savedLayout, chatEverywhere: true } : savedLayout;
   const chatInfo = useSyncExternalStore(options.chatStore?.subscribe ?? noChat, options.chatStore?.get ?? emptyChat);
@@ -422,7 +430,7 @@ function Editor({ initial, storage, options, leave, openOther, beforeClose }: { 
     characterBody: change => { selfLibraryBody.current = change; return () => { if (selfLibraryBody.current === change) selfLibraryBody.current = undefined; }; },
     presentationStage: stage => { presentationStage.current = stage; },
     presentAvatar: presentation.execute, presentationInfo: () => presentation.describe() + "; Available targets: self, " + presentationAgents.map(row => `${row.id} (${row.name})`).join(", "), ...(options.catalog ? { catalog: options.catalog } : {}), ...(options.model ? { model: options.model } : {}),
-    ...(options.chat ? { chat: { ...chatInfo, place, ...(options.chat.chooseAnswerer ? { chooseAnswerer: options.chat.chooseAnswerer } : {}), ...(options.chat.openChat ? { openChat: options.chat.openChat } : {}) } } : {}), leave: () => { void goHome(); }, settings: () => setSettings(true) }}>
+    ...(options.chat ? { chat: { ...chatInfo, place, ...(options.chat.chooseAnswerer ? { chooseAnswerer: options.chat.chooseAnswerer } : {}), ...(options.chat.openChat ? { openChat: options.chat.openChat } : {}), ...(options.chat.openFolder ? { openFolder: options.chat.openFolder } : {}) } } : {}), leave: () => { void goHome(); }, settings: () => setSettings(true) }}>
     <div className="flex h-dvh flex-col overflow-hidden bg-paper text-ink">
       <div style={embedLayout || desktop ? { display: 'none' } : undefined} className="flex h-12 shrink-0 items-center gap-1 border-b border-ink/10 bg-surface px-2">
         <IconButton label="My projects" disabled={(!ready && !error) || filming.busy || filming.studio.rendering} onClick={() => void goHome()}><House className="size-4" /></IconButton>
@@ -467,7 +475,7 @@ function Editor({ initial, storage, options, leave, openOther, beforeClose }: { 
       </main>
       {desktop && !embedLayout ? (
         // ITEMS-I10: on the computer the top strip becomes a thin status bar at the bottom, like Dpro.
-        <footer aria-label="Status bar" className="flex h-6 shrink-0 items-center gap-0.5 border-t border-ink/10 bg-surface px-1.5 text-[11px] text-ink/60">
+        <footer aria-label="Status bar" className="flex h-6 shrink-0 items-center gap-0.5 overflow-x-auto whitespace-nowrap border-t border-ink/10 bg-surface px-1.5 text-[11px] text-ink/60 [scrollbar-width:none] [&>*]:shrink-0">
           {options.liveBridge ? <span role="status" aria-label="Live MCP connection" className="inline-flex h-5 items-center gap-1.5 px-1.5"><span aria-hidden className={`size-1.5 rounded-full ${liveConnected ? 'bg-emerald-500' : 'bg-amber-500'}`} />{liveConnected ? 'MCP connected' : 'MCP connecting'}</span> : null}
           <span className="inline-flex h-5 items-center px-1.5">Local Studio</span>
           {agentCount !== null ? <span role="status" className="inline-flex h-5 items-center px-1.5">{agentCount} agents</span> : null}

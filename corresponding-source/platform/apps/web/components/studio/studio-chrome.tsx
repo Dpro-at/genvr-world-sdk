@@ -428,7 +428,7 @@ export function StudioChrome({
           building, the studio has no chat or player menu, only the way back to the place page. */}
       <header
         style={{ gridArea: 'top' }}
-        className={`flex h-14 min-w-0 items-center gap-2 border-b border-ink/10 bg-surface pr-3 ${testing ? 'pl-[8.5rem]' : 'pl-3'}`}
+        className={`flex h-14 min-w-0 items-center gap-2 overflow-x-auto whitespace-nowrap border-b border-ink/10 bg-surface pr-3 [scrollbar-width:none] [&>*]:shrink-0 ${testing ? 'pl-[8.5rem]' : 'pl-3'}`}
       >
         {testing ? null : (
           <a
