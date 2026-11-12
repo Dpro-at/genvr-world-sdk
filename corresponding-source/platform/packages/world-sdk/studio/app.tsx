@@ -10,6 +10,7 @@ import { AvatarSpeechPlayer, type AvatarSpeechPlayback } from './avatar-speech-p
 import { VoicePanel } from './voice-panel';
 import { AvatarCatalogQuery } from '../src/avatar-catalog-query';
 import { placePlay } from '../src/place-play';
+import { hostFor } from '../../../apps/web/components/studio/assistant-panel';
 import { setLibraryDetails } from '../../../apps/web/lib/library-details';
 import { CORE_ANIMATIONS, LIBRARY } from '@genvr/core-library';
 import { registerAvatarMotionLibrary, avatarMotionEntries, motionCategories, type AvatarMotionLibrary } from '@genvr/runtime';
@@ -397,11 +398,18 @@ function Editor({ initial, storage, options, leave, openOther, beforeClose }: { 
       if (blob.size > 8 * 1024 * 1024) throw new Error('Live capture exceeds 8 MB. Export it from Studio instead.');
       return { mime: blob.type, data: await new Promise<string>((resolve, reject) => { const reader = new FileReader(); reader.onload = () => resolve(String(reader.result).split(',')[1]!); reader.onerror = () => reject(new Error('Capture could not be read.')); reader.readAsDataURL(blob); }) };
     }
+    // The open place's building tools over the live connection (an agent in the host's chat builds here).
+    if (tool in TOOL_ARGS) {
+      if (tab !== 'build' && tab !== 'items') { setTab('build'); await new Promise(resolve => setTimeout(resolve, 0)); }
+      const outcome = await runTool(tool, raw, hostFor(runtime.current, initial.id));
+      if (!outcome.ok) throw new Error(outcome.result);
+      return outcome.result;
+    }
     throw new Error('Unsupported live Studio tool.');
   };
   useEffect(() => {
     if (!ready || !options.liveBridge) return;
-    return connectLiveStudio(options.liveBridge, initial, { avatar: true, privateLibrary: Boolean(library), filming: true, voice: true, avatarLive: true, sharing: Boolean(options.sharing), motionLab: Boolean(lab) }, (tool, args, signal) => liveExecutor.current(tool, args, signal), setLiveConnected);
+    return connectLiveStudio(options.liveBridge, initial, { avatar: true, privateLibrary: Boolean(library), filming: true, voice: true, avatarLive: true, sharing: Boolean(options.sharing), motionLab: Boolean(lab), worldTools: true }, (tool, args, signal) => liveExecutor.current(tool, args, signal), setLiveConnected);
   }, [ready, initial.id, options.liveBridge]);
   const shareStudio: NonNullable<AssistantHost['shareStudio']> = async input => {
     if(input.action==='inspect')return {available:Boolean(options.sharing),localOnly:!options.sharing,projectId:initial.id,layouts:AVATAR_LIVE_LAYOUTS};
@@ -430,7 +438,7 @@ function Editor({ initial, storage, options, leave, openOther, beforeClose }: { 
     characterBody: change => { selfLibraryBody.current = change; return () => { if (selfLibraryBody.current === change) selfLibraryBody.current = undefined; }; },
     presentationStage: stage => { presentationStage.current = stage; },
     presentAvatar: presentation.execute, presentationInfo: () => presentation.describe() + "; Available targets: self, " + presentationAgents.map(row => `${row.id} (${row.name})`).join(", "), ...(options.catalog ? { catalog: options.catalog } : {}), ...(options.model ? { model: options.model } : {}),
-    ...(options.chat ? { chat: { ...chatInfo, place, ...(options.chat.chooseAnswerer ? { chooseAnswerer: options.chat.chooseAnswerer } : {}), ...(options.chat.openChat ? { openChat: options.chat.openChat } : {}), ...(options.chat.openFolder ? { openFolder: options.chat.openFolder } : {}) } } : {}), leave: () => { void goHome(); }, settings: () => setSettings(true) }}>
+    ...(options.chat ? { chat: { ...chatInfo, place, ...(options.chat.chooseAnswerer ? { chooseAnswerer: options.chat.chooseAnswerer } : {}), ...(options.chat.openChat ? { openChat: options.chat.openChat } : {}), ...(options.chat.openFolder ? { openFolder: options.chat.openFolder } : {}), ...(options.chat.send ? { send: options.chat.send } : {}) } } : {}), leave: () => { void goHome(); }, settings: () => setSettings(true) }}>
     <div className="flex h-dvh flex-col overflow-hidden bg-paper text-ink">
       <div style={embedLayout || desktop ? { display: 'none' } : undefined} className="flex h-12 shrink-0 items-center gap-1 border-b border-ink/10 bg-surface px-2">
         <IconButton label="My projects" disabled={(!ready && !error) || filming.busy || filming.studio.rendering} onClick={() => void goHome()}><House className="size-4" /></IconButton>
