@@ -7,9 +7,11 @@ export function createLiveStudioBridge({ token = randomBytes(32).toString('hex')
   const json = (res, status, value) => { res.writeHead(status, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' }); res.end(JSON.stringify(value)); };
   const deliver = session => { if (session.poll && session.queue.length) { const res = session.poll; session.poll = null; clearTimeout(session.timer); json(res, 200, { commands: [session.queue.shift()] }); } };
   const call = (tool, args, sessionId) => new Promise((resolve, reject) => {
-    if (!allowed.has(tool)) { reject(new Error('Live Studio tool is not allowed.')); return; }
     const available = list();
     const session = sessions.get(sessionId ?? (available.length === 1 ? available[0].id : ''));
+    // World tools run in a Studio that says it takes them (the open place's own building tools).
+    const worldTool = !!session && session.capabilities?.worldTools === true && /^[a-z][a-z_]{1,63}$/.test(tool);
+    if (!allowed.has(tool) && !worldTool) { reject(new Error('Live Studio tool is not allowed.')); return; }
     if (!session || !available.some(row => row.id === session.id)) { reject(new Error(available.length > 1 ? 'Select a Studio session first.' : 'No live Studio session is connected.')); return; }
     if (pending.size >= 32 || session.queue.length >= 16) { reject(new Error('Live Studio queue is full.')); return; }
     const id = randomUUID(), timer = setTimeout(() => { pending.delete(id); session.queue = session.queue.filter(row => row.id !== id); reject(new Error('Live Studio operation timed out.')); }, timeout);

@@ -52,7 +52,13 @@ export interface StudioChatOptions extends StudioChatInfo {
   openChat?: () => void;
   /** Shows the place's folder in the computer's file manager (the folder line becomes a button). */
   openFolder?: () => void;
+  /** The host's own chat answers: the message goes to it, its reply streams back, and its agent builds
+   * with the place's tools over the live connection. Without it the Studio runs its own assistant. */
+  send?: StudioChatSend;
 }
+
+/** Sends one message to the host's chat; resolves when the reply is done. */
+export type StudioChatSend = (text: string, events: { onDelta: (text: string) => void; onTool?: (name: string, ok: boolean, result: string) => void }, signal: AbortSignal) => Promise<void>;
 
 /** What the Studio chat panel receives through the Studio host. */
 export interface StudioChatPanel extends StudioChatInfo {
@@ -60,6 +66,7 @@ export interface StudioChatPanel extends StudioChatInfo {
   chooseAnswerer?: () => void;
   openChat?: () => void;
   openFolder?: () => void;
+  send?: StudioChatSend;
 }
 
 const text = (value: unknown, max: number) =>

@@ -173,7 +173,7 @@ export function runStudioTool(runtime: GenvrRuntime, placeId: string, name: Para
   return executeTool(name, args, hostFor(runtime, placeId));
 }
 
-function hostFor(runtime: GenvrRuntime, placeId: string): AssistantHost {
+export function hostFor(runtime: GenvrRuntime, placeId: string): AssistantHost {
   const steps = agentSteps.get(runtime) ?? { done: null, undone: null };
   agentSteps.set(runtime, steps);
   return {
@@ -258,21 +258,24 @@ export function AssistantPanel({
   useEffect(() => () => abort.current?.abort(), []);
   // The host keeps this place's chat: its earlier lines show here once, before anything is said.
   const earlier = services.chat?.history;
+  const hostSends = !!services.chat?.send;
   useEffect(() => {
     if (!earlier?.length) return;
     setTurns((current) => {
-      if (current.length) return current;
+      // The host's chat is the conversation: while nothing is being answered here, show it as it is now
+      // (also lines written in the host's chat window). The Studio's own assistant keeps its turns.
+      if (current.length && (!hostSends || busy)) return current;
       history.current = earlier.map((line) => ({ role: line.role, content: line.text }) as ChatMessage);
       nextId.current = earlier.length;
       return earlier.map((line, index) => ({ id: index + 1, role: line.role, text: line.text, tools: [] }));
     });
-  }, [earlier]);
+  }, [earlier, hostSends, busy]);
 
   const send = async (prompt: string) => {
     const rt = runtime.current;
     const text = prompt.trim();
     if (!rt || !text || busy) return;
-    if (!services.platform && !services.model) { setError('No model configured for this local Studio.'); return; }
+    if (!services.chat?.send && !services.platform && !services.model) { setError('No model configured for this local Studio.'); return; }
     setDraft('');
     setAsk(null);
     setError(null);
@@ -287,6 +290,21 @@ export function AssistantPanel({
       setTurns((current) => current.map((turn) => (turn.id === answerId ? change(turn) : turn)));
     const controller = new AbortController();
     abort.current = controller;
+    // The host's chat answers: the agent builds with the place's tools over the live connection.
+    if (services.chat?.send) {
+      try {
+        await services.chat.send(text, {
+          onDelta: (delta) => update((turn) => ({ ...turn, text: turn.text + delta })),
+          onTool: (name, ok, result) => update((turn) => ({ ...turn, tools: [...turn.tools, { name, ok, result }] })),
+        }, controller.signal);
+      } catch (caught) {
+        if (!controller.signal.aborted) setError(caught instanceof Error ? caught.message : 'The chat stopped. Please try again.');
+      } finally {
+        abort.current = null;
+        setBusy(false);
+      }
+      return;
+    }
     // One Undo takes back everything this reply built.
     const mark = rt.undoMark();
     const before = new Set(rt.checkWorld().findings.map((finding) => finding.id));

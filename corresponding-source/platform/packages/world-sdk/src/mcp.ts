@@ -81,6 +81,10 @@ server.setRequestHandler(CallToolRequestSchema, async request => {
       if (dirname(file) !== realRoot) throw new Error('Saved file is outside the world folder.');
       if ((await stat(file)).size > 8 * 1024 * 1024) throw new Error('Saved world exceeds 8 MB.');
       session = new WorldSession(await readFile(file, 'utf8')); text = `Opened ${id}.`;
+    } else if (live && !session && Object.hasOwn(TOOL_ARGS, request.params.name) && (await live.sessions()).length) {
+      // A place open in the Studio: its own building tools run on it (the Studio keeps undo and checks).
+      const result = await live.call(request.params.name, args);
+      text = typeof result === 'string' ? result : JSON.stringify(result);
     } else {
       if (!session) throw new Error('Create or open a local world first.');
       if (request.params.name === 'save_world_local') {
