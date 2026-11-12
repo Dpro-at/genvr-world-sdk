@@ -19,3 +19,12 @@ it('shows the earlier lines once and offers Open in Chat when the host gives it'
   expect(panel).toMatch(/chat\.openChat \?/);
   expect(app).toMatch(/options\.chat\.openChat \? \{ openChat: options\.chat\.openChat \}/);
 });
+
+it('shows the agents in this place and a folder button when the host can open it', () => {
+  expect(cleanChatInfo({ team: [' Jules ', '', 'Sara', 5] }).team).toEqual(['Jules', 'Sara']);
+  const panel = readFileSync(new URL('../../../apps/web/components/studio/assistant-panel.tsx', import.meta.url), 'utf8');
+  expect(panel).toMatch(/title=\{`Agents in this place: \$\{chat\.team\.join\(', '\)\}`\}/);
+  expect(panel).toMatch(/title="Open in Chat" aria-label="Open in Chat"/);
+  expect(panel).not.toMatch(/>\s*Open in Chat\s*</);
+  expect(panel).toMatch(/onClick=\{chat\.openFolder\}/);
+});

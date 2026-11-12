@@ -422,7 +422,7 @@ function Editor({ initial, storage, options, leave, openOther, beforeClose }: { 
     characterBody: change => { selfLibraryBody.current = change; return () => { if (selfLibraryBody.current === change) selfLibraryBody.current = undefined; }; },
     presentationStage: stage => { presentationStage.current = stage; },
     presentAvatar: presentation.execute, presentationInfo: () => presentation.describe() + "; Available targets: self, " + presentationAgents.map(row => `${row.id} (${row.name})`).join(", "), ...(options.catalog ? { catalog: options.catalog } : {}), ...(options.model ? { model: options.model } : {}),
-    ...(options.chat ? { chat: { ...chatInfo, place, ...(options.chat.chooseAnswerer ? { chooseAnswerer: options.chat.chooseAnswerer } : {}), ...(options.chat.openChat ? { openChat: options.chat.openChat } : {}) } } : {}), leave: () => { void goHome(); }, settings: () => setSettings(true) }}>
+    ...(options.chat ? { chat: { ...chatInfo, place, ...(options.chat.chooseAnswerer ? { chooseAnswerer: options.chat.chooseAnswerer } : {}), ...(options.chat.openChat ? { openChat: options.chat.openChat } : {}), ...(options.chat.openFolder ? { openFolder: options.chat.openFolder } : {}) } } : {}), leave: () => { void goHome(); }, settings: () => setSettings(true) }}>
     <div className="flex h-dvh flex-col overflow-hidden bg-paper text-ink">
       <div style={embedLayout || desktop ? { display: 'none' } : undefined} className="flex h-12 shrink-0 items-center gap-1 border-b border-ink/10 bg-surface px-2">
         <IconButton label="My projects" disabled={(!ready && !error) || filming.busy || filming.studio.rendering} onClick={() => void goHome()}><House className="size-4" /></IconButton>

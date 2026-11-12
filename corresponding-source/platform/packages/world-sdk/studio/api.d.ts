@@ -25,8 +25,8 @@ export interface StudioOptions { sharing?: import('./types/studio-sharing.js').S
 /** The world open in the Studio. */
 export interface StudioContext { projectId: string; name: string; tab: 'build' | 'items' | 'avatar' | 'filming' | 'lab'; look: 'realistic' | 'blocky' | 'anime' | 'voxel'; kind: 'valley' | 'island' | 'plain' | 'mountains' | 'empty'; }
 /** What a host's chat shows about the place; `color` is #rrggbb. */
-export interface StudioChatInfo { folder?: string; answerer?: { name: string; detail?: string; color?: string }; /** The host's earlier lines of this place's chat, oldest first. */ history?: { role: 'user' | 'assistant'; text: string }[]; }
-export interface StudioChatOptions extends StudioChatInfo { /** Opens the host's own picker for who answers. */ chooseAnswerer?: () => void; /** Opens this same chat in the host's chat window. */ openChat?: () => void; }
+export interface StudioChatInfo { folder?: string; answerer?: { name: string; detail?: string; color?: string }; /** The host's earlier lines of this place's chat, oldest first. */ history?: { role: 'user' | 'assistant'; text: string }[]; /** The names of the agents in this place. */ team?: string[]; }
+export interface StudioChatOptions extends StudioChatInfo { /** Opens the host's own picker for who answers. */ chooseAnswerer?: () => void; /** Opens this same chat in the host's chat window. */ openChat?: () => void; /** Shows the place's folder in the file manager. */ openFolder?: () => void; }
 export declare function mountStudio(container: HTMLElement, options?: StudioOptions): { /** Change what the chat shows (needs the chat option). */ setChat(info: StudioChatInfo): void; dispose(): Promise<boolean> };
 
 export declare function mountAvatarPresentation(container: HTMLElement, runtime: Pick<GenvrRuntime, 'presentAnimation' | 'presentExpression'>, options?: AvatarPresentationOptions): { execute: AvatarPresentation['execute']; controller: AvatarPresentation; dispose(): void };
