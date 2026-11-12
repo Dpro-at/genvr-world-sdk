@@ -28,3 +28,16 @@ it('shows the agents in this place and a folder button when the host can open it
   expect(panel).not.toMatch(/>\s*Open in Chat\s*</);
   expect(panel).toMatch(/onClick=\{chat\.openFolder\}/);
 });
+
+it('puts the Assistant tab first and open when a host chat is given', () => {
+  const app = readFileSync(new URL('../studio/app.tsx', import.meta.url), 'utf8');
+  expect(app).toMatch(/order\.splice\(Math\.max\(0, order\.indexOf\('properties'\)\), 0, 'assistant'\);/);
+  expect(app).toMatch(/active: \{ \.\.\.savedLayout\.active, right: 'assistant' \}/);
+});
+
+it('keeps the toolbar and the status bar on one line in a narrow window (they scroll sideways)', () => {
+  const app = readFileSync(new URL('../studio/app.tsx', import.meta.url), 'utf8');
+  const chrome = readFileSync(new URL('../../../apps/web/components/studio/studio-chrome.tsx', import.meta.url), 'utf8');
+  expect(app).toMatch(/aria-label="Status bar" className="[^"]*overflow-x-auto whitespace-nowrap/);
+  expect(chrome).toMatch(/flex h-14 min-w-0 items-center gap-2 overflow-x-auto whitespace-nowrap/);
+});
