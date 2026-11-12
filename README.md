@@ -1,4 +1,4 @@
-# 3D World SDK 0.3.0-preview.19
+# 3D World SDK 0.3.0-preview.20
 
 Account-link support in this version requires the matching Genvr host routes and database migration 0041.
 The host implementation is prepared for review; production account linking is not active until that rollout is verified.
@@ -7,7 +7,7 @@ Account activation is not part of this release. Local authoring works independen
 Standalone authoring with the same Genvr world contracts, command engine, Core Library and assistant tools.
 No Dpro dependency; Dpro (https://agent.dpro.at) is one host that uses this package. JavaScript is bundled; declaration dependencies are ordinary npm
 packages, not private workspace packages. Install with `npm install 3d-world-sdk@preview` (Node 24+), or download the standalone `.tgz` from the GitHub SDK prerelease
-and run `npm install /path/to/3d-world-sdk-0.3.0-preview.19.tgz`. Run `npx genvr-studio` to open
+and run `npm install /path/to/3d-world-sdk-0.3.0-preview.20.tgz`. Run `npx genvr-studio` to open
 the included Studio at http://127.0.0.1:3029. Bundled Genvr source retains AGPL-3.0-only;
 the included asset credits describe their separate licenses. This preview uses the shared engine and
 authoring tools and existing website Studio components. `genvr-world-demo` remains the legacy simplified
@@ -17,6 +17,7 @@ example on3028; `genvr-studio` is the creation/building/filming application.
 
 Each release has its own notes in this repository:
 
+- [0.3.0-preview.20](RELEASE-0.3.0-preview.20.md)
 - [0.3.0-preview.19](RELEASE-0.3.0-preview.19.md)
 - [0.3.0-preview.18](RELEASE-0.3.0-preview.18.md)
 - [0.3.0-preview.17](RELEASE-0.3.0-preview.17.md)
@@ -35,7 +36,11 @@ Each release has its own notes in this repository:
 - [0.3.0-preview.1](RELEASE-0.3.0-preview.1.md)
 - [0.2.0](RELEASE-0.2.0.md)
 
-## What's new in 0.3.0-preview.19
+## What's new in 0.3.0-preview.20
+
+- **The full editor in a narrow desktop window.** `mountStudio` takes `desktopLayout: true`: a desktop host gets the tabs, panels and Lab in any window with a mouse, also when it is narrower than 1024 px; side panels keep at most a third of the width each.
+
+## What was new in 0.3.0-preview.19
 
 - **A host keeps its own place list.** `mountStudio` takes `onHome()`: My projects saves and hands back to the host instead of showing the Studio's own project page, which a host with `onHome` never shows. `openLab: true` opens the owner's motion lab at once (made the first time).
 
