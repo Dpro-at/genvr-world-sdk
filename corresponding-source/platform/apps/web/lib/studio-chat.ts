@@ -32,18 +32,29 @@ export interface StudioChatInfo {
   /** The world's folder on this computer, shown as given. */
   folder?: string;
   answerer?: StudioChatAnswerer;
+  /** The host's earlier messages of this place's chat, oldest first (its own chat keeps them). */
+  history?: StudioChatLine[];
+}
+
+/** One earlier line of the host's chat. */
+export interface StudioChatLine {
+  role: 'user' | 'assistant';
+  text: string;
 }
 
 /** Host options for its chat: the first info, and an optional picker for who answers. */
 export interface StudioChatOptions extends StudioChatInfo {
   /** Opens the host's own picker for who answers. */
   chooseAnswerer?: () => void;
+  /** Opens this same chat in the host's own chat window ("Open in Chat"). */
+  openChat?: () => void;
 }
 
 /** What the Studio chat panel receives through the Studio host. */
 export interface StudioChatPanel extends StudioChatInfo {
   place: StudioContext;
   chooseAnswerer?: () => void;
+  openChat?: () => void;
 }
 
 const text = (value: unknown, max: number) =>
@@ -63,6 +74,15 @@ export function cleanChatInfo(value: unknown): StudioChatInfo {
     if (detail) answerer.detail = detail;
     if (typeof who.color === 'string' && /^#[0-9a-fA-F]{6}$/.test(who.color)) answerer.color = who.color;
     out.answerer = answerer;
+  }
+  if (Array.isArray(input.history)) {
+    const lines: StudioChatLine[] = [];
+    for (const line of input.history.slice(-40)) {
+      const row = line && typeof line === 'object' ? (line as Record<string, unknown>) : {};
+      const said = typeof row.text === 'string' ? row.text.trim().slice(0, 20000) : '';
+      if ((row.role === 'user' || row.role === 'assistant') && said) lines.push({ role: row.role, text: said });
+    }
+    if (lines.length) out.history = lines;
   }
   return out;
 }

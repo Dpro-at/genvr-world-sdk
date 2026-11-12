@@ -44,6 +44,11 @@ function ChatPlace({ chat }: { chat: StudioChatPanel }) {
           )
         ) : null}
       </div>
+      {chat.openChat ? (
+        <button type="button" onClick={chat.openChat} title="Open this chat in the host's chat window" className="self-start text-xs font-bold text-ink/70 underline-offset-2 hover:underline">
+          Open in Chat
+        </button>
+      ) : null}
       {chat.folder ? (
         <p className="flex min-w-0 items-center gap-1.5 text-xs text-ink/60" title={chat.folder}>
           <FolderOpen className="size-3.5 shrink-0" aria-hidden />
@@ -236,6 +241,17 @@ export function AssistantPanel({
     list.current?.scrollTo({ top: list.current.scrollHeight });
   }, [turns, ask]);
   useEffect(() => () => abort.current?.abort(), []);
+  // The host keeps this place's chat: its earlier lines show here once, before anything is said.
+  const earlier = services.chat?.history;
+  useEffect(() => {
+    if (!earlier?.length) return;
+    setTurns((current) => {
+      if (current.length) return current;
+      history.current = earlier.map((line) => ({ role: line.role, content: line.text }) as ChatMessage);
+      nextId.current = earlier.length;
+      return earlier.map((line, index) => ({ id: index + 1, role: line.role, text: line.text, tools: [] }));
+    });
+  }, [earlier]);
 
   const send = async (prompt: string) => {
     const rt = runtime.current;

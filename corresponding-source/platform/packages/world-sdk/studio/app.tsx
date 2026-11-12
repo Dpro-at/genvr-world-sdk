@@ -10,7 +10,8 @@ import { AvatarSpeechPlayer, type AvatarSpeechPlayback } from './avatar-speech-p
 import { VoicePanel } from './voice-panel';
 import { AvatarCatalogQuery } from '../src/avatar-catalog-query';
 import { placePlay } from '../src/place-play';
-import { CORE_ANIMATIONS } from '@genvr/core-library';
+import { setLibraryDetails } from '../../../apps/web/lib/library-details';
+import { CORE_ANIMATIONS, LIBRARY } from '@genvr/core-library';
 import { registerAvatarMotionLibrary, avatarMotionEntries, motionCategories, type AvatarMotionLibrary } from '@genvr/runtime';
 import { browserUserAvatarStorage, type UserAvatarStorage } from '../src/user-avatar-library';
 import { browserMadeMotionStorage } from '../src/made-motion-library';
@@ -58,7 +59,11 @@ export interface StudioOptions { sharing?: StudioSharing; /** Board M14: publish
   /** A host with its own place list: My projects (after saving) returns to the host instead of the Studio's own project page, and that page is not shown. */
   onHome?: () => void;
   /** Open the owner's motion lab at once (made the first time), like the Motion lab button. */
-  openLab?: boolean; }
+  openLab?: boolean;
+  /** A desktop host: the full editor (tabs, panels, Lab) in any window with a mouse, also when it is narrow. */
+  desktopLayout?: boolean;
+  /** Open with this market item ready to place: the Items tab shows it (Add to a place… from a host's market). */
+  placeItem?: string; }
 /** Options as the mounted Studio holds them: the host's latest chat info lives in a store. */
 type MountedOptions = StudioOptions & { chatStore?: StudioChatStore };
 const noChat = () => () => {}, emptyChat = () => null;
@@ -185,7 +190,7 @@ function Editor({ initial, storage, options, leave, openOther, beforeClose }: { 
   const [metadata, setMetadata] = useState(initial), [settings, setSettings] = useState(false), [testing, setTesting] = useState(false);
   const [tab, setTab] = useState<StudioTab>(initial.lab ? 'lab' : 'build'), [preview, setPreview] = useState(DEFAULT_PREVIEW);
   useEffect(()=>{const world=runtime.current;if(!world||!presentationState.display.open)return;const background=presentationState.display.background==='world'&&!presentationState.display.worldId;world.setPresentationBackdrop(background);world.setPaused(!background);return()=>{world.setPresentationBackdrop(false);world.setPaused(tab==='avatar'&&!testing);};},[presentationState.display.open,presentationState.display.background,presentationState.display.worldId,ready]);
-  const [logs, setLogs] = useState<LogEntry[]>([]), desktop = useIsDesktop();
+  const [logs, setLogs] = useState<LogEntry[]>([]), desktop = useIsDesktop(options.desktopLayout ? 0 : undefined);
   const [savedLayout, setLayout] = useStudioLayout(tab === 'filming' ? 'filming' : 'build');
   // Board W1: a host's own chat shows on every tab, Filming too; the website keeps its panels.
   const layout = options.chat ? { ...savedLayout, chatEverywhere: true } : savedLayout;
@@ -234,6 +239,17 @@ function Editor({ initial, storage, options, leave, openOther, beforeClose }: { 
   void madeVersion;
   useEffect(() => { lab?.setMadeStore(madeStore); return madeMovesBridge.register(madeMoves); }, []);
   useEffect(() => { if (!ready || !runtime.current) return; madeMoves.setPlayer(runtime.current); return () => madeMoves.setPlayer(null); }, [ready]);
+  // GV1c v2: opened from a host's market with an item: the Items tab shows it, ready to place.
+  useEffect(() => {
+    if (!ready || !options.placeItem) return;
+    let gone = false;
+    const show = (entry: Parameters<typeof setLibraryDetails>[0]) => { if (gone || !entry) return; setTab('items'); setLibraryDetails(entry); };
+    // A built-in item first, else one from the host's market.
+    const builtIn = LIBRARY.find(item => item.manifest.id === options.placeItem);
+    if (builtIn) show(builtIn);
+    else if (options.catalog) void options.catalog.list().then(items => show(items.find(item => item.manifest.id === options.placeItem) ?? null)).catch(() => undefined);
+    return () => { gone = true; };
+  }, [ready]);
   // Board M17: the Lab runs the Avatar tab's character or one picked in the Lab, from the bodies and My characters.
   useEffect(() => lab?.setCharacterSource(library && userAvatars ? {
     list: async () => (await library.list()).filter(row => row.kind === 'character' && row.joints && row.height).map(row => ({
@@ -406,7 +422,7 @@ function Editor({ initial, storage, options, leave, openOther, beforeClose }: { 
     characterBody: change => { selfLibraryBody.current = change; return () => { if (selfLibraryBody.current === change) selfLibraryBody.current = undefined; }; },
     presentationStage: stage => { presentationStage.current = stage; },
     presentAvatar: presentation.execute, presentationInfo: () => presentation.describe() + "; Available targets: self, " + presentationAgents.map(row => `${row.id} (${row.name})`).join(", "), ...(options.catalog ? { catalog: options.catalog } : {}), ...(options.model ? { model: options.model } : {}),
-    ...(options.chat ? { chat: { ...chatInfo, place, ...(options.chat.chooseAnswerer ? { chooseAnswerer: options.chat.chooseAnswerer } : {}) } } : {}), leave: () => { void goHome(); }, settings: () => setSettings(true) }}>
+    ...(options.chat ? { chat: { ...chatInfo, place, ...(options.chat.chooseAnswerer ? { chooseAnswerer: options.chat.chooseAnswerer } : {}), ...(options.chat.openChat ? { openChat: options.chat.openChat } : {}) } } : {}), leave: () => { void goHome(); }, settings: () => setSettings(true) }}>
     <div className="flex h-dvh flex-col overflow-hidden bg-paper text-ink">
       <div style={embedLayout || desktop ? { display: 'none' } : undefined} className="flex h-12 shrink-0 items-center gap-1 border-b border-ink/10 bg-surface px-2">
         <IconButton label="My projects" disabled={(!ready && !error) || filming.busy || filming.studio.rendering} onClick={() => void goHome()}><House className="size-4" /></IconButton>
@@ -538,6 +554,7 @@ function PlayerPreview({ id, storage, options }: { id: string; storage: StudioSt
 
 let mounted = false;
 /** A local Studio owns its isolated bundled platform transport until disposed. */
+export { mountMarket, type MarketOptions } from './market';
 export function mountStudio(container: HTMLElement, options: StudioOptions = {}) {
   if (mounted) throw new Error('Only one Studio can be mounted per SDK module. Dispose it before mounting another.');
   mounted = true;
