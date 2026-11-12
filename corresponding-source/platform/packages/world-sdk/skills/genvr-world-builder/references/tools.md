@@ -31,6 +31,7 @@ Platform tools take `place_id` from `list_places`; local SDK tools use the curre
 | Tool | Use it for |
 |---|---|
 | `create_place` (`style`, `world_kind?`, `title?`, `size?`) | a new private place of this account, any style; realistic places start as a `valley`, `island` (sea all round), `plain` or `mountains` world; `size` small 500 m (default) to max 8000 m. Answers with the new `place_id`. |
+| `place_play` (`operation` get or set; `view` free or side, `moves?`, `orientation?`, `devices?`) | how the open place is played, like Place settings: 3D or a 2D side view, the side moves (double-jump, wall-jump, dash), the phone screen and the devices it is made for (at least one). Live Studio only; it is saved with the place. |
 | `make_world` (`kind`, `seed?`) | turn the place into a starter world of a kind (hills, woods, trees and rocks around the spawn). Not for block ground. |
 | `set_sea` (`level`) | the sea fills everything below this height (m); `null` takes it away. |
 | `set_story` | scroll-page camera stops |

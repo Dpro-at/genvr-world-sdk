@@ -9,6 +9,7 @@ import { connectLiveStudio, liveStudioOptions, type LiveStudioOptions } from './
 import { AvatarSpeechPlayer, type AvatarSpeechPlayback } from './avatar-speech-player';
 import { VoicePanel } from './voice-panel';
 import { AvatarCatalogQuery } from '../src/avatar-catalog-query';
+import { placePlay } from '../src/place-play';
 import { CORE_ANIMATIONS } from '@genvr/core-library';
 import { registerAvatarMotionLibrary, avatarMotionEntries, motionCategories, type AvatarMotionLibrary } from '@genvr/runtime';
 import { browserUserAvatarStorage, type UserAvatarStorage } from '../src/user-avatar-library';
@@ -339,6 +340,8 @@ function Editor({ initial, storage, options, leave, openOther, beforeClose }: { 
       await speechPlayback.current.load({data:args.data,target:args.target,duration:args.duration,...(typeof args.text==='string'?{text:args.text}:{})});
       return {started:true,target:args.target,mouthSync:args.target==='self'&&liveStage.current?liveStage.current.info.expressionSupported:runtime.current.supportsAvatarExpression(args.target)};
     }
+    // How the open place is played (Place settings); saved with the project like a change on the page.
+    if (tool === 'place_play') { const { play, changed: moved } = placePlay(project.current.play, raw); if (moved) updateMetadata({ ...project.current, play }); return { play, saved: moved }; }
     if(tool==='share_studio')return shareStudio(TOOL_ARGS.share_studio.parse(raw));
     if (tool === 'inspect_studio') return { availableWorlds:await storage.list(), projectId: initial.id, world: { style: runtime.current.world.style.base, kind: runtime.current.world.terrain.world?.kind ?? 'empty', seed: runtime.current.world.terrain.world?.seed, spawn: runtime.current.world.spawn, itemCount: runtime.current.world.instances.length }, ...(args.include_checks === true ? { checks: runtime.current.checkWorld() } : {}), workspace: tab, lighting: runtime.current.world.environment.lighting ?? [], speech:speechPlayback.current?.snapshot(), avatar: liveStage.current?.info ?? presentationStage.current?.info ?? runtime.current.avatarState, camera: latestFilm.current.camera, spot: latestFilm.current.avatarSpot(), actorPosition: runtime.current.localPlayer, expressionSupported: liveStage.current?.info.expressionSupported ?? runtime.current.supportsAvatarExpression('self'), plan: latestFilm.current.studio.plan, avatarLive: presentation.snapshot().display, presentation: presentation.snapshot().lastAction };
     if (tool === 'present_avatar') { const { event } = TOOL_ARGS.present_avatar.parse(raw); if(event.kind==='display'&&event.worldId&&event.worldId!==initial.id)await storage.read(event.worldId); const error = presentation.execute(event); if (error) throw new Error(error); return { executed: true, event: event.kind }; }
