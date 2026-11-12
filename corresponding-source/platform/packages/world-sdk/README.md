@@ -1,4 +1,4 @@
-# 3D World SDK 0.3.0-preview.17
+# 3D World SDK 0.3.0-preview.18
 
 Account-link support in this version requires the matching Genvr host routes and database migration 0041.
 The host implementation is prepared for review; production account linking is not active until that rollout is verified.
@@ -7,13 +7,18 @@ Account activation is not part of this release. Local authoring works independen
 Standalone authoring with the same Genvr world contracts, command engine, Core Library and assistant tools.
 No Dpro dependency; Dpro (https://agent.dpro.at) is one host that uses this package. JavaScript is bundled; declaration dependencies are ordinary npm
 packages, not private workspace packages. Install with `npm install 3d-world-sdk@preview` (Node 24+), or download the standalone `.tgz` from the GitHub SDK prerelease
-and run `npm install /path/to/3d-world-sdk-0.3.0-preview.17.tgz`. Run `npx genvr-studio` to open
+and run `npm install /path/to/3d-world-sdk-0.3.0-preview.18.tgz`. Run `npx genvr-studio` to open
 the included Studio at http://127.0.0.1:3029. Bundled Genvr source retains AGPL-3.0-only;
 the included asset credits describe their separate licenses. This preview uses the shared engine and
 authoring tools and existing website Studio components. `genvr-world-demo` remains the legacy simplified
 example on3028; `genvr-studio` is the creation/building/filming application.
 
-## What's new in 0.3.0-preview.17
+## What's new in 0.3.0-preview.18
+
+- **Set how a place is played from MCP.** The live Studio tool `place_play` reads or sets the open place's view (free 3D or side 2D), its side moves, the phone screen and the devices it is made for, with the same rules as Place settings; it is saved with the place and listed in `get_studio_capabilities`.
+- **Builds again from a clean checkout.** The assistant build copies its shared display runtime files, so the package build finds them.
+
+## What was new in 0.3.0-preview.17
 
 - **A host's own chat in the Studio.** `onContext(context)` tells the host which world is open (`projectId`, `name`, `tab`, `look`, `kind`) on open, tab change and rename. The `chat` option (`folder`, `answerer` `{ name, detail?, color? }`, optional `chooseAnswerer()`) makes the Studio chat show the place, its folder and who answers, on every tab including Filming; `mountStudio(...).setChat(info)` changes it at any time. Pair it with `model`. Without `chat` nothing changes.
 - **Tools for the host's model.** A `ChatModel` now receives the open place's tool definitions as an optional fifth argument, so a host's own model can call the same tools as the built-in assistant; tools still run in the Studio with the same undo and checks.
