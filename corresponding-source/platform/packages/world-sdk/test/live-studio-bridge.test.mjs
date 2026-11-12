@@ -20,6 +20,7 @@ it('authenticates actual mailbox delivery and refuses origins, unknown tools and
     await send('connect', { projectId: 'second-project', title: 'Second', capabilities: {} });
     await expect(bridge.call('inspect_studio', {})).rejects.toThrow(/Select/);
     await expect(bridge.call('evaluate_javascript', {}, sessionId)).rejects.toThrow(/not allowed/);
+    const play = bridge.call('place_play', { operation: 'get' }, sessionId); const polled = await (await send('poll', { sessionId })).json(); expect(polled.commands[0].tool).toBe('place_play'); await send('result', { sessionId, id: polled.commands[0].id, result: { play: { view: 'free' } } }); expect(await play).toEqual({ play: { view: 'free' } });
     const disconnected = bridge.call('inspect_studio', {}, sessionId); const assertion = expect(disconnected).rejects.toThrow(/disconnected/);
     await send('disconnect', { sessionId }); await assertion;
     expect(bridge.list()).toHaveLength(1);
