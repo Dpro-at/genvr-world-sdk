@@ -19,12 +19,14 @@ export interface StudioOptions { sharing?: import('./types/studio-sharing.js').S
   /** Open the owner's motion lab at once (made the first time), like the Motion lab button. */
   openLab?: boolean;
   /** A desktop host: the full editor (tabs, panels, Lab) in any window with a mouse, also when it is narrow. */
-  desktopLayout?: boolean; }
+  desktopLayout?: boolean;
+  /** Open with this market item ready to place: the Items tab shows it. */
+  placeItem?: string; }
 /** The world open in the Studio. */
 export interface StudioContext { projectId: string; name: string; tab: 'build' | 'items' | 'avatar' | 'filming' | 'lab'; look: 'realistic' | 'blocky' | 'anime' | 'voxel'; kind: 'valley' | 'island' | 'plain' | 'mountains' | 'empty'; }
 /** What a host's chat shows about the place; `color` is #rrggbb. */
-export interface StudioChatInfo { folder?: string; answerer?: { name: string; detail?: string; color?: string }; }
-export interface StudioChatOptions extends StudioChatInfo { /** Opens the host's own picker for who answers. */ chooseAnswerer?: () => void; }
+export interface StudioChatInfo { folder?: string; answerer?: { name: string; detail?: string; color?: string }; /** The host's earlier lines of this place's chat, oldest first. */ history?: { role: 'user' | 'assistant'; text: string }[]; }
+export interface StudioChatOptions extends StudioChatInfo { /** Opens the host's own picker for who answers. */ chooseAnswerer?: () => void; /** Opens this same chat in the host's chat window. */ openChat?: () => void; }
 export declare function mountStudio(container: HTMLElement, options?: StudioOptions): { /** Change what the chat shows (needs the chat option). */ setChat(info: StudioChatInfo): void; dispose(): Promise<boolean> };
 
 export declare function mountAvatarPresentation(container: HTMLElement, runtime: Pick<GenvrRuntime, 'presentAnimation' | 'presentExpression'>, options?: AvatarPresentationOptions): { execute: AvatarPresentation['execute']; controller: AvatarPresentation; dispose(): void };
@@ -37,3 +39,7 @@ export interface AvatarLivePrefs { size: 's' | 'm' | 'l'; speak: boolean; notifi
 export interface AvatarLiveHost { voices?: readonly { id: string; name: string; language?: string | null }[]; voiceId?: string; onVoice?(voiceId: string): void; onPrefs?(prefs: AvatarLivePrefs): void; onSettings?(open: boolean): void; }
 export interface AvatarLiveOptions extends AvatarPresentationOptions { recipe?: import('@genvr/contracts').CharacterRecipe; display?: Partial<import('@genvr/assistant').AvatarLiveDisplay>; projectId?: string; agent?: { name: string; detail?: string }; host?: AvatarLiveHost; }
 export declare function mountAvatarLive(container: HTMLElement, options?: AvatarLiveOptions): { execute: AvatarPresentation['execute']; controller: AvatarPresentation; setRecipe(recipe: import('@genvr/contracts').CharacterRecipe): void; setHost(next: { agent?: { name: string; detail?: string }; host?: Partial<AvatarLiveHost> }): void; openSettings(): void; speak(input: {data:string;target:string;duration:number;text?:string}): Promise<void>; speechControl(command:string,value?:number): Promise<unknown>; snapshot(): unknown; dispose():void; };
+
+/** GV1c v2: the Studio's Items catalog on its own, for a host's market page. */
+export interface MarketOptions { catalog: { list(): Promise<unknown[]> }; onAdd?: (itemId: string) => void; style?: 'blocky' | 'realistic' | 'voxel' | 'anime'; }
+export declare function mountMarket(container: HTMLElement, options: MarketOptions): { dispose(): void };
