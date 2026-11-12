@@ -54,7 +54,11 @@ export interface StudioOptions { sharing?: StudioSharing; /** Board M14: publish
   /** Board W1: told which world is open (on open, tab change, rename), so a host's own chat knows the place. */
   onContext?: (context: StudioContext) => void;
   /** Board W1: the host's own chat. The chat then shows on every tab and shows the place, its folder and who answers. */
-  chat?: StudioChatOptions; }
+  chat?: StudioChatOptions;
+  /** A host with its own place list: My projects (after saving) returns to the host instead of the Studio's own project page, and that page is not shown. */
+  onHome?: () => void;
+  /** Open the owner's motion lab at once (made the first time), like the Motion lab button. */
+  openLab?: boolean; }
 /** Options as the mounted Studio holds them: the host's latest chat info lives in a store. */
 type MountedOptions = StudioOptions & { chatStore?: StudioChatStore };
 const noChat = () => () => {}, emptyChat = () => null;
@@ -482,7 +486,7 @@ function App({ options, beforeClose }: { options: MountedOptions; beforeClose: B
   const [project, setProject] = useState<StudioProject | null>(null), [recent, setRecent] = useState<Array<{ id: string; title: string }>>([]);
   const [error, setError] = useState<string | null>(null), picker = useRef<HTMLInputElement>(null);
   const refresh = () => { void storage.list().then(setRecent).catch(error => setError(message(error))); };
-  useEffect(() => { refresh(); const id=new URLSearchParams(window.location.search).get('project')??options.initialProjectId; if(id)void open(id); }, []);
+  useEffect(() => { refresh(); const id=new URLSearchParams(window.location.search).get('project')??options.initialProjectId; if(id)void open(id); else if(options.openLab)void openMyLab().catch(error => setError(message(error))); }, []);
   const open = async (id: string) => { try { setProject(await storage.read(id)); setError(null); } catch (error) { setError(message(error)); } };
   // One motion lab (Mohamed, 2026-10-20): Motion lab opens mine, and makes it only the first time.
   const makeLab = async () => { const next = createLabProject(newLabData()); await storage.write(next); return next; };
@@ -493,8 +497,8 @@ function App({ options, beforeClose }: { options: MountedOptions; beforeClose: B
   const previewId = new URLSearchParams(location.search).get('studioPreview');
   if (previewId) return <PlayerPreview id={previewId} storage={storage} options={options} />;
   if (!project) beforeClose.current = async () => true;
-  return project ? <Editor key={project.id} initial={project} storage={storage} options={options} beforeClose={beforeClose} leave={() => { setProject(null); refresh(); }}
-    openOther={async id => { if (id) { setProject(await storage.read(id)); return; } setProject(await makeLab()); }} /> : <div className="min-h-dvh bg-paper text-ink">
+  return project ? <Editor key={project.id} initial={project} storage={storage} options={options} beforeClose={beforeClose} leave={() => { if (options.onHome) { options.onHome(); return; } setProject(null); refresh(); }}
+    openOther={async id => { if (id) { setProject(await storage.read(id)); return; } setProject(await makeLab()); }} /> : options.onHome ? <div className="min-h-dvh bg-paper text-ink">{error ? <p role="alert" className="mx-auto max-w-4xl p-4 text-coral">{error}</p> : null}</div> : <div className="min-h-dvh bg-paper text-ink">
     <header className="flex min-h-14 flex-wrap items-center gap-3 border-b border-ink/10 bg-surface px-4 py-2">
       <strong>Genvr Studio</strong>
       {recent.length ? <select aria-label="Open project" className="min-w-0 max-w-full rounded border border-ink/20 bg-paper p-2 text-sm" value="" onChange={event => void open(event.target.value)}><option value="" disabled>My projects</option>{recent.map(p => <option key={p.id} value={p.id}>{p.title}</option>)}</select> : null}
